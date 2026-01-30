@@ -1,0 +1,174 @@
+import { ReactNode, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { 
+  Package, 
+  ClipboardCheck, 
+  Settings, 
+  LogOut, 
+  Menu, 
+  X, 
+  ChevronRight,
+  User,
+  Shield
+} from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
+import logo from '@/assets/logo.png';
+
+interface AppLayoutProps {
+  children: ReactNode;
+}
+
+interface NavItem {
+  icon: typeof Package;
+  label: string;
+  href: string;
+  adminOnly?: boolean;
+}
+
+const navItems: NavItem[] = [
+  { icon: Package, label: 'Estoque', href: '/' },
+  { icon: ClipboardCheck, label: 'Checklists', href: '/checklists' },
+  { icon: Settings, label: 'Configurações', href: '/settings', adminOnly: true },
+];
+
+export function AppLayout({ children }: AppLayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { profile, role, isAdmin, signOut } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+
+  const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b shadow-sm">
+        <div className="flex items-center justify-between h-16 px-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-white">
+              <img src={logo} alt="Logo" className="w-full h-full object-contain" />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              "px-2 py-1 rounded-full text-xs font-medium",
+              isAdmin ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"
+            )}>
+              {isAdmin ? 'Admin' : 'Funcionário'}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-50 bg-black/50"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={cn(
+        "fixed top-0 left-0 z-50 h-full w-72 bg-card border-r shadow-xl transition-transform duration-300",
+        "lg:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between h-16 px-4 border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shadow">
+              <img src={logo} alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <h1 className="font-bold text-foreground">Gestão</h1>
+              <p className="text-xs text-muted-foreground">Sistema Completo</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-2 rounded-lg hover:bg-secondary"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* User Info */}
+        <div className="p-4 border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-foreground truncate">
+                {profile?.full_name || 'Usuário'}
+              </p>
+              <div className="flex items-center gap-1 mt-0.5">
+                {isAdmin && <Shield className="w-3 h-3 text-primary" />}
+                <span className="text-xs text-muted-foreground">
+                  {isAdmin ? 'Administrador' : 'Funcionário'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="p-3 space-y-1">
+          {filteredNavItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all",
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="flex-1">{item.label}</span>
+                {isActive && <ChevronRight className="w-4 h-4" />}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Sair</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className={cn(
+        "min-h-screen pt-16 lg:pt-0 lg:pl-72",
+        "transition-all duration-300"
+      )}>
+        {children}
+      </main>
+    </div>
+  );
+}
