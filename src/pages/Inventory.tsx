@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
+import { useSuppliers } from '@/hooks/useSuppliers';
+import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatsCard } from '@/components/inventory/StatsCard';
 import { ItemCard } from '@/components/inventory/ItemCardNew';
@@ -9,12 +11,13 @@ import { SearchBar } from '@/components/inventory/SearchBar';
 import { QuickMovementSheetNew } from '@/components/inventory/QuickMovementSheetNew';
 import { ItemFormSheetNew } from '@/components/inventory/ItemFormSheetNew';
 import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
+import { OrdersTab } from '@/components/inventory/OrdersTab';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { InventoryItem } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type View = 'items' | 'history';
+type View = 'items' | 'history' | 'orders';
 
 export default function InventoryPage() {
   const { isAdmin } = useAuth();
@@ -29,10 +32,11 @@ export default function InventoryPage() {
     getLowStockItems,
     getOutOfStockItems,
     getRecentMovements,
-    getItemsByCategory,
   } = useInventoryDB();
 
   const { categories } = useCategories();
+  const { suppliers } = useSuppliers();
+  const { orders, createOrder, updateOrderStatus, deleteOrder } = useOrders();
 
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('items');
@@ -45,7 +49,6 @@ export default function InventoryPage() {
   const lowStockItems = getLowStockItems();
   const outOfStockItems = getOutOfStockItems();
   const recentMovements = getRecentMovements(7);
-  const itemsByCategory = getItemsByCategory();
 
   const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -82,6 +85,7 @@ export default function InventoryPage() {
   const handleSaveItem = async (data: {
     name: string;
     category_id: string | null;
+    supplier_id: string | null;
     unit_type: 'unidade' | 'kg' | 'litro';
     current_stock: number;
     min_stock: number;
@@ -117,6 +121,39 @@ export default function InventoryPage() {
     }
   };
 
+  const handleCreateOrder = async (supplierId: string, orderItems: { item_id: string; quantity: number }[]) => {
+    try {
+      await createOrder(supplierId, orderItems);
+      toast.success('Pedido criado!');
+    } catch (error) {
+      toast.error('Erro ao criar pedido');
+    }
+  };
+
+  const handleSendOrder = async (orderId: string) => {
+    try {
+      const order = orders.find(o => o.id === orderId);
+      if (order?.status === 'draft') {
+        await updateOrderStatus(orderId, 'sent');
+        toast.success('Pedido marcado como enviado!');
+      } else if (order?.status === 'sent') {
+        await updateOrderStatus(orderId, 'received');
+        toast.success('Pedido marcado como recebido!');
+      }
+    } catch (error) {
+      toast.error('Erro ao atualizar pedido');
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      await deleteOrder(orderId);
+      toast.success('Pedido excluído!');
+    } catch (error) {
+      toast.error('Erro ao excluir pedido');
+    }
+  };
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -139,6 +176,9 @@ export default function InventoryPage() {
 
   // Sort categories alphabetically
   const sortedCategories = Object.keys(filteredByCategory).sort();
+
+  // Count items needing orders
+  const itemsNeedingOrder = items.filter(i => i.current_stock <= i.min_stock).length;
 
   return (
     <AppLayout>
@@ -218,18 +258,35 @@ export default function InventoryPage() {
           <div className="flex gap-2 bg-secondary p-1 rounded-xl">
             <button
               onClick={() => setView('items')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all ${
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
                 view === 'items' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-              }`}
+              )}
             >
               <ClipboardList className="w-4 h-4" />
               Itens
             </button>
             <button
+              onClick={() => setView('orders')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all relative",
+                view === 'orders' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Pedidos
+              {itemsNeedingOrder > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                  {itemsNeedingOrder}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setView('history')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all ${
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
                 view === 'history' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-              }`}
+              )}
             >
               <History className="w-4 h-4" />
               Histórico
@@ -237,11 +294,13 @@ export default function InventoryPage() {
           </div>
 
           {/* Search */}
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder={view === 'items' ? 'Buscar itens...' : 'Buscar movimentações...'}
-          />
+          {view !== 'orders' && (
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+              placeholder={view === 'items' ? 'Buscar itens...' : 'Buscar movimentações...'}
+            />
+          )}
 
           {/* Content */}
           {view === 'items' ? (
@@ -305,6 +364,15 @@ export default function InventoryPage() {
                 })
               )}
             </div>
+          ) : view === 'orders' ? (
+            <OrdersTab
+              items={items}
+              suppliers={suppliers}
+              orders={orders}
+              onCreateOrder={handleCreateOrder}
+              onSendOrder={handleSendOrder}
+              onDeleteOrder={handleDeleteOrder}
+            />
           ) : (
             <MovementHistoryNew
               movements={movements.filter(m => {
@@ -330,6 +398,7 @@ export default function InventoryPage() {
         <ItemFormSheetNew
           item={editingItem}
           categories={categories}
+          suppliers={suppliers}
           open={itemFormOpen}
           onOpenChange={setItemFormOpen}
           onSave={handleSaveItem}

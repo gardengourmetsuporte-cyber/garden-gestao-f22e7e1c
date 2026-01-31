@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { InventoryItem, StockMovement, MovementType, Category } from '@/types/database';
+import { InventoryItem, StockMovement, MovementType } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function useInventoryDB() {
@@ -15,7 +15,8 @@ export function useInventoryDB() {
         .from('inventory_items')
         .select(`
           *,
-          category:categories(*)
+          category:categories(*),
+          supplier:suppliers(*)
         `)
         .order('name');
 
@@ -59,6 +60,7 @@ export function useInventoryDB() {
   const addItem = useCallback(async (item: {
     name: string;
     category_id: string | null;
+    supplier_id?: string | null;
     unit_type: 'unidade' | 'kg' | 'litro';
     current_stock: number;
     min_stock: number;
@@ -66,7 +68,7 @@ export function useInventoryDB() {
     const { data, error } = await supabase
       .from('inventory_items')
       .insert(item)
-      .select(`*, category:categories(*)`)
+      .select(`*, category:categories(*), supplier:suppliers(*)`)
       .single();
 
     if (error) throw error;
@@ -75,13 +77,13 @@ export function useInventoryDB() {
   }, []);
 
   const updateItem = useCallback(async (id: string, updates: Partial<InventoryItem>) => {
-    const { category, ...updateData } = updates;
+    const { category, supplier, ...updateData } = updates;
     
     const { data, error } = await supabase
       .from('inventory_items')
       .update(updateData)
       .eq('id', id)
-      .select(`*, category:categories(*)`)
+      .select(`*, category:categories(*), supplier:suppliers(*)`)
       .single();
 
     if (error) throw error;

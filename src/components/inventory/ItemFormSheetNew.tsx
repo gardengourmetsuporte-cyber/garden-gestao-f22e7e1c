@@ -4,17 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InventoryItem, Category } from '@/types/database';
+import { InventoryItem, Category, Supplier } from '@/types/database';
 import { Trash2 } from 'lucide-react';
 
 interface ItemFormSheetProps {
   item?: InventoryItem | null;
   categories: Category[];
+  suppliers?: Supplier[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (data: {
     name: string;
     category_id: string | null;
+    supplier_id: string | null;
     unit_type: 'unidade' | 'kg' | 'litro';
     current_stock: number;
     min_stock: number;
@@ -26,6 +28,7 @@ interface ItemFormSheetProps {
 export function ItemFormSheetNew({ 
   item, 
   categories, 
+  suppliers = [],
   open, 
   onOpenChange, 
   onSave, 
@@ -34,6 +37,7 @@ export function ItemFormSheetNew({
 }: ItemFormSheetProps) {
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
+  const [supplierId, setSupplierId] = useState<string>('');
   const [unitType, setUnitType] = useState<'unidade' | 'kg' | 'litro'>('unidade');
   const [currentStock, setCurrentStock] = useState('');
   const [minStock, setMinStock] = useState('');
@@ -42,12 +46,14 @@ export function ItemFormSheetNew({
     if (item) {
       setName(item.name);
       setCategoryId(item.category_id || '');
+      setSupplierId(item.supplier_id || '');
       setUnitType(item.unit_type);
       setCurrentStock(item.current_stock.toString());
       setMinStock(item.min_stock.toString());
     } else {
       setName('');
       setCategoryId('');
+      setSupplierId('');
       setUnitType('unidade');
       setCurrentStock('');
       setMinStock('');
@@ -60,6 +66,7 @@ export function ItemFormSheetNew({
     onSave({
       name: name.trim(),
       category_id: categoryId || null,
+      supplier_id: supplierId || null,
       unit_type: unitType,
       current_stock: parseFloat(currentStock) || 0,
       min_stock: parseFloat(minStock) || 0,
@@ -121,6 +128,25 @@ export function ItemFormSheetNew({
               </SelectContent>
             </Select>
           </div>
+
+          {/* Supplier */}
+          {suppliers.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Fornecedor</Label>
+              <Select value={supplierId} onValueChange={setSupplierId}>
+                <SelectTrigger className="h-14 text-lg rounded-xl">
+                  <SelectValue placeholder="Selecione o fornecedor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((sup) => (
+                    <SelectItem key={sup.id} value={sup.id} className="text-base py-3">
+                      {sup.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Unit Type */}
           <div className="space-y-2">
