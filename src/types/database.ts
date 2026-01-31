@@ -2,6 +2,8 @@
 export type AppRole = 'admin' | 'funcionario';
 export type UnitType = 'unidade' | 'kg' | 'litro';
 export type MovementType = 'entrada' | 'saida';
+export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';
+export type ChecklistType = 'abertura' | 'fechamento' | 'limpeza';
 
 export interface Profile {
   id: string;
@@ -28,10 +30,21 @@ export interface Category {
   updated_at: string;
 }
 
+export interface Supplier {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface InventoryItem {
   id: string;
   name: string;
   category_id: string | null;
+  supplier_id: string | null;
   unit_type: UnitType;
   current_stock: number;
   min_stock: number;
@@ -39,6 +52,7 @@ export interface InventoryItem {
   updated_at: string;
   // Joined data
   category?: Category;
+  supplier?: Supplier;
 }
 
 export interface StockMovement {
@@ -51,6 +65,82 @@ export interface StockMovement {
   created_at: string;
   // Joined data
   item?: InventoryItem;
+  profile?: Profile;
+}
+
+export interface Order {
+  id: string;
+  supplier_id: string;
+  status: OrderStatus;
+  notes: string | null;
+  sent_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  supplier?: Supplier;
+  order_items?: OrderItem[];
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  item_id: string;
+  quantity: number;
+  notes: string | null;
+  created_at: string;
+  // Joined data
+  item?: InventoryItem;
+}
+
+// Checklist types
+export interface ChecklistSector {
+  id: string;
+  name: string;
+  color: string;
+  icon: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  subcategories?: ChecklistSubcategory[];
+}
+
+export interface ChecklistSubcategory {
+  id: string;
+  sector_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  sector?: ChecklistSector;
+  items?: ChecklistItem[];
+}
+
+export interface ChecklistItem {
+  id: string;
+  subcategory_id: string;
+  name: string;
+  description: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  subcategory?: ChecklistSubcategory;
+}
+
+export interface ChecklistCompletion {
+  id: string;
+  item_id: string;
+  checklist_type: ChecklistType;
+  completed_by: string;
+  completed_at: string;
+  notes: string | null;
+  date: string;
+  // Joined data
+  item?: ChecklistItem;
   profile?: Profile;
 }
 

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useCategories } from '@/hooks/useCategories';
+import { useSuppliers } from '@/hooks/useSuppliers';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Trash2, Edit2, Tag, Users, Shield } from 'lucide-react';
+import { Plus, Trash2, Edit2, Tag, Users, Shield, Truck, Phone, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { Supplier } from '@/types/database';
 
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
@@ -18,12 +20,22 @@ const colorOptions = [
 export default function SettingsPage() {
   const { profile, role, isAdmin } = useAuth();
   const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
+  const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
   
+  // Category state
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: string; name: string; color: string } | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('#6366f1');
 
+  // Supplier state
+  const [supplierSheetOpen, setSupplierSheetOpen] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [supplierName, setSupplierName] = useState('');
+  const [supplierPhone, setSupplierPhone] = useState('');
+  const [supplierEmail, setSupplierEmail] = useState('');
+
+  // Category handlers
   const handleSaveCategory = async () => {
     if (!newCategoryName.trim()) return;
 
@@ -39,7 +51,7 @@ export default function SettingsPage() {
         toast.success('Categoria criada!');
       }
       setCategorySheetOpen(false);
-      resetForm();
+      resetCategoryForm();
     } catch (error: any) {
       if (error.message?.includes('duplicate')) {
         toast.error('Já existe uma categoria com esse nome');
@@ -66,14 +78,70 @@ export default function SettingsPage() {
   };
 
   const handleAddCategory = () => {
-    resetForm();
+    resetCategoryForm();
     setCategorySheetOpen(true);
   };
 
-  const resetForm = () => {
+  const resetCategoryForm = () => {
     setEditingCategory(null);
     setNewCategoryName('');
     setNewCategoryColor('#6366f1');
+  };
+
+  // Supplier handlers
+  const handleSaveSupplier = async () => {
+    if (!supplierName.trim()) return;
+
+    try {
+      if (editingSupplier) {
+        await updateSupplier(editingSupplier.id, { 
+          name: supplierName.trim(), 
+          phone: supplierPhone.trim() || null,
+          email: supplierEmail.trim() || null,
+        });
+        toast.success('Fornecedor atualizado!');
+      } else {
+        await addSupplier({ 
+          name: supplierName.trim(), 
+          phone: supplierPhone.trim() || undefined,
+          email: supplierEmail.trim() || undefined,
+        });
+        toast.success('Fornecedor criado!');
+      }
+      setSupplierSheetOpen(false);
+      resetSupplierForm();
+    } catch (error: any) {
+      toast.error('Erro ao salvar fornecedor');
+    }
+  };
+
+  const handleDeleteSupplier = async (id: string) => {
+    try {
+      await deleteSupplier(id);
+      toast.success('Fornecedor excluído!');
+    } catch (error) {
+      toast.error('Erro ao excluir fornecedor');
+    }
+  };
+
+  const handleEditSupplier = (supplier: Supplier) => {
+    setEditingSupplier(supplier);
+    setSupplierName(supplier.name);
+    setSupplierPhone(supplier.phone || '');
+    setSupplierEmail(supplier.email || '');
+    setSupplierSheetOpen(true);
+  };
+
+  const handleAddSupplier = () => {
+    resetSupplierForm();
+    setSupplierSheetOpen(true);
+  };
+
+  const resetSupplierForm = () => {
+    setEditingSupplier(null);
+    setSupplierName('');
+    setSupplierPhone('');
+    setSupplierEmail('');
   };
 
   if (!isAdmin) {
@@ -169,6 +237,68 @@ export default function SettingsPage() {
                   </div>
                 </div>
               ))}
+              {categories.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Nenhuma categoria cadastrada
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Suppliers Management */}
+          <div className="bg-card rounded-2xl border p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Truck className="w-5 h-5 text-primary" />
+                <h2 className="font-semibold text-foreground">Fornecedores</h2>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddSupplier}
+                className="gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Novo
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              {suppliers.map((supplier) => (
+                <div
+                  key={supplier.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-secondary/50"
+                >
+                  <div className="flex-1">
+                    <span className="font-medium block">{supplier.name}</span>
+                    {supplier.phone && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                        <Phone className="w-3 h-3" />
+                        {supplier.phone}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEditSupplier(supplier)}
+                      className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSupplier(supplier.id)}
+                      className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {suppliers.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Nenhum fornecedor cadastrado
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -217,6 +347,67 @@ export default function SettingsPage() {
                 className="w-full h-12"
               >
                 {editingCategory ? 'Salvar' : 'Criar Categoria'}
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Supplier Form Sheet */}
+        <Sheet open={supplierSheetOpen} onOpenChange={setSupplierSheetOpen}>
+          <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
+            <SheetHeader className="pb-4">
+              <SheetTitle>
+                {editingSupplier ? 'Editar Fornecedor' : 'Novo Fornecedor'}
+              </SheetTitle>
+            </SheetHeader>
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label>Nome do Fornecedor *</Label>
+                <Input
+                  value={supplierName}
+                  onChange={(e) => setSupplierName(e.target.value)}
+                  placeholder="Ex: Distribuidora ABC"
+                  className="h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  Telefone/WhatsApp
+                </Label>
+                <Input
+                  value={supplierPhone}
+                  onChange={(e) => setSupplierPhone(e.target.value)}
+                  placeholder="Ex: 11999999999"
+                  className="h-12"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Usado para enviar pedidos via WhatsApp
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  E-mail
+                </Label>
+                <Input
+                  type="email"
+                  value={supplierEmail}
+                  onChange={(e) => setSupplierEmail(e.target.value)}
+                  placeholder="Ex: contato@fornecedor.com"
+                  className="h-12"
+                />
+              </div>
+
+              <Button
+                onClick={handleSaveSupplier}
+                disabled={!supplierName.trim()}
+                className="w-full h-12"
+              >
+                {editingSupplier ? 'Salvar' : 'Criar Fornecedor'}
               </Button>
             </div>
           </SheetContent>

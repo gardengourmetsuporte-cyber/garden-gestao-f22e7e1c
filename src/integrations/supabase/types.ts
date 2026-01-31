@@ -41,6 +41,150 @@ export type Database = {
         }
         Relationships: []
       }
+      checklist_completions: {
+        Row: {
+          checklist_type: Database["public"]["Enums"]["checklist_type"]
+          completed_at: string
+          completed_by: string
+          date: string
+          id: string
+          item_id: string
+          notes: string | null
+        }
+        Insert: {
+          checklist_type: Database["public"]["Enums"]["checklist_type"]
+          completed_at?: string
+          completed_by: string
+          date?: string
+          id?: string
+          item_id: string
+          notes?: string | null
+        }
+        Update: {
+          checklist_type?: Database["public"]["Enums"]["checklist_type"]
+          completed_at?: string
+          completed_by?: string
+          date?: string
+          id?: string
+          item_id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_completions_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          subcategory_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          subcategory_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          subcategory_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_sectors: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      checklist_subcategories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sector_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sector_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sector_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_subcategories_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_items: {
         Row: {
           category_id: string | null
@@ -49,6 +193,7 @@ export type Database = {
           id: string
           min_stock: number
           name: string
+          supplier_id: string | null
           unit_type: Database["public"]["Enums"]["unit_type"]
           updated_at: string
         }
@@ -59,6 +204,7 @@ export type Database = {
           id?: string
           min_stock?: number
           name: string
+          supplier_id?: string | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
           updated_at?: string
         }
@@ -69,6 +215,7 @@ export type Database = {
           id?: string
           min_stock?: number
           name?: string
+          supplier_id?: string | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
           updated_at?: string
         }
@@ -78,6 +225,96 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          notes: string | null
+          order_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          notes?: string | null
+          order_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          notes?: string | null
+          order_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]
@@ -147,6 +384,36 @@ export type Database = {
           },
         ]
       }
+      suppliers: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -184,7 +451,9 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "funcionario"
+      checklist_type: "abertura" | "fechamento" | "limpeza"
       movement_type: "entrada" | "saida"
+      order_status: "draft" | "sent" | "received" | "cancelled"
       unit_type: "unidade" | "kg" | "litro"
     }
     CompositeTypes: {
@@ -314,7 +583,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "funcionario"],
+      checklist_type: ["abertura", "fechamento", "limpeza"],
       movement_type: ["entrada", "saida"],
+      order_status: ["draft", "sent", "received", "cancelled"],
       unit_type: ["unidade", "kg", "litro"],
     },
   },
