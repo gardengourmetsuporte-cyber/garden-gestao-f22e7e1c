@@ -10,15 +10,17 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Clock
+  Clock,
+  User
 } from 'lucide-react';
-import { ChecklistSector, ChecklistType } from '@/types/database';
+import { ChecklistSector, ChecklistType, ChecklistCompletion } from '@/types/database';
 import { cn } from '@/lib/utils';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
   checklistType: ChecklistType;
   date: string;
+  completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
   onToggleItem: (itemId: string) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
@@ -36,6 +38,7 @@ export function ChecklistView({
   sectors,
   checklistType,
   date,
+  completions,
   isItemCompleted,
   onToggleItem,
   getCompletionProgress,
@@ -222,13 +225,14 @@ export function ChecklistView({
                     <div className="ml-4 space-y-1">
                       {activeItems.map(item => {
                         const completed = isItemCompleted(item.id);
+                        const completion = completions.find(c => c.item_id === item.id);
 
                         return (
                           <button
                             key={item.id}
                             onClick={() => onToggleItem(item.id)}
                             className={cn(
-                              "w-full flex items-center gap-3 p-3 rounded-lg transition-all active:scale-[0.98]",
+                              "w-full flex items-start gap-3 p-3 rounded-lg transition-all active:scale-[0.98]",
                               completed
                                 ? "bg-success/10 border border-success/20"
                                 : "bg-card border hover:border-primary/30"
@@ -236,7 +240,7 @@ export function ChecklistView({
                           >
                             <div
                               className={cn(
-                                "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                                "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-0.5",
                                 completed
                                   ? "bg-success border-success text-white"
                                   : "border-muted-foreground/30"
@@ -255,6 +259,15 @@ export function ChecklistView({
                                 <p className="text-xs text-muted-foreground">
                                   {item.description}
                                 </p>
+                              )}
+                              {completed && completion && (
+                                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                  <User className="w-3 h-3" />
+                                  <span>
+                                    {completion.profile?.full_name || 'Usuário'} às{' '}
+                                    {format(new Date(completion.completed_at), 'HH:mm')}
+                                  </span>
+                                </div>
                               )}
                             </div>
                           </button>

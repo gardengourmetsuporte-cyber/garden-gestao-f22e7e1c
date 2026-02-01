@@ -18,7 +18,7 @@ export function useSuppliers() {
       if (error) throw error;
       setSuppliers((data as Supplier[]) || []);
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      // Silent fail - suppliers will be empty
     }
   }, []);
 
