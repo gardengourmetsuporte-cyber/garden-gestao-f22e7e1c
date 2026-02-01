@@ -45,15 +45,32 @@ export default function InventoryPage() {
   const [itemFormOpen, setItemFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
 
   const lowStockItems = getLowStockItems();
   const outOfStockItems = getOutOfStockItems();
   const recentMovements = getRecentMovements(7);
 
-  const filteredItems = items.filter(item =>
+  // Apply stock filter first, then search
+  const getFilteredByStock = () => {
+    if (stockFilter === 'zero') return outOfStockItems;
+    if (stockFilter === 'low') return lowStockItems;
+    return items;
+  };
+
+  const filteredItems = getFilteredByStock().filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase()) ||
     item.category?.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleStockFilterClick = (filter: 'all' | 'low' | 'zero') => {
+    if (stockFilter === filter) {
+      setStockFilter(null); // Toggle off if already active
+    } else {
+      setStockFilter(filter);
+      setView('items'); // Switch to items view when filtering
+    }
+  };
 
   const toggleCategory = (categoryName: string) => {
     setCollapsedCategories(prev => {
@@ -215,33 +232,52 @@ export default function InventoryPage() {
         </header>
 
         <div className="px-4 py-4 lg:px-6 space-y-6">
-          {/* Stats */}
+          {/* Stats - Clickable */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <StatsCard
               title="Total de Itens"
               value={items.length}
               icon={Package}
               variant="default"
+              onClick={() => handleStockFilterClick('all')}
             />
             <StatsCard
               title="Estoque Baixo"
               value={lowStockItems.length}
               icon={AlertTriangle}
               variant={lowStockItems.length > 0 ? 'warning' : 'default'}
+              onClick={() => handleStockFilterClick('low')}
             />
             <StatsCard
               title="Zerados"
               value={outOfStockItems.length}
               icon={PackageX}
               variant={outOfStockItems.length > 0 ? 'destructive' : 'default'}
+              onClick={() => handleStockFilterClick('zero')}
             />
             <StatsCard
               title="Movimentações (7d)"
               value={recentMovements.length}
               icon={ArrowRightLeft}
               variant="success"
+              onClick={() => { setView('history'); setStockFilter(null); }}
             />
           </div>
+
+          {/* Active Filter Indicator */}
+          {stockFilter && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg">
+              <span className="text-sm text-primary font-medium">
+                Filtro ativo: {stockFilter === 'zero' ? 'Itens zerados' : stockFilter === 'low' ? 'Estoque baixo' : 'Todos os itens'}
+              </span>
+              <button 
+                onClick={() => setStockFilter(null)}
+                className="text-xs text-primary underline"
+              >
+                Limpar filtro
+              </button>
+            </div>
+          )}
 
           {/* Alerts */}
           {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
@@ -267,10 +303,10 @@ export default function InventoryPage() {
             </div>
           )}
 
-          {/* View Toggle */}
+          {/* View Toggle - Reordered: Itens, Histórico, Pedidos */}
           <div className="flex gap-2 bg-secondary p-1 rounded-xl">
             <button
-              onClick={() => setView('items')}
+              onClick={() => { setView('items'); }}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
                 view === 'items' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
@@ -279,9 +315,19 @@ export default function InventoryPage() {
               <ClipboardList className="w-4 h-4" />
               Itens
             </button>
+            <button
+              onClick={() => { setView('history'); setStockFilter(null); }}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
+                view === 'history' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              <History className="w-4 h-4" />
+              Histórico
+            </button>
             {isAdmin && (
               <button
-                onClick={() => setView('orders')}
+                onClick={() => { setView('orders'); setStockFilter(null); }}
                 className={cn(
                   "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all relative",
                   view === 'orders' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
@@ -296,16 +342,6 @@ export default function InventoryPage() {
                 )}
               </button>
             )}
-            <button
-              onClick={() => setView('history')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                view === 'history' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-              )}
-            >
-              <History className="w-4 h-4" />
-              Histórico
-            </button>
           </div>
 
           {/* Search */}
