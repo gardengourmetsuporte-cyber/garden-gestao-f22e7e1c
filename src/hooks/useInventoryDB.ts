@@ -131,8 +131,11 @@ export function useInventoryDB() {
     quantity: number,
     notes?: string
   ) => {
-    // Insert movement - stock is updated automatically by database trigger
-    const { data: movementData, error: movementError } = await supabase
+    // Insert movement
+    // IMPORTANT: do not rely on returning row representation here.
+    // Some roles/configs may allow INSERT but fail on returning SELECT, causing false negatives.
+    // Stock is updated automatically by database trigger.
+    const { error: movementError } = await supabase
       .from('stock_movements')
       .insert({
         item_id: itemId,
@@ -140,9 +143,7 @@ export function useInventoryDB() {
         quantity,
         notes,
         user_id: user?.id,
-      })
-      .select(`*, item:inventory_items(*)`)
-      .single();
+      });
 
     if (movementError) throw movementError;
 
@@ -158,9 +159,20 @@ export function useInventoryDB() {
       ));
     }
 
-    setMovements(prev => [movementData as StockMovement, ...prev]);
-    return movementData as StockMovement;
-  }, [user?.id, items]);
+    // Re-sync from backend so UI matches trigger-calculated stock and latest movements.
+    await Promise.all([fetchItems(), fetchMovements()]);
+
+    // We don't depend on returning the inserted row; callers in the UI only need success/failure.
+    return {
+      id: 'pending',
+      item_id: itemId,
+      type,
+      quantity,
+      notes: notes ?? null,
+      user_id: user?.id ?? null,
+      created_at: new Date().toISOString(),
+    } as unknown as StockMovement;
+  }, [user?.id, items, fetchItems, fetchMovements]);
 
   const getItemMovements = useCallback((itemId: string) => {
     return movements.filter(m => m.item_id === itemId);
