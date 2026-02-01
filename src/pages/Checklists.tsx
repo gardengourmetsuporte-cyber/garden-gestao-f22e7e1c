@@ -221,7 +221,7 @@ export default function ChecklistsPage() {
                 date={currentDate}
                 isItemCompleted={isItemCompleted}
                 onToggleItem={handleToggleItem}
-                getCompletionProgress={getCompletionProgress}
+                getCompletionProgress={(sectorId) => getCompletionProgress(sectorId, checklistType)}
               />
             </>
           ) : (

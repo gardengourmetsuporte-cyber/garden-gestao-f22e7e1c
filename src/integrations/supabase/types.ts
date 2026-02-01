@@ -81,6 +81,7 @@ export type Database = {
       }
       checklist_items: {
         Row: {
+          checklist_type: Database["public"]["Enums"]["checklist_type"]
           created_at: string
           description: string | null
           frequency: string
@@ -92,6 +93,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          checklist_type?: Database["public"]["Enums"]["checklist_type"]
           created_at?: string
           description?: string | null
           frequency?: string
@@ -103,6 +105,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          checklist_type?: Database["public"]["Enums"]["checklist_type"]
           created_at?: string
           description?: string | null
           frequency?: string
