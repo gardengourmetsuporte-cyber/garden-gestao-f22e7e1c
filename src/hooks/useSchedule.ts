@@ -40,8 +40,8 @@ export function useSchedule() {
       }));
       
       setSchedules(schedulesWithProfiles as WorkSchedule[]);
-    } catch (error) {
-      console.error('Error fetching schedules:', error);
+    } catch {
+      // Error handled silently - user sees empty state
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +67,8 @@ export function useSchedule() {
       await fetchSchedules();
       return data;
     } catch (error) {
-      console.error('Error creating schedule:', error);
-      throw error;
+      // Re-throw for caller to handle with generic message
+      throw new Error('Erro ao criar folga');
     }
   }
 
@@ -82,8 +82,8 @@ export function useSchedule() {
       if (error) throw error;
       await fetchSchedules();
     } catch (error) {
-      console.error('Error updating schedule:', error);
-      throw error;
+      // Re-throw for caller to handle with generic message
+      throw new Error('Erro ao atualizar folga');
     }
   }
 
@@ -103,8 +103,8 @@ export function useSchedule() {
       if (error) throw error;
       await fetchSchedules();
     } catch (error) {
-      console.error('Error approving schedule:', error);
-      throw error;
+      // Re-throw for caller to handle with generic message
+      throw new Error('Erro ao aprovar folga');
     }
   }
 
@@ -118,8 +118,8 @@ export function useSchedule() {
       if (error) throw error;
       await fetchSchedules();
     } catch (error) {
-      console.error('Error deleting schedule:', error);
-      throw error;
+      // Re-throw for caller to handle with generic message
+      throw new Error('Erro ao excluir folga');
     }
   }
 

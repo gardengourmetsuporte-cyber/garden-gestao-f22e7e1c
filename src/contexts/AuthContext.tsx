@@ -78,8 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
       
       setRole((roleData?.role as AppRole) ?? 'funcionario');
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+    } catch {
+      // Error handled silently - user sees logged out state
     } finally {
       setIsLoading(false);
     }
