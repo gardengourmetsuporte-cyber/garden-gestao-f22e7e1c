@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Auth from "./pages/Auth";
+import DashboardNew from "./pages/DashboardNew";
 import Inventory from "./pages/Inventory";
 import Checklists from "./pages/Checklists";
 import Rewards from "./pages/Rewards";
@@ -37,6 +38,14 @@ function AppRoutes() {
       <Route path="/auth" element={<Auth />} />
       <Route
         path="/"
+        element={
+          <ProtectedRoute>
+            <DashboardNew />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/inventory"
         element={
           <ProtectedRoute>
             <Inventory />
