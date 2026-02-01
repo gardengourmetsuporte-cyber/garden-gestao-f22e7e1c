@@ -222,13 +222,20 @@ export function useChecklists() {
   const toggleCompletion = useCallback(async (
     itemId: string,
     checklistType: ChecklistType,
-    date: string
+    date: string,
+    isAdmin?: boolean
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
     );
 
     if (existing) {
+      // Check permission before deleting: only admin or the user who completed can delete
+      const canDelete = isAdmin || existing.completed_by === user?.id;
+      if (!canDelete) {
+        throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
+      }
+
       // Remove completion
       const { error } = await supabase
         .from('checklist_completions')
