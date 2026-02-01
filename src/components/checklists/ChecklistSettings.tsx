@@ -7,19 +7,29 @@ import {
   ChevronRight,
   GripVertical,
   Folder,
-  FileText
+  FileText,
+  Calendar,
+  CalendarDays,
+  CalendarRange
 } from 'lucide-react';
-import { ChecklistSector, ChecklistSubcategory } from '@/types/database';
+import { ChecklistSector, ChecklistSubcategory, ItemFrequency } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
   '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6',
   '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
+];
+
+const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Calendar }[] = [
+  { value: 'daily', label: 'Diária', icon: Calendar },
+  { value: 'weekly', label: 'Semanal', icon: CalendarDays },
+  { value: 'monthly', label: 'Mensal', icon: CalendarRange },
 ];
 
 interface ChecklistSettingsProps {
@@ -30,8 +40,8 @@ interface ChecklistSettingsProps {
   onAddSubcategory: (data: { sector_id: string; name: string }) => Promise<void>;
   onUpdateSubcategory: (id: string, data: { name?: string }) => Promise<void>;
   onDeleteSubcategory: (id: string) => Promise<void>;
-  onAddItem: (data: { subcategory_id: string; name: string; description?: string }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean }) => Promise<void>;
+  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
 }
 
@@ -67,6 +77,11 @@ export function ChecklistSettings({
   const [subcategoryName, setSubcategoryName] = useState('');
   const [itemName, setItemName] = useState('');
   const [itemDescription, setItemDescription] = useState('');
+  const [itemFrequency, setItemFrequency] = useState<ItemFrequency>('daily');
+
+  const getFrequencyLabel = (freq: ItemFrequency) => {
+    return frequencyOptions.find(f => f.value === freq)?.label || 'Diária';
+  };
 
   const toggleSector = (sectorId: string) => {
     setExpandedSectors(prev => {
@@ -146,6 +161,7 @@ export function ChecklistSettings({
     setSelectedSubcategoryId(subcategoryId);
     setItemName('');
     setItemDescription('');
+    setItemFrequency('daily');
     setItemSheetOpen(true);
   };
 
@@ -156,6 +172,7 @@ export function ChecklistSettings({
       subcategory_id: selectedSubcategoryId,
       name: itemName.trim(),
       description: itemDescription.trim() || undefined,
+      frequency: itemFrequency,
     });
     setItemSheetOpen(false);
   };
@@ -284,7 +301,12 @@ export function ChecklistSettings({
                             >
                               <FileText className="w-4 h-4 text-muted-foreground" />
                               <div className="flex-1">
-                                <p className="text-sm font-medium">{item.name}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-medium">{item.name}</p>
+                                  <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                                    {getFrequencyLabel(item.frequency || 'daily')}
+                                  </span>
+                                </div>
                                 {item.description && (
                                   <p className="text-xs text-muted-foreground">{item.description}</p>
                                 )}
@@ -439,6 +461,25 @@ export function ChecklistSettings({
                 placeholder="Ex: Deve estar entre 2°C e 8°C"
                 className="h-12"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Frequência</Label>
+              <Select value={itemFrequency} onValueChange={(v) => setItemFrequency(v as ItemFrequency)}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {frequencyOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <div className="flex items-center gap-2">
+                        <opt.icon className="w-4 h-4" />
+                        {opt.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Button

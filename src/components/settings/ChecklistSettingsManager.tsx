@@ -86,7 +86,7 @@ export function ChecklistSettingsManager() {
     }
   };
 
-  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string }) => {
+  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }) => {
     try {
       await addItem(data);
       toast.success('Item criado!');
