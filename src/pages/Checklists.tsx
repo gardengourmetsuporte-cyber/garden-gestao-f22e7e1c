@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 type TabView = 'checklist' | 'settings';
 
 export default function ChecklistsPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const {
     sectors,
     completions,
@@ -47,9 +47,9 @@ export default function ChecklistsPage() {
 
   const handleToggleItem = async (itemId: string) => {
     try {
-      await toggleCompletion(itemId, checklistType, currentDate);
-    } catch (error) {
-      toast.error('Erro ao marcar item');
+      await toggleCompletion(itemId, checklistType, currentDate, isAdmin);
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao marcar item');
     }
   };
 
@@ -224,6 +224,8 @@ export default function ChecklistsPage() {
                 isItemCompleted={isItemCompleted}
                 onToggleItem={handleToggleItem}
                 getCompletionProgress={(sectorId) => getCompletionProgress(sectorId, checklistType)}
+                currentUserId={user?.id}
+                isAdmin={isAdmin}
               />
             </>
           ) : (

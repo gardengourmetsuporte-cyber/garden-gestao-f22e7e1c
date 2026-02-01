@@ -11,7 +11,8 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
-  User
+  User,
+  Lock
 } from 'lucide-react';
 import { ChecklistSector, ChecklistType, ChecklistCompletion } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,8 @@ interface ChecklistViewProps {
   isItemCompleted: (itemId: string) => boolean;
   onToggleItem: (itemId: string) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
+  currentUserId?: string;
+  isAdmin: boolean;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -42,6 +45,8 @@ export function ChecklistView({
   isItemCompleted,
   onToggleItem,
   getCompletionProgress,
+  currentUserId,
+  isAdmin,
 }: ChecklistViewProps) {
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set(sectors.map(s => s.id)));
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
@@ -93,6 +98,18 @@ export function ChecklistView({
   const progressPercent = totalProgress.total > 0 
     ? Math.round((totalProgress.completed / totalProgress.total) * 100) 
     : 0;
+
+  // Check if a completed item can be toggled (unchecked) by current user
+  const canToggleItem = (completion: ChecklistCompletion | undefined, completed: boolean) => {
+    // If not completed, anyone can mark it
+    if (!completed) return true;
+    // If admin, can toggle any item
+    if (isAdmin) return true;
+    // If completed by current user, can uncheck
+    if (completion?.completed_by === currentUserId) return true;
+    // Otherwise, cannot toggle
+    return false;
+  };
 
   return (
     <div className="space-y-4">
@@ -226,13 +243,18 @@ export function ChecklistView({
                       {activeItems.map(item => {
                         const completed = isItemCompleted(item.id);
                         const completion = completions.find(c => c.item_id === item.id);
+                        const canToggle = canToggleItem(completion, completed);
+                        const isLockedByOther = completed && !canToggle;
 
                         return (
                           <button
                             key={item.id}
-                            onClick={() => onToggleItem(item.id)}
+                            onClick={() => canToggle && onToggleItem(item.id)}
+                            disabled={!canToggle}
                             className={cn(
-                              "w-full flex items-start gap-3 p-3 rounded-lg transition-all active:scale-[0.98]",
+                              "w-full flex items-start gap-3 p-3 rounded-lg transition-all",
+                              !canToggle && "cursor-not-allowed opacity-80",
+                              canToggle && "active:scale-[0.98]",
                               completed
                                 ? "bg-success/10 border border-success/20"
                                 : "bg-card border hover:border-primary/30"
@@ -249,12 +271,17 @@ export function ChecklistView({
                               {completed && <Check className="w-4 h-4" />}
                             </div>
                             <div className="flex-1 text-left">
-                              <p className={cn(
-                                "font-medium",
-                                completed ? "text-success line-through" : "text-foreground"
-                              )}>
-                                {item.name}
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <p className={cn(
+                                  "font-medium",
+                                  completed ? "text-success line-through" : "text-foreground"
+                                )}>
+                                  {item.name}
+                                </p>
+                                {isLockedByOther && (
+                                  <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                                )}
+                              </div>
                               {item.description && (
                                 <p className="text-xs text-muted-foreground">
                                   {item.description}

@@ -279,21 +279,23 @@ export default function InventoryPage() {
               <ClipboardList className="w-4 h-4" />
               Itens
             </button>
-            <button
-              onClick={() => setView('orders')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all relative",
-                view === 'orders' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-              )}
-            >
-              <ShoppingCart className="w-4 h-4" />
-              Pedidos
-              {itemsNeedingOrder > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
-                  {itemsNeedingOrder}
-                </span>
-              )}
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setView('orders')}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all relative",
+                  view === 'orders' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+                )}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Pedidos
+                {itemsNeedingOrder > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                    {itemsNeedingOrder}
+                  </span>
+                )}
+              </button>
+            )}
             <button
               onClick={() => setView('history')}
               className={cn(
