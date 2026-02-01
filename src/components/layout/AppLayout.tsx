@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield } from 'lucide-react';
+import { Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield, Gift } from 'lucide-react';
+import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
@@ -21,6 +22,10 @@ const navItems: NavItem[] = [{
   icon: ClipboardCheck,
   label: 'Checklists',
   href: '/checklists'
+}, {
+  icon: Gift,
+  label: 'Recompensas',
+  href: '/rewards'
 }, {
   icon: Settings,
   label: 'Configurações',
@@ -102,6 +107,10 @@ export function AppLayout({
                 </span>
               </div>
             </div>
+          </div>
+          {/* Points Display */}
+          <div className="mt-3 pt-3 border-t">
+            <PointsDisplay />
           </div>
         </div>
 
