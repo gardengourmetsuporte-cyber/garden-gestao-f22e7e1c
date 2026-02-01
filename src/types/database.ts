@@ -4,12 +4,15 @@ export type UnitType = 'unidade' | 'kg' | 'litro';
 export type MovementType = 'entrada' | 'saida';
 export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';
 export type ChecklistType = 'abertura' | 'fechamento' | 'limpeza';
+export type ScheduleStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Profile {
   id: string;
   user_id: string;
   full_name: string;
   avatar_url: string | null;
+  job_title: string | null;
+  department: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -142,6 +145,23 @@ export interface ChecklistCompletion {
   // Joined data
   item?: ChecklistItem;
   profile?: Profile;
+}
+
+// Work Schedule types
+export interface WorkSchedule {
+  id: string;
+  user_id: string;
+  month: number;
+  year: number;
+  day_off: number;
+  status: ScheduleStatus;
+  approved_by: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  profile?: Profile;
+  approver_profile?: Profile;
 }
 
 export interface DashboardStats {

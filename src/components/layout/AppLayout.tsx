@@ -9,7 +9,8 @@ import {
   X, 
   ChevronRight,
   User,
-  Shield
+  Shield,
+  CalendarDays
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -29,7 +30,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { icon: Package, label: 'Estoque', href: '/' },
   { icon: ClipboardCheck, label: 'Checklists', href: '/checklists' },
-  { icon: Settings, label: 'Configurações', href: '/settings', adminOnly: true },
+  { icon: CalendarDays, label: 'Escala', href: '/schedule' },
+  { icon: Settings, label: 'Configurações', href: '/settings' },
 ];
 
 export function AppLayout({ children }: AppLayoutProps) {
