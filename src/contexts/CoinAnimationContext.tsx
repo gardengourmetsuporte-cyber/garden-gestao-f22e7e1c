@@ -52,8 +52,15 @@ export function CoinAnimationProvider({ children }: { children: ReactNode }) {
 
 export function useCoinAnimation() {
   const context = useContext(CoinAnimationContext);
+  // Return a no-op version if context is not available (safe for SSR/build)
   if (!context) {
-    throw new Error('useCoinAnimation must be used within a CoinAnimationProvider');
+    return {
+      coins: [],
+      triggerCoin: () => {},
+      removeCoin: () => {},
+      triggerPulse: () => {},
+      isPulsing: false,
+    };
   }
   return context;
 }
