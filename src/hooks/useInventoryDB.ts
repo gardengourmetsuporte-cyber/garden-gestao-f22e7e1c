@@ -131,7 +131,7 @@ export function useInventoryDB() {
     quantity: number,
     notes?: string
   ) => {
-    // Insert movement
+    // Insert movement - stock is updated automatically by database trigger
     const { data: movementData, error: movementError } = await supabase
       .from('stock_movements')
       .insert({
@@ -146,19 +146,21 @@ export function useInventoryDB() {
 
     if (movementError) throw movementError;
 
-    // Update item stock
+    // Update local state to reflect new stock (calculated by trigger)
     const item = items.find(i => i.id === itemId);
     if (item) {
       const newStock = type === 'entrada'
         ? item.current_stock + quantity
         : Math.max(0, item.current_stock - quantity);
 
-      await updateItem(itemId, { current_stock: newStock });
+      setItems(prev => prev.map(i => 
+        i.id === itemId ? { ...i, current_stock: newStock } : i
+      ));
     }
 
     setMovements(prev => [movementData as StockMovement, ...prev]);
     return movementData as StockMovement;
-  }, [user?.id, items, updateItem]);
+  }, [user?.id, items]);
 
   const getItemMovements = useCallback((itemId: string) => {
     return movements.filter(m => m.item_id === itemId);
