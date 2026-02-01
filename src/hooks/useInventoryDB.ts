@@ -22,8 +22,8 @@ export function useInventoryDB() {
 
       if (error) throw error;
       setItems((data as InventoryItem[]) || []);
-    } catch (error) {
-      console.error('Error fetching items:', error);
+    } catch {
+      // Error handled silently - user sees empty state
     }
   }, []);
 
@@ -40,8 +40,8 @@ export function useInventoryDB() {
 
       if (error) throw error;
       setMovements((data as StockMovement[]) || []);
-    } catch (error) {
-      console.error('Error fetching movements:', error);
+    } catch {
+      // Error handled silently - user sees empty state
     }
   }, []);
 

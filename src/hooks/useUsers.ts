@@ -46,8 +46,8 @@ export function useUsers() {
       });
 
       setUsers(usersWithRoles);
-    } catch (error) {
-      console.error('Error fetching users:', error);
+    } catch {
+      // Error handled silently - user sees empty state
     } finally {
       setIsLoading(false);
     }
@@ -81,8 +81,8 @@ export function useUsers() {
 
       await fetchUsers();
     } catch (error) {
-      console.error('Error updating user role:', error);
-      throw error;
+      // Re-throw for caller to handle with generic message
+      throw new Error('Erro ao atualizar função do usuário');
     }
   }
 
@@ -96,8 +96,8 @@ export function useUsers() {
       if (error) throw error;
       await fetchUsers();
     } catch (error) {
-      console.error('Error updating profile:', error);
-      throw error;
+      // Re-throw for caller to handle with generic message
+      throw new Error('Erro ao atualizar perfil');
     }
   }
 

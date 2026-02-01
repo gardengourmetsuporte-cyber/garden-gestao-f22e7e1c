@@ -30,8 +30,8 @@ export function ProfileSettings() {
 
       if (error) throw error;
       toast.success('Perfil atualizado com sucesso!');
-    } catch (error) {
-      console.error('Error updating profile:', error);
+    } catch {
+      // Show generic error to user
       toast.error('Erro ao atualizar perfil');
     } finally {
       setIsSaving(false);
