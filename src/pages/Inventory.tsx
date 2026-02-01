@@ -136,12 +136,23 @@ export default function InventoryPage() {
       if (order?.status === 'draft') {
         await updateOrderStatus(orderId, 'sent');
         toast.success('Pedido marcado como enviado!');
-      } else if (order?.status === 'sent') {
-        await updateOrderStatus(orderId, 'received');
-        toast.success('Pedido marcado como recebido!');
       }
     } catch (error) {
       toast.error('Erro ao atualizar pedido');
+    }
+  };
+
+  const handleReceiveOrder = async (orderId: string, receivedItems: { itemId: string; quantity: number }[]) => {
+    try {
+      // Register stock entries for each received item
+      for (const item of receivedItems) {
+        await registerMovement(item.itemId, 'entrada', item.quantity, `Recebimento de pedido`);
+      }
+      // Update order status to received
+      await updateOrderStatus(orderId, 'received');
+    } catch (error) {
+      toast.error('Erro ao receber pedido');
+      throw error;
     }
   };
 
@@ -372,6 +383,7 @@ export default function InventoryPage() {
               onCreateOrder={handleCreateOrder}
               onSendOrder={handleSendOrder}
               onDeleteOrder={handleDeleteOrder}
+              onReceiveOrder={handleReceiveOrder}
             />
           ) : (
             <MovementHistoryNew

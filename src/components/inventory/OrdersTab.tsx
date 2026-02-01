@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
-import { Package, Send, Plus, Trash2, MessageCircle, Check, Clock, X } from 'lucide-react';
+import { Package, Plus, Trash2, MessageCircle, Check, Clock, PackageCheck } from 'lucide-react';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { ReceiveOrderSheet } from './ReceiveOrderSheet';
 
 interface OrdersTabProps {
   items: InventoryItem[];
@@ -13,6 +14,7 @@ interface OrdersTabProps {
   onCreateOrder: (supplierId: string, items: { item_id: string; quantity: number }[]) => Promise<void>;
   onSendOrder: (orderId: string) => Promise<void>;
   onDeleteOrder: (orderId: string) => Promise<void>;
+  onReceiveOrder: (orderId: string, items: { itemId: string; quantity: number }[]) => Promise<void>;
 }
 
 export function OrdersTab({
@@ -22,11 +24,14 @@ export function OrdersTab({
   onCreateOrder,
   onSendOrder,
   onDeleteOrder,
+  onReceiveOrder,
 }: OrdersTabProps) {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [receiveOrderOpen, setReceiveOrderOpen] = useState(false);
+  const [orderToReceive, setOrderToReceive] = useState<Order | null>(null);
 
   // Get items that need to be ordered (below minimum stock)
   const lowStockItems = useMemo(() => {
@@ -261,11 +266,14 @@ export function OrdersTab({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => onSendOrder(order.id)}
-                    className="gap-2"
+                    onClick={() => {
+                      setOrderToReceive(order);
+                      setReceiveOrderOpen(true);
+                    }}
+                    className="gap-2 bg-success/10 hover:bg-success/20 text-success border-success/30"
                   >
-                    <Check className="w-4 h-4" />
-                    Marcar Recebido
+                    <PackageCheck className="w-4 h-4" />
+                    Receber Pedido
                   </Button>
                 )}
                 {(order.status === 'draft' || order.status === 'sent') && (
@@ -283,6 +291,14 @@ export function OrdersTab({
           ))}
         </div>
       )}
+
+      {/* Receive Order Sheet */}
+      <ReceiveOrderSheet
+        order={orderToReceive}
+        open={receiveOrderOpen}
+        onOpenChange={setReceiveOrderOpen}
+        onConfirmReceive={onReceiveOrder}
+      />
 
       {/* Create Order Sheet */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
