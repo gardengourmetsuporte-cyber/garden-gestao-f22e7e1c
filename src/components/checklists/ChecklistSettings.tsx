@@ -77,6 +77,7 @@ export function ChecklistSettings({
   // Editing states
   const [editingSector, setEditingSector] = useState<ChecklistSector | null>(null);
   const [editingSubcategory, setEditingSubcategory] = useState<ChecklistSubcategory | null>(null);
+  const [editingItem, setEditingItem] = useState<any | null>(null);
   const [selectedSectorId, setSelectedSectorId] = useState<string | null>(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
   
@@ -179,25 +180,43 @@ export function ChecklistSettings({
   };
 
   // Item handlers
-  const handleOpenItemSheet = (subcategoryId: string) => {
+  const handleOpenItemSheet = (subcategoryId: string, item?: any) => {
     setSelectedSubcategoryId(subcategoryId);
-    setItemName('');
-    setItemDescription('');
-    setItemFrequency('daily');
-    setItemChecklistType('abertura');
+    if (item) {
+      setEditingItem(item);
+      setItemName(item.name || '');
+      setItemDescription(item.description || '');
+      setItemFrequency(item.frequency || 'daily');
+      setItemChecklistType(item.checklist_type || 'abertura');
+    } else {
+      setEditingItem(null);
+      setItemName('');
+      setItemDescription('');
+      setItemFrequency('daily');
+      setItemChecklistType('abertura');
+    }
     setItemSheetOpen(true);
   };
 
   const handleSaveItem = async () => {
-    if (!itemName.trim() || !selectedSubcategoryId) return;
+    if (!itemName.trim()) return;
 
-    await onAddItem({
-      subcategory_id: selectedSubcategoryId,
-      name: itemName.trim(),
-      description: itemDescription.trim() || undefined,
-      frequency: itemFrequency,
-      checklist_type: itemChecklistType,
-    });
+    if (editingItem) {
+      await onUpdateItem(editingItem.id, {
+        name: itemName.trim(),
+        description: itemDescription.trim() || undefined,
+        frequency: itemFrequency,
+        checklist_type: itemChecklistType,
+      });
+    } else if (selectedSubcategoryId) {
+      await onAddItem({
+        subcategory_id: selectedSubcategoryId,
+        name: itemName.trim(),
+        description: itemDescription.trim() || undefined,
+        frequency: itemFrequency,
+        checklist_type: itemChecklistType,
+      });
+    }
     setItemSheetOpen(false);
   };
 
@@ -355,6 +374,12 @@ export function ChecklistSettings({
                                 {item.is_active ? 'Ativo' : 'Inativo'}
                               </button>
                               <button
+                                onClick={() => handleOpenItemSheet(subcategory.id, item)}
+                                className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground"
+                              >
+                                <Edit2 className="w-3 h-3" />
+                              </button>
+                              <button
                                 onClick={() => onDeleteItem(item.id)}
                                 className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
                               >
@@ -471,7 +496,7 @@ export function ChecklistSettings({
       <Sheet open={itemSheetOpen} onOpenChange={setItemSheetOpen}>
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
-            <SheetTitle>Novo Item</SheetTitle>
+            <SheetTitle>{editingItem ? 'Editar Item' : 'Novo Item'}</SheetTitle>
           </SheetHeader>
 
           <div className="space-y-5">
@@ -538,7 +563,7 @@ export function ChecklistSettings({
               disabled={!itemName.trim()}
               className="w-full h-12"
             >
-              Criar Item
+              {editingItem ? 'Salvar Item' : 'Criar Item'}
             </Button>
           </div>
         </SheetContent>

@@ -31,6 +31,13 @@ interface ChecklistViewProps {
   isAdmin: boolean;
 }
 
+// Helper to check if a date is today
+const isToday = (dateStr: string): boolean => {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  return dateStr === todayStr;
+};
+
 const iconMap: Record<string, React.ReactNode> = {
   ChefHat: <ChefHat className="w-5 h-5" />,
   UtensilsCrossed: <UtensilsCrossed className="w-5 h-5" />,
@@ -102,9 +109,14 @@ export function ChecklistView({
     ? Math.round((totalProgress.completed / totalProgress.total) * 100) 
     : 0;
 
+  // Check if the selected date is today
+  const isTodayDate = isToday(date);
+
   // Check if a completed item can be toggled (unchecked) by current user
   const canToggleItem = (completion: ChecklistCompletion | undefined, completed: boolean) => {
-    // If not completed, anyone can mark it
+    // Non-admins can only interact with tasks on today's date
+    if (!isAdmin && !isTodayDate) return false;
+    // If not completed, anyone can mark it (admin always, employee only on today)
     if (!completed) return true;
     // If admin, can toggle any item
     if (isAdmin) return true;
