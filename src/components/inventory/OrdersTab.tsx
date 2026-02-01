@@ -276,7 +276,7 @@ export function OrdersTab({
                     Receber Pedido
                   </Button>
                 )}
-                {(order.status === 'draft' || order.status === 'sent') && (
+                {(order.status === 'draft' || order.status === 'sent' || order.status === 'received') && (
                   <Button
                     size="sm"
                     variant="ghost"
