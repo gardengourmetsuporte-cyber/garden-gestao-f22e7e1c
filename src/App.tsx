@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Inventory from "./pages/Inventory";
 import Checklists from "./pages/Checklists";
 import Settings from "./pages/Settings";
+import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Checklists />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/schedule"
+        element={
+          <ProtectedRoute>
+            <Schedule />
           </ProtectedRoute>
         }
       />

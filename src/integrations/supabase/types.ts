@@ -323,24 +323,30 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          department: string | null
           full_name: string
           id: string
+          job_title: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           full_name: string
           id?: string
+          job_title?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string
           id?: string
+          job_title?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -435,6 +441,45 @@ export type Database = {
         }
         Relationships: []
       }
+      work_schedules: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          day_off: number
+          id: string
+          month: number
+          notes: string | null
+          status: Database["public"]["Enums"]["schedule_status"]
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          day_off: number
+          id?: string
+          month: number
+          notes?: string | null
+          status?: Database["public"]["Enums"]["schedule_status"]
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          day_off?: number
+          id?: string
+          month?: number
+          notes?: string | null
+          status?: Database["public"]["Enums"]["schedule_status"]
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -454,6 +499,7 @@ export type Database = {
       checklist_type: "abertura" | "fechamento" | "limpeza"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
+      schedule_status: "pending" | "approved" | "rejected"
       unit_type: "unidade" | "kg" | "litro"
     }
     CompositeTypes: {
@@ -586,6 +632,7 @@ export const Constants = {
       checklist_type: ["abertura", "fechamento", "limpeza"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
+      schedule_status: ["pending", "approved", "rejected"],
       unit_type: ["unidade", "kg", "litro"],
     },
   },
