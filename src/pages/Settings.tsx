@@ -1,12 +1,13 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Tag, Truck, ClipboardCheck, Users } from 'lucide-react';
+import { User, Tag, Truck, ClipboardCheck, Users, Gift } from 'lucide-react';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
 import { SupplierSettings } from '@/components/settings/SupplierSettings';
 import { UserManagement } from '@/components/settings/UserManagement';
 import { ChecklistSettingsManager } from '@/components/settings/ChecklistSettingsManager';
+import { RewardSettings } from '@/components/settings/RewardSettings';
 
 export default function SettingsPage() {
   const { isAdmin } = useAuth();
@@ -26,7 +27,7 @@ export default function SettingsPage() {
 
         <div className="px-4 py-6 lg:px-6">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-3 lg:grid-cols-5' : 'grid-cols-1'} h-auto gap-2 bg-transparent p-0`}>
+            <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-3 lg:grid-cols-6' : 'grid-cols-1'} h-auto gap-2 bg-transparent p-0`}>
               <TabsTrigger
                 value="profile"
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
@@ -64,6 +65,13 @@ export default function SettingsPage() {
                     <Users className="w-4 h-4" />
                     <span className="hidden sm:inline">Usuários</span>
                   </TabsTrigger>
+                  <TabsTrigger
+                    value="rewards"
+                    className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
+                  >
+                    <Gift className="w-4 h-4" />
+                    <span className="hidden sm:inline">Loja</span>
+                  </TabsTrigger>
                 </>
               )}
             </TabsList>
@@ -89,6 +97,10 @@ export default function SettingsPage() {
 
                   <TabsContent value="users" className="mt-0">
                     <UserManagement />
+                  </TabsContent>
+
+                  <TabsContent value="rewards" className="mt-0">
+                    <RewardSettings />
                   </TabsContent>
                 </>
               )}

@@ -358,6 +358,83 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          points_cost: number
+          stock: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          points_cost: number
+          stock?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          points_cost?: number
+          stock?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reward_redemptions: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          points_spent: number
+          product_id: string
+          status: Database["public"]["Enums"]["reward_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          points_spent: number
+          product_id: string
+          status?: Database["public"]["Enums"]["reward_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          points_spent?: number
+          product_id?: string
+          status?: Database["public"]["Enums"]["reward_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "reward_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stock_movements: {
         Row: {
           created_at: string
@@ -505,6 +582,7 @@ export type Database = {
       checklist_type: "abertura" | "fechamento" | "limpeza"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
+      reward_status: "pending" | "approved" | "delivered" | "cancelled"
       schedule_status: "pending" | "approved" | "rejected"
       unit_type: "unidade" | "kg" | "litro"
     }
@@ -638,6 +716,7 @@ export const Constants = {
       checklist_type: ["abertura", "fechamento", "limpeza"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
+      reward_status: ["pending", "approved", "delivered", "cancelled"],
       schedule_status: ["pending", "approved", "rejected"],
       unit_type: ["unidade", "kg", "litro"],
     },

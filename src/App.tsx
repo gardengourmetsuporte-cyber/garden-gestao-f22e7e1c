@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Auth from "./pages/Auth";
 import Inventory from "./pages/Inventory";
 import Checklists from "./pages/Checklists";
+import Rewards from "./pages/Rewards";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -47,6 +48,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Checklists />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rewards"
+        element={
+          <ProtectedRoute>
+            <Rewards />
           </ProtectedRoute>
         }
       />

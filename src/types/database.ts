@@ -173,3 +173,32 @@ export interface DashboardStats {
   outOfStockItems: number;
   recentMovements: number;
 }
+
+// Reward types
+export type RewardStatus = 'pending' | 'approved' | 'delivered' | 'cancelled';
+
+export interface RewardProduct {
+  id: string;
+  name: string;
+  description: string | null;
+  points_cost: number;
+  image_url: string | null;
+  is_active: boolean;
+  stock: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RewardRedemption {
+  id: string;
+  user_id: string;
+  product_id: string;
+  points_spent: number;
+  status: RewardStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  product?: RewardProduct;
+  profile?: Profile;
+}
