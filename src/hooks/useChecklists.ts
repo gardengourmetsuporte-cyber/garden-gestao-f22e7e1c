@@ -218,9 +218,18 @@ export function useChecklists() {
     await fetchSectors();
   }, [fetchSectors]);
 
-  // Reorder functions
+  // Reorder functions - with optimistic UI update
   const reorderSectors = useCallback(async (orderedIds: string[]) => {
-    // Update sort_order for each sector
+    // Optimistic update - reorder sectors in state immediately
+    setSectors(prev => {
+      const sectorMap = new Map(prev.map(s => [s.id, s]));
+      return orderedIds
+        .map(id => sectorMap.get(id))
+        .filter((s): s is ChecklistSector => s !== undefined)
+        .map((s, index) => ({ ...s, sort_order: index }));
+    });
+
+    // Persist to database in background
     const updates = orderedIds.map((id, index) => 
       supabase
         .from('checklist_sectors')
@@ -229,10 +238,23 @@ export function useChecklists() {
     );
     
     await Promise.all(updates);
-    await fetchSectors();
-  }, [fetchSectors]);
+  }, []);
 
   const reorderSubcategories = useCallback(async (sectorId: string, orderedIds: string[]) => {
+    // Optimistic update
+    setSectors(prev => prev.map(sector => {
+      if (sector.id !== sectorId) return sector;
+      
+      const subMap = new Map((sector.subcategories || []).map(s => [s.id, s]));
+      const reorderedSubs = orderedIds
+        .map(id => subMap.get(id))
+        .filter((s): s is ChecklistSubcategory => s !== undefined)
+        .map((s, index) => ({ ...s, sort_order: index }));
+      
+      return { ...sector, subcategories: reorderedSubs };
+    }));
+
+    // Persist to database
     const updates = orderedIds.map((id, index) => 
       supabase
         .from('checklist_subcategories')
@@ -241,10 +263,26 @@ export function useChecklists() {
     );
     
     await Promise.all(updates);
-    await fetchSectors();
-  }, [fetchSectors]);
+  }, []);
 
   const reorderItems = useCallback(async (subcategoryId: string, orderedIds: string[]) => {
+    // Optimistic update
+    setSectors(prev => prev.map(sector => ({
+      ...sector,
+      subcategories: (sector.subcategories || []).map(sub => {
+        if (sub.id !== subcategoryId) return sub;
+        
+        const itemMap = new Map((sub.items || []).map(i => [i.id, i]));
+        const reorderedItems = orderedIds
+          .map(id => itemMap.get(id))
+          .filter((i): i is ChecklistItem => i !== undefined)
+          .map((i, index) => ({ ...i, sort_order: index }));
+        
+        return { ...sub, items: reorderedItems };
+      })
+    })));
+
+    // Persist to database
     const updates = orderedIds.map((id, index) => 
       supabase
         .from('checklist_items')
@@ -253,8 +291,7 @@ export function useChecklists() {
     );
     
     await Promise.all(updates);
-    await fetchSectors();
-  }, [fetchSectors]);
+  }, []);
 
   // Completion management
   const toggleCompletion = useCallback(async (
