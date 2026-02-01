@@ -12,10 +12,12 @@ import {
   ChevronRight,
   Clock,
   User,
-  Lock
+  Lock,
+  Star
 } from 'lucide-react';
 import { ChecklistSector, ChecklistType, ChecklistCompletion } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -23,7 +25,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string) => void;
+  onToggleItem: (itemId: string, event?: React.MouseEvent) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -48,6 +50,7 @@ export function ChecklistView({
   currentUserId,
   isAdmin,
 }: ChecklistViewProps) {
+  const { triggerCoin } = useCoinAnimation();
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set(sectors.map(s => s.id)));
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
 
@@ -249,7 +252,15 @@ export function ChecklistView({
                         return (
                           <button
                             key={item.id}
-                            onClick={() => canToggle && onToggleItem(item.id)}
+                            onClick={(e) => {
+                              if (!canToggle) return;
+                              // Trigger coin animation only when completing (not uncompleting)
+                              if (!completed) {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                triggerCoin(rect.right - 40, rect.top + rect.height / 2);
+                              }
+                              onToggleItem(item.id, e);
+                            }}
                             disabled={!canToggle}
                             className={cn(
                               "w-full flex items-start gap-3 p-3 rounded-lg transition-all",
@@ -296,6 +307,16 @@ export function ChecklistView({
                                   </span>
                                 </div>
                               )}
+                            </div>
+                            {/* Coin badge showing points reward */}
+                            <div className={cn(
+                              "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
+                              completed 
+                                ? "bg-amber-500/10 text-amber-500/50" 
+                                : "bg-amber-500/20 text-amber-600"
+                            )}>
+                              <Star className={cn("w-3 h-3", completed ? "fill-amber-500/50" : "fill-amber-500")} />
+                              <span>+1</span>
                             </div>
                           </button>
                         );
