@@ -7,18 +7,15 @@ import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
-
 interface AppLayoutProps {
   children: ReactNode;
 }
-
 interface NavItem {
   icon: typeof Package;
   label: string;
   href: string;
   adminOnly?: boolean;
 }
-
 const navItems: NavItem[] = [{
   icon: Package,
   label: 'Estoque',
@@ -36,23 +33,26 @@ const navItems: NavItem[] = [{
   label: 'Configurações',
   href: '/settings'
 }];
-
-function AppLayoutContent({ children }: AppLayoutProps) {
+function AppLayoutContent({
+  children
+}: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { profile, isAdmin, signOut } = useAuth();
-  const { isPulsing } = useCoinAnimation();
+  const {
+    profile,
+    isAdmin,
+    signOut
+  } = useAuth();
+  const {
+    isPulsing
+  } = useCoinAnimation();
   const location = useLocation();
   const navigate = useNavigate();
-
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
   };
-
   const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b shadow-sm">
         <div className="flex items-center justify-between h-16 px-4">
@@ -82,7 +82,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="flex items-center justify-between h-16 px-4 border-b">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shadow">
-              <img src={logo} alt="Logo" className="w-full h-full object-contain" />
+              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
             </div>
             <div>
               <h1 className="font-bold text-foreground">Gestão</h1>
@@ -98,15 +98,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="p-4 border-b">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-              {profile?.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt="Avatar" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="w-6 h-6 text-primary" />
-              )}
+              {profile?.avatar_url ? <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <User className="w-6 h-6 text-primary" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-foreground truncate">
@@ -129,23 +121,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {/* Navigation */}
         <nav className="p-3 space-y-1">
           {filteredNavItems.map(item => {
-            const isActive = location.pathname === item.href;
-            return (
-              <Link 
-                key={item.href} 
-                to={item.href} 
-                onClick={() => setSidebarOpen(false)} 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all", 
-                  isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                )}
-              >
+          const isActive = location.pathname === item.href;
+          return <Link key={item.href} to={item.href} onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all", isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}>
                 <item.icon className="w-5 h-5" />
                 <span className="flex-1">{item.label}</span>
                 {isActive && <ChevronRight className="w-4 h-4" />}
-              </Link>
-            );
-          })}
+              </Link>;
+        })}
         </nav>
 
         {/* Logout */}
@@ -164,14 +146,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* Coin Animation Layer */}
       <CoinAnimationLayer />
-    </div>
-  );
+    </div>;
 }
-
-export function AppLayout({ children }: AppLayoutProps) {
-  return (
-    <CoinAnimationProvider>
+export function AppLayout({
+  children
+}: AppLayoutProps) {
+  return <CoinAnimationProvider>
       <AppLayoutContent>{children}</AppLayoutContent>
-    </CoinAnimationProvider>
-  );
+    </CoinAnimationProvider>;
 }
