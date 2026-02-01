@@ -177,7 +177,8 @@ export function ChecklistView({
             {/* Subcategories */}
             {isExpanded && sector.subcategories?.map(subcategory => {
               const isSubExpanded = expandedSubcategories.has(subcategory.id);
-              const activeItems = subcategory.items?.filter(i => i.is_active) || [];
+              // Filter items by checklist_type AND is_active
+              const activeItems = subcategory.items?.filter(i => i.is_active && (i as any).checklist_type === checklistType) || [];
               const completedItems = activeItems.filter(i => isItemCompleted(i.id));
               const subComplete = activeItems.length > 0 && completedItems.length === activeItems.length;
 

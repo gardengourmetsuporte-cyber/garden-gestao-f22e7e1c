@@ -157,6 +157,7 @@ export function useChecklists() {
     name: string;
     description?: string;
     frequency?: 'daily' | 'weekly' | 'monthly';
+    checklist_type?: ChecklistType;
   }) => {
     const { data, error } = await supabase
       .from('checklist_items')
@@ -165,6 +166,7 @@ export function useChecklists() {
         name: item.name,
         description: item.description,
         frequency: item.frequency || 'daily',
+        checklist_type: item.checklist_type || 'abertura',
       })
       .select()
       .single();
@@ -239,7 +241,7 @@ export function useChecklists() {
     return completions.some(c => c.item_id === itemId);
   }, [completions]);
 
-  const getCompletionProgress = useCallback((sectorId: string) => {
+  const getCompletionProgress = useCallback((sectorId: string, filterType?: ChecklistType) => {
     const sector = sectors.find(s => s.id === sectorId);
     if (!sector) return { completed: 0, total: 0 };
 
@@ -248,7 +250,9 @@ export function useChecklists() {
 
     sector.subcategories?.forEach(sub => {
       sub.items?.forEach(item => {
-        if (item.is_active) {
+        // Filter by checklist_type if provided
+        const itemType = (item as any).checklist_type;
+        if (item.is_active && (!filterType || itemType === filterType)) {
           total++;
           if (isItemCompleted(item.id)) completed++;
         }

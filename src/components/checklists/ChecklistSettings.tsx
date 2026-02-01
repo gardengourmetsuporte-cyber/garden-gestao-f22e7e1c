@@ -10,9 +10,12 @@ import {
   FileText,
   Calendar,
   CalendarDays,
-  CalendarRange
+  CalendarRange,
+  Sun,
+  Moon,
+  Sparkles
 } from 'lucide-react';
-import { ChecklistSector, ChecklistSubcategory, ItemFrequency } from '@/types/database';
+import { ChecklistSector, ChecklistSubcategory, ItemFrequency, ChecklistType } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,6 +35,12 @@ const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Cale
   { value: 'monthly', label: 'Mensal', icon: CalendarRange },
 ];
 
+const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof Sun }[] = [
+  { value: 'abertura', label: 'Abertura', icon: Sun },
+  { value: 'fechamento', label: 'Fechamento', icon: Moon },
+  { value: 'limpeza', label: 'Limpeza', icon: Sparkles },
+];
+
 interface ChecklistSettingsProps {
   sectors: ChecklistSector[];
   onAddSector: (data: { name: string; color: string }) => Promise<void>;
@@ -40,8 +49,8 @@ interface ChecklistSettingsProps {
   onAddSubcategory: (data: { sector_id: string; name: string }) => Promise<void>;
   onUpdateSubcategory: (id: string, data: { name?: string }) => Promise<void>;
   onDeleteSubcategory: (id: string) => Promise<void>;
-  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency }) => Promise<void>;
+  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
 }
 
@@ -78,9 +87,22 @@ export function ChecklistSettings({
   const [itemName, setItemName] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [itemFrequency, setItemFrequency] = useState<ItemFrequency>('daily');
+  const [itemChecklistType, setItemChecklistType] = useState<ChecklistType>('abertura');
 
   const getFrequencyLabel = (freq: ItemFrequency) => {
     return frequencyOptions.find(f => f.value === freq)?.label || 'Diária';
+  };
+
+  const getChecklistTypeLabel = (type: ChecklistType) => {
+    return checklistTypeOptions.find(t => t.value === type)?.label || 'Abertura';
+  };
+
+  const getChecklistTypeIcon = (type: ChecklistType) => {
+    switch (type) {
+      case 'abertura': return Sun;
+      case 'fechamento': return Moon;
+      case 'limpeza': return Sparkles;
+    }
   };
 
   const toggleSector = (sectorId: string) => {
@@ -162,6 +184,7 @@ export function ChecklistSettings({
     setItemName('');
     setItemDescription('');
     setItemFrequency('daily');
+    setItemChecklistType('abertura');
     setItemSheetOpen(true);
   };
 
@@ -173,6 +196,7 @@ export function ChecklistSettings({
       name: itemName.trim(),
       description: itemDescription.trim() || undefined,
       frequency: itemFrequency,
+      checklist_type: itemChecklistType,
     });
     setItemSheetOpen(false);
   };
@@ -301,10 +325,18 @@ export function ChecklistSettings({
                             >
                               <FileText className="w-4 h-4 text-muted-foreground" />
                               <div className="flex-1">
-                                <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                   <p className="text-sm font-medium">{item.name}</p>
                                   <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
                                     {getFrequencyLabel(item.frequency || 'daily')}
+                                  </span>
+                                  <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary flex items-center gap-1">
+                                    {(() => {
+                                      const itemType = (item as any).checklist_type || 'abertura';
+                                      const Icon = getChecklistTypeIcon(itemType as ChecklistType);
+                                      return <Icon className="w-3 h-3" />;
+                                    })()}
+                                    {getChecklistTypeLabel(((item as any).checklist_type || 'abertura') as ChecklistType)}
                                   </span>
                                 </div>
                                 {item.description && (
@@ -471,6 +503,25 @@ export function ChecklistSettings({
                 </SelectTrigger>
                 <SelectContent>
                   {frequencyOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <div className="flex items-center gap-2">
+                        <opt.icon className="w-4 h-4" />
+                        {opt.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Tipo de Checklist</Label>
+              <Select value={itemChecklistType} onValueChange={(v) => setItemChecklistType(v as ChecklistType)}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {checklistTypeOptions.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <div className="flex items-center gap-2">
                         <opt.icon className="w-4 h-4" />
