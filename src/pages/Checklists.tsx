@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useChecklists } from '@/hooks/useChecklists';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
-import { ClipboardCheck, Settings, Sun, Moon, Sparkles } from 'lucide-react';
+import { ClipboardCheck, Settings, Sun, Moon, Sparkles, CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type TabView = 'checklist' | 'settings';
 
@@ -39,7 +43,8 @@ export default function ChecklistsPage() {
 
   const [currentTab, setCurrentTab] = useState<TabView>('checklist');
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
-  const [currentDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const currentDate = format(selectedDate, 'yyyy-MM-dd');
 
   useEffect(() => {
     fetchCompletions(currentDate, checklistType);
@@ -175,6 +180,34 @@ export default function ChecklistsPage() {
         <div className="px-4 py-4 lg:px-6 space-y-4">
           {currentTab === 'checklist' ? (
             <>
+              {/* Date Picker */}
+              <div className="flex items-center gap-3">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-medium",
+                        "bg-card border"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => date && setSelectedDate(date)}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                      locale={ptBR}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
               {/* Checklist Type Selector */}
               <div className="flex gap-2 bg-secondary p-1 rounded-xl">
                 <button
