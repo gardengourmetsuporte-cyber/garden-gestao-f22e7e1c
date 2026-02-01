@@ -1,187 +1,110 @@
 
 
-# Plano Completo: Sistema RBAC + Nome nas Tarefas
+# Plano: Ocultar Pedidos para Funcionários + Bloquear Tarefas Completadas
 
-## Resumo Executivo
+## Resumo
 
-Este plano implementa todas as regras de permissão discutidas, corrige os 2 avisos de segurança (warnings), e adiciona o nome de quem completou cada tarefa no checklist.
+Este plano resolve dois problemas identificados:
 
----
-
-## Matriz de Permissões Final
-
-| Recurso | Admin | Funcionário |
-|---------|-------|-------------|
-| **ESTOQUE** | | |
-| Ver itens | ✅ | ✅ |
-| Entrada/saída | ✅ | ✅ |
-| Criar item | ✅ | ❌ |
-| Editar item | ✅ | ❌ |
-| Excluir item | ✅ | ❌ |
-| **CHECKLIST** | | |
-| Ver e completar tarefas | ✅ | ✅ |
-| Ver quem completou | ✅ | ✅ |
-| Configurar setores/itens | ✅ | ❌ |
-| **CONFIGURAÇÕES** | | |
-| Editar perfil próprio | ✅ | ✅ |
-| Ver categorias | ✅ | ❌ |
-| Gerenciar categorias | ✅ | ❌ |
-| Ver fornecedores | ✅ | ❌ |
-| Gerenciar fornecedores | ✅ | ❌ |
-| Gerenciar checklists | ✅ | ❌ |
-| Gerenciar usuários | ✅ | ❌ |
+1. **Funcionários vendo Pedidos**: A aba "Pedidos" no estoque será ocultada para funcionários
+2. **Bloqueio de tarefas completadas**: Após um funcionário marcar uma tarefa, apenas o admin poderá desmarcá-la
 
 ---
 
-## Alterações por Módulo
+## Problema 1: Funcionários Vendo Pedidos
 
-### 1. Banco de Dados (Migração SQL)
+### O que acontece hoje
+Na página de Estoque, funcionários conseguem ver a aba "Pedidos" com todas as informações de compras.
 
-Corrigir políticas RLS para restringir escrita apenas para admins:
-
-```sql
--- CATEGORIAS: Restringir escrita para admins (corrige warning categories_write_access)
-DROP POLICY IF EXISTS "Authenticated can manage categories" ON public.categories;
-
-CREATE POLICY "Admins can manage categories" ON public.categories
-  FOR ALL USING (has_role(auth.uid(), 'admin'::app_role))
-  WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
-
--- FORNECEDORES: Mesmo padrão
-DROP POLICY IF EXISTS "Authenticated can manage suppliers" ON public.suppliers;
-
-CREATE POLICY "Admins can manage suppliers" ON public.suppliers
-  FOR ALL USING (has_role(auth.uid(), 'admin'::app_role))
-  WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
-
--- MOVIMENTAÇÕES: Adicionar proteção DELETE (corrige warning stock_movements_no_delete)
-CREATE POLICY "Admins can delete movements" ON public.stock_movements
-  FOR DELETE USING (has_role(auth.uid(), 'admin'::app_role));
-
--- ITENS DE INVENTÁRIO: Restringir INSERT/UPDATE para admins
-DROP POLICY IF EXISTS "Authenticated can insert items" ON public.inventory_items;
-DROP POLICY IF EXISTS "Authenticated can update items" ON public.inventory_items;
-
-CREATE POLICY "Admins can insert items" ON public.inventory_items
-  FOR INSERT WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
-
-CREATE POLICY "Admins can update items" ON public.inventory_items
-  FOR UPDATE USING (has_role(auth.uid(), 'admin'::app_role));
-```
-
----
-
-### 2. Página de Estoque
+### Solução
+Ocultar a aba "Pedidos" para funcionários, mostrando apenas "Itens" e "Histórico".
 
 **Arquivo:** `src/pages/Inventory.tsx`
 
-Alterações:
-- Ocultar botão "+" (adicionar item) para não-admins
-- Não passar `onEdit` para o ItemCard quando não é admin (remove o lápis)
-
-```text
-Antes (linha 205-210):
-<button onClick={handleAddItem} ...>
-  <Plus />
-</button>
-
-Depois:
-{isAdmin && (
-  <button onClick={handleAddItem} ...>
-    <Plus />
-  </button>
-)}
-
-Antes (linha 364-369):
-<ItemCard
-  item={item}
-  onClick={() => handleItemClick(item)}
-  onEdit={() => handleEditItem(item)}
-/>
-
-Depois:
-<ItemCard
-  item={item}
-  onClick={() => handleItemClick(item)}
-  onEdit={isAdmin ? () => handleEditItem(item) : undefined}
-/>
 ```
-
----
-
-### 3. Página de Configurações
-
-**Arquivo:** `src/pages/Settings.tsx`
-
-Funcionário verá **apenas a aba Perfil**. Todas as outras abas serão exclusivas para admin.
-
-```text
 Antes:
-┌─────────┐ ┌────────────┐ ┌─────────────┐ ┌────────────┐ ┌──────────┐
-│ Perfil  │ │ Categorias │ │ Fornecedores│ │ Checklists │ │ Usuários │
-└─────────┘ └────────────┘ └─────────────┘ └────────────┘ └──────────┘
-   Todos       Todos          Todos        Só Admin       Só Admin
+┌────────┐ ┌──────────┐ ┌───────────┐
+│  Itens │ │ Pedidos  │ │ Histórico │
+└────────┘ └──────────┘ └───────────┘
+   Todos      Todos         Todos
 
 Depois:
-┌─────────┐ ┌────────────┐ ┌─────────────┐ ┌────────────┐ ┌──────────┐
-│ Perfil  │ │ Categorias │ │ Fornecedores│ │ Checklists │ │ Usuários │
-└─────────┘ └────────────┘ └─────────────┘ └────────────┘ └──────────┘
-   Todos      Só Admin       Só Admin       Só Admin       Só Admin
+┌────────┐ ┌──────────┐ ┌───────────┐
+│  Itens │ │ Pedidos  │ │ Histórico │
+└────────┘ └──────────┘ └───────────┘
+   Todos    Só Admin       Todos
 ```
 
-Mudanças no código:
-- Mover as abas de Categorias e Fornecedores para dentro do bloco `{isAdmin && (...)}`
-- Ajustar o grid de colunas dinamicamente
+**Alteração no código:**
+- Envolver o botão "Pedidos" em `{isAdmin && (...)}`
+- Garantir que a view 'orders' só seja acessível por admin
 
 ---
 
-### 4. Checklist - Nome de Quem Completou
+## Problema 2: Bloquear Tarefas Completadas
 
-**Arquivo:** `src/hooks/useChecklists.ts`
+### O que acontece hoje
+Qualquer funcionário pode desmarcar uma tarefa que outro funcionário completou, permitindo que alguém "roube" crédito de tarefas feitas por outros.
 
-Alterar a query de `fetchCompletions` para incluir o nome do usuário:
+### Solução
+Depois que um funcionário marca uma tarefa como concluída:
+- **Outro funcionário NÃO pode desmarcar** (o clique é bloqueado)
+- **Apenas o admin pode desmarcar** qualquer tarefa
 
-```typescript
-// Antes:
-.select('*')
+### Implementação
 
-// Depois:
-.select(`
-  *,
-  profile:profiles!completed_by(full_name)
-`)
+#### 1. Banco de Dados (RLS)
+Atualizar política de DELETE em `checklist_completions`:
+
+```sql
+-- Remover política antiga de delete para admins
+DROP POLICY IF EXISTS "Admins can delete completions" ON public.checklist_completions;
+
+-- Nova política: só pode deletar se for admin OU se foi você quem completou
+CREATE POLICY "User or admin can delete completions" ON public.checklist_completions
+  FOR DELETE USING (
+    has_role(auth.uid(), 'admin'::app_role) 
+    OR completed_by = auth.uid()
+  );
 ```
 
-**Arquivo:** `src/types/database.ts`
-
-O tipo `ChecklistCompletion` já tem `profile?: Profile` - basta garantir o retorno.
+#### 2. Interface (ChecklistView)
+Modificar o botão de cada tarefa para:
+- Se **não completada**: qualquer um pode clicar
+- Se **completada pelo próprio usuário**: pode desmarcar
+- Se **completada por outro usuário**: 
+  - **Admin**: pode desmarcar
+  - **Funcionário**: clique desabilitado + visual indicando bloqueio
 
 **Arquivo:** `src/components/checklists/ChecklistView.tsx`
 
-Adicionar props para receber os dados de completions e exibir nome + hora:
-
-```text
+```
 Antes:
-[✓] Verificar estoque de carnes
+[✓] Limpar bancada
+    ↳ Feito por Bruno às 08:35
+    (qualquer um clica e desmarca)
 
 Depois:
-[✓] Verificar estoque de carnes
+[✓] Limpar bancada  🔒
     ↳ Feito por Bruno às 08:35
+    (se você é Maria, não pode desmarcar)
+    (se você é Admin, pode desmarcar)
 ```
 
-**Arquivo:** `src/pages/Checklists.tsx`
+#### 3. Hook (useChecklists)
+Adicionar verificação antes de deletar completion:
 
-Passar `completions` para o ChecklistView para que ele possa exibir os nomes.
-
----
-
-### 5. Limpeza de Código (Remover console.error)
-
-Já foram removidos alguns no último diff. Faltam:
-
-- `src/hooks/useCategories.ts` (linhas 18-19)
-- `src/hooks/useSuppliers.ts` (linhas 20-22)
-- `src/hooks/useChecklists.ts` (linhas 33-34 e 48-49)
+```typescript
+// Em toggleCompletion
+if (existing) {
+  // Verifica se pode deletar
+  const canDelete = isAdmin || existing.completed_by === user?.id;
+  if (!canDelete) {
+    throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
+  }
+  // ... continua com delete
+}
+```
 
 ---
 
@@ -189,63 +112,54 @@ Já foram removidos alguns no último diff. Faltam:
 
 | Arquivo | Alteração |
 |---------|-----------|
-| Nova migração SQL | Políticas RLS |
-| `src/pages/Inventory.tsx` | Ocultar botão "+" e editar para não-admin |
-| `src/pages/Settings.tsx` | Mostrar apenas aba Perfil para funcionário |
-| `src/hooks/useChecklists.ts` | Buscar nome do completador + remover console.error |
-| `src/components/checklists/ChecklistView.tsx` | Exibir "Feito por X às HH:MM" |
-| `src/pages/Checklists.tsx` | Passar completions para ChecklistView |
-| `src/hooks/useCategories.ts` | Remover console.error |
-| `src/hooks/useSuppliers.ts` | Remover console.error |
+| Nova migração SQL | Atualizar política DELETE em checklist_completions |
+| `src/pages/Inventory.tsx` | Ocultar aba Pedidos para não-admin |
+| `src/components/checklists/ChecklistView.tsx` | Bloquear clique em tarefas de outros |
+| `src/hooks/useChecklists.ts` | Verificar permissão antes de desmarcar |
+| `src/pages/Checklists.tsx` | Passar `isAdmin` e `userId` para ChecklistView |
 
 ---
 
 ## Visual Final
 
-### Funcionário no Estoque:
+### Estoque para Funcionário:
 ```
 ┌──────────────────────────────────────┐
 │  Controle de Estoque                 │
-│  15 itens cadastrados                │
-│                             (sem +)  │
 ├──────────────────────────────────────┤
-│  🥩 Carnes (3)                       │
-│  ├── Picanha      8.5kg   OK         │
-│  ├── Costela      2.0kg   Baixo      │
-│  └── Frango       0kg     Zerado     │
-│                                      │
-│  (clique abre entrada/saída,         │
-│   sem lápis de editar)               │
+│  ┌────────┐  ┌───────────┐           │
+│  │ Itens  │  │ Histórico │           │
+│  └────────┘  └───────────┘           │
+│  (sem aba Pedidos!)                  │
 └──────────────────────────────────────┘
 ```
 
-### Funcionário nas Configurações:
+### Checklist para Funcionário Maria:
 ```
 ┌──────────────────────────────────────┐
-│  Configurações                       │
-│  Gerencie seu perfil                 │
+│  [✓] Verificar estoque de carnes  🔒 │
+│      ↳ Feito por Bruno às 08:35      │
+│      (Maria não pode desmarcar)      │
 ├──────────────────────────────────────┤
-│  ┌─────────┐                         │
-│  │ Perfil  │  (aba única)            │
-│  └─────────┘                         │
+│  [✓] Limpar bancada                  │
+│      ↳ Feito por Maria às 08:42      │
+│      (Maria PODE desmarcar)          │
 ├──────────────────────────────────────┤
-│  Nome: Bruno Momesso                 │
-│  Cargo: [________]                   │
-│  [Salvar]                            │
+│  [ ] Organizar geladeira             │
+│      (Maria pode marcar)             │
 └──────────────────────────────────────┘
 ```
 
-### Checklist com Nome:
+### Checklist para Admin:
 ```
 ┌──────────────────────────────────────┐
 │  [✓] Verificar estoque de carnes     │
 │      ↳ Feito por Bruno às 08:35      │
+│      (Admin PODE desmarcar)          │
 ├──────────────────────────────────────┤
 │  [✓] Limpar bancada                  │
 │      ↳ Feito por Maria às 08:42      │
-├──────────────────────────────────────┤
-│  [ ] Organizar geladeira             │
-│      (pendente)                      │
+│      (Admin PODE desmarcar)          │
 └──────────────────────────────────────┘
 ```
 
@@ -253,9 +167,40 @@ Já foram removidos alguns no último diff. Faltam:
 
 ## Benefícios
 
-1. **Segurança**: Funcionários não podem alterar dados críticos
-2. **Rastreabilidade**: Cada tarefa mostra quem a completou
-3. **Interface Limpa**: Funcionários veem apenas o que podem usar
-4. **Proteção Dupla**: RLS no banco + verificação na interface
-5. **Warnings Corrigidos**: Os 2 avisos de segurança serão resolvidos
+1. **Segurança**: Funcionários não acessam informações de compras/fornecedores
+2. **Integridade**: Ninguém pode "roubar" crédito de tarefas feitas por outros
+3. **Rastreabilidade**: O nome de quem completou permanece protegido
+4. **Flexibilidade**: Admin mantém controle total para corrigir erros
+
+---
+
+## Detalhes Técnicos
+
+### Migração SQL
+```sql
+-- Atualizar política de delete em completions
+DROP POLICY IF EXISTS "Admins can delete completions" ON public.checklist_completions;
+
+CREATE POLICY "User or admin can delete completions" ON public.checklist_completions
+  FOR DELETE USING (
+    has_role(auth.uid(), 'admin'::app_role) 
+    OR completed_by = auth.uid()
+  );
+```
+
+### ChecklistView - Props Adicionais
+```typescript
+interface ChecklistViewProps {
+  // ... existing props
+  currentUserId?: string;
+  isAdmin: boolean;
+}
+```
+
+### Lógica de Bloqueio
+```typescript
+// Para cada item completado:
+const canToggle = !completed || isAdmin || completion?.completed_by === currentUserId;
+const isLockedByOther = completed && !isAdmin && completion?.completed_by !== currentUserId;
+```
 
