@@ -90,9 +90,25 @@ export function OrdersTab({
     }
   };
 
+  const formatPhoneForWhatsApp = (phone: string): string => {
+    const cleaned = phone.replace(/\D/g, '');
+    // Se já começa com 55, usa direto
+    if (cleaned.startsWith('55') && cleaned.length >= 12) {
+      return cleaned;
+    }
+    // Adiciona 55 se não tiver
+    return `55${cleaned}`;
+  };
+
+  const hasValidWhatsApp = (phone: string | null): boolean => {
+    if (!phone) return false;
+    const cleaned = phone.replace(/\D/g, '');
+    return cleaned.length >= 10;
+  };
+
   const handleSendWhatsApp = (order: Order) => {
-    if (!order.supplier?.phone) {
-      alert('Este fornecedor não tem telefone cadastrado');
+    if (!order.supplier?.phone || !hasValidWhatsApp(order.supplier.phone)) {
+      alert('Este fornecedor não tem telefone válido cadastrado. Cadastre um número de WhatsApp nas configurações.');
       return;
     }
 
@@ -103,8 +119,8 @@ export function OrdersTab({
 
     const message = `*Pedido de Compra*\n\nOlá! Gostaria de fazer o seguinte pedido:\n\n${itemsList}\n\n${order.notes ? `Obs: ${order.notes}` : ''}`;
     
-    const phone = order.supplier.phone.replace(/\D/g, '');
-    const whatsappUrl = `https://wa.me/55${phone}?text=${encodeURIComponent(message)}`;
+    const phone = formatPhoneForWhatsApp(order.supplier.phone);
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     
     window.open(whatsappUrl, '_blank');
     onSendOrder(order.id);
@@ -222,15 +238,24 @@ export function OrdersTab({
               </div>
 
               <div className="flex gap-2">
-                {order.status === 'draft' && order.supplier?.phone && (
-                  <Button
-                    size="sm"
-                    onClick={() => handleSendWhatsApp(order)}
-                    className="gap-2 bg-green-600 hover:bg-green-700"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    Enviar WhatsApp
-                  </Button>
+                {order.status === 'draft' && (
+                  <>
+                    {hasValidWhatsApp(order.supplier?.phone || null) ? (
+                      <Button
+                        size="sm"
+                        onClick={() => handleSendWhatsApp(order)}
+                        className="gap-2 bg-green-600 hover:bg-green-700"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Enviar WhatsApp
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-warning flex items-center gap-1">
+                        <MessageCircle className="w-4 h-4" />
+                        Sem WhatsApp
+                      </span>
+                    )}
+                  </>
                 )}
                 {order.status === 'sent' && (
                   <Button

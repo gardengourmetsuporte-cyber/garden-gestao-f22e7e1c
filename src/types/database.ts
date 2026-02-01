@@ -121,11 +121,14 @@ export interface ChecklistSubcategory {
   items?: ChecklistItem[];
 }
 
+export type ItemFrequency = 'daily' | 'weekly' | 'monthly';
+
 export interface ChecklistItem {
   id: string;
   subcategory_id: string;
   name: string;
   description: string | null;
+  frequency: ItemFrequency;
   sort_order: number;
   is_active: boolean;
   created_at: string;

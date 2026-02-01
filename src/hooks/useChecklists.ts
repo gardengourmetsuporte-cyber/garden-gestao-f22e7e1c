@@ -156,10 +156,16 @@ export function useChecklists() {
     subcategory_id: string;
     name: string;
     description?: string;
+    frequency?: 'daily' | 'weekly' | 'monthly';
   }) => {
     const { data, error } = await supabase
       .from('checklist_items')
-      .insert(item)
+      .insert({
+        subcategory_id: item.subcategory_id,
+        name: item.name,
+        description: item.description,
+        frequency: item.frequency || 'daily',
+      })
       .select()
       .single();
 
