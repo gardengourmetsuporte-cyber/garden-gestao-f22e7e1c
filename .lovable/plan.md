@@ -1,146 +1,113 @@
 
-# Plano Unificado: Melhorias de Gamificação + Perfil Simplificado
+# Plano: Pontos por Setor + Dashboard Admin
 
-## Resumo Executivo
+## Resumo
 
-Este plano implementa todas as melhorias solicitadas em uma única entrega:
-1. **Moedinha nas tarefas**: Ícone de moeda com "+1" ao lado de cada tarefa
-2. **Nome no histórico de estoque**: Exibir quem fez cada movimentação
-3. **Animação de moeda**: Moeda voando da tarefa para o contador de pontos
-4. **Perfil simplificado**: Remover cargo/departamento, adicionar foto de perfil
+Este plano implementa duas funcionalidades:
+1. **Pontos disponíveis por setor**: Mostrar quantos pontos podem ser ganhos em cada categoria (ex: "Cozinha: 3 pontos disponíveis")
+2. **Dashboard Admin**: Novo módulo exclusivo para administradores que será a primeira opção na navegação
 
 ---
 
-## Parte 1: Moedinha nas Tarefas do Checklist
+## Parte 1: Pontos Disponíveis por Setor
 
-### Visual
+### Visual Proposto
+
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│  [ ]  Verificar estoque de carnes            🪙 +1         │
-│       Verificar quantidade disponível                       │
+│  Checklist de Abertura                                      │
+│  Segunda-feira, 3 de fevereiro                    85%       │
+│  ████████████████████░░░░                    17/20 itens    │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ┌──────────┐  Cozinha                                      │
+│  │   🍳     │  4/8 concluídos                               │
+│  │          │  ⭐ 4 pontos disponíveis        ████░░░░  ▼   │
+│  └──────────┘                                               │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ┌──────────┐  Salão                                        │
+│  │   🍽️     │  8/10 concluídos                              │
+│  │          │  ⭐ 2 pontos disponíveis        ██████░░  ▼   │
+│  └──────────┘                                               │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  ┌──────────┐  Caixa                      ✓ COMPLETO        │
+│  │   💳     │  5/5 concluídos                               │
+│  │          │  ⭐ 0 pontos disponíveis        ████████  ▼   │
+│  └──────────┘                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Lógica
+
+- **Pontos disponíveis** = Total de itens ativos no setor - Itens já completados
+- Se todos completados, mostra "0 pontos disponíveis" com estilo esmaecido
+- Badge dourado com ícone de estrela para destaque
+
+---
+
+## Parte 2: Dashboard Admin
+
+### Navegação
+
+O Dashboard Admin será a primeira opção no menu, visível apenas para administradores:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  📊 Dashboard          ← NOVO (primeiro, só para admin)    │
 ├─────────────────────────────────────────────────────────────┤
-│  [✓]  Limpar bancada                          🪙 +1        │
-│       ↳ Feito por Bruno às 08:35                            │
-│       (moeda fica esmaecida quando completada)              │
+│  📦 Estoque                                                 │
+│  ✅ Checklists                                              │
+│  🎁 Recompensas                                             │
+│  ⚙️ Configurações                                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Implementação
-- Adicionar ícone `Coins` do lucide-react ao lado de cada tarefa
-- Badge dourado com "+1" usando cores amber-500
-- Opacidade reduzida quando tarefa já está completa
+### Conteúdo do Dashboard
 
----
-
-## Parte 2: Nome de Quem Fez Movimentação no Estoque
-
-### Visual
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│  ↓  Arroz Branco                                            │
-│     Entrada • 14:32 • Por: Bruno Momesso      +10 kg        │
-├─────────────────────────────────────────────────────────────┤
-│  ↑  Carne Bovina                                            │
-│     Saída • 10:15 • Por: Maria Silva          -2 kg         │
+│  Dashboard Administrativo                                   │
+│  Visão geral do sistema                                     │
 └─────────────────────────────────────────────────────────────┘
-```
 
-### Implementação
-- Modificar `useInventoryDB.ts` para buscar profiles junto com movements
-- Atualizar `MovementHistoryNew.tsx` para exibir o nome do usuário
-- Como não há FK direta, buscar profiles separadamente e fazer merge
+┌──── Resumo Rápido ─────────────────────────────────────────┐
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│  │ 📦 25      │ │ ⚠️ 3        │ │ ✅ 85%      │           │
+│  │ Itens      │ │ Est. Baixo  │ │ Checklists  │           │
+│  └─────────────┘ └─────────────┘ └─────────────┘           │
+└─────────────────────────────────────────────────────────────┘
 
----
-
-## Parte 3: Animação de Moeda Voando
-
-### Fluxo Visual
-```text
-┌─────────────────────────────────────────────────────────────┐
+┌──── Pontos Disponíveis por Setor ──────────────────────────┐
 │                                                             │
-│   ┌──────────┐                                              │
-│   │ 🪙 127   │ ← Destino (pulsa ao receber)                │
-│   │ pontos   │                                              │
-│   └──────────┘                                              │
-│         ↑                                                   │
-│         │  🪙 ← Moeda voando                               │
-│         │     (arco + rotação + escala)                     │
-│         │                                                   │
-│   [✓] Limpar bancada  🪙 +1  ← Origem                      │
+│  Cozinha                                      ⭐ 4 pontos   │
+│  ████████████░░░░░░░░                              50%      │
 │                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Implementação
-
-**1. Keyframes CSS (tailwind.config.ts)**
-```css
-coin-fly: movimento em arco com rotação e fade out
-coin-pulse: pulso no contador ao receber moeda
-```
-
-**2. Novo componente: CoinAnimation.tsx**
-- Renderiza moeda em position: fixed
-- Anima de ponto inicial até ponto final
-- Remove-se automaticamente após animação
-
-**3. Context: CoinAnimationContext.tsx**
-- Gerencia lista de animações ativas
-- Expõe função `triggerCoin(x, y)`
-- Calcula destino automaticamente via getElementById
-
-**4. Integração**
-- PointsDisplay recebe `id="points-counter"` como destino
-- ChecklistView dispara animação ao marcar tarefa
-
----
-
-## Parte 4: Perfil Simplificado com Foto
-
-### Visual
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  ┌────────────────┐                                         │
-│  │                │   📷 Alterar Foto                       │
-│  │   [FOTO]       │                                         │
-│  │                │   Bruno Momesso                         │
-│  └────────────────┘   usuario@email.com                     │
+│  Salão                                        ⭐ 2 pontos   │
+│  ██████████████████░░                              80%      │
+│                                                             │
+│  Caixa                                        ⭐ 0 pontos   │
+│  ████████████████████                              100%     │
 │                                                             │
 │  ─────────────────────────────────────────────────────────  │
+│  Total disponível hoje: ⭐ 6 pontos                         │
 │                                                             │
-│  👤 Nome Completo                                           │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │  Bruno Momesso                                          ││
-│  └─────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────┘
+
+┌──── Resgates Pendentes ────────────────────────────────────┐
 │                                                             │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │              💾 Salvar Alterações                       ││
-│  └─────────────────────────────────────────────────────────┘│
+│  🎁 3 resgates aguardando aprovação                        │
+│                                                             │
+│  • Bruno Momesso - Folga (50 pts)      [Aprovar] [Recusar] │
+│  • Maria Silva - Sushi (30 pts)        [Aprovar] [Recusar] │
+│  • João Santos - Lanche (15 pts)       [Aprovar] [Recusar] │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-### Implementação
-
-**Banco de Dados**
-```sql
--- Criar bucket para avatars (público para visualização)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', true);
-
--- Políticas RLS:
--- Usuários podem fazer upload/update/delete do próprio avatar
--- Qualquer um pode ver avatars (são públicos)
-```
-
-**ProfileSettings.tsx**
-- Remover campos `jobTitle` e `department`
-- Adicionar upload de foto com preview
-- Upload vai para `storage/avatars/{user_id}/avatar.{ext}`
-- URL pública salva no campo `avatar_url` do profile
-
-**AppLayout.tsx**
-- Exibir foto do usuário quando `profile?.avatar_url` existir
-- Fallback para ícone User quando não houver foto
 
 ---
 
@@ -148,45 +115,66 @@ VALUES ('avatars', 'avatars', true);
 
 | Arquivo | Descrição |
 |---------|-----------|
-| `src/components/animations/CoinAnimation.tsx` | Componente da moeda animada |
-| `src/contexts/CoinAnimationContext.tsx` | Context para gerenciar animações |
+| `src/pages/AdminDashboard.tsx` | Página do dashboard administrativo |
+| `src/components/dashboard/SectorPointsSummary.tsx` | Componente com resumo de pontos por setor |
+| `src/components/dashboard/QuickStats.tsx` | Cards de estatísticas rápidas |
+| `src/components/dashboard/PendingRedemptions.tsx` | Lista de resgates pendentes |
 
 ## Arquivos a Modificar
 
 | Arquivo | Alteração |
 |---------|-----------|
-| Migração SQL | Criar bucket `avatars` com políticas RLS |
-| `tailwind.config.ts` | Keyframes para animações coin-fly e coin-pulse |
-| `src/components/checklists/ChecklistView.tsx` | Moedinha "+1" + trigger de animação |
-| `src/components/rewards/PointsDisplay.tsx` | ID para destino + animação de pulse |
-| `src/hooks/useInventoryDB.ts` | Buscar profiles junto com movements |
-| `src/components/inventory/MovementHistoryNew.tsx` | Exibir nome de quem fez movimentação |
-| `src/components/settings/ProfileSettings.tsx` | Remover campos + adicionar upload foto |
-| `src/components/layout/AppLayout.tsx` | Exibir avatar + incluir CoinAnimationProvider |
+| `src/App.tsx` | Adicionar rota /dashboard (admin only) |
+| `src/components/layout/AppLayout.tsx` | Adicionar Dashboard como primeiro item (adminOnly) |
+| `src/components/checklists/ChecklistView.tsx` | Exibir pontos disponíveis em cada setor |
+| `src/hooks/useChecklists.ts` | Adicionar função para calcular pontos disponíveis por setor |
 
 ---
 
-## Ordem de Implementação
+## Implementacao Tecnica
 
-1. Migração SQL para bucket de avatars
-2. Keyframes de animação no tailwind.config.ts
-3. CoinAnimation e CoinAnimationContext
-4. Atualizar PointsDisplay com id e pulse
-5. Modificar ChecklistView (moedinha + trigger)
-6. Atualizar useInventoryDB para buscar profiles
-7. Modificar MovementHistoryNew para exibir nome
-8. Simplificar ProfileSettings + upload de foto
-9. Atualizar AppLayout (avatar + provider)
-10. Testar fluxo completo
+### 1. ChecklistView - Pontos por Setor
+
+Adicionar no header de cada setor:
+- Calcular: `pontosDisponiveis = total - completados`
+- Exibir badge com estrela e texto "X pontos disponíveis"
+- Usar cores amber para destaque
+
+### 2. AdminDashboard
+
+- Rota: `/dashboard`
+- Acesso: Apenas administradores
+- Componentes:
+  - QuickStats: Total itens, estoque baixo, % checklists hoje
+  - SectorPointsSummary: Pontos disponíveis por setor com progresso
+  - PendingRedemptions: Lista de resgates para aprovar/recusar
+
+### 3. Navegacao
+
+Atualizar navItems no AppLayout:
+```typescript
+const navItems: NavItem[] = [
+  {
+    icon: LayoutDashboard,
+    label: 'Dashboard',
+    href: '/dashboard',
+    adminOnly: true  // ← Novo, primeiro da lista
+  },
+  {
+    icon: Package,
+    label: 'Estoque',
+    href: '/'
+  },
+  // ... resto
+];
+```
 
 ---
 
-## Benefícios
+## Beneficios
 
-| Melhoria | Benefício |
-|----------|-----------|
-| Moedinha nas tarefas | Visualização clara do valor de cada tarefa |
-| Animação de moeda | Feedback satisfatório e gamificação reforçada |
-| Nome no estoque | Accountability e rastreabilidade |
-| Foto de perfil | Personalização e identificação visual |
-| Perfil simplificado | Menos campos = experiência mais rápida |
+| Funcionalidade | Beneficio |
+|----------------|-----------|
+| Pontos por setor | Funcionarios sabem quanto podem ganhar em cada area |
+| Dashboard Admin | Visao consolidada para gestores tomarem decisoes |
+| Resgates no dashboard | Aprovacao rapida sem navegar ate configuracoes |
