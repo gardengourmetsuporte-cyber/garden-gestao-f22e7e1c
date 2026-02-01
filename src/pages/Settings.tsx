@@ -26,7 +26,7 @@ export default function SettingsPage() {
 
         <div className="px-4 py-6 lg:px-6">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto gap-2 bg-transparent p-0">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 h-auto gap-2 bg-transparent p-0">
               <TabsTrigger
                 value="profile"
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
@@ -34,22 +34,22 @@ export default function SettingsPage() {
                 <User className="w-4 h-4" />
                 <span className="hidden sm:inline">Perfil</span>
               </TabsTrigger>
+              <TabsTrigger
+                value="categories"
+                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
+              >
+                <Tag className="w-4 h-4" />
+                <span className="hidden sm:inline">Categorias</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="suppliers"
+                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
+              >
+                <Truck className="w-4 h-4" />
+                <span className="hidden sm:inline">Fornecedores</span>
+              </TabsTrigger>
               {isAdmin && (
                 <>
-                  <TabsTrigger
-                    value="categories"
-                    className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
-                  >
-                    <Tag className="w-4 h-4" />
-                    <span className="hidden sm:inline">Categorias</span>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="suppliers"
-                    className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
-                  >
-                    <Truck className="w-4 h-4" />
-                    <span className="hidden sm:inline">Fornecedores</span>
-                  </TabsTrigger>
                   <TabsTrigger
                     value="checklists"
                     className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3"
@@ -73,16 +73,16 @@ export default function SettingsPage() {
                 <ProfileSettings />
               </TabsContent>
 
+              <TabsContent value="categories" className="mt-0">
+                <CategorySettings />
+              </TabsContent>
+
+              <TabsContent value="suppliers" className="mt-0">
+                <SupplierSettings />
+              </TabsContent>
+
               {isAdmin && (
                 <>
-                  <TabsContent value="categories" className="mt-0">
-                    <CategorySettings />
-                  </TabsContent>
-
-                  <TabsContent value="suppliers" className="mt-0">
-                    <SupplierSettings />
-                  </TabsContent>
-
                   <TabsContent value="checklists" className="mt-0">
                     <ChecklistSettingsManager />
                   </TabsContent>
