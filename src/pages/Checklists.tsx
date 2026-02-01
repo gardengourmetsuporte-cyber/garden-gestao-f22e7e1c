@@ -26,14 +26,17 @@ export default function ChecklistsPage() {
     addSector,
     updateSector,
     deleteSector,
+    reorderSectors,
     // Subcategory operations
     addSubcategory,
     updateSubcategory,
     deleteSubcategory,
+    reorderSubcategories,
     // Item operations
     addItem,
     updateItem,
     deleteItem,
+    reorderItems,
     // Completion operations
     toggleCompletion,
     isItemCompleted,
@@ -282,12 +285,15 @@ export default function ChecklistsPage() {
                 onAddSector={handleAddSector}
                 onUpdateSector={handleUpdateSector}
                 onDeleteSector={handleDeleteSector}
+                onReorderSectors={reorderSectors}
                 onAddSubcategory={handleAddSubcategory}
                 onUpdateSubcategory={handleUpdateSubcategory}
                 onDeleteSubcategory={handleDeleteSubcategory}
+                onReorderSubcategories={reorderSubcategories}
                 onAddItem={handleAddItem}
                 onUpdateItem={handleUpdateItem}
                 onDeleteItem={handleDeleteItem}
+                onReorderItems={reorderItems}
               />
             </>
           )}
