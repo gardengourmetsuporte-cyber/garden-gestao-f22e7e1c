@@ -75,6 +75,9 @@ export function MovementHistoryNew({ movements, items, showItemName = false }: M
                       )}
                       <p className="text-sm text-muted-foreground">
                         {movement.type === 'entrada' ? 'Entrada' : 'Saída'} • {format(new Date(movement.created_at), 'HH:mm')}
+                        {(movement as any).user_name && (
+                          <span> • Por: {(movement as any).user_name}</span>
+                        )}
                       </p>
                       {movement.notes && (
                         <p className="text-xs text-muted-foreground truncate mt-0.5">{movement.notes}</p>

@@ -29,7 +29,8 @@ export function useInventoryDB() {
 
   const fetchMovements = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch movements
+      const { data: movementsData, error: movementsError } = await supabase
         .from('stock_movements')
         .select(`
           *,
@@ -38,8 +39,31 @@ export function useInventoryDB() {
         .order('created_at', { ascending: false })
         .limit(100);
 
-      if (error) throw error;
-      setMovements((data as StockMovement[]) || []);
+      if (movementsError) throw movementsError;
+
+      // Fetch profiles for user_ids
+      const userIds = [...new Set((movementsData || []).map(m => m.user_id).filter(Boolean))];
+      
+      let profilesMap: Record<string, string> = {};
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds);
+        
+        profilesMap = (profilesData || []).reduce((acc, p) => {
+          acc[p.user_id] = p.full_name;
+          return acc;
+        }, {} as Record<string, string>);
+      }
+
+      // Merge profile names into movements
+      const movementsWithProfiles = (movementsData || []).map(m => ({
+        ...m,
+        user_name: m.user_id ? profilesMap[m.user_id] || null : null,
+      }));
+
+      setMovements(movementsWithProfiles as StockMovement[]);
     } catch {
       // Error handled silently - user sees empty state
     }

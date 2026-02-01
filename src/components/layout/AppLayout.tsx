@@ -2,18 +2,23 @@ import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield, Gift } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
+import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
+import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
+
 interface AppLayoutProps {
   children: ReactNode;
 }
+
 interface NavItem {
   icon: typeof Package;
   label: string;
   href: string;
   adminOnly?: boolean;
 }
+
 const navItems: NavItem[] = [{
   icon: Package,
   label: 'Estoque',
@@ -31,24 +36,23 @@ const navItems: NavItem[] = [{
   label: 'Configurações',
   href: '/settings'
 }];
-export function AppLayout({
-  children
-}: AppLayoutProps) {
+
+function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const {
-    profile,
-    role,
-    isAdmin,
-    signOut
-  } = useAuth();
+  const { profile, isAdmin, signOut } = useAuth();
+  const { isPulsing } = useCoinAnimation();
   const location = useLocation();
   const navigate = useNavigate();
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
   };
+
   const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
-  return <div className="min-h-screen bg-background">
+
+  return (
+    <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b shadow-sm">
         <div className="flex items-center justify-between h-16 px-4">
@@ -93,8 +97,16 @@ export function AppLayout({
         {/* User Info */}
         <div className="p-4 border-b">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="w-6 h-6 text-primary" />
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+              {profile?.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt="Avatar" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-6 h-6 text-primary" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-foreground truncate">
@@ -110,20 +122,30 @@ export function AppLayout({
           </div>
           {/* Points Display */}
           <div className="mt-3 pt-3 border-t">
-            <PointsDisplay />
+            <PointsDisplay isPulsing={isPulsing} />
           </div>
         </div>
 
         {/* Navigation */}
         <nav className="p-3 space-y-1">
           {filteredNavItems.map(item => {
-          const isActive = location.pathname === item.href;
-          return <Link key={item.href} to={item.href} onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all", isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}>
+            const isActive = location.pathname === item.href;
+            return (
+              <Link 
+                key={item.href} 
+                to={item.href} 
+                onClick={() => setSidebarOpen(false)} 
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all", 
+                  isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+              >
                 <item.icon className="w-5 h-5" />
                 <span className="flex-1">{item.label}</span>
                 {isActive && <ChevronRight className="w-4 h-4" />}
-              </Link>;
-        })}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Logout */}
@@ -139,5 +161,17 @@ export function AppLayout({
       <main className={cn("min-h-screen pt-16 lg:pt-0 lg:pl-72", "transition-all duration-300")}>
         {children}
       </main>
-    </div>;
+
+      {/* Coin Animation Layer */}
+      <CoinAnimationLayer />
+    </div>
+  );
+}
+
+export function AppLayout({ children }: AppLayoutProps) {
+  return (
+    <CoinAnimationProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </CoinAnimationProvider>
+  );
 }
