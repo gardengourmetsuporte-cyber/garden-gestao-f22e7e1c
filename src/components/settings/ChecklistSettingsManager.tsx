@@ -10,12 +10,15 @@ export function ChecklistSettingsManager() {
     addSector,
     updateSector,
     deleteSector,
+    reorderSectors,
     addSubcategory,
     updateSubcategory,
     deleteSubcategory,
+    reorderSubcategories,
     addItem,
     updateItem,
     deleteItem,
+    reorderItems,
   } = useChecklists();
 
   if (isLoading) {
@@ -131,12 +134,15 @@ export function ChecklistSettingsManager() {
         onAddSector={handleAddSector}
         onUpdateSector={handleUpdateSector}
         onDeleteSector={handleDeleteSector}
+        onReorderSectors={reorderSectors}
         onAddSubcategory={handleAddSubcategory}
         onUpdateSubcategory={handleUpdateSubcategory}
         onDeleteSubcategory={handleDeleteSubcategory}
+        onReorderSubcategories={reorderSubcategories}
         onAddItem={handleAddItem}
         onUpdateItem={handleUpdateItem}
         onDeleteItem={handleDeleteItem}
+        onReorderItems={reorderItems}
       />
     </div>
   );

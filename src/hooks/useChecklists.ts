@@ -218,6 +218,44 @@ export function useChecklists() {
     await fetchSectors();
   }, [fetchSectors]);
 
+  // Reorder functions
+  const reorderSectors = useCallback(async (orderedIds: string[]) => {
+    // Update sort_order for each sector
+    const updates = orderedIds.map((id, index) => 
+      supabase
+        .from('checklist_sectors')
+        .update({ sort_order: index })
+        .eq('id', id)
+    );
+    
+    await Promise.all(updates);
+    await fetchSectors();
+  }, [fetchSectors]);
+
+  const reorderSubcategories = useCallback(async (sectorId: string, orderedIds: string[]) => {
+    const updates = orderedIds.map((id, index) => 
+      supabase
+        .from('checklist_subcategories')
+        .update({ sort_order: index })
+        .eq('id', id)
+    );
+    
+    await Promise.all(updates);
+    await fetchSectors();
+  }, [fetchSectors]);
+
+  const reorderItems = useCallback(async (subcategoryId: string, orderedIds: string[]) => {
+    const updates = orderedIds.map((id, index) => 
+      supabase
+        .from('checklist_items')
+        .update({ sort_order: index })
+        .eq('id', id)
+    );
+    
+    await Promise.all(updates);
+    await fetchSectors();
+  }, [fetchSectors]);
+
   // Completion management
   const toggleCompletion = useCallback(async (
     itemId: string,
@@ -295,14 +333,17 @@ export function useChecklists() {
     addSector,
     updateSector,
     deleteSector,
+    reorderSectors,
     // Subcategory operations
     addSubcategory,
     updateSubcategory,
     deleteSubcategory,
+    reorderSubcategories,
     // Item operations
     addItem,
     updateItem,
     deleteItem,
+    reorderItems,
     // Completion operations
     toggleCompletion,
     isItemCompleted,
