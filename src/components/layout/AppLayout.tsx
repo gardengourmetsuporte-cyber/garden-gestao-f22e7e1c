@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield, Gift } from 'lucide-react';
+import { LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield, Gift, ShoppingCart, History } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
@@ -16,23 +16,33 @@ interface NavItem {
   href: string;
   adminOnly?: boolean;
 }
-const navItems: NavItem[] = [{
-  icon: Package,
-  label: 'Estoque',
-  href: '/'
-}, {
-  icon: ClipboardCheck,
-  label: 'Checklists',
-  href: '/checklists'
-}, {
-  icon: Gift,
-  label: 'Recompensas',
-  href: '/rewards'
-}, {
-  icon: Settings,
-  label: 'Configurações',
-  href: '/settings'
-}];
+const navItems: NavItem[] = [
+  {
+    icon: LayoutDashboard,
+    label: 'Dashboard',
+    href: '/'
+  },
+  {
+    icon: Package,
+    label: 'Estoque',
+    href: '/inventory'
+  },
+  {
+    icon: ClipboardCheck,
+    label: 'Checklists',
+    href: '/checklists'
+  },
+  {
+    icon: Gift,
+    label: 'Recompensas',
+    href: '/rewards'
+  },
+  {
+    icon: Settings,
+    label: 'Configurações',
+    href: '/settings'
+  }
+];
 function AppLayoutContent({
   children
 }: AppLayoutProps) {

@@ -188,6 +188,21 @@ export function useRewards() {
     }
   }
 
+  async function deleteRedemption(id: string) {
+    try {
+      const { error } = await supabase
+        .from('reward_redemptions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      await fetchAllRedemptions();
+      await fetchRedemptions();
+    } catch (error) {
+      throw new Error('Erro ao excluir resgate');
+    }
+  }
+
   return {
     products,
     redemptions,
@@ -198,6 +213,7 @@ export function useRewards() {
     deleteProduct,
     redeemProduct,
     updateRedemptionStatus,
+    deleteRedemption,
     refetch: () => {
       fetchProducts();
       fetchRedemptions();

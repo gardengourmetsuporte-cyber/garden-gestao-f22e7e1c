@@ -28,7 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function RewardSettings() {
-  const { products, allRedemptions, createProduct, updateProduct, deleteProduct, updateRedemptionStatus } = useRewards();
+  const { products, allRedemptions, createProduct, updateProduct, deleteProduct, updateRedemptionStatus, deleteRedemption } = useRewards();
   const { toast } = useToast();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -154,6 +154,21 @@ export function RewardSettings() {
     }
   };
 
+  const handleDeleteRedemption = async (redemption: RewardRedemption) => {
+    if (!confirm(`Tem certeza que deseja excluir este resgate de ${redemption.profile?.full_name || 'Usuário'}?`)) return;
+    
+    try {
+      await deleteRedemption(redemption.id);
+      toast({ title: 'Resgate excluído!' });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível excluir o resgate.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -270,6 +285,7 @@ export function RewardSettings() {
                   <TableHead>Produto</TableHead>
                   <TableHead className="text-center">Pontos</TableHead>
                   <TableHead>Data</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -293,45 +309,75 @@ export function RewardSettings() {
                     <TableCell>
                       {format(new Date(redemption.created_at), "dd/MM/yyyy", { locale: ptBR })}
                     </TableCell>
+                    <TableCell className="text-center">
+                      <Badge 
+                        variant={
+                          redemption.status === 'pending' ? 'outline' :
+                          redemption.status === 'approved' ? 'default' :
+                          redemption.status === 'delivered' ? 'default' :
+                          'secondary'
+                        }
+                        className={
+                          redemption.status === 'pending' ? 'border-warning text-warning' :
+                          redemption.status === 'approved' ? 'bg-success' :
+                          redemption.status === 'delivered' ? 'bg-primary' :
+                          ''
+                        }
+                      >
+                        {redemption.status === 'pending' ? 'Pendente' :
+                         redemption.status === 'approved' ? 'Aprovado' :
+                         redemption.status === 'delivered' ? 'Entregue' :
+                         'Cancelado'}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-right">
-                      {redemption.status === 'pending' ? (
-                        <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1">
+                        {redemption.status === 'pending' && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleApprove(redemption)}
+                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleReject(redemption)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                        {redemption.status === 'approved' && (
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleApprove(redemption)}
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeliver(redemption)}
                           >
-                            <Check className="w-4 h-4" />
+                            Entregar
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleReject(redemption)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : redemption.status === 'approved' ? (
+                        )}
+                        {/* Delete button - always visible for admin */}
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeliver(redemption)}
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteRedemption(redemption)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title="Excluir resgate"
                         >
-                          Marcar Entregue
+                          <Trash2 className="w-4 h-4" />
                         </Button>
-                      ) : (
-                        <Badge variant={redemption.status === 'delivered' ? 'default' : 'secondary'}>
-                          {redemption.status === 'delivered' ? 'Entregue' : 'Cancelado'}
-                        </Badge>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
                 {allRedemptions.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       Nenhum resgate registrado
                     </TableCell>
                   </TableRow>
