@@ -100,6 +100,15 @@ export function useOrders() {
   }, []);
 
   const deleteOrder = useCallback(async (orderId: string) => {
+    // First delete order items (required due to foreign key constraint)
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .delete()
+      .eq('order_id', orderId);
+
+    if (itemsError) throw itemsError;
+
+    // Then delete the order
     const { error } = await supabase
       .from('orders')
       .delete()
