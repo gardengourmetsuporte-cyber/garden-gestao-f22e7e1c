@@ -19,7 +19,7 @@ function getUnitLabel(unitType: string): string {
 
 function getStockStatus(item: InventoryItem): 'ok' | 'low' | 'out' {
   if (item.current_stock === 0) return 'out';
-  if (item.current_stock <= item.min_stock) return 'low';
+  if (item.current_stock < item.min_stock) return 'low';
   return 'ok';
 }
 
