@@ -202,12 +202,14 @@ export default function InventoryPage() {
                 <h1 className="text-xl font-bold text-foreground">Controle de Estoque</h1>
                 <p className="text-sm text-muted-foreground">{items.length} itens cadastrados</p>
               </div>
-              <button
-                onClick={handleAddItem}
-                className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
-              >
-                <Plus className="w-6 h-6" />
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={handleAddItem}
+                  className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
+                >
+                  <Plus className="w-6 h-6" />
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -365,7 +367,7 @@ export default function InventoryPage() {
                               key={item.id}
                               item={item}
                               onClick={() => handleItemClick(item)}
-                              onEdit={() => handleEditItem(item)}
+                              onEdit={isAdmin ? () => handleEditItem(item) : undefined}
                             />
                           ))}
                         </div>

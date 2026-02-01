@@ -16,7 +16,7 @@ export function useCategories() {
       if (error) throw error;
       setCategories((data as Category[]) || []);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // Silent fail - categories will be empty
     } finally {
       setIsLoading(false);
     }

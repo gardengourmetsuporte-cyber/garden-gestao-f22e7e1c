@@ -31,22 +31,40 @@ export function useChecklists() {
       if (error) throw error;
       setSectors((data as ChecklistSector[]) || []);
     } catch (error) {
-      console.error('Error fetching sectors:', error);
+      // Silent fail - sectors will be empty
     }
   }, []);
 
   const fetchCompletions = useCallback(async (date: string, type: ChecklistType) => {
     try {
-      const { data, error } = await supabase
+      // First fetch completions
+      const { data: completionsData, error: completionsError } = await supabase
         .from('checklist_completions')
         .select('*')
         .eq('date', date)
         .eq('checklist_type', type);
 
-      if (error) throw error;
-      setCompletions((data as ChecklistCompletion[]) || []);
+      if (completionsError) throw completionsError;
+      
+      // Then fetch profiles for each completion
+      const completionsWithProfiles = await Promise.all(
+        (completionsData || []).map(async (completion) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('user_id', completion.completed_by)
+            .single();
+          
+          return {
+            ...completion,
+            profile: profileData ? { full_name: profileData.full_name } : undefined
+          } as ChecklistCompletion;
+        })
+      );
+      
+      setCompletions(completionsWithProfiles);
     } catch (error) {
-      console.error('Error fetching completions:', error);
+      // Silent fail - completions will be empty
     }
   }, []);
 

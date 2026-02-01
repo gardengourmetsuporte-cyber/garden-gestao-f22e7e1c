@@ -16,6 +16,7 @@ export default function ChecklistsPage() {
   const { isAdmin } = useAuth();
   const {
     sectors,
+    completions,
     isLoading,
     // Sector operations
     addSector,
@@ -219,6 +220,7 @@ export default function ChecklistsPage() {
                 sectors={sectors}
                 checklistType={checklistType}
                 date={currentDate}
+                completions={completions}
                 isItemCompleted={isItemCompleted}
                 onToggleItem={handleToggleItem}
                 getCompletionProgress={(sectorId) => getCompletionProgress(sectorId, checklistType)}
