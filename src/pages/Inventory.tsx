@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
@@ -20,6 +21,7 @@ import { cn } from '@/lib/utils';
 type View = 'items' | 'history' | 'orders';
 
 export default function InventoryPage() {
+  const location = useLocation();
   const { isAdmin } = useAuth();
   const {
     items,
@@ -46,6 +48,30 @@ export default function InventoryPage() {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
+
+  // Handle navigation state from Dashboard
+  useEffect(() => {
+    const state = location.state as { activeTab?: string; stockFilter?: string } | null;
+    if (state?.activeTab === 'orders' && isAdmin) {
+      setView('orders');
+    }
+    if (state?.stockFilter === 'critical') {
+      setStockFilter('zero');
+      setView('items');
+    }
+    if (state?.stockFilter === 'zero') {
+      setStockFilter('zero');
+      setView('items');
+    }
+    if (state?.stockFilter === 'low') {
+      setStockFilter('low');
+      setView('items');
+    }
+    // Clear the state after processing
+    if (state) {
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, isAdmin]);
 
   const lowStockItems = getLowStockItems();
   const outOfStockItems = getOutOfStockItems();

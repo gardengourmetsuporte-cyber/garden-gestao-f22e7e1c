@@ -3,7 +3,7 @@ export type AppRole = 'admin' | 'funcionario';
 export type UnitType = 'unidade' | 'kg' | 'litro';
 export type MovementType = 'entrada' | 'saida';
 export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';
-export type ChecklistType = 'abertura' | 'fechamento' | 'limpeza';
+export type ChecklistType = 'abertura' | 'fechamento';
 export type ScheduleStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Profile {

@@ -7,144 +7,83 @@ Redesenhar completamente o Dashboard Administrativo com um visual mais moderno, 
 
 ---
 
-## Novo Layout Proposto
+## ✅ IMPLEMENTADO
 
-### 1. Header de Boas-Vindas (Mantido com melhorias)
-- Gradiente atualizado com efeito mais sofisticado
-- Adicionar data/hora atual
-- Manter saudacao personalizada
+### 1. Navegação Funcional dos Cards do Dashboard
+Todos os cards do Dashboard agora direcionam para os locais corretos:
 
-### 2. Cards de Metricas Principais (Novo Design)
-Grid de 4 cards grandes e clicaveis com:
-- Icone destacado com fundo gradiente
-- Valor numerico grande e titulo
-- Indicador de tendencia ou status
-- Seta indicando navegacao
-- Hover com elevacao e destaque de borda
+| Card | Navega para | Estado passado |
+|------|-------------|----------------|
+| Usuários Ativos | `/settings` | `{ activeTab: 'users' }` |
+| Pedidos Pendentes | `/inventory` | `{ activeTab: 'orders' }` |
+| Resgates Pendentes | `/rewards` | - |
+| Estoque Crítico | `/inventory` | `{ stockFilter: 'critical' }` |
+| Alerta: Itens zerados | `/inventory` | `{ stockFilter: 'zero' }` |
+| Alerta: Estoque baixo | `/inventory` | `{ stockFilter: 'low' }` |
+| Card Estoque | `/inventory` | - |
+| Card Checklists | `/checklists` | - |
+| Card Recompensas | `/rewards` | - |
+| Card Configurações | `/settings` | - |
 
-**Cards previstos:**
-| Card | Clica para | Cor |
-|------|-----------|-----|
-| Usuarios Ativos | `/settings` (aba usuarios) | Azul |
-| Pedidos Pendentes | `/` (aba pedidos) | Laranja |
-| Resgates Pendentes | `/rewards` | Amarelo |
-| Estoque Critico | `/` (filtro itens criticos) | Vermelho |
+### 2. Checklists - Simplificação e Redesign
 
-### 3. Secao de Alertas (Redesenhada)
-- Card com visual mais impactante
-- Cada alerta clicavel levando para a acao correspondente
-- Badges com contadores
-- Icones coloridos por severidade
+#### Tipo "Limpeza" Removido
+- Atualizado `ChecklistType` para apenas `'abertura' | 'fechamento'`
+- Removido botão de Limpeza do seletor de tipos
+- Atualizado componentes: `ChecklistSettings.tsx`, `ChecklistView.tsx`, `Checklists.tsx`
 
-### 4. Cards de Acesso Rapido (Redesenhado)
-Grid 2x2 em mobile, 4 colunas em desktop:
-- Estoque (total de itens + status)
-- Checklists (progresso do dia)
-- Recompensas (pendentes)
-- Configuracoes (usuarios cadastrados)
+#### Nova Interface do Seletor de Tipo
+- Dois cards grandes lado a lado (grid 2 colunas)
+- Ícones grandes (w-14 h-14) com fundos gradientes
+- Visual diferenciado: Abertura (âmbar/laranja), Fechamento (índigo/roxo)
+- Animações de hover (scale) e feedback de clique
+- Subtítulos descritivos ("Tarefas da manhã" / "Tarefas da noite")
 
-Cada card tera:
-- Icone grande com fundo gradiente arredondado
-- Titulo e subtitulo informativos
-- Seta de navegacao
-- Animacao de hover suave
+#### Header de Progresso Modernizado
+- Gradiente de fundo que muda quando 100% (verde success)
+- Porcentagem maior e mais destacada (text-3xl font-black)
+- Barra de progresso mais alta (h-3) com gradiente
+- Mensagem motivacional dinâmica baseada no progresso
 
-### 5. Ranking e Pontos por Setor (Lado a lado)
-- Manter componentes existentes (Leaderboard e SectorPointsSummary)
-- Adicionar header clicavel "Ver todos" para ranking completo
-
----
-
-## Arquivos a Modificar
-
-### `src/components/dashboard/AdminDashboard.tsx`
-- Reescrever completamente o layout
-- Implementar navegacao programatica com useNavigate
-- Criar cards interativos com estados hover/active
-- Adicionar logica de filtros para navegacao contextual
-
-### `src/components/dashboard/QuickStats.tsx` (Opcional)
-- Pode ser substituido por componentes inline no AdminDashboard
-- Ou atualizado para aceitar props de clique e navegacao
+#### Itens de Checklist Melhorados
+- Checkboxes maiores (w-8 h-8) e mais visíveis
+- Padding aumentado (p-4) para melhor touch target
+- Bordas mais pronunciadas (border-2)
+- Efeito de sombra no hover
+- Visual de conclusão com gradiente e sombra colorida
 
 ---
 
-## Especificacoes Visuais
+## Especificações Técnicas Aplicadas
 
-### Cores dos Cards de Metricas
-```text
-Usuarios: bg-gradient-to-br from-blue-500 to-blue-600
-Pedidos: bg-gradient-to-br from-orange-500 to-amber-500  
-Resgates: bg-gradient-to-br from-amber-400 to-yellow-500
-Estoque Critico: bg-gradient-to-br from-red-500 to-rose-600
+### Cores e Gradientes
+```css
+/* Seletor Abertura */
+border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50
+
+/* Seletor Fechamento */  
+border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50
+
+/* Progress completo */
+bg-gradient-to-br from-success/20 to-success/5
 ```
 
-### Efeitos de Interacao
-- `hover:scale-[1.02]` - leve aumento no hover
-- `hover:shadow-xl` - sombra mais pronunciada
-- `active:scale-[0.98]` - feedback de clique
-- `transition-all duration-200` - transicoes suaves
-
-### Espacamento
-- Gap entre cards: `gap-4` (mobile) / `gap-6` (desktop)
-- Padding interno: `p-5` a `p-6`
-- Border radius: `rounded-2xl` para cards principais
-
----
-
-## Fluxo de Navegacao
-
-```text
-Card Usuarios ──────────> /settings (scroll to usuarios)
-Card Pedidos ───────────> / (tab pedidos)
-Card Resgates ──────────> /rewards
-Card Estoque Critico ───> / (filtro zerados + baixo)
-Card Estoque ───────────> /
-Card Checklists ────────> /checklists
-Card Recompensas ───────> /rewards
-Card Configuracoes ─────> /settings
-```
-
----
-
-## Detalhes Tecnicos
-
-### Navegacao com Estado
-Para navegar para uma pagina com filtro pre-aplicado, usaremos:
+### Estados de Navegação
 ```typescript
-navigate('/', { state: { stockFilter: 'critical' } })
-navigate('/', { state: { activeTab: 'pedidos' } })
-```
+// Inventory recebe e processa estados:
+const state = location.state as { activeTab?: string; stockFilter?: string };
 
-### Estrutura do Card de Metrica
-```tsx
-<div onClick={() => navigate('/path')} 
-     className="group cursor-pointer bg-gradient-to-br ... 
-                rounded-2xl p-5 text-white 
-                hover:scale-[1.02] hover:shadow-xl 
-                active:scale-[0.98] transition-all">
-  <div className="flex items-start justify-between">
-    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-      <Icon className="w-6 h-6" />
-    </div>
-    <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
-  </div>
-  <div className="mt-4">
-    <p className="text-3xl font-bold">{value}</p>
-    <p className="text-white/80 text-sm">{title}</p>
-  </div>
-</div>
+// Exemplos de navegação:
+navigate('/inventory', { state: { activeTab: 'orders' } })
+navigate('/inventory', { state: { stockFilter: 'zero' } })
 ```
 
 ---
 
-## Resultado Esperado
+## Resultado Final
 
-Um dashboard administrativo moderno com:
-- Visual profissional com gradientes e sombras
-- Todos os cards clicaveis com feedback visual
-- Navegacao intuitiva para acoes relacionadas
-- Hierarquia visual clara (metricas > alertas > acesso rapido > detalhes)
-- Responsivo para mobile e desktop
-- Consistente com o design system existente
-
+✅ Dashboard com navegação funcional para todas as ações
+✅ Checklists simplificados (apenas Abertura/Fechamento)
+✅ Interface moderna com gradientes e animações
+✅ Touch targets maiores para uso em mobile
+✅ Feedback visual claro em todas as interações

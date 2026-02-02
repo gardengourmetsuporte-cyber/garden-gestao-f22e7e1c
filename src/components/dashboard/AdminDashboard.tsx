@@ -168,7 +168,7 @@ export function AdminDashboard() {
           value={pendingOrders}
           icon={ShoppingCart}
           gradient="bg-gradient-to-br from-orange-500 to-amber-500"
-          onClick={() => navigate('/', { state: { activeTab: 'pedidos' } })}
+          onClick={() => navigate('/inventory', { state: { activeTab: 'orders' } })}
           subtitle={pendingOrders > 0 ? 'aguardando' : 'nenhum'}
         />
         <MetricCard
@@ -184,7 +184,7 @@ export function AdminDashboard() {
           value={criticalItems}
           icon={AlertTriangle}
           gradient="bg-gradient-to-br from-red-500 to-rose-600"
-          onClick={() => navigate('/', { state: { stockFilter: 'critical' } })}
+          onClick={() => navigate('/inventory', { state: { stockFilter: 'critical' } })}
           subtitle={criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
         />
       </div>
@@ -203,7 +203,7 @@ export function AdminDashboard() {
                   message="Itens zerados no estoque"
                   count={outOfStockItems.length}
                   severity="error"
-                  onClick={() => navigate('/', { state: { stockFilter: 'critical' } })}
+                  onClick={() => navigate('/inventory', { state: { stockFilter: 'zero' } })}
                 />
               )}
               {lowStockItems.length > 0 && (
@@ -211,7 +211,7 @@ export function AdminDashboard() {
                   message="Itens com estoque baixo"
                   count={lowStockItems.length}
                   severity="warning"
-                  onClick={() => navigate('/', { state: { stockFilter: 'critical' } })}
+                  onClick={() => navigate('/inventory', { state: { stockFilter: 'low' } })}
                 />
               )}
               {pendingRedemptions > 0 && (
@@ -239,7 +239,7 @@ export function AdminDashboard() {
             icon={Package}
             iconBg="bg-primary/10"
             iconColor="text-primary"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/inventory')}
           />
           <QuickAccessCard
             title="Checklists"

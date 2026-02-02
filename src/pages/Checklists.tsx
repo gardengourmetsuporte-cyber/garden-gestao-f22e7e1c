@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
-import { ClipboardCheck, Settings, Sun, Moon, Sparkles, CalendarIcon } from 'lucide-react';
+import { ClipboardCheck, Settings, Sun, Moon, CalendarIcon, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -211,43 +211,60 @@ export default function ChecklistsPage() {
                 </Popover>
               </div>
 
-              {/* Checklist Type Selector */}
-              <div className="flex gap-2 bg-secondary p-1 rounded-xl">
+              {/* Checklist Type Selector - Modern Cards */}
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setChecklistType('abertura')}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all",
+                    "hover:scale-[1.02] active:scale-[0.98]",
                     checklistType === 'abertura'
-                      ? "bg-card shadow-sm text-foreground"
-                      : "text-muted-foreground"
+                      ? "border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 shadow-lg shadow-amber-500/20"
+                      : "border-border bg-card hover:border-amber-300"
                   )}
                 >
-                  <Sun className="w-4 h-4" />
-                  Abertura
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                    checklistType === 'abertura'
+                      ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg"
+                      : "bg-amber-100 dark:bg-amber-900/30 text-amber-600"
+                  )}>
+                    <Sun className="w-7 h-7" />
+                  </div>
+                  <div className="text-center">
+                    <p className={cn(
+                      "font-bold text-lg",
+                      checklistType === 'abertura' ? "text-amber-700 dark:text-amber-400" : "text-foreground"
+                    )}>Abertura</p>
+                    <p className="text-xs text-muted-foreground">Tarefas da manhã</p>
+                  </div>
                 </button>
+
                 <button
                   onClick={() => setChecklistType('fechamento')}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all",
+                    "hover:scale-[1.02] active:scale-[0.98]",
                     checklistType === 'fechamento'
-                      ? "bg-card shadow-sm text-foreground"
-                      : "text-muted-foreground"
+                      ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/20 shadow-lg shadow-indigo-500/20"
+                      : "border-border bg-card hover:border-indigo-300"
                   )}
                 >
-                  <Moon className="w-4 h-4" />
-                  Fechamento
-                </button>
-                <button
-                  onClick={() => setChecklistType('limpeza')}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                    checklistType === 'limpeza'
-                      ? "bg-card shadow-sm text-foreground"
-                      : "text-muted-foreground"
-                  )}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Limpeza
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                    checklistType === 'fechamento'
+                      ? "bg-gradient-to-br from-indigo-400 to-purple-500 text-white shadow-lg"
+                      : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600"
+                  )}>
+                    <Moon className="w-7 h-7" />
+                  </div>
+                  <div className="text-center">
+                    <p className={cn(
+                      "font-bold text-lg",
+                      checklistType === 'fechamento' ? "text-indigo-700 dark:text-indigo-400" : "text-foreground"
+                    )}>Fechamento</p>
+                    <p className="text-xs text-muted-foreground">Tarefas da noite</p>
+                  </div>
                 </button>
               </div>
 
