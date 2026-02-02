@@ -55,7 +55,6 @@ const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Cale
 const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof Sun }[] = [
   { value: 'abertura', label: 'Abertura', icon: Sun },
   { value: 'fechamento', label: 'Fechamento', icon: Moon },
-  { value: 'limpeza', label: 'Limpeza', icon: Sparkles },
 ];
 
 interface ChecklistSettingsProps {
@@ -180,7 +179,7 @@ export function ChecklistSettings({
     switch (type) {
       case 'abertura': return Sun;
       case 'fechamento': return Moon;
-      case 'limpeza': return Sparkles;
+      default: return Sun;
     }
   };
 

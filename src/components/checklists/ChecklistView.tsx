@@ -89,7 +89,7 @@ export function ChecklistView({
     switch (type) {
       case 'abertura': return 'Abertura';
       case 'fechamento': return 'Fechamento';
-      case 'limpeza': return 'Limpeza';
+      default: return 'Abertura';
     }
   };
 
@@ -126,34 +126,62 @@ export function ChecklistView({
     return false;
   };
 
+  const getMotivationalMessage = () => {
+    if (progressPercent === 100) return "🎉 Excelente! Tudo concluído!";
+    if (progressPercent >= 75) return "💪 Quase lá! Continue assim!";
+    if (progressPercent >= 50) return "👍 Bom progresso!";
+    if (progressPercent >= 25) return "🚀 Você está indo bem!";
+    return "☕ Vamos começar!";
+  };
+
   return (
     <div className="space-y-4">
-      {/* Progress Header */}
-      <div className="bg-card rounded-2xl border p-4">
-        <div className="flex items-center justify-between mb-3">
+      {/* Progress Header - Modern Design */}
+      <div className={cn(
+        "rounded-2xl p-5 transition-all duration-500",
+        progressPercent === 100
+          ? "bg-gradient-to-br from-success/20 to-success/5 border-2 border-success/30"
+          : "bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
+      )}>
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-semibold text-foreground">
-              Checklist de {getTypeLabel(checklistType)}
+            <h3 className="font-bold text-lg text-foreground">
+              {getTypeLabel(checklistType)}
             </h3>
             <p className="text-sm text-muted-foreground">
               {format(new Date(date), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-primary">{progressPercent}%</p>
-            <p className="text-xs text-muted-foreground">
-              {totalProgress.completed}/{totalProgress.total} itens
+            <div className={cn(
+              "text-3xl font-black transition-all",
+              progressPercent === 100 ? "text-success" : "text-primary"
+            )}>
+              {progressPercent}%
+            </div>
+            <p className="text-xs text-muted-foreground font-medium">
+              {totalProgress.completed} de {totalProgress.total}
             </p>
           </div>
         </div>
         
-        {/* Progress Bar */}
-        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+        {/* Enhanced Progress Bar */}
+        <div className="h-3 bg-secondary/50 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-full bg-primary transition-all duration-300"
+            className={cn(
+              "h-full rounded-full transition-all duration-500 ease-out",
+              progressPercent === 100
+                ? "bg-gradient-to-r from-success to-emerald-400"
+                : "bg-gradient-to-r from-primary to-primary/70"
+            )}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
+        
+        {/* Motivational Message */}
+        <p className="text-center mt-3 text-sm font-medium text-muted-foreground">
+          {getMotivationalMessage()}
+        </p>
       </div>
 
       {/* Sectors */}
@@ -275,23 +303,23 @@ export function ChecklistView({
                             }}
                             disabled={!canToggle}
                             className={cn(
-                              "w-full flex items-start gap-3 p-3 rounded-lg transition-all",
+                              "w-full flex items-start gap-4 p-4 rounded-xl transition-all",
                               !canToggle && "cursor-not-allowed opacity-80",
-                              canToggle && "active:scale-[0.98]",
+                              canToggle && "active:scale-[0.98] hover:shadow-md",
                               completed
-                                ? "bg-success/10 border border-success/20"
-                                : "bg-card border hover:border-primary/30"
+                                ? "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30"
+                                : "bg-card border-2 border-border hover:border-primary/40"
                             )}
                           >
                             <div
                               className={cn(
-                                "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all mt-0.5",
+                                "w-8 h-8 rounded-xl flex items-center justify-center transition-all shrink-0",
                                 completed
-                                  ? "bg-success border-success text-white"
-                                  : "border-muted-foreground/30"
+                                  ? "bg-success text-white shadow-lg shadow-success/30"
+                                  : "border-2 border-muted-foreground/30 bg-background"
                               )}
                             >
-                              {completed && <Check className="w-4 h-4" />}
+                              {completed && <Check className="w-5 h-5" />}
                             </div>
                             <div className="flex-1 text-left">
                               <div className="flex items-center gap-2">
