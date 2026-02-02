@@ -1,196 +1,150 @@
 
-# Plano Unificado: Dashboard Adaptativo + Pontos por Setor
 
-## Resumo
+# Redesign do Painel Administrativo
 
-Este plano implementa todas as funcionalidades solicitadas:
-1. **Dashboard adaptativo** - Admin ve estatisticas completas, funcionario ve gamificacao e ranking
-2. **Pontos disponiveis por setor** - Visivel nos checklists e no dashboard
-3. **Ranking de funcionarios** - Competicao saudavel com medalhas
-4. **Alertas de estoque** - Lista simplificada para funcionarios
+## Objetivo
+Redesenhar completamente o Dashboard Administrativo com um visual mais moderno, profissional e interativo, com cards clicaveis que levam diretamente para as acoes correspondentes.
 
 ---
 
-## Arquivos a Criar
+## Novo Layout Proposto
 
-| Arquivo | Descricao |
-|---------|-----------|
-| `src/pages/Dashboard.tsx` | Pagina unificada que detecta role e renderiza dashboard correto |
-| `src/components/dashboard/AdminDashboard.tsx` | Dashboard completo para administradores |
-| `src/components/dashboard/EmployeeDashboard.tsx` | Dashboard com gamificacao para funcionarios |
-| `src/components/dashboard/SectorPointsSummary.tsx` | Pontos disponiveis por setor (compartilhado) |
-| `src/components/dashboard/PointsRanking.tsx` | Ranking com medalhas |
-| `src/components/dashboard/QuickStats.tsx` | Cards estatisticos (admin) |
-| `src/components/dashboard/PendingRedemptions.tsx` | Resgates pendentes (admin) |
-| `src/components/dashboard/StockAlerts.tsx` | Alertas de estoque |
-| `src/components/dashboard/UserPointsCard.tsx` | Card de pontos do usuario |
-| `src/hooks/useLeaderboard.ts` | Hook para ranking de todos os funcionarios |
+### 1. Header de Boas-Vindas (Mantido com melhorias)
+- Gradiente atualizado com efeito mais sofisticado
+- Adicionar data/hora atual
+- Manter saudacao personalizada
+
+### 2. Cards de Metricas Principais (Novo Design)
+Grid de 4 cards grandes e clicaveis com:
+- Icone destacado com fundo gradiente
+- Valor numerico grande e titulo
+- Indicador de tendencia ou status
+- Seta indicando navegacao
+- Hover com elevacao e destaque de borda
+
+**Cards previstos:**
+| Card | Clica para | Cor |
+|------|-----------|-----|
+| Usuarios Ativos | `/settings` (aba usuarios) | Azul |
+| Pedidos Pendentes | `/` (aba pedidos) | Laranja |
+| Resgates Pendentes | `/rewards` | Amarelo |
+| Estoque Critico | `/` (filtro itens criticos) | Vermelho |
+
+### 3. Secao de Alertas (Redesenhada)
+- Card com visual mais impactante
+- Cada alerta clicavel levando para a acao correspondente
+- Badges com contadores
+- Icones coloridos por severidade
+
+### 4. Cards de Acesso Rapido (Redesenhado)
+Grid 2x2 em mobile, 4 colunas em desktop:
+- Estoque (total de itens + status)
+- Checklists (progresso do dia)
+- Recompensas (pendentes)
+- Configuracoes (usuarios cadastrados)
+
+Cada card tera:
+- Icone grande com fundo gradiente arredondado
+- Titulo e subtitulo informativos
+- Seta de navegacao
+- Animacao de hover suave
+
+### 5. Ranking e Pontos por Setor (Lado a lado)
+- Manter componentes existentes (Leaderboard e SectorPointsSummary)
+- Adicionar header clicavel "Ver todos" para ranking completo
 
 ---
 
 ## Arquivos a Modificar
 
-| Arquivo | Alteracao |
-|---------|-----------|
-| `src/App.tsx` | Adicionar rota `/dashboard` |
-| `src/components/layout/AppLayout.tsx` | Dashboard como primeiro item do menu (todos verao) |
-| `src/components/checklists/ChecklistView.tsx` | Exibir pontos disponiveis em cada setor |
+### `src/components/dashboard/AdminDashboard.tsx`
+- Reescrever completamente o layout
+- Implementar navegacao programatica com useNavigate
+- Criar cards interativos com estados hover/active
+- Adicionar logica de filtros para navegacao contextual
+
+### `src/components/dashboard/QuickStats.tsx` (Opcional)
+- Pode ser substituido por componentes inline no AdminDashboard
+- Ou atualizado para aceitar props de clique e navegacao
+
+---
+
+## Especificacoes Visuais
+
+### Cores dos Cards de Metricas
+```text
+Usuarios: bg-gradient-to-br from-blue-500 to-blue-600
+Pedidos: bg-gradient-to-br from-orange-500 to-amber-500  
+Resgates: bg-gradient-to-br from-amber-400 to-yellow-500
+Estoque Critico: bg-gradient-to-br from-red-500 to-rose-600
+```
+
+### Efeitos de Interacao
+- `hover:scale-[1.02]` - leve aumento no hover
+- `hover:shadow-xl` - sombra mais pronunciada
+- `active:scale-[0.98]` - feedback de clique
+- `transition-all duration-200` - transicoes suaves
+
+### Espacamento
+- Gap entre cards: `gap-4` (mobile) / `gap-6` (desktop)
+- Padding interno: `p-5` a `p-6`
+- Border radius: `rounded-2xl` para cards principais
+
+---
+
+## Fluxo de Navegacao
+
+```text
+Card Usuarios ──────────> /settings (scroll to usuarios)
+Card Pedidos ───────────> / (tab pedidos)
+Card Resgates ──────────> /rewards
+Card Estoque Critico ───> / (filtro zerados + baixo)
+Card Estoque ───────────> /
+Card Checklists ────────> /checklists
+Card Recompensas ───────> /rewards
+Card Configuracoes ─────> /settings
+```
 
 ---
 
 ## Detalhes Tecnicos
 
-### 1. Hook useLeaderboard
-
-Busca ranking de todos os funcionarios:
-- Conta checklist_completions por usuario (pontos ganhos)
-- Soma reward_redemptions aprovadas/entregues (pontos gastos)
-- Calcula saldo e ordena por saldo DESC
-- Retorna: user_id, full_name, avatar_url, earned, spent, balance
-
-### 2. Componentes do Dashboard
-
-**AdminDashboard**:
-- QuickStats: Total itens, estoque baixo, % checklists hoje
-- PointsRanking: Ranking completo com barras de progresso
-- SectorPointsSummary: Pontos por setor com progresso
-- PendingRedemptions: Aprovar/recusar resgates
-
-**EmployeeDashboard**:
-- UserPointsCard: Saldo, ganhos, gastos em destaque
-- PointsRanking: Ranking com destaque na posicao do usuario
-- SectorPointsSummary: Pontos disponiveis por setor
-- StockAlerts: Apenas lista de itens com problema (sem contagem)
-
-### 3. Pontos por Setor no ChecklistView
-
-Adicionar no header de cada setor:
-- Badge dourado com estrela
-- Texto: "X pontos disponiveis"
-- Cor esmaecida quando setor completo
-
-### 4. Navegacao
-
-Dashboard sera primeiro item no menu, visivel para todos:
+### Navegacao com Estado
+Para navegar para uma pagina com filtro pre-aplicado, usaremos:
 ```typescript
-{
-  icon: LayoutDashboard,
-  label: 'Dashboard',
-  href: '/dashboard'
-}
+navigate('/', { state: { stockFilter: 'critical' } })
+navigate('/', { state: { activeTab: 'pedidos' } })
+```
+
+### Estrutura do Card de Metrica
+```tsx
+<div onClick={() => navigate('/path')} 
+     className="group cursor-pointer bg-gradient-to-br ... 
+                rounded-2xl p-5 text-white 
+                hover:scale-[1.02] hover:shadow-xl 
+                active:scale-[0.98] transition-all">
+  <div className="flex items-start justify-between">
+    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+      <Icon className="w-6 h-6" />
+    </div>
+    <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+  </div>
+  <div className="mt-4">
+    <p className="text-3xl font-bold">{value}</p>
+    <p className="text-white/80 text-sm">{title}</p>
+  </div>
+</div>
 ```
 
 ---
 
-## Visual - Dashboard Funcionario
+## Resultado Esperado
 
-```text
-+--------------------------------------------------+
-|  Ola, Maria!                                     |
-|  Seu progresso de hoje                           |
-+--------------------------------------------------+
+Um dashboard administrativo moderno com:
+- Visual profissional com gradientes e sombras
+- Todos os cards clicaveis com feedback visual
+- Navegacao intuitiva para acoes relacionadas
+- Hierarquia visual clara (metricas > alertas > acesso rapido > detalhes)
+- Responsivo para mobile e desktop
+- Consistente com o design system existente
 
-+--- Seus Pontos -----------------------------------+
-|                                                   |
-|          STAR  127 pontos                        |
-|                                                   |
-|     Ganhos: 150     Gastos: 23                   |
-|                                                   |
-+--------------------------------------------------+
-
-+--- Ranking de Pontos -----------------------------+
-|                                                   |
-|  1. Maria Clara       STAR 127 pts   MEDALHA_OURO|
-|  2. Bruno Momesso     STAR 98 pts   MEDALHA_PRATA|
-|  3. Joao Santos       STAR 85 pts  MEDALHA_BRONZE|
-|  4. Ana Silva         STAR 72 pts                |
-|  5. Pedro Costa       STAR 45 pts       <- Voce  |
-|                                                   |
-+--------------------------------------------------+
-
-+--- Pontos Disponiveis Hoje -----------------------+
-|                                                   |
-|  Cozinha              STAR 4 pontos    [====    ]|
-|  Salao                STAR 2 pontos    [======  ]|
-|  Caixa                STAR 0 pontos    [========]|
-|                                                   |
-|  Total: 6 pontos disponiveis                      |
-|                                                   |
-+--------------------------------------------------+
-
-+--- Alertas de Estoque ----------------------------+
-|                                                   |
-|  ALERTA 3 itens precisam de atencao              |
-|                                                   |
-|  - Arroz Branco - Estoque baixo                  |
-|  - Oleo de Soja - Zerado                         |
-|  - Guardanapos - Estoque baixo                   |
-|                                                   |
-+--------------------------------------------------+
-```
-
----
-
-## Visual - Dashboard Admin
-
-```text
-+--------------------------------------------------+
-|  Dashboard Administrativo                        |
-|  Visao geral do sistema                          |
-+--------------------------------------------------+
-
-+--- Resumo Rapido ---------------------------------+
-|                                                   |
-|  [CAIXA 25]    [ALERTA 3]     [CHECK 85%]       |
-|   Itens       Est. Baixo      Checklists        |
-|                                                   |
-+--------------------------------------------------+
-
-+--- Ranking de Funcionarios -----------------------+
-|                                                   |
-|  1. Maria Clara    STAR 127 pts  [============= ]|
-|  2. Bruno Momesso  STAR 98 pts   [==========    ]|
-|  3. Joao Santos    STAR 85 pts   [=========     ]|
-|                                                   |
-+--------------------------------------------------+
-
-+--- Pontos por Setor ------------------------------+
-|                                                   |
-|  Cozinha         STAR 4 pts   [====    ] 50%    |
-|  Salao           STAR 2 pts   [======  ] 80%    |
-|  Caixa           STAR 0 pts   [========] 100%   |
-|                                                   |
-|  Total hoje: 6 pontos                            |
-|                                                   |
-+--------------------------------------------------+
-
-+--- Resgates Pendentes ----------------------------+
-|                                                   |
-|  PRESENTE 3 resgates aguardando                  |
-|                                                   |
-|  Bruno - Folga (50pts)  [APROVAR] [RECUSAR]     |
-|  Maria - Sushi (30pts)  [APROVAR] [RECUSAR]     |
-|                                                   |
-+--------------------------------------------------+
-```
-
----
-
-## Ordem de Implementacao
-
-1. Criar `src/hooks/useLeaderboard.ts`
-2. Criar componentes compartilhados:
-   - `SectorPointsSummary.tsx`
-   - `PointsRanking.tsx`
-   - `StockAlerts.tsx`
-   - `UserPointsCard.tsx`
-3. Criar componentes admin:
-   - `QuickStats.tsx`
-   - `PendingRedemptions.tsx`
-4. Criar dashboards:
-   - `EmployeeDashboard.tsx`
-   - `AdminDashboard.tsx`
-5. Criar pagina `Dashboard.tsx`
-6. Atualizar `App.tsx` com rota
-7. Atualizar `AppLayout.tsx` com menu
-8. Atualizar `ChecklistView.tsx` com pontos por setor
