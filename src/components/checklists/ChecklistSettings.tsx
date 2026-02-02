@@ -477,54 +477,64 @@ export function ChecklistSettings({
                                               key={item.id}
                                               id={item.id}
                                               className={cn(
-                                                "p-2 rounded-lg bg-card",
+                                                "p-3 rounded-lg bg-card",
                                                 !item.is_active && "opacity-50"
                                               )}
                                             >
-                                              <div className="flex items-center gap-2 flex-1">
-                                                <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                                                <div className="flex-1 min-w-0">
-                                                  <div className="flex items-center gap-2 flex-wrap">
-                                                    <p className="text-sm font-medium truncate">{item.name}</p>
-                                                    <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
-                                                      {getFrequencyLabel(item.frequency || 'daily')}
-                                                    </span>
-                                                    <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary flex items-center gap-1">
-                                                      {(() => {
-                                                        const itemType = (item as any).checklist_type || 'abertura';
-                                                        const Icon = getChecklistTypeIcon(itemType as ChecklistType);
-                                                        return <Icon className="w-3 h-3" />;
-                                                      })()}
-                                                      {getChecklistTypeLabel(((item as any).checklist_type || 'abertura') as ChecklistType)}
-                                                    </span>
+                                              <div className="flex-1 min-w-0">
+                                                {/* Item content - stacked on mobile */}
+                                                <div className="flex items-start gap-2">
+                                                  <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                                                  <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium">{item.name}</p>
+                                                    {item.description && (
+                                                      <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+                                                    )}
+                                                    {/* Badges row */}
+                                                    <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                                                      <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                                                        {getFrequencyLabel(item.frequency || 'daily')}
+                                                      </span>
+                                                      <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary flex items-center gap-1">
+                                                        {(() => {
+                                                          const itemType = (item as any).checklist_type || 'abertura';
+                                                          const Icon = getChecklistTypeIcon(itemType as ChecklistType);
+                                                          return <Icon className="w-3 h-3" />;
+                                                        })()}
+                                                        {getChecklistTypeLabel(((item as any).checklist_type || 'abertura') as ChecklistType)}
+                                                      </span>
+                                                    </div>
                                                   </div>
-                                                  {item.description && (
-                                                    <p className="text-xs text-muted-foreground truncate">{item.description}</p>
-                                                  )}
                                                 </div>
-                                                <button
-                                                  onClick={() => onUpdateItem(item.id, { is_active: !item.is_active })}
-                                                  className={cn(
-                                                    "text-xs px-2 py-1 rounded shrink-0",
-                                                    item.is_active 
-                                                      ? "bg-success/10 text-success" 
-                                                      : "bg-muted text-muted-foreground"
-                                                  )}
-                                                >
-                                                  {item.is_active ? 'Ativo' : 'Inativo'}
-                                                </button>
-                                                <button
-                                                  onClick={() => handleOpenItemSheet(subcategory.id, item)}
-                                                  className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground shrink-0"
-                                                >
-                                                  <Edit2 className="w-3 h-3" />
-                                                </button>
-                                                <button
-                                                  onClick={() => onDeleteItem(item.id)}
-                                                  className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive shrink-0"
-                                                >
-                                                  <Trash2 className="w-3 h-3" />
-                                                </button>
+                                                
+                                                {/* Action buttons - always visible, properly sized for touch */}
+                                                <div className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-border/50">
+                                                  <button
+                                                    onClick={() => onUpdateItem(item.id, { is_active: !item.is_active })}
+                                                    className={cn(
+                                                      "text-xs px-3 py-1.5 rounded-lg font-medium transition-colors",
+                                                      item.is_active 
+                                                        ? "bg-success/10 text-success" 
+                                                        : "bg-muted text-muted-foreground"
+                                                    )}
+                                                  >
+                                                    {item.is_active ? 'Ativo' : 'Inativo'}
+                                                  </button>
+                                                  <button
+                                                    onClick={() => handleOpenItemSheet(subcategory.id, item)}
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-xs font-medium"
+                                                  >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                    Editar
+                                                  </button>
+                                                  <button
+                                                    onClick={() => onDeleteItem(item.id)}
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs font-medium"
+                                                  >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    Excluir
+                                                  </button>
+                                                </div>
                                               </div>
                                             </SortableItem>
                                           ))}
