@@ -11,7 +11,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Leaderboard } from './Leaderboard';
 import { SectorPointsSummary } from './SectorPointsSummary';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
@@ -38,7 +37,7 @@ function MetricCard({ title, value, icon: Icon, onClick, gradient, subtitle }: M
       className={cn(
         "group cursor-pointer rounded-2xl p-5 text-white",
         "hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]",
-        "transition-all duration-200",
+        "transition-all duration-200 border border-white/10",
         gradient
       )}
     >
@@ -68,19 +67,17 @@ interface QuickAccessCardProps {
 
 function QuickAccessCard({ title, subtitle, icon: Icon, onClick, iconBg, iconColor }: QuickAccessCardProps) {
   return (
-    <Card 
+    <div
       onClick={onClick}
-      className="group cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all duration-200 active:scale-[0.98]"
+      className="card-interactive p-4 flex flex-col items-center text-center group"
     >
-      <CardContent className="p-4 flex flex-col items-center text-center">
-        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-3", iconBg)}>
-          <Icon className={cn("w-6 h-6", iconColor)} />
-        </div>
-        <p className="font-semibold text-foreground">{title}</p>
-        <p className="text-xs text-muted-foreground">{subtitle}</p>
-        <ArrowUpRight className="w-4 h-4 mt-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-      </CardContent>
-    </Card>
+      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-3", iconBg)}>
+        <Icon className={cn("w-6 h-6", iconColor)} />
+      </div>
+      <p className="font-semibold text-foreground">{title}</p>
+      <p className="text-xs text-muted-foreground">{subtitle}</p>
+      <ArrowUpRight className="w-4 h-4 mt-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+    </div>
   );
 }
 
@@ -101,14 +98,14 @@ function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
   return (
     <div 
       onClick={onClick}
-      className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group"
+      className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors group"
     >
       <div className="flex items-center gap-3">
         <AlertCircle className={cn("w-4 h-4", severity === 'error' ? 'text-destructive' : severity === 'warning' ? 'text-warning' : 'text-primary')} />
         <span className="text-sm text-foreground">{message}</span>
       </div>
       <div className="flex items-center gap-2">
-        <Badge className={cn("text-xs", severityStyles[severity])}>{count}</Badge>
+        <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", severityStyles[severity])}>{count}</span>
         <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>

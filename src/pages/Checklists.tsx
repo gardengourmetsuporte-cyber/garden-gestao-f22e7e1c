@@ -155,13 +155,18 @@ export default function ChecklistsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header */}
-        <header className="bg-card border-b sticky top-0 lg:top-0 z-40">
-          <div className="px-4 py-4 lg:px-6">
+        {/* Header - Unified Design */}
+        <header className="page-header-unified">
+          <div className="page-header-content">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Checklists</h1>
-                <p className="text-sm text-muted-foreground">Controle de tarefas diárias</p>
+              <div className="flex items-center gap-3">
+                <div className="page-header-icon bg-success/10">
+                  <ClipboardCheck className="w-5 h-5 text-success" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Checklists</h1>
+                  <p className="text-sm text-muted-foreground">Controle de tarefas diárias</p>
+                </div>
               </div>
               {isAdmin && (
                 <button

@@ -21,7 +21,7 @@ export function StatsCard({ title, value, icon: Icon, variant = 'default', onCli
     <button
       onClick={onClick}
       className={cn(
-        "stock-card w-full text-left transition-all hover:shadow-md active:scale-[0.98]",
+        "card-interactive w-full text-left p-4",
         onClick && "cursor-pointer"
       )}
     >
