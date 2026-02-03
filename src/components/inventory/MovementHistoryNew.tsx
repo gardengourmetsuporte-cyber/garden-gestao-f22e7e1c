@@ -1,13 +1,29 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, Trash2, Loader2 } from 'lucide-react';
 import { StockMovement, InventoryItem } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface MovementHistoryProps {
   movements: StockMovement[];
   items: InventoryItem[];
   showItemName?: boolean;
+  onDeleteMovement?: (movementId: string) => Promise<void>;
 }
 
 function getUnitLabel(unitType: string): string {
@@ -19,7 +35,24 @@ function getUnitLabel(unitType: string): string {
   }
 }
 
-export function MovementHistoryNew({ movements, items, showItemName = false }: MovementHistoryProps) {
+export function MovementHistoryNew({ movements, items, showItemName = false, onDeleteMovement }: MovementHistoryProps) {
+  const { isAdmin } = useAuth();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (movementId: string) => {
+    if (!onDeleteMovement) return;
+    
+    setDeletingId(movementId);
+    try {
+      await onDeleteMovement(movementId);
+      toast.success('Movimentação excluída e estoque ajustado!');
+    } catch (error) {
+      toast.error('Erro ao excluir movimentação');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (movements.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -84,12 +117,52 @@ export function MovementHistoryNew({ movements, items, showItemName = false }: M
                       )}
                     </div>
 
-                    <div className={cn(
-                      "text-lg font-bold shrink-0",
-                      movement.type === 'entrada' ? "text-success" : "text-destructive"
-                    )}>
-                      {movement.type === 'entrada' ? '+' : '-'}
-                      {movement.quantity.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "text-lg font-bold shrink-0",
+                        movement.type === 'entrada' ? "text-success" : "text-destructive"
+                      )}>
+                        {movement.type === 'entrada' ? '+' : '-'}
+                        {movement.quantity.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}
+                      </div>
+
+                      {isAdmin && onDeleteMovement && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              disabled={deletingId === movement.id}
+                            >
+                              {deletingId === movement.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Excluir movimentação?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta ação irá excluir a movimentação e {movement.type === 'entrada' ? 'subtrair' : 'devolver'}{' '}
+                                <strong>{movement.quantity.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}</strong>{' '}
+                                {movement.type === 'entrada' ? 'do' : 'ao'} estoque de <strong>{item.name}</strong>.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(movement.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </div>
                 </div>

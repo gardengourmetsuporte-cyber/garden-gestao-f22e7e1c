@@ -210,6 +210,18 @@ export function useInventoryDB() {
     return grouped;
   }, [items]);
 
+  const deleteMovement = useCallback(async (movementId: string) => {
+    const { error } = await supabase
+      .from('stock_movements')
+      .delete()
+      .eq('id', movementId);
+
+    if (error) throw error;
+
+    // Re-sync from backend to reflect reversed stock
+    await Promise.all([fetchItems(), fetchMovements()]);
+  }, [fetchItems, fetchMovements]);
+
   return {
     items,
     movements,
@@ -218,6 +230,7 @@ export function useInventoryDB() {
     updateItem,
     deleteItem,
     registerMovement,
+    deleteMovement,
     getItemMovements,
     getItem,
     getLowStockItems,
