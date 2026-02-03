@@ -99,7 +99,7 @@ export function ChecklistSettingsManager() {
     }
   };
 
-  const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean }) => {
+  const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: 'abertura' | 'fechamento' }) => {
     try {
       await updateItem(id, data);
       toast.success('Item atualizado!');
