@@ -4,7 +4,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* Inventory Control System - Design System */
+/* =========================================================
+   DESIGN SYSTEM UNIFICADO - Garden Gestão
+   ========================================================= */
 
 @layer base {
   :root {
@@ -17,16 +19,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 10%;
 
-    --primary: 220 70% 45%;
+    --primary: 220 70% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 93%;
+    --secondary: 220 14% 96%;
     --secondary-foreground: 220 25% 20%;
 
-    --muted: 210 15% 93%;
+    --muted: 220 14% 96%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 210 15% 93%;
+    --accent: 220 14% 96%;
     --accent-foreground: 220 25% 20%;
 
     --destructive: 0 72% 51%;
@@ -38,38 +40,33 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 220 13% 88%;
-    --input: 220 13% 88%;
-    --ring: 220 70% 45%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 70% 50%;
 
-    --radius: 0.75rem;
-
-    /* Custom shadows for depth */
-    --shadow-sm: 0 1px 2px 0 hsl(220 25% 10% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(220 25% 10% / 0.1), 0 2px 4px -2px hsl(220 25% 10% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(220 25% 10% / 0.1), 0 4px 6px -4px hsl(220 25% 10% / 0.1);
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 220 25% 8%;
+    --background: 220 25% 6%;
     --foreground: 210 20% 98%;
 
-    --card: 220 25% 12%;
+    --card: 220 25% 10%;
     --card-foreground: 210 20% 98%;
 
-    --popover: 220 25% 12%;
+    --popover: 220 25% 10%;
     --popover-foreground: 210 20% 98%;
 
     --primary: 220 70% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 20%;
+    --secondary: 220 20% 18%;
     --secondary-foreground: 210 20% 98%;
 
-    --muted: 220 20% 20%;
+    --muted: 220 20% 18%;
     --muted-foreground: 220 10% 60%;
 
-    --accent: 220 20% 20%;
+    --accent: 220 20% 18%;
     --accent-foreground: 210 20% 98%;
 
     --destructive: 0 72% 51%;
@@ -81,8 +78,8 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
     --ring: 220 70% 55%;
   }
 }
@@ -102,25 +99,43 @@
   }
 }
 
+/* =========================================================
+   COMPONENTES DO DESIGN SYSTEM
+   ========================================================= */
+
 @layer components {
+  /* Touch target padrão para mobile */
   .touch-target {
     @apply min-h-[48px] min-w-[48px];
   }
 
-  /* Sistema de Cards Padronizado */
+  /* ========== CARDS UNIFICADOS ========== */
+  
+  /* Card base - usado em TODOS os lugares */
   .card-base {
-    @apply bg-card rounded-2xl border border-border/50 shadow-sm;
+    @apply bg-card rounded-2xl border border-border shadow-sm;
   }
 
+  /* Card interativo - para itens clicáveis */
   .card-interactive {
-    @apply bg-card rounded-2xl border border-border/50 shadow-sm 
-           hover:shadow-md hover:border-primary/20 
-           active:scale-[0.98] transition-all cursor-pointer;
+    @apply bg-card rounded-2xl border border-border shadow-sm 
+           cursor-pointer transition-all duration-200
+           hover:shadow-md hover:border-primary/30
+           active:scale-[0.98];
   }
 
-  /* Header Padronizado para Páginas */
-  .page-header-unified {
-    @apply bg-card border-b sticky top-0 lg:top-0 z-40;
+  /* Card com destaque de gradiente */
+  .card-gradient {
+    @apply rounded-2xl p-5 text-white transition-all duration-200
+           border border-white/10
+           hover:scale-[1.02] hover:shadow-xl 
+           active:scale-[0.98];
+  }
+
+  /* ========== HEADERS DE PÁGINA ========== */
+  
+  .page-header {
+    @apply bg-card border-b border-border sticky top-0 z-40;
   }
 
   .page-header-content {
@@ -131,52 +146,166 @@
     @apply w-10 h-10 rounded-xl flex items-center justify-center;
   }
 
-  /* Stats Card Padronizado */
-  .stats-card-unified {
+  .page-title {
+    @apply text-xl font-bold text-foreground;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-muted-foreground;
+  }
+
+  /* ========== STATS E MÉTRICAS ========== */
+
+  .stat-card {
     @apply card-interactive p-4;
   }
 
-  .stock-card {
-    @apply bg-card rounded-2xl p-4 shadow-sm border border-border/50;
+  .stat-icon {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center;
   }
 
-  .status-badge {
+  .stat-value {
+    @apply text-2xl font-bold text-foreground;
+  }
+
+  .stat-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  /* ========== LISTAS ========== */
+
+  .list-item {
+    @apply flex items-center justify-between p-3 rounded-xl 
+           bg-secondary/50 hover:bg-secondary transition-colors;
+  }
+
+  .list-item-interactive {
+    @apply list-item cursor-pointer active:scale-[0.99];
+  }
+
+  /* ========== BADGES DE STATUS ========== */
+
+  .badge-status {
     @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
   }
 
-  .status-ok {
+  .badge-success {
     @apply bg-success/15 text-success;
   }
 
-  .status-low {
+  .badge-warning {
     @apply bg-warning/15 text-warning;
   }
 
-  .status-out {
+  .badge-error {
     @apply bg-destructive/15 text-destructive;
   }
 
-  .action-button {
-    @apply touch-target flex items-center justify-center gap-2 rounded-xl font-semibold text-base transition-all active:scale-[0.98];
+  .badge-info {
+    @apply bg-primary/15 text-primary;
   }
 
-  .action-button-entry {
+  /* ========== SEÇÕES ========== */
+
+  .section-title {
+    @apply text-lg font-semibold text-foreground;
+  }
+
+  .section-label {
+    @apply text-sm font-semibold text-muted-foreground uppercase tracking-wider;
+  }
+
+  /* ========== BOTÕES DE AÇÃO ========== */
+
+  .action-button {
+    @apply touch-target flex items-center justify-center gap-2 
+           rounded-xl font-semibold text-base 
+           transition-all active:scale-[0.98];
+  }
+
+  .action-button-primary {
+    @apply action-button bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .action-button-success {
     @apply action-button bg-success text-success-foreground hover:bg-success/90;
   }
 
-  .action-button-exit {
+  .action-button-destructive {
     @apply action-button bg-destructive text-destructive-foreground hover:bg-destructive/90;
   }
 
-  .floating-button {
-    @apply fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-50 active:scale-95 transition-transform;
-  }
+  /* ========== INPUTS ========== */
 
   .input-large {
-    @apply h-14 text-lg px-4 rounded-xl;
+    @apply h-14 text-lg px-4 rounded-xl border border-input bg-background;
   }
 
-  .page-header {
-    @apply sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3;
+  /* ========== FLOATING ACTION BUTTON ========== */
+
+  .fab {
+    @apply fixed bottom-6 right-6 w-14 h-14 
+           rounded-2xl bg-primary text-primary-foreground 
+           shadow-lg shadow-primary/30
+           flex items-center justify-center 
+           z-50 active:scale-95 transition-transform;
+  }
+
+  /* ========== VIEW TOGGLES ========== */
+
+  .view-toggle-group {
+    @apply flex gap-1 bg-secondary p-1 rounded-xl;
+  }
+
+  .view-toggle-item {
+    @apply flex-1 flex items-center justify-center gap-2 
+           py-3 rounded-lg font-medium transition-all;
+  }
+
+  .view-toggle-active {
+    @apply bg-card shadow-sm text-foreground;
+  }
+
+  .view-toggle-inactive {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  /* ========== ALERTAS ========== */
+
+  .alert-card {
+    @apply card-base p-4 flex items-start gap-3;
+  }
+
+  .alert-warning {
+    @apply border-warning/30 bg-warning/5;
+  }
+
+  .alert-error {
+    @apply border-destructive/30 bg-destructive/5;
+  }
+
+  .alert-info {
+    @apply border-primary/30 bg-primary/5;
+  }
+}
+
+/* =========================================================
+   ANIMAÇÕES
+   ========================================================= */
+
+@layer utilities {
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

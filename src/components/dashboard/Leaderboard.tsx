@@ -1,5 +1,4 @@
 import { Trophy, Medal, Star, User } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LeaderboardEntry } from '@/hooks/useLeaderboard';
 import { cn } from '@/lib/utils';
@@ -42,31 +41,27 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries = 10
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-500" />
-            Ranking de Pontos
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <div className="card-base p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Trophy className="w-5 h-5 text-amber-500" />
+          <h3 className="font-semibold text-foreground">Ranking de Pontos</h3>
+        </div>
+        <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-16 bg-secondary rounded-xl animate-pulse" />
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-amber-500" />
-          Ranking de Pontos
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="card-base p-4">
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy className="w-5 h-5 text-amber-500" />
+        <h3 className="font-semibold text-foreground">Ranking de Pontos</h3>
+      </div>
+      <div className="space-y-2">
         {displayEntries.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -121,7 +116,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries = 10
             );
           })
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

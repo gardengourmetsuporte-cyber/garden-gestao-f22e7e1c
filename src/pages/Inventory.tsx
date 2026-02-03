@@ -237,8 +237,8 @@ export default function InventoryPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header - Unified Design */}
-        <header className="page-header-unified">
+        {/* Header */}
+        <header className="page-header">
           <div className="page-header-content">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -246,14 +246,14 @@ export default function InventoryPage() {
                   <Package className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-foreground">Controle de Estoque</h1>
-                  <p className="text-sm text-muted-foreground">{items.length} itens cadastrados</p>
+                  <h1 className="page-title">Controle de Estoque</h1>
+                  <p className="page-subtitle">{items.length} itens cadastrados</p>
                 </div>
               </div>
               {isAdmin && (
                 <button
                   onClick={handleAddItem}
-                  className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
+                  className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg shadow-primary/30"
                 >
                   <Plus className="w-6 h-6" />
                 </button>
@@ -262,7 +262,7 @@ export default function InventoryPage() {
           </div>
         </header>
 
-        <div className="px-4 py-4 lg:px-6 space-y-6">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Stats - Clickable */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <StatsCard
@@ -297,7 +297,7 @@ export default function InventoryPage() {
 
           {/* Active Filter Indicator */}
           {stockFilter && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg">
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-xl">
               <span className="text-sm text-primary font-medium">
                 Filtro ativo: {stockFilter === 'zero' ? 'Itens zerados' : stockFilter === 'low' ? 'Estoque baixo' : 'Todos os itens'}
               </span>
@@ -312,35 +312,33 @@ export default function InventoryPage() {
 
           {/* Alerts */}
           {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
-            <div className="stock-card border-warning/50 bg-warning/5">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-foreground">Atenção ao Estoque</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {outOfStockItems.length > 0 && (
-                      <span className="text-destructive font-medium">
-                        {outOfStockItems.length} item(ns) zerado(s).{' '}
-                      </span>
-                    )}
-                    {lowStockItems.length > 0 && (
-                      <span className="text-warning font-medium">
-                        {lowStockItems.length} item(ns) com estoque baixo.
-                      </span>
-                    )}
-                  </p>
-                </div>
+            <div className="alert-card alert-warning">
+              <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-foreground">Atenção ao Estoque</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {outOfStockItems.length > 0 && (
+                    <span className="text-destructive font-medium">
+                      {outOfStockItems.length} item(ns) zerado(s).{' '}
+                    </span>
+                  )}
+                  {lowStockItems.length > 0 && (
+                    <span className="text-warning font-medium">
+                      {lowStockItems.length} item(ns) com estoque baixo.
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
           )}
 
-          {/* View Toggle - Reordered: Itens, Histórico, Pedidos */}
-          <div className="flex gap-2 bg-secondary p-1 rounded-xl">
+          {/* View Toggle */}
+          <div className="view-toggle-group">
             <button
               onClick={() => { setView('items'); }}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                view === 'items' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+                "view-toggle-item",
+                view === 'items' ? 'view-toggle-active' : 'view-toggle-inactive'
               )}
             >
               <ClipboardList className="w-4 h-4" />
@@ -349,8 +347,8 @@ export default function InventoryPage() {
             <button
               onClick={() => { setView('history'); setStockFilter(null); }}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                view === 'history' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+                "view-toggle-item",
+                view === 'history' ? 'view-toggle-active' : 'view-toggle-inactive'
               )}
             >
               <History className="w-4 h-4" />
@@ -360,8 +358,8 @@ export default function InventoryPage() {
               <button
                 onClick={() => { setView('orders'); setStockFilter(null); }}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all relative",
-                  view === 'orders' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+                  "view-toggle-item relative",
+                  view === 'orders' ? 'view-toggle-active' : 'view-toggle-inactive'
                 )}
               >
                 <ShoppingCart className="w-4 h-4" />
@@ -411,7 +409,7 @@ export default function InventoryPage() {
                       {/* Category Header */}
                       <button
                         onClick={() => toggleCategory(categoryName)}
-                        className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-secondary/50 transition-colors"
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-secondary/50 transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <div
@@ -469,7 +467,7 @@ export default function InventoryPage() {
           )}
         </div>
 
-        {/* Quick Movement Sheet */}
+        {/* Movement Sheet */}
         <QuickMovementSheetNew
           item={selectedItem}
           open={movementSheetOpen}
@@ -479,13 +477,13 @@ export default function InventoryPage() {
 
         {/* Item Form Sheet */}
         <ItemFormSheetNew
+          open={itemFormOpen}
+          onOpenChange={setItemFormOpen}
           item={editingItem}
           categories={categories}
           suppliers={suppliers}
-          open={itemFormOpen}
-          onOpenChange={setItemFormOpen}
           onSave={handleSaveItem}
-          onDelete={handleDeleteItem}
+          onDelete={editingItem ? () => handleDeleteItem(editingItem.id) : undefined}
           isAdmin={isAdmin}
         />
       </div>
