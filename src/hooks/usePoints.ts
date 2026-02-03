@@ -28,11 +28,12 @@ export function usePoints() {
     
     setIsLoading(true);
     try {
-      // Count completed tasks (1 task = 1 point)
+      // Count completed tasks that awarded points (1 task = 1 point)
       const { count: earnedPoints } = await supabase
         .from('checklist_completions')
         .select('*', { count: 'exact', head: true })
-        .eq('completed_by', user.id);
+        .eq('completed_by', user.id)
+        .eq('awarded_points', true);
 
       // Sum points spent on approved/delivered redemptions
       const { data: redemptions } = await supabase

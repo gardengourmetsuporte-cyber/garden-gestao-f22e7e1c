@@ -69,6 +69,7 @@ export function useChecklists() {
           
           return {
             ...completion,
+            awarded_points: completion.awarded_points ?? true,
             profile: profileData ? { full_name: profileData.full_name } : undefined
           } as ChecklistCompletion;
         })
@@ -362,7 +363,8 @@ export function useChecklists() {
     itemId: string,
     checklistType: ChecklistType,
     date: string,
-    isAdmin?: boolean
+    isAdmin?: boolean,
+    awardPoints: boolean = true
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -384,7 +386,7 @@ export function useChecklists() {
       if (error) throw error;
       setCompletions(prev => prev.filter(c => c.id !== existing.id));
     } else {
-      // Add completion
+      // Add completion with awarded_points flag
       const { data, error } = await supabase
         .from('checklist_completions')
         .insert({
@@ -392,12 +394,13 @@ export function useChecklists() {
           checklist_type: checklistType,
           completed_by: user?.id,
           date,
+          awarded_points: awardPoints,
         })
         .select()
         .single();
 
       if (error) throw error;
-      setCompletions(prev => [...prev, data as ChecklistCompletion]);
+      setCompletions(prev => [...prev, { ...data, awarded_points: awardPoints } as ChecklistCompletion]);
     }
   }, [completions, user?.id]);
 

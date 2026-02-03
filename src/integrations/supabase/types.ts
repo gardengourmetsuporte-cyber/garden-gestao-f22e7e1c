@@ -43,6 +43,7 @@ export type Database = {
       }
       checklist_completions: {
         Row: {
+          awarded_points: boolean
           checklist_type: Database["public"]["Enums"]["checklist_type"]
           completed_at: string
           completed_by: string
@@ -52,6 +53,7 @@ export type Database = {
           notes: string | null
         }
         Insert: {
+          awarded_points?: boolean
           checklist_type: Database["public"]["Enums"]["checklist_type"]
           completed_at?: string
           completed_by: string
@@ -61,6 +63,7 @@ export type Database = {
           notes?: string | null
         }
         Update: {
+          awarded_points?: boolean
           checklist_type?: Database["public"]["Enums"]["checklist_type"]
           completed_at?: string
           completed_by?: string
