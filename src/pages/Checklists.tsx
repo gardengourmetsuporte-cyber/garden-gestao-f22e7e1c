@@ -46,6 +46,7 @@ export default function ChecklistsPage() {
 
   const [currentTab, setCurrentTab] = useState<TabView>('checklist');
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
+  const [settingsType, setSettingsType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
 
@@ -294,9 +295,39 @@ export default function ChecklistsPage() {
                 </div>
               </div>
 
+              {/* Type Selector */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSettingsType('abertura')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+                    settingsType === 'abertura' 
+                      ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" 
+                      : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                  )}
+                >
+                  <Sun className="w-5 h-5" />
+                  <span className="font-semibold">Abertura</span>
+                </button>
+                <button
+                  onClick={() => setSettingsType('fechamento')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+                    settingsType === 'fechamento' 
+                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400" 
+                      : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                  )}
+                >
+                  <Moon className="w-5 h-5" />
+                  <span className="font-semibold">Fechamento</span>
+                </button>
+              </div>
+
               {/* Settings Component */}
               <ChecklistSettings
                 sectors={sectors}
+                selectedType={settingsType}
+                onTypeChange={setSettingsType}
                 onAddSector={handleAddSector}
                 onUpdateSector={handleUpdateSector}
                 onDeleteSector={handleDeleteSector}

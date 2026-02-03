@@ -31,7 +31,17 @@ export function useChecklists() {
         .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
 
       if (error) throw error;
-      setSectors((data as ChecklistSector[]) || []);
+      
+      // Filter out soft-deleted items from the result
+      const filteredData = (data || []).map(sector => ({
+        ...sector,
+        subcategories: (sector.subcategories || []).map(sub => ({
+          ...sub,
+          items: (sub.items || []).filter((item: any) => item.deleted_at === null)
+        }))
+      }));
+      
+      setSectors(filteredData as ChecklistSector[]);
     } catch (error) {
       // Silent fail - sectors will be empty
     }
@@ -210,15 +220,67 @@ export function useChecklists() {
     return data as ChecklistItem;
   }, [fetchSectors]);
 
+  // Soft delete - marca como deletado ao invés de remover permanentemente
   const deleteItem = useCallback(async (id: string) => {
+    const { error } = await supabase
+      .from('checklist_items')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw error;
+    await fetchSectors();
+  }, [fetchSectors]);
+
+  // Restaurar item da lixeira
+  const restoreItem = useCallback(async (id: string) => {
+    const { error } = await supabase
+      .from('checklist_items')
+      .update({ deleted_at: null })
+      .eq('id', id);
+
+    if (error) throw error;
+    await fetchSectors();
+  }, [fetchSectors]);
+
+  // Buscar itens na lixeira (últimos 30 dias)
+  const fetchDeletedItems = useCallback(async () => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { data, error } = await supabase
+      .from('checklist_items')
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .gte('deleted_at', thirtyDaysAgo.toISOString())
+      .order('deleted_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as ChecklistItem[];
+  }, []);
+
+  // Exclusão permanente de um item
+  const permanentDeleteItem = useCallback(async (id: string) => {
     const { error } = await supabase
       .from('checklist_items')
       .delete()
       .eq('id', id);
 
     if (error) throw error;
-    await fetchSectors();
-  }, [fetchSectors]);
+  }, []);
+
+  // Esvaziar lixeira (excluir todos os itens soft-deleted)
+  const emptyTrash = useCallback(async () => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { error } = await supabase
+      .from('checklist_items')
+      .delete()
+      .not('deleted_at', 'is', null)
+      .gte('deleted_at', thirtyDaysAgo.toISOString());
+
+    if (error) throw error;
+  }, []);
 
   // Reorder functions - with optimistic UI update
   const reorderSectors = useCallback(async (orderedIds: string[]) => {
@@ -382,6 +444,10 @@ export function useChecklists() {
     addItem,
     updateItem,
     deleteItem,
+    restoreItem,
+    permanentDeleteItem,
+    fetchDeletedItems,
+    emptyTrash,
     reorderItems,
     // Completion operations
     toggleCompletion,
