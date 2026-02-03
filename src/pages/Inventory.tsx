@@ -31,6 +31,7 @@ export default function InventoryPage() {
     updateItem,
     deleteItem,
     registerMovement,
+    deleteMovement,
     getLowStockItems,
     getOutOfStockItems,
     getRecentMovements,
@@ -463,6 +464,7 @@ export default function InventoryPage() {
               })}
               items={items}
               showItemName
+              onDeleteMovement={deleteMovement}
             />
           )}
         </div>
