@@ -1,135 +1,277 @@
 
-# Plano: Corrigir Ordem dos Itens e Padronizar Design Visual
+# Plano: Redesign Visual Completo e Unificado
 
-## Problema 1: Ordem dos Itens na Checklist
+## Diagnóstico do Problema
 
-### Diagnóstico
-Quando você edita um item na checklist, a função `updateItem` chama `fetchSectors()` que busca os dados do banco novamente. O problema é que essa busca **não ordena** subcategorias e itens pelo campo `sort_order`, fazendo com que eles apareçam em ordem aleatória.
+Após análise detalhada, identifiquei que o aplicativo tem **múltiplos padrões visuais** que não conversam entre si:
 
-### Solução
-Adicionar ordenação por `sort_order` na query de subcategorias e itens dentro da função `fetchSectors`:
+### Inconsistências Encontradas
 
-```sql
--- Antes (sem ordenação de itens)
-subcategories:checklist_subcategories(*,items:checklist_items(*))
-
--- Depois (com ordenação)
-subcategories:checklist_subcategories(*, items:checklist_items(*).order(sort_order))
-  .order(sort_order)
-```
+| Elemento | Dashboard | Estoque | Checklists | Recompensas | Configurações |
+|----------|-----------|---------|------------|-------------|---------------|
+| **Cards** | `Card` shadcn + gradientes | `stock-card` customizado | `rounded-2xl border` manual | `Card` shadcn | `bg-secondary/50` |
+| **Cores Header** | `bg-gradient-to-br from-primary` | `bg-primary/10` | `bg-success/10` | `bg-gradient-to-br from-amber-500` | `bg-secondary` |
+| **Border Radius** | `rounded-2xl` | `rounded-2xl` e `rounded-xl` misturados | `rounded-2xl` | `rounded-xl` e `rounded-2xl` | `rounded-xl` |
+| **Sombras** | `shadow-lg` em alguns | `shadow-sm` | `shadow-inner` na progress | Sem sombra nos cards | Sem sombra |
+| **Espaçamentos** | `p-5`, `p-6` | `p-4`, `p-3` | `p-4`, `p-5` | `p-4`, `p-6` | `p-3`, `p-4` |
 
 ---
 
-## Problema 2: Design Visual Inconsistente
+## Solução: Design System Único e Coeso
 
-### Diagnóstico
-Cada módulo foi desenvolvido com estilos diferentes:
+### Princípios do Novo Design
 
-| Módulo | Problemas Identificados |
-|--------|------------------------|
-| **Dashboard** | Cards com gradientes únicos, espaçamento grande |
-| **Estoque** | Usa classe `stock-card` customizada, ícones menores |
-| **Checklists** | Cards arredondados com bordas, visual mais moderno |
-| **Recompensas** | Componentes `Card` do shadcn, estilo diferente |
-| **Configurações** | Tabs sem ícones visíveis em mobile, cards básicos |
+1. **Consistência Total**: Todos os componentes usam os mesmos tokens visuais
+2. **Hierarquia Clara**: Cores indicam função, não módulo
+3. **Touch-Friendly**: Mínimo 48px para áreas clicáveis
+4. **Profissional mas Acessível**: Visual moderno sem complexidade visual
 
-### Solução: Sistema de Design Unificado
+### Tokens Visuais Unificados
 
-Criar um **Design System consistente** que mantém toda a funcionalidade existente, mudando apenas a aparência visual.
+| Token | Valor | Uso |
+|-------|-------|-----|
+| `border-radius` | `1rem` (16px) = rounded-2xl | Cards, botões grandes |
+| `border-radius-sm` | `0.75rem` (12px) = rounded-xl | Ícones, elementos menores |
+| `shadow-card` | `shadow-sm` | Todos os cards em repouso |
+| `shadow-hover` | `shadow-md` | Cards ao passar o mouse |
+| `padding-card` | `p-4` | Padrão para cards |
+| `gap-items` | `gap-3` ou `gap-4` | Entre elementos |
 
-#### Princípios do Novo Design
+### Paleta de Cores por Função (não por módulo)
 
-1. **Cards Padronizados**: Todos usam `rounded-2xl`, sombra suave, bordas consistentes
-2. **Headers Unificados**: Mesmo estilo em todas as páginas (ícone + título + subtítulo)
-3. **Cores por Função**: 
-   - Ações principais: `bg-primary`
-   - Sucesso/Completado: `bg-success`
-   - Alerta/Atenção: `bg-warning`
-   - Erro/Crítico: `bg-destructive`
-4. **Touch-Targets**: Mínimo 48px para botões e áreas clicáveis
-5. **Tipografia**: Hierarquia clara (título bold, subtítulo muted)
+- **Primary**: Ações principais, navegação ativa
+- **Success**: Completado, entrada de estoque, checklist concluído
+- **Warning**: Atenção, estoque baixo
+- **Destructive**: Crítico, saída, erro
+- **Amber/Orange**: Pontos, recompensas, gamificação
 
 ---
 
 ## Arquivos a Modificar
 
-### Correção da Ordem (Bug Fix)
-| Arquivo | Mudança |
-|---------|---------|
-| `src/hooks/useChecklists.ts` | Adicionar `.order('sort_order')` nas subcategorias e itens da query |
+### 1. CSS Base (`src/index.css`)
+- Remover classes duplicadas/conflitantes
+- Criar sistema de classes unificado mais robusto
+- Padronizar transições e animações
 
-### Padronização Visual (Design System)
-| Arquivo | Mudança |
-|---------|---------|
-| `src/index.css` | Adicionar novas classes utilitárias padronizadas |
-| `src/pages/Checklists.tsx` | Atualizar header para padrão unificado |
-| `src/pages/Inventory.tsx` | Atualizar header e cards para padrão unificado |
-| `src/pages/Rewards.tsx` | Atualizar header para padrão unificado |
-| `src/pages/Settings.tsx` | Atualizar header e tabs para padrão unificado |
-| `src/components/dashboard/AdminDashboard.tsx` | Ajustar cards para padrão unificado |
-| `src/components/dashboard/EmployeeDashboard.tsx` | Ajustar cards para padrão unificado |
-| `src/components/inventory/StatsCard.tsx` | Atualizar para novo padrão visual |
-| `src/components/rewards/ProductCard.tsx` | Atualizar para novo padrão visual |
-| `src/components/checklists/ChecklistView.tsx` | Pequenos ajustes de consistência |
+### 2. Páginas Principais
+| Arquivo | Mudanças |
+|---------|----------|
+| `src/pages/DashboardNew.tsx` | Unificar header com mesmo padrão |
+| `src/pages/Inventory.tsx` | Remover `stock-card`, usar padrão unificado |
+| `src/pages/Checklists.tsx` | Ajustar espaçamentos e bordas |
+| `src/pages/Rewards.tsx` | Padronizar cards de produtos |
+| `src/pages/Settings.tsx` | Unificar tabs e cards internos |
+
+### 3. Componentes de Dashboard
+| Arquivo | Mudanças |
+|---------|----------|
+| `AdminDashboard.tsx` | Unificar MetricCard e QuickAccessCard |
+| `EmployeeDashboard.tsx` | Usar mesmos padrões do Admin |
+| `Leaderboard.tsx` | Usar novo padrão de card |
+| `UserPointsCard.tsx` | Ajustar para padrão unificado |
+| `SectorPointsSummary.tsx` | Ajustar para padrão unificado |
+
+### 4. Componentes de Estoque
+| Arquivo | Mudanças |
+|---------|----------|
+| `ItemCardNew.tsx` | Substituir stock-card por card-base |
+| `StatsCard.tsx` | Usar novo padrão unificado |
+
+### 5. Componentes de Recompensas
+| Arquivo | Mudanças |
+|---------|----------|
+| `ProductCard.tsx` | Unificar com design system |
+| `RedemptionHistory.tsx` | Usar padrão de lista unificado |
+
+### 6. Componentes de Checklists
+| Arquivo | Mudanças |
+|---------|----------|
+| `ChecklistView.tsx` | Ajustar cards de setor para padrão |
+
+### 7. Componentes de Configurações
+| Arquivo | Mudanças |
+|---------|----------|
+| `ProfileSettings.tsx` | Padronizar inputs e botões |
+| `CategorySettings.tsx` | Usar lista padronizada |
 
 ---
 
-## Detalhes Técnicos
+## Mudanças Visuais Específicas
 
-### 1. Correção da Query de Ordenação
+### Headers de Página (Todos Iguais)
+```css
+/* Padrão unificado para todos os headers */
+.page-header-unified {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
 
-```typescript
-// src/hooks/useChecklists.ts - fetchSectors
-const { data, error } = await supabase
-  .from('checklist_sectors')
-  .select(`
-    *,
-    subcategories:checklist_subcategories(
-      *,
-      items:checklist_items(*)
-    )
-  `)
-  .order('sort_order')
-  .order('sort_order', { referencedTable: 'checklist_subcategories' })
-  .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
+/* Ícone do header - cor varia por módulo mas estrutura é igual */
+.page-header-icon {
+  width: 2.5rem;      /* 40px */
+  height: 2.5rem;     /* 40px */
+  border-radius: 0.75rem; /* 12px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 ```
 
-### 2. Novas Classes CSS Utilitárias
+### Cards (Padrão Único)
+```css
+/* Card base - usado em TODOS os lugares */
+.card-unified {
+  background: var(--card);
+  border-radius: 1rem;      /* 16px */
+  border: 1px solid hsl(var(--border) / 0.5);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Card interativo - para itens clicáveis */
+.card-unified-interactive {
+  composes: card-unified;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-unified-interactive:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-color: hsl(var(--primary) / 0.2);
+}
+
+.card-unified-interactive:active {
+  transform: scale(0.98);
+}
+```
+
+### Listas de Itens (Padrão Único)
+```css
+/* Item de lista padrão */
+.list-item-unified {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;    /* 12px 16px */
+  border-radius: 0.75rem;   /* 12px */
+  background: hsl(var(--secondary) / 0.5);
+  transition: background 0.15s ease;
+}
+
+.list-item-unified:hover {
+  background: var(--secondary);
+}
+```
+
+---
+
+## Antes vs Depois (Visual)
+
+```
+ANTES (Fragmentado)
+┌──────────────────────────────────────────────────────┐
+│ Dashboard: Gradientes fortes, cards com shadow-lg   │
+│ Estoque: stock-card cinza, bordas finas             │
+│ Checklists: Bordas médias, gradientes sutis         │
+│ Recompensas: Cards shadcn padrão, pouco destaque    │
+│ Configurações: Visual básico, sem personalidade     │
+└──────────────────────────────────────────────────────┘
+
+DEPOIS (Unificado)
+┌──────────────────────────────────────────────────────┐
+│                                                      │
+│  ┌──────────────────────────────────────────────┐   │
+│  │  Mesmo padrão de header em todas as páginas │   │
+│  │  Ícone 40x40 + Título + Subtítulo           │   │
+│  └──────────────────────────────────────────────┘   │
+│                                                      │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐            │
+│  │ Card     │ │ Card     │ │ Card     │            │
+│  │ rounded  │ │ rounded  │ │ rounded  │            │
+│  │ shadow   │ │ shadow   │ │ shadow   │            │
+│  │ hover    │ │ hover    │ │ hover    │            │
+│  └──────────┘ └──────────┘ └──────────┘            │
+│  Todos os cards seguem o mesmo padrão visual        │
+│                                                      │
+└──────────────────────────────────────────────────────┘
+```
+
+---
+
+## O Que NÃO Muda
+
+- Toda a lógica e funcionalidade do sistema
+- Estrutura de navegação (sidebar, rotas)
+- Fluxos de dados e banco de dados
+- Permissões de admin vs funcionário
+- Comportamento de checklists, estoque, recompensas, pontos
+
+---
+
+## Seção Técnica
+
+### Novas Classes CSS Unificadas
 
 ```css
-/* Sistema de Cards Padronizado */
-.card-base {
-  @apply bg-card rounded-2xl border shadow-sm;
+/* Adicionar ao src/index.css */
+
+/* ========== DESIGN SYSTEM UNIFICADO ========== */
+
+/* Cards */
+.card-unified {
+  @apply bg-card rounded-2xl border border-border/50 shadow-sm;
 }
 
-.card-interactive {
-  @apply card-base hover:shadow-md active:scale-[0.98] 
-         transition-all cursor-pointer;
+.card-unified-interactive {
+  @apply card-unified cursor-pointer transition-all duration-200;
+  @apply hover:shadow-md hover:border-primary/20;
+  @apply active:scale-[0.98];
 }
 
-/* Header Padronizado */
-.page-header-new {
-  @apply bg-card border-b sticky top-0 lg:top-0 z-40;
+/* Listas */
+.list-item {
+  @apply flex items-center justify-between p-3 rounded-xl bg-secondary/50;
+  @apply hover:bg-secondary transition-colors;
 }
 
-.page-header-content {
-  @apply px-4 py-4 lg:px-6;
+/* Stats/Métricas */
+.stat-card {
+  @apply card-unified-interactive p-4;
 }
 
-/* Stats Card Padronizado */
-.stats-card {
-  @apply card-interactive p-4;
+.stat-card-gradient {
+  @apply rounded-2xl p-5 text-white transition-all duration-200;
+  @apply hover:scale-[1.02] hover:shadow-xl active:scale-[0.98];
 }
+
+/* Seções */
+.section-header {
+  @apply text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3;
+}
+
+/* Badges de Status */
+.badge-status {
+  @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-success { @apply bg-success/15 text-success; }
+.badge-warning { @apply bg-warning/15 text-warning; }
+.badge-error { @apply bg-destructive/15 text-destructive; }
+.badge-info { @apply bg-primary/15 text-primary; }
 ```
 
-### 3. Padrão de Header para Todas as Páginas
+### Padrão de Header Atualizado
 
 ```tsx
-<header className="page-header-new">
+// Usar em TODAS as páginas
+<header className="page-header-unified">
   <div className="page-header-content">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-        <Icon className="w-5 h-5 text-primary" />
+      <div className="page-header-icon bg-[COR]/10">
+        <Icon className="w-5 h-5 text-[COR]" />
       </div>
       <div>
         <h1 className="text-xl font-bold text-foreground">Título</h1>
@@ -140,47 +282,35 @@ const { data, error } = await supabase
 </header>
 ```
 
----
+### Migração do stock-card
 
-## O Que NÃO Muda
+```tsx
+// ANTES (ItemCardNew.tsx)
+<div className="stock-card w-full transition-all hover:shadow-md">
 
-- Toda a lógica e funcionalidade permanece igual
-- Estrutura de navegação (sidebar, menu)
-- Fluxos de dados e integrações com o banco
-- Permissões de admin vs funcionário
-- Comportamento de checklists, estoque, recompensas
-
----
-
-## Resumo Visual das Mudanças
-
-```text
-┌─────────────────────────────────────────────────────────┐
-│  ANTES: Design fragmentado                              │
-│  ┌─────┐ ┌───────┐ ┌─────────┐ ┌───────────┐           │
-│  │Dark │ │Rounded│ │Gradient │ │ Sharp     │           │
-│  │Blue │ │Green  │ │Orange   │ │ Gray      │           │
-│  └─────┘ └───────┘ └─────────┘ └───────────┘           │
-│  Dashboard  Checklist  Rewards   Settings               │
-└─────────────────────────────────────────────────────────┘
-                        ↓
-┌─────────────────────────────────────────────────────────┐
-│  DEPOIS: Design unificado                               │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │  Mesma estrutura de card                        │   │
-│  │  Mesma tipografia                               │   │
-│  │  Mesmas cores por função                        │   │
-│  │  Mesmos espaçamentos                            │   │
-│  └─────────────────────────────────────────────────┘   │
-│  Dashboard = Checklist = Rewards = Settings             │
-└─────────────────────────────────────────────────────────┘
+// DEPOIS
+<div className="card-unified-interactive p-4">
 ```
 
 ---
 
-## Benefícios
+## Ordem de Execução
 
-1. **Familiaridade**: Usuário aprende uma vez, usa em todos os módulos
-2. **Profissionalismo**: App parece uma única aplicação coesa
-3. **Manutenção**: Mudanças futuras de estilo são centralizadas
-4. **Acessibilidade**: Touch-targets consistentes para uso em celular
+1. Atualizar `src/index.css` com novas classes unificadas
+2. Atualizar headers de todas as páginas
+3. Atualizar componentes de Dashboard (Admin e Employee)
+4. Atualizar componentes de Estoque
+5. Atualizar componentes de Checklists
+6. Atualizar componentes de Recompensas
+7. Atualizar componentes de Configurações
+
+---
+
+## Resultado Esperado
+
+Um aplicativo com **visual profissional e coeso** onde:
+- O usuário reconhece instantaneamente que está no mesmo sistema
+- Cores indicam função (sucesso, alerta, ação) não módulo
+- Interações são previsíveis e consistentes
+- Mobile-first com touch-targets adequados
+- Transições suaves e feedback visual claro
