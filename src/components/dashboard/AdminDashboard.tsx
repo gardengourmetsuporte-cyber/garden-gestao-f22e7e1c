@@ -11,7 +11,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Leaderboard } from './Leaderboard';
-import { SectorPointsSummary } from './SectorPointsSummary';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useOrders } from '@/hooks/useOrders';
@@ -112,7 +111,7 @@ function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { leaderboard, sectorPoints, isLoading: leaderboardLoading } = useLeaderboard();
+  const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
   const { items, getLowStockItems, getOutOfStockItems } = useInventoryDB();
   const { orders } = useOrders();
   const { allRedemptions } = useRewards();
@@ -260,19 +259,13 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      {/* Leaderboard and Sector Points */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Leaderboard 
-          entries={leaderboard} 
-          currentUserId={user?.id}
-          isLoading={leaderboardLoading}
-          maxEntries={5}
-        />
-        <SectorPointsSummary 
-          sectors={sectorPoints}
-          isLoading={leaderboardLoading}
-        />
-      </div>
+      {/* Leaderboard */}
+      <Leaderboard 
+        entries={leaderboard} 
+        currentUserId={user?.id}
+        isLoading={leaderboardLoading}
+        maxEntries={5}
+      />
     </div>
   );
 }
