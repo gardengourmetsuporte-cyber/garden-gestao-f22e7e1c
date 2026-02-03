@@ -1,89 +1,186 @@
 
+# Plano: Corrigir Ordem dos Itens e Padronizar Design Visual
 
-# Redesign do Painel Administrativo
+## Problema 1: Ordem dos Itens na Checklist
 
-## Objetivo
-Redesenhar completamente o Dashboard Administrativo com um visual mais moderno, profissional e interativo, com cards clicaveis que levam diretamente para as acoes correspondentes.
+### Diagnóstico
+Quando você edita um item na checklist, a função `updateItem` chama `fetchSectors()` que busca os dados do banco novamente. O problema é que essa busca **não ordena** subcategorias e itens pelo campo `sort_order`, fazendo com que eles apareçam em ordem aleatória.
 
----
+### Solução
+Adicionar ordenação por `sort_order` na query de subcategorias e itens dentro da função `fetchSectors`:
 
-## ✅ IMPLEMENTADO
+```sql
+-- Antes (sem ordenação de itens)
+subcategories:checklist_subcategories(*,items:checklist_items(*))
 
-### 1. Navegação Funcional dos Cards do Dashboard
-Todos os cards do Dashboard agora direcionam para os locais corretos:
-
-| Card | Navega para | Estado passado |
-|------|-------------|----------------|
-| Usuários Ativos | `/settings` | `{ activeTab: 'users' }` |
-| Pedidos Pendentes | `/inventory` | `{ activeTab: 'orders' }` |
-| Resgates Pendentes | `/rewards` | - |
-| Estoque Crítico | `/inventory` | `{ stockFilter: 'critical' }` |
-| Alerta: Itens zerados | `/inventory` | `{ stockFilter: 'zero' }` |
-| Alerta: Estoque baixo | `/inventory` | `{ stockFilter: 'low' }` |
-| Card Estoque | `/inventory` | - |
-| Card Checklists | `/checklists` | - |
-| Card Recompensas | `/rewards` | - |
-| Card Configurações | `/settings` | - |
-
-### 2. Checklists - Simplificação e Redesign
-
-#### Tipo "Limpeza" Removido
-- Atualizado `ChecklistType` para apenas `'abertura' | 'fechamento'`
-- Removido botão de Limpeza do seletor de tipos
-- Atualizado componentes: `ChecklistSettings.tsx`, `ChecklistView.tsx`, `Checklists.tsx`
-
-#### Nova Interface do Seletor de Tipo
-- Dois cards grandes lado a lado (grid 2 colunas)
-- Ícones grandes (w-14 h-14) com fundos gradientes
-- Visual diferenciado: Abertura (âmbar/laranja), Fechamento (índigo/roxo)
-- Animações de hover (scale) e feedback de clique
-- Subtítulos descritivos ("Tarefas da manhã" / "Tarefas da noite")
-
-#### Header de Progresso Modernizado
-- Gradiente de fundo que muda quando 100% (verde success)
-- Porcentagem maior e mais destacada (text-3xl font-black)
-- Barra de progresso mais alta (h-3) com gradiente
-- Mensagem motivacional dinâmica baseada no progresso
-
-#### Itens de Checklist Melhorados
-- Checkboxes maiores (w-8 h-8) e mais visíveis
-- Padding aumentado (p-4) para melhor touch target
-- Bordas mais pronunciadas (border-2)
-- Efeito de sombra no hover
-- Visual de conclusão com gradiente e sombra colorida
-
----
-
-## Especificações Técnicas Aplicadas
-
-### Cores e Gradientes
-```css
-/* Seletor Abertura */
-border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50
-
-/* Seletor Fechamento */  
-border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50
-
-/* Progress completo */
-bg-gradient-to-br from-success/20 to-success/5
+-- Depois (com ordenação)
+subcategories:checklist_subcategories(*, items:checklist_items(*).order(sort_order))
+  .order(sort_order)
 ```
 
-### Estados de Navegação
+---
+
+## Problema 2: Design Visual Inconsistente
+
+### Diagnóstico
+Cada módulo foi desenvolvido com estilos diferentes:
+
+| Módulo | Problemas Identificados |
+|--------|------------------------|
+| **Dashboard** | Cards com gradientes únicos, espaçamento grande |
+| **Estoque** | Usa classe `stock-card` customizada, ícones menores |
+| **Checklists** | Cards arredondados com bordas, visual mais moderno |
+| **Recompensas** | Componentes `Card` do shadcn, estilo diferente |
+| **Configurações** | Tabs sem ícones visíveis em mobile, cards básicos |
+
+### Solução: Sistema de Design Unificado
+
+Criar um **Design System consistente** que mantém toda a funcionalidade existente, mudando apenas a aparência visual.
+
+#### Princípios do Novo Design
+
+1. **Cards Padronizados**: Todos usam `rounded-2xl`, sombra suave, bordas consistentes
+2. **Headers Unificados**: Mesmo estilo em todas as páginas (ícone + título + subtítulo)
+3. **Cores por Função**: 
+   - Ações principais: `bg-primary`
+   - Sucesso/Completado: `bg-success`
+   - Alerta/Atenção: `bg-warning`
+   - Erro/Crítico: `bg-destructive`
+4. **Touch-Targets**: Mínimo 48px para botões e áreas clicáveis
+5. **Tipografia**: Hierarquia clara (título bold, subtítulo muted)
+
+---
+
+## Arquivos a Modificar
+
+### Correção da Ordem (Bug Fix)
+| Arquivo | Mudança |
+|---------|---------|
+| `src/hooks/useChecklists.ts` | Adicionar `.order('sort_order')` nas subcategorias e itens da query |
+
+### Padronização Visual (Design System)
+| Arquivo | Mudança |
+|---------|---------|
+| `src/index.css` | Adicionar novas classes utilitárias padronizadas |
+| `src/pages/Checklists.tsx` | Atualizar header para padrão unificado |
+| `src/pages/Inventory.tsx` | Atualizar header e cards para padrão unificado |
+| `src/pages/Rewards.tsx` | Atualizar header para padrão unificado |
+| `src/pages/Settings.tsx` | Atualizar header e tabs para padrão unificado |
+| `src/components/dashboard/AdminDashboard.tsx` | Ajustar cards para padrão unificado |
+| `src/components/dashboard/EmployeeDashboard.tsx` | Ajustar cards para padrão unificado |
+| `src/components/inventory/StatsCard.tsx` | Atualizar para novo padrão visual |
+| `src/components/rewards/ProductCard.tsx` | Atualizar para novo padrão visual |
+| `src/components/checklists/ChecklistView.tsx` | Pequenos ajustes de consistência |
+
+---
+
+## Detalhes Técnicos
+
+### 1. Correção da Query de Ordenação
+
 ```typescript
-// Inventory recebe e processa estados:
-const state = location.state as { activeTab?: string; stockFilter?: string };
+// src/hooks/useChecklists.ts - fetchSectors
+const { data, error } = await supabase
+  .from('checklist_sectors')
+  .select(`
+    *,
+    subcategories:checklist_subcategories(
+      *,
+      items:checklist_items(*)
+    )
+  `)
+  .order('sort_order')
+  .order('sort_order', { referencedTable: 'checklist_subcategories' })
+  .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
+```
 
-// Exemplos de navegação:
-navigate('/inventory', { state: { activeTab: 'orders' } })
-navigate('/inventory', { state: { stockFilter: 'zero' } })
+### 2. Novas Classes CSS Utilitárias
+
+```css
+/* Sistema de Cards Padronizado */
+.card-base {
+  @apply bg-card rounded-2xl border shadow-sm;
+}
+
+.card-interactive {
+  @apply card-base hover:shadow-md active:scale-[0.98] 
+         transition-all cursor-pointer;
+}
+
+/* Header Padronizado */
+.page-header-new {
+  @apply bg-card border-b sticky top-0 lg:top-0 z-40;
+}
+
+.page-header-content {
+  @apply px-4 py-4 lg:px-6;
+}
+
+/* Stats Card Padronizado */
+.stats-card {
+  @apply card-interactive p-4;
+}
+```
+
+### 3. Padrão de Header para Todas as Páginas
+
+```tsx
+<header className="page-header-new">
+  <div className="page-header-content">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        <Icon className="w-5 h-5 text-primary" />
+      </div>
+      <div>
+        <h1 className="text-xl font-bold text-foreground">Título</h1>
+        <p className="text-sm text-muted-foreground">Subtítulo</p>
+      </div>
+    </div>
+  </div>
+</header>
 ```
 
 ---
 
-## Resultado Final
+## O Que NÃO Muda
 
-✅ Dashboard com navegação funcional para todas as ações
-✅ Checklists simplificados (apenas Abertura/Fechamento)
-✅ Interface moderna com gradientes e animações
-✅ Touch targets maiores para uso em mobile
-✅ Feedback visual claro em todas as interações
+- Toda a lógica e funcionalidade permanece igual
+- Estrutura de navegação (sidebar, menu)
+- Fluxos de dados e integrações com o banco
+- Permissões de admin vs funcionário
+- Comportamento de checklists, estoque, recompensas
+
+---
+
+## Resumo Visual das Mudanças
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  ANTES: Design fragmentado                              │
+│  ┌─────┐ ┌───────┐ ┌─────────┐ ┌───────────┐           │
+│  │Dark │ │Rounded│ │Gradient │ │ Sharp     │           │
+│  │Blue │ │Green  │ │Orange   │ │ Gray      │           │
+│  └─────┘ └───────┘ └─────────┘ └───────────┘           │
+│  Dashboard  Checklist  Rewards   Settings               │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│  DEPOIS: Design unificado                               │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  Mesma estrutura de card                        │   │
+│  │  Mesma tipografia                               │   │
+│  │  Mesmas cores por função                        │   │
+│  │  Mesmos espaçamentos                            │   │
+│  └─────────────────────────────────────────────────┘   │
+│  Dashboard = Checklist = Rewards = Settings             │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Benefícios
+
+1. **Familiaridade**: Usuário aprende uma vez, usa em todos os módulos
+2. **Profissionalismo**: App parece uma única aplicação coesa
+3. **Manutenção**: Mudanças futuras de estilo são centralizadas
+4. **Acessibilidade**: Touch-targets consistentes para uso em celular
