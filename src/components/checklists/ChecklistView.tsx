@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   ChefHat, 
@@ -149,7 +149,7 @@ export function ChecklistView({
               {getTypeLabel(checklistType)}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {format(new Date(date), "EEEE, d 'de' MMMM", { locale: ptBR })}
+              {format(parseISO(date), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </p>
           </div>
           <div className="text-right">
