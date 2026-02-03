@@ -29,7 +29,7 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
   const categoryColor = item.category?.color || '#6b7280';
 
   return (
-    <div className="stock-card w-full transition-all hover:shadow-md animate-slide-up">
+    <div className="card-interactive p-4 w-full animate-slide-up">
       <div className="flex items-center gap-3">
         {/* Category Color Indicator */}
         <div 
@@ -68,10 +68,10 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
             <span className="text-sm font-normal text-muted-foreground ml-1">{unitLabel}</span>
           </p>
           <span className={cn(
-            "status-badge",
-            status === 'ok' && "status-ok",
-            status === 'low' && "status-low",
-            status === 'out' && "status-out"
+            "badge-status",
+            status === 'ok' && "badge-success",
+            status === 'low' && "badge-warning",
+            status === 'out' && "badge-error"
           )}>
             {status === 'ok' && 'OK'}
             {status === 'low' && 'Baixo'}

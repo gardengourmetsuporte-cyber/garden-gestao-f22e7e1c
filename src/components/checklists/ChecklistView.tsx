@@ -136,12 +136,12 @@ export function ChecklistView({
 
   return (
     <div className="space-y-4">
-      {/* Progress Header - Modern Design */}
+      {/* Progress Header */}
       <div className={cn(
-        "rounded-2xl p-5 transition-all duration-500",
+        "card-base p-5 transition-all duration-500",
         progressPercent === 100
           ? "bg-gradient-to-br from-success/20 to-success/5 border-2 border-success/30"
-          : "bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
+          : "bg-gradient-to-br from-primary/10 to-primary/5"
       )}>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -165,8 +165,8 @@ export function ChecklistView({
           </div>
         </div>
         
-        {/* Enhanced Progress Bar */}
-        <div className="h-3 bg-secondary/50 rounded-full overflow-hidden shadow-inner">
+        {/* Progress Bar */}
+        <div className="h-3 bg-secondary/50 rounded-full overflow-hidden">
           <div
             className={cn(
               "h-full rounded-full transition-all duration-500 ease-out",
@@ -199,7 +199,7 @@ export function ChecklistView({
                 "w-full flex items-center justify-between p-4 rounded-xl transition-all",
                 sectorComplete 
                   ? "bg-success/10 border border-success/20" 
-                  : "bg-card border"
+                  : "card-base"
               )}
             >
               <div className="flex items-center gap-3">
@@ -251,7 +251,7 @@ export function ChecklistView({
                   <button
                     onClick={() => toggleSubcategory(subcategory.id)}
                     className={cn(
-                      "w-full flex items-center justify-between p-3 rounded-lg transition-all",
+                      "w-full flex items-center justify-between p-3 rounded-xl transition-all",
                       subComplete 
                         ? "bg-success/5 border border-success/10" 
                         : "bg-secondary/50 hover:bg-secondary"
@@ -308,7 +308,7 @@ export function ChecklistView({
                               canToggle && "active:scale-[0.98] hover:shadow-md",
                               completed
                                 ? "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30"
-                                : "bg-card border-2 border-border hover:border-primary/40"
+                                : "card-base border-2 hover:border-primary/40"
                             )}
                           >
                             <div

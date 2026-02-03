@@ -12,25 +12,21 @@ const statusConfig = {
   pending: {
     label: 'Pendente',
     icon: Clock,
-    variant: 'secondary' as const,
     className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
   },
   approved: {
     label: 'Aprovado',
     icon: CheckCircle,
-    variant: 'default' as const,
     className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   },
   delivered: {
     label: 'Entregue',
     icon: Truck,
-    variant: 'default' as const,
     className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   },
   cancelled: {
     label: 'Cancelado',
     icon: XCircle,
-    variant: 'destructive' as const,
     className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
   },
 };
@@ -55,10 +51,10 @@ export function RedemptionHistory({ redemptions }: RedemptionHistoryProps) {
         return (
           <div 
             key={redemption.id}
-            className="flex items-center justify-between p-4 rounded-xl bg-card border"
+            className="card-base flex items-center justify-between p-4"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <Star className="w-5 h-5 text-primary" />
               </div>
               <div>

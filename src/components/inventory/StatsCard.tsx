@@ -21,16 +21,16 @@ export function StatsCard({ title, value, icon: Icon, variant = 'default', onCli
     <button
       onClick={onClick}
       className={cn(
-        "card-interactive w-full text-left p-4",
+        "stat-card w-full text-left",
         onClick && "cursor-pointer"
       )}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold mt-1">{value}</p>
+          <p className="stat-label">{title}</p>
+          <p className="stat-value mt-1">{value}</p>
         </div>
-        <div className={cn("p-2.5 rounded-xl", variantStyles[variant])}>
+        <div className={cn("stat-icon", variantStyles[variant])}>
           <Icon className="w-5 h-5" />
         </div>
       </div>

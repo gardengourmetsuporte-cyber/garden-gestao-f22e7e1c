@@ -3,8 +3,6 @@ import {
   ClipboardCheck, 
   Gift, 
   Package,
-  Star,
-  Trophy,
   ArrowRight
 } from 'lucide-react';
 import { UserPointsCard } from './UserPointsCard';
@@ -12,7 +10,6 @@ import { Leaderboard } from './Leaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRewards } from '@/hooks/useRewards';
-import { cn } from '@/lib/utils';
 
 export function EmployeeDashboard() {
   const { user, profile } = useAuth();
@@ -26,7 +23,7 @@ export function EmployeeDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-6 text-primary-foreground">
+      <div className="card-gradient bg-gradient-to-r from-primary to-primary/80 p-6">
         <h2 className="text-2xl font-bold mb-1">
           Olá, {profile?.full_name?.split(' ')[0] || 'Colaborador'}! 👋
         </h2>

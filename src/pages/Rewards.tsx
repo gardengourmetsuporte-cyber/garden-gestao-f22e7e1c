@@ -54,26 +54,24 @@ export default function RewardsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header - Unified Design */}
-        <header className="page-header-unified">
+        {/* Header */}
+        <header className="page-header">
           <div className="page-header-content">
             <div className="flex items-center gap-3">
               <div className="page-header-icon bg-gradient-to-br from-amber-500 to-orange-500">
                 <Gift className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Loja de Recompensas</h1>
-                <p className="text-sm text-muted-foreground">
-                  Troque seus pontos por prêmios!
-                </p>
+                <h1 className="page-title">Loja de Recompensas</h1>
+                <p className="page-subtitle">Troque seus pontos por prêmios!</p>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="px-4 py-6 lg:px-6 space-y-8">
+        <div className="px-4 py-6 lg:px-6 space-y-6">
           {/* Points Balance */}
-          <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 text-white">
+          <div className="card-gradient bg-gradient-to-r from-amber-500 to-orange-500 p-6">
             <p className="text-amber-100 text-sm mb-1">Seu saldo</p>
             <div className="flex items-center gap-3">
               <Star className="w-8 h-8 fill-current" />
@@ -84,9 +82,7 @@ export default function RewardsPage() {
 
           {/* Products Grid */}
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Prêmios Disponíveis
-            </h2>
+            <h2 className="section-title mb-4">Prêmios Disponíveis</h2>
             
             {activeProducts.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
@@ -109,9 +105,7 @@ export default function RewardsPage() {
 
           {/* Redemption History */}
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Meus Resgates
-            </h2>
+            <h2 className="section-title mb-4">Meus Resgates</h2>
             <RedemptionHistory redemptions={redemptions} />
           </section>
         </div>

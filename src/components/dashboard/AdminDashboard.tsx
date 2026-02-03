@@ -10,7 +10,6 @@ import {
   Settings,
   AlertCircle
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Leaderboard } from './Leaderboard';
 import { SectorPointsSummary } from './SectorPointsSummary';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
@@ -35,9 +34,7 @@ function MetricCard({ title, value, icon: Icon, onClick, gradient, subtitle }: M
     <div
       onClick={onClick}
       className={cn(
-        "group cursor-pointer rounded-2xl p-5 text-white",
-        "hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]",
-        "transition-all duration-200 border border-white/10",
+        "card-gradient group cursor-pointer",
         gradient
       )}
     >
@@ -138,7 +135,7 @@ export function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-br from-primary via-primary to-primary/80 rounded-2xl p-6 text-primary-foreground shadow-lg">
+      <div className="card-gradient bg-gradient-to-br from-primary via-primary to-primary/80 p-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
           <div>
             <h2 className="text-2xl font-bold">Painel Administrativo</h2>
@@ -151,7 +148,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Usuários Ativos"
           value={users.length}
@@ -188,8 +185,8 @@ export function AdminDashboard() {
 
       {/* Alerts Section */}
       {hasAlerts && (
-        <Card className="border-warning/30 bg-gradient-to-r from-warning/5 to-transparent overflow-hidden">
-          <CardContent className="p-4">
+        <div className="alert-card alert-warning">
+          <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-5 h-5 text-warning" />
               <h3 className="font-semibold text-foreground">Ações Pendentes</h3>
@@ -220,15 +217,13 @@ export function AdminDashboard() {
                 />
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Quick Access Cards */}
       <div>
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Acesso Rápido
-        </h3>
+        <h3 className="section-label mb-3">Acesso Rápido</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <QuickAccessCard
             title="Estoque"
