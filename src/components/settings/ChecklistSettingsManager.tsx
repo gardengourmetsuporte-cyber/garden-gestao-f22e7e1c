@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
-import { Loader2, ClipboardCheck } from 'lucide-react';
+import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
+import { Loader2, ClipboardCheck, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import { ChecklistType } from '@/types/database';
+import { cn } from '@/lib/utils';
 
 export function ChecklistSettingsManager() {
   const {
@@ -18,8 +22,14 @@ export function ChecklistSettingsManager() {
     addItem,
     updateItem,
     deleteItem,
+    restoreItem,
+    permanentDeleteItem,
+    fetchDeletedItems,
+    emptyTrash,
     reorderItems,
   } = useChecklists();
+
+  const [selectedType, setSelectedType] = useState<ChecklistType>('abertura');
 
   if (isLoading) {
     return (
@@ -89,9 +99,10 @@ export function ChecklistSettingsManager() {
     }
   };
 
-  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly' }) => {
+  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType }) => {
     try {
-      await addItem(data);
+      // Auto-assign selected type when adding new item
+      await addItem({ ...data, checklist_type: data.checklist_type || selectedType });
       toast.success('Item criado!');
     } catch (error) {
       toast.error('Erro ao criar item');
@@ -112,7 +123,7 @@ export function ChecklistSettingsManager() {
   const handleDeleteItem = async (id: string) => {
     try {
       await deleteItem(id);
-      toast.success('Item excluído!');
+      toast.success('Item movido para lixeira!');
     } catch (error) {
       toast.error('Erro ao excluir item');
       throw error;
@@ -121,16 +132,54 @@ export function ChecklistSettingsManager() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3 mb-4">
-        <ClipboardCheck className="w-5 h-5 text-primary" />
-        <h3 className="font-semibold text-foreground">Configurar Checklists</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <ClipboardCheck className="w-5 h-5 text-primary" />
+          <h3 className="font-semibold text-foreground">Configurar Checklists</h3>
+        </div>
+        <ChecklistTrash
+          fetchDeletedItems={fetchDeletedItems}
+          onRestore={restoreItem}
+          onPermanentDelete={permanentDeleteItem}
+          onEmptyTrash={emptyTrash}
+        />
       </div>
       <p className="text-sm text-muted-foreground mb-4">
         Configure os setores, subcategorias e itens de verificação para os checklists diários.
       </p>
+
+      {/* Type Selector */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setSelectedType('abertura')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+            selectedType === 'abertura' 
+              ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" 
+              : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+          )}
+        >
+          <Sun className="w-5 h-5" />
+          <span className="font-semibold">Abertura</span>
+        </button>
+        <button
+          onClick={() => setSelectedType('fechamento')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+            selectedType === 'fechamento' 
+              ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400" 
+              : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+          )}
+        >
+          <Moon className="w-5 h-5" />
+          <span className="font-semibold">Fechamento</span>
+        </button>
+      </div>
       
       <ChecklistSettings
         sectors={sectors}
+        selectedType={selectedType}
+        onTypeChange={setSelectedType}
         onAddSector={handleAddSector}
         onUpdateSector={handleUpdateSector}
         onDeleteSector={handleDeleteSector}

@@ -129,8 +129,10 @@ export interface ChecklistItem {
   name: string;
   description: string | null;
   frequency: ItemFrequency;
+  checklist_type: ChecklistType;
   sort_order: number;
   is_active: boolean;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
   // Joined data

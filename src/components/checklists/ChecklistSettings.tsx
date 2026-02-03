@@ -59,6 +59,8 @@ const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof 
 
 interface ChecklistSettingsProps {
   sectors: ChecklistSector[];
+  selectedType: ChecklistType;
+  onTypeChange: (type: ChecklistType) => void;
   onAddSector: (data: { name: string; color: string }) => Promise<void>;
   onUpdateSector: (id: string, data: { name?: string; color?: string }) => Promise<void>;
   onDeleteSector: (id: string) => Promise<void>;
@@ -119,6 +121,8 @@ function SortableItem({
 
 export function ChecklistSettings({
   sectors,
+  selectedType,
+  onTypeChange,
   onAddSector,
   onUpdateSector,
   onDeleteSector,
@@ -295,13 +299,14 @@ export function ChecklistSettings({
       setItemName(item.name || '');
       setItemDescription(item.description || '');
       setItemFrequency(item.frequency || 'daily');
-      setItemChecklistType((item as any).checklist_type || 'abertura');
+      setItemChecklistType(item.checklist_type || selectedType);
     } else {
       setEditingItem(null);
       setItemName('');
       setItemDescription('');
       setItemFrequency('daily');
-      setItemChecklistType('abertura');
+      // Use selected type as default for new items
+      setItemChecklistType(selectedType);
     }
     setItemSheetOpen(true);
   };
@@ -428,7 +433,7 @@ export function ChecklistSettings({
                                     >
                                       <span className="font-medium text-foreground">{subcategory.name}</span>
                                       <span className="text-xs text-muted-foreground">
-                                        ({subcategory.items?.length || 0} itens)
+                                        ({(subcategory.items || []).filter(i => i.checklist_type === selectedType).length} itens de {selectedType})
                                       </span>
                                     </button>
                                     <div className="flex items-center gap-1">
@@ -459,19 +464,34 @@ export function ChecklistSettings({
                                     </div>
                                   </div>
 
-                                  {/* Items with DnD */}
-                                  {isSubExpanded && subcategory.items && subcategory.items.length > 0 && (
+                                  {isSubExpanded && subcategory.items && (() => {
+                                    // Filter items by selected type
+                                    const filteredItems = subcategory.items.filter(
+                                      item => item.checklist_type === selectedType
+                                    );
+                                    
+                                    if (filteredItems.length === 0) {
+                                      return (
+                                        <div className="px-2 pb-2">
+                                          <p className="text-xs text-muted-foreground text-center py-2">
+                                            Nenhum item de {selectedType === 'abertura' ? 'abertura' : 'fechamento'} nesta subcategoria
+                                          </p>
+                                        </div>
+                                      );
+                                    }
+                                    
+                                    return (
                                     <div className="px-2 pb-2 space-y-1">
                                       <DndContext
                                         sensors={sensors}
                                         collisionDetection={closestCenter}
-                                        onDragEnd={(e) => handleItemDragEnd(subcategory.id, subcategory.items || [], e)}
+                                        onDragEnd={(e) => handleItemDragEnd(subcategory.id, filteredItems, e)}
                                       >
                                         <SortableContext 
-                                          items={(subcategory.items || []).map(i => i.id)} 
+                                          items={filteredItems.map(i => i.id)} 
                                           strategy={verticalListSortingStrategy}
                                         >
-                                          {subcategory.items.map(item => (
+                                          {filteredItems.map(item => (
                                             <SortableItem
                                               key={item.id}
                                               id={item.id}
@@ -540,7 +560,8 @@ export function ChecklistSettings({
                                         </SortableContext>
                                       </DndContext>
                                     </div>
-                                  )}
+                                    );
+                                  })()}
                                 </div>
                               </SortableItem>
                             );
