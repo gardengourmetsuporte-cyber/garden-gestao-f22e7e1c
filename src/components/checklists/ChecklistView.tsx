@@ -13,11 +13,13 @@ import {
   Clock,
   User,
   Lock,
-  Star
+  Star,
+  RefreshCw
 } from 'lucide-react';
 import { ChecklistSector, ChecklistType, ChecklistCompletion } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -25,7 +27,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, event?: React.MouseEvent) => void;
+  onToggleItem: (itemId: string, awardPoints: boolean, event?: React.MouseEvent) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -60,6 +62,7 @@ export function ChecklistView({
   const { triggerCoin } = useCoinAnimation();
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set(sectors.map(s => s.id)));
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
+  const [openPopover, setOpenPopover] = useState<string | null>(null);
 
   const toggleSector = (sectorId: string) => {
     setExpandedSectors(prev => {
@@ -132,6 +135,16 @@ export function ChecklistView({
     if (progressPercent >= 50) return "👍 Bom progresso!";
     if (progressPercent >= 25) return "🚀 Você está indo bem!";
     return "☕ Vamos começar!";
+  };
+
+  const handleComplete = (itemId: string, awardPoints: boolean, e: React.MouseEvent) => {
+    if (awardPoints) {
+      // Trigger coin animation
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      triggerCoin(rect.right - 40, rect.top + rect.height / 2);
+    }
+    onToggleItem(itemId, awardPoints, e);
+    setOpenPopover(null);
   };
 
   return (
@@ -288,77 +301,142 @@ export function ChecklistView({
                         const completion = completions.find(c => c.item_id === item.id);
                         const canToggle = canToggleItem(completion, completed);
                         const isLockedByOther = completed && !canToggle;
+                        const wasAwardedPoints = completion?.awarded_points !== false;
 
-                        return (
-                          <button
-                            key={item.id}
-                            onClick={(e) => {
-                              if (!canToggle) return;
-                              // Trigger coin animation only when completing (not uncompleting)
-                              if (!completed) {
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                triggerCoin(rect.right - 40, rect.top + rect.height / 2);
-                              }
-                              onToggleItem(item.id, e);
-                            }}
-                            disabled={!canToggle}
-                            className={cn(
-                              "w-full flex items-start gap-4 p-4 rounded-xl transition-all",
-                              !canToggle && "cursor-not-allowed opacity-80",
-                              canToggle && "active:scale-[0.98] hover:shadow-md",
-                              completed
-                                ? "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30"
-                                : "card-base border-2 hover:border-primary/40"
-                            )}
-                          >
-                            <div
+                        // If completed, clicking unchecks it. If not completed, show popover.
+                        if (completed) {
+                          return (
+                            <button
+                              key={item.id}
+                              onClick={(e) => {
+                                if (!canToggle) return;
+                                onToggleItem(item.id, true, e); // awardPoints doesn't matter for unchecking
+                              }}
+                              disabled={!canToggle}
                               className={cn(
-                                "w-8 h-8 rounded-xl flex items-center justify-center transition-all shrink-0",
-                                completed
-                                  ? "bg-success text-white shadow-lg shadow-success/30"
-                                  : "border-2 border-muted-foreground/30 bg-background"
+                                "w-full flex items-start gap-4 p-4 rounded-xl transition-all",
+                                !canToggle && "cursor-not-allowed opacity-80",
+                                canToggle && "active:scale-[0.98] hover:shadow-md",
+                                "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30"
                               )}
                             >
-                              {completed && <Check className="w-5 h-5" />}
-                            </div>
-                            <div className="flex-1 text-left">
-                              <div className="flex items-center gap-2">
-                                <p className={cn(
-                                  "font-medium",
-                                  completed ? "text-success line-through" : "text-foreground"
-                                )}>
-                                  {item.name}
-                                </p>
-                                {isLockedByOther && (
-                                  <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                              <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-all shrink-0 bg-success text-white shadow-lg shadow-success/30">
+                                <Check className="w-5 h-5" />
+                              </div>
+                              <div className="flex-1 text-left">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium text-success line-through">
+                                    {item.name}
+                                  </p>
+                                  {isLockedByOther && (
+                                    <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                                  )}
+                                </div>
+                                {item.description && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {item.description}
+                                  </p>
+                                )}
+                                {completion && (
+                                  <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                    <User className="w-3 h-3" />
+                                    <span>
+                                      {completion.profile?.full_name || 'Usuário'} às{' '}
+                                      {format(new Date(completion.completed_at), 'HH:mm')}
+                                    </span>
+                                    {!wasAwardedPoints && (
+                                      <span className="text-blue-500 ml-1">(já pronto)</span>
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                              {item.description && (
-                                <p className="text-xs text-muted-foreground">
-                                  {item.description}
-                                </p>
-                              )}
-                              {completed && completion && (
-                                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                  <User className="w-3 h-3" />
-                                  <span>
-                                    {completion.profile?.full_name || 'Usuário'} às{' '}
-                                    {format(new Date(completion.completed_at), 'HH:mm')}
-                                  </span>
+                              {/* Badge showing completion type */}
+                              <div className={cn(
+                                "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
+                                !wasAwardedPoints
+                                  ? "bg-blue-500/10 text-blue-500"
+                                  : "bg-amber-500/10 text-amber-500/50"
+                              )}>
+                                {!wasAwardedPoints ? (
+                                  <>
+                                    <RefreshCw className="w-3 h-3" />
+                                    <span>pronto</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Star className="w-3 h-3 fill-amber-500/50" />
+                                    <span>+1</span>
+                                  </>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        }
+
+                        // Not completed - show popover with options
+                        return (
+                          <Popover 
+                            key={item.id} 
+                            open={openPopover === item.id} 
+                            onOpenChange={(open) => setOpenPopover(open ? item.id : null)}
+                          >
+                            <PopoverTrigger asChild>
+                              <button
+                                disabled={!canToggle}
+                                className={cn(
+                                  "w-full flex items-start gap-4 p-4 rounded-xl transition-all",
+                                  !canToggle && "cursor-not-allowed opacity-80",
+                                  canToggle && "active:scale-[0.98] hover:shadow-md",
+                                  "card-base border-2 hover:border-primary/40"
+                                )}
+                              >
+                                <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-all shrink-0 border-2 border-muted-foreground/30 bg-background" />
+                                <div className="flex-1 text-left">
+                                  <p className="font-medium text-foreground">
+                                    {item.name}
+                                  </p>
+                                  {item.description && (
+                                    <p className="text-xs text-muted-foreground">
+                                      {item.description}
+                                    </p>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                            {/* Coin badge showing points reward */}
-                            <div className={cn(
-                              "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
-                              completed 
-                                ? "bg-amber-500/10 text-amber-500/50" 
-                                : "bg-amber-500/20 text-amber-600"
-                            )}>
-                              <Star className={cn("w-3 h-3", completed ? "fill-amber-500/50" : "fill-amber-500")} />
-                              <span>+1</span>
-                            </div>
-                          </button>
+                                {/* Coin badge showing potential points */}
+                                <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-amber-500/20 text-amber-600">
+                                  <Star className="w-3 h-3 fill-amber-500" />
+                                  <span>+1</span>
+                                </div>
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-64 p-2" align="end">
+                              <div className="space-y-1">
+                                <button
+                                  onClick={(e) => handleComplete(item.id, true, e)}
+                                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-success/10 text-left transition-colors"
+                                >
+                                  <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
+                                    <Check className="w-5 h-5 text-success" />
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-success">Concluí agora</p>
+                                    <p className="text-xs text-muted-foreground">Ganhar +1 ponto</p>
+                                  </div>
+                                </button>
+                                <button
+                                  onClick={(e) => handleComplete(item.id, false, e)}
+                                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary text-left transition-colors"
+                                >
+                                  <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                    <RefreshCw className="w-5 h-5 text-muted-foreground" />
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-foreground">Já estava pronto</p>
+                                    <p className="text-xs text-muted-foreground">Sem ponto</p>
+                                  </div>
+                                </button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                         );
                       })}
                     </div>

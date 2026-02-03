@@ -147,6 +147,7 @@ export interface ChecklistCompletion {
   completed_at: string;
   notes: string | null;
   date: string;
+  awarded_points: boolean;
   // Joined data
   item?: ChecklistItem;
   profile?: Profile;
