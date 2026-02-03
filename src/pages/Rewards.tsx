@@ -54,11 +54,11 @@ export default function RewardsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header */}
-        <header className="bg-card border-b sticky top-0 lg:top-0 z-40">
-          <div className="px-4 py-4 lg:px-6">
+        {/* Header - Unified Design */}
+        <header className="page-header-unified">
+          <div className="page-header-content">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+              <div className="page-header-icon bg-gradient-to-br from-amber-500 to-orange-500">
                 <Gift className="w-5 h-5 text-white" />
               </div>
               <div>

@@ -26,7 +26,9 @@ export function useChecklists() {
             items:checklist_items(*)
           )
         `)
-        .order('sort_order');
+        .order('sort_order')
+        .order('sort_order', { referencedTable: 'checklist_subcategories' })
+        .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
 
       if (error) throw error;
       setSectors((data as ChecklistSector[]) || []);

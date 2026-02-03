@@ -1,6 +1,5 @@
 import { Star, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RewardProduct } from '@/hooks/useRewards';
 
@@ -17,7 +16,7 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
   const isDisabled = !canAfford || isOutOfStock || isRedeeming;
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg">
+    <div className="card-base overflow-hidden transition-all hover:shadow-lg hover:border-primary/20">
       <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
         {product.image_url ? (
           <img 
@@ -30,7 +29,7 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
         )}
       </div>
       
-      <CardContent className="p-4">
+      <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-foreground line-clamp-1">{product.name}</h3>
           {isOutOfStock && (
@@ -55,9 +54,9 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
             {product.stock} disponíveis
           </p>
         )}
-      </CardContent>
+      </div>
       
-      <CardFooter className="p-4 pt-0">
+      <div className="p-4 pt-0">
         <Button 
           className="w-full" 
           disabled={isDisabled}
@@ -68,7 +67,7 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
            !canAfford ? `Faltam ${product.points_cost - userBalance} pontos` :
            'Resgatar'}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
