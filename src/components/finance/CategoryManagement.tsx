@@ -114,6 +114,46 @@ export function CategoryManagement({
   const handleDelete = async (id: string) => {
     setIsLoading(true);
     try {
+      // 1) Block delete if category (or its children) is used by any transaction
+      const { count: directCount, error: directErr } = await supabase
+        .from('finance_transactions')
+        .select('id', { count: 'exact', head: true })
+        .eq('category_id', id);
+      if (directErr) throw directErr;
+
+      // Find children (subcategories)
+      const children = categories
+        .flatMap(c => c.subcategories || [])
+        .filter(sub => sub.parent_id === id);
+
+      if (children.length > 0) {
+        const childIds = children.map(c => c.id);
+        const { count: childCount, error: childErr } = await supabase
+          .from('finance_transactions')
+          .select('id', { count: 'exact', head: true })
+          .in('category_id', childIds);
+        if (childErr) throw childErr;
+        if ((directCount || 0) + (childCount || 0) > 0) {
+          toast.error('Não é possível excluir: há lançamentos usando essa categoria/subcategoria.');
+          return;
+        }
+      } else {
+        if ((directCount || 0) > 0) {
+          toast.error('Não é possível excluir: há lançamentos usando essa categoria.');
+          return;
+        }
+
+      }
+
+      // 2) Delete children first (avoid FK constraint on parent_id)
+      if (children.length > 0) {
+        const { error: delChildrenErr } = await supabase
+          .from('finance_categories')
+          .delete()
+          .in('id', children.map(c => c.id));
+        if (delChildrenErr) throw delChildrenErr;
+      }
+
       const { error } = await supabase
         .from('finance_categories')
         .delete()

@@ -22,6 +22,7 @@ import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, ChevronDown, Loader2, Trash2, Repeat, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
+import { toast } from 'sonner';
 
 interface TransactionSheetProps {
   open: boolean;
@@ -193,7 +194,7 @@ export function TransactionSheet({
         await onSave({
           type,
           amount: parseFloat(amount),
-          description: description.trim(),
+          description: `${description.trim()} (${i + 1}/${count})`,
           category_id: categoryId,
           account_id: accountId,
           to_account_id: type === 'transfer' ? toAccountId : null,
@@ -205,6 +206,8 @@ export function TransactionSheet({
           notes: notes.trim() || undefined
         });
       }
+
+      toast.success(`Criados ${count} lançamentos. Os próximos aparecem nos meses seguintes.`);
     } else {
       // Single transaction
       await onSave({
