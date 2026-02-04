@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Auth from "./pages/Auth";
 import DashboardNew from "./pages/DashboardNew";
 import Agenda from "./pages/Agenda";
+import Finance from "./pages/Finance";
 import Inventory from "./pages/Inventory";
 import Checklists from "./pages/Checklists";
 import Rewards from "./pages/Rewards";
@@ -50,6 +51,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Agenda />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance"
+        element={
+          <ProtectedRoute>
+            <Finance />
           </ProtectedRoute>
         }
       />
