@@ -29,7 +29,12 @@ export default function Finance() {
     isLoading,
     addTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    toggleTransactionPaid,
+    addAccount,
+    updateAccount,
+    deleteAccount,
+    refetch
   } = useFinance(selectedMonth);
 
   const {
@@ -58,6 +63,10 @@ export default function Finance() {
     } else {
       await addTransaction(data);
     }
+  };
+
+  const handleRefreshCategories = async () => {
+    await refetch();
   };
 
   if (isLoading) {
@@ -91,6 +100,7 @@ export default function Finance() {
             transactionsByDate={transactionsByDate}
             monthStats={monthStats}
             onTransactionClick={handleTransactionClick}
+            onTogglePaid={toggleTransactionPaid}
           />
         )}
 
@@ -115,8 +125,12 @@ export default function Finance() {
 
         {activeTab === 'more' && (
           <FinanceMore
-            onManageAccounts={() => {}}
-            onManageCategories={() => {}}
+            accounts={accounts}
+            categories={categories}
+            onAddAccount={addAccount}
+            onUpdateAccount={updateAccount}
+            onDeleteAccount={deleteAccount}
+            onRefreshCategories={handleRefreshCategories}
           />
         )}
       </div>

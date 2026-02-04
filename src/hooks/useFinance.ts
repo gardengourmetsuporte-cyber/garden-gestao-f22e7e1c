@@ -229,6 +229,17 @@ export function useFinance(selectedMonth: Date) {
     await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 
+  const toggleTransactionPaid = async (id: string, isPaid: boolean) => {
+    const { error } = await supabase
+      .from('finance_transactions')
+      .update({ is_paid: isPaid })
+      .eq('id', id);
+    if (error) {
+      toast.error('Erro ao atualizar transação');
+      return;
+    }
+    await Promise.all([fetchTransactions(), fetchAccounts()]);
+  };
   const addAccount = async (data: Omit<FinanceAccount, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
     if (!user) return;
     const { error } = await supabase.from('finance_accounts').insert({
@@ -321,6 +332,7 @@ export function useFinance(selectedMonth: Date) {
     addTransaction,
     updateTransaction,
     deleteTransaction,
+    toggleTransactionPaid,
     addAccount,
     updateAccount,
     deleteAccount,

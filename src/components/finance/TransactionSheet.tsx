@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CategoryPicker } from './CategoryPicker';
 import { 
   TransactionType, 
@@ -18,7 +19,7 @@ import {
 } from '@/types/finance';
 import { format, isToday, isYesterday, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, ChevronDown, Loader2, Trash2 } from 'lucide-react';
+import { CalendarIcon, ChevronDown, Loader2, Trash2, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
 
@@ -32,6 +33,16 @@ interface TransactionSheetProps {
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
 }
+
+const RECURRING_OPTIONS = [
+  { value: 'weekly', label: 'Semanal' },
+  { value: 'biweekly', label: 'Quinzenal' },
+  { value: 'monthly', label: 'Mensal' },
+  { value: 'bimonthly', label: 'Bimestral' },
+  { value: 'quarterly', label: 'Trimestral' },
+  { value: 'semiannual', label: 'Semestral' },
+  { value: 'yearly', label: 'Anual' },
+];
 
 export function TransactionSheet({
   open,
@@ -53,6 +64,8 @@ export function TransactionSheet({
   const [date, setDate] = useState<Date>(new Date());
   const [isPaid, setIsPaid] = useState(true);
   const [isFixed, setIsFixed] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringInterval, setRecurringInterval] = useState<string>('monthly');
   const [notes, setNotes] = useState('');
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -70,6 +83,8 @@ export function TransactionSheet({
         setDate(new Date(editingTransaction.date));
         setIsPaid(editingTransaction.is_paid);
         setIsFixed(editingTransaction.is_fixed);
+        setIsRecurring(editingTransaction.is_recurring);
+        setRecurringInterval(editingTransaction.recurring_interval || 'monthly');
         setNotes(editingTransaction.notes || '');
       } else {
         setType(defaultType);
@@ -81,6 +96,8 @@ export function TransactionSheet({
         setDate(new Date());
         setIsPaid(true);
         setIsFixed(false);
+        setIsRecurring(false);
+        setRecurringInterval('monthly');
         setNotes('');
       }
     }
@@ -101,7 +118,8 @@ export function TransactionSheet({
       date: format(date, 'yyyy-MM-dd'),
       is_paid: isPaid,
       is_fixed: isFixed,
-      is_recurring: false,
+      is_recurring: isRecurring,
+      recurring_interval: isRecurring ? recurringInterval : undefined,
       notes: notes.trim() || undefined
     });
     setIsLoading(false);
@@ -293,6 +311,48 @@ export function TransactionSheet({
               <div className="flex items-center justify-between">
                 <Label>Despesa fixa</Label>
                 <Switch checked={isFixed} onCheckedChange={setIsFixed} />
+              </div>
+
+              {/* Recurring options */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Repeat className="w-4 h-4 text-muted-foreground" />
+                    <Label>Repetir</Label>
+                  </div>
+                  <Switch checked={isRecurring} onCheckedChange={setIsRecurring} />
+                </div>
+                
+                {isRecurring && (
+                  <div className="ml-6 p-3 bg-secondary/30 rounded-lg space-y-3">
+                    <div className="space-y-2">
+                      <Label className="text-sm">Frequência</Label>
+                      <Select value={recurringInterval} onValueChange={setRecurringInterval}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {RECURRING_OPTIONS.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Esta transação será criada automaticamente {
+                        recurringInterval === 'weekly' ? 'toda semana' :
+                        recurringInterval === 'biweekly' ? 'a cada 15 dias' :
+                        recurringInterval === 'monthly' ? 'todo mês' :
+                        recurringInterval === 'bimonthly' ? 'a cada 2 meses' :
+                        recurringInterval === 'quarterly' ? 'a cada 3 meses' :
+                        recurringInterval === 'semiannual' ? 'a cada 6 meses' :
+                        'todo ano'
+                      } na mesma data.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
