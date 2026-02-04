@@ -12,6 +12,7 @@ interface FinanceTransactionsProps {
   transactionsByDate: Record<string, FinanceTransaction[]>;
   monthStats: MonthlyStats;
   onTransactionClick: (transaction: FinanceTransaction) => void;
+  onTogglePaid: (id: string, isPaid: boolean) => Promise<void>;
 }
 
 export function FinanceTransactions({
@@ -19,7 +20,8 @@ export function FinanceTransactions({
   onMonthChange,
   transactionsByDate,
   monthStats,
-  onTransactionClick
+  onTransactionClick,
+  onTogglePaid
 }: FinanceTransactionsProps) {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -81,6 +83,7 @@ export function FinanceTransactions({
                       key={transaction.id}
                       transaction={transaction}
                       onClick={() => onTransactionClick(transaction)}
+                      onTogglePaid={onTogglePaid}
                     />
                   ))}
                 </div>

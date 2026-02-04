@@ -1,15 +1,18 @@
-import { ArrowUpCircle, ArrowDownCircle, ArrowLeftRight, CreditCard, Check } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, ArrowLeftRight, CreditCard, Check, Loader2 } from 'lucide-react';
 import { FinanceTransaction } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
+import { useState } from 'react';
 
 interface TransactionItemProps {
   transaction: FinanceTransaction;
   onClick?: () => void;
+  onTogglePaid?: (id: string, isPaid: boolean) => Promise<void>;
 }
 
-export function TransactionItem({ transaction, onClick }: TransactionItemProps) {
+export function TransactionItem({ transaction, onClick, onTogglePaid }: TransactionItemProps) {
   const { type, amount, description, category, account, is_paid } = transaction;
+  const [isToggling, setIsToggling] = useState(false);
 
   const getTypeIcon = () => {
     switch (type) {
@@ -42,47 +45,76 @@ export function TransactionItem({ transaction, onClick }: TransactionItemProps) 
     return formatted;
   };
 
+  const handleTogglePaid = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onTogglePaid || isToggling) return;
+    
+    setIsToggling(true);
+    await onTogglePaid(transaction.id, !is_paid);
+    setIsToggling(false);
+  };
+
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all w-full text-left",
-        onClick && "hover:bg-secondary/50",
+        "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all w-full",
         !is_paid && "opacity-60"
       )}
     >
-      {/* Type icon */}
-      <div className="flex-shrink-0">
-        {getTypeIcon()}
-      </div>
+      {/* Quick pay toggle */}
+      <button
+        onClick={handleTogglePaid}
+        disabled={isToggling}
+        className={cn(
+          "flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all",
+          is_paid 
+            ? "bg-success border-success text-success-foreground" 
+            : "border-muted-foreground/30 hover:border-success hover:bg-success/10",
+          isToggling && "opacity-50"
+        )}
+      >
+        {isToggling ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : is_paid ? (
+          <Check className="w-4 h-4" />
+        ) : null}
+      </button>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+      {/* Content - clickable area for editing */}
+      <button
+        onClick={onClick}
+        className="flex-1 flex items-center gap-3 text-left min-w-0"
+      >
+        {/* Type icon */}
+        <div className="flex-shrink-0">
+          {getTypeIcon()}
+        </div>
+
+        {/* Details */}
+        <div className="flex-1 min-w-0">
           <p className="font-medium truncate">{description}</p>
-          {is_paid && <Check className="w-3 h-3 text-success flex-shrink-0" />}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {getCategoryIcon()}
+            <span className="truncate">{category?.name || 'Sem categoria'}</span>
+            {account && (
+              <>
+                <span>•</span>
+                <span className="truncate">{account.name}</span>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {getCategoryIcon()}
-          <span className="truncate">{category?.name || 'Sem categoria'}</span>
-          {account && (
-            <>
-              <span>•</span>
-              <span className="truncate">{account.name}</span>
-            </>
-          )}
-        </div>
-      </div>
 
-      {/* Amount */}
-      <p className={cn(
-        "font-semibold tabular-nums flex-shrink-0",
-        type === 'income' ? "text-success" : 
-        type === 'transfer' ? "text-primary" : 
-        "text-destructive"
-      )}>
-        {formatAmount()}
-      </p>
-    </button>
+        {/* Amount */}
+        <p className={cn(
+          "font-semibold tabular-nums flex-shrink-0",
+          type === 'income' ? "text-success" : 
+          type === 'transfer' ? "text-primary" : 
+          "text-destructive"
+        )}>
+          {formatAmount()}
+        </p>
+      </button>
+    </div>
   );
 }
