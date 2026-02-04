@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Wallet, Tag, Settings, FileText, HelpCircle } from 'lucide-react';
+import { Wallet, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AccountManagement } from './AccountManagement';
 import { CategoryManagement } from './CategoryManagement';
@@ -28,9 +28,6 @@ export function FinanceMore({
   const menuItems = [
     { icon: Wallet, label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true) },
     { icon: Tag, label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true) },
-    { icon: FileText, label: 'Relatórios', disabled: true },
-    { icon: Settings, label: 'Configurações', disabled: true },
-    { icon: HelpCircle, label: 'Ajuda', disabled: true },
   ];
 
   return (
@@ -44,13 +41,9 @@ export function FinanceMore({
             variant="ghost"
             className="w-full justify-start h-14 text-left gap-3"
             onClick={item.onClick}
-            disabled={item.disabled}
           >
             <item.icon className="w-5 h-5 text-muted-foreground" />
             <span className="font-medium">{item.label}</span>
-            {item.disabled && (
-              <span className="ml-auto text-xs text-muted-foreground">Em breve</span>
-            )}
           </Button>
         ))}
       </div>

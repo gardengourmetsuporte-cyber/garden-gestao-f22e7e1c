@@ -1,4 +1,4 @@
-import { Home, FileText, Plus, PieChart, MoreHorizontal } from 'lucide-react';
+import { Home, FileText, Plus, PieChart, MoreHorizontal, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FinanceTab } from '@/types/finance';
 
@@ -11,8 +11,8 @@ interface FinanceBottomNavProps {
 const tabs: { id: FinanceTab; icon: typeof Home; label: string }[] = [
   { id: 'home', icon: Home, label: 'Principal' },
   { id: 'transactions', icon: FileText, label: 'Transações' },
+  { id: 'cards', icon: CreditCard, label: 'Cartões' },
   { id: 'charts', icon: PieChart, label: 'Gráficos' },
-  { id: 'planning', icon: PieChart, label: 'Planejar' },
   { id: 'more', icon: MoreHorizontal, label: 'Mais' },
 ];
 
