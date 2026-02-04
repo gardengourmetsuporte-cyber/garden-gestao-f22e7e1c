@@ -197,6 +197,245 @@ export type Database = {
           },
         ]
       }
+      finance_accounts: {
+        Row: {
+          balance: number
+          color: string
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      finance_budgets: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          month: number
+          planned_amount: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          month: number
+          planned_amount: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          month?: number
+          planned_amount?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_budgets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_categories: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          is_system: boolean
+          name: string
+          parent_id: string | null
+          sort_order: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          is_system?: boolean
+          name: string
+          parent_id?: string | null
+          sort_order?: number
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          is_system?: boolean
+          name?: string
+          parent_id?: string | null
+          sort_order?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      finance_transactions: {
+        Row: {
+          account_id: string | null
+          amount: number
+          attachment_url: string | null
+          category_id: string | null
+          created_at: string
+          date: string
+          description: string
+          id: string
+          is_fixed: boolean
+          is_paid: boolean
+          is_recurring: boolean
+          notes: string | null
+          recurring_interval: string | null
+          tags: string[] | null
+          to_account_id: string | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          attachment_url?: string | null
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          is_fixed?: boolean
+          is_paid?: boolean
+          is_recurring?: boolean
+          notes?: string | null
+          recurring_interval?: string | null
+          tags?: string[] | null
+          to_account_id?: string | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          attachment_url?: string | null
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          is_fixed?: boolean
+          is_paid?: boolean
+          is_recurring?: boolean
+          notes?: string | null
+          recurring_interval?: string | null
+          tags?: string[] | null
+          to_account_id?: string | null
+          type?: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "finance_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_transactions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_transactions_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "finance_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_items: {
         Row: {
           category_id: string | null
@@ -673,6 +912,7 @@ export type Database = {
       reward_status: "pending" | "approved" | "delivered" | "cancelled"
       schedule_status: "pending" | "approved" | "rejected"
       task_priority: "low" | "medium" | "high"
+      transaction_type: "income" | "expense" | "transfer" | "credit_card"
       unit_type: "unidade" | "kg" | "litro"
     }
     CompositeTypes: {
@@ -809,6 +1049,7 @@ export const Constants = {
       reward_status: ["pending", "approved", "delivered", "cancelled"],
       schedule_status: ["pending", "approved", "rejected"],
       task_priority: ["low", "medium", "high"],
+      transaction_type: ["income", "expense", "transfer", "credit_card"],
       unit_type: ["unidade", "kg", "litro"],
     },
   },
