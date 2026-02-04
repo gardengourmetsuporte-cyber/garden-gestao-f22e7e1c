@@ -4,11 +4,12 @@ import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
 import { FinanceHome } from '@/components/finance/FinanceHome';
 import { FinanceTransactions } from '@/components/finance/FinanceTransactions';
 import { FinanceCharts } from '@/components/finance/FinanceCharts';
-import { FinancePlanning } from '@/components/finance/FinancePlanning';
 import { FinanceMore } from '@/components/finance/FinanceMore';
+import { CreditCardTab } from '@/components/finance/CreditCardTab';
 import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { useFinance } from '@/hooks/useFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
+import { useCreditCardInvoices } from '@/hooks/useCreditCardInvoices';
 import { FinanceTab, TransactionType, FinanceTransaction } from '@/types/finance';
 import { Loader2 } from 'lucide-react';
 
@@ -45,6 +46,14 @@ export default function Finance() {
     getSubcategoryStats
   } = useFinanceStats(transactions, categories);
 
+  const {
+    invoices,
+    isLoading: isLoadingInvoices,
+    fetchInvoices,
+    payInvoice,
+    getInvoiceTransactions
+  } = useCreditCardInvoices();
+
   const handleAddTransaction = (type: TransactionType) => {
     setEditingTransaction(null);
     setTransactionType(type);
@@ -63,10 +72,18 @@ export default function Finance() {
     } else {
       await addTransaction(data);
     }
+    // Refresh invoices if it's a credit card transaction
+    if (data.type === 'credit_card') {
+      await fetchInvoices();
+    }
   };
 
   const handleRefreshCategories = async () => {
     await refetch();
+  };
+
+  const handleRefreshAll = async () => {
+    await Promise.all([refetch(), fetchInvoices()]);
   };
 
   if (isLoading) {
@@ -104,6 +121,19 @@ export default function Finance() {
           />
         )}
 
+        {activeTab === 'cards' && (
+          <CreditCardTab
+            accounts={accounts}
+            categories={categories}
+            invoices={invoices}
+            onPayInvoice={payInvoice}
+            onGetInvoiceTransactions={getInvoiceTransactions}
+            onAddTransaction={handleSaveTransaction}
+            onDeleteTransaction={deleteTransaction}
+            onRefresh={handleRefreshAll}
+          />
+        )}
+
         {activeTab === 'charts' && (
           <FinanceCharts
             selectedMonth={selectedMonth}
@@ -113,13 +143,6 @@ export default function Finance() {
             dailyExpenses={dailyExpenses}
             dailyIncome={dailyIncome}
             getSubcategoryStats={getSubcategoryStats}
-          />
-        )}
-
-        {activeTab === 'planning' && (
-          <FinancePlanning
-            selectedMonth={selectedMonth}
-            onMonthChange={setSelectedMonth}
           />
         )}
 

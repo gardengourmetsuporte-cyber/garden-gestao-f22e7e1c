@@ -197,6 +197,66 @@ export type Database = {
           },
         ]
       }
+      credit_card_invoices: {
+        Row: {
+          account_id: string
+          close_date: string
+          created_at: string
+          due_date: string
+          id: string
+          is_paid: boolean
+          notes: string | null
+          paid_at: string | null
+          paid_from_account_id: string | null
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          close_date: string
+          created_at?: string
+          due_date: string
+          id?: string
+          is_paid?: boolean
+          notes?: string | null
+          paid_at?: string | null
+          paid_from_account_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          close_date?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          is_paid?: boolean
+          notes?: string | null
+          paid_at?: string | null
+          paid_from_account_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_card_invoices_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "finance_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_card_invoices_paid_from_account_id_fkey"
+            columns: ["paid_from_account_id"]
+            isOneToOne: false
+            referencedRelation: "finance_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       finance_accounts: {
         Row: {
           balance: number
@@ -358,9 +418,12 @@ export type Database = {
           attachment_url: string | null
           category_id: string | null
           created_at: string
+          credit_card_invoice_id: string | null
           date: string
           description: string
           id: string
+          installment_group_id: string | null
+          installment_number: number | null
           is_fixed: boolean
           is_paid: boolean
           is_recurring: boolean
@@ -368,6 +431,7 @@ export type Database = {
           recurring_interval: string | null
           tags: string[] | null
           to_account_id: string | null
+          total_installments: number | null
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at: string
           user_id: string
@@ -378,9 +442,12 @@ export type Database = {
           attachment_url?: string | null
           category_id?: string | null
           created_at?: string
+          credit_card_invoice_id?: string | null
           date?: string
           description: string
           id?: string
+          installment_group_id?: string | null
+          installment_number?: number | null
           is_fixed?: boolean
           is_paid?: boolean
           is_recurring?: boolean
@@ -388,6 +455,7 @@ export type Database = {
           recurring_interval?: string | null
           tags?: string[] | null
           to_account_id?: string | null
+          total_installments?: number | null
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           user_id: string
@@ -398,9 +466,12 @@ export type Database = {
           attachment_url?: string | null
           category_id?: string | null
           created_at?: string
+          credit_card_invoice_id?: string | null
           date?: string
           description?: string
           id?: string
+          installment_group_id?: string | null
+          installment_number?: number | null
           is_fixed?: boolean
           is_paid?: boolean
           is_recurring?: boolean
@@ -408,6 +479,7 @@ export type Database = {
           recurring_interval?: string | null
           tags?: string[] | null
           to_account_id?: string | null
+          total_installments?: number | null
           type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           user_id?: string
@@ -425,6 +497,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_transactions_credit_card_invoice_id_fkey"
+            columns: ["credit_card_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "credit_card_invoices"
             referencedColumns: ["id"]
           },
           {

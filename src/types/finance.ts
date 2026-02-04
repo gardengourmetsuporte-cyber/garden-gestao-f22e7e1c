@@ -52,6 +52,11 @@ export interface FinanceTransaction {
   attachment_url: string | null;
   created_at: string;
   updated_at: string;
+  // Credit card fields
+  credit_card_invoice_id: string | null;
+  installment_number: number | null;
+  total_installments: number | null;
+  installment_group_id: string | null;
   // Joined data
   category?: FinanceCategory;
   account?: FinanceAccount;
@@ -95,23 +100,6 @@ export interface CategoryStats {
   transactionCount: number;
 }
 
-// Form data for creating/updating transactions
-export interface TransactionFormData {
-  type: TransactionType;
-  amount: number;
-  description: string;
-  category_id: string | null;
-  account_id: string | null;
-  to_account_id?: string | null;
-  date: string;
-  is_paid: boolean;
-  is_fixed: boolean;
-  is_recurring: boolean;
-  recurring_interval?: string | null;
-  tags?: string[];
-  notes?: string;
-  attachment_url?: string;
-}
 
 // Default categories for restaurant
 export const DEFAULT_EXPENSE_CATEGORIES = [
@@ -131,4 +119,47 @@ export const DEFAULT_INCOME_CATEGORIES = [
   { name: 'Outros', icon: 'Plus', color: '#059669', subcategories: [] },
 ];
 
-export type FinanceTab = 'home' | 'transactions' | 'charts' | 'planning' | 'more';
+export type FinanceTab = 'home' | 'transactions' | 'charts' | 'planning' | 'more' | 'cards';
+
+// Credit card invoices
+export interface CreditCardInvoice {
+  id: string;
+  user_id: string;
+  account_id: string;
+  due_date: string;
+  close_date: string;
+  total_amount: number;
+  is_paid: boolean;
+  paid_at: string | null;
+  paid_from_account_id: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  account?: FinanceAccount;
+  transactions?: FinanceTransaction[];
+}
+
+// Extended transaction with installment info
+export interface TransactionFormData {
+  type: TransactionType;
+  amount: number;
+  description: string;
+  category_id: string | null;
+  account_id: string | null;
+  to_account_id?: string | null;
+  date: string;
+  is_paid: boolean;
+  is_fixed: boolean;
+  is_recurring: boolean;
+  recurring_interval?: string | null;
+  recurring_count?: number;
+  tags?: string[];
+  notes?: string;
+  attachment_url?: string;
+  // Credit card specific
+  credit_card_invoice_id?: string | null;
+  installment_number?: number | null;
+  total_installments?: number | null;
+  installment_group_id?: string | null;
+}
