@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Auth from "./pages/Auth";
 import DashboardNew from "./pages/DashboardNew";
+import Agenda from "./pages/Agenda";
 import Inventory from "./pages/Inventory";
 import Checklists from "./pages/Checklists";
 import Rewards from "./pages/Rewards";
@@ -41,6 +42,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <DashboardNew />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/agenda"
+        element={
+          <ProtectedRoute>
+            <Agenda />
           </ProtectedRoute>
         }
       />

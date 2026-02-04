@@ -11,6 +11,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Leaderboard } from './Leaderboard';
+import { AIAssistant } from './AIAssistant';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useOrders } from '@/hooks/useOrders';
@@ -258,6 +259,9 @@ export function AdminDashboard() {
           />
         </div>
       </div>
+
+      {/* AI Assistant */}
+      <AIAssistant />
 
       {/* Leaderboard */}
       <Leaderboard 

@@ -248,6 +248,87 @@ export type Database = {
           },
         ]
       }
+      manager_appointments: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          scheduled_time: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          scheduled_time: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          scheduled_time?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      manager_tasks: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          date: string
+          id: string
+          is_completed: boolean
+          is_system_generated: boolean
+          period: Database["public"]["Enums"]["day_period"]
+          priority: Database["public"]["Enums"]["task_priority"]
+          source_data: Json | null
+          system_source: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          is_completed?: boolean
+          is_system_generated?: boolean
+          period?: Database["public"]["Enums"]["day_period"]
+          priority?: Database["public"]["Enums"]["task_priority"]
+          source_data?: Json | null
+          system_source?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          is_completed?: boolean
+          is_system_generated?: boolean
+          period?: Database["public"]["Enums"]["day_period"]
+          priority?: Database["public"]["Enums"]["task_priority"]
+          source_data?: Json | null
+          system_source?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -586,10 +667,12 @@ export type Database = {
     Enums: {
       app_role: "admin" | "funcionario"
       checklist_type: "abertura" | "fechamento" | "limpeza"
+      day_period: "morning" | "afternoon" | "evening"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
       reward_status: "pending" | "approved" | "delivered" | "cancelled"
       schedule_status: "pending" | "approved" | "rejected"
+      task_priority: "low" | "medium" | "high"
       unit_type: "unidade" | "kg" | "litro"
     }
     CompositeTypes: {
@@ -720,10 +803,12 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "funcionario"],
       checklist_type: ["abertura", "fechamento", "limpeza"],
+      day_period: ["morning", "afternoon", "evening"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
       reward_status: ["pending", "approved", "delivered", "cancelled"],
       schedule_status: ["pending", "approved", "rejected"],
+      task_priority: ["low", "medium", "high"],
       unit_type: ["unidade", "kg", "litro"],
     },
   },
