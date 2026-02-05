@@ -5,11 +5,10 @@ import { FinanceHome } from '@/components/finance/FinanceHome';
 import { FinanceTransactions } from '@/components/finance/FinanceTransactions';
 import { FinanceCharts } from '@/components/finance/FinanceCharts';
 import { FinanceMore } from '@/components/finance/FinanceMore';
-import { CreditCardTab } from '@/components/finance/CreditCardTab';
 import { TransactionSheet } from '@/components/finance/TransactionSheet';
+import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
-import { useCreditCardInvoices } from '@/hooks/useCreditCardInvoices';
 import { FinanceTab, TransactionType, FinanceTransaction, TransactionFormData } from '@/types/finance';
 import { Loader2 } from 'lucide-react';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
@@ -20,6 +19,7 @@ export default function Finance() {
   const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<TransactionType>('expense');
   const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
+  const [accountManagementOpen, setAccountManagementOpen] = useState(false);
 
   const {
     accounts,
@@ -48,13 +48,6 @@ export default function Finance() {
     getSubcategoryStats
   } = useFinanceStats(transactions, categories);
 
-  const {
-    invoices,
-    isLoading: isLoadingInvoices,
-    fetchInvoices,
-    payInvoice,
-    getInvoiceTransactions
-  } = useCreditCardInvoices();
 
   const handleAddTransaction = (type: TransactionType) => {
     setEditingTransaction(null);
@@ -74,10 +67,6 @@ export default function Finance() {
     } else {
       await addTransaction(data);
     }
-    // Refresh invoices if it's a credit card transaction
-    if (data.type === 'credit_card') {
-      await fetchInvoices();
-    }
   };
 
   const handleRefreshCategories = async () => {
@@ -85,7 +74,7 @@ export default function Finance() {
   };
 
   const handleRefreshAll = async () => {
-    await Promise.all([refetch(), fetchInvoices()]);
+    await refetch();
   };
 
   if (isLoading) {
@@ -109,6 +98,7 @@ export default function Finance() {
             totalBalance={totalBalance}
             monthStats={monthStats}
             onAddTransaction={handleAddTransaction}
+            onAddAccount={() => setAccountManagementOpen(true)}
           />
         )}
 
@@ -123,18 +113,6 @@ export default function Finance() {
           />
         )}
 
-        {activeTab === 'cards' && (
-          <CreditCardTab
-            accounts={accounts}
-            categories={categories}
-            invoices={invoices}
-            onPayInvoice={payInvoice}
-            onGetInvoiceTransactions={getInvoiceTransactions}
-            onAddTransaction={handleSaveTransaction}
-            onDeleteTransaction={deleteTransaction}
-            onRefresh={handleRefreshAll}
-          />
-        )}
 
         {activeTab === 'charts' && (
           <FinanceCharts
@@ -178,6 +156,16 @@ export default function Finance() {
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}
         onUpdateRecurring={updateRecurringTransaction}
+      />
+
+      {/* Account Management from Home */}
+      <AccountManagement
+        open={accountManagementOpen}
+        onOpenChange={setAccountManagementOpen}
+        accounts={accounts}
+        onAdd={addAccount}
+        onUpdate={updateAccount}
+        onDelete={deleteAccount}
       />
     </AppLayout>
   );
