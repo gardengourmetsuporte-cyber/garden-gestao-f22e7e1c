@@ -53,6 +53,7 @@ interface SubRecipeItem {
   subRecipes: SubRecipeItem[];
    onSave: (data: any) => Promise<void>;
    isSaving: boolean;
+  defaultCategoryId?: string | null;
  }
  
  export function RecipeSheet({
@@ -64,6 +65,7 @@ interface SubRecipeItem {
   subRecipes,
    onSave,
    isSaving,
+  defaultCategoryId,
  }: RecipeSheetProps) {
    const [name, setName] = useState('');
    const [categoryId, setCategoryId] = useState<string>('');
@@ -107,7 +109,14 @@ interface SubRecipeItem {
        setNotes('');
        setIngredients([]);
      }
-   }, [recipe, open]);
+  }, [recipe, open, defaultCategoryId]);
+  
+  // Apply default category when opening for new recipe
+  useEffect(() => {
+    if (open && !recipe && defaultCategoryId) {
+      setCategoryId(defaultCategoryId);
+    }
+  }, [open, recipe, defaultCategoryId]);
    
    const totalCost = ingredients.reduce((sum, ing) => sum + ing.total_cost, 0);
    const costPerPortion = parseFloat(yieldQuantity) > 0 ? totalCost / parseFloat(yieldQuantity) : totalCost;
@@ -296,7 +305,9 @@ interface SubRecipeItem {
                    <div className="space-y-2">
                      {ingredients.map((ingredient, index) => (
                        <IngredientRow
-                         key={ingredient.item_id}
+                      key={ingredient.source_type === 'recipe' 
+                        ? `recipe-${ingredient.source_recipe_id}` 
+                        : `item-${ingredient.item_id}-${index}`}
                          ingredient={ingredient}
                          onChange={(updates) => handleIngredientChange(index, updates)}
                          onRemove={() => handleRemoveIngredient(index)}

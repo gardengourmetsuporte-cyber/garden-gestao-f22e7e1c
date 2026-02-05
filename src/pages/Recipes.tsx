@@ -5,6 +5,7 @@
  import { Input } from '@/components/ui/input';
  import { Card, CardContent } from '@/components/ui/card';
  import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
  import { RecipeCard } from '@/components/recipes/RecipeCard';
  import { RecipeSheet } from '@/components/recipes/RecipeSheet';
  import { useRecipes } from '@/hooks/useRecipes';
@@ -44,16 +45,33 @@
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
    const [recipeToDelete, setRecipeToDelete] = useState<string | null>(null);
    const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<'produtos' | 'bases'>('produtos');
+  const [preSelectedCategoryId, setPreSelectedCategoryId] = useState<string | null>(null);
    
+  // Find the "Bases e Preparos" category
+  const basesCategory = useMemo(() => {
+    return categories.find(c => c.name.toLowerCase().includes('bases') || c.name.toLowerCase().includes('preparo'));
+  }, [categories]);
+  
    // Filter and group recipes
-   const groupedRecipes = useMemo(() => {
-     const filtered = recipes.filter((r) =>
-       r.name.toLowerCase().includes(search.toLowerCase())
+  const { productRecipes, baseRecipes, groupedRecipes } = useMemo(() => {
+    const basesCategoryId = basesCategory?.id;
+    
+    const products = recipes.filter(r => 
+      r.category_id !== basesCategoryId && 
+      r.name.toLowerCase().includes(search.toLowerCase())
+    );
+    
+    const bases = recipes.filter(r => 
+      r.category_id === basesCategoryId && 
+      r.name.toLowerCase().includes(search.toLowerCase())
      );
      
+    const recipesToGroup = activeTab === 'produtos' ? products : bases;
+    
      const groups: Record<string, { category: typeof categories[0] | null; recipes: Recipe[] }> = {};
      
-     filtered.forEach((recipe) => {
+    recipesToGroup.forEach((recipe) => {
        const catId = recipe.category_id || 'sem-categoria';
        if (!groups[catId]) {
          groups[catId] = {
@@ -64,12 +82,14 @@
        groups[catId].recipes.push(recipe);
      });
      
-     return Object.entries(groups).sort((a, b) => {
+    const grouped = Object.entries(groups).sort((a, b) => {
        const orderA = a[1].category?.sort_order ?? 999;
        const orderB = b[1].category?.sort_order ?? 999;
        return orderA - orderB;
      });
-   }, [recipes, search]);
+    
+    return { productRecipes: products, baseRecipes: bases, groupedRecipes: grouped };
+  }, [recipes, search, basesCategory, activeTab]);
    
    // Stats
    const stats = useMemo(() => {
@@ -100,6 +120,12 @@
    
    const handleCreate = () => {
      setSelectedRecipe(null);
+    // Pre-select "Bases e Preparos" category when creating from bases tab
+    if (activeTab === 'bases' && basesCategory) {
+      setPreSelectedCategoryId(basesCategory.id);
+    } else {
+      setPreSelectedCategoryId(null);
+    }
      setSheetOpen(true);
    };
    
@@ -138,10 +164,6 @@
              <h1 className="text-2xl font-bold">Fichas Técnicas</h1>
              <p className="text-muted-foreground text-sm">Gerencie suas receitas e custos</p>
            </div>
-           <Button onClick={handleCreate} className="gap-2">
-             <Plus className="h-4 w-4" />
-             <span className="hidden sm:inline">Nova Ficha</span>
-           </Button>
          </div>
          
          {/* Stats */}
@@ -175,75 +197,108 @@
            </Card>
          </div>
          
-         {/* Search */}
-         <div className="relative">
-           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-           <Input
-             placeholder="Buscar receitas..."
-             value={search}
-             onChange={(e) => setSearch(e.target.value)}
-             className="pl-10"
-           />
-         </div>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'produtos' | 'bases')}>
+          <div className="flex items-center gap-2">
+            <TabsList className="flex-1">
+              <TabsTrigger value="produtos" className="flex-1 gap-2">
+                <ChefHat className="h-4 w-4" />
+                Produtos
+                <span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">
+                  {productRecipes.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="bases" className="flex-1 gap-2">
+                🍲 Bases
+                <span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">
+                  {baseRecipes.length}
+                </span>
+              </TabsTrigger>
+            </TabsList>
+            <Button onClick={handleCreate} size="sm" className="gap-1">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {activeTab === 'bases' ? 'Nova Base' : 'Nova Ficha'}
+              </span>
+            </Button>
+          </div>
+          
+          {/* Search */}
+          <div className="relative mt-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={activeTab === 'bases' ? 'Buscar bases e preparos...' : 'Buscar receitas...'}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
          
-         {/* Recipe List */}
-         {isLoading ? (
-           <div className="text-center py-12 text-muted-foreground">Carregando...</div>
-         ) : groupedRecipes.length === 0 ? (
-           <div className="text-center py-12">
-             <ChefHat className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-             <p className="text-muted-foreground">Nenhuma ficha técnica encontrada</p>
-             <Button onClick={handleCreate} variant="outline" className="mt-4">
-               Criar primeira ficha
-             </Button>
-           </div>
-         ) : (
-           <div className="space-y-4">
-             {groupedRecipes.map(([catId, group]) => (
-               <Collapsible
-                 key={catId}
-                 open={expandedCategories.has(catId) || search.length > 0}
-                 onOpenChange={() => toggleCategory(catId)}
-               >
-                 <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
-                   {expandedCategories.has(catId) || search.length > 0 ? (
-                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                   ) : (
-                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                   )}
-                   <div
-                     className="w-3 h-3 rounded-full"
-                     style={{ backgroundColor: group.category?.color || '#6b7280' }}
-                   />
-                   <span className="font-medium">
-                     {group.category?.name || 'Sem categoria'}
-                   </span>
-                   <span className="text-sm text-muted-foreground ml-auto">
-                     ({group.recipes.length})
-                   </span>
-                 </CollapsibleTrigger>
-                 
-                 <CollapsibleContent>
-                   <div className="space-y-2 mt-2 ml-2">
-                     {group.recipes.map((recipe) => (
-                       <RecipeCard
-                         key={recipe.id}
-                         recipe={recipe}
-                         onEdit={handleEdit}
-                         onDuplicate={duplicateRecipe}
-                         onToggleActive={(id, active) => toggleActive({ id, is_active: active })}
-                         onDelete={(id) => {
-                           setRecipeToDelete(id);
-                           setDeleteDialogOpen(true);
-                         }}
-                       />
-                     ))}
-                   </div>
-                 </CollapsibleContent>
-               </Collapsible>
-             ))}
-           </div>
-         )}
+          {/* Recipe List */}
+          <TabsContent value={activeTab} className="mt-4">
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground">Carregando...</div>
+            ) : groupedRecipes.length === 0 ? (
+              <div className="text-center py-12">
+                <ChefHat className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  {activeTab === 'bases' 
+                    ? 'Nenhuma base ou preparo encontrado'
+                    : 'Nenhuma ficha técnica encontrada'}
+                </p>
+                <Button onClick={handleCreate} variant="outline" className="mt-4">
+                  {activeTab === 'bases' ? 'Criar primeira base' : 'Criar primeira ficha'}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {groupedRecipes.map(([catId, group]) => (
+                  <Collapsible
+                    key={catId}
+                    open={expandedCategories.has(catId) || search.length > 0}
+                    onOpenChange={() => toggleCategory(catId)}
+                  >
+                    <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
+                      {expandedCategories.has(catId) || search.length > 0 ? (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: group.category?.color || '#6b7280' }}
+                      />
+                      <span className="font-medium">
+                        {group.category?.name || 'Sem categoria'}
+                      </span>
+                      <span className="text-sm text-muted-foreground ml-auto">
+                        ({group.recipes.length})
+                      </span>
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent>
+                      <div className="space-y-2 mt-2 ml-2">
+                        {group.recipes.map((recipe) => (
+                          <RecipeCard
+                            key={recipe.id}
+                            recipe={recipe}
+                            onEdit={handleEdit}
+                            onDuplicate={duplicateRecipe}
+                            onToggleActive={(id, active) => toggleActive({ id, is_active: active })}
+                            onDelete={(id) => {
+                              setRecipeToDelete(id);
+                              setDeleteDialogOpen(true);
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
        </div>
        
        <RecipeSheet
@@ -252,6 +307,7 @@
          recipe={selectedRecipe}
          categories={categories}
          inventoryItems={inventoryItems}
+        defaultCategoryId={preSelectedCategoryId}
         subRecipes={getAvailableSubRecipes(selectedRecipe?.id).map(r => ({
           id: r.id,
           name: r.name,

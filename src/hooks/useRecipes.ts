@@ -31,7 +31,7 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
          .select(`
            *,
            category:recipe_categories(*),
-           ingredients:recipe_ingredients(
+           ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(
              *,
              item:inventory_items(
                id,
