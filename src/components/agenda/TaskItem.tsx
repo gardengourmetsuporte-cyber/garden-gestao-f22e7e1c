@@ -99,6 +99,13 @@
              </span>
            )}
          </div>
+
+          {/* Notes preview */}
+          {task.notes && (
+            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+              {task.notes}
+            </p>
+          )}
        </button>
  
       <button

@@ -1,18 +1,21 @@
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
 
 interface AgendaCalendarViewProps {
   tasks: ManagerTask[];
   onTaskClick: (task: ManagerTask) => void;
+  onToggleTask?: (id: string) => void;
 }
 
-export function AgendaCalendarView({ tasks, onTaskClick }: AgendaCalendarViewProps) {
+export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaCalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -96,9 +99,7 @@ export function AgendaCalendarView({ tasks, onTaskClick }: AgendaCalendarViewPro
                 !isSameMonth(day, currentMonth) && 'opacity-40'
               )}
               onClick={() => {
-                if (dayTasks.length > 0) {
-                  onTaskClick(dayTasks[0]);
-                }
+                setSelectedDate(dateKey);
               }}
             >
               <span className={cn(
@@ -127,6 +128,83 @@ export function AgendaCalendarView({ tasks, onTaskClick }: AgendaCalendarViewPro
           );
         })}
       </div>
+
+      {/* Selected Date Tasks */}
+      {selectedDate && (
+        <div className="mt-4 space-y-3 animate-in slide-in-from-top-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">
+              {format(new Date(selectedDate + 'T12:00:00'), "d 'de' MMMM", { locale: ptBR })}
+            </h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-7 h-7 rounded-lg"
+              onClick={() => setSelectedDate(null)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {(tasksByDate.get(selectedDate) || []).length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              Nenhuma tarefa neste dia
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {(tasksByDate.get(selectedDate) || []).map(task => (
+                <div
+                  key={task.id}
+                  className={cn(
+                    'p-3 rounded-xl bg-card border border-border transition-all',
+                    'hover:border-primary/30 hover:shadow-sm',
+                    task.is_completed && 'opacity-60'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    {onToggleTask && (
+                      <Checkbox
+                        checked={task.is_completed}
+                        onCheckedChange={() => onToggleTask(task.id)}
+                        className="w-5 h-5 mt-0.5 rounded-full border-2 data-[state=checked]:bg-success data-[state=checked]:border-success"
+                      />
+                    )}
+                    <button
+                      onClick={() => onTaskClick(task)}
+                      className="flex-1 text-left min-w-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        {task.category && (
+                          <div 
+                            className="w-2 h-2 rounded-full shrink-0" 
+                            style={{ backgroundColor: task.category.color }}
+                          />
+                        )}
+                        <span className={cn(
+                          'text-sm font-medium truncate',
+                          task.is_completed && 'line-through text-muted-foreground'
+                        )}>
+                          {task.title}
+                        </span>
+                      </div>
+                      {task.due_time && (
+                        <span className="text-xs text-muted-foreground">
+                          às {task.due_time}
+                        </span>
+                      )}
+                      {task.notes && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                          {task.notes}
+                        </p>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tasks without dates */}
       {tasks.filter(t => !t.due_date && !t.is_completed).length > 0 && (
