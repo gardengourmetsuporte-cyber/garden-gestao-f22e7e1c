@@ -14,7 +14,8 @@ import {
   Plus,
   Trash2,
   Receipt,
-  Wallet
+  Wallet,
+  Utensils
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   const [debitAmount, setDebitAmount] = useState(0);
   const [creditAmount, setCreditAmount] = useState(0);
   const [pixAmount, setPixAmount] = useState(0);
+  const [mealVoucherAmount, setMealVoucherAmount] = useState(0);
   const [deliveryAmount, setDeliveryAmount] = useState(0);
   const [cashDifference, setCashDifference] = useState(0);
   const [notes, setNotes] = useState('');
@@ -68,13 +70,14 @@ export function CashClosingForm({ onSuccess }: Props) {
   // Total esperado no caixa = Caixa inicial + Dinheiro vendido - Gastos (= cashCounted)
   const expectedCashInDrawer = initialCash + cashSold - totalExpenses;
   // Total de vendas = todos os meios
-  const totalPayments = cashSold + debitAmount + creditAmount + pixAmount + deliveryAmount;
+  const totalPayments = cashSold + debitAmount + creditAmount + pixAmount + mealVoucherAmount + deliveryAmount;
 
   const paymentValues: Record<string, { value: number; setter: (v: number) => void }> = {
     cash_amount: { value: cashCounted, setter: setCashCounted },
     debit_amount: { value: debitAmount, setter: setDebitAmount },
     credit_amount: { value: creditAmount, setter: setCreditAmount },
     pix_amount: { value: pixAmount, setter: setPixAmount },
+    meal_voucher_amount: { value: mealVoucherAmount, setter: setMealVoucherAmount },
     delivery_amount: { value: deliveryAmount, setter: setDeliveryAmount },
   };
 
@@ -161,6 +164,7 @@ export function CashClosingForm({ onSuccess }: Props) {
         debit_amount: debitAmount,
         credit_amount: creditAmount,
         pix_amount: pixAmount,
+        meal_voucher_amount: mealVoucherAmount,
         delivery_amount: deliveryAmount,
         cash_difference: cashDifference,
         receipt_url: receiptUrl,
@@ -182,6 +186,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       case 'CreditCard': return CreditCard;
       case 'Smartphone': return Smartphone;
       case 'Truck': return Truck;
+      case 'Utensils': return Utensils;
       default: return Banknote;
     }
   };
@@ -417,6 +422,10 @@ export function CashClosingForm({ onSuccess }: Props) {
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">+ Pix</span>
               <span>R$ {pixAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">+ Vale Alimentação</span>
+              <span>R$ {mealVoucherAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">+ Delivery</span>
