@@ -1,617 +1,177 @@
 
+# Plano de Melhorias Visuais e Funcionais
 
-# Plano: Módulo Financeiro Completo (Baseado no Mobills)
+## Resumo das Alterações Solicitadas
 
-## Objetivo
+1. **Persistência de ordem dos lembretes** - Quando arrastar, salvar a nova posição no banco
+2. **Toggle Calendário/Lista na Agenda** - Substituir "Lembretes" por alternador de visualização
+3. **Botões de transação mais vibrantes** - Melhorar visual dos botões de Receita/Despesa/Transferência
+4. **Padronização visual do sistema inteiro** - Cores, espaçamentos, cards e tipografia consistentes
 
-Criar um módulo financeiro completo exclusivo para o gestor, replicando o layout, fluxo e funcionalidades do Mobills, adaptado para gestão de restaurante/hamburgueria. O gestor poderá lançar despesas em menos de 10 segundos.
+---
 
-## Visão Geral do Módulo
+## Parte 1: Correção da Persistência de Reordenação (Agenda)
 
+### Problema Atual
+O drag-and-drop dos lembretes não persiste a nova ordem no banco. O `handleDragEnd` apenas faz console.log.
+
+### Solução
+1. Adicionar coluna `sort_order` na tabela `manager_tasks`
+2. Criar mutation `reorderTasks` no hook `useAgenda.ts`
+3. Implementar optimistic update no `handleDragEnd` em `Agenda.tsx`
+
+### Arquivos Afetados
+- **Migração SQL**: Nova coluna `sort_order`
+- `src/hooks/useAgenda.ts`: Adicionar `reorderTasks` mutation
+- `src/pages/Agenda.tsx`: Implementar lógica de reordenação
+
+---
+
+## Parte 2: Toggle Calendário/Lista na Agenda
+
+### Design Proposto
+Substituir o header "Lembretes" por um toggle visual:
+- **Ícone de Lista** - Visualização atual (lista de lembretes)
+- **Ícone de Calendário** - Nova visualização mensal
+
+### Componentes Novos
+- `src/components/agenda/AgendaCalendarView.tsx` - Visualização por calendário mostrando lembretes por data
+
+### Arquivos Afetados
+- `src/pages/Agenda.tsx`: Adicionar estado de view e toggle
+- Criar componente de calendário adaptado do `ScheduleCalendar`
+
+---
+
+## Parte 3: Botões de Transação Mais Vibrantes (Finance)
+
+### Problema Atual
+Os botões de "Receita", "Despesa" e "Transf." em `FinanceHome.tsx` usam `variant="outline"` com cores sutis.
+
+### Nova Aparência
 ```text
-┌─────────────────────────────────────────────────────────────────────┐
-│                     MÓDULO FINANCEIRO                               │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  📍 NAVEGAÇÃO INFERIOR FIXA (estilo Mobills)                        │
-│  ┌─────────┬─────────┬─────────┬─────────┬─────────┐               │
-│  │  🏠     │   📄    │    ➕   │   📊    │    ⚙️   │               │
-│  │Principal│Transações│ ADICIONAR│Gráficos │  Mais   │               │
-│  └─────────┴─────────┴─────────┴─────────┴─────────┘               │
-│                                                                     │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  🏠 TELA PRINCIPAL                                                  │
-│  ├─ Mês selecionável (Fevereiro 2026)                              │
-│  ├─ Card de saldo total                                            │
-│  ├─ Receitas (verde) vs Despesas (vermelho)                        │
-│  ├─ Alertas de pendências                                          │
-│  └─ Lista de contas (Carteira, Banco)                              │
-│                                                                     │
-│  📄 TRANSAÇÕES                                                      │
-│  ├─ Lista cronológica por dia                                      │
-│  ├─ Agrupamento por data                                           │
-│  ├─ Ícones por categoria                                           │
-│  └─ Status de pago                                                 │
-│                                                                     │
-│  📊 GRÁFICOS                                                        │
-│  ├─ Pizza por categorias                                           │
-│  ├─ Linha do tempo                                                 │
-│  └─ Detalhamento por subcategoria                                  │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│    ↑        │  │    ↓        │  │    ↔        │
+│  Receita    │  │  Despesa    │  │  Transf.    │
+│ (verde)     │  │ (vermelho)  │  │  (azul)     │
+└─────────────┘  └─────────────┘  └─────────────┘
 ```
 
-## Arquivos a Criar/Modificar
+### Mudanças de Estilo
+- Background sólido com gradiente sutil
+- Ícones maiores (w-6 h-6)
+- Sombra colorida (shadow-success/20, shadow-destructive/20, shadow-primary/20)
+- Bordas mais definidas
+- Touch targets maiores (py-4)
 
-| Arquivo | Tipo | Descrição |
-|---------|------|-----------|
-| **Migração SQL** | Banco | Criar 5 tabelas + enums + RLS |
-| `src/types/finance.ts` | Novo | Tipos TypeScript do módulo |
-| `src/hooks/useFinance.ts` | Novo | Hook principal com CRUD |
-| `src/hooks/useFinanceStats.ts` | Novo | Hook para estatísticas e gráficos |
-| `src/pages/Finance.tsx` | Novo | Container principal com tabs |
-| `src/components/finance/FinanceHome.tsx` | Novo | Tela principal |
-| `src/components/finance/FinanceTransactions.tsx` | Novo | Lista de transações |
-| `src/components/finance/FinanceCharts.tsx` | Novo | Gráficos e análises |
-| `src/components/finance/FinancePlanning.tsx` | Novo | Planejamento |
-| `src/components/finance/FinanceMore.tsx` | Novo | Configurações do módulo |
-| `src/components/finance/TransactionSheet.tsx` | Novo | Formulário de lançamento |
-| `src/components/finance/TransactionItem.tsx` | Novo | Item de transação |
-| `src/components/finance/AccountCard.tsx` | Novo | Card de conta |
-| `src/components/finance/CategoryPicker.tsx` | Novo | Seletor de categoria |
-| `src/components/finance/FinanceBottomNav.tsx` | Novo | Navegação inferior |
-| `src/components/finance/MonthSelector.tsx` | Novo | Seletor de mês |
-| `src/components/settings/FinanceCategorySettings.tsx` | Novo | Gestão de categorias |
-| `src/components/settings/FinanceAccountSettings.tsx` | Novo | Gestão de contas |
-| `src/components/layout/AppLayout.tsx` | Modificar | Adicionar link Financeiro |
-| `src/App.tsx` | Modificar | Adicionar rota `/finance` |
+### Arquivos Afetados
+- `src/components/finance/FinanceHome.tsx`: Redesenhar os 3 botões de ação
 
-## Seção Tecnica
+---
 
-### 1. Estrutura do Banco de Dados
+## Parte 4: Padronização Visual do Sistema
 
+### Princípios de Design a Aplicar
+
+| Elemento | Padrão |
+|----------|--------|
+| Cards | `rounded-2xl`, sombra sutil, borda `border-border` |
+| Headers | Gradiente suave ou fundo sólido com ícone destacado |
+| Botões primários | Sombra colorida (`shadow-lg shadow-primary/30`) |
+| Espaçamentos | `gap-4` entre seções, `p-4` interno |
+| Cores funcionais | Success=verde, Warning=âmbar, Destructive=vermelho, Primary=azul |
+
+### Arquivos a Padronizar
+
+1. **`src/index.css`** - Adicionar mais classes utilitárias unificadas
+2. **`src/components/ui/button.tsx`** - Adicionar variante `success` e melhorar bordas
+3. **`src/pages/Agenda.tsx`** - Aplicar classes do design system
+4. **`src/pages/CashClosing.tsx`** - Padronizar header igual outros módulos
+5. **`src/components/finance/FinanceHome.tsx`** - Melhorar botões de ação
+6. **`src/components/finance/FinanceBottomNav.tsx`** - Adicionar sombra e destaque no FAB
+7. **`src/components/agenda/TaskItem.tsx`** - Melhorar visual dos cards
+8. **`src/components/agenda/CategoryChips.tsx`** - Chips mais elegantes
+9. **`src/components/agenda/TaskSheet.tsx`** - Formulário padronizado
+
+---
+
+## Detalhes Técnicos
+
+### Migração do Banco de Dados
 ```sql
--- =============================================
--- ENUMS
--- =============================================
+-- Adicionar sort_order para persistir ordem dos lembretes
+ALTER TABLE manager_tasks ADD COLUMN sort_order INTEGER DEFAULT 0;
 
-CREATE TYPE transaction_type AS ENUM ('income', 'expense', 'transfer', 'credit_card');
-
--- =============================================
--- TABELA: Contas Financeiras
--- =============================================
-
-CREATE TABLE finance_accounts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  type TEXT NOT NULL DEFAULT 'wallet', -- 'wallet', 'bank', 'credit_card'
-  balance DECIMAL(15,2) NOT NULL DEFAULT 0,
-  color TEXT NOT NULL DEFAULT '#3b82f6',
-  icon TEXT DEFAULT 'Wallet',
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- =============================================
--- TABELA: Categorias Financeiras
--- =============================================
-
-CREATE TABLE finance_categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  type TEXT NOT NULL, -- 'income' ou 'expense'
-  icon TEXT NOT NULL DEFAULT 'Tag',
-  color TEXT NOT NULL DEFAULT '#6366f1',
-  parent_id UUID REFERENCES finance_categories(id) ON DELETE CASCADE,
-  is_system BOOLEAN NOT NULL DEFAULT false, -- categorias padrão
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- =============================================
--- TABELA: Transações
--- =============================================
-
-CREATE TABLE finance_transactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  type transaction_type NOT NULL,
-  amount DECIMAL(15,2) NOT NULL,
-  description TEXT NOT NULL,
-  category_id UUID REFERENCES finance_categories(id),
-  account_id UUID REFERENCES finance_accounts(id),
-  to_account_id UUID REFERENCES finance_accounts(id), -- para transferências
-  date DATE NOT NULL DEFAULT CURRENT_DATE,
-  is_paid BOOLEAN NOT NULL DEFAULT true,
-  is_fixed BOOLEAN NOT NULL DEFAULT false, -- despesa fixa
-  is_recurring BOOLEAN NOT NULL DEFAULT false,
-  recurring_interval TEXT, -- 'monthly', 'weekly', etc
-  tags TEXT[],
-  notes TEXT,
-  attachment_url TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- =============================================
--- TABELA: Orçamento/Planejamento
--- =============================================
-
-CREATE TABLE finance_budgets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  category_id UUID REFERENCES finance_categories(id),
-  month INTEGER NOT NULL, -- 1-12
-  year INTEGER NOT NULL,
-  planned_amount DECIMAL(15,2) NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(user_id, category_id, month, year)
-);
-
--- =============================================
--- TABELA: Tags Personalizadas
--- =============================================
-
-CREATE TABLE finance_tags (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  color TEXT NOT NULL DEFAULT '#6366f1',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(user_id, name)
-);
-
--- =============================================
--- ÍNDICES
--- =============================================
-
-CREATE INDEX idx_finance_transactions_user_date 
-  ON finance_transactions(user_id, date DESC);
-CREATE INDEX idx_finance_transactions_category 
-  ON finance_transactions(category_id);
-CREATE INDEX idx_finance_transactions_account 
-  ON finance_transactions(account_id);
-CREATE INDEX idx_finance_categories_user_type 
-  ON finance_categories(user_id, type);
-
--- =============================================
--- RLS POLICIES (todas as tabelas)
--- =============================================
-
--- Admins podem gerenciar suas próprias finanças
-ALTER TABLE finance_accounts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE finance_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE finance_transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE finance_budgets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE finance_tags ENABLE ROW LEVEL SECURITY;
-
--- Políticas: usuário vê/edita apenas seus dados
-CREATE POLICY "Users manage own accounts" ON finance_accounts
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users manage own categories" ON finance_categories
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users manage own transactions" ON finance_transactions
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users manage own budgets" ON finance_budgets
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users manage own tags" ON finance_tags
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-
--- =============================================
--- TRIGGERS
--- =============================================
-
-CREATE TRIGGER update_finance_accounts_updated_at
-  BEFORE UPDATE ON finance_accounts
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_finance_categories_updated_at
-  BEFORE UPDATE ON finance_categories
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_finance_transactions_updated_at
-  BEFORE UPDATE ON finance_transactions
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_finance_budgets_updated_at
-  BEFORE UPDATE ON finance_budgets
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- =============================================
--- FUNÇÃO: Atualizar saldo da conta
--- =============================================
-
-CREATE OR REPLACE FUNCTION update_account_balance_on_transaction()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Para novas transações
-  IF TG_OP = 'INSERT' THEN
-    IF NEW.type = 'income' AND NEW.is_paid THEN
-      UPDATE finance_accounts SET balance = balance + NEW.amount WHERE id = NEW.account_id;
-    ELSIF NEW.type IN ('expense', 'credit_card') AND NEW.is_paid THEN
-      UPDATE finance_accounts SET balance = balance - NEW.amount WHERE id = NEW.account_id;
-    ELSIF NEW.type = 'transfer' AND NEW.is_paid THEN
-      UPDATE finance_accounts SET balance = balance - NEW.amount WHERE id = NEW.account_id;
-      UPDATE finance_accounts SET balance = balance + NEW.amount WHERE id = NEW.to_account_id;
-    END IF;
-  END IF;
-  
-  -- Para exclusões
-  IF TG_OP = 'DELETE' THEN
-    IF OLD.type = 'income' AND OLD.is_paid THEN
-      UPDATE finance_accounts SET balance = balance - OLD.amount WHERE id = OLD.account_id;
-    ELSIF OLD.type IN ('expense', 'credit_card') AND OLD.is_paid THEN
-      UPDATE finance_accounts SET balance = balance + OLD.amount WHERE id = OLD.account_id;
-    ELSIF OLD.type = 'transfer' AND OLD.is_paid THEN
-      UPDATE finance_accounts SET balance = balance + OLD.amount WHERE id = OLD.account_id;
-      UPDATE finance_accounts SET balance = balance - OLD.amount WHERE id = OLD.to_account_id;
-    END IF;
-  END IF;
-  
-  RETURN COALESCE(NEW, OLD);
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER trigger_update_balance
-  AFTER INSERT OR DELETE ON finance_transactions
-  FOR EACH ROW EXECUTE FUNCTION update_account_balance_on_transaction();
+-- Popular sort_order inicial baseado em created_at
+UPDATE manager_tasks 
+SET sort_order = sub.row_num 
+FROM (
+  SELECT id, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY due_date NULLS FIRST, created_at) as row_num 
+  FROM manager_tasks
+) sub 
+WHERE manager_tasks.id = sub.id;
 ```
 
-### 2. Categorias Padrão (Restaurante)
-
-As categorias serão criadas automaticamente no primeiro acesso:
-
-**Despesas:**
-- Matéria-prima (Carnes, Frios, Bebidas, Panificação, Hortifruti, Mercado)
-- Despesas Administrativas (Energia, Água, Aluguel, Limpeza)
-- Folha de Pagamento
-- Pró-labore
-- Taxas Operacionais (App Delivery, PDV, Tarifa Bancária)
-- Impostos
-- Financiamentos
-- Investimentos
-
-**Receitas:**
-- Vendas Balcão
-- Vendas Delivery
-- Outros
-
-### 3. Tipos TypeScript
-
+### Hook useAgenda - Reordenação
 ```typescript
-// src/types/finance.ts
-
-export type TransactionType = 'income' | 'expense' | 'transfer' | 'credit_card';
-export type AccountType = 'wallet' | 'bank' | 'credit_card';
-
-export interface FinanceAccount {
-  id: string;
-  user_id: string;
-  name: string;
-  type: AccountType;
-  balance: number;
-  color: string;
-  icon: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface FinanceCategory {
-  id: string;
-  user_id: string;
-  name: string;
-  type: 'income' | 'expense';
-  icon: string;
-  color: string;
-  parent_id: string | null;
-  is_system: boolean;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-  subcategories?: FinanceCategory[];
-}
-
-export interface FinanceTransaction {
-  id: string;
-  user_id: string;
-  type: TransactionType;
-  amount: number;
-  description: string;
-  category_id: string | null;
-  account_id: string | null;
-  to_account_id: string | null;
-  date: string;
-  is_paid: boolean;
-  is_fixed: boolean;
-  is_recurring: boolean;
-  recurring_interval: string | null;
-  tags: string[];
-  notes: string | null;
-  attachment_url: string | null;
-  created_at: string;
-  updated_at: string;
-  // Joined
-  category?: FinanceCategory;
-  account?: FinanceAccount;
-  to_account?: FinanceAccount;
-}
-
-export interface FinanceBudget {
-  id: string;
-  user_id: string;
-  category_id: string | null;
-  month: number;
-  year: number;
-  planned_amount: number;
-  created_at: string;
-  updated_at: string;
-  category?: FinanceCategory;
-}
-
-export interface MonthlyStats {
-  month: number;
-  year: number;
-  totalIncome: number;
-  totalExpense: number;
-  balance: number;
-  byCategory: { category: FinanceCategory; amount: number; percentage: number }[];
-}
+const reorderTasksMutation = useMutation({
+  mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+    const { error } = await supabase
+      .from('manager_tasks')
+      .upsert(updates.map(u => ({ id: u.id, sort_order: u.sort_order })));
+    if (error) throw error;
+  },
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manager-tasks'] }),
+});
 ```
 
-### 4. Hook Principal (useFinance)
-
+### Toggle de View (Agenda)
 ```typescript
-// src/hooks/useFinance.ts
+const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
 
-export function useFinance(selectedMonth: Date) {
-  const { user } = useAuth();
-  
-  // Estados
-  const [accounts, setAccounts] = useState<FinanceAccount[]>([]);
-  const [categories, setCategories] = useState<FinanceCategory[]>([]);
-  const [transactions, setTransactions] = useState<FinanceTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Buscar dados do mês selecionado
-  async function fetchMonthData() {
-    const startDate = startOfMonth(selectedMonth);
-    const endDate = endOfMonth(selectedMonth);
-    
-    // Buscar transações do mês
-    const { data } = await supabase
-      .from('finance_transactions')
-      .select(`
-        *,
-        category:finance_categories(*),
-        account:finance_accounts(*),
-        to_account:finance_accounts(*)
-      `)
-      .gte('date', format(startDate, 'yyyy-MM-dd'))
-      .lte('date', format(endDate, 'yyyy-MM-dd'))
-      .order('date', { ascending: false });
-      
-    setTransactions(data || []);
-  }
-
-  // CRUD de transações
-  async function addTransaction(data: Omit<FinanceTransaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
-    await supabase.from('finance_transactions').insert({
-      ...data,
-      user_id: user.id,
-    });
-    await fetchMonthData();
-    await fetchAccounts(); // Atualizar saldos
-  }
-
-  // Estatísticas do mês
-  const monthStats = useMemo(() => {
-    const income = transactions
-      .filter(t => t.type === 'income' && t.is_paid)
-      .reduce((sum, t) => sum + t.amount, 0);
-      
-    const expense = transactions
-      .filter(t => t.type !== 'income' && t.type !== 'transfer' && t.is_paid)
-      .reduce((sum, t) => sum + t.amount, 0);
-      
-    return { income, expense, balance: income - expense };
-  }, [transactions]);
-
-  // Transações por data (para lista agrupada)
-  const transactionsByDate = useMemo(() => {
-    const grouped: Record<string, FinanceTransaction[]> = {};
-    transactions.forEach(t => {
-      const dateKey = t.date;
-      if (!grouped[dateKey]) grouped[dateKey] = [];
-      grouped[dateKey].push(t);
-    });
-    return grouped;
-  }, [transactions]);
-
-  return {
-    accounts,
-    categories,
-    transactions,
-    transactionsByDate,
-    monthStats,
-    isLoading,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    addAccount,
-    updateAccount,
-    deleteAccount,
-    refetch: fetchMonthData,
-  };
-}
+// No header, substituir título por toggle:
+<div className="view-toggle-group">
+  <button className={viewMode === 'list' ? 'view-toggle-active' : 'view-toggle-inactive'}>
+    <ListChecks /> Lista
+  </button>
+  <button className={viewMode === 'calendar' ? 'view-toggle-active' : 'view-toggle-inactive'}>
+    <Calendar /> Calendário
+  </button>
+</div>
 ```
 
-### 5. Tela de Lançamento (TransactionSheet)
-
-Design igual ao Mobills - formulário rápido:
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                    NOVA DESPESA                    [X]      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  [  Despesa  ] [ Receita ] [ Transf. ] [ Cartão ]          │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  R$                                        0,00     │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-│  ☑ Pago                           📅 Hoje | Ontem | ...    │
-│                                                             │
-│  📁 Categoria                                       ▼      │
-│  💳 Conta                                           ▼      │
-│  📝 Descrição                                              │
-│                                                             │
-│  ── Opções Avançadas ──                                    │
-│  ☐ Despesa fixa                                            │
-│  ☐ Repetir                                                 │
-│  📎 Anexar comprovante                                     │
-│  🏷 Tags                                                   │
-│                                                             │
-│            [ SALVAR LANÇAMENTO ]                           │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 6. Tela de Gráficos
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  📊 Análise de Gastos                                       │
-│                                                             │
-│  [Categorias] [Linha do Tempo] [Barras]                    │
-│                                                             │
-│         ┌─────────────────────┐                            │
-│         │                     │                            │
-│         │    GRÁFICO PIZZA    │                            │
-│         │                     │                            │
-│         │   R$ 45.320,00      │                            │
-│         │   total do mês      │                            │
-│         └─────────────────────┘                            │
-│                                                             │
-│  Matéria-prima ████████████████████ 45%  R$ 20.394         │
-│  Folha Pagto   ████████████         28%  R$ 12.690         │
-│  Desp. Admin   ██████               12%  R$ 5.438          │
-│  Taxas Oper.   ████                  8%  R$ 3.626          │
-│  Outros        ██                    7%  R$ 3.172          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-
-Ao clicar em "Matéria-prima":
-
-┌─────────────────────────────────────────────────────────────┐
-│  ← Matéria-prima                        R$ 20.394,00       │
-│                                                             │
-│  Carnes       ██████████████████████  48%  R$ 9.789        │
-│  Bebidas      ████████████            25%  R$ 5.099        │
-│  Hortifruti   ██████                  12%  R$ 2.447        │
-│  Panificação  ████                     8%  R$ 1.632        │
-│  Outros       ██                       7%  R$ 1.427        │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 7. Navegação e Layout
-
-O módulo financeiro terá seu próprio layout interno com navegação inferior fixa:
-
+### Botões Vibrantes (Finance)
 ```typescript
-// src/pages/Finance.tsx
+// De:
+<Button variant="outline" className="bg-success/10 ...">
 
-export default function Finance() {
-  const [activeTab, setActiveTab] = useState<'home' | 'transactions' | 'charts' | 'planning' | 'more'>('home');
-  const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
-  const [transactionType, setTransactionType] = useState<TransactionType>('expense');
-
-  const handleAddTransaction = (type: TransactionType) => {
-    setTransactionType(type);
-    setTransactionSheetOpen(true);
-  };
-
-  return (
-    <AppLayout>
-      <div className="pb-20"> {/* Espaço para nav inferior */}
-        {activeTab === 'home' && <FinanceHome onAddTransaction={handleAddTransaction} />}
-        {activeTab === 'transactions' && <FinanceTransactions />}
-        {activeTab === 'charts' && <FinanceCharts />}
-        {activeTab === 'planning' && <FinancePlanning />}
-        {activeTab === 'more' && <FinanceMore />}
-      </div>
-
-      {/* Bottom Navigation (estilo Mobills) */}
-      <FinanceBottomNav
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onAddPress={() => handleAddTransaction('expense')}
-      />
-
-      <TransactionSheet
-        open={transactionSheetOpen}
-        onOpenChange={setTransactionSheetOpen}
-        defaultType={transactionType}
-      />
-    </AppLayout>
-  );
-}
+// Para:
+<button className="flex-col h-auto py-4 gap-2 rounded-2xl 
+  bg-gradient-to-br from-success to-success/80 
+  text-success-foreground shadow-lg shadow-success/30
+  hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
+  transition-all">
 ```
 
-### 8. Cores e Design
+---
 
-| Elemento | Cor | Classe CSS |
-|----------|-----|------------|
-| Receita | Verde | `text-success`, `bg-success` |
-| Despesa | Vermelho | `text-destructive`, `bg-destructive` |
-| Transferência | Azul | `text-primary`, `bg-primary` |
-| Cartão de Crédito | Roxo | `text-purple-500`, `bg-purple-500` |
-| Pendente | Amarelo | `text-warning`, `bg-warning` |
+## Ordem de Implementação
 
-### 9. Preparação para IA
+1. Criar migração SQL para `sort_order`
+2. Atualizar `useAgenda.ts` com reordenação e query ordenada por `sort_order`
+3. Implementar `handleDragEnd` funcional em `Agenda.tsx`
+4. Criar componente `AgendaCalendarView.tsx`
+5. Adicionar toggle de visualização em `Agenda.tsx`
+6. Redesenhar botões de ação em `FinanceHome.tsx`
+7. Padronizar visual do `CashClosing.tsx`
+8. Adicionar classes CSS globais para consistência
+9. Aplicar melhorias visuais nos componentes da Agenda
 
-O módulo será estruturado para permitir:
-- Análise de gastos recorrentes
-- Alertas de desvio (ex: matéria-prima acima da média)
-- Sugestões de economia
-- Integração futura com estoque (custo real de insumos)
-
-Os dados serão organizados de forma a facilitar queries analíticas via Edge Function.
-
-## Ordem de Execução
-
-1. **Migração do banco** - Tabelas, enums, triggers, RLS
-2. **Tipos TypeScript** - `src/types/finance.ts`
-3. **Hooks** - `useFinance.ts` e `useFinanceStats.ts`
-4. **Componentes base** - TransactionItem, AccountCard, CategoryPicker
-5. **Telas** - Home, Transactions, Charts, Planning, More
-6. **TransactionSheet** - Formulário de lançamento rápido
-7. **Bottom Navigation** - Navegação estilo Mobills
-8. **Página principal** - Finance.tsx
-9. **Navegação** - Adicionar link no menu lateral (admin only)
-10. **Rota** - Adicionar no App.tsx
+---
 
 ## Resultado Esperado
 
-- Módulo financeiro completo exclusivo para admins
-- Interface idêntica ao Mobills (fluxo e layout)
-- Lançamento de despesa em menos de 10 segundos
-- Gráficos por categoria com drill-down
-- Saldo em tempo real por conta
-- Histórico completo de transações
-- Mobile-first com navegação inferior
-- Base preparada para IA financeira futura
-- Integração futura com estoque possível
-
+- Lembretes mantêm a ordem definida pelo usuário ao arrastar
+- Visualização alternável entre lista e calendário na Agenda
+- Botões de transação financeira mais chamativos e intuitivos
+- Interface visual consistente em todo o sistema com cores padronizadas
