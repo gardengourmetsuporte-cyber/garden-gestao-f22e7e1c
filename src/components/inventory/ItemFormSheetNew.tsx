@@ -87,7 +87,7 @@ export function ItemFormSheetNew({
       current_stock: parseFloat(currentStock) || 0,
       min_stock: parseFloat(minStock) || 0,
       unit_price: unitPrice ? parseFloat(unitPrice) : null,
-      recipe_unit_type: recipeUnitType || null,
+      recipe_unit_type: recipeUnitType && recipeUnitType !== '__same__' ? recipeUnitType : null,
       recipe_unit_price: recipeUnitPrice ? parseFloat(recipeUnitPrice) : null,
     });
     
@@ -288,7 +288,7 @@ export function ItemFormSheetNew({
                     <SelectValue placeholder="Mesma do estoque" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="" className="text-base py-3">Mesma do estoque</SelectItem>
+                    <SelectItem value="__same__" className="text-base py-3">Mesma do estoque</SelectItem>
                     {getRecipeUnitOptions().map((option) => (
                       <SelectItem key={option.value} value={option.value} className="text-base py-3">
                         {option.label}
@@ -298,7 +298,7 @@ export function ItemFormSheetNew({
                 </Select>
               </div>
 
-              {recipeUnitType && (
+              {recipeUnitType && recipeUnitType !== '__same__' && (
                 <div className="space-y-2">
                   <Label htmlFor="recipeUnitPrice" className="text-base font-medium">
                     Preço por {recipeUnitType === 'kg' ? 'kg' : recipeUnitType === 'g' ? 'g' : recipeUnitType === 'litro' ? 'L' : recipeUnitType === 'ml' ? 'ml' : 'un'}
