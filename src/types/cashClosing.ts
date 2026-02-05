@@ -58,6 +58,7 @@ export interface CashClosing {
 export interface CashClosingFormData {
   date: string;
   unit_name: string;
+  initial_cash: number;
   cash_amount: number;
   debit_amount: number;
   credit_amount: number;
