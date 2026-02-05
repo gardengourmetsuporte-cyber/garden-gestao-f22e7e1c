@@ -819,6 +819,7 @@ export type Database = {
       }
       payment_method_settings: {
         Row: {
+          create_transaction: boolean
           created_at: string
           fee_percentage: number | null
           id: string
@@ -832,6 +833,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          create_transaction?: boolean
           created_at?: string
           fee_percentage?: number | null
           id?: string
@@ -845,6 +847,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          create_transaction?: boolean
           created_at?: string
           fee_percentage?: number | null
           id?: string

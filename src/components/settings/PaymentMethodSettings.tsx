@@ -5,6 +5,7 @@
  import { Label } from '@/components/ui/label';
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
  import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
  import { Loader2, Banknote, CreditCard, Smartphone, Utensils, Truck, Save } from 'lucide-react';
  
  const ICONS: Record<string, React.ElementType> = {
@@ -53,6 +54,7 @@
        settlement_days: localSetting.settlement_days,
        settlement_day_of_week: localSetting.settlement_day_of_week,
        fee_percentage: localSetting.fee_percentage,
+      create_transaction: localSetting.create_transaction,
      });
      setIsSaving(false);
    };
@@ -61,7 +63,8 @@
      localSetting.settlement_type !== setting.settlement_type ||
      localSetting.settlement_days !== setting.settlement_days ||
      localSetting.settlement_day_of_week !== setting.settlement_day_of_week ||
-     localSetting.fee_percentage !== setting.fee_percentage;
+    localSetting.fee_percentage !== setting.fee_percentage ||
+    localSetting.create_transaction !== setting.create_transaction;
  
    return (
      <Card className="relative overflow-hidden">
@@ -167,6 +170,20 @@
            )}
          </div>
  
+        <div className="flex items-center justify-between pt-2 border-t">
+          <div className="space-y-0.5">
+            <Label className="text-sm">Lançar no financeiro</Label>
+            <p className="text-xs text-muted-foreground">Criar transação ao aprovar fechamento</p>
+          </div>
+          <Switch
+            checked={localSetting.create_transaction}
+            onCheckedChange={(checked) => setLocalSetting(prev => ({
+              ...prev,
+              create_transaction: checked,
+            }))}
+          />
+        </div>
+
          {hasChanges && (
            <Button onClick={handleSave} disabled={isSaving} className="w-full" size="sm">
              {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}

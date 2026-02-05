@@ -12,6 +12,7 @@ interface PaymentSetting {
   settlement_days: number;
   settlement_day_of_week: number | null;
   fee_percentage: number;
+  create_transaction: boolean;
 }
  
  export function useCashClosing() {
@@ -280,7 +281,7 @@ interface PaymentSetting {
         };
 
        // Create income transactions for each payment method
-       if (closing.cash_amount > 0) {
+       if (closing.cash_amount > 0 && (getPaymentSetting('cash_amount')?.create_transaction !== false)) {
           const cashSetting = getPaymentSetting('cash_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, cashSetting);
           const netAmount = applyFee(closing.cash_amount, cashSetting);
@@ -298,7 +299,7 @@ interface PaymentSetting {
          });
        }
  
-       if (closing.debit_amount > 0) {
+       if (closing.debit_amount > 0 && (getPaymentSetting('debit_amount')?.create_transaction !== false)) {
           const debitSetting = getPaymentSetting('debit_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, debitSetting);
           const netAmount = applyFee(closing.debit_amount, debitSetting);
@@ -316,7 +317,7 @@ interface PaymentSetting {
          });
        }
  
-       if (closing.credit_amount > 0) {
+       if (closing.credit_amount > 0 && (getPaymentSetting('credit_amount')?.create_transaction !== false)) {
           const creditSetting = getPaymentSetting('credit_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, creditSetting);
           const netAmount = applyFee(closing.credit_amount, creditSetting);
@@ -334,7 +335,7 @@ interface PaymentSetting {
          });
        }
  
-       if (closing.pix_amount > 0) {
+       if (closing.pix_amount > 0 && (getPaymentSetting('pix_amount')?.create_transaction !== false)) {
           const pixSetting = getPaymentSetting('pix_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, pixSetting);
           const netAmount = applyFee(closing.pix_amount, pixSetting);
@@ -352,7 +353,7 @@ interface PaymentSetting {
          });
        }
  
-        if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0) {
+        if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0 && (getPaymentSetting('meal_voucher_amount')?.create_transaction !== false)) {
            const voucherSetting = getPaymentSetting('meal_voucher_amount');
            const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, voucherSetting);
            const netAmount = applyFee(closing.meal_voucher_amount, voucherSetting);
@@ -370,7 +371,7 @@ interface PaymentSetting {
           });
         }
 
-       if (closing.delivery_amount > 0) {
+       if (closing.delivery_amount > 0 && (getPaymentSetting('delivery_amount')?.create_transaction !== false)) {
           const deliverySetting = getPaymentSetting('delivery_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, deliverySetting);
           const netAmount = applyFee(closing.delivery_amount, deliverySetting);

@@ -17,6 +17,7 @@ interface FinanceTransactionsProps {
   monthStats: MonthlyStats;
   onTransactionClick: (transaction: FinanceTransaction) => void;
   onTogglePaid: (id: string, isPaid: boolean) => Promise<void>;
+  onDeleteTransaction: (id: string) => Promise<void>;
    categories: FinanceCategory[];
    accounts: FinanceAccount[];
 }
@@ -28,6 +29,7 @@ export function FinanceTransactions({
   monthStats,
   onTransactionClick,
    onTogglePaid,
+  onDeleteTransaction,
    categories,
    accounts
 }: FinanceTransactionsProps) {
@@ -143,6 +145,7 @@ export function FinanceTransactions({
                       transaction={transaction}
                       onClick={() => onTransactionClick(transaction)}
                       onTogglePaid={onTogglePaid}
+                     onDelete={onDeleteTransaction}
                     />
                      </div>
                   ))}
