@@ -86,31 +86,40 @@ export function FinanceHome({
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-3 gap-2">
-        <Button
-          variant="outline"
-          className="flex-col h-auto py-3 gap-1 bg-success/10 border-success/30 hover:bg-success/20"
+      <div className="grid grid-cols-3 gap-3">
+        <button
+          className="flex flex-col items-center justify-center h-auto py-4 gap-2 rounded-2xl 
+            bg-gradient-to-br from-success to-success/80 
+            text-success-foreground shadow-lg shadow-success/30
+            hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
+            transition-all border border-success/20"
           onClick={() => onAddTransaction('income')}
         >
-          <ArrowUpCircle className="w-5 h-5 text-success" />
-          <span className="text-xs">Receita</span>
-        </Button>
-        <Button
-          variant="outline"
-          className="flex-col h-auto py-3 gap-1 bg-destructive/10 border-destructive/30 hover:bg-destructive/20"
+          <ArrowUpCircle className="w-6 h-6" />
+          <span className="text-xs font-semibold">Receita</span>
+        </button>
+        <button
+          className="flex flex-col items-center justify-center h-auto py-4 gap-2 rounded-2xl 
+            bg-gradient-to-br from-destructive to-destructive/80 
+            text-destructive-foreground shadow-lg shadow-destructive/30
+            hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
+            transition-all border border-destructive/20"
           onClick={() => onAddTransaction('expense')}
         >
-          <ArrowDownCircle className="w-5 h-5 text-destructive" />
-          <span className="text-xs">Despesa</span>
-        </Button>
-        <Button
-          variant="outline"
-          className="flex-col h-auto py-3 gap-1"
+          <ArrowDownCircle className="w-6 h-6" />
+          <span className="text-xs font-semibold">Despesa</span>
+        </button>
+        <button
+          className="flex flex-col items-center justify-center h-auto py-4 gap-2 rounded-2xl 
+            bg-gradient-to-br from-primary to-primary/80 
+            text-primary-foreground shadow-lg shadow-primary/30
+            hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
+            transition-all border border-primary/20"
           onClick={() => onAddTransaction('transfer')}
         >
-          <ArrowLeftRight className="w-5 h-5 text-primary" />
-          <span className="text-xs">Transf.</span>
-        </Button>
+          <ArrowLeftRight className="w-6 h-6" />
+          <span className="text-xs font-semibold">Transf.</span>
+        </button>
       </div>
 
       {/* Accounts List */}

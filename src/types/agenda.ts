@@ -34,6 +34,7 @@ export interface ManagerTask {
   is_system_generated?: boolean;
   system_source?: string | null;
   source_data?: Record<string, unknown> | null;
+  sort_order?: number;
 }
 
 export interface ManagerAppointment {

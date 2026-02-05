@@ -18,7 +18,7 @@ const tabs: { id: FinanceTab; icon: typeof Home; label: string }[] = [
 export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: FinanceBottomNavProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 lg:left-72 z-40 bg-card border-t shadow-lg">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative safe-area-pb">
         {/* Left tabs */}
         {tabs.slice(0, 2).map(tab => (
           <button
@@ -40,7 +40,10 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: Finance
         <div className="flex-1 flex items-center justify-center">
           <button
             onClick={onAddPress}
-            className="absolute -top-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
+            className="absolute -top-6 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 
+              text-primary-foreground shadow-lg shadow-primary/30 
+              flex items-center justify-center 
+              hover:scale-105 active:scale-95 transition-all"
           >
             <Plus className="w-7 h-7" />
           </button>

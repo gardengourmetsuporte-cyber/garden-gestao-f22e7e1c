@@ -1,6 +1,5 @@
  import { Plus, X } from 'lucide-react';
  import { cn } from '@/lib/utils';
- import { Button } from '@/components/ui/button';
  import type { TaskCategory } from '@/types/agenda';
  
  interface CategoryChipsProps {
@@ -19,14 +18,14 @@
    onAddCategory,
  }: CategoryChipsProps) {
    return (
-     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
        <button
          onClick={() => onSelectCategory(null)}
          className={cn(
-           'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0',
+          'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 shadow-sm',
            selectedCategoryId === null
-             ? 'bg-primary text-primary-foreground'
-             : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            ? 'bg-primary text-primary-foreground shadow-primary/30'
+            : 'bg-card border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
          )}
        >
          Todos
@@ -37,10 +36,10 @@
            key={cat.id}
            onClick={() => onSelectCategory(cat.id)}
            className={cn(
-             'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 flex items-center gap-1.5 group',
+          'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 flex items-center gap-2 group shadow-sm',
              selectedCategoryId === cat.id
-               ? 'text-white'
-               : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            ? 'text-white shadow-lg'
+            : 'bg-card border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
            )}
            style={selectedCategoryId === cat.id ? { backgroundColor: cat.color } : undefined}
          >
@@ -62,14 +61,14 @@
        ))}
  
        {onAddCategory && (
-         <Button
-           variant="ghost"
-           size="sm"
+        <button
            onClick={onAddCategory}
-           className="rounded-full shrink-0 h-8 w-8 p-0"
+          className="w-10 h-10 flex items-center justify-center rounded-xl shrink-0 
+            bg-card border border-dashed border-border text-muted-foreground
+            hover:border-primary hover:text-primary transition-all"
          >
            <Plus className="w-4 h-4" />
-         </Button>
+        </button>
        )}
      </div>
    );
