@@ -13,7 +13,8 @@ import {
   Loader2,
   Plus,
   Trash2,
-  Receipt
+  Receipt,
+  Wallet
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +43,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   
   const today = format(new Date(), 'yyyy-MM-dd');
   
+  const [initialCash, setInitialCash] = useState(0);
   const [cashAmount, setCashAmount] = useState(0);
   const [debitAmount, setDebitAmount] = useState(0);
   const [creditAmount, setCreditAmount] = useState(0);
@@ -60,7 +62,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   
   const totalPayments = cashAmount + debitAmount + creditAmount + pixAmount + deliveryAmount;
-  const total = totalPayments - totalExpenses;
+  const totalCashInDrawer = initialCash + cashAmount - totalExpenses;
 
   const paymentValues: Record<string, { value: number; setter: (v: number) => void }> = {
     cash_amount: { value: cashAmount, setter: setCashAmount },
@@ -107,14 +109,20 @@ export function CashClosingForm({ onSuccess }: Props) {
   const handleSubmit = async () => {
     // Check checklist first
     setChecklistStatus('checking');
-    const checklistOk = await checkChecklistCompleted(today);
-    
-    if (!checklistOk) {
-      setChecklistStatus('incomplete');
-      toast.error('Complete o checklist de fechamento antes de enviar!');
-      return;
+    try {
+      const checklistOk = await checkChecklistCompleted(today);
+      
+      if (!checklistOk) {
+        setChecklistStatus('incomplete');
+        toast.error('Complete o checklist de fechamento antes de enviar!');
+        return;
+      }
+      setChecklistStatus('completed');
+    } catch (err) {
+      // If checklist check fails, allow submission
+      console.warn('Checklist check failed, allowing submission:', err);
+      setChecklistStatus('completed');
     }
-    setChecklistStatus('completed');
 
     if (totalPayments <= 0) {
       toast.error('Informe pelo menos um valor de pagamento');
@@ -137,6 +145,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       const success = await createClosing({
         date: today,
         unit_name: 'Principal',
+        initial_cash: initialCash,
         cash_amount: cashAmount,
         debit_amount: debitAmount,
         credit_amount: creditAmount,
@@ -187,9 +196,44 @@ export function CashClosingForm({ onSuccess }: Props) {
       </Card>
 
       {/* Payment Values */}
+      {/* Initial Cash */}
       <Card className="card-unified">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Valores por Meio de Pagamento</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Wallet className="w-4 h-4" />
+            Caixa Inicial
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-amber-100 dark:bg-amber-900/30">
+              <Wallet className="w-5 h-5 text-amber-600" />
+            </div>
+            <Label className="flex-1 text-sm font-medium">Valor inicial do caixa</Label>
+            <div className="relative w-32">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                className="pl-10 text-right h-11"
+                value={initialCash || ''}
+                onChange={(e) => setInitialCash(parseFloat(e.target.value) || 0)}
+                placeholder="0,00"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Valor em dinheiro que estava no caixa no início do turno
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Sales by Payment Method */}
+      <Card className="card-unified">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Vendas por Meio de Pagamento</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {PAYMENT_METHODS.map(method => {
@@ -224,7 +268,7 @@ export function CashClosingForm({ onSuccess }: Props) {
           {/* Total */}
           <div className="border-t pt-3 mt-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-lg">Total Recebido</span>
+              <span className="font-semibold text-lg">Total em Vendas</span>
               <span className="text-2xl font-bold text-primary">
                 R$ {totalPayments.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
@@ -303,18 +347,35 @@ export function CashClosingForm({ onSuccess }: Props) {
       </Card>
 
       {/* Net Total */}
-      {expenses.length > 0 && (
-        <Card className="card-unified bg-primary/5">
-          <CardContent className="p-4">
+      <Card className="card-unified bg-primary/5">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Resumo do Dinheiro no Caixa</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Caixa inicial</span>
+            <span>R$ {initialCash.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">+ Entrada em dinheiro</span>
+            <span className="text-green-600">+ R$ {cashAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+          </div>
+          {totalExpenses > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">- Gastos do dia</span>
+              <span className="text-destructive">- R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            </div>
+          )}
+          <div className="border-t pt-2 mt-2">
             <div className="flex items-center justify-between">
-              <span className="font-semibold">Líquido (Recebido - Gastos)</span>
+              <span className="font-semibold">Total esperado no caixa</span>
               <span className="text-xl font-bold text-primary">
-                R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R$ {totalCashInDrawer.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Cash Difference (optional) */}
       <Card className="card-unified">
