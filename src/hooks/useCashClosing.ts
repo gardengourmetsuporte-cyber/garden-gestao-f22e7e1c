@@ -202,10 +202,33 @@
          .limit(1);
  
        const defaultAccountId = accounts?.[0]?.id || null;
-       const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão');
-       const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery');
+       
+       // Find main categories
+       const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
+       const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
+       
+       // Find specific subcategories for each payment method
+       const dinheiroSubcat = categories?.find(c => c.name === 'Dinheiro' && c.parent_id === balcaoCategory?.id);
+       const debitoSubcat = categories?.find(c => c.name === 'Cartão Débito' && c.parent_id === balcaoCategory?.id);
+       const creditoSubcat = categories?.find(c => c.name === 'Cartão Crédito' && c.parent_id === balcaoCategory?.id);
+       const pixSubcat = categories?.find(c => c.name === 'Pix' && c.parent_id === balcaoCategory?.id);
+       const ifoodSubcat = categories?.find(c => c.name === 'iFood' && c.parent_id === deliveryCategory?.id);
  
        const transactions = [];
+       
+       // Helper function to calculate business days offset
+       const addBusinessDays = (dateStr: string, days: number): string => {
+         const date = new Date(dateStr);
+         let added = 0;
+         while (added < days) {
+           date.setDate(date.getDate() + 1);
+           const dayOfWeek = date.getDay();
+           if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+             added++;
+           }
+         }
+         return format(date, 'yyyy-MM-dd');
+       };
  
        // Create income transactions for each payment method
        if (closing.cash_amount > 0) {
@@ -214,10 +237,11 @@
            type: 'income',
            amount: closing.cash_amount,
            description: `Fechamento caixa - Dinheiro (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: balcaoCategory?.id || null,
+           category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
            date: closing.date,
            is_paid: true,
+           notes: 'Lançamento automático - Dinheiro cai na hora',
          });
        }
  
@@ -227,10 +251,11 @@
            type: 'income',
            amount: closing.debit_amount,
            description: `Fechamento caixa - Débito (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: balcaoCategory?.id || null,
+           category_id: debitoSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
-           date: closing.date,
-           is_paid: true,
+           date: addBusinessDays(closing.date, 1),
+           is_paid: false,
+           notes: 'Lançamento automático - Débito: +1 dia útil',
          });
        }
  
@@ -240,10 +265,11 @@
            type: 'income',
            amount: closing.credit_amount,
            description: `Fechamento caixa - Crédito (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: balcaoCategory?.id || null,
+           category_id: creditoSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
-           date: closing.date,
-           is_paid: true,
+           date: addBusinessDays(closing.date, 1),
+           is_paid: false,
+           notes: 'Lançamento automático - Crédito: +1 dia útil',
          });
        }
  
@@ -253,10 +279,11 @@
            type: 'income',
            amount: closing.pix_amount,
            description: `Fechamento caixa - Pix (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: balcaoCategory?.id || null,
+           category_id: pixSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
            date: closing.date,
            is_paid: true,
+           notes: 'Lançamento automático - Pix cai na hora',
          });
        }
  
@@ -269,21 +296,58 @@
             category_id: balcaoCategory?.id || null,
             account_id: defaultAccountId,
             date: closing.date,
-            is_paid: true,
+            is_paid: false,
+            notes: 'Lançamento automático - Vale Alimentação: conferir prazo',
           });
         }
 
        if (closing.delivery_amount > 0) {
+         // Get the next Wednesday for iFood payment
+         const getNextWednesday = (dateStr: string): string => {
+           const date = new Date(dateStr);
+           const dayOfWeek = date.getDay();
+           const daysUntilWednesday = (3 - dayOfWeek + 7) % 7 || 7;
+           date.setDate(date.getDate() + daysUntilWednesday);
+           return format(date, 'yyyy-MM-dd');
+         };
+         
          transactions.push({
            user_id: user.id,
            type: 'income',
            amount: closing.delivery_amount,
            description: `Fechamento caixa - Delivery (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: deliveryCategory?.id || null,
+           category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
            account_id: defaultAccountId,
-           date: closing.date,
-           is_paid: true,
+           date: getNextWednesday(closing.date),
+           is_paid: false,
+           notes: 'Lançamento automático - iFood: toda quarta-feira',
          });
+       }
+ 
+       // Create expense transactions from cash closing expenses
+       if (closing.expenses && Array.isArray(closing.expenses)) {
+         // Get expense categories
+         const { data: expenseCategories } = await supabase
+           .from('finance_categories')
+           .select('*')
+           .eq('user_id', user.id)
+           .eq('type', 'expense');
+         
+         for (const expense of closing.expenses as any[]) {
+           if (expense.amount && expense.amount > 0) {
+             transactions.push({
+               user_id: user.id,
+               type: 'expense',
+               amount: expense.amount,
+               description: expense.description || 'Gasto do dia',
+               category_id: null, // Could be improved with category matching
+               account_id: defaultAccountId,
+               date: closing.date,
+               is_paid: true,
+               notes: 'Lançamento automático do fechamento de caixa',
+             });
+           }
+         }
        }
  
        if (transactions.length > 0) {
