@@ -159,6 +159,7 @@ export default function Finance() {
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}
         onUpdateRecurring={updateRecurringTransaction}
+        onRefreshCategories={handleRefreshCategories}
       />
 
       {/* Account Management from Home */}

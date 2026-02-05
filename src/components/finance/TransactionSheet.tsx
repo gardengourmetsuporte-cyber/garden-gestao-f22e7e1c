@@ -39,6 +39,7 @@ interface TransactionSheetProps {
   editingTransaction?: FinanceTransaction | null;
   onUpdateRecurring?: (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => Promise<void>;
   onSaveAndContinue?: (data: TransactionFormData) => Promise<void>;
+  onRefreshCategories?: () => Promise<void>;
 }
 
 const RECURRING_OPTIONS = [
@@ -62,7 +63,8 @@ export function TransactionSheet({
   onDelete,
   editingTransaction,
   onUpdateRecurring,
-  onSaveAndContinue
+  onSaveAndContinue,
+  onRefreshCategories
 }: TransactionSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -617,6 +619,7 @@ export function TransactionSheet({
         type={type === 'income' ? 'income' : 'expense'}
         selectedId={categoryId}
         onSelect={(cat) => setCategoryId(cat.id)}
+        onRefreshCategories={onRefreshCategories}
       />
       
       {/* Recurring Edit Mode Dialog */}
