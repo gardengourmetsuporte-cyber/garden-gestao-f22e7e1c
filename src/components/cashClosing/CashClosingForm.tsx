@@ -37,11 +37,12 @@ interface ExpenseItem {
 }
 
 export function CashClosingForm({ onSuccess }: Props) {
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const { uploadReceipt, createClosing, checkChecklistCompleted } = useCashClosing();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const today = format(new Date(), 'yyyy-MM-dd');
+  // Use UTC date string to match backend date columns (avoids timezone issues after midnight)
+  const today = new Date().toISOString().slice(0, 10);
   
   const [initialCash, setInitialCash] = useState(0);
   const [cashAmount, setCashAmount] = useState(0);
@@ -107,6 +108,10 @@ export function CashClosingForm({ onSuccess }: Props) {
   };
 
   const handleSubmit = async () => {
+    // Admin can bypass checklist requirement when needed
+    if (isAdmin) {
+      setChecklistStatus('completed');
+    } else {
     // Check checklist first
     setChecklistStatus('checking');
     try {
@@ -122,6 +127,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       // If checklist check fails, allow submission
       console.warn('Checklist check failed, allowing submission:', err);
       setChecklistStatus('completed');
+    }
     }
 
     if (totalPayments <= 0) {
@@ -206,8 +212,8 @@ export function CashClosingForm({ onSuccess }: Props) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-amber-100 dark:bg-amber-900/30">
-              <Wallet className="w-5 h-5 text-amber-600" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-warning/10">
+              <Wallet className="w-5 h-5 text-warning" />
             </div>
             <Label className="flex-1 text-sm font-medium">Valor inicial do caixa</Label>
             <div className="relative w-32">
@@ -358,7 +364,7 @@ export function CashClosingForm({ onSuccess }: Props) {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">+ Entrada em dinheiro</span>
-            <span className="text-green-600">+ R$ {cashAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-success">+ R$ {cashAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           {totalExpenses > 0 && (
             <div className="flex justify-between text-sm">
@@ -396,7 +402,7 @@ export function CashClosingForm({ onSuccess }: Props) {
             </div>
           </div>
           {cashDifference !== 0 && (
-            <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+            <p className="text-xs text-warning mt-2 flex items-center gap-1">
               <AlertCircle className="w-3 h-3" />
               {cashDifference > 0 ? 'Sobra' : 'Falta'} no caixa será registrada
             </p>

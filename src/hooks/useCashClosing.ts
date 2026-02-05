@@ -307,7 +307,7 @@
      }
    };
  
-   const checkChecklistCompleted = async (date: string): Promise<boolean> => {
+    const checkChecklistCompleted = async (date: string): Promise<boolean> => {
      if (!user) return false;
  
      try {
@@ -325,11 +325,13 @@
        }
  
        // Check completions for today
-       const { data: completions } = await supabase
+        const { data: completions } = await supabase
          .from('checklist_completions')
          .select('item_id')
          .eq('date', date)
-         .eq('checklist_type', 'fechamento');
+          .eq('checklist_type', 'fechamento')
+          // checklist completions are user-scoped in the app
+          .eq('completed_by', user.id);
  
        const completedIds = new Set(completions?.map(c => c.item_id) || []);
        const allCompleted = items.every(item => completedIds.has(item.id));
