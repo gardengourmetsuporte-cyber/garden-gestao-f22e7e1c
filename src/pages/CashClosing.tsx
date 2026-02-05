@@ -1,5 +1,5 @@
  import { useState } from 'react';
- import { Plus, List, LayoutDashboard } from 'lucide-react';
+import { Plus, List, LayoutDashboard, Receipt } from 'lucide-react';
  import { Button } from '@/components/ui/button';
  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
  import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -30,17 +30,27 @@
      <AppLayout 
      >
       <div className="p-4 space-y-4 pb-24">
-        {/* Page Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/')}
-            className="shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Fechamento de Caixa</h1>
+         {/* Page Header - Unified Style */}
+         <div className="flex items-start justify-between">
+           <div className="flex items-center gap-3">
+             <Button
+               variant="ghost"
+               size="icon"
+               onClick={() => navigate('/')}
+               className="shrink-0 rounded-xl"
+             >
+               <ArrowLeft className="w-5 h-5" />
+             </Button>
+             <div className="p-2.5 rounded-xl bg-primary/10">
+               <Receipt className="w-6 h-6 text-primary" />
+             </div>
+             <div>
+               <h1 className="text-xl font-bold text-foreground">Fechamento de Caixa</h1>
+               <p className="text-sm text-muted-foreground">
+                 {closings.length} registro{closings.length !== 1 ? 's' : ''}
+               </p>
+             </div>
+           </div>
         </div>
 
          {/* Admin Tabs */}
@@ -83,8 +93,11 @@
          <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
            <SheetTrigger asChild>
              <Button
-               size="lg"
-               className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg z-50"
+                size="icon"
+                className="fixed bottom-20 right-4 h-14 w-14 rounded-2xl 
+                  bg-gradient-to-br from-primary to-primary/80 
+                  shadow-lg shadow-primary/30 z-50
+                  hover:scale-105 active:scale-95 transition-all"
              >
                <Plus className="w-6 h-6" />
              </Button>

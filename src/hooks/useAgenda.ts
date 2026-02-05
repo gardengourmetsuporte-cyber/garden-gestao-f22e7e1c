@@ -5,6 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import type { ManagerTask, TaskCategory } from '@/types/agenda';
 
+interface ReorderUpdate {
+  id: string;
+  sort_order: number;
+}
+
 export function useAgenda() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -36,8 +41,8 @@ export function useAgenda() {
         .from('manager_tasks')
         .select('*, category:task_categories(*)')
         .eq('user_id', user.id)
-        .order('due_date', { ascending: true, nullsFirst: true })
-        .order('created_at', { ascending: true });
+        .order('sort_order', { ascending: true })
+        .order('due_date', { ascending: true, nullsFirst: true });
       
       if (error) throw error;
       return data as ManagerTask[];
@@ -133,6 +138,29 @@ export function useAgenda() {
     },
   });
 
+  // Reorder tasks mutation
+  const reorderTasksMutation = useMutation({
+    mutationFn: async (updates: ReorderUpdate[]) => {
+      // Batch update all sort_order values
+      const promises = updates.map(({ id, sort_order }) =>
+        supabase
+          .from('manager_tasks')
+          .update({ sort_order })
+          .eq('id', id)
+      );
+      
+      const results = await Promise.all(promises);
+      const error = results.find(r => r.error)?.error;
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
+    },
+    onError: () => {
+      toast({ title: 'Erro ao reordenar', variant: 'destructive' });
+    },
+  });
+
   // Add category mutation
   const addCategoryMutation = useMutation({
     mutationFn: async (category: { name: string; color: string; icon?: string }) => {
@@ -185,6 +213,7 @@ export function useAgenda() {
     deleteTask: deleteTaskMutation.mutate,
     addCategory: addCategoryMutation.mutate,
     deleteCategory: deleteCategoryMutation.mutate,
+    reorderTasks: reorderTasksMutation.mutate,
     isAddingTask: addTaskMutation.isPending,
     isUpdatingTask: updateTaskMutation.isPending,
   };

@@ -124,40 +124,40 @@
  
    return (
      <Sheet open={open} onOpenChange={onOpenChange}>
-       <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-2xl overflow-y-auto">
-         <SheetHeader className="text-left">
+      <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl overflow-y-auto">
+        <SheetHeader className="text-left pb-2">
            <SheetTitle>{editingTask ? 'Editar Lembrete' : 'Novo Lembrete'}</SheetTitle>
-           <SheetDescription>
+          <SheetDescription className="text-muted-foreground">
              {editingTask ? 'Atualize as informações do lembrete' : 'Adicione um lembrete com data opcional'}
            </SheetDescription>
          </SheetHeader>
  
          <form onSubmit={handleSubmit} className="space-y-4 mt-4 pb-4">
            {/* Title & Notes */}
-           <div className="bg-muted/50 rounded-xl p-3 space-y-2">
+          <div className="bg-secondary/50 rounded-2xl p-4 space-y-2 border border-border">
              <Input
                placeholder="Título"
                value={title}
                onChange={(e) => setTitle(e.target.value)}
-               className="h-11 border-0 bg-transparent px-0 text-base font-medium focus-visible:ring-0"
+              className="h-12 border-0 bg-transparent px-0 text-lg font-semibold focus-visible:ring-0 placeholder:text-muted-foreground/60"
                autoFocus
              />
              <Textarea
                placeholder="Notas"
                value={notes}
                onChange={(e) => setNotes(e.target.value)}
-               className="min-h-[60px] border-0 bg-transparent px-0 resize-none focus-visible:ring-0"
+              className="min-h-[60px] border-0 bg-transparent px-0 resize-none focus-visible:ring-0 placeholder:text-muted-foreground/60"
              />
            </div>
  
            {/* Category */}
-           <div className="bg-muted/50 rounded-xl p-3">
+          <div className="bg-secondary/50 rounded-2xl p-4 border border-border">
              <div className="flex items-center justify-between">
                <div className="flex items-center gap-3">
-                 <div className="p-2 rounded-lg bg-primary/10">
+                <div className="p-2.5 rounded-xl bg-primary/10">
                    <Folder className="w-4 h-4 text-primary" />
                  </div>
-                 <p className="font-medium text-sm">Categoria</p>
+                <p className="font-semibold text-sm">Categoria</p>
                </div>
                <Select 
                  value={categoryId || 'none'} 
@@ -223,14 +223,14 @@
            </div>
  
            {/* Date & Time */}
-           <div className="bg-muted/50 rounded-xl divide-y divide-border">
-             <div className="flex items-center justify-between p-3">
+          <div className="bg-secondary/50 rounded-2xl divide-y divide-border border border-border">
+            <div className="flex items-center justify-between p-4">
                <div className="flex items-center gap-3">
-                 <div className="p-2 rounded-lg bg-destructive/10">
+                <div className="p-2.5 rounded-xl bg-destructive/10">
                    <CalendarIcon className="w-4 h-4 text-destructive" />
                  </div>
                  <div>
-                   <p className="font-medium text-sm">Data</p>
+                  <p className="font-semibold text-sm">Data</p>
                    {hasDate && (
                      <Popover>
                        <PopoverTrigger asChild>
@@ -248,13 +248,13 @@
                <Switch checked={hasDate} onCheckedChange={setHasDate} />
              </div>
  
-             <div className="flex items-center justify-between p-3">
+            <div className="flex items-center justify-between p-4">
                <div className="flex items-center gap-3">
-                 <div className="p-2 rounded-lg bg-primary/10">
+                <div className="p-2.5 rounded-xl bg-primary/10">
                    <Clock className="w-4 h-4 text-primary" />
                  </div>
                  <div>
-                   <p className="font-medium text-sm">Horário</p>
+                  <p className="font-semibold text-sm">Horário</p>
                    {hasTime && (
                      <input 
                        type="time" 
@@ -271,11 +271,11 @@
  
            <div className="flex gap-2">
              {editingTask && onDelete && (
-               <Button type="button" variant="destructive" className="h-12" onClick={handleDelete}>
+              <Button type="button" variant="destructive" className="h-12 rounded-xl" onClick={handleDelete}>
                  Excluir
                </Button>
              )}
-             <Button type="submit" className="flex-1 h-12" disabled={!title.trim() || isSubmitting}>
+            <Button type="submit" className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20" disabled={!title.trim() || isSubmitting}>
                {isSubmitting ? 'Salvando...' : editingTask ? 'Salvar' : 'Criar Lembrete'}
              </Button>
            </div>

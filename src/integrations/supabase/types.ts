@@ -691,6 +691,7 @@ export type Database = {
           notes: string | null
           period: Database["public"]["Enums"]["day_period"]
           priority: Database["public"]["Enums"]["task_priority"]
+          sort_order: number | null
           source_data: Json | null
           system_source: string | null
           title: string
@@ -710,6 +711,7 @@ export type Database = {
           notes?: string | null
           period?: Database["public"]["Enums"]["day_period"]
           priority?: Database["public"]["Enums"]["task_priority"]
+          sort_order?: number | null
           source_data?: Json | null
           system_source?: string | null
           title: string
@@ -729,6 +731,7 @@ export type Database = {
           notes?: string | null
           period?: Database["public"]["Enums"]["day_period"]
           priority?: Database["public"]["Enums"]["task_priority"]
+          sort_order?: number | null
           source_data?: Json | null
           system_source?: string | null
           title?: string
