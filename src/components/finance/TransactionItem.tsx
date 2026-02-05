@@ -34,7 +34,7 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }
       case 'transfer':
         return <ArrowLeftRight className="w-5 h-5 text-primary" />;
       case 'credit_card':
-        return <CreditCard className="w-5 h-5 text-purple-500" />;
+        return <CreditCard className="w-5 h-5 text-primary" />;
     }
   };
 
@@ -99,21 +99,30 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }
       const absX = Math.abs(diffX);
       const absY = Math.abs(diffY);
 
-      if (absX < DEADZONE && absY < DEADZONE) return;
+      // deadzone maior pra não abrir no scroll
+      if (absX < 14 && absY < 14) return;
 
-      isGestureLocked.current = absX > absY ? 'horizontal' : 'vertical';
+      // Só considera "horizontal" se for claramente dominante
+      // (evita abrir quando você está rolando e tem micro-movimento lateral)
+      const isHorizontal = absX > absY * 1.6 && absX >= 18;
+      const isVertical = absY > absX * 1.2 && absY >= 14;
+
+      if (isHorizontal) isGestureLocked.current = 'horizontal';
+      else if (isVertical) isGestureLocked.current = 'vertical';
+      else return; // ainda indefinido
     }
 
     if (isGestureLocked.current === 'vertical') {
-      // scrolling: keep list smooth and close any partial swipe
-      if (swipeOffset !== 0) setSwipeOffset(0);
+      // scrolling: fecha e não tenta mais mexer no offset nessa interação
+      setSwipeOffset((prev) => (prev === 0 ? 0 : 0));
+      isSwiping.current = false;
       return;
     }
 
     // clamp: only allow left swipe
     const clamped = Math.max(0, Math.min(diffX, MAX_SWIPE));
     setSwipeOffset(clamped);
-  }, [swipeOffset]);
+  }, []);
 
   const handleTouchEnd = useCallback(() => {
     isSwiping.current = false;
@@ -137,7 +146,7 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }
           disabled={isToggling}
           className={cn(
             'w-[70px] flex items-center justify-center transition-colors',
-            is_paid ? 'bg-amber-500 hover:bg-amber-600' : 'bg-success hover:bg-success/90'
+            is_paid ? 'bg-warning hover:bg-warning/90' : 'bg-success hover:bg-success/90'
           )}
         >
           {isToggling ? (
