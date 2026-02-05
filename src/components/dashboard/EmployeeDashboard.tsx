@@ -3,7 +3,8 @@ import {
   ClipboardCheck, 
   Gift, 
   Package,
-  ArrowRight
+  ArrowRight,
+  Receipt
 } from 'lucide-react';
 import { UserPointsCard } from './UserPointsCard';
 import { Leaderboard } from './Leaderboard';
@@ -40,24 +41,34 @@ export function EmployeeDashboard() {
       <UserPointsCard />
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         <Link to="/checklists">
-          <div className="card-interactive p-5 flex flex-col items-center text-center h-full">
-            <div className="w-14 h-14 rounded-2xl bg-success/10 text-success flex items-center justify-center mb-3">
-              <ClipboardCheck className="w-7 h-7" />
+          <div className="card-interactive p-4 flex flex-col items-center text-center h-full">
+            <div className="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center mb-2">
+              <ClipboardCheck className="w-6 h-6" />
             </div>
-            <p className="font-semibold text-lg">Checklists</p>
-            <p className="text-sm text-muted-foreground">Ganhe pontos</p>
+            <p className="font-semibold text-sm">Checklists</p>
+            <p className="text-xs text-muted-foreground">Ganhe pontos</p>
+          </div>
+        </Link>
+
+        <Link to="/cash-closing">
+          <div className="card-interactive p-4 flex flex-col items-center text-center h-full">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-2">
+              <Receipt className="w-6 h-6" />
+            </div>
+            <p className="font-semibold text-sm">Caixa</p>
+            <p className="text-xs text-muted-foreground">Fechamento</p>
           </div>
         </Link>
 
         <Link to="/rewards">
-          <div className="card-interactive p-5 flex flex-col items-center text-center relative h-full">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-3">
-              <Gift className="w-7 h-7" />
+          <div className="card-interactive p-4 flex flex-col items-center text-center relative h-full">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-2">
+              <Gift className="w-6 h-6" />
             </div>
-            <p className="font-semibold text-lg">Recompensas</p>
-            <p className="text-sm text-muted-foreground">Troque pontos</p>
+            <p className="font-semibold text-sm">Recompensas</p>
+            <p className="text-xs text-muted-foreground">Troque</p>
             {pendingRedemptions > 0 && (
               <span className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold">
                 {pendingRedemptions}
@@ -76,7 +87,7 @@ export function EmployeeDashboard() {
       />
 
       {/* Inventory Link */}
-      <Link to="/">
+      <Link to="/inventory">
         <div className="card-interactive p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">

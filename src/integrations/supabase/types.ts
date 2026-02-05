@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      cash_closings: {
+        Row: {
+          cash_amount: number
+          cash_difference: number | null
+          created_at: string
+          credit_amount: number
+          date: string
+          debit_amount: number
+          delivery_amount: number
+          financial_integrated: boolean
+          id: string
+          notes: string | null
+          pix_amount: number
+          receipt_url: string
+          status: Database["public"]["Enums"]["cash_closing_status"]
+          total_amount: number | null
+          unit_name: string
+          updated_at: string
+          user_id: string
+          validated_at: string | null
+          validated_by: string | null
+          validation_notes: string | null
+        }
+        Insert: {
+          cash_amount?: number
+          cash_difference?: number | null
+          created_at?: string
+          credit_amount?: number
+          date: string
+          debit_amount?: number
+          delivery_amount?: number
+          financial_integrated?: boolean
+          id?: string
+          notes?: string | null
+          pix_amount?: number
+          receipt_url: string
+          status?: Database["public"]["Enums"]["cash_closing_status"]
+          total_amount?: number | null
+          unit_name?: string
+          updated_at?: string
+          user_id: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+        }
+        Update: {
+          cash_amount?: number
+          cash_difference?: number | null
+          created_at?: string
+          credit_amount?: number
+          date?: string
+          debit_amount?: number
+          delivery_amount?: number
+          financial_integrated?: boolean
+          id?: string
+          notes?: string | null
+          pix_amount?: number
+          receipt_url?: string
+          status?: Database["public"]["Enums"]["cash_closing_status"]
+          total_amount?: number | null
+          unit_name?: string
+          updated_at?: string
+          user_id?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string
@@ -984,6 +1053,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "funcionario"
+      cash_closing_status: "pending" | "approved" | "divergent"
       checklist_type: "abertura" | "fechamento" | "limpeza"
       day_period: "morning" | "afternoon" | "evening"
       movement_type: "entrada" | "saida"
@@ -1121,6 +1191,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "funcionario"],
+      cash_closing_status: ["pending", "approved", "divergent"],
       checklist_type: ["abertura", "fechamento", "limpeza"],
       day_period: ["morning", "afternoon", "evening"],
       movement_type: ["entrada", "saida"],

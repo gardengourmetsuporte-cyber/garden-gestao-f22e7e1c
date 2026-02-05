@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield, Gift, CalendarDays, DollarSign } from 'lucide-react';
+ import { LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X, ChevronRight, User, Shield, Gift, CalendarDays, DollarSign, Receipt } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
@@ -43,6 +43,11 @@ const navItems: NavItem[] = [
     icon: ClipboardCheck,
     label: 'Checklists',
     href: '/checklists'
+  },
+  {
+    icon: Receipt,
+    label: 'Fechamento Caixa',
+    href: '/cash-closing'
   },
   {
     icon: Gift,
