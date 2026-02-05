@@ -65,7 +65,6 @@ export default function ChecklistsPage() {
   const handleAddSector = async (data: { name: string; color: string }) => {
     try {
       await addSector(data);
-      toast.success('Setor criado!');
     } catch (error) {
       toast.error('Erro ao criar setor');
     }
@@ -74,7 +73,6 @@ export default function ChecklistsPage() {
   const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
     try {
       await updateSector(id, data);
-      toast.success('Setor atualizado!');
     } catch (error) {
       toast.error('Erro ao atualizar setor');
     }
@@ -83,7 +81,6 @@ export default function ChecklistsPage() {
   const handleDeleteSector = async (id: string) => {
     try {
       await deleteSector(id);
-      toast.success('Setor excluído!');
     } catch (error) {
       toast.error('Erro ao excluir setor');
     }
@@ -92,7 +89,6 @@ export default function ChecklistsPage() {
   const handleAddSubcategory = async (data: { sector_id: string; name: string }) => {
     try {
       await addSubcategory(data);
-      toast.success('Subcategoria criada!');
     } catch (error) {
       toast.error('Erro ao criar subcategoria');
     }
@@ -101,7 +97,6 @@ export default function ChecklistsPage() {
   const handleUpdateSubcategory = async (id: string, data: { name?: string }) => {
     try {
       await updateSubcategory(id, data);
-      toast.success('Subcategoria atualizada!');
     } catch (error) {
       toast.error('Erro ao atualizar subcategoria');
     }
@@ -110,7 +105,6 @@ export default function ChecklistsPage() {
   const handleDeleteSubcategory = async (id: string) => {
     try {
       await deleteSubcategory(id);
-      toast.success('Subcategoria excluída!');
     } catch (error) {
       toast.error('Erro ao excluir subcategoria');
     }
@@ -119,7 +113,6 @@ export default function ChecklistsPage() {
   const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string }) => {
     try {
       await addItem(data);
-      toast.success('Item criado!');
     } catch (error) {
       toast.error('Erro ao criar item');
     }
@@ -128,7 +121,6 @@ export default function ChecklistsPage() {
   const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean }) => {
     try {
       await updateItem(id, data);
-      toast.success('Item atualizado!');
     } catch (error) {
       toast.error('Erro ao atualizar item');
     }
@@ -137,7 +129,6 @@ export default function ChecklistsPage() {
   const handleDeleteItem = async (id: string) => {
     try {
       await deleteItem(id);
-      toast.success('Item excluído!');
     } catch (error) {
       toast.error('Erro ao excluir item');
     }

@@ -149,11 +149,10 @@
        
        if (error) throw error;
      },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ['recipe-cost-settings'] });
-       queryClient.invalidateQueries({ queryKey: ['monthly-fixed-cost'] });
-       toast.success('Configurações salvas!');
-     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recipe-cost-settings'] });
+      queryClient.invalidateQueries({ queryKey: ['monthly-fixed-cost'] });
+    },
      onError: () => {
        toast.error('Erro ao salvar configurações');
      },

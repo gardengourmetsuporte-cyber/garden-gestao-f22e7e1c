@@ -137,10 +137,8 @@ export default function InventoryPage() {
     try {
       if (editingItem) {
         await updateItem(editingItem.id, data);
-        toast.success('Item atualizado!');
       } else {
         await addItem(data);
-        toast.success('Item adicionado!');
       }
     } catch (error) {
       toast.error('Erro ao salvar item');
@@ -150,7 +148,6 @@ export default function InventoryPage() {
   const handleDeleteItem = async (id: string) => {
     try {
       await deleteItem(id);
-      toast.success('Item excluído!');
     } catch (error) {
       toast.error('Erro ao excluir item');
     }
@@ -159,7 +156,6 @@ export default function InventoryPage() {
   const handleMovement = async (itemId: string, type: 'entrada' | 'saida', quantity: number, notes?: string) => {
     try {
       await registerMovement(itemId, type, quantity, notes);
-      toast.success(type === 'entrada' ? 'Entrada registrada!' : 'Saída registrada!');
     } catch (error) {
       toast.error('Erro ao registrar movimentação');
     }
@@ -168,7 +164,6 @@ export default function InventoryPage() {
   const handleCreateOrder = async (supplierId: string, orderItems: { item_id: string; quantity: number }[]) => {
     try {
       await createOrder(supplierId, orderItems);
-      toast.success('Pedido criado!');
     } catch (error) {
       toast.error('Erro ao criar pedido');
     }
@@ -179,7 +174,6 @@ export default function InventoryPage() {
       const order = orders.find(o => o.id === orderId);
       if (order?.status === 'draft') {
         await updateOrderStatus(orderId, 'sent');
-        toast.success('Pedido marcado como enviado!');
       }
     } catch (error) {
       toast.error('Erro ao atualizar pedido');
@@ -203,7 +197,6 @@ export default function InventoryPage() {
   const handleDeleteOrder = async (orderId: string) => {
     try {
       await deleteOrder(orderId);
-      toast.success('Pedido excluído!');
     } catch (error) {
       toast.error('Erro ao excluir pedido');
     }

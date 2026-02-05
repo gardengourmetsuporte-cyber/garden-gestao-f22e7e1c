@@ -197,7 +197,6 @@ export function TransactionSheet({
         });
       }
 
-      toast.success(`Criados ${count} lançamentos. Os próximos aparecem nos meses seguintes.`);
     } else {
       // Single transaction
       await onSave({

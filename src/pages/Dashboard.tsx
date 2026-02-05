@@ -60,21 +60,17 @@ export default function Dashboard() {
   const handleSaveItem = (data: Omit<InventoryItem, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingItem) {
       updateItem(editingItem.id, data);
-      toast.success('Item atualizado!');
     } else {
       addItem(data);
-      toast.success('Item adicionado!');
     }
   };
 
   const handleDeleteItem = (id: string) => {
     deleteItem(id);
-    toast.success('Item excluído!');
   };
 
   const handleMovement = (itemId: string, type: 'entrada' | 'saida', quantity: number, notes?: string) => {
     registerMovement(itemId, type, quantity, notes);
-    toast.success(type === 'entrada' ? 'Entrada registrada!' : 'Saída registrada!');
   };
 
   if (isLoading) {

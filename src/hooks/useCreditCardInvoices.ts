@@ -141,7 +141,6 @@ export function useCreditCardInvoices() {
       .update({ is_paid: true })
       .eq('credit_card_invoice_id', invoiceId);
 
-    toast.success('Fatura paga com sucesso!');
     await fetchInvoices();
   };
 
@@ -174,7 +173,6 @@ export function useCreditCardInvoices() {
       return;
     }
 
-    toast.success('Fatura excluída!');
     await fetchInvoices();
   };
 

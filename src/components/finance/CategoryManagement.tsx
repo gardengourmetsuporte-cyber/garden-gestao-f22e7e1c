@@ -109,7 +109,6 @@ export function CategoryManagement({
           .update({ name: name.trim(), icon, color })
           .eq('id', editingCategory.id);
         if (error) throw error;
-        toast.success('Categoria atualizada!');
       } else {
         const { error } = await supabase
           .from('finance_categories')
@@ -123,7 +122,6 @@ export function CategoryManagement({
             is_system: false
           });
         if (error) throw error;
-        toast.success('Categoria criada!');
       }
       await onRefresh();
       resetForm();
@@ -207,8 +205,6 @@ export function CategoryManagement({
         .delete()
         .eq('id', categoryToDelete.id);
       if (error) throw error;
-      
-      toast.success('Categoria excluída!');
       await onRefresh();
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
