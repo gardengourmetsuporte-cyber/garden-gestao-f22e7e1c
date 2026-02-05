@@ -14,6 +14,7 @@ import Rewards from "./pages/Rewards";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
  import CashClosing from "./pages/CashClosing";
+ import Recipes from "./pages/Recipes";
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+       <Route
+         path="/recipes"
+         element={
+           <ProtectedRoute>
+             <Recipes />
+           </ProtectedRoute>
+         }
+       />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

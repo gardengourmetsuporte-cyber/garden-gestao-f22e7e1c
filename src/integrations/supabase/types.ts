@@ -602,6 +602,7 @@ export type Database = {
           min_stock: number
           name: string
           supplier_id: string | null
+          unit_price: number | null
           unit_type: Database["public"]["Enums"]["unit_type"]
           updated_at: string
         }
@@ -613,6 +614,7 @@ export type Database = {
           min_stock?: number
           name: string
           supplier_id?: string | null
+          unit_price?: number | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
           updated_at?: string
         }
@@ -624,6 +626,7 @@ export type Database = {
           min_stock?: number
           name?: string
           supplier_id?: string | null
+          unit_price?: number | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
           updated_at?: string
         }
@@ -909,6 +912,140 @@ export type Database = {
         }
         Relationships: []
       }
+      recipe_categories: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      recipe_ingredients: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          quantity: number
+          recipe_id: string
+          sort_order: number | null
+          total_cost: number
+          unit_cost: number
+          unit_type: Database["public"]["Enums"]["recipe_unit_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          quantity: number
+          recipe_id: string
+          sort_order?: number | null
+          total_cost?: number
+          unit_cost?: number
+          unit_type: Database["public"]["Enums"]["recipe_unit_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          quantity?: number
+          recipe_id?: string
+          sort_order?: number | null
+          total_cost?: number
+          unit_cost?: number
+          unit_type?: Database["public"]["Enums"]["recipe_unit_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_ingredients_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes: {
+        Row: {
+          category_id: string | null
+          cost_per_portion: number
+          cost_updated_at: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          preparation_notes: string | null
+          total_cost: number
+          updated_at: string
+          yield_quantity: number
+          yield_unit: string
+        }
+        Insert: {
+          category_id?: string | null
+          cost_per_portion?: number
+          cost_updated_at?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          preparation_notes?: string | null
+          total_cost?: number
+          updated_at?: string
+          yield_quantity?: number
+          yield_unit?: string
+        }
+        Update: {
+          category_id?: string | null
+          cost_per_portion?: number
+          cost_updated_at?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          preparation_notes?: string | null
+          total_cost?: number
+          updated_at?: string
+          yield_quantity?: number
+          yield_unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reward_products: {
         Row: {
           created_at: string
@@ -1168,6 +1305,7 @@ export type Database = {
       day_period: "morning" | "afternoon" | "evening"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
+      recipe_unit_type: "unidade" | "kg" | "g" | "litro" | "ml"
       reward_status: "pending" | "approved" | "delivered" | "cancelled"
       schedule_status: "pending" | "approved" | "rejected"
       task_priority: "low" | "medium" | "high"
@@ -1306,6 +1444,7 @@ export const Constants = {
       day_period: ["morning", "afternoon", "evening"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
+      recipe_unit_type: ["unidade", "kg", "g", "litro", "ml"],
       reward_status: ["pending", "approved", "delivered", "cancelled"],
       schedule_status: ["pending", "approved", "rejected"],
       task_priority: ["low", "medium", "high"],
