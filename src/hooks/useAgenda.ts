@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import type { ManagerTask, TaskPriority, TaskCategory } from '@/types/agenda';
+import type { ManagerTask, TaskCategory } from '@/types/agenda';
 
 export function useAgenda() {
   const { user } = useAuth();
@@ -36,9 +36,8 @@ export function useAgenda() {
         .from('manager_tasks')
         .select('*, category:task_categories(*)')
         .eq('user_id', user.id)
-        .order('due_date', { ascending: true, nullsFirst: false })
-        .order('priority', { ascending: false })
-        .order('created_at', { ascending: false });
+        .order('due_date', { ascending: true, nullsFirst: true })
+        .order('created_at', { ascending: true });
       
       if (error) throw error;
       return data as ManagerTask[];
@@ -48,14 +47,7 @@ export function useAgenda() {
 
   // Add task mutation
   const addTaskMutation = useMutation({
-    mutationFn: async (task: { 
-      title: string; 
-      notes?: string;
-      due_date?: string; 
-      due_time?: string;
-      priority: TaskPriority;
-      category_id?: string;
-    }) => {
+    mutationFn: async (task: { title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string }) => {
       if (!user?.id) throw new Error('User not authenticated');
       const { error } = await supabase
         .from('manager_tasks')
@@ -65,7 +57,7 @@ export function useAgenda() {
           notes: task.notes || null,
           due_date: task.due_date || null,
           due_time: task.due_time || null,
-          priority: task.priority,
+          priority: 'medium',
           category_id: task.category_id || null,
         });
       if (error) throw error;
@@ -81,15 +73,7 @@ export function useAgenda() {
 
   // Update task mutation
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ id, ...task }: { 
-      id: string;
-      title: string; 
-      notes?: string;
-      due_date?: string; 
-      due_time?: string;
-      priority: TaskPriority;
-      category_id?: string;
-    }) => {
+    mutationFn: async ({ id, ...task }: { id: string; title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string }) => {
       const { error } = await supabase
         .from('manager_tasks')
         .update({
@@ -97,7 +81,6 @@ export function useAgenda() {
           notes: task.notes || null,
           due_date: task.due_date || null,
           due_time: task.due_time || null,
-          priority: task.priority,
           category_id: task.category_id || null,
         })
         .eq('id', id);
