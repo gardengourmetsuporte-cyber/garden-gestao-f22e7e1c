@@ -136,8 +136,8 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }
       {/* Swipe action buttons - behind */}
       <div
         className={cn(
-          'absolute inset-y-0 right-0 flex z-0',
-          swipeOffset === 0 && 'pointer-events-none'
+          'absolute inset-y-0 right-0 flex z-0 transition-opacity',
+          swipeOffset === 0 ? 'pointer-events-none opacity-0' : 'opacity-100'
         )}
         style={{ width: `${MAX_SWIPE}px` }}
       >
@@ -172,7 +172,8 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }
       <div
         className={cn(
           'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
-          !is_paid && 'opacity-60',
+          // Não usar opacity no container (senão vaza o fundo/ações atrás); só “diminui” o conteúdo.
+          !is_paid && 'text-muted-foreground',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
         style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
