@@ -19,7 +19,7 @@ import {
 } from '@/types/finance';
 import { format, isToday, isYesterday, subDays, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, ChevronDown, Loader2, Trash2, Repeat, CreditCard } from 'lucide-react';
+import { CalendarIcon, ChevronDown, ChevronUp, Loader2, Trash2, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
 import { toast } from 'sonner';
@@ -33,7 +33,6 @@ interface TransactionSheetProps {
   onSave: (data: TransactionFormData) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
-  creditCardAccountId?: string;
 }
 
 const RECURRING_OPTIONS = [
@@ -46,20 +45,6 @@ const RECURRING_OPTIONS = [
   { value: 'yearly', label: 'Anual' },
 ];
 
-const INSTALLMENT_OPTIONS = [
-  { value: '1', label: 'À vista' },
-  { value: '2', label: '2x' },
-  { value: '3', label: '3x' },
-  { value: '4', label: '4x' },
-  { value: '5', label: '5x' },
-  { value: '6', label: '6x' },
-  { value: '7', label: '7x' },
-  { value: '8', label: '8x' },
-  { value: '9', label: '9x' },
-  { value: '10', label: '10x' },
-  { value: '11', label: '11x' },
-  { value: '12', label: '12x' },
-];
 
 export function TransactionSheet({
   open,
@@ -69,8 +54,7 @@ export function TransactionSheet({
   accounts,
   onSave,
   onDelete,
-  editingTransaction,
-  creditCardAccountId
+  editingTransaction
 }: TransactionSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -88,12 +72,7 @@ export function TransactionSheet({
   const [notes, setNotes] = useState('');
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  
-  // Credit card specific
-  const [installments, setInstallments] = useState<string>('1');
-
-  // Get credit card accounts
-  const creditCardAccounts = accounts.filter(a => a.type === 'credit_card');
+  const [showRecurringConfig, setShowRecurringConfig] = useState(false);
 
   // Reset form when opened
   useEffect(() => {
@@ -111,33 +90,24 @@ export function TransactionSheet({
         setIsRecurring(editingTransaction.is_recurring);
         setRecurringInterval(editingTransaction.recurring_interval || 'monthly');
         setNotes(editingTransaction.notes || '');
-        setInstallments(editingTransaction.total_installments?.toString() || '1');
       } else {
         setType(defaultType);
         setAmount('');
         setDescription('');
         setCategoryId(null);
-        // Set account based on type
-        if (defaultType === 'credit_card' && creditCardAccountId) {
-          setAccountId(creditCardAccountId);
-        } else if (defaultType === 'credit_card' && creditCardAccounts.length > 0) {
-          setAccountId(creditCardAccounts[0].id);
-        } else {
-          const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
-          setAccountId(nonCreditCards[0]?.id || accounts[0]?.id || null);
-        }
+        const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
+        setAccountId(nonCreditCards[0]?.id || accounts[0]?.id || null);
         setToAccountId(null);
         setDate(new Date());
-        setIsPaid(defaultType !== 'credit_card');
+        setIsPaid(true);
         setIsFixed(false);
         setIsRecurring(false);
         setRecurringInterval('monthly');
         setRecurringCount('12');
         setNotes('');
-        setInstallments('1');
       }
     }
-  }, [open, defaultType, accounts, editingTransaction, creditCardAccountId, creditCardAccounts]);
+  }, [open, defaultType, accounts, editingTransaction]);
 
   const handleSave = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
@@ -145,32 +115,7 @@ export function TransactionSheet({
 
     setIsLoading(true);
     
-    const totalInstallments = type === 'credit_card' ? parseInt(installments) : 1;
-    const installmentAmount = parseFloat(amount) / totalInstallments;
-    
-    // For credit card with installments, create multiple transactions
-    if (type === 'credit_card' && totalInstallments > 1) {
-      const groupId = crypto.randomUUID();
-      
-      for (let i = 0; i < totalInstallments; i++) {
-        const installmentDate = addMonths(date, i);
-        await onSave({
-          type,
-          amount: installmentAmount,
-          description: `${description.trim()} (${i + 1}/${totalInstallments})`,
-          category_id: categoryId,
-          account_id: accountId,
-          date: format(installmentDate, 'yyyy-MM-dd'),
-          is_paid: false,
-          is_fixed: isFixed,
-          is_recurring: false,
-          notes: notes.trim() || undefined,
-          installment_number: i + 1,
-          total_installments: totalInstallments,
-          installment_group_id: groupId
-        });
-      }
-    } else if (isRecurring && parseInt(recurringCount) > 1) {
+    if (isRecurring && parseInt(recurringCount) > 1) {
       // Create recurring transactions
       const count = parseInt(recurringCount);
       for (let i = 0; i < count; i++) {
@@ -249,17 +194,17 @@ export function TransactionSheet({
     return format(date, 'dd/MM/yyyy');
   };
 
-  const typeLabels: Record<TransactionType, string> = {
+  // Only show expense, income, transfer (no credit_card)
+  const availableTypes: TransactionType[] = ['expense', 'income', 'transfer'];
+  
+  const typeLabels: Record<string, string> = {
     expense: 'Despesa',
     income: 'Receita',
-    transfer: 'Transf.',
-    credit_card: 'Cartão'
+    transfer: 'Transferência',
   };
 
-  // Filter accounts based on type
-  const availableAccounts = type === 'credit_card' 
-    ? creditCardAccounts 
-    : accounts.filter(a => a.type !== 'credit_card');
+  // Filter accounts (no credit cards)
+  const availableAccounts = accounts.filter(a => a.type !== 'credit_card');
 
   return (
     <>
@@ -275,26 +220,19 @@ export function TransactionSheet({
             {/* Type selector */}
             <Tabs value={type} onValueChange={(v) => {
               setType(v as TransactionType);
-              // Reset account when changing type
-              if (v === 'credit_card' && creditCardAccounts.length > 0) {
-                setAccountId(creditCardAccounts[0].id);
-                setIsPaid(false);
-              } else {
-                const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
-                setAccountId(nonCreditCards[0]?.id || null);
-                setIsPaid(true);
-              }
+              const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
+              setAccountId(nonCreditCards[0]?.id || null);
+              setIsPaid(true);
             }} className="w-full">
-              <TabsList className="grid grid-cols-4 w-full">
-                {(['expense', 'income', 'transfer', 'credit_card'] as TransactionType[]).map(t => (
+              <TabsList className="grid grid-cols-3 w-full">
+                {availableTypes.map(t => (
                   <TabsTrigger
                     key={t}
                     value={t}
                     className={cn(
                       "text-xs",
                       type === t && t === 'income' && "data-[state=active]:bg-success data-[state=active]:text-success-foreground",
-                      type === t && t === 'expense' && "data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground",
-                      type === t && t === 'credit_card' && "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                      type === t && t === 'expense' && "data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground"
                     )}
                   >
                     {typeLabels[t]}
@@ -305,7 +243,7 @@ export function TransactionSheet({
 
             {/* Amount */}
             <div className="space-y-2">
-              <Label>Valor {type === 'credit_card' && parseInt(installments) > 1 && `(${installments}x de R$ ${(parseFloat(amount || '0') / parseInt(installments)).toFixed(2)})`}</Label>
+              <Label>Valor</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
                 <Input
@@ -319,36 +257,12 @@ export function TransactionSheet({
               </div>
             </div>
 
-            {/* Credit card: Installments */}
-            {type === 'credit_card' && (
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" />
-                  Parcelas
-                </Label>
-                <Select value={installments} onValueChange={setInstallments}>
-                  <SelectTrigger className="h-12">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {INSTALLMENT_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
             {/* Paid toggle and Date */}
             <div className="flex items-center gap-4">
-              {type !== 'credit_card' && (
-                <div className="flex items-center gap-2">
-                  <Switch checked={isPaid} onCheckedChange={setIsPaid} />
-                  <Label>Pago</Label>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Switch checked={isPaid} onCheckedChange={setIsPaid} />
+                <Label>Pago</Label>
+              </div>
               <div className="flex-1 flex justify-end gap-2">
                 <Button
                   variant={isToday(date) ? "default" : "outline"}
@@ -450,7 +364,6 @@ export function TransactionSheet({
             </div>
 
             {/* Advanced options */}
-            {type !== 'credit_card' && (
               <div className="space-y-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
                   <Label>Despesa fixa</Label>
@@ -464,54 +377,83 @@ export function TransactionSheet({
                       <Repeat className="w-4 h-4 text-muted-foreground" />
                       <Label>Repetir</Label>
                     </div>
-                    <Switch checked={isRecurring} onCheckedChange={setIsRecurring} />
+                    <Switch checked={isRecurring} onCheckedChange={(checked) => {
+                      setIsRecurring(checked);
+                      if (checked) setShowRecurringConfig(true);
+                    }} />
                   </div>
                   
-                  {isRecurring && (
-                    <div className="ml-6 p-3 bg-secondary/30 rounded-lg space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-2">
-                          <Label className="text-sm">Frequência</Label>
-                          <Select value={recurringInterval} onValueChange={setRecurringInterval}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {RECURRING_OPTIONS.map(opt => (
-                                <SelectItem key={opt.value} value={opt.value}>
-                                  {opt.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                  {isRecurring && showRecurringConfig && (
+                    <div className="bg-card border rounded-xl p-4 space-y-4">
+                      <h4 className="text-sm font-medium">Como sua transação se repete?</h4>
+                      
+                      {/* Quantity selector with increment/decrement */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Repeat className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">Quantidade</span>
                         </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm">Quantas vezes</Label>
-                          <Select value={recurringCount} onValueChange={setRecurringCount}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {[2, 3, 4, 5, 6, 12, 24, 36].map(n => (
-                                <SelectItem key={n} value={String(n)}>
-                                  {n}x
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                        <div className="flex items-center gap-3">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setRecurringCount(String(Math.max(2, parseInt(recurringCount) - 1)))}
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </Button>
+                          <span className="text-lg font-semibold w-8 text-center">{recurringCount}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setRecurringCount(String(Math.min(60, parseInt(recurringCount) + 1)))}
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Serão criados {recurringCount} lançamentos{' '}
-                        {recurringInterval === 'weekly' ? 'semanais' :
-                        recurringInterval === 'biweekly' ? 'quinzenais' :
-                        recurringInterval === 'monthly' ? 'mensais' :
-                        recurringInterval === 'bimonthly' ? 'bimestrais' :
-                        recurringInterval === 'quarterly' ? 'trimestrais' :
-                        recurringInterval === 'semiannual' ? 'semestrais' :
-                        'anuais'}
-                      </p>
+
+                      {/* Period selector */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Repeat className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">Período</span>
+                        </div>
+                        <Select value={recurringInterval} onValueChange={setRecurringInterval}>
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {RECURRING_OPTIONS.map(opt => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <Button
+                        type="button"
+                        className="w-full"
+                        onClick={() => setShowRecurringConfig(false)}
+                      >
+                        Pronto
+                      </Button>
                     </div>
+                  )}
+
+                  {isRecurring && !showRecurringConfig && (
+                    <button
+                      type="button"
+                      onClick={() => setShowRecurringConfig(true)}
+                      className="ml-6 text-sm text-primary underline"
+                    >
+                      {recurringCount}x {RECURRING_OPTIONS.find(o => o.value === recurringInterval)?.label || 'Mensal'}
+                    </button>
                   )}
                 </div>
 
@@ -525,7 +467,6 @@ export function TransactionSheet({
                   />
                 </div>
               </div>
-            )}
 
             {/* Actions */}
             <div className="flex gap-3 pt-4 pb-8">

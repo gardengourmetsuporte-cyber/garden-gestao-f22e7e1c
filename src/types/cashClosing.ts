@@ -18,6 +18,7 @@ export interface CashClosing {
   debit_amount: number;
   credit_amount: number;
   pix_amount: number;
+  meal_voucher_amount: number;
   delivery_amount: number;
   total_amount: number;
   
@@ -63,6 +64,7 @@ export interface CashClosingFormData {
   debit_amount: number;
   credit_amount: number;
   pix_amount: number;
+  meal_voucher_amount: number;
   delivery_amount: number;
   cash_difference: number;
   receipt_url?: string;
@@ -75,5 +77,6 @@ export const PAYMENT_METHODS = [
   { key: 'debit_amount', label: 'Débito', icon: 'CreditCard', color: '#3b82f6' },
   { key: 'credit_amount', label: 'Crédito', icon: 'CreditCard', color: '#8b5cf6' },
   { key: 'pix_amount', label: 'Pix', icon: 'Smartphone', color: '#06b6d4' },
+  { key: 'meal_voucher_amount', label: 'Vale Alimentação', icon: 'Utensils', color: '#f59e0b' },
   { key: 'delivery_amount', label: 'iFood/Delivery', icon: 'Truck', color: '#f97316' },
 ] as const;

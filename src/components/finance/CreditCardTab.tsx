@@ -365,12 +365,11 @@ export function CreditCardTab({
             setShowAddTransaction(open);
             if (!open) onRefresh();
           }}
-          defaultType="credit_card"
+          defaultType="expense"
           categories={categories}
           accounts={accounts}
           onSave={onAddTransaction}
           onDelete={onDeleteTransaction}
-          creditCardAccountId={selectedInvoice.account_id}
         />
       )}
     </div>
