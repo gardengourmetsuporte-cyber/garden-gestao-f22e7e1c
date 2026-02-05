@@ -201,7 +201,10 @@ export function useFinance(selectedMonth: Date) {
       toast.error('Erro ao salvar transação');
       return;
     }
-    toast.success('Transação salva!');
+    // Only show toast if not part of a recurring series (those are handled separately)
+    if (!data.installment_group_id) {
+      toast.success('Transação salva!');
+    }
     await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 

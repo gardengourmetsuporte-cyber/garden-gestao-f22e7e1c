@@ -38,6 +38,7 @@ interface TransactionSheetProps {
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
   onUpdateRecurring?: (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => Promise<void>;
+  onSaveAndContinue?: (data: TransactionFormData) => Promise<void>;
 }
 
 const RECURRING_OPTIONS = [
@@ -60,7 +61,8 @@ export function TransactionSheet({
   onSave,
   onDelete,
   editingTransaction,
-  onUpdateRecurring
+  onUpdateRecurring,
+  onSaveAndContinue
 }: TransactionSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -74,7 +76,7 @@ export function TransactionSheet({
   const [isFixed, setIsFixed] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringInterval, setRecurringInterval] = useState<string>('monthly');
-  const [recurringCount, setRecurringCount] = useState<string>('12');
+  const [recurringCount, setRecurringCount] = useState<string>('2');
   const [notes, setNotes] = useState('');
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -99,6 +101,13 @@ export function TransactionSheet({
         setRecurringInterval(editingTransaction.recurring_interval || 'monthly');
         setNotes(editingTransaction.notes || '');
         setRecurringEditMode('single');
+        // Reset recurring count to prevent showing wrong value
+        if (editingTransaction.total_installments) {
+          setRecurringCount(String(editingTransaction.total_installments));
+        } else {
+          setRecurringCount('2');
+        }
+        setShowRecurringConfig(false);
       } else {
         setType(defaultType);
         setAmount('');
@@ -112,8 +121,9 @@ export function TransactionSheet({
         setIsFixed(false);
         setIsRecurring(false);
         setRecurringInterval('monthly');
-        setRecurringCount('12');
+        setRecurringCount('2');
         setNotes('');
+        setShowRecurringConfig(false);
       }
     }
   }, [open, defaultType, accounts, editingTransaction]);
@@ -208,6 +218,36 @@ export function TransactionSheet({
     
     setIsLoading(false);
     onOpenChange(false);
+  };
+
+  const handleSaveAndContinue = async () => {
+    if (!amount || parseFloat(amount) <= 0) return;
+    if (!description.trim()) return;
+    
+    setIsLoading(true);
+    
+    await onSave({
+      type,
+      amount: parseFloat(amount),
+      description: description.trim(),
+      category_id: categoryId,
+      account_id: accountId,
+      to_account_id: type === 'transfer' ? toAccountId : null,
+      date: format(date, 'yyyy-MM-dd'),
+      is_paid: isPaid,
+      is_fixed: isFixed,
+      is_recurring: false,
+      notes: notes.trim() || undefined
+    });
+    
+    setIsLoading(false);
+    
+    // Reset form for next entry
+    setAmount('');
+    setDescription('');
+    setNotes('');
+    setIsRecurring(false);
+    setShowRecurringConfig(false);
   };
 
   const handleRecurringEditConfirm = async () => {
@@ -534,7 +574,20 @@ export function TransactionSheet({
               </div>
 
             {/* Actions */}
-            <div className="flex gap-3 pt-4 pb-8">
+            <div className="flex flex-col gap-3 pt-4 pb-8">
+              {/* Save and Continue - only for new transactions */}
+              {!editingTransaction && (
+                <Button
+                  variant="ghost"
+                  onClick={handleSaveAndContinue}
+                  disabled={isLoading || !amount || parseFloat(amount) <= 0 || !description.trim()}
+                  className="text-primary"
+                >
+                  Salvar e continuar
+                </Button>
+              )}
+              
+              <div className="flex gap-3">
               {editingTransaction && onDelete && (
                 <Button 
                   variant="destructive" 
@@ -552,6 +605,7 @@ export function TransactionSheet({
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
               </Button>
+              </div>
             </div>
           </div>
         </SheetContent>
