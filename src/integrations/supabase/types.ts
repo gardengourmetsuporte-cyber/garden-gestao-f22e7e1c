@@ -26,6 +26,7 @@ export type Database = {
           expenses: Json | null
           financial_integrated: boolean
           id: string
+          initial_cash: number
           notes: string | null
           pix_amount: number
           receipt_url: string
@@ -49,6 +50,7 @@ export type Database = {
           expenses?: Json | null
           financial_integrated?: boolean
           id?: string
+          initial_cash?: number
           notes?: string | null
           pix_amount?: number
           receipt_url: string
@@ -72,6 +74,7 @@ export type Database = {
           expenses?: Json | null
           financial_integrated?: boolean
           id?: string
+          initial_cash?: number
           notes?: string | null
           pix_amount?: number
           receipt_url?: string

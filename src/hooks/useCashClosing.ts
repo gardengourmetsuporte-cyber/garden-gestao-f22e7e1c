@@ -94,6 +94,7 @@
          .insert({
           date: formData.date,
           unit_name: formData.unit_name,
+       initial_cash: formData.initial_cash,
           cash_amount: formData.cash_amount,
           debit_amount: formData.debit_amount,
           credit_amount: formData.credit_amount,
