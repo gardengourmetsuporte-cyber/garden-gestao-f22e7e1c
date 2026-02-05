@@ -8,7 +8,8 @@ import {
   ArrowUpRight,
   ShoppingCart,
   Settings,
-  AlertCircle
+  AlertCircle,
+  Receipt
 } from 'lucide-react';
 import { Leaderboard } from './Leaderboard';
 import { AIAssistant } from './AIAssistant';
@@ -19,6 +20,7 @@ import { useRewards } from '@/hooks/useRewards';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+ import { useCashClosing } from '@/hooks/useCashClosing';
 
 interface MetricCardProps {
   title: string;
@@ -117,12 +119,14 @@ export function AdminDashboard() {
   const { orders } = useOrders();
   const { allRedemptions } = useRewards();
   const { users } = useUsers();
+  const { closings } = useCashClosing();
 
   const lowStockItems = getLowStockItems();
   const outOfStockItems = getOutOfStockItems();
   const criticalItems = lowStockItems.length + outOfStockItems.length;
   const pendingOrders = orders.filter(o => o.status === 'draft' || o.status === 'sent').length;
   const pendingRedemptions = allRedemptions.filter(r => r.status === 'pending').length;
+  const pendingClosings = closings.filter(c => c.status === 'pending').length;
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -130,7 +134,7 @@ export function AdminDashboard() {
     month: 'long',
   });
 
-  const hasAlerts = outOfStockItems.length > 0 || lowStockItems.length > 0 || pendingRedemptions > 0;
+  const hasAlerts = outOfStockItems.length > 0 || lowStockItems.length > 0 || pendingRedemptions > 0 || pendingClosings > 0;
 
   return (
     <div className="space-y-6">
@@ -216,6 +220,14 @@ export function AdminDashboard() {
                   onClick={() => navigate('/rewards')}
                 />
               )}
+              {pendingClosings > 0 && (
+                <AlertItem
+                  message="Fechamentos aguardando validação"
+                  count={pendingClosings}
+                  severity="warning"
+                  onClick={() => navigate('/cash-closing')}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -224,7 +236,7 @@ export function AdminDashboard() {
       {/* Quick Access Cards */}
       <div>
         <h3 className="section-label mb-3">Acesso Rápido</h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <QuickAccessCard
             title="Estoque"
             subtitle={`${items.length} itens cadastrados`}
@@ -240,6 +252,14 @@ export function AdminDashboard() {
             iconBg="bg-success/10"
             iconColor="text-success"
             onClick={() => navigate('/checklists')}
+          />
+          <QuickAccessCard
+            title="Fechamento"
+            subtitle={pendingClosings > 0 ? `${pendingClosings} pendentes` : 'Validar caixas'}
+            icon={Receipt}
+            iconBg="bg-cyan-500/10"
+            iconColor="text-cyan-600"
+            onClick={() => navigate('/cash-closing')}
           />
           <QuickAccessCard
             title="Recompensas"

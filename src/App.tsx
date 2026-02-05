@@ -13,6 +13,7 @@ import Checklists from "./pages/Checklists";
 import Rewards from "./pages/Rewards";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+ import CashClosing from "./pages/CashClosing";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +92,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cash-closing"
+        element={
+          <ProtectedRoute>
+            <CashClosing />
           </ProtectedRoute>
         }
       />
