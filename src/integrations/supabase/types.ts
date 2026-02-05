@@ -948,6 +948,42 @@ export type Database = {
         }
         Relationships: []
       }
+      recipe_cost_settings: {
+        Row: {
+          card_fee_percentage: number
+          created_at: string
+          fixed_cost_category_ids: string[] | null
+          id: string
+          monthly_products_sold: number
+          packaging_cost_per_unit: number
+          tax_percentage: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_fee_percentage?: number
+          created_at?: string
+          fixed_cost_category_ids?: string[] | null
+          id?: string
+          monthly_products_sold?: number
+          packaging_cost_per_unit?: number
+          tax_percentage?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_fee_percentage?: number
+          created_at?: string
+          fixed_cost_category_ids?: string[] | null
+          id?: string
+          monthly_products_sold?: number
+          packaging_cost_per_unit?: number
+          tax_percentage?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       recipe_ingredients: {
         Row: {
           created_at: string

@@ -1,4 +1,4 @@
- import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
  import { Plus } from 'lucide-react';
  import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
  import { Button } from '@/components/ui/button';
@@ -9,7 +9,9 @@
  import { ScrollArea } from '@/components/ui/scroll-area';
  import { IngredientRow } from './IngredientRow';
  import { IngredientPicker } from './IngredientPicker';
+import { OperationalCostsSection } from './OperationalCostsSection';
 import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type Recipe, type RecipeCategory, type RecipeUnitType, type IngredientSourceType } from '@/types/recipe';
+import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
  
  interface LocalIngredient {
    id?: string;
@@ -76,6 +78,9 @@ interface SubRecipeItem {
    const [notes, setNotes] = useState('');
    const [ingredients, setIngredients] = useState<LocalIngredient[]>([]);
    const [pickerOpen, setPickerOpen] = useState(false);
+  
+  // Hook para custos operacionais
+  const { settings, calculateOperationalCosts } = useRecipeCostSettings();
    
    // Reset form when recipe changes
    useEffect(() => {
@@ -122,6 +127,14 @@ interface SubRecipeItem {
    
    const totalCost = ingredients.reduce((sum, ing) => sum + ing.total_cost, 0);
    const costPerPortion = parseFloat(yieldQuantity) > 0 ? totalCost / parseFloat(yieldQuantity) : totalCost;
+  
+  // Calcular custos operacionais baseado no custo por porção
+  const operationalCosts = useMemo(
+    () => calculateOperationalCosts(costPerPortion),
+    [costPerPortion, settings]
+  );
+  
+  const totalWithOperational = costPerPortion + operationalCosts.totalOperational;
    
   const handleAddInventoryItem = (item: InventoryItem) => {
      // Use recipe-specific unit and price if available
@@ -321,20 +334,34 @@ interface SubRecipeItem {
                  )}
                </div>
                
+              {/* Operational Costs Section */}
+              <OperationalCostsSection
+                operationalCosts={operationalCosts}
+                settings={settings}
+              />
+              
                {/* Cost Summary */}
                <div className="bg-primary/5 rounded-2xl p-4 space-y-2">
                  <div className="flex justify-between items-center">
-                   <span className="text-muted-foreground">Custo Total</span>
+                  <span className="text-muted-foreground">Custo Ingredientes</span>
                    <span className="text-lg font-bold text-primary">
                      {formatCurrency(totalCost)}
                    </span>
                  </div>
                  <div className="flex justify-between items-center">
-                   <span className="text-muted-foreground">Custo por Porção</span>
-                   <span className="text-lg font-bold text-primary">
+                  <span className="text-muted-foreground">Custo por Porção (ingredientes)</span>
+                  <span className="text-sm font-medium">
                      {formatCurrency(costPerPortion)}
                    </span>
                  </div>
+                {operationalCosts.totalOperational > 0 && (
+                  <div className="flex justify-between items-center pt-2 border-t border-primary/20">
+                    <span className="text-muted-foreground font-semibold">Custo Total por Porção</span>
+                    <span className="text-lg font-bold text-primary">
+                      {formatCurrency(totalWithOperational)}
+                    </span>
+                  </div>
+                )}
                </div>
                
                {/* Notes */}
