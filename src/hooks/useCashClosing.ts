@@ -4,6 +4,15 @@
  import { CashClosing, CashClosingFormData, CashClosingStatus } from '@/types/cashClosing';
  import { format } from 'date-fns';
  import { toast } from 'sonner';
+import { supabase as sb } from '@/integrations/supabase/client';
+
+interface PaymentSetting {
+  method_key: string;
+  settlement_type: 'immediate' | 'business_days' | 'weekly_day';
+  settlement_days: number;
+  settlement_day_of_week: number | null;
+  fee_percentage: number;
+}
  
  export function useCashClosing() {
    const { user, isAdmin } = useAuth();
@@ -186,6 +195,17 @@
      if (!user) return;
  
      try {
+        // Fetch user's payment method settings
+        const { data: paymentSettings } = await sb
+          .from('payment_method_settings' as any)
+          .select('*')
+          .eq('user_id', user.id);
+
+        const getPaymentSetting = (methodKey: string): PaymentSetting | null => {
+          const setting = (paymentSettings as unknown as PaymentSetting[] || []).find(s => s.method_key === methodKey);
+          return setting || null;
+        };
+
        // Get user's income categories for each payment method
        const { data: categories } = await supabase
          .from('finance_categories')
@@ -202,11 +222,11 @@
          .limit(1);
  
        const defaultAccountId = accounts?.[0]?.id || null;
-       
+
        // Find main categories
        const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
        const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
-       
+
        // Find specific subcategories for each payment method
        const dinheiroSubcat = categories?.find(c => c.name === 'Dinheiro' && c.parent_id === balcaoCategory?.id);
        const debitoSubcat = categories?.find(c => c.name === 'Cartão Débito' && c.parent_id === balcaoCategory?.id);
@@ -215,9 +235,10 @@
        const ifoodSubcat = categories?.find(c => c.name === 'iFood' && c.parent_id === deliveryCategory?.id);
  
        const transactions = [];
-       
-       // Helper function to calculate business days offset
+
+        // Helper functions for date calculations
        const addBusinessDays = (dateStr: string, days: number): string => {
+          if (days === 0) return dateStr;
          const date = new Date(dateStr);
          let added = 0;
          while (added < days) {
@@ -230,97 +251,140 @@
          return format(date, 'yyyy-MM-dd');
        };
  
+        const getNextDayOfWeek = (dateStr: string, targetDay: number): string => {
+          const date = new Date(dateStr);
+          const currentDay = date.getDay();
+          const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7;
+          date.setDate(date.getDate() + daysUntilTarget);
+          return format(date, 'yyyy-MM-dd');
+        };
+
+        const calculateSettlementDate = (baseDate: string, setting: PaymentSetting | null): { date: string; isPaid: boolean } => {
+          if (!setting) return { date: baseDate, isPaid: true };
+
+          switch (setting.settlement_type) {
+            case 'immediate':
+              return { date: baseDate, isPaid: true };
+            case 'business_days':
+              return { date: addBusinessDays(baseDate, setting.settlement_days), isPaid: false };
+            case 'weekly_day':
+              return { date: getNextDayOfWeek(baseDate, setting.settlement_day_of_week ?? 3), isPaid: false };
+            default:
+              return { date: baseDate, isPaid: true };
+          }
+        };
+
+        const applyFee = (amount: number, setting: PaymentSetting | null): number => {
+          if (!setting || setting.fee_percentage === 0) return amount;
+          return amount * (1 - setting.fee_percentage / 100);
+        };
+
        // Create income transactions for each payment method
        if (closing.cash_amount > 0) {
+          const cashSetting = getPaymentSetting('cash_amount');
+          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, cashSetting);
+          const netAmount = applyFee(closing.cash_amount, cashSetting);
+
          transactions.push({
            user_id: user.id,
            type: 'income',
-           amount: closing.cash_amount,
+            amount: netAmount,
            description: `Fechamento caixa - Dinheiro (${format(new Date(closing.date), 'dd/MM')})`,
            category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
-           date: closing.date,
-           is_paid: true,
-           notes: 'Lançamento automático - Dinheiro cai na hora',
+            date: settlementDate,
+            is_paid: isPaid,
+            notes: `Lançamento automático${cashSetting?.fee_percentage ? ` (taxa: ${cashSetting.fee_percentage}%)` : ''}`,
          });
        }
  
        if (closing.debit_amount > 0) {
+          const debitSetting = getPaymentSetting('debit_amount');
+          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, debitSetting);
+          const netAmount = applyFee(closing.debit_amount, debitSetting);
+
          transactions.push({
            user_id: user.id,
            type: 'income',
-           amount: closing.debit_amount,
+            amount: netAmount,
            description: `Fechamento caixa - Débito (${format(new Date(closing.date), 'dd/MM')})`,
            category_id: debitoSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
-           date: addBusinessDays(closing.date, 1),
-           is_paid: false,
-           notes: 'Lançamento automático - Débito: +1 dia útil',
+            date: settlementDate,
+            is_paid: isPaid,
+            notes: `Lançamento automático${debitSetting?.fee_percentage ? ` (taxa: ${debitSetting.fee_percentage}%)` : ''}`,
          });
        }
  
        if (closing.credit_amount > 0) {
+          const creditSetting = getPaymentSetting('credit_amount');
+          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, creditSetting);
+          const netAmount = applyFee(closing.credit_amount, creditSetting);
+
          transactions.push({
            user_id: user.id,
            type: 'income',
-           amount: closing.credit_amount,
+            amount: netAmount,
            description: `Fechamento caixa - Crédito (${format(new Date(closing.date), 'dd/MM')})`,
            category_id: creditoSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
-           date: addBusinessDays(closing.date, 1),
-           is_paid: false,
-           notes: 'Lançamento automático - Crédito: +1 dia útil',
+            date: settlementDate,
+            is_paid: isPaid,
+            notes: `Lançamento automático${creditSetting?.fee_percentage ? ` (taxa: ${creditSetting.fee_percentage}%)` : ''}`,
          });
        }
  
        if (closing.pix_amount > 0) {
+          const pixSetting = getPaymentSetting('pix_amount');
+          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, pixSetting);
+          const netAmount = applyFee(closing.pix_amount, pixSetting);
+
          transactions.push({
            user_id: user.id,
            type: 'income',
-           amount: closing.pix_amount,
+            amount: netAmount,
            description: `Fechamento caixa - Pix (${format(new Date(closing.date), 'dd/MM')})`,
            category_id: pixSubcat?.id || balcaoCategory?.id || null,
            account_id: defaultAccountId,
-           date: closing.date,
-           is_paid: true,
-           notes: 'Lançamento automático - Pix cai na hora',
+            date: settlementDate,
+            is_paid: isPaid,
+            notes: `Lançamento automático${pixSetting?.fee_percentage ? ` (taxa: ${pixSetting.fee_percentage}%)` : ''}`,
          });
        }
  
         if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0) {
+           const voucherSetting = getPaymentSetting('meal_voucher_amount');
+           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, voucherSetting);
+           const netAmount = applyFee(closing.meal_voucher_amount, voucherSetting);
+
           transactions.push({
             user_id: user.id,
             type: 'income',
-            amount: closing.meal_voucher_amount,
+             amount: netAmount,
             description: `Fechamento caixa - Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
             category_id: balcaoCategory?.id || null,
             account_id: defaultAccountId,
-            date: closing.date,
-            is_paid: false,
-            notes: 'Lançamento automático - Vale Alimentação: conferir prazo',
+             date: settlementDate,
+             is_paid: isPaid,
+             notes: `Lançamento automático${voucherSetting?.fee_percentage ? ` (taxa: ${voucherSetting.fee_percentage}%)` : ''}`,
           });
         }
 
        if (closing.delivery_amount > 0) {
-         // Get the next Wednesday for iFood payment
-         const getNextWednesday = (dateStr: string): string => {
-           const date = new Date(dateStr);
-           const dayOfWeek = date.getDay();
-           const daysUntilWednesday = (3 - dayOfWeek + 7) % 7 || 7;
-           date.setDate(date.getDate() + daysUntilWednesday);
-           return format(date, 'yyyy-MM-dd');
-         };
-         
+          const deliverySetting = getPaymentSetting('delivery_amount');
+          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, deliverySetting);
+          const netAmount = applyFee(closing.delivery_amount, deliverySetting);
+
          transactions.push({
            user_id: user.id,
            type: 'income',
-           amount: closing.delivery_amount,
+            amount: netAmount,
            description: `Fechamento caixa - Delivery (${format(new Date(closing.date), 'dd/MM')})`,
            category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
            account_id: defaultAccountId,
-           date: getNextWednesday(closing.date),
-           is_paid: false,
-           notes: 'Lançamento automático - iFood: toda quarta-feira',
+            date: settlementDate,
+            is_paid: isPaid,
+            notes: `Lançamento automático${deliverySetting?.fee_percentage ? ` (taxa: ${deliverySetting.fee_percentage}%)` : ''}`,
          });
        }
  

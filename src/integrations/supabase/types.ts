@@ -808,6 +808,48 @@ export type Database = {
           },
         ]
       }
+      payment_method_settings: {
+        Row: {
+          created_at: string
+          fee_percentage: number | null
+          id: string
+          is_active: boolean | null
+          method_key: string
+          method_name: string
+          settlement_day_of_week: number | null
+          settlement_days: number | null
+          settlement_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fee_percentage?: number | null
+          id?: string
+          is_active?: boolean | null
+          method_key: string
+          method_name: string
+          settlement_day_of_week?: number | null
+          settlement_days?: number | null
+          settlement_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fee_percentage?: number | null
+          id?: string
+          is_active?: boolean | null
+          method_key?: string
+          method_name?: string
+          settlement_day_of_week?: number | null
+          settlement_days?: number | null
+          settlement_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
