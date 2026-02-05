@@ -1,7 +1,7 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet } from 'lucide-react';
+import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator } from 'lucide-react';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
 import { SupplierSettings } from '@/components/settings/SupplierSettings';
@@ -9,6 +9,7 @@ import { UserManagement } from '@/components/settings/UserManagement';
 import { ChecklistSettingsManager } from '@/components/settings/ChecklistSettingsManager';
 import { RewardSettings } from '@/components/settings/RewardSettings';
 import { PaymentMethodSettings } from '@/components/settings/PaymentMethodSettings';
+import { RecipeCostSettings } from '@/components/settings/RecipeCostSettings';
 
 export default function SettingsPage() {
   const { isAdmin } = useAuth();
@@ -35,7 +36,7 @@ export default function SettingsPage() {
 
         <div className="px-4 py-6 lg:px-6">
           <Tabs defaultValue="profile" className="space-y-4">
-            <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-4 lg:grid-cols-7' : 'grid-cols-1'} h-auto gap-2 bg-transparent p-0`}>
+            <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-4 lg:grid-cols-8' : 'grid-cols-1'} h-auto gap-2 bg-transparent p-0`}>
               <TabsTrigger
                 value="profile"
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 bg-secondary"
@@ -87,6 +88,13 @@ export default function SettingsPage() {
                     <Wallet className="w-4 h-4" />
                     <span className="hidden sm:inline">Pagamentos</span>
                   </TabsTrigger>
+                  <TabsTrigger
+                    value="costs"
+                    className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 bg-secondary"
+                  >
+                    <Calculator className="w-4 h-4" />
+                    <span className="hidden sm:inline">Custos</span>
+                  </TabsTrigger>
                 </>
               )}
             </TabsList>
@@ -120,6 +128,10 @@ export default function SettingsPage() {
 
                   <TabsContent value="payments" className="mt-0">
                     <PaymentMethodSettings />
+                  </TabsContent>
+
+                  <TabsContent value="costs" className="mt-0">
+                    <RecipeCostSettings />
                   </TabsContent>
                 </>
               )}
