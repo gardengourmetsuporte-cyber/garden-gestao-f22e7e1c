@@ -42,7 +42,6 @@ export function ChecklistSettingsManager() {
   const handleAddSector = async (data: { name: string; color: string }) => {
     try {
       await addSector(data);
-      toast.success('Setor criado!');
     } catch (error) {
       toast.error('Erro ao criar setor');
       throw error;
@@ -52,7 +51,6 @@ export function ChecklistSettingsManager() {
   const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
     try {
       await updateSector(id, data);
-      toast.success('Setor atualizado!');
     } catch (error) {
       toast.error('Erro ao atualizar setor');
       throw error;
@@ -62,7 +60,6 @@ export function ChecklistSettingsManager() {
   const handleDeleteSector = async (id: string) => {
     try {
       await deleteSector(id);
-      toast.success('Setor excluído!');
     } catch (error) {
       toast.error('Erro ao excluir setor');
       throw error;
@@ -72,7 +69,6 @@ export function ChecklistSettingsManager() {
   const handleAddSubcategory = async (data: { sector_id: string; name: string }) => {
     try {
       await addSubcategory(data);
-      toast.success('Subcategoria criada!');
     } catch (error) {
       toast.error('Erro ao criar subcategoria');
       throw error;
@@ -82,7 +78,6 @@ export function ChecklistSettingsManager() {
   const handleUpdateSubcategory = async (id: string, data: { name?: string }) => {
     try {
       await updateSubcategory(id, data);
-      toast.success('Subcategoria atualizada!');
     } catch (error) {
       toast.error('Erro ao atualizar subcategoria');
       throw error;
@@ -92,7 +87,6 @@ export function ChecklistSettingsManager() {
   const handleDeleteSubcategory = async (id: string) => {
     try {
       await deleteSubcategory(id);
-      toast.success('Subcategoria excluída!');
     } catch (error) {
       toast.error('Erro ao excluir subcategoria');
       throw error;
@@ -101,9 +95,7 @@ export function ChecklistSettingsManager() {
 
   const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType }) => {
     try {
-      // Auto-assign selected type when adding new item
       await addItem({ ...data, checklist_type: data.checklist_type || selectedType });
-      toast.success('Item criado!');
     } catch (error) {
       toast.error('Erro ao criar item');
       throw error;
@@ -113,7 +105,6 @@ export function ChecklistSettingsManager() {
   const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: 'abertura' | 'fechamento' }) => {
     try {
       await updateItem(id, data);
-      toast.success('Item atualizado!');
     } catch (error) {
       toast.error('Erro ao atualizar item');
       throw error;
@@ -123,7 +114,6 @@ export function ChecklistSettingsManager() {
   const handleDeleteItem = async (id: string) => {
     try {
       await deleteItem(id);
-      toast.success('Item movido para lixeira!');
     } catch (error) {
       toast.error('Erro ao excluir item');
       throw error;

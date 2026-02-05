@@ -14,7 +14,6 @@ export function UserManagement() {
     setUpdatingUser(userId);
     try {
       await updateUserRole(userId, newRole);
-      toast.success('Função atualizada com sucesso!');
     } catch (error) {
       toast.error('Erro ao atualizar função');
     } finally {

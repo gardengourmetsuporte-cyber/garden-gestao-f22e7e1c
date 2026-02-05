@@ -87,7 +87,6 @@ export function ReceiveOrderSheet({
     setIsSubmitting(true);
     try {
       await onConfirmReceive(order.id, itemsToAdd);
-      toast.success('Pedido recebido e estoque atualizado!');
       onOpenChange(false);
     } catch (error) {
       console.error('Error receiving order:', error);

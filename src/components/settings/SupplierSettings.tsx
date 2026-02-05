@@ -41,14 +41,12 @@ export function SupplierSettings() {
           phone: phone.trim() || null,
           email: email.trim() || null,
         });
-        toast.success('Fornecedor atualizado!');
       } else {
         await addSupplier({
           name: name.trim(),
           phone: phone.trim() || undefined,
           email: email.trim() || undefined,
         });
-        toast.success('Fornecedor criado!');
       }
       setSheetOpen(false);
       resetForm();
@@ -60,7 +58,6 @@ export function SupplierSettings() {
   const handleDelete = async (id: string) => {
     try {
       await deleteSupplier(id);
-      toast.success('Fornecedor excluído!');
     } catch (error) {
       toast.error('Erro ao excluir fornecedor');
     }

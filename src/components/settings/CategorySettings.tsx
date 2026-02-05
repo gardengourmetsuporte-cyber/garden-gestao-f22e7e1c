@@ -26,10 +26,8 @@ export function CategorySettings() {
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.id, { name: name.trim(), color });
-        toast.success('Categoria atualizada!');
       } else {
         await addCategory(name.trim(), color, 'Package');
-        toast.success('Categoria criada!');
       }
       setSheetOpen(false);
       resetForm();
@@ -45,7 +43,6 @@ export function CategorySettings() {
   const handleDelete = async (id: string) => {
     try {
       await deleteCategory(id);
-      toast.success('Categoria excluída!');
     } catch (error) {
       toast.error('Erro ao excluir categoria');
     }

@@ -127,8 +127,7 @@ interface PaymentSetting {
          return false;
        }
  
-       toast.success('Fechamento enviado com sucesso!');
-       await fetchClosings();
+      await fetchClosings();
        return true;
      } catch {
        toast.error('Erro ao enviar fechamento');
@@ -158,8 +157,7 @@ interface PaymentSetting {
          await integrateWithFinancial(closing);
        }
  
-       toast.success('Fechamento aprovado!');
-       await fetchClosings();
+      await fetchClosings();
        return true;
      } catch {
        toast.error('Erro ao aprovar fechamento');
@@ -183,8 +181,7 @@ interface PaymentSetting {
  
        if (error) throw error;
  
-       toast.success('Fechamento marcado como divergente');
-       await fetchClosings();
+      await fetchClosings();
        return true;
      } catch {
        toast.error('Erro ao marcar divergência');
@@ -441,8 +438,7 @@ interface PaymentSetting {
  
        if (error) throw error;
  
-       toast.success('Fechamento excluído');
-       await fetchClosings();
+      await fetchClosings();
        return true;
      } catch {
        toast.error('Erro ao excluir fechamento');

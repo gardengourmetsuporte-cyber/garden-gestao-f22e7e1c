@@ -320,7 +320,6 @@ export function useFinance(selectedMonth: Date) {
       toast.error('Erro ao criar conta');
       return;
     }
-    toast.success('Conta criada!');
     await fetchAccounts();
   };
 
@@ -345,7 +344,6 @@ export function useFinance(selectedMonth: Date) {
       toast.error('Erro ao excluir conta');
       return;
     }
-    toast.success('Conta excluída!');
     await fetchAccounts();
   };
 

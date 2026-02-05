@@ -94,8 +94,7 @@
          .eq('id', id);
  
        if (error) throw error;
- 
-       toast.success('Configuração salva!');
+
        await fetchSettings();
        return true;
      } catch (error) {

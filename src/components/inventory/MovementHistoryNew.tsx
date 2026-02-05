@@ -45,7 +45,6 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
     setDeletingId(movementId);
     try {
       await onDeleteMovement(movementId);
-      toast.success('Movimentação excluída e estoque ajustado!');
     } catch (error) {
       toast.error('Erro ao excluir movimentação');
     } finally {

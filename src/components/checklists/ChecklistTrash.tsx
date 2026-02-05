@@ -58,7 +58,6 @@ export function ChecklistTrash({
     try {
       await onRestore(id);
       setDeletedItems(prev => prev.filter(item => item.id !== id));
-      toast.success('Item restaurado!');
     } catch (error) {
       toast.error('Erro ao restaurar item');
     }
@@ -69,7 +68,6 @@ export function ChecklistTrash({
     try {
       await onPermanentDelete(confirmDeleteId);
       setDeletedItems(prev => prev.filter(item => item.id !== confirmDeleteId));
-      toast.success('Item excluído permanentemente');
     } catch (error) {
       toast.error('Erro ao excluir item');
     } finally {
@@ -81,7 +79,6 @@ export function ChecklistTrash({
     try {
       await onEmptyTrash();
       setDeletedItems([]);
-      toast.success('Lixeira esvaziada!');
     } catch (error) {
       toast.error('Erro ao esvaziar lixeira');
     } finally {
