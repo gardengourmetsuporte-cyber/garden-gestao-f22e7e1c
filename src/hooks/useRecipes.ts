@@ -2,7 +2,7 @@
  import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
  import { supabase } from '@/integrations/supabase/client';
  import { useToast } from '@/hooks/use-toast';
- import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, calculateIngredientCost } from '@/types/recipe';
+import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, IngredientSourceType } from '@/types/recipe';
  
  export function useRecipes() {
    const { toast } = useToast();
@@ -39,6 +39,13 @@
                unit_type,
                unit_price,
                category:categories(name, color)
+            ),
+            source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(
+              id,
+              name,
+              yield_unit,
+              cost_per_portion,
+              category:recipe_categories(name, color)
              )
            )
          `)
@@ -49,6 +56,32 @@
      },
    });
  
+  // Get available sub-recipes (excluding current recipe to avoid cycles)
+  const getAvailableSubRecipes = (excludeRecipeId?: string) => {
+    return recipes.filter(r => 
+      r.id !== excludeRecipeId && 
+      r.is_active &&
+      !hasCircularDependency(r.id, excludeRecipeId)
+    );
+  };
+
+  // Check for circular dependency
+  const hasCircularDependency = (subRecipeId: string, parentRecipeId?: string): boolean => {
+    if (!parentRecipeId) return false;
+    
+    const subRecipe = recipes.find(r => r.id === subRecipeId);
+    if (!subRecipe?.ingredients) return false;
+    
+    for (const ing of subRecipe.ingredients) {
+      if (ing.source_type === 'recipe' && ing.source_recipe_id) {
+        if (ing.source_recipe_id === parentRecipeId) return true;
+        if (hasCircularDependency(ing.source_recipe_id, parentRecipeId)) return true;
+      }
+    }
+    
+    return false;
+  };
+
    // Fetch inventory items for ingredient picker
    const { data: inventoryItems = [] } = useQuery({
      queryKey: ['inventory-items-for-recipes'],
@@ -78,11 +111,13 @@
        yield_unit: string;
        preparation_notes?: string;
        ingredients: Array<{
-         item_id: string;
+        item_id: string | null;
          quantity: number;
          unit_type: RecipeUnitType;
          unit_cost: number;
          total_cost: number;
+        source_type: IngredientSourceType;
+        source_recipe_id: string | null;
        }>;
      }) => {
        const { ingredients, ...recipeData } = data;
@@ -118,6 +153,8 @@
                unit_cost: ing.unit_cost,
                total_cost: ing.total_cost,
                sort_order: index,
+              source_type: ing.source_type,
+              source_recipe_id: ing.source_recipe_id,
              }))
            );
          
@@ -146,11 +183,13 @@
        preparation_notes?: string;
        ingredients: Array<{
          id?: string;
-         item_id: string;
+        item_id: string | null;
          quantity: number;
          unit_type: RecipeUnitType;
          unit_cost: number;
          total_cost: number;
+        source_type: IngredientSourceType;
+        source_recipe_id: string | null;
        }>;
      }) => {
        const { id, ingredients, ...recipeData } = data;
@@ -193,6 +232,8 @@
                unit_cost: ing.unit_cost,
                total_cost: ing.total_cost,
                sort_order: index,
+              source_type: ing.source_type,
+              source_recipe_id: ing.source_recipe_id,
              }))
            );
          
@@ -272,6 +313,8 @@
                unit_cost: ing.unit_cost,
                total_cost: ing.total_cost,
                sort_order: index,
+              source_type: ing.source_type || 'inventory',
+              source_recipe_id: ing.source_recipe_id || null,
              }))
            );
          
@@ -346,5 +389,7 @@
      addCategory: addCategoryMutation.mutateAsync,
      isAddingRecipe: addRecipeMutation.isPending,
      isUpdatingRecipe: updateRecipeMutation.isPending,
+    getAvailableSubRecipes,
+    hasCircularDependency,
    };
  }
