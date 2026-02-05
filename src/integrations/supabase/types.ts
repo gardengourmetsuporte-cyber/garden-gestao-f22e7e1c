@@ -679,6 +679,7 @@ export type Database = {
       }
       manager_tasks: {
         Row: {
+          category_id: string | null
           completed_at: string | null
           created_at: string
           date: string
@@ -697,6 +698,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category_id?: string | null
           completed_at?: string | null
           created_at?: string
           date?: string
@@ -715,6 +717,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category_id?: string | null
           completed_at?: string | null
           created_at?: string
           date?: string
@@ -732,7 +735,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "manager_tasks_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "task_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
@@ -1037,6 +1048,39 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      task_categories: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

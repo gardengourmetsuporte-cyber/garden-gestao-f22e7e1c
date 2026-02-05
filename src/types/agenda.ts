@@ -3,6 +3,17 @@
 export type DayPeriod = 'morning' | 'afternoon' | 'evening';
 export type TaskPriority = 'low' | 'medium' | 'high';
 
+export interface TaskCategory {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string;
+  icon: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ManagerTask {
   id: string;
   user_id: string;
@@ -13,6 +24,8 @@ export interface ManagerTask {
   priority: TaskPriority;
   is_completed: boolean;
   completed_at: string | null;
+  category_id?: string | null;
+  category?: TaskCategory | null;
   created_at: string;
   updated_at: string;
   // Deprecated fields kept for backward compatibility

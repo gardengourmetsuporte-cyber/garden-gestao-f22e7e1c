@@ -9,19 +9,25 @@ import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect } from 'react';
+import type { ManagerTask } from '@/types/agenda';
 
 export default function Agenda() {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
 
   const {
     tasks,
+    categories,
     isLoading,
     addTask,
+    updateTask,
     toggleTask,
     deleteTask,
+    addCategory,
     isAddingTask,
+    isUpdatingTask,
   } = useAgenda();
 
   // Redirect non-admins
@@ -30,6 +36,16 @@ export default function Agenda() {
       navigate('/');
     }
   }, [isAdmin, navigate]);
+
+  const handleEditTask = (task: ManagerTask) => {
+    setEditingTask(task);
+    setTaskSheetOpen(true);
+  };
+
+  const handleCloseSheet = (open: boolean) => {
+    setTaskSheetOpen(open);
+    if (!open) setEditingTask(null);
+  };
 
   const pendingTasks = tasks.filter(t => !t.is_completed);
   const completedTasks = tasks.filter(t => t.is_completed);
@@ -97,6 +113,7 @@ export default function Agenda() {
                   task={task}
                   onToggle={toggleTask}
                   onDelete={deleteTask}
+                  onClick={() => handleEditTask(task)}
                 />
               ))
             )}
@@ -115,6 +132,7 @@ export default function Agenda() {
                   task={task}
                   onToggle={toggleTask}
                   onDelete={deleteTask}
+                  onClick={() => handleEditTask(task)}
                 />
               ))
             )}
@@ -125,9 +143,14 @@ export default function Agenda() {
       {/* Sheets */}
       <TaskSheet
         open={taskSheetOpen}
-        onOpenChange={setTaskSheetOpen}
+        onOpenChange={handleCloseSheet}
         onSubmit={addTask}
-        isSubmitting={isAddingTask}
+        onUpdate={updateTask}
+        onDelete={deleteTask}
+        isSubmitting={isAddingTask || isUpdatingTask}
+        editingTask={editingTask}
+        categories={categories}
+        onAddCategory={addCategory}
       />
     </AppLayout>
   );
