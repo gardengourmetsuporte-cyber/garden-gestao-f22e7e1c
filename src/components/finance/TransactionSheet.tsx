@@ -9,6 +9,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CategoryPicker } from './CategoryPicker';
 import { 
   TransactionType, 
@@ -17,12 +19,14 @@ import {
   TransactionFormData,
   FinanceTransaction
 } from '@/types/finance';
-import { format, isToday, isYesterday, subDays, addMonths } from 'date-fns';
+import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, ChevronDown, ChevronUp, Loader2, Trash2, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
 import { toast } from 'sonner';
+
+export type RecurringEditMode = 'single' | 'pending' | 'all';
 
 interface TransactionSheetProps {
   open: boolean;
@@ -33,6 +37,7 @@ interface TransactionSheetProps {
   onSave: (data: TransactionFormData) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
+  onUpdateRecurring?: (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => Promise<void>;
 }
 
 const RECURRING_OPTIONS = [
@@ -54,7 +59,8 @@ export function TransactionSheet({
   accounts,
   onSave,
   onDelete,
-  editingTransaction
+  editingTransaction,
+  onUpdateRecurring
 }: TransactionSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -73,6 +79,8 @@ export function TransactionSheet({
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showRecurringConfig, setShowRecurringConfig] = useState(false);
+  const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
+  const [recurringEditMode, setRecurringEditMode] = useState<RecurringEditMode>('single');
 
   // Reset form when opened
   useEffect(() => {
@@ -90,6 +98,7 @@ export function TransactionSheet({
         setIsRecurring(editingTransaction.is_recurring);
         setRecurringInterval(editingTransaction.recurring_interval || 'monthly');
         setNotes(editingTransaction.notes || '');
+        setRecurringEditMode('single');
       } else {
         setType(defaultType);
         setAmount('');
@@ -109,21 +118,41 @@ export function TransactionSheet({
     }
   }, [open, defaultType, accounts, editingTransaction]);
 
+  // Auto-toggle isPaid based on date
+  const handleDateChange = (newDate: Date) => {
+    setDate(newDate);
+    // If date is in the future, automatically set is_paid to false
+    const today = startOfDay(new Date());
+    const selectedDay = startOfDay(newDate);
+    if (selectedDay > today) {
+      setIsPaid(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
     if (!description.trim()) return;
+    
+    // If editing a recurring transaction, show the edit mode dialog
+    if (editingTransaction && editingTransaction.is_recurring && editingTransaction.installment_group_id) {
+      setShowRecurringEditDialog(true);
+      return;
+    }
 
     setIsLoading(true);
     
     if (isRecurring && parseInt(recurringCount) > 1) {
       // Create recurring transactions
+      const groupId = crypto.randomUUID();
       const count = parseInt(recurringCount);
+      const today = startOfDay(new Date());
+      
       for (let i = 0; i < count; i++) {
         let txDate = date;
         if (recurringInterval === 'weekly') {
-          txDate = new Date(date.getTime() + i * 7 * 24 * 60 * 60 * 1000);
+          txDate = addWeeks(date, i);
         } else if (recurringInterval === 'biweekly') {
-          txDate = new Date(date.getTime() + i * 14 * 24 * 60 * 60 * 1000);
+          txDate = addWeeks(date, i * 2);
         } else if (recurringInterval === 'monthly') {
           txDate = addMonths(date, i);
         } else if (recurringInterval === 'bimonthly') {
@@ -136,6 +165,9 @@ export function TransactionSheet({
           txDate = addMonths(date, i * 12);
         }
         
+        // Only the first transaction (if date is today or past) should be marked as paid
+        const txIsPaid = (i === 0 && startOfDay(txDate) <= today) ? isPaid : false;
+        
         await onSave({
           type,
           amount: parseFloat(amount),
@@ -144,11 +176,14 @@ export function TransactionSheet({
           account_id: accountId,
           to_account_id: type === 'transfer' ? toAccountId : null,
           date: format(txDate, 'yyyy-MM-dd'),
-          is_paid: i === 0 ? isPaid : false,
+          is_paid: txIsPaid,
           is_fixed: isFixed,
           is_recurring: true,
           recurring_interval: recurringInterval,
-          notes: notes.trim() || undefined
+          notes: notes.trim() || undefined,
+          installment_number: i + 1,
+          total_installments: count,
+          installment_group_id: groupId
         });
       }
 
@@ -169,6 +204,36 @@ export function TransactionSheet({
         recurring_interval: isRecurring ? recurringInterval : undefined,
         notes: notes.trim() || undefined
       });
+    }
+    
+    setIsLoading(false);
+    onOpenChange(false);
+  };
+
+  const handleRecurringEditConfirm = async () => {
+    if (!editingTransaction) return;
+    
+    setShowRecurringEditDialog(false);
+    setIsLoading(true);
+    
+    const updateData: Partial<TransactionFormData> = {
+      type,
+      amount: parseFloat(amount),
+      description: description.trim(),
+      category_id: categoryId,
+      account_id: accountId,
+      to_account_id: type === 'transfer' ? toAccountId : null,
+      date: format(date, 'yyyy-MM-dd'),
+      is_paid: isPaid,
+      is_fixed: isFixed,
+      notes: notes.trim() || undefined
+    };
+    
+    if (onUpdateRecurring) {
+      await onUpdateRecurring(editingTransaction.id, updateData, recurringEditMode);
+    } else {
+      // Fallback: just update single
+      await onSave(updateData as TransactionFormData);
     }
     
     setIsLoading(false);
@@ -267,14 +332,14 @@ export function TransactionSheet({
                 <Button
                   variant={isToday(date) ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setDate(new Date())}
+                  onClick={() => handleDateChange(new Date())}
                 >
                   Hoje
                 </Button>
                 <Button
                   variant={isYesterday(date) ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setDate(subDays(new Date(), 1))}
+                  onClick={() => handleDateChange(subDays(new Date(), 1))}
                 >
                   Ontem
                 </Button>
@@ -290,7 +355,7 @@ export function TransactionSheet({
                       mode="single"
                       selected={date}
                       onSelect={(d) => {
-                        if (d) setDate(d);
+                        if (d) handleDateChange(d);
                         setShowCalendar(false);
                       }}
                       locale={ptBR}
@@ -500,6 +565,53 @@ export function TransactionSheet({
         selectedId={categoryId}
         onSelect={(cat) => setCategoryId(cat.id)}
       />
+      
+      {/* Recurring Edit Mode Dialog */}
+      <Dialog open={showRecurringEditDialog} onOpenChange={setShowRecurringEditDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              Atenção! Esta é uma transação repetida<br />
+              Você deseja:
+            </DialogTitle>
+          </DialogHeader>
+          
+          <RadioGroup 
+            value={recurringEditMode} 
+            onValueChange={(v) => setRecurringEditMode(v as RecurringEditMode)}
+            className="space-y-3 py-4"
+          >
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem value="single" id="edit-single" />
+              <Label htmlFor="edit-single" className="font-normal cursor-pointer">
+                Editar somente esta
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem value="pending" id="edit-pending" />
+              <Label htmlFor="edit-pending" className="font-normal cursor-pointer">
+                Editar todas as pendentes
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <RadioGroupItem value="all" id="edit-all" />
+              <Label htmlFor="edit-all" className="font-normal cursor-pointer">
+                Editar todas (incluindo efetivadas)
+              </Label>
+            </div>
+          </RadioGroup>
+          
+          <DialogFooter>
+            <Button 
+              onClick={handleRecurringEditConfirm}
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirmar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

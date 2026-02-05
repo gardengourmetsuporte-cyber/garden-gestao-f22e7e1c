@@ -10,8 +10,9 @@ import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { useFinance } from '@/hooks/useFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
 import { useCreditCardInvoices } from '@/hooks/useCreditCardInvoices';
-import { FinanceTab, TransactionType, FinanceTransaction } from '@/types/finance';
+import { FinanceTab, TransactionType, FinanceTransaction, TransactionFormData } from '@/types/finance';
 import { Loader2 } from 'lucide-react';
+import { RecurringEditMode } from '@/components/finance/TransactionSheet';
 
 export default function Finance() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
@@ -35,6 +36,7 @@ export default function Finance() {
     addAccount,
     updateAccount,
     deleteAccount,
+    updateRecurringTransaction,
     refetch
   } = useFinance(selectedMonth);
 
@@ -175,6 +177,7 @@ export default function Finance() {
         onSave={handleSaveTransaction}
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}
+        onUpdateRecurring={updateRecurringTransaction}
       />
     </AppLayout>
   );

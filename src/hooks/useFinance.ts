@@ -13,6 +13,8 @@ import {
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { toast } from 'sonner';
 
+export type RecurringEditMode = 'single' | 'pending' | 'all';
+
 export function useFinance(selectedMonth: Date) {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<FinanceAccount[]>([]);
@@ -216,6 +218,74 @@ export function useFinance(selectedMonth: Date) {
     await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 
+  const updateRecurringTransaction = async (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => {
+    // First get the transaction to find its group
+    const { data: transaction } = await supabase
+      .from('finance_transactions')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (!transaction) {
+      toast.error('Transação não encontrada');
+      return;
+    }
+    
+    const groupId = transaction.installment_group_id;
+    
+    if (mode === 'single' || !groupId) {
+      // Update only this transaction
+      const { error } = await supabase
+        .from('finance_transactions')
+        .update(data)
+        .eq('id', id);
+      if (error) {
+        toast.error('Erro ao atualizar transação');
+        return;
+      }
+      toast.success('Transação atualizada!');
+    } else if (mode === 'pending') {
+      // Update all pending (is_paid = false) transactions in the group
+      const { error } = await supabase
+        .from('finance_transactions')
+        .update({
+          amount: data.amount,
+          description: data.description ? data.description.replace(/\s*\(\d+\/\d+\)$/, '') : undefined,
+          category_id: data.category_id,
+          account_id: data.account_id,
+          is_fixed: data.is_fixed,
+          notes: data.notes
+        })
+        .eq('installment_group_id', groupId)
+        .eq('is_paid', false);
+      if (error) {
+        toast.error('Erro ao atualizar transações pendentes');
+        return;
+      }
+      toast.success('Transações pendentes atualizadas!');
+    } else if (mode === 'all') {
+      // Update all transactions in the group
+      const { error } = await supabase
+        .from('finance_transactions')
+        .update({
+          amount: data.amount,
+          description: data.description ? data.description.replace(/\s*\(\d+\/\d+\)$/, '') : undefined,
+          category_id: data.category_id,
+          account_id: data.account_id,
+          is_fixed: data.is_fixed,
+          notes: data.notes
+        })
+        .eq('installment_group_id', groupId);
+      if (error) {
+        toast.error('Erro ao atualizar todas as transações');
+        return;
+      }
+      toast.success('Todas as transações atualizadas!');
+    }
+    
+    await Promise.all([fetchTransactions(), fetchAccounts()]);
+  };
+
   const deleteTransaction = async (id: string) => {
     const { error } = await supabase
       .from('finance_transactions')
@@ -336,6 +406,7 @@ export function useFinance(selectedMonth: Date) {
     addAccount,
     updateAccount,
     deleteAccount,
+    updateRecurringTransaction,
     refetch: () => Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]),
   };
 }
