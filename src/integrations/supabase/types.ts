@@ -601,6 +601,8 @@ export type Database = {
           id: string
           min_stock: number
           name: string
+          recipe_unit_price: number | null
+          recipe_unit_type: string | null
           supplier_id: string | null
           unit_price: number | null
           unit_type: Database["public"]["Enums"]["unit_type"]
@@ -613,6 +615,8 @@ export type Database = {
           id?: string
           min_stock?: number
           name: string
+          recipe_unit_price?: number | null
+          recipe_unit_type?: string | null
           supplier_id?: string | null
           unit_price?: number | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
@@ -625,6 +629,8 @@ export type Database = {
           id?: string
           min_stock?: number
           name?: string
+          recipe_unit_price?: number | null
+          recipe_unit_type?: string | null
           supplier_id?: string | null
           unit_price?: number | null
           unit_type?: Database["public"]["Enums"]["unit_type"]

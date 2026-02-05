@@ -13,6 +13,8 @@ import { formatCurrency } from '@/types/recipe';
    name: string;
    unit_type: string;
    unit_price: number;
+  recipe_unit_type?: string | null;
+  recipe_unit_price?: number | null;
    category?: { id: string; name: string; color: string } | null;
  }
  
@@ -97,6 +99,13 @@ interface SubRecipeItem {
     return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
   }, [subRecipes, excludeRecipeIds, search]);
   
+  // Get the effective unit and price for recipe (prefer recipe-specific values)
+  const getRecipeDisplay = (item: InventoryItem) => {
+    const unit = item.recipe_unit_type || item.unit_type;
+    const price = item.recipe_unit_price ?? item.unit_price;
+    return { unit, price };
+  };
+
    const toggleCategory = (categoryId: string) => {
      setExpandedCategories((prev) => {
        const next = new Set(prev);
@@ -193,7 +202,7 @@ interface SubRecipeItem {
                          >
                            <span className="font-medium">{item.name}</span>
                            <span className="text-sm text-muted-foreground">
-                             {formatCurrency(item.unit_price || 0)}/{item.unit_type}
+                             {formatCurrency(getRecipeDisplay(item).price || 0)}/{getRecipeDisplay(item).unit}
                            </span>
                          </button>
                        ))}

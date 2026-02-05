@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InventoryItem, Category, Supplier } from '@/types/database';
-import { Trash2 } from 'lucide-react';
+import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface ItemFormSheetProps {
   item?: InventoryItem | null;
@@ -20,6 +21,9 @@ interface ItemFormSheetProps {
     unit_type: 'unidade' | 'kg' | 'litro';
     current_stock: number;
     min_stock: number;
+    unit_price: number | null;
+    recipe_unit_type: string | null;
+    recipe_unit_price: number | null;
   }) => void;
   onDelete?: (id: string) => void;
   isAdmin?: boolean;
@@ -41,6 +45,10 @@ export function ItemFormSheetNew({
   const [unitType, setUnitType] = useState<'unidade' | 'kg' | 'litro'>('unidade');
   const [currentStock, setCurrentStock] = useState('');
   const [minStock, setMinStock] = useState('');
+  const [unitPrice, setUnitPrice] = useState('');
+  const [recipeUnitType, setRecipeUnitType] = useState<string>('');
+  const [recipeUnitPrice, setRecipeUnitPrice] = useState('');
+  const [showRecipeSection, setShowRecipeSection] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -50,6 +58,10 @@ export function ItemFormSheetNew({
       setUnitType(item.unit_type);
       setCurrentStock(item.current_stock.toString());
       setMinStock(item.min_stock.toString());
+      setUnitPrice(item.unit_price?.toString() || '');
+      setRecipeUnitType(item.recipe_unit_type || '');
+      setRecipeUnitPrice(item.recipe_unit_price?.toString() || '');
+      setShowRecipeSection(!!item.recipe_unit_type || !!item.recipe_unit_price);
     } else {
       setName('');
       setCategoryId('');
@@ -57,6 +69,10 @@ export function ItemFormSheetNew({
       setUnitType('unidade');
       setCurrentStock('');
       setMinStock('');
+      setUnitPrice('');
+      setRecipeUnitType('');
+      setRecipeUnitPrice('');
+      setShowRecipeSection(false);
     }
   }, [item, open]);
 
@@ -70,6 +86,9 @@ export function ItemFormSheetNew({
       unit_type: unitType,
       current_stock: parseFloat(currentStock) || 0,
       min_stock: parseFloat(minStock) || 0,
+      unit_price: unitPrice ? parseFloat(unitPrice) : null,
+      recipe_unit_type: recipeUnitType || null,
+      recipe_unit_price: recipeUnitPrice ? parseFloat(recipeUnitPrice) : null,
     });
     
     onOpenChange(false);
@@ -80,6 +99,23 @@ export function ItemFormSheetNew({
       onDelete(item.id);
       onOpenChange(false);
     }
+  };
+
+  // Get recipe unit options based on stock unit type
+  const getRecipeUnitOptions = () => {
+    if (unitType === 'kg') return [
+      { value: 'kg', label: 'Quilos (kg)' },
+      { value: 'g', label: 'Gramas (g)' },
+    ];
+    if (unitType === 'litro') return [
+      { value: 'litro', label: 'Litros (L)' },
+      { value: 'ml', label: 'Mililitros (ml)' },
+    ];
+    return [
+      { value: 'unidade', label: 'Unidade' },
+      { value: 'kg', label: 'Quilos (kg)' },
+      { value: 'g', label: 'Gramas (g)' },
+    ];
   };
 
   const isValid = name.trim();
@@ -206,6 +242,84 @@ export function ItemFormSheetNew({
               />
             </div>
           </div>
+
+          {/* Unit Price */}
+          <div className="space-y-2">
+            <Label htmlFor="unitPrice" className="text-base font-medium">
+              Preço por {unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litro' : 'unidade'}
+            </Label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+              <Input
+                id="unitPrice"
+                type="number"
+                value={unitPrice}
+                onChange={(e) => setUnitPrice(e.target.value)}
+                placeholder="0,00"
+                className="input-large pl-12"
+                step={0.01}
+                min={0}
+              />
+            </div>
+          </div>
+
+          {/* Recipe-specific pricing section */}
+          <Collapsible open={showRecipeSection} onOpenChange={setShowRecipeSection}>
+            <CollapsibleTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 justify-between text-base font-medium"
+              >
+                <span>⚙️ Configurar para Fichas Técnicas</span>
+                {showRecipeSection ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-4 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Configure uma unidade e preço diferente para usar nas fichas técnicas. 
+                Ex: Estoque conta "pacotes", mas ficha usa "kg".
+              </p>
+              
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Unidade para Fichas</Label>
+                <Select value={recipeUnitType} onValueChange={setRecipeUnitType}>
+                  <SelectTrigger className="h-14 text-lg rounded-xl">
+                    <SelectValue placeholder="Mesma do estoque" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="" className="text-base py-3">Mesma do estoque</SelectItem>
+                    {getRecipeUnitOptions().map((option) => (
+                      <SelectItem key={option.value} value={option.value} className="text-base py-3">
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {recipeUnitType && (
+                <div className="space-y-2">
+                  <Label htmlFor="recipeUnitPrice" className="text-base font-medium">
+                    Preço por {recipeUnitType === 'kg' ? 'kg' : recipeUnitType === 'g' ? 'g' : recipeUnitType === 'litro' ? 'L' : recipeUnitType === 'ml' ? 'ml' : 'un'}
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                    <Input
+                      id="recipeUnitPrice"
+                      type="number"
+                      value={recipeUnitPrice}
+                      onChange={(e) => setRecipeUnitPrice(e.target.value)}
+                      placeholder="0,00"
+                      className="input-large pl-12"
+                      step={0.01}
+                      min={0}
+                    />
+                  </div>
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
 
           {/* Actions */}
           <div className="space-y-3 pt-4">
