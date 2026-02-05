@@ -10,6 +10,7 @@ interface TaskItemProps {
   task: ManagerTask;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onClick?: () => void;
 }
 
 const priorityColors = {
@@ -40,21 +41,24 @@ function isOverdue(dateStr: string | null): boolean {
   return isPast(date) && !isToday(date);
 }
 
-export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
+export function TaskItem({ task, onToggle, onDelete, onClick }: TaskItemProps) {
   const dueLabel = formatDueDate(task.due_date || null, task.due_time || null);
   const overdue = !task.is_completed && isOverdue(task.due_date || null);
 
   return (
     <div
+      onClick={onClick}
       className={cn(
         'flex items-center gap-3 p-3 rounded-xl transition-all group',
         'bg-card border shadow-sm hover:shadow-md',
-        task.is_completed && 'opacity-60 bg-muted'
+        task.is_completed && 'opacity-60 bg-muted',
+        onClick && 'cursor-pointer'
       )}
     >
       <Checkbox
         checked={task.is_completed}
         onCheckedChange={() => onToggle(task.id)}
+        onClick={(e) => e.stopPropagation()}
         className={cn(
           'w-6 h-6 rounded-full border-2',
           priorityColors[task.priority]
@@ -79,6 +83,16 @@ export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
           </p>
         )}
 
+        {task.category && (
+          <div className="flex items-center gap-1 mt-0.5">
+            <div 
+              className="w-2 h-2 rounded-full" 
+              style={{ backgroundColor: task.category.color }}
+            />
+            <span className="text-xs text-muted-foreground">{task.category.name}</span>
+          </div>
+        )}
+
         {task.notes && (
           <p className="text-xs text-muted-foreground mt-0.5 truncate">
             {task.notes}
@@ -90,7 +104,10 @@ export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
         variant="ghost"
         size="icon"
         className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
-        onClick={() => onDelete(task.id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(task.id);
+        }}
       >
         <Trash2 className="w-4 h-4" />
       </Button>
