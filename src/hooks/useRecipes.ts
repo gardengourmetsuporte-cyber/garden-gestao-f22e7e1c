@@ -38,6 +38,8 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
                name,
                unit_type,
                unit_price,
+              recipe_unit_type,
+              recipe_unit_price,
                category:categories(name, color)
             ),
             source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(
@@ -93,6 +95,8 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
            name,
            unit_type,
            unit_price,
+          recipe_unit_type,
+          recipe_unit_price,
            category:categories(id, name, color)
          `)
          .order('name');

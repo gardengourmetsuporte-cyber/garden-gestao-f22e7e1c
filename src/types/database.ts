@@ -49,8 +49,11 @@ export interface InventoryItem {
   category_id: string | null;
   supplier_id: string | null;
   unit_type: UnitType;
+  unit_price: number | null;
   current_stock: number;
   min_stock: number;
+  recipe_unit_type: string | null;
+  recipe_unit_price: number | null;
   created_at: string;
   updated_at: string;
   // Joined data

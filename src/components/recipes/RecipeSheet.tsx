@@ -33,6 +33,8 @@ import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type R
    name: string;
    unit_type: string;
    unit_price: number;
+  recipe_unit_type?: string | null;
+  recipe_unit_price?: number | null;
    category?: { id: string; name: string; color: string } | null;
  }
  
@@ -89,9 +91,9 @@ interface SubRecipeItem {
           source_type: (ing.source_type || 'inventory') as IngredientSourceType,
           item_id: ing.item_id || null,
           item_name: ing.item?.name || null,
-          item_unit: ing.item?.unit_type || null,
-          item_price: ing.unit_cost || ing.item?.unit_price || null,
-          original_item_price: ing.item?.unit_price,
+         item_unit: ing.item?.recipe_unit_type || ing.item?.unit_type || null,
+         item_price: ing.unit_cost || ing.item?.recipe_unit_price || ing.item?.unit_price || null,
+         original_item_price: ing.item?.recipe_unit_price ?? ing.item?.unit_price,
           source_recipe_id: ing.source_recipe_id || null,
           source_recipe_name: ing.source_recipe?.name || null,
           source_recipe_unit: ing.source_recipe?.yield_unit || null,
@@ -122,9 +124,11 @@ interface SubRecipeItem {
    const costPerPortion = parseFloat(yieldQuantity) > 0 ? totalCost / parseFloat(yieldQuantity) : totalCost;
    
   const handleAddInventoryItem = (item: InventoryItem) => {
-     const defaultUnit = item.unit_type as RecipeUnitType;
+     // Use recipe-specific unit and price if available
+     const effectiveUnit = (item.recipe_unit_type || item.unit_type) as RecipeUnitType;
+     const effectivePrice = item.recipe_unit_price ?? item.unit_price ?? 0;
      const defaultQuantity = 1;
-     const cost = calculateIngredientCost(item.unit_price || 0, item.unit_type, defaultQuantity, defaultUnit);
+     const cost = calculateIngredientCost(effectivePrice, effectiveUnit, defaultQuantity, effectiveUnit);
      
      setIngredients((prev) => [
        ...prev,
@@ -132,15 +136,15 @@ interface SubRecipeItem {
         source_type: 'inventory',
          item_id: item.id,
          item_name: item.name,
-         item_unit: item.unit_type,
-         item_price: item.unit_price || 0,
-        original_item_price: item.unit_price || 0,
+         item_unit: effectiveUnit,
+         item_price: effectivePrice,
+        original_item_price: effectivePrice,
         source_recipe_id: null,
         source_recipe_name: null,
         source_recipe_unit: null,
         source_recipe_cost: null,
          quantity: defaultQuantity,
-         unit_type: defaultUnit,
+         unit_type: effectiveUnit,
          total_cost: cost,
        },
      ]);

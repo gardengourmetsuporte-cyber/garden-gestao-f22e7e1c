@@ -88,6 +88,9 @@ export function useInventoryDB() {
     unit_type: 'unidade' | 'kg' | 'litro';
     current_stock: number;
     min_stock: number;
+    unit_price?: number | null;
+    recipe_unit_type?: string | null;
+    recipe_unit_price?: number | null;
   }) => {
     const { data, error } = await supabase
       .from('inventory_items')
