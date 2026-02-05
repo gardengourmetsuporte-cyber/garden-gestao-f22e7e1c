@@ -1,152 +1,174 @@
-import { useState } from 'react';
-import { X, Pencil } from 'lucide-react';
+ import { X, Package, Soup, AlertTriangle } from 'lucide-react';
  import { Button } from '@/components/ui/button';
  import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+ import { Label } from '@/components/ui/label';
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
- import { formatCurrency, type RecipeUnitType, calculateIngredientCost } from '@/types/recipe';
+ import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost, getCompatibleUnits } from '@/types/recipe';
+ import { cn } from '@/lib/utils';
  
  interface IngredientRowProps {
    ingredient: {
-     item_id: string;
-     item_name: string;
-     item_unit: string;
-     item_price: number;
+     source_type: IngredientSourceType;
+     item_id: string | null;
+     item_name: string | null;
+     item_unit: string | null;
+     item_price: number | null;
+     original_item_price?: number;
+     source_recipe_id: string | null;
+     source_recipe_name: string | null;
+     source_recipe_unit: string | null;
+     source_recipe_cost: number | null;
      quantity: number;
      unit_type: RecipeUnitType;
      total_cost: number;
    };
-  onChange: (updates: { quantity?: number; unit_type?: RecipeUnitType; total_cost?: number; item_price?: number }) => void;
+   onChange: (updates: Partial<IngredientRowProps['ingredient']>) => void;
    onRemove: () => void;
  }
  
- const UNIT_OPTIONS: { value: RecipeUnitType; label: string; group: string }[] = [
-   { value: 'unidade', label: 'un', group: 'unidade' },
-   { value: 'kg', label: 'kg', group: 'peso' },
-   { value: 'g', label: 'g', group: 'peso' },
-   { value: 'litro', label: 'L', group: 'volume' },
-   { value: 'ml', label: 'ml', group: 'volume' },
+ const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
+   { value: 'unidade', label: 'un' },
+   { value: 'kg', label: 'kg' },
+   { value: 'g', label: 'g' },
+   { value: 'litro', label: 'L' },
+   { value: 'ml', label: 'ml' },
  ];
  
- // Get compatible units based on item's unit type
- function getCompatibleUnits(itemUnit: string): RecipeUnitType[] {
-   if (itemUnit === 'kg') return ['kg', 'g'];
-   if (itemUnit === 'litro') return ['litro', 'ml'];
-   return ['unidade'];
- }
- 
  export function IngredientRow({ ingredient, onChange, onRemove }: IngredientRowProps) {
-   const compatibleUnits = getCompatibleUnits(ingredient.item_unit);
-  const [priceOpen, setPriceOpen] = useState(false);
-  const [tempPrice, setTempPrice] = useState(ingredient.item_price.toString());
+   const isSubRecipe = ingredient.source_type === 'recipe';
+   const baseUnit = isSubRecipe ? ingredient.source_recipe_unit : ingredient.item_unit;
+   const compatibleUnits = getCompatibleUnits(baseUnit || 'unidade');
+   
+   const basePrice = isSubRecipe 
+     ? ingredient.source_recipe_cost || 0 
+     : ingredient.item_price || 0;
+   
+   const displayName = isSubRecipe 
+     ? ingredient.source_recipe_name 
+     : ingredient.item_name;
+   
+   const displayUnit = baseUnit || 'unidade';
+   
+   const hasPriceChanged = !isSubRecipe && 
+     ingredient.original_item_price !== undefined && 
+     ingredient.item_price !== ingredient.original_item_price;
    
    const handleQuantityChange = (value: string) => {
      const quantity = parseFloat(value) || 0;
-     const total_cost = calculateIngredientCost(
-       ingredient.item_price,
-       ingredient.item_unit,
-       quantity,
-       ingredient.unit_type
-     );
-     onChange({ quantity, unit_type: ingredient.unit_type, total_cost });
+     const total_cost = isSubRecipe
+       ? calculateSubRecipeCost(basePrice, displayUnit, quantity, ingredient.unit_type)
+       : calculateIngredientCost(basePrice, displayUnit, quantity, ingredient.unit_type);
+     onChange({ quantity, total_cost });
    };
    
    const handleUnitChange = (unit_type: RecipeUnitType) => {
-     const total_cost = calculateIngredientCost(
-       ingredient.item_price,
-       ingredient.item_unit,
-       ingredient.quantity,
-       unit_type
-     );
-     onChange({ quantity: ingredient.quantity, unit_type, total_cost });
+     const total_cost = isSubRecipe
+       ? calculateSubRecipeCost(basePrice, displayUnit, ingredient.quantity, unit_type)
+       : calculateIngredientCost(basePrice, displayUnit, ingredient.quantity, unit_type);
+     onChange({ unit_type, total_cost });
    };
    
-  const handlePriceSave = () => {
-    const newPrice = parseFloat(tempPrice) || 0;
-    const total_cost = calculateIngredientCost(
-      newPrice,
-      ingredient.item_unit,
-      ingredient.quantity,
-      ingredient.unit_type
-    );
-    onChange({ item_price: newPrice, total_cost });
-    setPriceOpen(false);
-  };
-  
+   const handlePriceChange = (value: string) => {
+     if (isSubRecipe) return;
+     const newPrice = parseFloat(value) || 0;
+     const total_cost = calculateIngredientCost(newPrice, displayUnit, ingredient.quantity, ingredient.unit_type);
+     onChange({ item_price: newPrice, total_cost });
+   };
+   
    return (
-    <div className="p-3 bg-secondary/30 rounded-xl space-y-2">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{ingredient.item_name}</p>
-          <Popover open={priceOpen} onOpenChange={(o) => {
-            setPriceOpen(o);
-            if (o) setTempPrice(ingredient.item_price.toString());
-          }}>
-            <PopoverTrigger asChild>
-              <button className="text-xs text-primary underline underline-offset-2 hover:text-primary/80 flex items-center gap-1">
-                {formatCurrency(ingredient.item_price)}/{ingredient.item_unit}
-                <Pencil className="h-3 w-3" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-3" align="start">
-              <div className="space-y-2">
-                <Label className="text-xs font-medium">Preço por {ingredient.item_unit}</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={tempPrice}
-                  onChange={(e) => setTempPrice(e.target.value)}
-                  className="h-9"
-                  placeholder="0,00"
-                />
-                <Button size="sm" className="w-full" onClick={handlePriceSave}>
-                  Salvar Preço
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
-          onClick={onRemove}
-        >
-          <X className="h-4 w-4" />
-        </Button>
+     <div className="p-4 bg-secondary/30 rounded-xl space-y-3">
+       {/* Header */}
+       <div className="flex items-center justify-between gap-2">
+         <div className="flex items-center gap-2 flex-1 min-w-0">
+           <div className={cn(
+             "p-1.5 rounded-lg shrink-0",
+             isSubRecipe ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" : "bg-primary/10 text-primary"
+           )}>
+             {isSubRecipe ? <Soup className="h-4 w-4" /> : <Package className="h-4 w-4" />}
+           </div>
+           <div className="min-w-0">
+             <p className="font-medium text-sm truncate">{displayName}</p>
+             <p className="text-xs text-muted-foreground">
+               {isSubRecipe ? 'Sub-receita' : 'Estoque'}
+             </p>
+           </div>
+         </div>
+         <Button
+           type="button"
+           variant="ghost"
+           size="icon"
+           className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+           onClick={onRemove}
+         >
+           <X className="h-4 w-4" />
+         </Button>
        </div>
        
-      <div className="flex items-center gap-2">
-         <Input
-           type="number"
-           value={ingredient.quantity || ''}
-           onChange={(e) => handleQuantityChange(e.target.value)}
-          className="w-20 h-9 text-center flex-shrink-0"
-           placeholder="Qtd"
-           min="0"
-           step="0.01"
-         />
+       {/* Price Row */}
+       <div className="space-y-1">
+         <Label className="text-xs text-muted-foreground">
+           {isSubRecipe ? 'Custo por porção (ficha técnica)' : 'Preço base'}
+         </Label>
+         <div className="flex items-center gap-2">
+           {isSubRecipe ? (
+             <div className="flex-1 h-9 px-3 flex items-center bg-muted/50 rounded-md text-sm">
+               {formatCurrency(basePrice)}/{displayUnit}
+             </div>
+           ) : (
+             <div className="flex-1 flex items-center gap-1">
+               <span className="text-muted-foreground text-sm">R$</span>
+               <Input
+                 type="number"
+                 step="0.01"
+                 min="0"
+                 value={ingredient.item_price || ''}
+                 onChange={(e) => handlePriceChange(e.target.value)}
+                 className="h-9"
+               />
+               <span className="text-muted-foreground text-sm">/{displayUnit}</span>
+             </div>
+           )}
+         </div>
+         {hasPriceChanged && (
+           <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+             <AlertTriangle className="h-3 w-3" />
+             <span>Estoque: {formatCurrency(ingredient.original_item_price || 0)}</span>
+           </div>
+         )}
+       </div>
+       
+       {/* Quantity Row */}
+       <div className="flex items-end gap-3">
+         <div className="flex-1 space-y-1">
+           <Label className="text-xs text-muted-foreground">Quantidade</Label>
+           <div className="flex gap-2">
+             <Input
+               type="number"
+               value={ingredient.quantity || ''}
+               onChange={(e) => handleQuantityChange(e.target.value)}
+               className="h-9 flex-1"
+               placeholder="0"
+               min="0"
+               step="0.01"
+             />
+             <Select value={ingredient.unit_type} onValueChange={handleUnitChange}>
+               <SelectTrigger className="w-20 h-9">
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent>
+                 {UNIT_OPTIONS.filter((u) => compatibleUnits.includes(u.value)).map((unit) => (
+                   <SelectItem key={unit.value} value={unit.value}>
+                     {unit.label}
+                   </SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+           </div>
+         </div>
          
-         <Select value={ingredient.unit_type} onValueChange={handleUnitChange}>
-          <SelectTrigger className="w-16 h-9 flex-shrink-0">
-             <SelectValue />
-           </SelectTrigger>
-           <SelectContent>
-             {UNIT_OPTIONS.filter((u) => compatibleUnits.includes(u.value)).map((unit) => (
-               <SelectItem key={unit.value} value={unit.value}>
-                 {unit.label}
-               </SelectItem>
-             ))}
-           </SelectContent>
-         </Select>
-         
-        <div className="flex-1 text-right">
-          <span className="text-sm font-semibold text-primary">
-             {formatCurrency(ingredient.total_cost)}
-           </span>
+         <div className="text-right pb-1">
+           <p className="text-xs text-muted-foreground">Custo</p>
+           <p className="text-lg font-bold text-primary">{formatCurrency(ingredient.total_cost)}</p>
          </div>
        </div>
      </div>

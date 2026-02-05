@@ -35,6 +35,7 @@
      deleteRecipe,
      isAddingRecipe,
      isUpdatingRecipe,
+    getAvailableSubRecipes,
    } = useRecipes();
    
    const [search, setSearch] = useState('');
@@ -251,6 +252,13 @@
          recipe={selectedRecipe}
          categories={categories}
          inventoryItems={inventoryItems}
+        subRecipes={getAvailableSubRecipes(selectedRecipe?.id).map(r => ({
+          id: r.id,
+          name: r.name,
+          yield_unit: r.yield_unit,
+          cost_per_portion: r.cost_per_portion,
+          category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
+        }))}
          onSave={handleSave}
          isSaving={isAddingRecipe || isUpdatingRecipe}
        />

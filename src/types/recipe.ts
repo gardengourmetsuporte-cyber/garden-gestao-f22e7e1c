@@ -1,4 +1,5 @@
  export type RecipeUnitType = 'unidade' | 'kg' | 'g' | 'litro' | 'ml';
+export type IngredientSourceType = 'inventory' | 'recipe';
  
  export interface RecipeCategory {
    id: string;
@@ -31,13 +32,15 @@
  export interface RecipeIngredient {
    id: string;
    recipe_id: string;
-   item_id: string;
+  item_id: string | null;
    quantity: number;
    unit_type: RecipeUnitType;
    unit_cost: number;
    total_cost: number;
    sort_order: number;
    created_at: string;
+  source_type: IngredientSourceType;
+  source_recipe_id: string | null;
    // Joined data
    item?: {
      id: string;
@@ -46,6 +49,13 @@
      unit_price: number;
      category?: { name: string; color: string } | null;
    };
+  source_recipe?: {
+    id: string;
+    name: string;
+    yield_unit: string;
+    cost_per_portion: number;
+    category?: { name: string; color: string } | null;
+  };
  }
  
  // Unit conversion utilities
@@ -97,3 +107,22 @@
      currency: 'BRL',
    }).format(value);
  }
+
+// Calculate cost for sub-recipe ingredient
+export function calculateSubRecipeCost(
+  subRecipeCostPerPortion: number,
+  subRecipeYieldUnit: string,
+  recipeQuantity: number,
+  recipeUnit: string
+): number {
+  // Convert recipe quantity to sub-recipe's yield unit
+  const convertedQty = convertUnit(recipeQuantity, recipeUnit, subRecipeYieldUnit);
+  return convertedQty * subRecipeCostPerPortion;
+}
+
+// Get compatible units for a base unit
+export function getCompatibleUnits(baseUnit: string): RecipeUnitType[] {
+  if (baseUnit === 'kg' || baseUnit === 'g') return ['kg', 'g'];
+  if (baseUnit === 'litro' || baseUnit === 'ml') return ['litro', 'ml'];
+  return ['unidade'];
+}

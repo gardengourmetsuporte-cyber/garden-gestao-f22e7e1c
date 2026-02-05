@@ -946,10 +946,12 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          item_id: string
+          item_id: string | null
           quantity: number
           recipe_id: string
           sort_order: number | null
+          source_recipe_id: string | null
+          source_type: string
           total_cost: number
           unit_cost: number
           unit_type: Database["public"]["Enums"]["recipe_unit_type"]
@@ -957,10 +959,12 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          item_id: string
+          item_id?: string | null
           quantity: number
           recipe_id: string
           sort_order?: number | null
+          source_recipe_id?: string | null
+          source_type?: string
           total_cost?: number
           unit_cost?: number
           unit_type: Database["public"]["Enums"]["recipe_unit_type"]
@@ -968,10 +972,12 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          item_id?: string
+          item_id?: string | null
           quantity?: number
           recipe_id?: string
           sort_order?: number | null
+          source_recipe_id?: string | null
+          source_type?: string
           total_cost?: number
           unit_cost?: number
           unit_type?: Database["public"]["Enums"]["recipe_unit_type"]
@@ -987,6 +993,13 @@ export type Database = {
           {
             foreignKeyName: "recipe_ingredients_recipe_id_fkey"
             columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ingredients_source_recipe_id_fkey"
+            columns: ["source_recipe_id"]
             isOneToOne: false
             referencedRelation: "recipes"
             referencedColumns: ["id"]

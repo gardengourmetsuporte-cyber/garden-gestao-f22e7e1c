@@ -9,14 +9,20 @@
  import { ScrollArea } from '@/components/ui/scroll-area';
  import { IngredientRow } from './IngredientRow';
  import { IngredientPicker } from './IngredientPicker';
- import { formatCurrency, calculateIngredientCost, type Recipe, type RecipeCategory, type RecipeUnitType } from '@/types/recipe';
+import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type Recipe, type RecipeCategory, type RecipeUnitType, type IngredientSourceType } from '@/types/recipe';
  
  interface LocalIngredient {
    id?: string;
-   item_id: string;
-   item_name: string;
-   item_unit: string;
-   item_price: number;
+  source_type: IngredientSourceType;
+  item_id: string | null;
+  item_name: string | null;
+  item_unit: string | null;
+  item_price: number | null;
+  original_item_price?: number;
+  source_recipe_id: string | null;
+  source_recipe_name: string | null;
+  source_recipe_unit: string | null;
+  source_recipe_cost: number | null;
    quantity: number;
    unit_type: RecipeUnitType;
    total_cost: number;
@@ -30,12 +36,21 @@
    category?: { id: string; name: string; color: string } | null;
  }
  
+interface SubRecipeItem {
+  id: string;
+  name: string;
+  yield_unit: string;
+  cost_per_portion: number;
+  category?: { id: string; name: string; color: string } | null;
+}
+
  interface RecipeSheetProps {
    open: boolean;
    onOpenChange: (open: boolean) => void;
    recipe: Recipe | null;
    categories: RecipeCategory[];
    inventoryItems: InventoryItem[];
+  subRecipes: SubRecipeItem[];
    onSave: (data: any) => Promise<void>;
    isSaving: boolean;
  }
@@ -46,6 +61,7 @@
    recipe,
    categories,
    inventoryItems,
+  subRecipes,
    onSave,
    isSaving,
  }: RecipeSheetProps) {
@@ -68,10 +84,16 @@
        setIngredients(
          (recipe.ingredients || []).map((ing) => ({
            id: ing.id,
-           item_id: ing.item_id,
-           item_name: ing.item?.name || '',
-           item_unit: ing.item?.unit_type || 'unidade',
-           item_price: ing.item?.unit_price || 0,
+          source_type: (ing.source_type || 'inventory') as IngredientSourceType,
+          item_id: ing.item_id || null,
+          item_name: ing.item?.name || null,
+          item_unit: ing.item?.unit_type || null,
+          item_price: ing.unit_cost || ing.item?.unit_price || null,
+          original_item_price: ing.item?.unit_price,
+          source_recipe_id: ing.source_recipe_id || null,
+          source_recipe_name: ing.source_recipe?.name || null,
+          source_recipe_unit: ing.source_recipe?.yield_unit || null,
+          source_recipe_cost: ing.source_recipe?.cost_per_portion || null,
            quantity: ing.quantity,
            unit_type: ing.unit_type,
            total_cost: ing.total_cost,
@@ -90,7 +112,7 @@
    const totalCost = ingredients.reduce((sum, ing) => sum + ing.total_cost, 0);
    const costPerPortion = parseFloat(yieldQuantity) > 0 ? totalCost / parseFloat(yieldQuantity) : totalCost;
    
-   const handleAddIngredient = (item: InventoryItem) => {
+  const handleAddInventoryItem = (item: InventoryItem) => {
      const defaultUnit = item.unit_type as RecipeUnitType;
      const defaultQuantity = 1;
      const cost = calculateIngredientCost(item.unit_price || 0, item.unit_type, defaultQuantity, defaultUnit);
@@ -98,10 +120,16 @@
      setIngredients((prev) => [
        ...prev,
        {
+        source_type: 'inventory',
          item_id: item.id,
          item_name: item.name,
          item_unit: item.unit_type,
          item_price: item.unit_price || 0,
+        original_item_price: item.unit_price || 0,
+        source_recipe_id: null,
+        source_recipe_name: null,
+        source_recipe_unit: null,
+        source_recipe_cost: null,
          quantity: defaultQuantity,
          unit_type: defaultUnit,
          total_cost: cost,
@@ -109,6 +137,30 @@
      ]);
    };
    
+  const handleAddSubRecipe = (subRecipe: SubRecipeItem) => {
+    const defaultUnit = subRecipe.yield_unit as RecipeUnitType;
+    const defaultQuantity = 1;
+    const cost = calculateSubRecipeCost(subRecipe.cost_per_portion, subRecipe.yield_unit, defaultQuantity, defaultUnit);
+    
+    setIngredients((prev) => [
+      ...prev,
+      {
+        source_type: 'recipe',
+        item_id: null,
+        item_name: null,
+        item_unit: null,
+        item_price: null,
+        source_recipe_id: subRecipe.id,
+        source_recipe_name: subRecipe.name,
+        source_recipe_unit: subRecipe.yield_unit,
+        source_recipe_cost: subRecipe.cost_per_portion,
+        quantity: defaultQuantity,
+        unit_type: defaultUnit,
+        total_cost: cost,
+      },
+    ]);
+  };
+  
    const handleIngredientChange = (
      index: number,
     updates: Partial<LocalIngredient>
@@ -137,8 +189,10 @@
          item_id: ing.item_id,
          quantity: ing.quantity,
          unit_type: ing.unit_type,
-         unit_cost: ing.item_price,
+        unit_cost: ing.source_type === 'recipe' ? ing.source_recipe_cost || 0 : ing.item_price || 0,
          total_cost: ing.total_cost,
+        source_type: ing.source_type,
+        source_recipe_id: ing.source_recipe_id,
        })),
      };
      
@@ -288,8 +342,11 @@
          open={pickerOpen}
          onOpenChange={setPickerOpen}
          items={inventoryItems}
-         excludeIds={ingredients.map((i) => i.item_id)}
-         onSelect={handleAddIngredient}
+          subRecipes={subRecipes}
+          excludeIds={ingredients.filter(i => i.source_type === 'inventory' && i.item_id).map((i) => i.item_id!)}
+          excludeRecipeIds={[...(recipe?.id ? [recipe.id] : []), ...ingredients.filter(i => i.source_type === 'recipe' && i.source_recipe_id).map((i) => i.source_recipe_id!)]}
+          onSelectItem={handleAddInventoryItem}
+          onSelectSubRecipe={handleAddSubRecipe}
        />
      </>
    );
