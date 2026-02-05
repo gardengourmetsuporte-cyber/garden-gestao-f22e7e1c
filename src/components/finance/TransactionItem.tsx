@@ -2,7 +2,7 @@
  import { FinanceTransaction } from '@/types/finance';
  import { cn } from '@/lib/utils';
  import { getLucideIcon } from '@/lib/icons';
- import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
  
  interface TransactionItemProps {
    transaction: FinanceTransaction;
@@ -16,8 +16,9 @@
    const [isToggling, setIsToggling] = useState(false);
    const [isDeleting, setIsDeleting] = useState(false);
    const [swipeOffset, setSwipeOffset] = useState(0);
-   const [isSwiping, setIsSwiping] = useState(false);
    const startXRef = useRef(0);
+  const isSwiping = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
  
    const getTypeIcon = () => {
      switch (type) {
@@ -69,43 +70,48 @@
      setIsDeleting(false);
    };
  
-   const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
      startXRef.current = e.touches[0].clientX;
-     setIsSwiping(true);
-   };
+    isSwiping.current = true;
+  }, []);
  
-   const handleTouchMove = (e: React.TouchEvent) => {
-     if (!isSwiping) return;
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isSwiping.current) return;
      const currentX = e.touches[0].clientX;
      const diff = startXRef.current - currentX;
+    // Only allow swipe left (positive diff)
      if (diff > 0) {
-       setSwipeOffset(Math.min(diff, 150));
-     } else {
-       setSwipeOffset(Math.max(diff / 3, -50));
+      setSwipeOffset(Math.min(diff, 140));
+    } else if (diff < -20) {
+      // Reset if swiping right
+      setSwipeOffset(0);
      }
-   };
+  }, []);
  
-   const handleTouchEnd = () => {
-     setIsSwiping(false);
-     if (swipeOffset > 75) {
-       setSwipeOffset(150);
+  const handleTouchEnd = useCallback(() => {
+    isSwiping.current = false;
+    if (swipeOffset > 70) {
+      setSwipeOffset(140);
      } else {
        setSwipeOffset(0);
      }
-   };
+  }, [swipeOffset]);
  
    return (
-     <div className="relative overflow-hidden rounded-xl">
+    <div ref={containerRef} className="relative overflow-hidden rounded-xl">
        {/* Swipe action buttons - positioned behind */}
        <div 
-         className="absolute inset-y-0 right-0 flex"
-         style={{ width: '150px' }}
+        className={cn(
+          "absolute inset-y-0 right-0 flex",
+          swipeOffset === 0 && "pointer-events-none"
+        )}
+        style={{ width: '140px' }}
        >
          <button
            onClick={handleTogglePaid}
            disabled={isToggling}
            className={cn(
-             "w-[75px] flex items-center justify-center",
+            "w-[70px] flex items-center justify-center transition-colors",
              is_paid
                ? "bg-amber-500 hover:bg-amber-600"
                : "bg-success hover:bg-success/90"
@@ -122,7 +128,7 @@
          <button
            onClick={handleDelete}
            disabled={isDeleting}
-           className="w-[75px] bg-destructive hover:bg-destructive/90 flex items-center justify-center"
+          className="w-[70px] bg-destructive hover:bg-destructive/90 flex items-center justify-center transition-colors"
          >
            {isDeleting ? (
              <Loader2 className="w-5 h-5 text-white animate-spin" />
@@ -135,9 +141,9 @@
        {/* Main content - slides left to reveal actions */}
        <div
          className={cn(
-           "flex items-center gap-3 p-3 bg-card border w-full relative z-10",
+          "flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative",
            !is_paid && "opacity-60",
-           !isSwiping && "transition-transform duration-200 ease-out"
+          swipeOffset === 0 && "transition-transform duration-200 ease-out"
          )}
          style={{ transform: `translateX(-${swipeOffset}px)` }}
          onTouchStart={handleTouchStart}

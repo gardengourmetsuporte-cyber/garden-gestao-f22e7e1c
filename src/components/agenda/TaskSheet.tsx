@@ -1,7 +1,7 @@
  import { useState, useEffect } from 'react';
  import { format } from 'date-fns';
  import { ptBR } from 'date-fns/locale';
- import { CalendarIcon, Clock, AlertCircle, AlertTriangle, Info, Folder, Plus, X } from 'lucide-react';
+ import { CalendarIcon, Clock, Folder, Plus, X } from 'lucide-react';
  import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
  import { Button } from '@/components/ui/button';
  import { Input } from '@/components/ui/input';
@@ -11,14 +11,13 @@
  import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
  import { Calendar } from '@/components/ui/calendar';
  import { cn } from '@/lib/utils';
- import type { TaskPriority, ManagerTask, TaskCategory } from '@/types/agenda';
+ import type { ManagerTask, TaskCategory } from '@/types/agenda';
  
  interface TaskFormData {
    title: string; 
    notes?: string;
    due_date?: string; 
    due_time?: string;
-   priority: TaskPriority;
    category_id?: string;
  }
  
@@ -56,13 +55,11 @@
    const [dueDate, setDueDate] = useState<Date>(new Date());
    const [hasTime, setHasTime] = useState(false);
    const [dueTime, setDueTime] = useState('09:00');
-   const [priority, setPriority] = useState<TaskPriority>('medium');
    const [categoryId, setCategoryId] = useState<string | null>(null);
    const [showNewCategory, setShowNewCategory] = useState(false);
    const [newCategoryName, setNewCategoryName] = useState('');
    const [newCategoryColor, setNewCategoryColor] = useState(CATEGORY_COLORS[4]);
  
-   // Populate form when editing
    useEffect(() => {
      if (editingTask) {
        setTitle(editingTask.title);
@@ -71,7 +68,6 @@
        setDueDate(editingTask.due_date ? new Date(editingTask.due_date) : new Date());
        setHasTime(!!editingTask.due_time);
        setDueTime(editingTask.due_time || '09:00');
-       setPriority(editingTask.priority);
        setCategoryId(editingTask.category_id || null);
      } else {
        resetForm();
@@ -85,7 +81,6 @@
      setDueDate(new Date());
      setHasTime(false);
      setDueTime('09:00');
-     setPriority('medium');
      setCategoryId(null);
      setShowNewCategory(false);
      setNewCategoryName('');
@@ -100,7 +95,6 @@
        notes: notes.trim() || undefined,
        due_date: hasDate ? format(dueDate, 'yyyy-MM-dd') : undefined,
        due_time: hasTime ? dueTime : undefined,
-       priority,
        category_id: categoryId || undefined
      };
  
@@ -128,12 +122,6 @@
      }
    };
  
-   const priorityOptions = [
-     { value: 'low', label: 'Baixa', icon: Info, color: 'text-primary' },
-     { value: 'medium', label: 'Média', icon: AlertTriangle, color: 'text-warning' },
-     { value: 'high', label: 'Alta', icon: AlertCircle, color: 'text-destructive' },
-   ];
- 
    return (
      <Sheet open={open} onOpenChange={onOpenChange}>
        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-2xl overflow-y-auto">
@@ -145,7 +133,7 @@
          </SheetHeader>
  
          <form onSubmit={handleSubmit} className="space-y-4 mt-4 pb-4">
-           {/* Title & Notes Card */}
+           {/* Title & Notes */}
            <div className="bg-muted/50 rounded-xl p-3 space-y-2">
              <Input
                placeholder="Título"
@@ -162,7 +150,7 @@
              />
            </div>
  
-           {/* Category Card */}
+           {/* Category */}
            <div className="bg-muted/50 rounded-xl p-3">
              <div className="flex items-center justify-between">
                <div className="flex items-center gap-3">
@@ -183,10 +171,7 @@
                    {categories.map((cat) => (
                      <SelectItem key={cat.id} value={cat.id}>
                        <div className="flex items-center gap-2">
-                         <div 
-                           className="w-3 h-3 rounded-full" 
-                           style={{ backgroundColor: cat.color }}
-                         />
+                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
                          {cat.name}
                        </div>
                      </SelectItem>
@@ -203,7 +188,6 @@
                </Select>
              </div>
  
-             {/* New Category Input */}
              {showNewCategory && (
                <div className="mt-3 pt-3 border-t space-y-2">
                  <div className="flex items-center gap-2">
@@ -213,21 +197,10 @@
                      onChange={(e) => setNewCategoryName(e.target.value)}
                      className="flex-1 h-9"
                    />
-                   <Button 
-                     type="button" 
-                     size="sm" 
-                     onClick={handleAddCategory}
-                     disabled={!newCategoryName.trim()}
-                   >
+                   <Button type="button" size="sm" onClick={handleAddCategory} disabled={!newCategoryName.trim()}>
                      Criar
                    </Button>
-                   <Button 
-                     type="button" 
-                     variant="ghost" 
-                     size="icon"
-                     className="h-9 w-9"
-                     onClick={() => setShowNewCategory(false)}
-                   >
+                   <Button type="button" variant="ghost" size="icon" className="h-9 w-9" onClick={() => setShowNewCategory(false)}>
                      <X className="w-4 h-4" />
                    </Button>
                  </div>
@@ -249,7 +222,7 @@
              )}
            </div>
  
-           {/* Date & Time Card */}
+           {/* Date & Time */}
            <div className="bg-muted/50 rounded-xl divide-y divide-border">
              <div className="flex items-center justify-between p-3">
                <div className="flex items-center gap-3">
@@ -266,12 +239,7 @@
                          </button>
                        </PopoverTrigger>
                        <PopoverContent className="w-auto p-0" align="start">
-                         <Calendar
-                           mode="single"
-                           selected={dueDate}
-                           onSelect={(date) => date && setDueDate(date)}
-                           locale={ptBR}
-                         />
+                         <Calendar mode="single" selected={dueDate} onSelect={(date) => date && setDueDate(date)} locale={ptBR} />
                        </PopoverContent>
                      </Popover>
                    )}
@@ -301,49 +269,13 @@
              </div>
            </div>
  
-           {/* Priority Card */}
-           <div className="bg-muted/50 rounded-xl p-3">
-             <div className="flex items-center justify-between">
-               <div className="flex items-center gap-3">
-                 <div className="p-2 rounded-lg bg-destructive/10">
-                   <AlertCircle className="w-4 h-4 text-destructive" />
-                 </div>
-                 <p className="font-medium text-sm">Prioridade</p>
-               </div>
-               <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
-                 <SelectTrigger className="w-auto h-8 border-0 bg-transparent gap-2">
-                   <SelectValue />
-                 </SelectTrigger>
-                 <SelectContent align="end">
-                   {priorityOptions.map((opt) => (
-                     <SelectItem key={opt.value} value={opt.value}>
-                       <div className="flex items-center gap-2">
-                         <opt.icon className={cn('w-4 h-4', opt.color)} />
-                         {opt.label}
-                       </div>
-                     </SelectItem>
-                   ))}
-                 </SelectContent>
-               </Select>
-             </div>
-           </div>
- 
            <div className="flex gap-2">
              {editingTask && onDelete && (
-               <Button 
-                 type="button" 
-                 variant="destructive"
-                 className="h-12" 
-                 onClick={handleDelete}
-               >
+               <Button type="button" variant="destructive" className="h-12" onClick={handleDelete}>
                  Excluir
                </Button>
              )}
-             <Button 
-               type="submit" 
-               className="flex-1 h-12" 
-               disabled={!title.trim() || isSubmitting}
-             >
+             <Button type="submit" className="flex-1 h-12" disabled={!title.trim() || isSubmitting}>
                {isSubmitting ? 'Salvando...' : editingTask ? 'Salvar' : 'Criar Lembrete'}
              </Button>
            </div>
