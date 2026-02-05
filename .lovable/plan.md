@@ -1,243 +1,136 @@
 
+# Plano: Correcao de Sub-receitas e Interface de Gerenciamento
 
-# Plano: Ficha Tecnica Robusta - Precos e Sub-Receitas
+## Problemas Identificados
 
-## Resumo do Problema
+### 1. Erro de Query no Supabase (PGRST201)
+A query de busca de receitas esta retornando **erro 300** porque agora existem duas foreign keys de `recipe_ingredients` para `recipes`:
+- `recipe_id` (ingrediente pertence a qual receita)
+- `source_recipe_id` (ingrediente vem de qual sub-receita)
 
-1. **Edicao de precos atual e ruim** - O popover e pequeno e escondido
-2. **Nao permite receitas dentro de receitas** - Molhos e bases nao podem ser reutilizados
-3. **Conversao de unidades limitada** - Precisa ser mais flexivel
+O Supabase nao sabe qual relacao usar e exige um hint explicito.
 
----
-
-## 1. Novo Sistema de Ingredientes
-
-### Conceito: Ingrediente Unificado
-
-O sistema passara a suportar dois tipos de ingredientes:
-- **Item do Estoque** - Produtos do inventario (atual)
-- **Sub-Receita** - Outra ficha tecnica (novo)
-
-```text
-Exemplo de uso:
-┌────────────────────────────────────────────────┐
-│ X-BURGUER ESPECIAL                             │
-├────────────────────────────────────────────────┤
-│ Ingredientes:                                  │
-│                                                │
-│ [ESTOQUE] Pao Tradicional                      │
-│ 1 un × R$ 0,85 = R$ 0,85                       │
-│                                                │
-│ [ESTOQUE] Hamburguer 130g                      │
-│ 1 un × R$ 3,66 = R$ 3,66                       │
-│                                                │
-│ [SUB-RECEITA] Molho Especial                   │
-│ 50g × R$ 12,00/kg = R$ 0,60                    │
-│                                                │
-│ CUSTO TOTAL: R$ 5,11                           │
-└────────────────────────────────────────────────┘
-```
-
----
-
-## 2. Estrutura do Banco de Dados
-
-### Modificacao na Tabela `recipe_ingredients`
-
-Adicionar campos para suportar sub-receitas:
-
+**Correcao:** Atualizar a query no hook `useRecipes.ts` para especificar qual FK usar:
 ```sql
-ALTER TABLE recipe_ingredients
-  ADD COLUMN source_type TEXT NOT NULL DEFAULT 'inventory',
-  ADD COLUMN source_recipe_id UUID REFERENCES recipes(id) ON DELETE RESTRICT;
-
--- source_type: 'inventory' | 'recipe'
--- source_recipe_id: ID da sub-receita (quando source_type = 'recipe')
+ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(...)
 ```
 
-### Logica de Custo para Sub-Receitas
-
-Quando uma sub-receita e usada:
-- Usar o `cost_per_portion` como preco base
-- A unidade base e o `yield_unit` da sub-receita
-- Permitir conversoes (se yield_unit = kg, pode usar g)
+### 2. Interface para Gerenciar Sub-receitas
+Adicionar sistema de abas/filtros na pagina de Fichas Tecnicas para organizar:
+- **Produtos** (fichas tecnicas normais - lanches, pratos)
+- **Bases e Preparos** (sub-receitas - molhos, massas, preparos)
 
 ---
 
-## 3. Nova Interface de Ingredientes
+## Solucao Tecnica
 
-### Novo Layout do IngredientRow
+### Arquivo: `src/hooks/useRecipes.ts`
+- Corrigir a query para usar hint explicito na FK: `recipe_ingredients!recipe_ingredients_recipe_id_fkey`
+- Manter o join de `source_recipe` com sua FK explicita
 
-Substituir o popover por campos inline mais claros:
+### Arquivo: `src/pages/Recipes.tsx`
+- Adicionar sistema de abas: "Produtos" | "Bases e Preparos"
+- Filtrar receitas pela categoria (detectar se e "Bases e Preparos")
+- Contador de itens em cada aba
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│ [📦] Queijo Mucerala                              [✕]  │
-│                                                         │
-│ Preco base: R$ [46,00] / kg                             │
-│                                                         │
-│ Quantidade: [200] g        Custo: R$ 9,20               │
-└─────────────────────────────────────────────────────────┘
+### Arquivo: `src/components/recipes/RecipeSheet.tsx`
+- Adicionar opcao para marcar receita como "Base/Preparo" (usando categoria)
+- Pre-selecionar categoria correta quando criar a partir da aba
 
-┌─────────────────────────────────────────────────────────┐
-│ [🍲] Molho Especial (sub-receita)                 [✕]  │
-│                                                         │
-│ Custo porcao: R$ 12,00/kg (da ficha tecnica)            │
-│                                                         │
-│ Quantidade: [50] g         Custo: R$ 0,60               │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Novo IngredientPicker com Abas
-
-```text
-┌─────────────────────────────────────────────────┐
-│ Adicionar Ingrediente                           │
-├─────────────────────────────────────────────────┤
-│ [📦 Estoque]  [🍲 Sub-Receitas]                 │
-│─────────────────────────────────────────────────│
-│ 🔍 Buscar...                                    │
-│                                                 │
-│ ABA ESTOQUE:                                    │
-│ ▼ Carnes                                        │
-│   Hamburguer 130g        R$ 3,66/un             │
-│   Bacon                  R$ 45,00/kg            │
-│                                                 │
-│ ▼ Laticinios                                    │
-│   Queijo Mucerala        R$ 46,00/kg            │
-│                                                 │
-│─────────────────────────────────────────────────│
-│ ABA SUB-RECEITAS:                               │
-│ ▼ Molhos                                        │
-│   Molho Especial         R$ 12,00/kg            │
-│   Maionese Caseira       R$ 8,50/kg             │
-│                                                 │
-│ ▼ Bases                                         │
-│   Massa de Pizza         R$ 2,30/un             │
-└─────────────────────────────────────────────────┘
-```
+### Arquivo: `src/components/recipes/IngredientRow.tsx`
+- Corrigir key duplicada (estava usando `item_id` que pode ser null para sub-receitas)
 
 ---
 
-## 4. Fluxo de Edicao de Preco Melhorado
+## Mudancas Detalhadas
 
-### Preco Editavel Inline
-
-O preco do ingrediente sera editavel diretamente na linha:
-
-```text
-Preco base: R$ [input editavel] / unidade
-
-- Campo numerico com formato de moeda
-- Atualizacao imediata do custo total
-- Nao afeta o preco no estoque (apenas nesta ficha)
-```
-
-### Indicador Visual
-
-Se o preco foi alterado em relacao ao estoque, mostrar indicador:
-
-```text
-┌─────────────────────────────────────────────────┐
-│ [📦] Queijo Mucerala                            │
-│                                                 │
-│ Preco: R$ [48,00] / kg ⚠️ (estoque: R$ 46,00)  │
-│                                                 │
-│ Quantidade: [200] g     Custo: R$ 9,60          │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## 5. Categorias Especiais para Sub-Receitas
-
-Adicionar categoria "Bases e Preparos" automaticamente:
-
-```sql
-INSERT INTO recipe_categories (name, color, icon, sort_order)
-VALUES ('Bases e Preparos', '#8b5cf6', 'Soup', 0);
-```
-
-Isso permite organizar:
-- Molhos
-- Massas base
-- Preparos que serao reutilizados
-
----
-
-## 6. Arquivos a Modificar
-
-### Banco de Dados
-- Migration para adicionar `source_type` e `source_recipe_id`
-
-### Types
-- `src/types/recipe.ts` - Adicionar campos de source
-
-### Componentes
-- `src/components/recipes/IngredientRow.tsx` - Novo layout com preco inline
-- `src/components/recipes/IngredientPicker.tsx` - Adicionar abas (Estoque/Sub-Receitas)
-- `src/components/recipes/RecipeSheet.tsx` - Suportar novo formato de ingrediente
-
-### Hooks
-- `src/hooks/useRecipes.ts` - Buscar sub-receitas disponiveis
-
----
-
-## 7. Logica de Calculo Atualizada
-
-### Para Itens do Estoque
-```typescript
-// Atual - sem mudancas
-cost = convertUnit(quantity, recipeUnit, itemUnit) * itemPrice
-```
-
-### Para Sub-Receitas
-```typescript
-// Novo
-// Se a sub-receita rende 1kg e custa R$12,00
-// Usar 50g = 0.05kg × R$12,00 = R$0,60
-cost = convertUnit(quantity, recipeUnit, subRecipe.yield_unit) * subRecipe.cost_per_portion
-```
-
----
-
-## 8. Restricoes de Seguranca
-
-### Evitar Ciclos
-Nao permitir que uma receita A use uma sub-receita B que usa A:
+### 1. useRecipes.ts - Query Corrigida
 
 ```typescript
-function canAddSubRecipe(currentRecipeId: string, subRecipeId: string): boolean {
-  // Verificar se subRecipe nao usa currentRecipe em nenhum nivel
-  // Implementar verificacao recursiva
-}
+// ANTES (erro 300):
+ingredients:recipe_ingredients(
+  *,
+  item:inventory_items(...),
+  source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(...)
+)
+
+// DEPOIS (com hint explicito):
+ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(
+  *,
+  item:inventory_items(...),
+  source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(...)
+)
 ```
 
-### Atualizacao de Custos em Cascata
-Quando uma sub-receita tem seu custo alterado:
-- Mostrar indicador nas receitas que a usam
-- Botao "Atualizar Custos" para recalcular
+### 2. Recipes.tsx - Sistema de Abas
+
+Layout proposto:
+
+```text
+┌──────────────────────────────────────┐
+│ Fichas Técnicas                  [+] │
+├──────────────────────────────────────┤
+│ [📋 Produtos (8)] [🍲 Bases (3)]     │  <- Tabs
+├──────────────────────────────────────┤
+│ [🔍 Buscar...]                       │
+│                                      │
+│ ▼ Lanches (5)                        │
+│   X-Burguer                          │
+│   X-Salada                           │
+│   ...                                │
+└──────────────────────────────────────┘
+```
+
+Logica:
+- "Produtos" = receitas que NAO sao categoria "Bases e Preparos"
+- "Bases e Preparos" = receitas na categoria especifica
+- Botao [+] na aba de Bases ja pre-seleciona a categoria
+
+### 3. RecipeSheet.tsx - Ajustes
+
+- Quando abrir sheet pela aba "Bases", pre-selecionar categoria "Bases e Preparos"
+- Adicionar validacao para evitar duplicatas
+
+### 4. IngredientRow.tsx - Key Unica
+
+```typescript
+// ANTES:
+<IngredientRow key={ingredient.item_id} ... />
+
+// DEPOIS:
+<IngredientRow 
+  key={ingredient.source_type === 'recipe' 
+    ? `recipe-${ingredient.source_recipe_id}` 
+    : `item-${ingredient.item_id}`} 
+  ... 
+/>
+```
 
 ---
 
-## 9. Resultado Esperado
+## Preco Hibrido (ja implementado)
 
-1. **Interface limpa** - Precos editaveis inline, sem popovers escondidos
-2. **Sub-receitas** - Molhos e bases podem ser criados e reutilizados
-3. **Calculo correto** - Conversao de unidades funciona para ambos os tipos
-4. **Organizacao** - Categoria especial para preparos base
-5. **Indicadores visuais** - Mostrar quando preco foi alterado ou esta desatualizado
+O sistema ja suporta:
+- Preco padrao vem do estoque
+- Pode editar o preco inline na ficha
+- Indicador visual quando preco difere do estoque
 
 ---
 
-## Ordem de Implementacao
+## Arquivos a Modificar
 
-1. Migration do banco (adicionar source_type e source_recipe_id)
-2. Atualizar types em recipe.ts
-3. Refatorar IngredientRow com layout inline
-4. Adicionar abas ao IngredientPicker
-5. Atualizar RecipeSheet para novo formato
-6. Atualizar useRecipes para buscar sub-receitas
-7. Implementar verificacao de ciclos
-8. Testar fluxo completo
+| Arquivo | Alteracao |
+|---------|-----------|
+| `src/hooks/useRecipes.ts` | Corrigir query com hint de FK |
+| `src/pages/Recipes.tsx` | Adicionar abas Produtos/Bases |
+| `src/components/recipes/RecipeSheet.tsx` | Prop para pre-selecionar categoria |
 
+---
+
+## Resultado Esperado
+
+1. **Receitas salvam corretamente** - Query corrigida resolve erro 300
+2. **Sub-receitas aparecem no picker** - Lista de receitas funciona
+3. **Interface organizada** - Aba dedicada para "Bases e Preparos"
+4. **Criar sub-receita facil** - Botao [+] na aba ja abre com categoria certa
+5. **Preco hibrido funcionando** - Editar inline com indicador de diferenca
