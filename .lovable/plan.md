@@ -1,177 +1,453 @@
 
-# Plano de Melhorias Visuais e Funcionais
+# Plano: Modulo Ficha Tecnica (Recipe Technical Sheets)
 
-## Resumo das Alterações Solicitadas
+## Visao Geral
 
-1. **Persistência de ordem dos lembretes** - Quando arrastar, salvar a nova posição no banco
-2. **Toggle Calendário/Lista na Agenda** - Substituir "Lembretes" por alternador de visualização
-3. **Botões de transação mais vibrantes** - Melhorar visual dos botões de Receita/Despesa/Transferência
-4. **Padronização visual do sistema inteiro** - Cores, espaçamentos, cards e tipografia consistentes
+Criar um modulo completo de Ficha Tecnica integrado ao sistema existente, permitindo que gestores criem receitas padronizadas utilizando ingredientes do estoque, com calculo automatico de custos.
 
 ---
 
-## Parte 1: Correção da Persistência de Reordenação (Agenda)
+## 1. Estrutura do Banco de Dados
 
-### Problema Atual
-O drag-and-drop dos lembretes não persiste a nova ordem no banco. O `handleDragEnd` apenas faz console.log.
+### Novas Tabelas
 
-### Solução
-1. Adicionar coluna `sort_order` na tabela `manager_tasks`
-2. Criar mutation `reorderTasks` no hook `useAgenda.ts`
-3. Implementar optimistic update no `handleDragEnd` em `Agenda.tsx`
-
-### Arquivos Afetados
-- **Migração SQL**: Nova coluna `sort_order`
-- `src/hooks/useAgenda.ts`: Adicionar `reorderTasks` mutation
-- `src/pages/Agenda.tsx`: Implementar lógica de reordenação
-
----
-
-## Parte 2: Toggle Calendário/Lista na Agenda
-
-### Design Proposto
-Substituir o header "Lembretes" por um toggle visual:
-- **Ícone de Lista** - Visualização atual (lista de lembretes)
-- **Ícone de Calendário** - Nova visualização mensal
-
-### Componentes Novos
-- `src/components/agenda/AgendaCalendarView.tsx` - Visualização por calendário mostrando lembretes por data
-
-### Arquivos Afetados
-- `src/pages/Agenda.tsx`: Adicionar estado de view e toggle
-- Criar componente de calendário adaptado do `ScheduleCalendar`
-
----
-
-## Parte 3: Botões de Transação Mais Vibrantes (Finance)
-
-### Problema Atual
-Os botões de "Receita", "Despesa" e "Transf." em `FinanceHome.tsx` usam `variant="outline"` com cores sutis.
-
-### Nova Aparência
 ```text
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│    ↑        │  │    ↓        │  │    ↔        │
-│  Receita    │  │  Despesa    │  │  Transf.    │
-│ (verde)     │  │ (vermelho)  │  │  (azul)     │
-└─────────────┘  └─────────────┘  └─────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                     recipe_categories                            │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid, PK)                                                   │
+│ name (text)           - Ex: "Lanches", "Bebidas", "Acomp."      │
+│ color (text)          - Cor para identificacao visual           │
+│ icon (text)           - Icone Lucide                            │
+│ sort_order (int)      - Ordenacao                               │
+│ created_at, updated_at (timestamps)                             │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ 1:N
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         recipes                                  │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid, PK)                                                   │
+│ name (text)           - Nome da receita                         │
+│ category_id (uuid, FK)- Categoria da receita                    │
+│ yield_quantity (numeric) - Rendimento (qtd porções)             │
+│ yield_unit (text)     - Unidade do rendimento                   │
+│ preparation_notes (text) - Observações/modo de preparo          │
+│ is_active (boolean)   - Status ativo/inativo                    │
+│ total_cost (numeric)  - Custo total calculado (cache)           │
+│ cost_per_portion (numeric) - Custo por porção (cache)           │
+│ cost_updated_at (timestamp) - Última atualização de custo       │
+│ created_at, updated_at (timestamps)                             │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ 1:N
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     recipe_ingredients                           │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid, PK)                                                   │
+│ recipe_id (uuid, FK)  - Referência à receita                    │
+│ item_id (uuid, FK)    - Referência ao item do estoque           │
+│ quantity (numeric)    - Quantidade usada                        │
+│ unit_type (enum)      - Unidade (kg, g, un, L, ml)              │
+│ unit_cost (numeric)   - Custo unitário no momento (cache)       │
+│ total_cost (numeric)  - Custo total do ingrediente (cache)      │
+│ sort_order (int)      - Ordenação na lista                      │
+│ created_at (timestamp)                                          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Mudanças de Estilo
-- Background sólido com gradiente sutil
-- Ícones maiores (w-6 h-6)
-- Sombra colorida (shadow-success/20, shadow-destructive/20, shadow-primary/20)
-- Bordas mais definidas
-- Touch targets maiores (py-4)
+### Novo Enum para Unidades Expandidas
 
-### Arquivos Afetados
-- `src/components/finance/FinanceHome.tsx`: Redesenhar os 3 botões de ação
-
----
-
-## Parte 4: Padronização Visual do Sistema
-
-### Princípios de Design a Aplicar
-
-| Elemento | Padrão |
-|----------|--------|
-| Cards | `rounded-2xl`, sombra sutil, borda `border-border` |
-| Headers | Gradiente suave ou fundo sólido com ícone destacado |
-| Botões primários | Sombra colorida (`shadow-lg shadow-primary/30`) |
-| Espaçamentos | `gap-4` entre seções, `p-4` interno |
-| Cores funcionais | Success=verde, Warning=âmbar, Destructive=vermelho, Primary=azul |
-
-### Arquivos a Padronizar
-
-1. **`src/index.css`** - Adicionar mais classes utilitárias unificadas
-2. **`src/components/ui/button.tsx`** - Adicionar variante `success` e melhorar bordas
-3. **`src/pages/Agenda.tsx`** - Aplicar classes do design system
-4. **`src/pages/CashClosing.tsx`** - Padronizar header igual outros módulos
-5. **`src/components/finance/FinanceHome.tsx`** - Melhorar botões de ação
-6. **`src/components/finance/FinanceBottomNav.tsx`** - Adicionar sombra e destaque no FAB
-7. **`src/components/agenda/TaskItem.tsx`** - Melhorar visual dos cards
-8. **`src/components/agenda/CategoryChips.tsx`** - Chips mais elegantes
-9. **`src/components/agenda/TaskSheet.tsx`** - Formulário padronizado
-
----
-
-## Detalhes Técnicos
-
-### Migração do Banco de Dados
 ```sql
--- Adicionar sort_order para persistir ordem dos lembretes
-ALTER TABLE manager_tasks ADD COLUMN sort_order INTEGER DEFAULT 0;
-
--- Popular sort_order inicial baseado em created_at
-UPDATE manager_tasks 
-SET sort_order = sub.row_num 
-FROM (
-  SELECT id, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY due_date NULLS FIRST, created_at) as row_num 
-  FROM manager_tasks
-) sub 
-WHERE manager_tasks.id = sub.id;
+-- Criar enum com mais opções de unidade para conversões
+CREATE TYPE recipe_unit_type AS ENUM (
+  'unidade', 'kg', 'g', 'litro', 'ml'
+);
 ```
 
-### Hook useAgenda - Reordenação
-```typescript
-const reorderTasksMutation = useMutation({
-  mutationFn: async (updates: { id: string; sort_order: number }[]) => {
-    const { error } = await supabase
-      .from('manager_tasks')
-      .upsert(updates.map(u => ({ id: u.id, sort_order: u.sort_order })));
-    if (error) throw error;
-  },
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['manager-tasks'] }),
-});
-```
+### Políticas RLS
 
-### Toggle de View (Agenda)
-```typescript
-const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+```text
+Recipes/Recipe Categories:
+- SELECT: Admins apenas (has_role('admin'))
+- INSERT/UPDATE/DELETE: Admins apenas
 
-// No header, substituir título por toggle:
-<div className="view-toggle-group">
-  <button className={viewMode === 'list' ? 'view-toggle-active' : 'view-toggle-inactive'}>
-    <ListChecks /> Lista
-  </button>
-  <button className={viewMode === 'calendar' ? 'view-toggle-active' : 'view-toggle-inactive'}>
-    <Calendar /> Calendário
-  </button>
-</div>
-```
-
-### Botões Vibrantes (Finance)
-```typescript
-// De:
-<Button variant="outline" className="bg-success/10 ...">
-
-// Para:
-<button className="flex-col h-auto py-4 gap-2 rounded-2xl 
-  bg-gradient-to-br from-success to-success/80 
-  text-success-foreground shadow-lg shadow-success/30
-  hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
-  transition-all">
+Recipe Ingredients:
+- SELECT: Admins apenas
+- INSERT/UPDATE/DELETE: Admins apenas
 ```
 
 ---
 
-## Ordem de Implementação
+## 2. Conversao de Unidades
 
-1. Criar migração SQL para `sort_order`
-2. Atualizar `useAgenda.ts` com reordenação e query ordenada por `sort_order`
-3. Implementar `handleDragEnd` funcional em `Agenda.tsx`
-4. Criar componente `AgendaCalendarView.tsx`
-5. Adicionar toggle de visualização em `Agenda.tsx`
-6. Redesenhar botões de ação em `FinanceHome.tsx`
-7. Padronizar visual do `CashClosing.tsx`
-8. Adicionar classes CSS globais para consistência
-9. Aplicar melhorias visuais nos componentes da Agenda
+O sistema precisa converter automaticamente entre unidades para calcular custos corretamente.
+
+```text
+Fator de Conversao Base:
+┌────────────┬────────────┬────────────┐
+│   De       │    Para    │   Fator    │
+├────────────┼────────────┼────────────┤
+│ kg         │ g          │ 1000       │
+│ g          │ kg         │ 0.001      │
+│ litro      │ ml         │ 1000       │
+│ ml         │ litro      │ 0.001      │
+│ unidade    │ unidade    │ 1          │
+└────────────┴────────────┴────────────┘
+
+Exemplo de Calculo:
+- Item do estoque: Queijo (kg) - Preço: R$ 40,00/kg
+- Receita usa: 200g de queijo
+- Conversao: 200g = 0.2kg
+- Custo: 0.2 × R$ 40,00 = R$ 8,00
+```
+
+**Nota importante:** O sistema de estoque atual nao tem campo de preco. Sera necessario adicionar coluna `unit_price` na tabela `inventory_items`.
 
 ---
 
-## Resultado Esperado
+## 3. Estrutura de Arquivos
 
-- Lembretes mantêm a ordem definida pelo usuário ao arrastar
-- Visualização alternável entre lista e calendário na Agenda
-- Botões de transação financeira mais chamativos e intuitivos
-- Interface visual consistente em todo o sistema com cores padronizadas
+```text
+src/
+├── pages/
+│   └── Recipes.tsx              # Página principal do módulo
+├── components/
+│   └── recipes/
+│       ├── RecipeList.tsx       # Lista de fichas técnicas
+│       ├── RecipeCard.tsx       # Card individual de receita
+│       ├── RecipeSheet.tsx      # Sheet de criação/edição
+│       ├── RecipeDetail.tsx     # Visualização detalhada
+│       ├── IngredientPicker.tsx # Seletor de ingredientes do estoque
+│       ├── IngredientRow.tsx    # Linha de ingrediente na receita
+│       ├── CostSummary.tsx      # Resumo de custos
+│       └── RecipeCategoryPicker.tsx # Seletor de categoria
+├── hooks/
+│   └── useRecipes.ts            # Hook principal do módulo
+└── types/
+    └── recipe.ts                # Types do módulo
+```
+
+---
+
+## 4. Fluxo de Telas
+
+### 4.1 Lista de Fichas Tecnicas (/recipes)
+
+```text
+┌──────────────────────────────────────┐
+│ [←]  Fichas Técnicas            [+]  │
+│─────────────────────────────────────│
+│ 📊 Resumo                            │
+│ ┌────────┐ ┌────────┐ ┌────────┐    │
+│ │ 12     │ │ R$156  │ │ 3      │    │
+│ │Receitas│ │Custo Md│ │Inativas│    │
+│ └────────┘ └────────┘ └────────┘    │
+│─────────────────────────────────────│
+│ [🔍 Buscar receitas...]              │
+│─────────────────────────────────────│
+│ ▼ Lanches (5)                        │
+│ ┌──────────────────────────────────┐│
+│ │ 🍔 X-Burguer            [⋮]      ││
+│ │ Custo: R$ 8,83 │ Porção: R$ 8,83 ││
+│ │ ● Ativo                          ││
+│ └──────────────────────────────────┘│
+│ ┌──────────────────────────────────┐│
+│ │ 🍔 X-Salada             [⋮]      ││
+│ │ Custo: R$ 10,50│ Porção: R$ 10,50││
+│ │ ● Ativo                          ││
+│ └──────────────────────────────────┘│
+│─────────────────────────────────────│
+│ ▼ Bebidas (3)                        │
+│ ...                                  │
+└──────────────────────────────────────┘
+```
+
+### 4.2 Criacao/Edicao de Receita (Sheet)
+
+```text
+┌──────────────────────────────────────┐
+│ [✕]     Nova Ficha Técnica   [Salvar]│
+│─────────────────────────────────────│
+│ Nome da Receita                      │
+│ ┌──────────────────────────────────┐│
+│ │ X-Burguer Tradicional            ││
+│ └──────────────────────────────────┘│
+│                                      │
+│ Categoria                            │
+│ ┌──────────────────────────────────┐│
+│ │ Lanches                      [▼] ││
+│ └──────────────────────────────────┘│
+│                                      │
+│ Rendimento                           │
+│ ┌────────────┐  ┌──────────────────┐│
+│ │ 1          │  │ Unidades     [▼] ││
+│ └────────────┘  └──────────────────┘│
+│─────────────────────────────────────│
+│ INGREDIENTES                    [+]  │
+│ ┌──────────────────────────────────┐│
+│ │ Pão Tradicional                  ││
+│ │ 1 un          →        R$ 0,85   ││
+│ │                            [✕]   ││
+│ └──────────────────────────────────┘│
+│ ┌──────────────────────────────────┐│
+│ │ Hambúrguer 130g                  ││
+│ │ 1 un          →        R$ 3,66   ││
+│ │                            [✕]   ││
+│ └──────────────────────────────────┘│
+│ ┌──────────────────────────────────┐│
+│ │ Queijo Muçarela                  ││
+│ │ 40 g          →        R$ 1,85   ││
+│ │                            [✕]   ││
+│ └──────────────────────────────────┘│
+│─────────────────────────────────────│
+│ ┌──────────────────────────────────┐│
+│ │ CUSTO TOTAL          R$ 8,83     ││
+│ │ CUSTO POR PORÇÃO     R$ 8,83     ││
+│ └──────────────────────────────────┘│
+│─────────────────────────────────────│
+│ Observações (opcional)               │
+│ ┌──────────────────────────────────┐│
+│ │ Modo de preparo...               ││
+│ └──────────────────────────────────┘│
+└──────────────────────────────────────┘
+```
+
+### 4.3 Seletor de Ingrediente (Sheet Secundário)
+
+```text
+┌──────────────────────────────────────┐
+│ [←]   Adicionar Ingrediente          │
+│─────────────────────────────────────│
+│ [🔍 Buscar no estoque...]            │
+│─────────────────────────────────────│
+│ ▼ Carnes                             │
+│   Hambúrguer 130g      R$ 3,66/un    │
+│   Bacon Fatiado        R$ 45,00/kg   │
+│   Calabresa           R$ 28,00/kg   │
+│                                      │
+│ ▼ Hortifruti                         │
+│   Alface              R$ 2,50/un     │
+│   Tomate              R$ 4,00/kg     │
+│   Cebola              R$ 3,50/kg     │
+│                                      │
+│ ▼ Laticínios                         │
+│   Queijo Muçarela     R$ 46,00/kg    │
+│   Cheddar             R$ 52,00/kg    │
+└──────────────────────────────────────┘
+(Ao selecionar, abre input de quantidade)
+```
+
+---
+
+## 5. Detalhes Tecnicos
+
+### 5.1 Hook useRecipes
+
+```typescript
+// Funcionalidades principais:
+- fetchRecipes(): Lista todas as receitas com ingredientes
+- fetchRecipeCategories(): Lista categorias de receitas
+- addRecipe(data): Cria nova receita
+- updateRecipe(id, data): Atualiza receita existente
+- deleteRecipe(id): Remove receita
+- duplicateRecipe(id): Duplica receita existente
+- toggleRecipeActive(id): Alterna status ativo/inativo
+- addIngredient(recipeId, itemId, quantity, unit): Adiciona ingrediente
+- updateIngredient(id, updates): Atualiza ingrediente
+- removeIngredient(id): Remove ingrediente
+- recalculateCosts(recipeId): Recalcula custos da receita
+```
+
+### 5.2 Calculo de Custos
+
+O calculo sera feito em tempo real no frontend e salvo no banco como cache:
+
+```typescript
+function calculateIngredientCost(
+  item: InventoryItem,      // Item do estoque
+  quantity: number,          // Quantidade usada
+  recipeUnit: RecipeUnitType // Unidade na receita
+): number {
+  // Obter preço unitário do item
+  const itemPrice = item.unit_price ?? 0;
+  const itemUnit = item.unit_type; // kg, litro, unidade
+  
+  // Converter unidades se necessário
+  const convertedQty = convertUnit(quantity, recipeUnit, itemUnit);
+  
+  // Calcular custo
+  return convertedQty * itemPrice;
+}
+```
+
+### 5.3 Atualizacao de Precos
+
+Opcoes para atualizar custos quando precos do estoque mudam:
+
+1. **Sob demanda**: Botao "Atualizar custos" na ficha
+2. **Ao abrir**: Recalcula quando usuario abre a ficha
+3. **Indicador visual**: Mostra quando custo esta desatualizado
+
+---
+
+## 6. Migracao do Banco de Dados
+
+```sql
+-- 1. Adicionar preco unitario na tabela de estoque
+ALTER TABLE inventory_items 
+ADD COLUMN unit_price NUMERIC DEFAULT 0;
+
+-- 2. Criar enum de unidades para receitas
+CREATE TYPE recipe_unit_type AS ENUM ('unidade', 'kg', 'g', 'litro', 'ml');
+
+-- 3. Criar tabela de categorias de receitas
+CREATE TABLE recipe_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  color TEXT NOT NULL DEFAULT '#6366f1',
+  icon TEXT DEFAULT 'ChefHat',
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 4. Criar tabela de receitas
+CREATE TABLE recipes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  category_id UUID REFERENCES recipe_categories(id) ON DELETE SET NULL,
+  yield_quantity NUMERIC NOT NULL DEFAULT 1,
+  yield_unit TEXT NOT NULL DEFAULT 'unidade',
+  preparation_notes TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  total_cost NUMERIC NOT NULL DEFAULT 0,
+  cost_per_portion NUMERIC NOT NULL DEFAULT 0,
+  cost_updated_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 5. Criar tabela de ingredientes da receita
+CREATE TABLE recipe_ingredients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+  item_id UUID NOT NULL REFERENCES inventory_items(id) ON DELETE RESTRICT,
+  quantity NUMERIC NOT NULL,
+  unit_type recipe_unit_type NOT NULL,
+  unit_cost NUMERIC NOT NULL DEFAULT 0,
+  total_cost NUMERIC NOT NULL DEFAULT 0,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 6. Habilitar RLS
+ALTER TABLE recipe_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE recipes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE recipe_ingredients ENABLE ROW LEVEL SECURITY;
+
+-- 7. Políticas - Apenas admins
+CREATE POLICY "Admins can manage recipe_categories"
+  ON recipe_categories FOR ALL
+  USING (has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can manage recipes"
+  ON recipes FOR ALL
+  USING (has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can manage recipe_ingredients"
+  ON recipe_ingredients FOR ALL
+  USING (has_role(auth.uid(), 'admin'));
+
+-- 8. Inserir categorias padrão
+INSERT INTO recipe_categories (name, color, icon, sort_order) VALUES
+  ('Lanches', '#f97316', 'Sandwich', 1),
+  ('Acompanhamentos', '#22c55e', 'Soup', 2),
+  ('Bebidas', '#3b82f6', 'Coffee', 3),
+  ('Sobremesas', '#ec4899', 'IceCream', 4);
+```
+
+---
+
+## 7. Navegacao
+
+### Adicionar ao Menu Lateral
+
+```typescript
+// Em AppLayout.tsx, adicionar item:
+{
+  icon: ChefHat,
+  label: 'Fichas Técnicas',
+  href: '/recipes',
+  adminOnly: true  // Apenas gestores
+}
+```
+
+### Nova Rota
+
+```typescript
+// Em App.tsx
+<Route
+  path="/recipes"
+  element={
+    <ProtectedRoute>
+      <Recipes />
+    </ProtectedRoute>
+  }
+/>
+```
+
+---
+
+## 8. Ordenacao e Filtros
+
+A lista de receitas podera ser ordenada por:
+
+- Nome (A-Z / Z-A)
+- Maior custo primeiro
+- Menor custo primeiro
+- Mais recentes
+- Status (ativos primeiro / inativos primeiro)
+
+---
+
+## 9. Restricoes Implementadas
+
+| Restricao | Implementacao |
+|-----------|---------------|
+| Apenas gestores | RLS + verificacao isAdmin no frontend |
+| Ingredientes do estoque | Picker conectado a inventory_items |
+| Sem baixa automatica | Nao implementado (escopo futuro) |
+| Sem vinculo com vendas | Nao implementado (escopo futuro) |
+
+---
+
+## 10. Resultado Final
+
+O modulo entregara:
+
+1. **Lista organizada** de fichas tecnicas por categoria
+2. **Criacao intuitiva** com seletor de ingredientes do estoque
+3. **Calculo automatico** de custo total e por porcao
+4. **Conversao de unidades** inteligente (kg/g, L/ml)
+5. **Visualizacao clara** dos custos de cada ingrediente
+6. **Ordenacao por custo** para identificar receitas mais caras
+7. **Duplicacao de receitas** para criar variacoes rapidamente
+8. **Status ativo/inativo** para controle do cardapio
+
+---
+
+## Ordem de Implementacao
+
+1. Criar migracao do banco (novas tabelas + campo unit_price)
+2. Criar types em `src/types/recipe.ts`
+3. Criar hook `useRecipes.ts`
+4. Criar componentes base (RecipeCard, IngredientRow)
+5. Criar pagina principal `Recipes.tsx`
+6. Criar sheet de criacao/edicao `RecipeSheet.tsx`
+7. Criar seletor de ingredientes `IngredientPicker.tsx`
+8. Adicionar rota e menu lateral
+9. Implementar ordenacao e filtros
+10. Testar fluxo completo
