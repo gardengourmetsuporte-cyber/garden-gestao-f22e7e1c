@@ -7,16 +7,20 @@ export interface ManagerTask {
   id: string;
   user_id: string;
   title: string;
-  period: DayPeriod;
+  notes?: string | null;
+  due_date?: string | null;
+  due_time?: string | null;
   priority: TaskPriority;
   is_completed: boolean;
-  is_system_generated: boolean;
-  system_source: string | null;
-  source_data: Record<string, unknown> | null;
-  date: string;
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+  // Deprecated fields kept for backward compatibility
+  period?: DayPeriod;
+  date?: string;
+  is_system_generated?: boolean;
+  system_source?: string | null;
+  source_data?: Record<string, unknown> | null;
 }
 
 export interface ManagerAppointment {

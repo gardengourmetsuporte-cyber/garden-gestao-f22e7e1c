@@ -682,9 +682,12 @@ export type Database = {
           completed_at: string | null
           created_at: string
           date: string
+          due_date: string | null
+          due_time: string | null
           id: string
           is_completed: boolean
           is_system_generated: boolean
+          notes: string | null
           period: Database["public"]["Enums"]["day_period"]
           priority: Database["public"]["Enums"]["task_priority"]
           source_data: Json | null
@@ -697,9 +700,12 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           date?: string
+          due_date?: string | null
+          due_time?: string | null
           id?: string
           is_completed?: boolean
           is_system_generated?: boolean
+          notes?: string | null
           period?: Database["public"]["Enums"]["day_period"]
           priority?: Database["public"]["Enums"]["task_priority"]
           source_data?: Json | null
@@ -712,9 +718,12 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           date?: string
+          due_date?: string | null
+          due_time?: string | null
           id?: string
           is_completed?: boolean
           is_system_generated?: boolean
+          notes?: string | null
           period?: Database["public"]["Enums"]["day_period"]
           priority?: Database["public"]["Enums"]["task_priority"]
           source_data?: Json | null
