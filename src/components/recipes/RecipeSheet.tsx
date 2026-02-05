@@ -228,16 +228,16 @@ interface SubRecipeItem {
    
    return (
      <>
-       <Sheet open={open} onOpenChange={onOpenChange}>
-         <SheetContent side="right" className="w-full sm:max-w-lg p-0">
-           <SheetHeader className="p-4 border-b">
-             <div className="flex items-center justify-between">
-               <SheetTitle>{recipe ? 'Editar Ficha' : 'Nova Ficha Técnica'}</SheetTitle>
-               <Button onClick={handleSubmit} disabled={isSaving || !name.trim()}>
-                 {isSaving ? 'Salvando...' : 'Salvar'}
-               </Button>
-             </div>
-           </SheetHeader>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="right" className="w-full sm:max-w-lg p-0 [&>button]:hidden">
+            <SheetHeader className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <SheetTitle>{recipe ? 'Editar Ficha' : 'Nova Ficha Técnica'}</SheetTitle>
+                <Button onClick={handleSubmit} disabled={isSaving || !name.trim()}>
+                  {isSaving ? 'Salvando...' : 'Salvar'}
+                </Button>
+              </div>
+            </SheetHeader>
            
            <ScrollArea className="h-[calc(100vh-80px)]">
              <div className="p-4 space-y-6">
