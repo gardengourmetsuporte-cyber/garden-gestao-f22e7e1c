@@ -198,6 +198,7 @@ export default function Agenda() {
           <AgendaCalendarView 
             tasks={filteredTasks}
             onTaskClick={handleEditTask}
+            onToggleTask={toggleTask}
           />
         )}
 
