@@ -97,6 +97,11 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+   
+   /* Hide the Lovable preview banner when keyboard is open */
+   [data-lovable-preview-banner] {
+     display: none !important;
+   }
 }
 
 /* =========================================================

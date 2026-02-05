@@ -110,6 +110,8 @@ export default function Finance() {
             monthStats={monthStats}
             onTransactionClick={handleTransactionClick}
             onTogglePaid={toggleTransactionPaid}
+             categories={categories}
+             accounts={accounts}
           />
         )}
 
