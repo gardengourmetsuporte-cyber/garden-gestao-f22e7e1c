@@ -1,6 +1,8 @@
+import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Trash2, Package, ClipboardCheck, Gift, AlertCircle } from 'lucide-react';
+import { Trash2, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
 
@@ -11,27 +13,36 @@ interface TaskItemProps {
 }
 
 const priorityColors = {
-  low: 'bg-primary/10 text-primary',
-  medium: 'bg-warning/10 text-warning',
-  high: 'bg-destructive/10 text-destructive',
+  low: 'border-primary',
+  medium: 'border-warning',
+  high: 'border-destructive',
 };
 
-const priorityDots = {
-  low: 'bg-primary',
-  medium: 'bg-warning',
-  high: 'bg-destructive',
-};
+function formatDueDate(dateStr: string | null, timeStr: string | null): string | null {
+  if (!dateStr) return null;
+  
+  const date = parseISO(dateStr);
+  
+  if (isToday(date)) {
+    return timeStr ? `Hoje às ${timeStr}` : 'Hoje';
+  }
+  if (isTomorrow(date)) {
+    return timeStr ? `Amanhã às ${timeStr}` : 'Amanhã';
+  }
+  
+  const formatted = format(date, "d 'de' MMM", { locale: ptBR });
+  return timeStr ? `${formatted} às ${timeStr}` : formatted;
+}
 
-const sourceIcons = {
-  inventory: Package,
-  checklist: ClipboardCheck,
-  rewards: Gift,
-};
+function isOverdue(dateStr: string | null): boolean {
+  if (!dateStr) return false;
+  const date = parseISO(dateStr);
+  return isPast(date) && !isToday(date);
+}
 
 export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
-  const SourceIcon = task.system_source 
-    ? sourceIcons[task.system_source as keyof typeof sourceIcons] || AlertCircle
-    : null;
+  const dueLabel = formatDueDate(task.due_date || null, task.due_time || null);
+  const overdue = !task.is_completed && isOverdue(task.due_date || null);
 
   return (
     <div
@@ -44,7 +55,10 @@ export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
       <Checkbox
         checked={task.is_completed}
         onCheckedChange={() => onToggle(task.id)}
-        className="w-6 h-6 rounded-lg border-2"
+        className={cn(
+          'w-6 h-6 rounded-full border-2',
+          priorityColors[task.priority]
+        )}
       />
       
       <div className="flex-1 min-w-0">
@@ -55,33 +69,31 @@ export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
           {task.title}
         </p>
         
-        {task.is_system_generated && SourceIcon && (
-          <div className="flex items-center gap-1.5 mt-1">
-            <SourceIcon className="w-3 h-3 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">
-              Gerado pelo sistema
-            </span>
-          </div>
+        {dueLabel && (
+          <p className={cn(
+            'text-xs mt-0.5 flex items-center gap-1',
+            overdue ? 'text-destructive' : 'text-muted-foreground'
+          )}>
+            <CalendarDays className="w-3 h-3" />
+            {dueLabel}
+          </p>
+        )}
+
+        {task.notes && (
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+            {task.notes}
+          </p>
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className={cn(
-          'w-2 h-2 rounded-full',
-          priorityDots[task.priority]
-        )} />
-        
-        {!task.is_system_generated && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-            onClick={() => onDelete(task.id)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
+        onClick={() => onDelete(task.id)}
+      >
+        <Trash2 className="w-4 h-4" />
+      </Button>
     </div>
   );
 }
