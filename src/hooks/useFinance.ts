@@ -201,10 +201,7 @@ export function useFinance(selectedMonth: Date) {
       toast.error('Erro ao salvar transação');
       return;
     }
-    // Only show toast if not part of a recurring series (those are handled separately)
-    if (!data.installment_group_id) {
-      toast.success('Transação salva!');
-    }
+    // Silent success - no toast
     await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 
@@ -217,7 +214,7 @@ export function useFinance(selectedMonth: Date) {
       toast.error('Erro ao atualizar transação');
       return;
     }
-    toast.success('Transação atualizada!');
+    // Silent success - no toast
     await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 
@@ -246,7 +243,7 @@ export function useFinance(selectedMonth: Date) {
         toast.error('Erro ao atualizar transação');
         return;
       }
-      toast.success('Transação atualizada!');
+      // Silent success
     } else if (mode === 'pending') {
       // Update all pending (is_paid = false) transactions in the group
       const { error } = await supabase
@@ -265,7 +262,7 @@ export function useFinance(selectedMonth: Date) {
         toast.error('Erro ao atualizar transações pendentes');
         return;
       }
-      toast.success('Transações pendentes atualizadas!');
+      // Silent success
     } else if (mode === 'all') {
       // Update all transactions in the group
       const { error } = await supabase
@@ -283,7 +280,7 @@ export function useFinance(selectedMonth: Date) {
         toast.error('Erro ao atualizar todas as transações');
         return;
       }
-      toast.success('Todas as transações atualizadas!');
+      // Silent success
     }
     
     await Promise.all([fetchTransactions(), fetchAccounts()]);
@@ -298,7 +295,7 @@ export function useFinance(selectedMonth: Date) {
       toast.error('Erro ao excluir transação');
       return;
     }
-    toast.success('Transação excluída!');
+    // Silent success
     await Promise.all([fetchTransactions(), fetchAccounts()]);
   };
 

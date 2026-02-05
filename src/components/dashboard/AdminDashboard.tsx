@@ -9,7 +9,10 @@ import {
   ShoppingCart,
   Settings,
   AlertCircle,
-  Receipt
+  Receipt,
+  Wallet,
+  ChefHat,
+  CalendarDays
 } from 'lucide-react';
 import { Leaderboard } from './Leaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
@@ -19,7 +22,9 @@ import { useRewards } from '@/hooks/useRewards';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
- import { useCashClosing } from '@/hooks/useCashClosing';
+import { useCashClosing } from '@/hooks/useCashClosing';
+import { useFinance } from '@/hooks/useFinance';
+import { useRecipes } from '@/hooks/useRecipes';
 
 interface MetricCardProps {
   title: string;
@@ -119,6 +124,8 @@ export function AdminDashboard() {
   const { allRedemptions } = useRewards();
   const { users } = useUsers();
   const { closings } = useCashClosing();
+  const { monthStats } = useFinance(new Date());
+  const { recipes } = useRecipes();
 
   const lowStockItems = getLowStockItems();
   const outOfStockItems = getOutOfStockItems();
@@ -126,6 +133,7 @@ export function AdminDashboard() {
   const pendingOrders = orders.filter(o => o.status === 'draft' || o.status === 'sent').length;
   const pendingRedemptions = allRedemptions.filter(r => r.status === 'pending').length;
   const pendingClosings = closings.filter(c => c.status === 'pending').length;
+  const pendingExpenses = monthStats.pendingExpenses;
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -133,7 +141,7 @@ export function AdminDashboard() {
     month: 'long',
   });
 
-  const hasAlerts = outOfStockItems.length > 0 || lowStockItems.length > 0 || pendingRedemptions > 0 || pendingClosings > 0;
+  const hasAlerts = outOfStockItems.length > 0 || lowStockItems.length > 0 || pendingRedemptions > 0 || pendingClosings > 0 || pendingExpenses > 0;
 
   return (
     <div className="space-y-6">
@@ -153,12 +161,12 @@ export function AdminDashboard() {
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          title="Usuários Ativos"
-          value={users.length}
-          icon={Users}
-          gradient="bg-gradient-to-br from-blue-500 to-blue-600"
-          onClick={() => navigate('/settings', { state: { activeTab: 'users' } })}
-          subtitle="cadastrados"
+          title="Saldo do Mês"
+          value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthStats.balance)}
+          icon={Wallet}
+          gradient={monthStats.balance >= 0 ? "bg-gradient-to-br from-emerald-500 to-green-600" : "bg-gradient-to-br from-red-500 to-rose-600"}
+          onClick={() => navigate('/finance')}
+          subtitle={monthStats.balance >= 0 ? 'positivo' : 'negativo'}
         />
         <MetricCard
           title="Pedidos Pendentes"
@@ -169,12 +177,12 @@ export function AdminDashboard() {
           subtitle={pendingOrders > 0 ? 'aguardando' : 'nenhum'}
         />
         <MetricCard
-          title="Resgates Pendentes"
-          value={pendingRedemptions}
-          icon={Gift}
-          gradient="bg-gradient-to-br from-amber-400 to-yellow-500"
-          onClick={() => navigate('/rewards')}
-          subtitle={pendingRedemptions > 0 ? 'para aprovar' : 'nenhum'}
+          title="Fichas Técnicas"
+          value={recipes.length}
+          icon={ChefHat}
+          gradient="bg-gradient-to-br from-purple-500 to-violet-600"
+          onClick={() => navigate('/recipes')}
+          subtitle="cadastradas"
         />
         <MetricCard
           title="Estoque Crítico"
@@ -227,6 +235,14 @@ export function AdminDashboard() {
                   onClick={() => navigate('/cash-closing')}
                 />
               )}
+              {pendingExpenses > 0 && (
+                <AlertItem
+                  message="Despesas a pagar"
+                  count={Math.round(pendingExpenses)}
+                  severity="info"
+                  onClick={() => navigate('/finance')}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -235,10 +251,34 @@ export function AdminDashboard() {
       {/* Quick Access Cards */}
       <div>
         <h3 className="section-label mb-3">Acesso Rápido</h3>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <QuickAccessCard
+            title="Financeiro"
+            subtitle="Receitas e despesas"
+            icon={Wallet}
+            iconBg="bg-emerald-500/10"
+            iconColor="text-emerald-600"
+            onClick={() => navigate('/finance')}
+          />
+          <QuickAccessCard
+            title="Fichas Técnicas"
+            subtitle={`${recipes.length} receitas`}
+            icon={ChefHat}
+            iconBg="bg-purple-500/10"
+            iconColor="text-purple-600"
+            onClick={() => navigate('/recipes')}
+          />
+          <QuickAccessCard
+            title="Agenda"
+            subtitle="Tarefas do gestor"
+            icon={CalendarDays}
+            iconBg="bg-blue-500/10"
+            iconColor="text-blue-600"
+            onClick={() => navigate('/agenda')}
+          />
           <QuickAccessCard
             title="Estoque"
-            subtitle={`${items.length} itens cadastrados`}
+            subtitle={`${items.length} itens`}
             icon={Package}
             iconBg="bg-primary/10"
             iconColor="text-primary"
@@ -262,7 +302,7 @@ export function AdminDashboard() {
           />
           <QuickAccessCard
             title="Recompensas"
-            subtitle={pendingRedemptions > 0 ? `${pendingRedemptions} pendentes` : 'Gerenciar prêmios'}
+            subtitle={pendingRedemptions > 0 ? `${pendingRedemptions} pendentes` : 'Prêmios'}
             icon={Gift}
             iconBg="bg-amber-500/10"
             iconColor="text-amber-500"
