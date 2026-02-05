@@ -165,56 +165,63 @@
                  <p className="font-medium">{closing.unit_name}</p>
                </div>
              </div>
-           </CardContent>
-         </Card>
- 
-         {/* Payment Breakdown */}
-         <Card className="card-unified">
-           <CardContent className="p-4 space-y-3">
-             <h3 className="font-semibold mb-2">Valores por Meio de Pagamento</h3>
-             
-             {PAYMENT_METHODS.map(method => {
-               const Icon = getIcon(method.icon);
-               const value = closing[method.key as keyof CashClosing] as number;
-               if (value === 0) return null;
-               
-               return (
-                 <div key={method.key} className="flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                     <div 
-                       className="w-8 h-8 rounded-lg flex items-center justify-center"
-                       style={{ backgroundColor: `${method.color}20` }}
-                     >
-                       <Icon className="w-4 h-4" style={{ color: method.color }} />
-                     </div>
-                     <span className="text-sm">{method.label}</span>
-                   </div>
-                   <span className="font-medium">
-                     R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                   </span>
-                 </div>
-               );
-             })}
- 
-             <div className="border-t pt-3 mt-3">
-               <div className="flex items-center justify-between">
-                 <span className="font-semibold">Total</span>
-                 <span className="text-xl font-bold text-primary">
-                   R$ {closing.total_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                 </span>
-               </div>
-             </div>
- 
-             {closing.cash_difference !== 0 && (
-               <div className="flex items-center justify-between text-amber-600 text-sm">
-                 <span>Diferença de caixa</span>
-                 <span className="font-medium">
-                   R$ {closing.cash_difference.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                 </span>
-               </div>
-             )}
-           </CardContent>
-         </Card>
+          </CardContent>
+        </Card>
+
+        {/* Payment Breakdown */}
+        <Card className="card-unified">
+          <CardContent className="p-4 space-y-3">
+            <h3 className="font-semibold mb-2">Valores por Meio de Pagamento</h3>
+            
+            {PAYMENT_METHODS.map(method => {
+              const Icon = getIcon(method.icon);
+              const value = closing[method.key as keyof CashClosing] as number;
+              if (value === 0) return null;
+              
+              return (
+                <div key={method.key} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: `${method.color}20` }}
+                    >
+                      <Icon className="w-4 h-4" style={{ color: method.color }} />
+                    </div>
+                    <span className="text-sm">{method.label}</span>
+                  </div>
+                  <span className="font-medium">
+                    R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Total real de vendas (sem descontar despesas) */}
+            {(() => {
+              const rawTotal = closing.cash_amount + closing.debit_amount + closing.credit_amount + 
+                closing.pix_amount + closing.meal_voucher_amount + closing.delivery_amount;
+              return (
+                <div className="border-t pt-3 mt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">Total em Vendas</span>
+                    <span className="text-xl font-bold text-primary">
+                      R$ {rawTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {closing.cash_difference !== 0 && (
+              <div className="flex items-center justify-between text-amber-600 text-sm">
+                <span>Diferença de caixa</span>
+                <span className="font-medium">
+                  R$ {closing.cash_difference.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
  
         {/* Expenses */}
         {closing.expenses && closing.expenses.length > 0 && (
