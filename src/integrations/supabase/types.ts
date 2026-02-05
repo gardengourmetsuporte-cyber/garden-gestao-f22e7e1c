@@ -23,6 +23,7 @@ export type Database = {
           date: string
           debit_amount: number
           delivery_amount: number
+          expenses: Json | null
           financial_integrated: boolean
           id: string
           notes: string | null
@@ -45,6 +46,7 @@ export type Database = {
           date: string
           debit_amount?: number
           delivery_amount?: number
+          expenses?: Json | null
           financial_integrated?: boolean
           id?: string
           notes?: string | null
@@ -67,6 +69,7 @@ export type Database = {
           date?: string
           debit_amount?: number
           delivery_amount?: number
+          expenses?: Json | null
           financial_integrated?: boolean
           id?: string
           notes?: string | null
