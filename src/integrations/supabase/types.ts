@@ -27,6 +27,7 @@ export type Database = {
           financial_integrated: boolean
           id: string
           initial_cash: number
+          meal_voucher_amount: number
           notes: string | null
           pix_amount: number
           receipt_url: string
@@ -51,6 +52,7 @@ export type Database = {
           financial_integrated?: boolean
           id?: string
           initial_cash?: number
+          meal_voucher_amount?: number
           notes?: string | null
           pix_amount?: number
           receipt_url: string
@@ -75,6 +77,7 @@ export type Database = {
           financial_integrated?: boolean
           id?: string
           initial_cash?: number
+          meal_voucher_amount?: number
           notes?: string | null
           pix_amount?: number
           receipt_url?: string

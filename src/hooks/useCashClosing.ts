@@ -99,6 +99,7 @@
           debit_amount: formData.debit_amount,
           credit_amount: formData.credit_amount,
           pix_amount: formData.pix_amount,
+           meal_voucher_amount: formData.meal_voucher_amount || 0,
           delivery_amount: formData.delivery_amount,
           cash_difference: formData.cash_difference,
           receipt_url: formData.receipt_url || '',
@@ -259,6 +260,19 @@
          });
        }
  
+        if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0) {
+          transactions.push({
+            user_id: user.id,
+            type: 'income',
+            amount: closing.meal_voucher_amount,
+            description: `Fechamento caixa - Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
+            category_id: balcaoCategory?.id || null,
+            account_id: defaultAccountId,
+            date: closing.date,
+            is_paid: true,
+          });
+        }
+
        if (closing.delivery_amount > 0) {
          transactions.push({
            user_id: user.id,
