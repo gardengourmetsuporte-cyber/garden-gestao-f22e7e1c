@@ -111,7 +111,7 @@
    
    const handleIngredientChange = (
      index: number,
-     updates: { quantity: number; unit_type: RecipeUnitType; total_cost: number }
+    updates: Partial<LocalIngredient>
    ) => {
      setIngredients((prev) =>
        prev.map((ing, i) => (i === index ? { ...ing, ...updates } : ing))

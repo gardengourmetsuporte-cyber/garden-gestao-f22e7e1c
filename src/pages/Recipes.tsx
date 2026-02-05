@@ -144,38 +144,32 @@
          </div>
          
          {/* Stats */}
-         <div className="grid grid-cols-3 gap-3">
-           <Card className="card-unified">
-             <CardContent className="p-4 flex items-center gap-3">
-               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <div className="grid grid-cols-3 gap-2">
+            <Card className="card-unified overflow-hidden">
+              <CardContent className="p-3 flex flex-col items-center justify-center text-center min-h-[80px]">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-1">
                  <ChefHat className="h-5 w-5 text-primary" />
                </div>
-               <div>
-                 <p className="text-2xl font-bold">{stats.total}</p>
-                 <p className="text-xs text-muted-foreground">Receitas</p>
-               </div>
+                <p className="text-xl font-bold leading-tight">{stats.total}</p>
+                <p className="text-[10px] text-muted-foreground">Receitas</p>
              </CardContent>
            </Card>
-           <Card className="card-unified">
-             <CardContent className="p-4 flex items-center gap-3">
-               <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+            <Card className="card-unified overflow-hidden">
+              <CardContent className="p-3 flex flex-col items-center justify-center text-center min-h-[80px]">
+                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center mb-1">
                  <DollarSign className="h-5 w-5 text-success" />
                </div>
-               <div>
-                 <p className="text-2xl font-bold">{formatCurrency(stats.avgCost)}</p>
-                 <p className="text-xs text-muted-foreground">Custo Médio</p>
-               </div>
+                <p className="text-lg font-bold leading-tight">{formatCurrency(stats.avgCost)}</p>
+                <p className="text-[10px] text-muted-foreground">Custo Médio</p>
              </CardContent>
            </Card>
-           <Card className="card-unified">
-             <CardContent className="p-4 flex items-center gap-3">
-               <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+            <Card className="card-unified overflow-hidden">
+              <CardContent className="p-3 flex flex-col items-center justify-center text-center min-h-[80px]">
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center mb-1">
                  <Archive className="h-5 w-5 text-muted-foreground" />
                </div>
-               <div>
-                 <p className="text-2xl font-bold">{stats.inactive}</p>
-                 <p className="text-xs text-muted-foreground">Inativas</p>
-               </div>
+                <p className="text-xl font-bold leading-tight">{stats.inactive}</p>
+                <p className="text-[10px] text-muted-foreground">Inativas</p>
              </CardContent>
            </Card>
          </div>
