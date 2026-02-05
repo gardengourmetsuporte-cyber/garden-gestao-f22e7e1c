@@ -21,6 +21,7 @@ export function useFinance(selectedMonth: Date) {
   const [categories, setCategories] = useState<FinanceCategory[]>([]);
   const [transactions, setTransactions] = useState<FinanceTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   // Fetch accounts
   const fetchAccounts = useCallback(async () => {
@@ -173,22 +174,25 @@ export function useFinance(selectedMonth: Date) {
     }
   }, [user]);
 
-  // Initial load
+  // Initial load - only initialize defaults once
   useEffect(() => {
     async function load() {
-      if (!user) return;
+      if (!user || initialized) return;
       setIsLoading(true);
+      setInitialized(true);
       await initializeDefaults();
       await Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]);
       setIsLoading(false);
     }
     load();
-  }, [user, initializeDefaults, fetchAccounts, fetchCategories, fetchTransactions]);
+  }, [user, initialized]);
 
-  // Refetch transactions when month changes
+  // Refetch transactions when month changes (only after initial load)
   useEffect(() => {
-    fetchTransactions();
-  }, [selectedMonth, fetchTransactions]);
+    if (initialized && user) {
+      fetchTransactions();
+    }
+  }, [selectedMonth]);
 
   // CRUD Operations
   const addTransaction = async (data: TransactionFormData) => {
