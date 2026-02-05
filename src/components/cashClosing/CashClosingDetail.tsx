@@ -15,7 +15,8 @@
    FileImage,
    MessageSquare,
    Loader2,
-   Trash2
+  Trash2,
+  Receipt
  } from 'lucide-react';
  import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
@@ -215,6 +216,36 @@
            </CardContent>
          </Card>
  
+        {/* Expenses */}
+        {closing.expenses && closing.expenses.length > 0 && (
+          <Card className="card-unified">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-muted-foreground" />
+                <h3 className="font-semibold">Gastos do Dia</h3>
+              </div>
+              
+              {closing.expenses.map((expense, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-sm">{expense.description}</span>
+                  <span className="font-medium text-destructive">
+                    - R$ {expense.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              ))}
+
+              <div className="border-t pt-2 mt-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Total de gastos</span>
+                  <span className="font-medium text-destructive">
+                    - R$ {closing.expenses.reduce((sum, e) => sum + e.amount, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
          {/* Receipt */}
          <Card className="card-unified">
            <CardContent className="p-4">
@@ -223,16 +254,22 @@
                  <FileImage className="w-5 h-5 text-muted-foreground" />
                  <span className="font-medium">Comprovante PDV</span>
                </div>
-               <Button
-                 variant="outline"
-                 size="sm"
-                 onClick={() => setShowReceipt(!showReceipt)}
-               >
-                 {showReceipt ? 'Ocultar' : 'Visualizar'}
-               </Button>
+              {closing.receipt_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowReceipt(!showReceipt)}
+                >
+                  {showReceipt ? 'Ocultar' : 'Visualizar'}
+                </Button>
+              )}
              </div>
              
-             {showReceipt && (
+            {!closing.receipt_url && (
+              <p className="text-sm text-muted-foreground">Nenhum comprovante anexado</p>
+            )}
+            
+            {showReceipt && closing.receipt_url && (
                <img 
                  src={closing.receipt_url} 
                  alt="Comprovante" 

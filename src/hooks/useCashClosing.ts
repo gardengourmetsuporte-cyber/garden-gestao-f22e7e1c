@@ -92,7 +92,17 @@
        const { error } = await supabase
          .from('cash_closings' as any)
          .insert({
-           ...formData,
+          date: formData.date,
+          unit_name: formData.unit_name,
+          cash_amount: formData.cash_amount,
+          debit_amount: formData.debit_amount,
+          credit_amount: formData.credit_amount,
+          pix_amount: formData.pix_amount,
+          delivery_amount: formData.delivery_amount,
+          cash_difference: formData.cash_difference,
+          receipt_url: formData.receipt_url || '',
+          notes: formData.notes,
+          expenses: formData.expenses || [],
            user_id: user.id,
          } as any);
  
