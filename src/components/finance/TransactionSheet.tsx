@@ -472,22 +472,42 @@ export function TransactionSheet({
             {/* Advanced options */}
               <div className="space-y-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <Label>Despesa fixa</Label>
-                  <Switch checked={isFixed} onCheckedChange={setIsFixed} />
+                  <div className="flex flex-col">
+                    <Label>Despesa Fixa (mensal)</Label>
+                    <span className="text-xs text-muted-foreground">Repete automaticamente todo mês</span>
+                  </div>
+                  <Switch 
+                    checked={isFixed} 
+                    onCheckedChange={(checked) => {
+                      setIsFixed(checked);
+                      // Despesa fixa = recorrência mensal automática
+                      if (checked && !editingTransaction) {
+                        setIsRecurring(true);
+                        setRecurringInterval('monthly');
+                        setRecurringCount('12'); // 12 meses por padrão
+                        setShowRecurringConfig(true);
+                      } else if (!checked) {
+                        setIsRecurring(false);
+                        setShowRecurringConfig(false);
+                      }
+                    }} 
+                  />
                 </div>
 
-                {/* Recurring options */}
+                {/* Recurring options - show only if not fixed */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Repeat className="w-4 h-4 text-muted-foreground" />
-                      <Label>Repetir</Label>
+                  {!isFixed && (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Repeat className="w-4 h-4 text-muted-foreground" />
+                        <Label>Repetir</Label>
+                      </div>
+                      <Switch checked={isRecurring} onCheckedChange={(checked) => {
+                        setIsRecurring(checked);
+                        if (checked) setShowRecurringConfig(true);
+                      }} />
                     </div>
-                    <Switch checked={isRecurring} onCheckedChange={(checked) => {
-                      setIsRecurring(checked);
-                      if (checked) setShowRecurringConfig(true);
-                    }} />
-                  </div>
+                  )}
                   
                   {isRecurring && showRecurringConfig && (
                     <div className="bg-card border rounded-xl p-4 space-y-4">
