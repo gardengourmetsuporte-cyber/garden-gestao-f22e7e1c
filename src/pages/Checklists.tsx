@@ -54,9 +54,9 @@ export default function ChecklistsPage() {
     fetchCompletions(currentDate, checklistType);
   }, [currentDate, checklistType, fetchCompletions]);
 
-  const handleToggleItem = async (itemId: string, awardPoints: boolean = true) => {
+  const handleToggleItem = async (itemId: string, points: number = 1) => {
     try {
-      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, awardPoints);
+      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao marcar item');
     }
