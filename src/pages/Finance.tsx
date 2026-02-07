@@ -160,6 +160,7 @@ export default function Finance() {
         editingTransaction={editingTransaction}
         onUpdateRecurring={updateRecurringTransaction}
         onRefreshCategories={handleRefreshCategories}
+        allTransactions={transactions}
       />
 
       {/* Account Management from Home */}
