@@ -5,7 +5,10 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { EmployeeList } from '@/components/employees/EmployeeList';
 import { EmployeePayments } from '@/components/employees/EmployeePayments';
 import { MyPayslips } from '@/components/employees/MyPayslips';
-import { Users } from 'lucide-react';
+import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
+import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
+import { Users, Calendar } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Employees() {
   const { isAdmin } = useAuth();
@@ -22,12 +25,12 @@ export default function Employees() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">
-                {isAdmin ? 'Funcionários' : 'Meus Pagamentos'}
+                {isAdmin ? 'Funcionários' : 'Meus Dados'}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {isAdmin 
-                  ? 'Gerencie funcionários e pagamentos' 
-                  : 'Consulte seus holerites e vales'}
+                  ? 'Gerencie funcionários, pagamentos e folgas' 
+                  : 'Consulte seus holerites e solicite folgas'}
               </p>
             </div>
           </div>
@@ -42,10 +45,44 @@ export default function Employees() {
                 onBack={() => setSelectedEmployee(null)}
               />
             ) : (
-              <EmployeeList onSelectEmployee={setSelectedEmployee} />
+              <Tabs defaultValue="employees" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="employees">
+                    <Users className="w-4 h-4 mr-2" />
+                    Funcionários
+                  </TabsTrigger>
+                  <TabsTrigger value="schedules">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Folgas
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="employees">
+                  <EmployeeList onSelectEmployee={setSelectedEmployee} />
+                </TabsContent>
+                <TabsContent value="schedules">
+                  <ScheduleManagement />
+                </TabsContent>
+              </Tabs>
             )
           ) : (
-            <MyPayslips />
+            <Tabs defaultValue="payslips" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="payslips">
+                  <Users className="w-4 h-4 mr-2" />
+                  Holerites
+                </TabsTrigger>
+                <TabsTrigger value="schedules">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Folgas
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="payslips">
+                <MyPayslips />
+              </TabsContent>
+              <TabsContent value="schedules">
+                <EmployeeScheduleRequest />
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </div>
