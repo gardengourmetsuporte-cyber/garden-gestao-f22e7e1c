@@ -46,6 +46,15 @@ export function useSupplierInvoices() {
       notes?: string;
     }): Promise<string> => {
       // Create supplier invoice
+      // Busca nome do fornecedor
+      const { data: supplierData } = await supabase
+        .from('suppliers')
+        .select('name')
+        .eq('id', invoice.supplier_id)
+        .single();
+      
+      const supplierName = supplierData?.name || 'Fornecedor';
+      
       const { data: invoiceData, error: invoiceError } = await supabase
         .from('supplier_invoices')
         .insert({
@@ -57,13 +66,13 @@ export function useSupplierInvoices() {
       
       if (invoiceError) throw invoiceError;
       
-      // Create provisioned finance transaction (is_paid = false)
+      // Create provisioned finance transaction (is_paid = false) - usa nome do fornecedor
       const { error: transError } = await supabase
         .from('finance_transactions')
         .insert({
           user_id: user?.id,
           type: 'expense',
-          description: invoice.description,
+          description: supplierName,
           amount: invoice.amount,
           date: invoice.due_date,
           supplier_id: invoice.supplier_id,
