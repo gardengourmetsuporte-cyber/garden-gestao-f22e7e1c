@@ -1,7 +1,7 @@
  import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
  import { ptBR } from 'date-fns/locale';
  import { Checkbox } from '@/components/ui/checkbox';
- import { Trash2, CalendarDays, GripVertical } from 'lucide-react';
+ import { Trash2, CalendarDays, GripVertical, Pencil } from 'lucide-react';
  import { cn } from '@/lib/utils';
  import type { ManagerTask } from '@/types/agenda';
  
@@ -108,16 +108,29 @@
           )}
        </button>
  
+      {/* Edit button */}
+      <button
+        className="w-9 h-9 flex items-center justify-center rounded-xl 
+          opacity-0 group-hover:opacity-100 transition-all 
+          text-muted-foreground hover:text-primary hover:bg-primary/10 shrink-0"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
+      >
+        <Pencil className="w-4 h-4" />
+      </button>
+
       <button
         className="w-9 h-9 flex items-center justify-center rounded-xl 
           opacity-0 group-hover:opacity-100 transition-all 
           text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
-         onClick={(e) => {
-           e.stopPropagation();
-           onDelete(task.id);
-         }}
-       >
-         <Trash2 className="w-4 h-4" />
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(task.id);
+        }}
+      >
+        <Trash2 className="w-4 h-4" />
       </button>
      </div>
    );

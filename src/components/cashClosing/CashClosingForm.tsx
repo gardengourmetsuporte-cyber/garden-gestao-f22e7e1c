@@ -42,8 +42,9 @@ export function CashClosingForm({ onSuccess }: Props) {
   const { uploadReceipt, createClosing, checkChecklistCompleted } = useCashClosing();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Use UTC date string to match backend date columns (avoids timezone issues after midnight)
-  const today = new Date().toISOString().slice(0, 10);
+  // Use LOCAL date to match the operational day (not UTC which may be next day after midnight)
+  const now = new Date();
+  const today = format(now, 'yyyy-MM-dd');
   
   const [initialCash, setInitialCash] = useState(0);
   const [cashCounted, setCashCounted] = useState(0);

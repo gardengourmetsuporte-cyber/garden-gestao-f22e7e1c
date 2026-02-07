@@ -151,6 +151,7 @@ export interface ChecklistCompletion {
   notes: string | null;
   date: string;
   awarded_points: boolean;
+  points_awarded: number; // 1-4 stars, 0 means "already done"
   // Joined data
   item?: ChecklistItem;
   profile?: Profile;
