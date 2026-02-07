@@ -10,8 +10,9 @@ interface LeaderboardProps {
   maxEntries?: number;
 }
 
-export function Leaderboard({ entries, currentUserId, isLoading, maxEntries = 10 }: LeaderboardProps) {
-  const displayEntries = entries.slice(0, maxEntries);
+export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: LeaderboardProps) {
+  // Se maxEntries não for passado, mostra todos
+  const displayEntries = maxEntries ? entries.slice(0, maxEntries) : entries;
 
   const getRankIcon = (rank: number) => {
     switch (rank) {

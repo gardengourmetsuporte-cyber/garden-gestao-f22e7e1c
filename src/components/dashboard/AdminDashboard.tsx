@@ -319,12 +319,11 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      {/* Leaderboard */}
+      {/* Leaderboard - Completo */}
       <Leaderboard 
         entries={leaderboard} 
         currentUserId={user?.id}
         isLoading={leaderboardLoading}
-        maxEntries={5}
       />
     </div>
   );

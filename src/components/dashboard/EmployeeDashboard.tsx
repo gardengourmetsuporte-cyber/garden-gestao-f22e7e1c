@@ -78,12 +78,11 @@ export function EmployeeDashboard() {
         </Link>
       </div>
 
-      {/* Leaderboard */}
+      {/* Leaderboard - Completo */}
       <Leaderboard 
         entries={leaderboard}
         currentUserId={user?.id}
         isLoading={leaderboardLoading}
-        maxEntries={10}
       />
 
       {/* Inventory Link */}
