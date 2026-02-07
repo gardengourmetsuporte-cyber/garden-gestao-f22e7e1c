@@ -48,11 +48,13 @@ function clampPoints(points: number): 1 | 2 | 3 | 4 {
   return 4;
 }
 
-function getPointsTone(points: number): { color: string; glow: string } {
+function getPointsTone(points: number): { color: string; bg: string; border: string } {
   const p = clampPoints(points);
   return {
     color: `hsl(var(--coin-${p}))`,
-    glow: `hsl(var(--coin-${p}-glow))`,
+    // Fundo suave para garantir contraste com o texto (não usar --coin-*-glow aqui)
+    bg: `hsl(var(--coin-${p}) / 0.18)`,
+    border: `hsl(var(--coin-${p}) / 0.35)`,
   };
 }
 
@@ -383,9 +385,9 @@ export function ChecklistView({
                                 style={
                                   wasAwardedPoints && pointsAwarded > 0
                                     ? {
-                                        backgroundColor: getPointsTone(pointsAwarded).glow,
+                                        backgroundColor: getPointsTone(pointsAwarded).bg,
                                         color: getPointsTone(pointsAwarded).color,
-                                        borderColor: getPointsTone(pointsAwarded).glow,
+                                        borderColor: getPointsTone(pointsAwarded).border,
                                       }
                                     : undefined
                                 }
@@ -449,9 +451,9 @@ export function ChecklistView({
                                   <div
                                     className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border"
                                     style={{
-                                      backgroundColor: getPointsTone(configuredPoints).glow,
+                                      backgroundColor: getPointsTone(configuredPoints).bg,
                                       color: getPointsTone(configuredPoints).color,
-                                      borderColor: getPointsTone(configuredPoints).glow,
+                                      borderColor: getPointsTone(configuredPoints).border,
                                     }}
                                   >
                                     <Star
