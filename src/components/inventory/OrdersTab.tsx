@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Package, Plus, Trash2, MessageCircle, Check, Clock, PackageCheck } from 'lucide-react';
+import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText } from 'lucide-react';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { ReceiveOrderSheet } from './ReceiveOrderSheet';
+import { RegisterInvoiceAfterReceive } from './RegisterInvoiceAfterReceive';
 
 interface OrdersTabProps {
   items: InventoryItem[];
@@ -15,6 +16,13 @@ interface OrdersTabProps {
   onSendOrder: (orderId: string) => Promise<void>;
   onDeleteOrder: (orderId: string) => Promise<void>;
   onReceiveOrder: (orderId: string, items: { itemId: string; quantity: number }[]) => Promise<void>;
+  onRegisterInvoice?: (data: {
+    supplierId: string;
+    amount: number;
+    dueDate: string;
+    description: string;
+    invoiceNumber?: string;
+  }) => Promise<void>;
 }
 
 export function OrdersTab({
@@ -25,6 +33,7 @@ export function OrdersTab({
   onSendOrder,
   onDeleteOrder,
   onReceiveOrder,
+  onRegisterInvoice,
 }: OrdersTabProps) {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -32,6 +41,8 @@ export function OrdersTab({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [receiveOrderOpen, setReceiveOrderOpen] = useState(false);
   const [orderToReceive, setOrderToReceive] = useState<Order | null>(null);
+  const [invoiceSheetOpen, setInvoiceSheetOpen] = useState(false);
+  const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
 
   // Get items that need to be ordered (below minimum stock)
   const lowStockItems = useMemo(() => {
@@ -276,6 +287,20 @@ export function OrdersTab({
                     Receber Pedido
                   </Button>
                 )}
+                {order.status === 'received' && onRegisterInvoice && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setOrderForInvoice(order);
+                      setInvoiceSheetOpen(true);
+                    }}
+                    className="gap-2 bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Cadastrar Despesa
+                  </Button>
+                )}
                 {(order.status === 'draft' || order.status === 'sent' || order.status === 'received') && (
                   <Button
                     size="sm"
@@ -297,8 +322,30 @@ export function OrdersTab({
         order={orderToReceive}
         open={receiveOrderOpen}
         onOpenChange={setReceiveOrderOpen}
-        onConfirmReceive={onReceiveOrder}
+        onConfirmReceive={async (orderId, items) => {
+          await onReceiveOrder(orderId, items);
+          // After receiving, open invoice sheet
+          if (onRegisterInvoice) {
+            setOrderForInvoice(orderToReceive);
+            setInvoiceSheetOpen(true);
+          }
+        }}
       />
+
+      {/* Register Invoice After Receive */}
+      {onRegisterInvoice && (
+        <RegisterInvoiceAfterReceive
+          order={orderForInvoice}
+          open={invoiceSheetOpen}
+          onOpenChange={setInvoiceSheetOpen}
+          onRegisterInvoice={async (data) => {
+            await onRegisterInvoice(data);
+          }}
+          onSkip={() => {
+            setOrderForInvoice(null);
+          }}
+        />
+      )}
 
       {/* Create Order Sheet */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>

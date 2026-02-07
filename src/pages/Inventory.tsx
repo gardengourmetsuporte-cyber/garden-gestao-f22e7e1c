@@ -5,6 +5,7 @@ import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useOrders } from '@/hooks/useOrders';
+import { useSupplierInvoices } from '@/hooks/useSupplierInvoices';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatsCard } from '@/components/inventory/StatsCard';
 import { ItemCard } from '@/components/inventory/ItemCardNew';
@@ -41,7 +42,7 @@ export default function InventoryPage() {
   const { categories } = useCategories();
   const { suppliers } = useSuppliers();
   const { orders, createOrder, updateOrderStatus, deleteOrder } = useOrders();
-
+  const { addInvoice } = useSupplierInvoices();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('items');
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -200,6 +201,27 @@ export default function InventoryPage() {
       await deleteOrder(orderId);
     } catch (error) {
       toast.error('Erro ao excluir pedido');
+    }
+  };
+
+  const handleRegisterInvoice = async (data: {
+    supplierId: string;
+    amount: number;
+    dueDate: string;
+    description: string;
+    invoiceNumber?: string;
+  }) => {
+    try {
+      await addInvoice({
+        supplier_id: data.supplierId,
+        amount: data.amount,
+        due_date: data.dueDate,
+        description: data.description,
+        invoice_number: data.invoiceNumber,
+      });
+    } catch (error) {
+      toast.error('Erro ao cadastrar boleto');
+      throw error;
     }
   };
 
@@ -460,6 +482,7 @@ export default function InventoryPage() {
               onSendOrder={handleSendOrder}
               onDeleteOrder={handleDeleteOrder}
               onReceiveOrder={handleReceiveOrder}
+              onRegisterInvoice={handleRegisterInvoice}
             />
           ) : view === 'invoices' ? (
             <SupplierInvoicesList />

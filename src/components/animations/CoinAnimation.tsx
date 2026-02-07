@@ -13,19 +13,19 @@ interface FlyingCoinProps {
   points?: number;
 }
 
-// Cores bem distintas e chamativas para cada nível de pontos
-function getCoinColors(points: number) {
+// Cores MUITO distintas e chamativas para cada nível de pontos
+function getCoinColors(points: number): { bg: string; glow: string } {
   switch (points) {
     case 1:
-      return { bg: 'bg-blue-500', shadow: 'shadow-blue-500/60' }; // Azul
+      return { bg: '#3B82F6', glow: '#3B82F6' }; // Azul vibrante
     case 2:
-      return { bg: 'bg-emerald-500', shadow: 'shadow-emerald-500/60' }; // Verde
+      return { bg: '#10B981', glow: '#10B981' }; // Verde esmeralda
     case 3:
-      return { bg: 'bg-orange-500', shadow: 'shadow-orange-500/60' }; // Laranja
+      return { bg: '#F97316', glow: '#F97316' }; // Laranja forte
     case 4:
-      return { bg: 'bg-rose-500', shadow: 'shadow-rose-500/60' }; // Vermelho/Rosa
+      return { bg: '#EF4444', glow: '#EF4444' }; // Vermelho intenso
     default:
-      return { bg: 'bg-blue-500', shadow: 'shadow-blue-500/60' };
+      return { bg: '#3B82F6', glow: '#3B82F6' };
   }
 }
 
@@ -66,12 +66,14 @@ function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinPr
         transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       }}
     >
-      <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center shadow-lg",
-        colors.bg,
-        colors.shadow
-      )}>
-        <Star className="w-5 h-5 text-white fill-white" />
+      <div 
+        className="w-10 h-10 rounded-full flex items-center justify-center"
+        style={{
+          backgroundColor: colors.bg,
+          boxShadow: `0 0 20px 8px ${colors.glow}80, 0 0 40px 16px ${colors.glow}40`,
+        }}
+      >
+        <Star className="w-6 h-6 text-white fill-white" />
       </div>
     </div>,
     document.body
