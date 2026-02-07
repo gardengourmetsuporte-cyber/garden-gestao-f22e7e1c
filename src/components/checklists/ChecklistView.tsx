@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
@@ -14,13 +14,15 @@ import {
   User,
   Lock,
   Star,
-  RefreshCw
+  RefreshCw,
+  Users
 } from 'lucide-react';
-import { ChecklistSector, ChecklistType, ChecklistCompletion } from '@/types/database';
+import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getPointsColors, clampPoints } from '@/lib/points';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -28,7 +30,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, points: number, event?: React.MouseEvent) => void;
+  onToggleItem: (itemId: string, points: number, completedByUserId?: string) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -64,6 +66,20 @@ export function ChecklistView({
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set(sectors.map(s => s.id)));
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
   const [openPopover, setOpenPopover] = useState<string | null>(null);
+  const [profiles, setProfiles] = useState<Pick<Profile, 'user_id' | 'full_name'>[]>([]);
+
+  // Load profiles for admin user selector
+  useEffect(() => {
+    if (isAdmin) {
+      supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .order('full_name')
+        .then(({ data }) => {
+          if (data) setProfiles(data);
+        });
+    }
+  }, [isAdmin]);
 
   const toggleSector = (sectorId: string) => {
     setExpandedSectors(prev => {
@@ -138,17 +154,17 @@ export function ChecklistView({
     return "☕ Vamos começar!";
   };
 
-  const handleComplete = (itemId: string, points: number, configuredPoints: number, e: React.MouseEvent) => {
-    if (points > 0) {
+  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement) => {
+    if (points > 0 && buttonElement) {
       // Trigger coin animation for each point with color based on total points
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const rect = buttonElement.getBoundingClientRect();
       for (let i = 0; i < points; i++) {
         setTimeout(() => {
           triggerCoin(rect.right - 40 + (i * 10), rect.top + rect.height / 2, configuredPoints);
         }, i * 100);
       }
     }
-    onToggleItem(itemId, points, e);
+    onToggleItem(itemId, points, completedByUserId);
     setOpenPopover(null);
   };
 
@@ -189,7 +205,7 @@ export function ChecklistView({
             className={cn(
               "h-full rounded-full transition-all duration-500 ease-out",
               progressPercent === 100
-                ? "bg-gradient-to-r from-success to-emerald-400"
+                ? "bg-gradient-to-r from-success to-success/70"
                 : "bg-gradient-to-r from-primary to-primary/70"
             )}
             style={{ width: `${progressPercent}%` }}
@@ -315,9 +331,9 @@ export function ChecklistView({
                           return (
                             <button
                               key={item.id}
-                              onClick={(e) => {
+                              onClick={() => {
                                 if (!canToggle) return;
-                                onToggleItem(item.id, 0, e); // 0 points for unchecking
+                                onToggleItem(item.id, 0); // 0 points for unchecking
                               }}
                               disabled={!canToggle}
                               className={cn(
@@ -352,7 +368,7 @@ export function ChecklistView({
                                       {format(new Date(completion.completed_at), 'HH:mm')}
                                     </span>
                                     {!wasAwardedPoints && (
-                                      <span className="text-blue-500 ml-1">(já pronto)</span>
+                                      <span className="text-primary ml-1">(já pronto)</span>
                                     )}
                                   </div>
                                 )}
@@ -455,62 +471,116 @@ export function ChecklistView({
                                 )}
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-64 p-3" align="end">
+                            <PopoverContent className="w-72 p-3" align="end">
                               <div className="space-y-3">
-                                {/* Main action - mark complete with configured points */}
-                                <button
-                                  onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, e)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-colors border-2 border-success/30"
-                                >
-                                  <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center">
-                                    <Check className="w-5 h-5 text-success-foreground" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="font-semibold text-success">Concluí agora</p>
-                                    {configuredPoints > 0 ? (
-                                      <div className="flex items-center gap-0.5 mt-0.5">
-                                        {Array.from({ length: configuredPoints }).map((_, i) => (
-                                          <Star
-                                            key={i}
-                                            className="w-3 h-3"
-                                            style={{
-                                              color: getPointsColors(configuredPoints).color,
-                                              fill: getPointsColors(configuredPoints).color,
-                                            }}
-                                          />
-                                        ))}
-                                        <span
-                                          className="text-xs font-bold ml-0.5"
-                                          style={{ color: getPointsColors(configuredPoints).color }}
-                                        >
-                                          +{configuredPoints}
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <span className="text-xs text-muted-foreground">Tarefa sem pontos</span>
-                                    )}
-                                  </div>
-                                </button>
-                                
-                                {/* Divider - only show if task has points */}
-                                {configuredPoints > 0 && (
+                                {/* Admin: Show user selector */}
+                                {isAdmin && profiles.length > 0 && (
                                   <>
+                                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                                      <Users className="w-4 h-4" />
+                                      <span>Quem realizou?</span>
+                                    </div>
+                                    <div className="max-h-32 overflow-y-auto space-y-1">
+                                      {profiles.map((profile) => (
+                                        <button
+                                          key={profile.user_id}
+                                          onClick={(e) => {
+                                            handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget);
+                                          }}
+                                          className={cn(
+                                            "w-full flex items-center gap-2 p-2 rounded-lg text-left transition-colors text-sm",
+                                            profile.user_id === currentUserId
+                                              ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium"
+                                              : "hover:bg-secondary text-foreground"
+                                          )}
+                                        >
+                                          <User className="w-4 h-4 shrink-0" />
+                                          <span className="truncate">{profile.full_name}</span>
+                                          {profile.user_id === currentUserId && (
+                                            <span className="text-xs text-muted-foreground ml-auto">(eu)</span>
+                                          )}
+                                        </button>
+                                      ))}
+                                    </div>
                                     <div className="border-t border-border" />
-                                    
-                                    {/* Already done - no points */}
+                                  </>
+                                )}
+
+                                {/* Non-admin: Regular completion options */}
+                                {!isAdmin && (
+                                  <>
+                                    {/* Main action - mark complete with configured points */}
                                     <button
-                                      onClick={(e) => handleComplete(item.id, 0, configuredPoints, e)}
-                                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-colors"
+                                      onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
+                                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-colors border-2 border-success/30"
                                     >
-                                      <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
-                                        <RefreshCw className="w-5 h-5 text-muted-foreground" />
+                                      <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center">
+                                        <Check className="w-5 h-5 text-success-foreground" />
                                       </div>
-                                      <div>
-                                        <p className="font-semibold text-foreground">Já estava pronto</p>
-                                        <p className="text-xs text-muted-foreground">Sem pontos</p>
+                                      <div className="flex-1">
+                                        <p className="font-semibold text-success">Concluí agora</p>
+                                        {configuredPoints > 0 ? (
+                                          <div className="flex items-center gap-0.5 mt-0.5">
+                                            {Array.from({ length: configuredPoints }).map((_, i) => (
+                                              <Star
+                                                key={i}
+                                                className="w-3 h-3"
+                                                style={{
+                                                  color: getPointsColors(configuredPoints).color,
+                                                  fill: getPointsColors(configuredPoints).color,
+                                                }}
+                                              />
+                                            ))}
+                                            <span
+                                              className="text-xs font-bold ml-0.5"
+                                              style={{ color: getPointsColors(configuredPoints).color }}
+                                            >
+                                              +{configuredPoints}
+                                            </span>
+                                          </div>
+                                        ) : (
+                                          <span className="text-xs text-muted-foreground">Tarefa sem pontos</span>
+                                        )}
                                       </div>
                                     </button>
+                                    
+                                    {/* Divider - only show if task has points */}
+                                    {configuredPoints > 0 && (
+                                      <>
+                                        <div className="border-t border-border" />
+                                        
+                                        {/* Already done - no points */}
+                                        <button
+                                          onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget)}
+                                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-colors"
+                                        >
+                                          <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                            <RefreshCw className="w-5 h-5 text-muted-foreground" />
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-foreground">Já estava pronto</p>
+                                            <p className="text-xs text-muted-foreground">Sem pontos</p>
+                                          </div>
+                                        </button>
+                                      </>
+                                    )}
                                   </>
+                                )}
+
+                                {/* Admin: Already done option (no user selector needed) */}
+                                {isAdmin && configuredPoints > 0 && (
+                                  <button
+                                    onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget)}
+                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-colors"
+                                  >
+                                    <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                      <RefreshCw className="w-5 h-5 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-foreground">Já estava pronto</p>
+                                      <p className="text-xs text-muted-foreground">Sem pontos (eu marquei)</p>
+                                    </div>
+                                  </button>
                                 )}
                               </div>
                             </PopoverContent>
