@@ -34,7 +34,7 @@ export function useSupplierInvoices() {
     return new Date(inv.due_date) < new Date();
   });
 
-  // Add invoice
+  // Add invoice and provision in finance (is_paid = false)
   const addInvoice = useMutation({
     mutationFn: async (invoice: {
       supplier_id: string;
@@ -44,19 +44,44 @@ export function useSupplierInvoices() {
       issue_date?: string;
       due_date: string;
       notes?: string;
-    }) => {
-      const { error } = await supabase
+    }): Promise<string> => {
+      // Create supplier invoice
+      const { data: invoiceData, error: invoiceError } = await supabase
         .from('supplier_invoices')
         .insert({
           ...invoice,
           user_id: user?.id,
+        })
+        .select('id')
+        .single();
+      
+      if (invoiceError) throw invoiceError;
+      
+      // Create provisioned finance transaction (is_paid = false)
+      const { error: transError } = await supabase
+        .from('finance_transactions')
+        .insert({
+          user_id: user?.id,
+          type: 'expense',
+          description: invoice.description,
+          amount: invoice.amount,
+          date: invoice.due_date,
+          supplier_id: invoice.supplier_id,
+          is_paid: false,
+          is_fixed: false,
         });
       
-      if (error) throw error;
+      if (transError) {
+        console.error('Error creating finance transaction:', transError);
+        // Don't fail if finance transaction fails - invoice was created
+      }
+      
+      return invoiceData.id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['supplier-invoices'] });
-      toast.success('Boleto cadastrado com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['finance-transactions'] });
+      toast.success('Boleto cadastrado e provisionado no financeiro!');
     },
     onError: () => {
       toast.error('Erro ao cadastrar boleto');

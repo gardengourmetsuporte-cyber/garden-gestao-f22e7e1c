@@ -14,19 +14,16 @@ interface FlyingCoinProps {
 }
 
 // Cores MUITO distintas e chamativas para cada nível de pontos
+// 1pt = Ciano, 2pt = Amarelo Dourado, 3pt = Rosa/Magenta, 4pt = Roxo/Violeta
+const COIN_COLORS: Record<number, { bg: string; glow: string }> = {
+  1: { bg: '#22D3EE', glow: '#22D3EE' }, // Ciano brilhante (cyan-400)
+  2: { bg: '#FCD34D', glow: '#FCD34D' }, // Amarelo dourado (amber-300)
+  3: { bg: '#F472B6', glow: '#F472B6' }, // Rosa pink (pink-400)
+  4: { bg: '#A78BFA', glow: '#A78BFA' }, // Roxo violeta (violet-400)
+};
+
 function getCoinColors(points: number): { bg: string; glow: string } {
-  switch (points) {
-    case 1:
-      return { bg: '#06B6D4', glow: '#06B6D4' }; // Ciano/Turquesa
-    case 2:
-      return { bg: '#FACC15', glow: '#FACC15' }; // Amarelo dourado
-    case 3:
-      return { bg: '#EC4899', glow: '#EC4899' }; // Rosa/Magenta
-    case 4:
-      return { bg: '#8B5CF6', glow: '#8B5CF6' }; // Roxo/Violeta
-    default:
-      return { bg: '#06B6D4', glow: '#06B6D4' };
-  }
+  return COIN_COLORS[points] || COIN_COLORS[1];
 }
 
 function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinProps) {
@@ -67,13 +64,14 @@ function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinPr
       }}
     >
       <div 
-        className="w-10 h-10 rounded-full flex items-center justify-center"
+        className="w-12 h-12 rounded-full flex items-center justify-center animate-pulse"
         style={{
           backgroundColor: colors.bg,
-          boxShadow: `0 0 20px 8px ${colors.glow}80, 0 0 40px 16px ${colors.glow}40`,
+          boxShadow: `0 0 25px 10px ${colors.glow}, 0 0 50px 20px ${colors.glow}80`,
+          border: '3px solid white',
         }}
       >
-        <Star className="w-6 h-6 text-white fill-white" />
+        <Star className="w-7 h-7 text-white fill-white drop-shadow-lg" />
       </div>
     </div>,
     document.body

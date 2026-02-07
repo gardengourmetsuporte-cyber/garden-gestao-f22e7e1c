@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp, ShoppingCart, FileText } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
@@ -41,7 +42,7 @@ export default function InventoryPage() {
 
   const { categories } = useCategories();
   const { suppliers } = useSuppliers();
-  const { orders, createOrder, updateOrderStatus, deleteOrder } = useOrders();
+  const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
   const { addInvoice } = useSupplierInvoices();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('items');
@@ -205,24 +206,33 @@ export default function InventoryPage() {
   };
 
   const handleRegisterInvoice = async (data: {
+    orderId: string;
     supplierId: string;
     amount: number;
     dueDate: string;
     description: string;
     invoiceNumber?: string;
-  }) => {
-    try {
-      await addInvoice({
-        supplier_id: data.supplierId,
-        amount: data.amount,
-        due_date: data.dueDate,
-        description: data.description,
-        invoice_number: data.invoiceNumber,
-      });
-    } catch (error) {
-      toast.error('Erro ao cadastrar boleto');
-      throw error;
+  }): Promise<string> => {
+    // Add invoice and get the ID back
+    const invoiceId = await addInvoice({
+      supplier_id: data.supplierId,
+      amount: data.amount,
+      due_date: data.dueDate,
+      description: data.description,
+      invoice_number: data.invoiceNumber,
+    });
+    
+    // Link invoice to order
+    if (invoiceId) {
+      await supabase
+        .from('orders')
+        .update({ supplier_invoice_id: invoiceId })
+        .eq('id', data.orderId);
+      // Refetch orders to update UI
+      await refetchOrders();
     }
+    
+    return invoiceId || '';
   };
 
   if (isLoading) {

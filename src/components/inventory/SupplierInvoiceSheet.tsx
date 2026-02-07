@@ -32,7 +32,7 @@ interface SupplierInvoiceSheetProps {
     issue_date?: string;
     due_date: string;
     notes?: string;
-  }) => Promise<void>;
+  }) => Promise<string | void>;
   onUpdate?: (data: Partial<SupplierInvoice> & { id: string }) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
 }
