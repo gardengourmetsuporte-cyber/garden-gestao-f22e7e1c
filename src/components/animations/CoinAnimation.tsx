@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Star } from 'lucide-react';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
-import { cn } from '@/lib/utils';
 
 interface FlyingCoinProps {
   id: string;
@@ -13,26 +12,31 @@ interface FlyingCoinProps {
   points?: number;
 }
 
-// Cores MUITO distintas e chamativas para cada nível de pontos
-// 1pt = Ciano, 2pt = Amarelo Dourado, 3pt = Rosa/Magenta, 4pt = Roxo/Violeta
-const COIN_COLORS: Record<number, { bg: string; glow: string }> = {
-  1: { bg: '#22D3EE', glow: '#22D3EE' }, // Ciano brilhante (cyan-400)
-  2: { bg: '#FCD34D', glow: '#FCD34D' }, // Amarelo dourado (amber-300)
-  3: { bg: '#F472B6', glow: '#F472B6' }, // Rosa pink (pink-400)
-  4: { bg: '#A78BFA', glow: '#A78BFA' }, // Roxo violeta (violet-400)
-};
+function clampPoints(points: number): 1 | 2 | 3 | 4 {
+  const p = Math.round(Number(points) || 1);
+  if (p <= 1) return 1;
+  if (p === 2) return 2;
+  if (p === 3) return 3;
+  return 4;
+}
 
+// Usa tokens HSL do design system (definidos em src/index.css)
 function getCoinColors(points: number): { bg: string; glow: string } {
-  return COIN_COLORS[points] || COIN_COLORS[1];
+  const p = clampPoints(points);
+
+  const bg = `hsl(var(--coin-${p}))`;
+  const glow = `hsl(var(--coin-${p}-glow))`;
+
+  return { bg, glow };
 }
 
 function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinProps) {
   const { removeCoin, triggerPulse } = useCoinAnimation();
   const [position, setPosition] = useState({ x: startX, y: startY, scale: 1, opacity: 1, rotation: 0 });
-  const colors = getCoinColors(points);
+
+  const colors = useMemo(() => getCoinColors(points), [points]);
 
   useEffect(() => {
-    // Start animation after a frame
     requestAnimationFrame(() => {
       setPosition({
         x: endX,
@@ -43,7 +47,6 @@ function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinPr
       });
     });
 
-    // Trigger pulse on destination and remove coin
     const timer = setTimeout(() => {
       triggerPulse();
       removeCoin(id);
@@ -63,15 +66,15 @@ function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinPr
         transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       }}
     >
-      <div 
+      <div
         className="w-12 h-12 rounded-full flex items-center justify-center animate-pulse"
         style={{
           backgroundColor: colors.bg,
-          boxShadow: `0 0 25px 10px ${colors.glow}, 0 0 50px 20px ${colors.glow}80`,
-          border: '3px solid white',
+          boxShadow: `0 0 25px 10px ${colors.glow}, 0 0 50px 20px ${colors.glow}`,
+          border: '3px solid hsl(var(--background))',
         }}
       >
-        <Star className="w-7 h-7 text-white fill-white drop-shadow-lg" />
+        <Star className="w-7 h-7 text-primary-foreground fill-primary-foreground drop-shadow-lg" />
       </div>
     </div>,
     document.body
@@ -83,7 +86,7 @@ export function CoinAnimationLayer() {
 
   return (
     <>
-      {coins.map(coin => (
+      {coins.map((coin) => (
         <FlyingCoin key={coin.id} {...coin} />
       ))}
     </>
