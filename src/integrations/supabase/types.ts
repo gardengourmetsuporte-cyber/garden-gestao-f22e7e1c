@@ -343,53 +343,110 @@ export type Database = {
       }
       employee_payments: {
         Row: {
+          advance_deduction: number | null
           amount: number
+          base_salary: number | null
           created_at: string
           created_by: string | null
           employee_id: string
+          fgts_amount: number | null
           finance_transaction_id: string | null
           id: string
+          inss_deduction: number | null
+          irrf_deduction: number | null
           is_paid: boolean
+          meal_allowance: number | null
+          net_salary: number | null
+          night_bonus: number | null
+          night_hours: number | null
           notes: string | null
+          other_deductions: number | null
+          other_deductions_description: string | null
+          other_earnings: number | null
+          other_earnings_description: string | null
+          overtime_bonus: number | null
+          overtime_hours: number | null
           paid_at: string | null
           payment_date: string
           receipt_url: string | null
           reference_month: number
           reference_year: number
+          regular_hours: number | null
+          total_deductions: number | null
+          total_earnings: number | null
+          transport_allowance: number | null
           type: string
           updated_at: string
         }
         Insert: {
+          advance_deduction?: number | null
           amount: number
+          base_salary?: number | null
           created_at?: string
           created_by?: string | null
           employee_id: string
+          fgts_amount?: number | null
           finance_transaction_id?: string | null
           id?: string
+          inss_deduction?: number | null
+          irrf_deduction?: number | null
           is_paid?: boolean
+          meal_allowance?: number | null
+          net_salary?: number | null
+          night_bonus?: number | null
+          night_hours?: number | null
           notes?: string | null
+          other_deductions?: number | null
+          other_deductions_description?: string | null
+          other_earnings?: number | null
+          other_earnings_description?: string | null
+          overtime_bonus?: number | null
+          overtime_hours?: number | null
           paid_at?: string | null
           payment_date: string
           receipt_url?: string | null
           reference_month: number
           reference_year: number
+          regular_hours?: number | null
+          total_deductions?: number | null
+          total_earnings?: number | null
+          transport_allowance?: number | null
           type: string
           updated_at?: string
         }
         Update: {
+          advance_deduction?: number | null
           amount?: number
+          base_salary?: number | null
           created_at?: string
           created_by?: string | null
           employee_id?: string
+          fgts_amount?: number | null
           finance_transaction_id?: string | null
           id?: string
+          inss_deduction?: number | null
+          irrf_deduction?: number | null
           is_paid?: boolean
+          meal_allowance?: number | null
+          net_salary?: number | null
+          night_bonus?: number | null
+          night_hours?: number | null
           notes?: string | null
+          other_deductions?: number | null
+          other_deductions_description?: string | null
+          other_earnings?: number | null
+          other_earnings_description?: string | null
+          overtime_bonus?: number | null
+          overtime_hours?: number | null
           paid_at?: string | null
           payment_date?: string
           receipt_url?: string | null
           reference_month?: number
           reference_year?: number
+          regular_hours?: number | null
+          total_deductions?: number | null
+          total_earnings?: number | null
+          transport_allowance?: number | null
           type?: string
           updated_at?: string
         }
@@ -620,6 +677,7 @@ export type Database = {
           is_recurring: boolean
           notes: string | null
           recurring_interval: string | null
+          supplier_id: string | null
           tags: string[] | null
           to_account_id: string | null
           total_installments: number | null
@@ -644,6 +702,7 @@ export type Database = {
           is_recurring?: boolean
           notes?: string | null
           recurring_interval?: string | null
+          supplier_id?: string | null
           tags?: string[] | null
           to_account_id?: string | null
           total_installments?: number | null
@@ -668,6 +727,7 @@ export type Database = {
           is_recurring?: boolean
           notes?: string | null
           recurring_interval?: string | null
+          supplier_id?: string | null
           tags?: string[] | null
           to_account_id?: string | null
           total_installments?: number | null
@@ -695,6 +755,13 @@ export type Database = {
             columns: ["credit_card_invoice_id"]
             isOneToOne: false
             referencedRelation: "credit_card_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_transactions_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
           {
@@ -1325,6 +1392,72 @@ export type Database = {
             columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          due_date: string
+          finance_transaction_id: string | null
+          id: string
+          invoice_number: string | null
+          is_paid: boolean
+          issue_date: string
+          notes: string | null
+          paid_at: string | null
+          supplier_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          due_date: string
+          finance_transaction_id?: string | null
+          id?: string
+          invoice_number?: string | null
+          is_paid?: boolean
+          issue_date?: string
+          notes?: string | null
+          paid_at?: string | null
+          supplier_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          due_date?: string
+          finance_transaction_id?: string | null
+          id?: string
+          invoice_number?: string | null
+          is_paid?: boolean
+          issue_date?: string
+          notes?: string | null
+          paid_at?: string | null
+          supplier_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_invoices_finance_transaction_id_fkey"
+            columns: ["finance_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "finance_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_invoices_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
+import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp, ShoppingCart, FileText } from 'lucide-react';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
@@ -13,12 +13,13 @@ import { QuickMovementSheetNew } from '@/components/inventory/QuickMovementSheet
 import { ItemFormSheetNew } from '@/components/inventory/ItemFormSheetNew';
 import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
 import { OrdersTab } from '@/components/inventory/OrdersTab';
+import { SupplierInvoicesList } from '@/components/inventory/SupplierInvoicesList';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { InventoryItem } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type View = 'items' | 'history' | 'orders';
+type View = 'items' | 'history' | 'orders' | 'invoices';
 
 export default function InventoryPage() {
   const location = useLocation();
@@ -365,10 +366,22 @@ export default function InventoryPage() {
                 )}
               </button>
             )}
+            {isAdmin && (
+              <button
+                onClick={() => { setView('invoices'); setStockFilter(null); }}
+                className={cn(
+                  "view-toggle-item",
+                  view === 'invoices' ? 'view-toggle-active' : 'view-toggle-inactive'
+                )}
+              >
+                <FileText className="w-4 h-4" />
+                Boletos
+              </button>
+            )}
           </div>
 
           {/* Search */}
-          {view !== 'orders' && (
+          {view !== 'orders' && view !== 'invoices' && (
             <SearchBar
               value={search}
               onChange={setSearch}
@@ -448,6 +461,8 @@ export default function InventoryPage() {
               onDeleteOrder={handleDeleteOrder}
               onReceiveOrder={handleReceiveOrder}
             />
+          ) : view === 'invoices' ? (
+            <SupplierInvoicesList />
           ) : (
             <MovementHistoryNew
               movements={movements.filter(m => {

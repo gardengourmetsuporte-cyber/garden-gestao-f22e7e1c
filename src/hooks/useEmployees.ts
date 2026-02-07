@@ -133,7 +133,7 @@ export function useEmployeePayments(employeeId?: string) {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as (EmployeePayment & { employee: { id: string; full_name: string } })[];
+      return data as unknown as (EmployeePayment & { employee: { id: string; full_name: string } })[];
     },
     enabled: isAdmin || !!employeeId,
   });
