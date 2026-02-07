@@ -218,9 +218,13 @@ interface PaymentSetting {
           .eq('user_id', user.id)
           .eq('is_active', true);
   
-        // Find specific accounts
-        const carteiraAccount = accounts?.find(a => a.name.toLowerCase() === 'carteira');
-        const itauAccount = accounts?.find(a => a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau'));
+        // Find specific accounts - busca flexível por nome
+        const carteiraAccount = accounts?.find(a => 
+          a.name.toLowerCase().includes('carteira') || a.type === 'wallet'
+        );
+        const itauAccount = accounts?.find(a => 
+          a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau')
+        );
         const carteiraAccountId = carteiraAccount?.id || accounts?.[0]?.id || null;
         const bankAccountId = itauAccount?.id || accounts?.[0]?.id || null;
 
