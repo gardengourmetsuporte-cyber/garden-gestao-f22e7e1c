@@ -446,14 +446,21 @@ export function ChecklistView({
                                 </div>
                                 {/* Coin badge showing potential points */}
                                 {configuredPoints > 0 ? (
-                                  <div className={cn(
-                                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
-                                    configuredPoints >= 3 ? "bg-orange-500/20 text-orange-600" : "bg-amber-500/20 text-amber-600"
-                                  )}>
-                                    <Star className={cn(
-                                      "w-3 h-3",
-                                      configuredPoints >= 3 ? "fill-orange-500 text-orange-500" : "fill-amber-500 text-amber-500"
-                                    )} />
+                                  <div
+                                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border"
+                                    style={{
+                                      backgroundColor: getPointsTone(configuredPoints).glow,
+                                      color: getPointsTone(configuredPoints).color,
+                                      borderColor: getPointsTone(configuredPoints).glow,
+                                    }}
+                                  >
+                                    <Star
+                                      className="w-3 h-3"
+                                      style={{
+                                        color: getPointsTone(configuredPoints).color,
+                                        fill: getPointsTone(configuredPoints).color,
+                                      }}
+                                    />
                                     <span>+{configuredPoints}</span>
                                   </div>
                                 ) : (
@@ -478,15 +485,21 @@ export function ChecklistView({
                                     {configuredPoints > 0 ? (
                                       <div className="flex items-center gap-0.5 mt-0.5">
                                         {Array.from({ length: configuredPoints }).map((_, i) => (
-                                          <Star key={i} className={cn(
-                                            "w-3 h-3",
-                                            configuredPoints >= 3 ? "fill-orange-500 text-orange-500" : "fill-amber-500 text-amber-500"
-                                          )} />
+                                          <Star
+                                            key={i}
+                                            className="w-3 h-3"
+                                            style={{
+                                              color: getPointsTone(configuredPoints).color,
+                                              fill: getPointsTone(configuredPoints).color,
+                                            }}
+                                          />
                                         ))}
-                                        <span className={cn(
-                                          "text-xs font-bold ml-0.5",
-                                          configuredPoints >= 3 ? "text-orange-600" : "text-amber-600"
-                                        )}>+{configuredPoints}</span>
+                                        <span
+                                          className="text-xs font-bold ml-0.5"
+                                          style={{ color: getPointsTone(configuredPoints).color }}
+                                        >
+                                          +{configuredPoints}
+                                        </span>
                                       </div>
                                     ) : (
                                       <span className="text-xs text-muted-foreground">Tarefa sem pontos</span>
