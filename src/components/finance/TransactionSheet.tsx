@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CategoryPicker } from './CategoryPicker';
+import { TransactionSuggestions } from './TransactionSuggestions';
 import { 
   TransactionType, 
   FinanceCategory, 
@@ -40,6 +41,7 @@ interface TransactionSheetProps {
   onUpdateRecurring?: (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => Promise<void>;
   onSaveAndContinue?: (data: TransactionFormData) => Promise<void>;
   onRefreshCategories?: () => Promise<void>;
+  allTransactions?: FinanceTransaction[];
 }
 
 const RECURRING_OPTIONS = [
@@ -64,7 +66,8 @@ export function TransactionSheet({
   editingTransaction,
   onUpdateRecurring,
   onSaveAndContinue,
-  onRefreshCategories
+  onRefreshCategories,
+  allTransactions = []
 }: TransactionSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -85,6 +88,8 @@ export function TransactionSheet({
   const [showRecurringConfig, setShowRecurringConfig] = useState(false);
   const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
   const [recurringEditMode, setRecurringEditMode] = useState<RecurringEditMode>('single');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const descriptionInputRef = useRef<HTMLInputElement>(null);
 
   // Reset form when opened
   useEffect(() => {
@@ -461,12 +466,42 @@ export function TransactionSheet({
             {/* Description */}
             <div className="space-y-2">
               <Label>Descrição</Label>
-              <Input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: Compra de carnes"
-                className="h-12"
-              />
+              <div className="relative">
+                <Input
+                  ref={descriptionInputRef}
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    setShowSuggestions(e.target.value.length >= 2);
+                  }}
+                  onFocus={() => setShowSuggestions(description.length >= 2)}
+                  onBlur={() => {
+                    // Delay to allow click on suggestion
+                    setTimeout(() => setShowSuggestions(false), 200);
+                  }}
+                  placeholder="Ex: Compra de carnes"
+                  className="h-12"
+                  autoComplete="off"
+                />
+                {showSuggestions && !editingTransaction && (
+                  <TransactionSuggestions
+                    searchTerm={description}
+                    transactions={allTransactions}
+                    categories={categories}
+                    accounts={accounts}
+                    onSelect={(suggestion) => {
+                      setDescription(suggestion.description);
+                      if (suggestion.category) {
+                        setCategoryId(suggestion.category.id);
+                      }
+                      if (suggestion.account) {
+                        setAccountId(suggestion.account.id);
+                      }
+                      setShowSuggestions(false);
+                    }}
+                  />
+                )}
+              </div>
             </div>
 
             {/* Advanced options */}
