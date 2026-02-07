@@ -299,38 +299,90 @@ interface PaymentSetting {
        if (closing.debit_amount > 0 && (getPaymentSetting('debit_amount')?.create_transaction !== false)) {
           const debitSetting = getPaymentSetting('debit_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, debitSetting);
-          const netAmount = applyFee(closing.debit_amount, debitSetting);
+          const feeAmount = debitSetting?.fee_percentage ? closing.debit_amount * (debitSetting.fee_percentage / 100) : 0;
 
-         transactions.push({
-           user_id: user.id,
-           type: 'income',
-            amount: netAmount,
-           description: `Fechamento caixa - Débito (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: debitoSubcat?.id || balcaoCategory?.id || null,
-           account_id: defaultAccountId,
+          // Lançamento de entrada com valor bruto
+          transactions.push({
+            user_id: user.id,
+            type: 'income',
+            amount: closing.debit_amount,
+            description: `Fechamento caixa - Débito (${format(new Date(closing.date), 'dd/MM')})`,
+            category_id: debitoSubcat?.id || balcaoCategory?.id || null,
+            account_id: defaultAccountId,
             date: settlementDate,
             is_paid: isPaid,
-            notes: `Lançamento automático${debitSetting?.fee_percentage ? ` (taxa: ${debitSetting.fee_percentage}%)` : ''}`,
-         });
-       }
+            notes: 'Lançamento automático',
+          });
+
+          // Lançamento de saída da taxa (se houver)
+          if (feeAmount > 0) {
+            // Get fee category (Taxas Operacionais > Maquininha)
+            const { data: expCategories } = await supabase
+              .from('finance_categories')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('type', 'expense');
+            
+            const taxasCategory = expCategories?.find(c => c.name === 'Taxas Operacionais' && !c.parent_id);
+            const maquininhaSubcat = expCategories?.find(c => c.name === 'Maquininha' && c.parent_id === taxasCategory?.id);
+
+            transactions.push({
+              user_id: user.id,
+              type: 'expense',
+              amount: feeAmount,
+              description: `Taxa Débito - ${debitSetting?.fee_percentage}% (${format(new Date(closing.date), 'dd/MM')})`,
+              category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
+              account_id: defaultAccountId,
+              date: settlementDate,
+              is_paid: isPaid,
+              notes: `Taxa automática sobre R$ ${closing.debit_amount.toFixed(2)}`,
+            });
+          }
+        }
  
        if (closing.credit_amount > 0 && (getPaymentSetting('credit_amount')?.create_transaction !== false)) {
           const creditSetting = getPaymentSetting('credit_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, creditSetting);
-          const netAmount = applyFee(closing.credit_amount, creditSetting);
+          const feeAmount = creditSetting?.fee_percentage ? closing.credit_amount * (creditSetting.fee_percentage / 100) : 0;
 
-         transactions.push({
-           user_id: user.id,
-           type: 'income',
-            amount: netAmount,
-           description: `Fechamento caixa - Crédito (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: creditoSubcat?.id || balcaoCategory?.id || null,
-           account_id: defaultAccountId,
+          // Lançamento de entrada com valor bruto
+          transactions.push({
+            user_id: user.id,
+            type: 'income',
+            amount: closing.credit_amount,
+            description: `Fechamento caixa - Crédito (${format(new Date(closing.date), 'dd/MM')})`,
+            category_id: creditoSubcat?.id || balcaoCategory?.id || null,
+            account_id: defaultAccountId,
             date: settlementDate,
             is_paid: isPaid,
-            notes: `Lançamento automático${creditSetting?.fee_percentage ? ` (taxa: ${creditSetting.fee_percentage}%)` : ''}`,
-         });
-       }
+            notes: 'Lançamento automático',
+          });
+
+          // Lançamento de saída da taxa (se houver)
+          if (feeAmount > 0) {
+            // Get fee category (Taxas Operacionais > Maquininha)
+            const { data: expCategories } = await supabase
+              .from('finance_categories')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('type', 'expense');
+            
+            const taxasCategory = expCategories?.find(c => c.name === 'Taxas Operacionais' && !c.parent_id);
+            const maquininhaSubcat = expCategories?.find(c => c.name === 'Maquininha' && c.parent_id === taxasCategory?.id);
+
+            transactions.push({
+              user_id: user.id,
+              type: 'expense',
+              amount: feeAmount,
+              description: `Taxa Crédito - ${creditSetting?.fee_percentage}% (${format(new Date(closing.date), 'dd/MM')})`,
+              category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
+              account_id: defaultAccountId,
+              date: settlementDate,
+              is_paid: isPaid,
+              notes: `Taxa automática sobre R$ ${closing.credit_amount.toFixed(2)}`,
+            });
+          }
+        }
  
        if (closing.pix_amount > 0 && (getPaymentSetting('pix_amount')?.create_transaction !== false)) {
           const pixSetting = getPaymentSetting('pix_amount');
