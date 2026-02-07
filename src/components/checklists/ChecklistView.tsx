@@ -27,7 +27,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, awardPoints: boolean, event?: React.MouseEvent) => void;
+  onToggleItem: (itemId: string, points: number, event?: React.MouseEvent) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -137,13 +137,17 @@ export function ChecklistView({
     return "☕ Vamos começar!";
   };
 
-  const handleComplete = (itemId: string, awardPoints: boolean, e: React.MouseEvent) => {
-    if (awardPoints) {
-      // Trigger coin animation
+  const handleComplete = (itemId: string, points: number, e: React.MouseEvent) => {
+    if (points > 0) {
+      // Trigger coin animation for each point
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      triggerCoin(rect.right - 40, rect.top + rect.height / 2);
+      for (let i = 0; i < points; i++) {
+        setTimeout(() => {
+          triggerCoin(rect.right - 40 + (i * 10), rect.top + rect.height / 2);
+        }, i * 100);
+      }
     }
-    onToggleItem(itemId, awardPoints, e);
+    onToggleItem(itemId, points, e);
     setOpenPopover(null);
   };
 
@@ -310,7 +314,7 @@ export function ChecklistView({
                               key={item.id}
                               onClick={(e) => {
                                 if (!canToggle) return;
-                                onToggleItem(item.id, true, e); // awardPoints doesn't matter for unchecking
+                                onToggleItem(item.id, 0, e); // 0 points for unchecking
                               }}
                               disabled={!canToggle}
                               className={cn(
@@ -408,30 +412,43 @@ export function ChecklistView({
                                 </div>
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-64 p-2" align="end">
-                              <div className="space-y-1">
-                                <button
-                                  onClick={(e) => handleComplete(item.id, true, e)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-success/10 text-left transition-colors"
-                                >
-                                  <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
-                                    <Check className="w-5 h-5 text-success" />
+                            <PopoverContent className="w-72 p-3" align="end">
+                              <div className="space-y-3">
+                                {/* Points Selection - "Concluí agora" */}
+                                <div>
+                                  <p className="text-sm font-semibold text-foreground mb-2">Concluí agora</p>
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {[1, 2, 3, 4].map((points) => (
+                                      <button
+                                        key={points}
+                                        onClick={(e) => handleComplete(item.id, points, e)}
+                                        className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-success/10 border-2 border-transparent hover:border-success/30 transition-all"
+                                      >
+                                        <div className="flex items-center gap-0.5">
+                                          {Array.from({ length: points }).map((_, i) => (
+                                            <Star key={i} className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                                          ))}
+                                        </div>
+                                        <span className="text-xs font-bold text-success">+{points}</span>
+                                      </button>
+                                    ))}
                                   </div>
-                                  <div>
-                                    <p className="font-semibold text-success">Concluí agora</p>
-                                    <p className="text-xs text-muted-foreground">Ganhar +1 ponto</p>
-                                  </div>
-                                </button>
+                                </div>
+                                
+                                {/* Divider */}
+                                <div className="border-t border-border" />
+                                
+                                {/* Already done - no points */}
                                 <button
-                                  onClick={(e) => handleComplete(item.id, false, e)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary text-left transition-colors"
+                                  onClick={(e) => handleComplete(item.id, 0, e)}
+                                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-colors"
                                 >
                                   <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
                                     <RefreshCw className="w-5 h-5 text-muted-foreground" />
                                   </div>
                                   <div>
                                     <p className="font-semibold text-foreground">Já estava pronto</p>
-                                    <p className="text-xs text-muted-foreground">Sem ponto</p>
+                                    <p className="text-xs text-muted-foreground">Sem pontos</p>
                                   </div>
                                 </button>
                               </div>

@@ -364,7 +364,7 @@ export function useChecklists() {
     checklistType: ChecklistType,
     date: string,
     isAdmin?: boolean,
-    awardPoints: boolean = true
+    points: number = 1
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -386,7 +386,7 @@ export function useChecklists() {
       if (error) throw error;
       setCompletions(prev => prev.filter(c => c.id !== existing.id));
     } else {
-      // Add completion with awarded_points flag
+      // Add completion with points (0 means no points awarded)
       const { data, error } = await supabase
         .from('checklist_completions')
         .insert({
@@ -394,13 +394,14 @@ export function useChecklists() {
           checklist_type: checklistType,
           completed_by: user?.id,
           date,
-          awarded_points: awardPoints,
+          awarded_points: points > 0,
+          points_awarded: points,
         })
         .select()
         .single();
 
       if (error) throw error;
-      setCompletions(prev => [...prev, { ...data, awarded_points: awardPoints } as ChecklistCompletion]);
+      setCompletions(prev => [...prev, { ...data, awarded_points: points > 0, points_awarded: points } as ChecklistCompletion]);
     }
   }, [completions, user?.id]);
 
