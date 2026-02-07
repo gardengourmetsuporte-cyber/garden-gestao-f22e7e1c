@@ -211,26 +211,28 @@ interface PaymentSetting {
          .eq('user_id', user.id)
          .eq('type', 'income');
  
-       // Get user's first active account
-       const { data: accounts } = await supabase
-         .from('finance_accounts')
-         .select('*')
-         .eq('user_id', user.id)
-         .eq('is_active', true)
-         .limit(1);
- 
-       const defaultAccountId = accounts?.[0]?.id || null;
+        // Get Itaú account as default, or fall back to first active account
+        const { data: accounts } = await supabase
+          .from('finance_accounts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true);
+  
+        // Prioritize Itaú account
+        const itauAccount = accounts?.find(a => a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau'));
+        const defaultAccountId = itauAccount?.id || accounts?.[0]?.id || null;
 
-       // Find main categories
-       const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
-       const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
+        // Find main categories
+        const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
+        const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
 
-       // Find specific subcategories for each payment method
-       const dinheiroSubcat = categories?.find(c => c.name === 'Dinheiro' && c.parent_id === balcaoCategory?.id);
-       const debitoSubcat = categories?.find(c => c.name === 'Cartão Débito' && c.parent_id === balcaoCategory?.id);
-       const creditoSubcat = categories?.find(c => c.name === 'Cartão Crédito' && c.parent_id === balcaoCategory?.id);
-       const pixSubcat = categories?.find(c => c.name === 'Pix' && c.parent_id === balcaoCategory?.id);
-       const ifoodSubcat = categories?.find(c => c.name === 'iFood' && c.parent_id === deliveryCategory?.id);
+        // Find specific subcategories for each payment method - busca por nome exato
+        const dinheiroSubcat = categories?.find(c => c.name.toLowerCase() === 'dinheiro');
+        const debitoSubcat = categories?.find(c => c.name.toLowerCase() === 'cartão débito' || c.name.toLowerCase() === 'débito');
+        const creditoSubcat = categories?.find(c => c.name.toLowerCase() === 'cartão crédito' || c.name.toLowerCase() === 'crédito');
+        const pixSubcat = categories?.find(c => c.name.toLowerCase() === 'pix');
+        const voucherSubcat = categories?.find(c => c.name.toLowerCase() === 'vale alimentação' || c.name.toLowerCase() === 'vale refeição');
+        const ifoodSubcat = categories?.find(c => c.name.toLowerCase() === 'ifood' || c.name.toLowerCase() === 'delivery');
  
        const transactions = [];
 
@@ -412,7 +414,7 @@ interface PaymentSetting {
              type: 'income',
               amount: netAmount,
              description: `Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
-             category_id: balcaoCategory?.id || null,
+             category_id: voucherSubcat?.id || balcaoCategory?.id || null,
              account_id: defaultAccountId,
               date: settlementDate,
               is_paid: isPaid,
