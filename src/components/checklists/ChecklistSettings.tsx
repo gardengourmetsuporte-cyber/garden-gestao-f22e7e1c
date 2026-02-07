@@ -13,7 +13,6 @@ import {
   CalendarRange,
   Sun,
   Moon,
-  Sparkles,
   Star
 } from 'lucide-react';
 import {
@@ -55,7 +54,6 @@ const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Cale
 
 const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof Sun }[] = [
   { value: 'abertura', label: 'Abertura', icon: Sun },
-  { value: 'limpeza', label: 'Limpeza', icon: Sparkles },
   { value: 'fechamento', label: 'Fechamento', icon: Moon },
 ];
 
@@ -207,7 +205,6 @@ export function ChecklistSettings({
   const getChecklistTypeIcon = (type: ChecklistType) => {
     switch (type) {
       case 'abertura': return Sun;
-      case 'limpeza': return Sparkles;
       case 'fechamento': return Moon;
       default: return Sun;
     }
