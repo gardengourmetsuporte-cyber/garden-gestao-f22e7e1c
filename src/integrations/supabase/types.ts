@@ -129,6 +129,7 @@ export type Database = {
           id: string
           item_id: string
           notes: string | null
+          points_awarded: number
         }
         Insert: {
           awarded_points?: boolean
@@ -139,6 +140,7 @@ export type Database = {
           id?: string
           item_id: string
           notes?: string | null
+          points_awarded?: number
         }
         Update: {
           awarded_points?: boolean
@@ -149,6 +151,7 @@ export type Database = {
           id?: string
           item_id?: string
           notes?: string | null
+          points_awarded?: number
         }
         Relationships: [
           {

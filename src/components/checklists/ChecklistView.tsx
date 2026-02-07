@@ -306,6 +306,7 @@ export function ChecklistView({
                         const canToggle = canToggleItem(completion, completed);
                         const isLockedByOther = completed && !canToggle;
                         const wasAwardedPoints = completion?.awarded_points !== false;
+                        const pointsAwarded = completion?.points_awarded ?? 1;
 
                         // If completed, clicking unchecks it. If not completed, show popover.
                         if (completed) {
@@ -354,12 +355,12 @@ export function ChecklistView({
                                   </div>
                                 )}
                               </div>
-                              {/* Badge showing completion type */}
+                              {/* Badge showing completion type and points */}
                               <div className={cn(
                                 "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
                                 !wasAwardedPoints
                                   ? "bg-blue-500/10 text-blue-500"
-                                  : "bg-amber-500/10 text-amber-500/50"
+                                  : "bg-amber-500/10 text-amber-600"
                               )}>
                                 {!wasAwardedPoints ? (
                                   <>
@@ -367,10 +368,12 @@ export function ChecklistView({
                                     <span>pronto</span>
                                   </>
                                 ) : (
-                                  <>
-                                    <Star className="w-3 h-3 fill-amber-500/50" />
-                                    <span>+1</span>
-                                  </>
+                                  <div className="flex items-center gap-0.5">
+                                    {Array.from({ length: pointsAwarded }).map((_, i) => (
+                                      <Star key={i} className="w-3 h-3 fill-amber-500 text-amber-500" />
+                                    ))}
+                                    <span className="ml-0.5">+{pointsAwarded}</span>
+                                  </div>
                                 )}
                               </div>
                             </button>
