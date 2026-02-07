@@ -211,16 +211,18 @@ interface PaymentSetting {
          .eq('user_id', user.id)
          .eq('type', 'income');
  
-        // Get Itaú account as default, or fall back to first active account
+        // Get accounts - Carteira for cash, Itaú for others
         const { data: accounts } = await supabase
           .from('finance_accounts')
           .select('*')
           .eq('user_id', user.id)
           .eq('is_active', true);
   
-        // Prioritize Itaú account
+        // Find specific accounts
+        const carteiraAccount = accounts?.find(a => a.name.toLowerCase() === 'carteira');
         const itauAccount = accounts?.find(a => a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau'));
-        const defaultAccountId = itauAccount?.id || accounts?.[0]?.id || null;
+        const carteiraAccountId = carteiraAccount?.id || accounts?.[0]?.id || null;
+        const bankAccountId = itauAccount?.id || accounts?.[0]?.id || null;
 
         // Find main categories
         const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
@@ -291,7 +293,7 @@ interface PaymentSetting {
              amount: netAmount,
             description: `Dinheiro (${format(new Date(closing.date), 'dd/MM')})`,
             category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
-            account_id: defaultAccountId,
+            account_id: carteiraAccountId, // Dinheiro vai para Carteira
              date: settlementDate,
              is_paid: isPaid,
              notes: `Fechamento de caixa${cashSetting?.fee_percentage ? ` (taxa: ${cashSetting.fee_percentage}%)` : ''}`,
@@ -310,7 +312,7 @@ interface PaymentSetting {
              amount: closing.debit_amount,
              description: `Débito (${format(new Date(closing.date), 'dd/MM')})`,
              category_id: debitoSubcat?.id || balcaoCategory?.id || null,
-             account_id: defaultAccountId,
+             account_id: bankAccountId,
              date: settlementDate,
              is_paid: isPaid,
              notes: 'Fechamento de caixa',
@@ -334,7 +336,7 @@ interface PaymentSetting {
               amount: feeAmount,
               description: `Taxa Débito - ${debitSetting?.fee_percentage}% (${format(new Date(closing.date), 'dd/MM')})`,
               category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
-              account_id: defaultAccountId,
+              account_id: bankAccountId,
               date: settlementDate,
               is_paid: isPaid,
               notes: `Taxa automática sobre R$ ${closing.debit_amount.toFixed(2)}`,
@@ -354,7 +356,7 @@ interface PaymentSetting {
              amount: closing.credit_amount,
              description: `Crédito (${format(new Date(closing.date), 'dd/MM')})`,
              category_id: creditoSubcat?.id || balcaoCategory?.id || null,
-             account_id: defaultAccountId,
+             account_id: bankAccountId,
              date: settlementDate,
              is_paid: isPaid,
              notes: 'Fechamento de caixa',
@@ -378,7 +380,7 @@ interface PaymentSetting {
               amount: feeAmount,
               description: `Taxa Crédito - ${creditSetting?.fee_percentage}% (${format(new Date(closing.date), 'dd/MM')})`,
               category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
-              account_id: defaultAccountId,
+              account_id: bankAccountId,
               date: settlementDate,
               is_paid: isPaid,
               notes: `Taxa automática sobre R$ ${closing.credit_amount.toFixed(2)}`,
@@ -397,7 +399,7 @@ interface PaymentSetting {
              amount: netAmount,
             description: `Pix (${format(new Date(closing.date), 'dd/MM')})`,
             category_id: pixSubcat?.id || balcaoCategory?.id || null,
-            account_id: defaultAccountId,
+            account_id: bankAccountId,
              date: settlementDate,
              is_paid: isPaid,
              notes: `Fechamento de caixa${pixSetting?.fee_percentage ? ` (taxa: ${pixSetting.fee_percentage}%)` : ''}`,
@@ -415,7 +417,7 @@ interface PaymentSetting {
               amount: netAmount,
              description: `Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
              category_id: voucherSubcat?.id || balcaoCategory?.id || null,
-             account_id: defaultAccountId,
+             account_id: bankAccountId,
               date: settlementDate,
               is_paid: isPaid,
               notes: `Fechamento de caixa${voucherSetting?.fee_percentage ? ` (taxa: ${voucherSetting.fee_percentage}%)` : ''}`,
@@ -433,7 +435,7 @@ interface PaymentSetting {
              amount: netAmount,
             description: `Delivery (${format(new Date(closing.date), 'dd/MM')})`,
             category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
-            account_id: defaultAccountId,
+            account_id: bankAccountId,
              date: settlementDate,
              is_paid: isPaid,
              notes: `Fechamento de caixa${deliverySetting?.fee_percentage ? ` (taxa: ${deliverySetting.fee_percentage}%)` : ''}`,
@@ -451,17 +453,17 @@ interface PaymentSetting {
          
          for (const expense of closing.expenses as any[]) {
            if (expense.amount && expense.amount > 0) {
-             transactions.push({
-               user_id: user.id,
-               type: 'expense',
-               amount: expense.amount,
-               description: expense.description || 'Gasto do dia',
-               category_id: null, // Could be improved with category matching
-               account_id: defaultAccountId,
-               date: closing.date,
-               is_paid: true,
-               notes: 'Lançamento automático do fechamento de caixa',
-             });
+              transactions.push({
+                user_id: user.id,
+                type: 'expense',
+                amount: expense.amount,
+                description: expense.description || 'Gasto do dia',
+                category_id: null, // Could be improved with category matching
+                account_id: carteiraAccountId, // Gastos do dia saem da Carteira
+                date: closing.date,
+                is_paid: true,
+                notes: 'Lançamento automático do fechamento de caixa',
+              });
            }
          }
        }
