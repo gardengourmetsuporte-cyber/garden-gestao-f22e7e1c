@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateEarnedPoints, calculateSpentPoints } from '@/lib/points';
 
 export interface LeaderboardEntry {
   user_id: string;
@@ -24,72 +25,69 @@ export function useLeaderboard() {
   const [sectorPoints, setSectorPoints] = useState<SectorPointsSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLeaderboard();
-    fetchSectorPoints();
-  }, []);
-
-  async function fetchLeaderboard() {
+  const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Get all profiles
+      // Busca todos os perfis
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('user_id, full_name, avatar_url');
 
       if (profilesError) throw profilesError;
 
-      // Get completions with actual points_awarded (variable points per task: 0-4)
+      // Busca completions com pontos reais
       const { data: completions, error: completionsError } = await supabase
         .from('checklist_completions')
-        .select('completed_by, points_awarded, awarded_points')
-        .eq('awarded_points', true);
+        .select('completed_by, points_awarded, awarded_points');
 
       if (completionsError) throw completionsError;
 
-      // Get redemptions per user (spent points) - only approved/delivered
+      // Busca redemptions aprovadas/entregues
       const { data: redemptions, error: redemptionsError } = await supabase
         .from('reward_redemptions')
-        .select('user_id, points_spent, status')
-        .in('status', ['approved', 'delivered']);
+        .select('user_id, points_spent, status');
 
       if (redemptionsError) throw redemptionsError;
 
-      // Calculate points for each user
-      const userPointsMap = new Map<string, { earned: number; spent: number }>();
-
-      // Sum earned points using points_awarded value
+      // Agrupa completions por usuário
+      const userCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
       completions?.forEach(c => {
-        const current = userPointsMap.get(c.completed_by) || { earned: 0, spent: 0 };
-        current.earned += c.points_awarded || 0;
-        userPointsMap.set(c.completed_by, current);
+        const list = userCompletions.get(c.completed_by) || [];
+        list.push({ points_awarded: c.points_awarded, awarded_points: c.awarded_points });
+        userCompletions.set(c.completed_by, list);
       });
 
-      // Sum spent points
+      // Agrupa redemptions por usuário
+      const userRedemptions = new Map<string, Array<{ points_spent: number; status: string }>>();
       redemptions?.forEach(r => {
-        const current = userPointsMap.get(r.user_id) || { earned: 0, spent: 0 };
-        current.spent += r.points_spent;
-        userPointsMap.set(r.user_id, current);
+        const list = userRedemptions.get(r.user_id) || [];
+        list.push({ points_spent: r.points_spent, status: r.status });
+        userRedemptions.set(r.user_id, list);
       });
 
-      // Build leaderboard entries
+      // Calcula pontos usando funções centralizadas
       const entries: LeaderboardEntry[] = (profiles || [])
         .map(profile => {
-          const points = userPointsMap.get(profile.user_id) || { earned: 0, spent: 0 };
+          const userComps = userCompletions.get(profile.user_id) || [];
+          const userReds = userRedemptions.get(profile.user_id) || [];
+          
+          const earned = calculateEarnedPoints(userComps);
+          const spent = calculateSpentPoints(userReds);
+          
           return {
             user_id: profile.user_id,
             full_name: profile.full_name,
             avatar_url: profile.avatar_url,
-            earned_points: points.earned,
-            spent_points: points.spent,
-            balance: points.earned - points.spent,
+            earned_points: earned,
+            spent_points: spent,
+            balance: earned - spent,
             rank: 0,
           };
         })
-        .filter(e => e.earned_points > 0) // Only show users with points
+        .filter(e => e.earned_points > 0)
         .sort((a, b) => b.earned_points - a.earned_points);
 
-      // Assign ranks
+      // Atribui ranks
       entries.forEach((entry, index) => {
         entry.rank = index + 1;
       });
@@ -100,7 +98,7 @@ export function useLeaderboard() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
 
   async function fetchSectorPoints() {
     try {
@@ -183,6 +181,11 @@ export function useLeaderboard() {
       console.error('Error fetching sector points:', error);
     }
   }
+
+  useEffect(() => {
+    fetchLeaderboard();
+    fetchSectorPoints();
+  }, [fetchLeaderboard]);
 
   return {
     leaderboard,

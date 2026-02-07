@@ -1,63 +1,64 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { calculatePointsSummary, PointsSummary } from '@/lib/points';
 
-export interface PointsData {
+export interface PointsData extends PointsSummary {
   earnedPoints: number;
   spentPoints: number;
-  balance: number;
 }
 
 export function usePoints() {
   const { user } = useAuth();
   const [points, setPoints] = useState<PointsData>({
+    earned: 0,
+    spent: 0,
+    balance: 0,
     earnedPoints: 0,
     spentPoints: 0,
-    balance: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      fetchPoints();
-    }
-  }, [user]);
-
-  async function fetchPoints() {
+  const fetchPoints = useCallback(async () => {
     if (!user) return;
     
     setIsLoading(true);
     try {
-      // Sum all points_awarded from completions (variable points per task: 0-4)
+      // Busca completions com pontos
       const { data: completions } = await supabase
         .from('checklist_completions')
-        .select('points_awarded')
-        .eq('completed_by', user.id)
-        .eq('awarded_points', true);
+        .select('points_awarded, awarded_points')
+        .eq('completed_by', user.id);
 
-      const earnedPoints = completions?.reduce((sum, c) => sum + (c.points_awarded || 0), 0) || 0;
-
-      // Sum points spent on approved/delivered redemptions
+      // Busca redemptions aprovadas/entregues
       const { data: redemptions } = await supabase
         .from('reward_redemptions')
-        .select('points_spent')
-        .eq('user_id', user.id)
-        .in('status', ['approved', 'delivered']);
+        .select('points_spent, status')
+        .eq('user_id', user.id);
 
-      const spentPoints = redemptions?.reduce((sum, r) => sum + r.points_spent, 0) || 0;
-      const balance = earnedPoints - spentPoints;
+      // Usa função centralizada para cálculo
+      const summary = calculatePointsSummary(
+        completions || [],
+        redemptions || []
+      );
 
       setPoints({
-        earnedPoints: earnedPoints || 0,
-        spentPoints,
-        balance,
+        ...summary,
+        earnedPoints: summary.earned,
+        spentPoints: summary.spent,
       });
     } catch (error) {
       console.error('Error fetching points:', error);
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPoints();
+    }
+  }, [user, fetchPoints]);
 
   return {
     ...points,
