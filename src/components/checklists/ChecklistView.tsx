@@ -40,6 +40,22 @@ const isToday = (dateStr: string): boolean => {
   return dateStr === todayStr;
 };
 
+function clampPoints(points: number): 1 | 2 | 3 | 4 {
+  const p = Math.round(Number(points) || 1);
+  if (p <= 1) return 1;
+  if (p === 2) return 2;
+  if (p === 3) return 3;
+  return 4;
+}
+
+function getPointsTone(points: number): { color: string; glow: string } {
+  const p = clampPoints(points);
+  return {
+    color: `hsl(var(--coin-${p}))`,
+    glow: `hsl(var(--coin-${p}-glow))`,
+  };
+}
+
 const iconMap: Record<string, React.ReactNode> = {
   ChefHat: <ChefHat className="w-5 h-5" />,
   UtensilsCrossed: <UtensilsCrossed className="w-5 h-5" />,
@@ -357,12 +373,23 @@ export function ChecklistView({
                                 )}
                               </div>
                               {/* Badge showing completion type and points */}
-                              <div className={cn(
-                                "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
-                                !wasAwardedPoints
-                                  ? "bg-blue-500/10 text-blue-500"
-                                  : "bg-amber-500/10 text-amber-600"
-                              )}>
+                              <div
+                                className={cn(
+                                  "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border",
+                                  !wasAwardedPoints
+                                    ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                                    : "border-border"
+                                )}
+                                style={
+                                  wasAwardedPoints && pointsAwarded > 0
+                                    ? {
+                                        backgroundColor: getPointsTone(pointsAwarded).glow,
+                                        color: getPointsTone(pointsAwarded).color,
+                                        borderColor: getPointsTone(pointsAwarded).glow,
+                                      }
+                                    : undefined
+                                }
+                              >
                                 {!wasAwardedPoints ? (
                                   <>
                                     <RefreshCw className="w-3 h-3" />
@@ -370,9 +397,17 @@ export function ChecklistView({
                                   </>
                                 ) : (
                                   <div className="flex items-center gap-0.5">
-                                    {Array.from({ length: pointsAwarded }).map((_, i) => (
-                                      <Star key={i} className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                    ))}
+                                    {pointsAwarded > 0 &&
+                                      Array.from({ length: pointsAwarded }).map((_, i) => {
+                                        const tone = getPointsTone(pointsAwarded);
+                                        return (
+                                          <Star
+                                            key={i}
+                                            className="w-3 h-3"
+                                            style={{ color: tone.color, fill: tone.color }}
+                                          />
+                                        );
+                                      })}
                                     <span className="ml-0.5">+{pointsAwarded}</span>
                                   </div>
                                 )}
