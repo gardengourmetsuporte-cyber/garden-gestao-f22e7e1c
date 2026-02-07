@@ -283,17 +283,17 @@ interface PaymentSetting {
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, cashSetting);
           const netAmount = applyFee(closing.cash_amount, cashSetting);
 
-         transactions.push({
-           user_id: user.id,
-           type: 'income',
-            amount: netAmount,
-           description: `Fechamento caixa - Dinheiro (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
-           account_id: defaultAccountId,
-            date: settlementDate,
-            is_paid: isPaid,
-            notes: `Lançamento automático${cashSetting?.fee_percentage ? ` (taxa: ${cashSetting.fee_percentage}%)` : ''}`,
-         });
+          transactions.push({
+            user_id: user.id,
+            type: 'income',
+             amount: netAmount,
+            description: `Dinheiro (${format(new Date(closing.date), 'dd/MM')})`,
+            category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
+            account_id: defaultAccountId,
+             date: settlementDate,
+             is_paid: isPaid,
+             notes: `Fechamento de caixa${cashSetting?.fee_percentage ? ` (taxa: ${cashSetting.fee_percentage}%)` : ''}`,
+          });
        }
  
        if (closing.debit_amount > 0 && (getPaymentSetting('debit_amount')?.create_transaction !== false)) {
@@ -301,18 +301,18 @@ interface PaymentSetting {
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, debitSetting);
           const feeAmount = debitSetting?.fee_percentage ? closing.debit_amount * (debitSetting.fee_percentage / 100) : 0;
 
-          // Lançamento de entrada com valor bruto
-          transactions.push({
-            user_id: user.id,
-            type: 'income',
-            amount: closing.debit_amount,
-            description: `Fechamento caixa - Débito (${format(new Date(closing.date), 'dd/MM')})`,
-            category_id: debitoSubcat?.id || balcaoCategory?.id || null,
-            account_id: defaultAccountId,
-            date: settlementDate,
-            is_paid: isPaid,
-            notes: 'Lançamento automático',
-          });
+           // Lançamento de entrada com valor bruto
+           transactions.push({
+             user_id: user.id,
+             type: 'income',
+             amount: closing.debit_amount,
+             description: `Débito (${format(new Date(closing.date), 'dd/MM')})`,
+             category_id: debitoSubcat?.id || balcaoCategory?.id || null,
+             account_id: defaultAccountId,
+             date: settlementDate,
+             is_paid: isPaid,
+             notes: 'Fechamento de caixa',
+           });
 
           // Lançamento de saída da taxa (se houver)
           if (feeAmount > 0) {
@@ -345,18 +345,18 @@ interface PaymentSetting {
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, creditSetting);
           const feeAmount = creditSetting?.fee_percentage ? closing.credit_amount * (creditSetting.fee_percentage / 100) : 0;
 
-          // Lançamento de entrada com valor bruto
-          transactions.push({
-            user_id: user.id,
-            type: 'income',
-            amount: closing.credit_amount,
-            description: `Fechamento caixa - Crédito (${format(new Date(closing.date), 'dd/MM')})`,
-            category_id: creditoSubcat?.id || balcaoCategory?.id || null,
-            account_id: defaultAccountId,
-            date: settlementDate,
-            is_paid: isPaid,
-            notes: 'Lançamento automático',
-          });
+           // Lançamento de entrada com valor bruto
+           transactions.push({
+             user_id: user.id,
+             type: 'income',
+             amount: closing.credit_amount,
+             description: `Crédito (${format(new Date(closing.date), 'dd/MM')})`,
+             category_id: creditoSubcat?.id || balcaoCategory?.id || null,
+             account_id: defaultAccountId,
+             date: settlementDate,
+             is_paid: isPaid,
+             notes: 'Fechamento de caixa',
+           });
 
           // Lançamento de saída da taxa (se houver)
           if (feeAmount > 0) {
@@ -389,17 +389,17 @@ interface PaymentSetting {
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, pixSetting);
           const netAmount = applyFee(closing.pix_amount, pixSetting);
 
-         transactions.push({
-           user_id: user.id,
-           type: 'income',
-            amount: netAmount,
-           description: `Fechamento caixa - Pix (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: pixSubcat?.id || balcaoCategory?.id || null,
-           account_id: defaultAccountId,
-            date: settlementDate,
-            is_paid: isPaid,
-            notes: `Lançamento automático${pixSetting?.fee_percentage ? ` (taxa: ${pixSetting.fee_percentage}%)` : ''}`,
-         });
+          transactions.push({
+            user_id: user.id,
+            type: 'income',
+             amount: netAmount,
+            description: `Pix (${format(new Date(closing.date), 'dd/MM')})`,
+            category_id: pixSubcat?.id || balcaoCategory?.id || null,
+            account_id: defaultAccountId,
+             date: settlementDate,
+             is_paid: isPaid,
+             notes: `Fechamento de caixa${pixSetting?.fee_percentage ? ` (taxa: ${pixSetting.fee_percentage}%)` : ''}`,
+          });
        }
  
         if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0 && (getPaymentSetting('meal_voucher_amount')?.create_transaction !== false)) {
@@ -407,17 +407,17 @@ interface PaymentSetting {
            const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, voucherSetting);
            const netAmount = applyFee(closing.meal_voucher_amount, voucherSetting);
 
-          transactions.push({
-            user_id: user.id,
-            type: 'income',
-             amount: netAmount,
-            description: `Fechamento caixa - Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
-            category_id: balcaoCategory?.id || null,
-            account_id: defaultAccountId,
-             date: settlementDate,
-             is_paid: isPaid,
-             notes: `Lançamento automático${voucherSetting?.fee_percentage ? ` (taxa: ${voucherSetting.fee_percentage}%)` : ''}`,
-          });
+           transactions.push({
+             user_id: user.id,
+             type: 'income',
+              amount: netAmount,
+             description: `Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
+             category_id: balcaoCategory?.id || null,
+             account_id: defaultAccountId,
+              date: settlementDate,
+              is_paid: isPaid,
+              notes: `Fechamento de caixa${voucherSetting?.fee_percentage ? ` (taxa: ${voucherSetting.fee_percentage}%)` : ''}`,
+           });
         }
 
        if (closing.delivery_amount > 0 && (getPaymentSetting('delivery_amount')?.create_transaction !== false)) {
@@ -425,17 +425,17 @@ interface PaymentSetting {
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, deliverySetting);
           const netAmount = applyFee(closing.delivery_amount, deliverySetting);
 
-         transactions.push({
-           user_id: user.id,
-           type: 'income',
-            amount: netAmount,
-           description: `Fechamento caixa - Delivery (${format(new Date(closing.date), 'dd/MM')})`,
-           category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
-           account_id: defaultAccountId,
-            date: settlementDate,
-            is_paid: isPaid,
-            notes: `Lançamento automático${deliverySetting?.fee_percentage ? ` (taxa: ${deliverySetting.fee_percentage}%)` : ''}`,
-         });
+          transactions.push({
+            user_id: user.id,
+            type: 'income',
+             amount: netAmount,
+            description: `Delivery (${format(new Date(closing.date), 'dd/MM')})`,
+            category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
+            account_id: defaultAccountId,
+             date: settlementDate,
+             is_paid: isPaid,
+             notes: `Fechamento de caixa${deliverySetting?.fee_percentage ? ` (taxa: ${deliverySetting.fee_percentage}%)` : ''}`,
+          });
        }
  
        // Create expense transactions from cash closing expenses

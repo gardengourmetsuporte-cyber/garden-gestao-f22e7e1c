@@ -173,6 +173,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          points: number
           sort_order: number
           subcategory_id: string
           updated_at: string
@@ -186,6 +187,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          points?: number
           sort_order?: number
           subcategory_id: string
           updated_at?: string
@@ -199,6 +201,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          points?: number
           sort_order?: number
           subcategory_id?: string
           updated_at?: string

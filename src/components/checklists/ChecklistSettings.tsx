@@ -13,7 +13,8 @@ import {
   CalendarRange,
   Sun,
   Moon,
-  Sparkles
+  Sparkles,
+  Star
 } from 'lucide-react';
 import {
   DndContext,
@@ -57,6 +58,14 @@ const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof 
   { value: 'fechamento', label: 'Fechamento', icon: Moon },
 ];
 
+const pointsOptions = [
+  { value: 0, label: 'Sem pontos', color: 'text-muted-foreground' },
+  { value: 1, label: '1 ponto', color: 'text-amber-400' },
+  { value: 2, label: '2 pontos', color: 'text-amber-500' },
+  { value: 3, label: '3 pontos', color: 'text-orange-500' },
+  { value: 4, label: '4 pontos', color: 'text-yellow-400' },
+];
+
 interface ChecklistSettingsProps {
   sectors: ChecklistSector[];
   selectedType: ChecklistType;
@@ -69,8 +78,8 @@ interface ChecklistSettingsProps {
   onUpdateSubcategory: (id: string, data: { name?: string }) => Promise<void>;
   onDeleteSubcategory: (id: string) => Promise<void>;
   onReorderSubcategories?: (sectorId: string, orderedIds: string[]) => Promise<void>;
-  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType }) => Promise<void>;
+  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
@@ -159,6 +168,7 @@ export function ChecklistSettings({
   const [itemDescription, setItemDescription] = useState('');
   const [itemFrequency, setItemFrequency] = useState<ItemFrequency>('daily');
   const [itemChecklistType, setItemChecklistType] = useState<ChecklistType>('abertura');
+  const [itemPoints, setItemPoints] = useState<number>(1);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -300,6 +310,7 @@ export function ChecklistSettings({
       setItemDescription(item.description || '');
       setItemFrequency(item.frequency || 'daily');
       setItemChecklistType(item.checklist_type || selectedType);
+      setItemPoints(item.points ?? 1);
     } else {
       setEditingItem(null);
       setItemName('');
@@ -307,6 +318,7 @@ export function ChecklistSettings({
       setItemFrequency('daily');
       // Use selected type as default for new items
       setItemChecklistType(selectedType);
+      setItemPoints(1);
     }
     setItemSheetOpen(true);
   };
@@ -320,6 +332,7 @@ export function ChecklistSettings({
         description: itemDescription.trim() || undefined,
         frequency: itemFrequency,
         checklist_type: itemChecklistType,
+        points: itemPoints,
       });
     } else if (selectedSubcategoryId) {
       await onAddItem({
@@ -328,6 +341,7 @@ export function ChecklistSettings({
         description: itemDescription.trim() || undefined,
         frequency: itemFrequency,
         checklist_type: itemChecklistType,
+        points: itemPoints,
       });
     }
     setItemSheetOpen(false);
@@ -521,6 +535,16 @@ export function ChecklistSettings({
                                                           return <Icon className="w-3 h-3" />;
                                                         })()}
                                                         {getChecklistTypeLabel(((item as any).checklist_type || 'abertura') as ChecklistType)}
+                                                      </span>
+                                                      {/* Points badge */}
+                                                      <span className={cn(
+                                                        "text-xs px-1.5 py-0.5 rounded flex items-center gap-1",
+                                                        item.points === 0 
+                                                          ? "bg-muted text-muted-foreground" 
+                                                          : "bg-amber-500/10 text-amber-600"
+                                                      )}>
+                                                        <Star className="w-3 h-3" />
+                                                        {item.points === 0 ? 'Sem pts' : `${item.points} pt${item.points > 1 ? 's' : ''}`}
                                                       </span>
                                                     </div>
                                                   </div>
@@ -729,6 +753,25 @@ export function ChecklistSettings({
                     <SelectItem key={opt.value} value={opt.value}>
                       <div className="flex items-center gap-2">
                         <opt.icon className="w-4 h-4" />
+                        {opt.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Pontos</Label>
+              <Select value={itemPoints.toString()} onValueChange={(v) => setItemPoints(parseInt(v))}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {pointsOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value.toString()}>
+                      <div className={cn("flex items-center gap-2", opt.color)}>
+                        <Star className="w-4 h-4" />
                         {opt.label}
                       </div>
                     </SelectItem>
