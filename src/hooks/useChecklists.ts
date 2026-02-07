@@ -189,6 +189,7 @@ export function useChecklists() {
     description?: string;
     frequency?: 'daily' | 'weekly' | 'monthly';
     checklist_type?: ChecklistType;
+    points?: number;
   }) => {
     const { data, error } = await supabase
       .from('checklist_items')
@@ -198,6 +199,7 @@ export function useChecklists() {
         description: item.description,
         frequency: item.frequency || 'daily',
         checklist_type: item.checklist_type || 'abertura',
+        points: item.points ?? 1,
       })
       .select()
       .single();

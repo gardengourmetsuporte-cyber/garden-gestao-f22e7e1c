@@ -136,6 +136,7 @@ export interface ChecklistItem {
   sort_order: number;
   is_active: boolean;
   deleted_at: string | null;
+  points: number; // 0 = no points, 1-4 = configurable points
   created_at: string;
   updated_at: string;
   // Joined data

@@ -6,11 +6,12 @@ interface CoinPosition {
   startY: number;
   endX: number;
   endY: number;
+  points?: number;
 }
 
 interface CoinAnimationContextType {
   coins: CoinPosition[];
-  triggerCoin: (startX: number, startY: number) => void;
+  triggerCoin: (startX: number, startY: number, points?: number) => void;
   removeCoin: (id: string) => void;
   triggerPulse: () => void;
   isPulsing: boolean;
@@ -22,7 +23,7 @@ export function CoinAnimationProvider({ children }: { children: ReactNode }) {
   const [coins, setCoins] = useState<CoinPosition[]>([]);
   const [isPulsing, setIsPulsing] = useState(false);
 
-  const triggerCoin = useCallback((startX: number, startY: number) => {
+  const triggerCoin = useCallback((startX: number, startY: number, points: number = 1) => {
     const pointsCounter = document.getElementById('points-counter');
     if (!pointsCounter) return;
 
@@ -31,7 +32,7 @@ export function CoinAnimationProvider({ children }: { children: ReactNode }) {
     const endY = rect.top + rect.height / 2;
 
     const id = `coin-${Date.now()}-${Math.random()}`;
-    setCoins(prev => [...prev, { id, startX, startY, endX, endY }]);
+    setCoins(prev => [...prev, { id, startX, startY, endX, endY, points }]);
   }, []);
 
   const removeCoin = useCallback((id: string) => {

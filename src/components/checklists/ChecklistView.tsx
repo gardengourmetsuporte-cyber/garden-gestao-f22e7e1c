@@ -137,13 +137,13 @@ export function ChecklistView({
     return "☕ Vamos começar!";
   };
 
-  const handleComplete = (itemId: string, points: number, e: React.MouseEvent) => {
+  const handleComplete = (itemId: string, points: number, configuredPoints: number, e: React.MouseEvent) => {
     if (points > 0) {
-      // Trigger coin animation for each point
+      // Trigger coin animation for each point with color based on total points
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
       for (let i = 0; i < points; i++) {
         setTimeout(() => {
-          triggerCoin(rect.right - 40 + (i * 10), rect.top + rect.height / 2);
+          triggerCoin(rect.right - 40 + (i * 10), rect.top + rect.height / 2, configuredPoints);
         }, i * 100);
       }
     }
@@ -306,7 +306,8 @@ export function ChecklistView({
                         const canToggle = canToggleItem(completion, completed);
                         const isLockedByOther = completed && !canToggle;
                         const wasAwardedPoints = completion?.awarded_points !== false;
-                        const pointsAwarded = completion?.points_awarded ?? 1;
+                        const pointsAwarded = completion?.points_awarded ?? item.points;
+                        const configuredPoints = item.points ?? 1; // Get configured points from task
 
                         // If completed, clicking unchecks it. If not completed, show popover.
                         if (completed) {
@@ -409,51 +410,75 @@ export function ChecklistView({
                                   )}
                                 </div>
                                 {/* Coin badge showing potential points */}
-                                <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-amber-500/20 text-amber-600">
-                                  <Star className="w-3 h-3 fill-amber-500" />
-                                  <span>+1</span>
-                                </div>
+                                {configuredPoints > 0 ? (
+                                  <div className={cn(
+                                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0",
+                                    configuredPoints >= 3 ? "bg-orange-500/20 text-orange-600" : "bg-amber-500/20 text-amber-600"
+                                  )}>
+                                    <Star className={cn(
+                                      "w-3 h-3",
+                                      configuredPoints >= 3 ? "fill-orange-500 text-orange-500" : "fill-amber-500 text-amber-500"
+                                    )} />
+                                    <span>+{configuredPoints}</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground">
+                                    <span>sem pts</span>
+                                  </div>
+                                )}
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-72 p-3" align="end">
+                            <PopoverContent className="w-64 p-3" align="end">
                               <div className="space-y-3">
-                                {/* Points Selection - "Concluí agora" */}
-                                <div>
-                                  <p className="text-sm font-semibold text-foreground mb-2">Concluí agora</p>
-                                  <div className="grid grid-cols-4 gap-2">
-                                    {[1, 2, 3, 4].map((points) => (
-                                      <button
-                                        key={points}
-                                        onClick={(e) => handleComplete(item.id, points, e)}
-                                        className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-success/10 border-2 border-transparent hover:border-success/30 transition-all"
-                                      >
-                                        <div className="flex items-center gap-0.5">
-                                          {Array.from({ length: points }).map((_, i) => (
-                                            <Star key={i} className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                                          ))}
-                                        </div>
-                                        <span className="text-xs font-bold text-success">+{points}</span>
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                                
-                                {/* Divider */}
-                                <div className="border-t border-border" />
-                                
-                                {/* Already done - no points */}
+                                {/* Main action - mark complete with configured points */}
                                 <button
-                                  onClick={(e) => handleComplete(item.id, 0, e)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-colors"
+                                  onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, e)}
+                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-colors border-2 border-success/30"
                                 >
-                                  <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
-                                    <RefreshCw className="w-5 h-5 text-muted-foreground" />
+                                  <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center">
+                                    <Check className="w-5 h-5 text-white" />
                                   </div>
-                                  <div>
-                                    <p className="font-semibold text-foreground">Já estava pronto</p>
-                                    <p className="text-xs text-muted-foreground">Sem pontos</p>
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-success">Concluí agora</p>
+                                    {configuredPoints > 0 ? (
+                                      <div className="flex items-center gap-0.5 mt-0.5">
+                                        {Array.from({ length: configuredPoints }).map((_, i) => (
+                                          <Star key={i} className={cn(
+                                            "w-3 h-3",
+                                            configuredPoints >= 3 ? "fill-orange-500 text-orange-500" : "fill-amber-500 text-amber-500"
+                                          )} />
+                                        ))}
+                                        <span className={cn(
+                                          "text-xs font-bold ml-0.5",
+                                          configuredPoints >= 3 ? "text-orange-600" : "text-amber-600"
+                                        )}>+{configuredPoints}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-muted-foreground">Tarefa sem pontos</span>
+                                    )}
                                   </div>
                                 </button>
+                                
+                                {/* Divider - only show if task has points */}
+                                {configuredPoints > 0 && (
+                                  <>
+                                    <div className="border-t border-border" />
+                                    
+                                    {/* Already done - no points */}
+                                    <button
+                                      onClick={(e) => handleComplete(item.id, 0, configuredPoints, e)}
+                                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-colors"
+                                    >
+                                      <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                        <RefreshCw className="w-5 h-5 text-muted-foreground" />
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-foreground">Já estava pronto</p>
+                                        <p className="text-xs text-muted-foreground">Sem pontos</p>
+                                      </div>
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </PopoverContent>
                           </Popover>
