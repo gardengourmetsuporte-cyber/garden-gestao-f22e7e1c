@@ -20,6 +20,7 @@ import { ChecklistSector, ChecklistType, ChecklistCompletion } from '@/types/dat
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { getPointsColors, clampPoints } from '@/lib/points';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -39,24 +40,6 @@ const isToday = (dateStr: string): boolean => {
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   return dateStr === todayStr;
 };
-
-function clampPoints(points: number): 1 | 2 | 3 | 4 {
-  const p = Math.round(Number(points) || 1);
-  if (p <= 1) return 1;
-  if (p === 2) return 2;
-  if (p === 3) return 3;
-  return 4;
-}
-
-function getPointsTone(points: number): { color: string; bg: string; border: string } {
-  const p = clampPoints(points);
-  return {
-    color: `hsl(var(--coin-${p}))`,
-    // Fundo suave para garantir contraste com o texto (não usar --coin-*-glow aqui)
-    bg: `hsl(var(--coin-${p}) / 0.18)`,
-    border: `hsl(var(--coin-${p}) / 0.35)`,
-  };
-}
 
 const iconMap: Record<string, React.ReactNode> = {
   ChefHat: <ChefHat className="w-5 h-5" />,
@@ -379,15 +362,15 @@ export function ChecklistView({
                                 className={cn(
                                   "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border",
                                   !wasAwardedPoints
-                                    ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                                    ? "bg-primary/10 text-primary border-primary/20"
                                     : "border-border"
                                 )}
                                 style={
                                   wasAwardedPoints && pointsAwarded > 0
                                     ? {
-                                        backgroundColor: getPointsTone(pointsAwarded).bg,
-                                        color: getPointsTone(pointsAwarded).color,
-                                        borderColor: getPointsTone(pointsAwarded).border,
+                                        backgroundColor: getPointsColors(pointsAwarded).bg,
+                                        color: getPointsColors(pointsAwarded).color,
+                                        borderColor: getPointsColors(pointsAwarded).border,
                                       }
                                     : undefined
                                 }
@@ -401,12 +384,12 @@ export function ChecklistView({
                                   <div className="flex items-center gap-0.5">
                                     {pointsAwarded > 0 &&
                                       Array.from({ length: pointsAwarded }).map((_, i) => {
-                                        const tone = getPointsTone(pointsAwarded);
+                                        const colors = getPointsColors(pointsAwarded);
                                         return (
                                           <Star
                                             key={i}
                                             className="w-3 h-3"
-                                            style={{ color: tone.color, fill: tone.color }}
+                                            style={{ color: colors.color, fill: colors.color }}
                                           />
                                         );
                                       })}
@@ -451,16 +434,16 @@ export function ChecklistView({
                                   <div
                                     className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border"
                                     style={{
-                                      backgroundColor: getPointsTone(configuredPoints).bg,
-                                      color: getPointsTone(configuredPoints).color,
-                                      borderColor: getPointsTone(configuredPoints).border,
+                                      backgroundColor: getPointsColors(configuredPoints).bg,
+                                      color: getPointsColors(configuredPoints).color,
+                                      borderColor: getPointsColors(configuredPoints).border,
                                     }}
                                   >
                                     <Star
                                       className="w-3 h-3"
                                       style={{
-                                        color: getPointsTone(configuredPoints).color,
-                                        fill: getPointsTone(configuredPoints).color,
+                                        color: getPointsColors(configuredPoints).color,
+                                        fill: getPointsColors(configuredPoints).color,
                                       }}
                                     />
                                     <span>+{configuredPoints}</span>
@@ -480,7 +463,7 @@ export function ChecklistView({
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-colors border-2 border-success/30"
                                 >
                                   <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center">
-                                    <Check className="w-5 h-5 text-white" />
+                                    <Check className="w-5 h-5 text-success-foreground" />
                                   </div>
                                   <div className="flex-1">
                                     <p className="font-semibold text-success">Concluí agora</p>
@@ -491,14 +474,14 @@ export function ChecklistView({
                                             key={i}
                                             className="w-3 h-3"
                                             style={{
-                                              color: getPointsTone(configuredPoints).color,
-                                              fill: getPointsTone(configuredPoints).color,
+                                              color: getPointsColors(configuredPoints).color,
+                                              fill: getPointsColors(configuredPoints).color,
                                             }}
                                           />
                                         ))}
                                         <span
                                           className="text-xs font-bold ml-0.5"
-                                          style={{ color: getPointsTone(configuredPoints).color }}
+                                          style={{ color: getPointsColors(configuredPoints).color }}
                                         >
                                           +{configuredPoints}
                                         </span>

@@ -90,35 +90,40 @@
                      className="card-unified-interactive cursor-pointer"
                      onClick={() => setSelectedClosing(closing)}
                    >
-                     <CardContent className="p-4">
-                       <div className="flex items-center gap-3">
-                         <div className="flex-1 min-w-0">
-                           <div className="flex items-center gap-2 mb-1">
-                             <User className="w-4 h-4 text-muted-foreground" />
-                             <span className="font-medium truncate">
-                               {closing.profile?.full_name || 'Usuário'}
-                             </span>
-                           </div>
-                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                             <span>{closing.unit_name}</span>
-                             <span>•</span>
-                             <span className="font-semibold text-foreground">
-                               R$ {closing.total_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                             </span>
-                           </div>
-                         </div>
-                         
-                         <Badge 
-                           variant="outline" 
-                           className={`${status.color} shrink-0`}
-                         >
-                           <StatusIcon className="w-3 h-3 mr-1" />
-                           {status.label}
-                         </Badge>
-                         
-                         <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                       </div>
-                     </CardContent>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <User className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-medium truncate">
+                                {closing.profile?.full_name || 'Usuário'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <span>{closing.unit_name}</span>
+                              {/* Valores só aparecem para admin */}
+                              {isAdmin && (
+                                <>
+                                  <span>•</span>
+                                  <span className="font-semibold text-foreground">
+                                    R$ {closing.total_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <Badge 
+                            variant="outline" 
+                            className={`${status.color} shrink-0`}
+                          >
+                            <StatusIcon className="w-3 h-3 mr-1" />
+                            {status.label}
+                          </Badge>
+                          
+                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                      </CardContent>
                    </Card>
                  );
                })}

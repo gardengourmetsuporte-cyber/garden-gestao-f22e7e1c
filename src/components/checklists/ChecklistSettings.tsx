@@ -39,6 +39,7 @@ import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { getPointsColors, clampPoints } from '@/lib/points';
 
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
@@ -65,18 +66,10 @@ const pointsOptions = [
   { value: 4, label: '4 pontos' },
 ];
 
-function clampPoints(points: number): 1 | 2 | 3 | 4 {
-  const p = Math.round(Number(points) || 1);
-  if (p <= 1) return 1;
-  if (p === 2) return 2;
-  if (p === 3) return 3;
-  return 4;
-}
-
 function getPointsToneStyle(points: number): React.CSSProperties {
   if (!points) return { color: 'hsl(var(--muted-foreground))' };
-  const p = clampPoints(points);
-  return { color: `hsl(var(--coin-${p}))` };
+  const colors = getPointsColors(points);
+  return { color: colors.color };
 }
 
 interface ChecklistSettingsProps {
