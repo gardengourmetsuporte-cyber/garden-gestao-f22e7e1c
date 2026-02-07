@@ -13,8 +13,9 @@ import Checklists from "./pages/Checklists";
 import Rewards from "./pages/Rewards";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
- import CashClosing from "./pages/CashClosing";
- import Recipes from "./pages/Recipes";
+import CashClosing from "./pages/CashClosing";
+import Recipes from "./pages/Recipes";
+import Employees from "./pages/Employees";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,14 @@ function AppRoutes() {
            </ProtectedRoute>
          }
        />
+      <Route
+        path="/employees"
+        element={
+          <ProtectedRoute>
+            <Employees />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

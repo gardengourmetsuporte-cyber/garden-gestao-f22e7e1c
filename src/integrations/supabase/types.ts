@@ -341,6 +341,113 @@ export type Database = {
           },
         ]
       }
+      employee_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          finance_transaction_id: string | null
+          id: string
+          is_paid: boolean
+          notes: string | null
+          paid_at: string | null
+          payment_date: string
+          receipt_url: string | null
+          reference_month: number
+          reference_year: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          finance_transaction_id?: string | null
+          id?: string
+          is_paid?: boolean
+          notes?: string | null
+          paid_at?: string | null
+          payment_date: string
+          receipt_url?: string | null
+          reference_month: number
+          reference_year: number
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          finance_transaction_id?: string | null
+          id?: string
+          is_paid?: boolean
+          notes?: string | null
+          paid_at?: string | null
+          payment_date?: string
+          receipt_url?: string | null
+          reference_month?: number
+          reference_year?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_payments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          admission_date: string | null
+          base_salary: number
+          cpf: string | null
+          created_at: string
+          department: string | null
+          full_name: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          role: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admission_date?: string | null
+          base_salary?: number
+          cpf?: string | null
+          created_at?: string
+          department?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          role?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admission_date?: string | null
+          base_salary?: number
+          cpf?: string | null
+          created_at?: string
+          department?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          role?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       finance_accounts: {
         Row: {
           balance: number
