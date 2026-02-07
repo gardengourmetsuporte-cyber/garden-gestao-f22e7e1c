@@ -81,6 +81,7 @@ export interface Order {
   notes: string | null;
   sent_at: string | null;
   created_by: string | null;
+  supplier_invoice_id: string | null;
   created_at: string;
   updated_at: string;
   // Joined data

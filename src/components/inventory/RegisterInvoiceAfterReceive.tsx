@@ -14,12 +14,13 @@ interface RegisterInvoiceAfterReceiveProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRegisterInvoice: (data: {
+    orderId: string;
     supplierId: string;
     amount: number;
     dueDate: string;
     description: string;
     invoiceNumber?: string;
-  }) => Promise<void>;
+  }) => Promise<string | void>;
   onSkip: () => void;
 }
 
@@ -36,7 +37,7 @@ export function RegisterInvoiceAfterReceive({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!order?.supplier_id || !amount || !dueDate) {
+    if (!order?.id || !order?.supplier_id || !amount || !dueDate) {
       toast.error('Preencha o valor e a data de vencimento');
       return;
     }
@@ -50,6 +51,7 @@ export function RegisterInvoiceAfterReceive({
     setIsSubmitting(true);
     try {
       await onRegisterInvoice({
+        orderId: order.id,
         supplierId: order.supplier_id,
         amount: parsedAmount,
         dueDate,

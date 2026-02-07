@@ -988,6 +988,7 @@ export type Database = {
           sent_at: string | null
           status: Database["public"]["Enums"]["order_status"]
           supplier_id: string
+          supplier_invoice_id: string | null
           updated_at: string
         }
         Insert: {
@@ -998,6 +999,7 @@ export type Database = {
           sent_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           supplier_id: string
+          supplier_invoice_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -1008,6 +1010,7 @@ export type Database = {
           sent_at?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           supplier_id?: string
+          supplier_invoice_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1016,6 +1019,13 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_supplier_invoice_id_fkey"
+            columns: ["supplier_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_invoices"
             referencedColumns: ["id"]
           },
         ]

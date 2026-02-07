@@ -17,12 +17,13 @@ interface OrdersTabProps {
   onDeleteOrder: (orderId: string) => Promise<void>;
   onReceiveOrder: (orderId: string, items: { itemId: string; quantity: number }[]) => Promise<void>;
   onRegisterInvoice?: (data: {
+    orderId: string;
     supplierId: string;
     amount: number;
     dueDate: string;
     description: string;
     invoiceNumber?: string;
-  }) => Promise<void>;
+  }) => Promise<string | void>;
 }
 
 export function OrdersTab({
@@ -287,7 +288,7 @@ export function OrdersTab({
                     Receber Pedido
                   </Button>
                 )}
-                {order.status === 'received' && onRegisterInvoice && (
+                {order.status === 'received' && onRegisterInvoice && !order.supplier_invoice_id && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -300,6 +301,12 @@ export function OrdersTab({
                     <FileText className="w-4 h-4" />
                     Cadastrar Despesa
                   </Button>
+                )}
+                {order.status === 'received' && order.supplier_invoice_id && (
+                  <span className="text-xs text-success flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    Despesa cadastrada
+                  </span>
                 )}
                 {(order.status === 'draft' || order.status === 'sent' || order.status === 'received') && (
                   <Button
@@ -339,7 +346,9 @@ export function OrdersTab({
           open={invoiceSheetOpen}
           onOpenChange={setInvoiceSheetOpen}
           onRegisterInvoice={async (data) => {
-            await onRegisterInvoice(data);
+            const invoiceId = await onRegisterInvoice(data);
+            // Order will be updated via refetch since we link invoice_id
+            return invoiceId;
           }}
           onSkip={() => {
             setOrderForInvoice(null);

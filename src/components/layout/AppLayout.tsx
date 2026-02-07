@@ -115,9 +115,9 @@ function AppLayoutContent({
       {sidebarOpen && <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)} />}
 
       {/* Sidebar */}
-      <aside className={cn("fixed top-0 left-0 z-50 h-full w-72 bg-card border-r shadow-xl transition-transform duration-300", "lg:translate-x-0", sidebarOpen ? "translate-x-0" : "-translate-x-full")}>
+      <aside className={cn("fixed top-0 left-0 z-50 h-full w-72 bg-card border-r shadow-xl transition-transform duration-300 flex flex-col", "lg:translate-x-0", sidebarOpen ? "translate-x-0" : "-translate-x-full")}>
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b">
+        <div className="flex items-center justify-between h-16 px-4 border-b shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shadow">
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
@@ -133,7 +133,7 @@ function AppLayoutContent({
         </div>
 
         {/* User Info */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
               {profile?.avatar_url ? <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : <User className="w-6 h-6 text-primary" />}
@@ -156,8 +156,8 @@ function AppLayoutContent({
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="p-3 space-y-1">
+        {/* Navigation - scrollable */}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           {filteredNavItems.map(item => {
           const isActive = location.pathname === item.href;
           return <Link key={item.href} to={item.href} onClick={() => setSidebarOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all", isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-secondary hover:text-foreground")}>
@@ -168,8 +168,8 @@ function AppLayoutContent({
         })}
         </nav>
 
-        {/* Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+        {/* Logout - fixed at bottom */}
+        <div className="shrink-0 p-4 border-t bg-card">
           <button onClick={handleSignOut} className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all">
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Sair</span>
