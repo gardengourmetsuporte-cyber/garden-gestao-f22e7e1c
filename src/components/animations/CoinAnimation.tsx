@@ -17,15 +17,15 @@ interface FlyingCoinProps {
 function getCoinColors(points: number): { bg: string; glow: string } {
   switch (points) {
     case 1:
-      return { bg: '#3B82F6', glow: '#3B82F6' }; // Azul vibrante
+      return { bg: '#06B6D4', glow: '#06B6D4' }; // Ciano/Turquesa
     case 2:
-      return { bg: '#10B981', glow: '#10B981' }; // Verde esmeralda
+      return { bg: '#FACC15', glow: '#FACC15' }; // Amarelo dourado
     case 3:
-      return { bg: '#F97316', glow: '#F97316' }; // Laranja forte
+      return { bg: '#EC4899', glow: '#EC4899' }; // Rosa/Magenta
     case 4:
-      return { bg: '#EF4444', glow: '#EF4444' }; // Vermelho intenso
+      return { bg: '#8B5CF6', glow: '#8B5CF6' }; // Roxo/Violeta
     default:
-      return { bg: '#3B82F6', glow: '#3B82F6' };
+      return { bg: '#06B6D4', glow: '#06B6D4' };
   }
 }
 
