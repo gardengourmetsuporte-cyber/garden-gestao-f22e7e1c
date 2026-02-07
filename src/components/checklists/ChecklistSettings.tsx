@@ -59,12 +59,26 @@ const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof 
 ];
 
 const pointsOptions = [
-  { value: 0, label: 'Sem pontos', color: 'text-muted-foreground' },
-  { value: 1, label: '1 ponto', color: 'text-amber-400' },
-  { value: 2, label: '2 pontos', color: 'text-amber-500' },
-  { value: 3, label: '3 pontos', color: 'text-orange-500' },
-  { value: 4, label: '4 pontos', color: 'text-yellow-400' },
+  { value: 0, label: 'Sem pontos' },
+  { value: 1, label: '1 ponto' },
+  { value: 2, label: '2 pontos' },
+  { value: 3, label: '3 pontos' },
+  { value: 4, label: '4 pontos' },
 ];
+
+function clampPoints(points: number): 1 | 2 | 3 | 4 {
+  const p = Math.round(Number(points) || 1);
+  if (p <= 1) return 1;
+  if (p === 2) return 2;
+  if (p === 3) return 3;
+  return 4;
+}
+
+function getPointsToneStyle(points: number): React.CSSProperties {
+  if (!points) return { color: 'hsl(var(--muted-foreground))' };
+  const p = clampPoints(points);
+  return { color: `hsl(var(--coin-${p}))` };
+}
 
 interface ChecklistSettingsProps {
   sectors: ChecklistSector[];
@@ -768,14 +782,18 @@ export function ChecklistSettings({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {pointsOptions.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value.toString()}>
-                      <div className={cn("flex items-center gap-2", opt.color)}>
-                        <Star className="w-4 h-4" />
-                        {opt.label}
-                      </div>
-                    </SelectItem>
-                  ))}
+                  {pointsOptions.map((opt) => {
+                    const toneStyle = getPointsToneStyle(opt.value);
+
+                    return (
+                      <SelectItem key={opt.value} value={opt.value.toString()}>
+                        <div className="flex items-center gap-2" style={toneStyle}>
+                          <Star className="w-4 h-4" style={{ ...toneStyle, fill: toneStyle.color as string }} />
+                          {opt.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
