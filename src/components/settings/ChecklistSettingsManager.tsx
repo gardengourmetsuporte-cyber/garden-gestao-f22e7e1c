@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
-import { Loader2, ClipboardCheck, Sun, Moon } from 'lucide-react';
+import { Loader2, ClipboardCheck, Sun, Moon, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChecklistType } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -143,26 +143,38 @@ export function ChecklistSettingsManager() {
         <button
           onClick={() => setSelectedType('abertura')}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+            "flex-1 flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
             selectedType === 'abertura' 
               ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" 
               : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
           )}
         >
-          <Sun className="w-5 h-5" />
-          <span className="font-semibold">Abertura</span>
+          <Sun className="w-4 h-4" />
+          <span className="font-semibold text-sm">Abertura</span>
+        </button>
+        <button
+          onClick={() => setSelectedType('limpeza')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
+            selectedType === 'limpeza' 
+              ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400" 
+              : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+          )}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span className="font-semibold text-sm">Limpeza</span>
         </button>
         <button
           onClick={() => setSelectedType('fechamento')}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+            "flex-1 flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
             selectedType === 'fechamento' 
               ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400" 
               : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
           )}
         >
-          <Moon className="w-5 h-5" />
-          <span className="font-semibold">Fechamento</span>
+          <Moon className="w-4 h-4" />
+          <span className="font-semibold text-sm">Fechamento</span>
         </button>
       </div>
       

@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
-import { ClipboardCheck, Settings, Sun, Moon, CalendarIcon } from 'lucide-react';
+import { ClipboardCheck, Settings, Sun, Moon, CalendarIcon, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -204,56 +204,82 @@ export default function ChecklistsPage() {
               </Popover>
 
               {/* Checklist Type Selector */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setChecklistType('abertura')}
                   className={cn(
-                    "card-interactive flex flex-col items-center gap-2 p-4",
+                    "card-interactive flex flex-col items-center gap-2 p-3",
                     checklistType === 'abertura'
                       ? "border-2 border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 shadow-lg shadow-amber-500/20"
                       : "hover:border-amber-300"
                   )}
                 >
                   <div className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                    "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
                     checklistType === 'abertura'
                       ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg"
                       : "bg-amber-100 dark:bg-amber-900/30 text-amber-600"
                   )}>
-                    <Sun className="w-7 h-7" />
+                    <Sun className="w-6 h-6" />
                   </div>
                   <div className="text-center">
                     <p className={cn(
-                      "font-bold text-lg",
+                      "font-bold text-sm",
                       checklistType === 'abertura' ? "text-amber-700 dark:text-amber-400" : "text-foreground"
                     )}>Abertura</p>
-                    <p className="text-xs text-muted-foreground">Tarefas da manhã</p>
+                    <p className="text-[10px] text-muted-foreground">Manhã</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setChecklistType('limpeza')}
+                  className={cn(
+                    "card-interactive flex flex-col items-center gap-2 p-3",
+                    checklistType === 'limpeza'
+                      ? "border-2 border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 shadow-lg shadow-emerald-500/20"
+                      : "hover:border-emerald-300"
+                  )}
+                >
+                  <div className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
+                    checklistType === 'limpeza'
+                      ? "bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg"
+                      : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600"
+                  )}>
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <div className="text-center">
+                    <p className={cn(
+                      "font-bold text-sm",
+                      checklistType === 'limpeza' ? "text-emerald-700 dark:text-emerald-400" : "text-foreground"
+                    )}>Limpeza</p>
+                    <p className="text-[10px] text-muted-foreground">Periódica</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => setChecklistType('fechamento')}
                   className={cn(
-                    "card-interactive flex flex-col items-center gap-2 p-4",
+                    "card-interactive flex flex-col items-center gap-2 p-3",
                     checklistType === 'fechamento'
                       ? "border-2 border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/20 shadow-lg shadow-indigo-500/20"
                       : "hover:border-indigo-300"
                   )}
                 >
                   <div className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                    "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
                     checklistType === 'fechamento'
                       ? "bg-gradient-to-br from-indigo-400 to-purple-500 text-white shadow-lg"
                       : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600"
                   )}>
-                    <Moon className="w-7 h-7" />
+                    <Moon className="w-6 h-6" />
                   </div>
                   <div className="text-center">
                     <p className={cn(
-                      "font-bold text-lg",
+                      "font-bold text-sm",
                       checklistType === 'fechamento' ? "text-indigo-700 dark:text-indigo-400" : "text-foreground"
                     )}>Fechamento</p>
-                    <p className="text-xs text-muted-foreground">Tarefas da noite</p>
+                    <p className="text-[10px] text-muted-foreground">Noite</p>
                   </div>
                 </button>
               </div>
@@ -291,26 +317,38 @@ export default function ChecklistsPage() {
                 <button
                   onClick={() => setSettingsType('abertura')}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+                    "flex-1 flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
                     settingsType === 'abertura' 
                       ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" 
                       : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
                   )}
                 >
-                  <Sun className="w-5 h-5" />
-                  <span className="font-semibold">Abertura</span>
+                  <Sun className="w-4 h-4" />
+                  <span className="font-semibold text-sm">Abertura</span>
+                </button>
+                <button
+                  onClick={() => setSettingsType('limpeza')}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
+                    settingsType === 'limpeza' 
+                      ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400" 
+                      : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                  )}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="font-semibold text-sm">Limpeza</span>
                 </button>
                 <button
                   onClick={() => setSettingsType('fechamento')}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+                    "flex-1 flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
                     settingsType === 'fechamento' 
                       ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400" 
                       : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
                   )}
                 >
-                  <Moon className="w-5 h-5" />
-                  <span className="font-semibold">Fechamento</span>
+                  <Moon className="w-4 h-4" />
+                  <span className="font-semibold text-sm">Fechamento</span>
                 </button>
               </div>
 

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   Banknote, 
@@ -15,7 +15,8 @@ import {
   Trash2,
   Receipt,
   Wallet,
-  Utensils
+  Utensils,
+  CalendarIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { PAYMENT_METHODS } from '@/types/cashClosing';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,8 +46,14 @@ export function CashClosingForm({ onSuccess }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Use LOCAL date to match the operational day (not UTC which may be next day after midnight)
+  // Allow selecting yesterday for after-midnight closings
   const now = new Date();
-  const today = format(now, 'yyyy-MM-dd');
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterdayDate = subDays(todayDate, 1);
+  
+  // Default to today's date but allow user to change for late-night closings
+  const [selectedDate, setSelectedDate] = useState<Date>(todayDate);
+  const operationalDate = format(selectedDate, 'yyyy-MM-dd');
   
   const [initialCash, setInitialCash] = useState(0);
   const [cashCounted, setCashCounted] = useState(0);
@@ -124,7 +133,7 @@ export function CashClosingForm({ onSuccess }: Props) {
     // Check checklist first
     setChecklistStatus('checking');
     try {
-      const checklistOk = await checkChecklistCompleted(today);
+      const checklistOk = await checkChecklistCompleted(operationalDate);
       
       if (!checklistOk) {
         setChecklistStatus('incomplete');
@@ -158,7 +167,7 @@ export function CashClosingForm({ onSuccess }: Props) {
 
       // Create closing
       const success = await createClosing({
-        date: today,
+        date: operationalDate,
         unit_name: 'Principal',
         initial_cash: initialCash,
         cash_amount: cashSold, // Salvar o dinheiro vendido (calculado)
@@ -194,15 +203,40 @@ export function CashClosingForm({ onSuccess }: Props) {
 
   return (
     <div className="space-y-4 pb-6">
-      {/* Header Info */}
+      {/* Header Info with Date Selector */}
       <Card className="card-unified">
         <CardContent className="p-4">
-          <div className="flex justify-between items-center text-sm">
-            <div>
-              <span className="text-muted-foreground">Data:</span>
-              <span className="ml-2 font-medium">
-                {format(new Date(today), "dd 'de' MMMM", { locale: ptBR })}
-              </span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Data operacional:</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 font-medium"
+                  >
+                    <CalendarIcon className="w-4 h-4" />
+                    {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => date && setSelectedDate(date)}
+                    initialFocus
+                    locale={ptBR}
+                    disabled={(date) => date > todayDate || date < yesterdayDate}
+                    className="p-3 pointer-events-auto"
+                  />
+                  <div className="px-3 pb-3">
+                    <p className="text-xs text-muted-foreground">
+                      Se passou da meia-noite, selecione o dia anterior para o fechamento correto.
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <div>
               <span className="text-muted-foreground">Responsável:</span>
