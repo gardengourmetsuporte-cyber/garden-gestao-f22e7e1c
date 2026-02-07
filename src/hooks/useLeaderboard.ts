@@ -39,10 +39,11 @@ export function useLeaderboard() {
 
       if (profilesError) throw profilesError;
 
-      // Get completions count per user (earned points)
+      // Get completions with actual points_awarded (variable points per task: 0-4)
       const { data: completions, error: completionsError } = await supabase
         .from('checklist_completions')
-        .select('completed_by');
+        .select('completed_by, points_awarded, awarded_points')
+        .eq('awarded_points', true);
 
       if (completionsError) throw completionsError;
 
@@ -57,10 +58,10 @@ export function useLeaderboard() {
       // Calculate points for each user
       const userPointsMap = new Map<string, { earned: number; spent: number }>();
 
-      // Count earned points
+      // Sum earned points using points_awarded value
       completions?.forEach(c => {
         const current = userPointsMap.get(c.completed_by) || { earned: 0, spent: 0 };
-        current.earned += 1;
+        current.earned += c.points_awarded || 0;
         userPointsMap.set(c.completed_by, current);
       });
 
