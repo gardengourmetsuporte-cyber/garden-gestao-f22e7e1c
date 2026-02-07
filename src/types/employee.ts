@@ -37,6 +37,26 @@ export interface EmployeePayment {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  // Payslip details
+  base_salary: number;
+  regular_hours: number;
+  night_hours: number;
+  night_bonus: number;
+  overtime_hours: number;
+  overtime_bonus: number;
+  meal_allowance: number;
+  transport_allowance: number;
+  other_earnings: number;
+  other_earnings_description: string | null;
+  inss_deduction: number;
+  irrf_deduction: number;
+  advance_deduction: number;
+  other_deductions: number;
+  other_deductions_description: string | null;
+  total_earnings: number;
+  total_deductions: number;
+  net_salary: number;
+  fgts_amount: number;
   // Joined data
   employee?: Employee;
 }

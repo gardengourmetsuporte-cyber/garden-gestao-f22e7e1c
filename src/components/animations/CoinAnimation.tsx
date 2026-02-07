@@ -13,19 +13,19 @@ interface FlyingCoinProps {
   points?: number;
 }
 
-// Get coin color based on points
+// Cores bem distintas e chamativas para cada nível de pontos
 function getCoinColors(points: number) {
   switch (points) {
     case 1:
-      return { bg: 'bg-amber-400', shadow: 'shadow-amber-400/50' };
+      return { bg: 'bg-blue-500', shadow: 'shadow-blue-500/60' }; // Azul
     case 2:
-      return { bg: 'bg-amber-500', shadow: 'shadow-amber-500/50' };
+      return { bg: 'bg-emerald-500', shadow: 'shadow-emerald-500/60' }; // Verde
     case 3:
-      return { bg: 'bg-orange-500', shadow: 'shadow-orange-500/50' };
+      return { bg: 'bg-orange-500', shadow: 'shadow-orange-500/60' }; // Laranja
     case 4:
-      return { bg: 'bg-yellow-400', shadow: 'shadow-yellow-400/50' };
+      return { bg: 'bg-rose-500', shadow: 'shadow-rose-500/60' }; // Vermelho/Rosa
     default:
-      return { bg: 'bg-amber-500', shadow: 'shadow-amber-500/50' };
+      return { bg: 'bg-blue-500', shadow: 'shadow-blue-500/60' };
   }
 }
 

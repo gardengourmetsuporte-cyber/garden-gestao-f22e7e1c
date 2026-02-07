@@ -19,8 +19,10 @@ import {
   Trash2,
   Receipt,
   Loader2,
+  FileText,
 } from 'lucide-react';
 import { PaymentSheet } from './PaymentSheet';
+import { PayslipSheet } from './PayslipSheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,11 +68,13 @@ interface EmployeePaymentsProps {
 }
 
 export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
-  const { payments, isLoading, deletePayment, markAsPaidWithTransaction } = useEmployeePayments(employee.id);
+  const { payments, isLoading, addPayment, updatePayment, deletePayment, markAsPaidWithTransaction } = useEmployeePayments(employee.id);
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<FinanceAccount[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [payslipSheetOpen, setPayslipSheetOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<EmployeePayment | null>(null);
+  const [editingPayslip, setEditingPayslip] = useState<EmployeePayment | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [payDialog, setPayDialog] = useState<{ open: boolean; paymentId: string | null }>({ open: false, paymentId: null });
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
@@ -99,8 +103,13 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
   };
 
   const handleEdit = (payment: EmployeePayment) => {
-    setEditingPayment(payment);
-    setSheetOpen(true);
+    if (payment.type === 'salary' && payment.total_earnings > 0) {
+      setEditingPayslip(payment);
+      setPayslipSheetOpen(true);
+    } else {
+      setEditingPayment(payment);
+      setSheetOpen(true);
+    }
   };
 
   const handleDelete = async () => {
@@ -166,10 +175,16 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
             {employee.role || 'Funcionário'} • {formatCurrency(employee.base_salary)}/mês
           </p>
         </div>
-        <Button onClick={() => { setEditingPayment(null); setSheetOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Pagamento
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => { setEditingPayment(null); setSheetOpen(true); }}>
+            <Plus className="w-4 h-4 mr-2" />
+            Vale/Bônus
+          </Button>
+          <Button onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
+            <FileText className="w-4 h-4 mr-2" />
+            Holerite
+          </Button>
+        </div>
       </div>
 
       {/* Payments by month */}
@@ -285,6 +300,17 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         onOpenChange={setSheetOpen}
         employee={employee}
         payment={editingPayment}
+      />
+
+      {/* Payslip Sheet */}
+      <PayslipSheet
+        open={payslipSheetOpen}
+        onOpenChange={setPayslipSheetOpen}
+        employee={employee}
+        editingPayment={editingPayslip}
+        onSave={addPayment}
+        onUpdate={updatePayment}
+        onDelete={deletePayment}
       />
 
       {/* Delete Dialog */}

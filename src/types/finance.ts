@@ -42,6 +42,7 @@ export interface FinanceTransaction {
   category_id: string | null;
   account_id: string | null;
   to_account_id: string | null;
+  supplier_id: string | null;
   date: string;
   is_paid: boolean;
   is_fixed: boolean;
@@ -61,6 +62,7 @@ export interface FinanceTransaction {
   category?: FinanceCategory;
   account?: FinanceAccount;
   to_account?: FinanceAccount;
+  supplier?: { id: string; name: string };
 }
 
 export interface FinanceBudget {
