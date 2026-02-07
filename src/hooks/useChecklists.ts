@@ -366,7 +366,8 @@ export function useChecklists() {
     checklistType: ChecklistType,
     date: string,
     isAdmin?: boolean,
-    points: number = 1
+    points: number = 1,
+    completedByUserId?: string // Admin can specify who completed the task
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -388,13 +389,16 @@ export function useChecklists() {
       if (error) throw error;
       setCompletions(prev => prev.filter(c => c.id !== existing.id));
     } else {
+      // Use specified user or current user
+      const targetUserId = completedByUserId || user?.id;
+      
       // Add completion with points (0 means no points awarded)
       const { data, error } = await supabase
         .from('checklist_completions')
         .insert({
           item_id: itemId,
           checklist_type: checklistType,
-          completed_by: user?.id,
+          completed_by: targetUserId,
           date,
           awarded_points: points > 0,
           points_awarded: points,
