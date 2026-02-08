@@ -1,19 +1,18 @@
- import { useState } from 'react';
- import { format } from 'date-fns';
- import { ptBR } from 'date-fns/locale';
- import { 
-   Clock, 
-   CheckCircle2, 
-   AlertTriangle,
-   Eye,
-   ChevronRight,
-   User
- } from 'lucide-react';
- import { Card, CardContent } from '@/components/ui/card';
- import { Badge } from '@/components/ui/badge';
- import { CashClosing } from '@/types/cashClosing';
- import { CashClosingDetail } from './CashClosingDetail';
- import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useState } from 'react';
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { 
+  Clock, 
+  CheckCircle2, 
+  AlertTriangle,
+  ChevronRight,
+  User
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CashClosing } from '@/types/cashClosing';
+import { CashClosingDetail } from './CashClosingDetail';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
  
  interface Props {
    closings: CashClosing[];
@@ -76,9 +75,9 @@
        <div className="space-y-4">
          {Object.entries(groupedByDate).map(([date, dateClosings]) => (
            <div key={date}>
-             <h3 className="text-sm font-medium text-muted-foreground mb-2 px-1">
-               {format(new Date(date), "EEEE, dd 'de' MMMM", { locale: ptBR })}
-             </h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-2 px-1">
+                {format(parseISO(date), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+              </h3>
              <div className="space-y-2">
                {dateClosings.map(closing => {
                  const status = getStatusConfig(closing.status);
