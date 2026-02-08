@@ -46,13 +46,16 @@ export function CashClosingForm({ onSuccess }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Use LOCAL date to match the operational day (not UTC which may be next day after midnight)
-  // Allow selecting yesterday for after-midnight closings
+  // Allow selecting up to 3 days back for late closings (after midnight or delayed submissions)
   const now = new Date();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterdayDate = subDays(todayDate, 1);
+  const minAllowedDate = subDays(todayDate, 3); // Allow up to 3 days back
   
-  // Default to today's date but allow user to change for late-night closings
-  const [selectedDate, setSelectedDate] = useState<Date>(todayDate);
+  // Default to yesterday if it's past midnight and before 6 AM (likely closing previous day)
+  const currentHour = now.getHours();
+  const defaultDate = currentHour < 6 ? subDays(todayDate, 1) : todayDate;
+  
+  const [selectedDate, setSelectedDate] = useState<Date>(defaultDate);
   const operationalDate = format(selectedDate, 'yyyy-MM-dd');
   
   const [initialCash, setInitialCash] = useState(0);
@@ -227,12 +230,12 @@ export function CashClosingForm({ onSuccess }: Props) {
                     onSelect={(date) => date && setSelectedDate(date)}
                     initialFocus
                     locale={ptBR}
-                    disabled={(date) => date > todayDate || date < yesterdayDate}
+                    disabled={(date) => date > todayDate || date < minAllowedDate}
                     className="p-3 pointer-events-auto"
                   />
                   <div className="px-3 pb-3">
                     <p className="text-xs text-muted-foreground">
-                      Se passou da meia-noite, selecione o dia anterior para o fechamento correto.
+                      Selecione a data operacional correta. Disponível até 3 dias anteriores.
                     </p>
                   </div>
                 </PopoverContent>
