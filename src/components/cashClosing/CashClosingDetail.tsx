@@ -1,7 +1,7 @@
- import { useState } from 'react';
- import { format } from 'date-fns';
- import { ptBR } from 'date-fns/locale';
- import { 
+import { useState } from 'react';
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { 
    Banknote, 
    CreditCard, 
    Smartphone, 
@@ -152,11 +152,11 @@
              <div className="flex items-center gap-3">
                <Calendar className="w-5 h-5 text-muted-foreground" />
                <div>
-                 <p className="text-sm text-muted-foreground">Data</p>
-                 <p className="font-medium">
-                   {format(new Date(closing.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                 </p>
-               </div>
+                  <p className="text-sm text-muted-foreground">Data</p>
+                  <p className="font-medium">
+                    {format(parseISO(closing.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  </p>
+                </div>
              </div>
              <div className="flex items-center gap-3">
                <Building2 className="w-5 h-5 text-muted-foreground" />
