@@ -58,8 +58,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             >
               <Menu className="w-6 h-6 text-foreground" />
             </button>
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-border/30">
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+            <div className="w-9 h-9 rounded-xl overflow-hidden">
+              <img alt="Garden Gourmet" className="w-full h-full object-cover" src="/garden-logo.png" />
             </div>
           </div>
           
@@ -97,8 +97,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {/* Sidebar Header */}
         <div className="flex items-center justify-between h-14 px-4 border-b border-border/30 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 border border-border/30">
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden">
+              <img alt="Garden Gourmet" className="w-full h-full object-cover" src="/garden-logo.png" />
             </div>
             <div>
               <h1 className="font-bold text-sm text-foreground">Gestão</h1>
