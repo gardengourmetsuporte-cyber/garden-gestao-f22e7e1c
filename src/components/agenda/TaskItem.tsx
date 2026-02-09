@@ -1,7 +1,7 @@
  import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
  import { ptBR } from 'date-fns/locale';
  import { Checkbox } from '@/components/ui/checkbox';
- import { Trash2, CalendarDays, GripVertical, Pencil } from 'lucide-react';
+ import { Trash2, CalendarDays, Pencil } from 'lucide-react';
  import { cn } from '@/lib/utils';
  import type { ManagerTask } from '@/types/agenda';
  
@@ -50,15 +50,6 @@
         !task.is_completed && !isDragging && 'hover:shadow-md hover:border-primary/30',
        )}
      >
-       {/* Drag handle */}
-      {dragHandleProps && (
-        <div 
-          {...dragHandleProps}
-          className="touch-none cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-        >
-          <GripVertical className="w-5 h-5" />
-        </div>
-      )}
  
        <Checkbox
          checked={task.is_completed}
