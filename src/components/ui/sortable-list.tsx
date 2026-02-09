@@ -2,11 +2,13 @@ import React from 'react';
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
+  TouchSensor,
+  MouseSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverlay,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -54,15 +56,14 @@ function SortableItemWrapper({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 50 : undefined,
-    position: isDragging ? 'relative' as const : undefined,
+    opacity: isDragging ? 0.4 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style}>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {renderItem({
         isDragging,
-        dragHandleProps: { ...attributes, ...listeners },
+        dragHandleProps: {},
       })}
     </div>
   );
@@ -77,14 +78,21 @@ export function SortableList<T>({
   className,
   direction = 'vertical',
 }: SortableListProps<T>) {
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const activeItem = activeId ? items.find(item => getItemId(item) === activeId) : null;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -112,7 +120,16 @@ export function SortableList<T>({
   const strategy = direction === 'horizontal' ? horizontalListSortingStrategy : verticalListSortingStrategy;
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={(event) => setActiveId(String(event.active.id))}
+      onDragEnd={(event) => {
+        setActiveId(null);
+        handleDragEnd(event);
+      }}
+      onDragCancel={() => setActiveId(null)}
+    >
       <SortableContext items={items.map(getItemId)} strategy={strategy}>
         <div className={className}>
           {items.map(item => (
@@ -124,6 +141,9 @@ export function SortableList<T>({
           ))}
         </div>
       </SortableContext>
+      <DragOverlay dropAnimation={null}>
+        {activeItem ? renderItem(activeItem, { isDragging: true, dragHandleProps: {} }) : null}
+      </DragOverlay>
     </DndContext>
   );
 }
