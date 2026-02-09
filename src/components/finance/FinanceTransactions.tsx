@@ -1,4 +1,4 @@
- import { useMemo, useState } from 'react';
+ import { useMemo, useState, useCallback } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
@@ -9,6 +9,54 @@ import { FinanceTransaction, MonthlyStats } from '@/types/finance';
  import { Badge } from '@/components/ui/badge';
  import { TransactionFilters, TransactionFiltersState } from './TransactionFilters';
  import { FinanceCategory, FinanceAccount } from '@/types/finance';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  TouchSensor,
+  MouseSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  useDroppable,
+} from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+
+// Droppable date zone
+function DateDropZone({ dateStr, children, isOver }: { dateStr: string; children: React.ReactNode; isOver?: boolean }) {
+  const { setNodeRef, isOver: dropIsOver } = useDroppable({ id: `date-${dateStr}` });
+  const active = isOver ?? dropIsOver;
+  return (
+    <div ref={setNodeRef} className={active ? 'bg-primary/5 rounded-lg transition-colors' : 'transition-colors'}>
+      {children}
+    </div>
+  );
+}
+
+// Draggable transaction wrapper
+function DraggableTransaction({ transaction, children }: { transaction: FinanceTransaction; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: transaction.id,
+    data: { type: 'transaction', transaction },
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    touchAction: 'none' as const,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
+}
 
 interface FinanceTransactionsProps {
   selectedMonth: Date;
@@ -18,6 +66,7 @@ interface FinanceTransactionsProps {
   onTransactionClick: (transaction: FinanceTransaction) => void;
   onTogglePaid: (id: string, isPaid: boolean) => Promise<void>;
   onDeleteTransaction: (id: string) => Promise<void>;
+  onUpdateTransactionDate?: (id: string, newDate: string) => Promise<void>;
    categories: FinanceCategory[];
    accounts: FinanceAccount[];
 }
@@ -30,6 +79,7 @@ export function FinanceTransactions({
   onTransactionClick,
    onTogglePaid,
   onDeleteTransaction,
+  onUpdateTransactionDate,
    categories,
    accounts
 }: FinanceTransactionsProps) {
@@ -39,26 +89,32 @@ export function FinanceTransactions({
      categoryId: null,
      accountId: null
    });
+   const [activeTransaction, setActiveTransaction] = useState<FinanceTransaction | null>(null);
  
+  const sensors = useSensors(
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-   // Apply filters to transactions
    const filteredTransactionsByDate = useMemo(() => {
      const result: Record<string, FinanceTransaction[]> = {};
      
      Object.entries(transactionsByDate).forEach(([date, transactions]) => {
        const filtered = transactions.filter(t => {
-         // Status filter
          if (filters.status === 'paid' && !t.is_paid) return false;
          if (filters.status === 'pending' && t.is_paid) return false;
-         
-         // Category filter
          if (filters.categoryId && t.category_id !== filters.categoryId) return false;
-         
-         // Account filter
          if (filters.accountId && t.account_id !== filters.accountId) return false;
-         
          return true;
        });
        
@@ -74,8 +130,49 @@ export function FinanceTransactions({
      return Object.keys(filteredTransactionsByDate).sort((a, b) => b.localeCompare(a));
    }, [filteredTransactionsByDate]);
 
+  // Build a flat list of all transaction IDs for finding which date a transaction belongs to
+  const transactionDateMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    Object.entries(filteredTransactionsByDate).forEach(([date, txns]) => {
+      txns.forEach(t => { map[t.id] = date; });
+    });
+    return map;
+  }, [filteredTransactionsByDate]);
+
   const hasTransactions = sortedDates.length > 0;
    const hasActiveFilters = filters.status !== 'all' || filters.categoryId || filters.accountId;
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const txnId = String(event.active.id);
+    // Find the transaction
+    for (const txns of Object.values(filteredTransactionsByDate)) {
+      const found = txns.find(t => t.id === txnId);
+      if (found) { setActiveTransaction(found); break; }
+    }
+  }, [filteredTransactionsByDate]);
+
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    setActiveTransaction(null);
+    const { active, over } = event;
+    if (!over || !onUpdateTransactionDate) return;
+
+    const txnId = String(active.id);
+    const overId = String(over.id);
+    
+    // Determine target date - could be dropping on a date zone or on another transaction
+    let targetDate: string | null = null;
+    if (overId.startsWith('date-')) {
+      targetDate = overId.replace('date-', '');
+    } else {
+      // Dropped on another transaction - use that transaction's date
+      targetDate = transactionDateMap[overId] || null;
+    }
+    
+    const currentDate = transactionDateMap[txnId];
+    if (targetDate && targetDate !== currentDate) {
+      await onUpdateTransactionDate(txnId, targetDate);
+    }
+  }, [onUpdateTransactionDate, transactionDateMap]);
 
   return (
      <>
@@ -108,52 +205,72 @@ export function FinanceTransactions({
         </div>
       </div>
 
-      {/* Transactions List */}
+      {/* Transactions List with DnD */}
       {hasTransactions ? (
-        <div className="px-4 pb-24 space-y-4">
-          {sortedDates.map(dateStr => {
-             const transactions = filteredTransactionsByDate[dateStr];
-            const dayTotal = transactions.reduce((sum, t) => {
-              if (t.type === 'income') return sum + Number(t.amount);
-              if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
-              return sum;
-            }, 0);
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setActiveTransaction(null)}
+        >
+          <div className="px-4 pb-24 space-y-4">
+            {sortedDates.map(dateStr => {
+               const transactions = filteredTransactionsByDate[dateStr];
+              const dayTotal = transactions.reduce((sum, t) => {
+                if (t.type === 'income') return sum + Number(t.amount);
+                if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
+                return sum;
+              }, 0);
 
-            return (
-              <div key={dateStr}>
-                {/* Date Header */}
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium text-muted-foreground capitalize">
-                    {format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR })}
-                  </span>
-                  <span className={`text-sm font-semibold ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
-                    {formatCurrency(dayTotal)}
-                  </span>
-                </div>
+              return (
+                <DateDropZone key={dateStr} dateStr={dateStr}>
+                  {/* Date Header */}
+                  <div className="flex items-center justify-between py-2 px-1">
+                    <span className="text-sm font-medium text-muted-foreground capitalize">
+                      {format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                    </span>
+                    <span className={`text-sm font-semibold ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
+                      {formatCurrency(dayTotal)}
+                    </span>
+                  </div>
 
-                {/* Transactions for this date */}
-                <div className="space-y-2">
-                  {transactions.map(transaction => (
-                     <div key={transaction.id} className="relative">
-                       {transaction.is_recurring && transaction.installment_group_id && (
-                         <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
-                           <Repeat className="w-2.5 h-2.5 mr-0.5" />
-                           {transaction.installment_number}/{transaction.total_installments}
-                         </Badge>
-                       )}
-                       <TransactionItem
-                      transaction={transaction}
-                      onClick={() => onTransactionClick(transaction)}
-                      onTogglePaid={onTogglePaid}
-                     onDelete={onDeleteTransaction}
-                    />
-                     </div>
-                  ))}
-                </div>
+                  {/* Transactions for this date */}
+                  <div className="space-y-2">
+                    {transactions.map(transaction => (
+                       <DraggableTransaction key={transaction.id} transaction={transaction}>
+                         <div className="relative">
+                           {transaction.is_recurring && transaction.installment_group_id && (
+                             <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                               <Repeat className="w-2.5 h-2.5 mr-0.5" />
+                               {transaction.installment_number}/{transaction.total_installments}
+                             </Badge>
+                           )}
+                           <TransactionItem
+                          transaction={transaction}
+                          onClick={() => onTransactionClick(transaction)}
+                          onTogglePaid={onTogglePaid}
+                         onDelete={onDeleteTransaction}
+                        />
+                         </div>
+                       </DraggableTransaction>
+                    ))}
+                  </div>
+                </DateDropZone>
+              );
+            })}
+          </div>
+
+          <DragOverlay dropAnimation={null}>
+            {activeTransaction && (
+              <div className="opacity-90 shadow-lg rounded-xl">
+                <TransactionItem
+                  transaction={activeTransaction}
+                />
               </div>
-            );
-          })}
-        </div>
+            )}
+          </DragOverlay>
+        </DndContext>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <FileText className="w-12 h-12 mb-4 opacity-50" />

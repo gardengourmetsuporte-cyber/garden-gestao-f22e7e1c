@@ -69,6 +69,10 @@ export default function Finance() {
     }
   };
 
+  const handleUpdateTransactionDate = async (id: string, newDate: string) => {
+    await updateTransaction(id, { date: newDate });
+  };
+
   const handleRefreshCategories = async () => {
     await refetch();
   };
@@ -111,6 +115,7 @@ export default function Finance() {
             onTransactionClick={handleTransactionClick}
             onTogglePaid={toggleTransactionPaid}
             onDeleteTransaction={deleteTransaction}
+            onUpdateTransactionDate={handleUpdateTransactionDate}
              categories={categories}
              accounts={accounts}
           />
