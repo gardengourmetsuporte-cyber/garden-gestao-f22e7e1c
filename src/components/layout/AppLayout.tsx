@@ -48,16 +48,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border/30">
-        <div className="flex items-center justify-between h-14 px-4">
-          <div className="flex items-center gap-3">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/30">
+        <div className="flex items-center justify-between h-14 px-3">
+          <div className="flex items-center gap-2">
             <button 
               onClick={() => setSidebarOpen(true)} 
-              className="p-2 -ml-2 rounded-xl hover:bg-secondary active:scale-95 transition-all"
+              className="p-2.5 rounded-xl hover:bg-secondary active:scale-95 transition-all touch-manipulation"
+              style={{ minWidth: 44, minHeight: 44 }}
             >
-              <Menu className="w-5 h-5 text-foreground" />
+              <Menu className="w-6 h-6 text-foreground" />
             </button>
-            <div className="w-7 h-7 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/30">
+            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-border/30">
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
             </div>
           </div>
