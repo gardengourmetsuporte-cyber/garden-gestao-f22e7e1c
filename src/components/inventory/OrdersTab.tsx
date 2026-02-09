@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, CheckCircle2 } from 'lucide-react';
+import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText } from 'lucide-react';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -156,134 +156,124 @@ export function OrdersTab({
     }
   };
 
-  const [orderTab, setOrderTab] = useState<'pending' | 'done'>('pending');
-
-  const pendingOrders = useMemo(() => 
-    orders.filter(o => o.status === 'draft' || o.status === 'sent'), [orders]);
-  
-  const doneOrders = useMemo(() => 
-    orders.filter(o => o.status === 'received' || o.status === 'cancelled'), [orders]);
-
-  const displayOrders = orderTab === 'pending' ? pendingOrders : doneOrders;
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders'>('to-order');
 
   return (
-    <div className="space-y-6">
-      {/* Low Stock Summary by Supplier */}
-      {Object.keys(itemsBySupplier).length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p className="font-medium">Nenhum item precisa de reposição</p>
-          <p className="text-sm mt-1">Todos os itens estão acima do estoque mínimo</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <Package className="w-4 h-4" />
-            Itens para Pedido
-          </h3>
-          
-          {Object.entries(itemsBySupplier).map(([supplierId, supplierItems]) => {
-            const supplier = suppliers.find(s => s.id === supplierId);
-            const isNoSupplier = supplierId === 'no-supplier';
+    <div className="space-y-4">
+      {/* Tabs */}
+      <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+        <button
+          onClick={() => setOrderTab('to-order')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all",
+            orderTab === 'to-order'
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Package className="w-4 h-4" />
+          Itens para Pedido
+          {lowStockItems.length > 0 && (
+            <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-warning/10 text-warning">
+              {lowStockItems.length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setOrderTab('orders')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all",
+            orderTab === 'orders'
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Clock className="w-4 h-4" />
+          Pedidos Feitos
+          {orders.length > 0 && (
+            <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary">
+              {orders.length}
+            </span>
+          )}
+        </button>
+      </div>
 
-            return (
-              <div key={supplierId} className="bg-card rounded-xl border p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-foreground">
-                      {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {supplierItems.length} item(ns) abaixo do mínimo
-                    </p>
-                  </div>
-                  {!isNoSupplier && supplier && (
-                    <Button
-                      size="sm"
-                      onClick={() => handleOpenOrder(supplier)}
-                      className="gap-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Criar Pedido
-                    </Button>
-                  )}
-                </div>
+      {/* Tab: Itens para Pedido */}
+      {orderTab === 'to-order' && (
+        Object.keys(itemsBySupplier).length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p className="font-medium">Nenhum item precisa de reposição</p>
+            <p className="text-sm mt-1">Todos os itens estão acima do estoque mínimo</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {Object.entries(itemsBySupplier).map(([supplierId, supplierItems]) => {
+              const supplier = suppliers.find(s => s.id === supplierId);
+              const isNoSupplier = supplierId === 'no-supplier';
 
-                <div className="space-y-2">
-                  {supplierItems.slice(0, 3).map(item => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between py-2 border-t border-border/50 first:border-t-0"
-                    >
-                      <span className="text-sm">{item.name}</span>
-                      <span className={cn(
-                        "text-sm font-medium",
-                        item.current_stock === 0 ? "text-destructive" : "text-warning"
-                      )}>
-                        {item.current_stock} / {item.min_stock} {item.unit_type}
-                      </span>
+              return (
+                <div key={supplierId} className="bg-card rounded-xl border p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {supplierItems.length} item(ns) abaixo do mínimo
+                      </p>
                     </div>
-                  ))}
-                  {supplierItems.length > 3 && (
-                    <p className="text-xs text-muted-foreground">
-                      +{supplierItems.length - 3} mais item(ns)
-                    </p>
-                  )}
+                    {!isNoSupplier && supplier && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleOpenOrder(supplier)}
+                        className="gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Criar Pedido
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {supplierItems.slice(0, 3).map(item => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between py-2 border-t border-border/50 first:border-t-0"
+                      >
+                        <span className="text-sm">{item.name}</span>
+                        <span className={cn(
+                          "text-sm font-medium",
+                          item.current_stock === 0 ? "text-destructive" : "text-warning"
+                        )}>
+                          {item.current_stock} / {item.min_stock} {item.unit_type}
+                        </span>
+                      </div>
+                    ))}
+                    {supplierItems.length > 3 && (
+                      <p className="text-xs text-muted-foreground">
+                        +{supplierItems.length - 3} mais item(ns)
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )
       )}
 
-      {/* Orders with Tabs */}
-      {orders.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
-            <button
-              onClick={() => setOrderTab('pending')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all",
-                orderTab === 'pending'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Clock className="w-4 h-4" />
-              Pendentes
-              {pendingOrders.length > 0 && (
-                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary">
-                  {pendingOrders.length}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setOrderTab('done')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all",
-                orderTab === 'done'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              Concluídos
-              {doneOrders.length > 0 && (
-                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-success/10 text-success">
-                  {doneOrders.length}
-                </span>
-              )}
-            </button>
+      {/* Tab: Pedidos Feitos */}
+      {orderTab === 'orders' && (
+        orders.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p className="font-medium">Nenhum pedido feito</p>
+            <p className="text-sm mt-1">Crie um pedido a partir dos itens para pedido</p>
           </div>
-
-          {displayOrders.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="text-sm">
-                {orderTab === 'pending' ? 'Nenhum pedido pendente' : 'Nenhum pedido concluído'}
-              </p>
-            </div>
-          ) : (
-            displayOrders.map(order => (
+        ) : (
+          <div className="space-y-3">
+            {orders.map(order => (
               <div key={order.id} className="bg-card rounded-xl border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
@@ -369,9 +359,9 @@ export function OrdersTab({
                   )}
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )
       )}
 
       {/* Receive Order Sheet */}
@@ -381,7 +371,6 @@ export function OrdersTab({
         onOpenChange={setReceiveOrderOpen}
         onConfirmReceive={async (orderId, items) => {
           await onReceiveOrder(orderId, items);
-          // After receiving, open invoice sheet
           if (onRegisterInvoice) {
             setOrderForInvoice(orderToReceive);
             setInvoiceSheetOpen(true);
@@ -397,7 +386,6 @@ export function OrdersTab({
           onOpenChange={setInvoiceSheetOpen}
           onRegisterInvoice={async (data) => {
             const invoiceId = await onRegisterInvoice(data);
-            // Order will be updated via refetch since we link invoice_id
             return invoiceId;
           }}
           onSkip={() => {
