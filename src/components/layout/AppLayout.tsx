@@ -48,7 +48,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center justify-between h-14 px-3">
           <div className="flex items-center gap-2">
             <button 
@@ -92,7 +92,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         "lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}
-        style={{ boxShadow: sidebarOpen ? 'var(--shadow-elevated)' : 'none' }}
+        style={{ paddingTop: 'env(safe-area-inset-top)', boxShadow: sidebarOpen ? 'var(--shadow-elevated)' : 'none' }}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between h-14 px-4 border-b border-border/30 shrink-0">
@@ -180,7 +180,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className={cn("min-h-screen pt-14 lg:pt-0 lg:pl-72", "transition-all duration-300")}>
+      <main className={cn("min-h-screen lg:pt-0 lg:pl-72", "transition-all duration-300")} style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.5rem)' }}>
         {children}
       </main>
 
