@@ -6,6 +6,7 @@ import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimatio
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -186,6 +187,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* Coin Animation Layer */}
       <CoinAnimationLayer />
+
+      {/* Push Notification Prompt */}
+      <PushNotificationPrompt />
     </div>
   );
 }
