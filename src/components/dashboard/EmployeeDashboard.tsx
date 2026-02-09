@@ -16,14 +16,14 @@ export function EmployeeDashboard() {
   const pendingRedemptions = redemptions.filter(r => r.status === 'pending').length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 p-4 lg:p-6">
       {/* Welcome Header */}
       <div className="animate-slide-up stagger-1">
-        <div className="card-gradient bg-gradient-to-r from-primary to-primary/80 p-5">
+        <div className="card-gradient bg-gradient-to-r from-primary/90 to-blue-700 p-5">
           <h2 className="text-xl font-bold">
             Olá, {profile?.full_name?.split(' ')[0] || 'Colaborador'}! 👋
           </h2>
-          <p className="text-primary-foreground/70 text-xs mt-1">
+          <p className="text-white/60 text-xs mt-1">
             {userRank ? (
               <>Você está em <span className="font-bold text-primary-foreground">#{userRank}</span> no ranking!</>
             ) : (

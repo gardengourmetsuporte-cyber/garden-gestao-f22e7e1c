@@ -147,14 +147,14 @@ export function AdminDashboard() {
   const hasAlerts = outOfStockItems.length > 0 || lowStockItems.length > 0 || pendingRedemptions > 0 || pendingClosings > 0 || pendingExpenses > 0;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 p-4 lg:p-6">
       {/* Welcome Header */}
       <div className="animate-slide-up stagger-1">
-        <div className="card-gradient bg-gradient-to-br from-primary via-primary to-primary/80 p-5">
+        <div className="card-gradient bg-gradient-to-br from-primary/90 via-primary to-blue-700 p-5">
           <h2 className="text-xl font-bold">
             Olá, {profile?.full_name?.split(' ')[0] || 'Admin'}! 👋
           </h2>
-          <p className="text-primary-foreground/70 text-xs mt-1 capitalize">{currentDate}</p>
+          <p className="text-white/60 text-xs mt-1 capitalize">{currentDate}</p>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export function AdminDashboard() {
           title="Saldo do Mês"
           value={formatCurrency(animatedBalance)}
           icon={Wallet}
-          gradient={monthStats.balance >= 0 ? "bg-gradient-to-br from-emerald-500 to-green-600" : "bg-gradient-to-br from-red-500 to-rose-600"}
+          gradient={monthStats.balance >= 0 ? "bg-gradient-to-br from-emerald-600 to-emerald-800" : "bg-gradient-to-br from-red-600 to-red-800"}
           onClick={() => navigate('/finance')}
           subtitle={monthStats.balance >= 0 ? 'positivo' : 'negativo'}
           index={0}
@@ -173,7 +173,7 @@ export function AdminDashboard() {
           title="Pedidos Pendentes"
           value={String(animatedOrders)}
           icon={ShoppingCart}
-          gradient="bg-gradient-to-br from-orange-500 to-amber-500"
+          gradient="bg-gradient-to-br from-amber-600 to-amber-800"
           onClick={() => navigate('/inventory', { state: { activeTab: 'orders' } })}
           subtitle={pendingOrders > 0 ? 'aguardando' : 'nenhum'}
           index={1}
@@ -182,7 +182,7 @@ export function AdminDashboard() {
           title="Fichas Técnicas"
           value={String(animatedRecipes)}
           icon={ChefHat}
-          gradient="bg-gradient-to-br from-purple-500 to-violet-600"
+          gradient="bg-gradient-to-br from-violet-600 to-violet-800"
           onClick={() => navigate('/recipes')}
           subtitle="cadastradas"
           index={2}
@@ -191,7 +191,7 @@ export function AdminDashboard() {
           title="Estoque Crítico"
           value={String(animatedCritical)}
           icon={AlertTriangle}
-          gradient="bg-gradient-to-br from-red-500 to-rose-600"
+          gradient="bg-gradient-to-br from-rose-600 to-rose-800"
           onClick={() => navigate('/inventory', { state: { stockFilter: 'critical' } })}
           subtitle={criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
           index={3}

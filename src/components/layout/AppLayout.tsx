@@ -47,25 +47,27 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Header - Compact */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border/50">
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border/30">
         <div className="flex items-center justify-between h-14 px-4">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setSidebarOpen(true)} 
               className="p-2 -ml-2 rounded-xl hover:bg-secondary active:scale-95 transition-all"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5 text-foreground" />
             </button>
-            <div className="w-7 h-7 rounded-lg overflow-hidden bg-white shadow-sm">
+            <div className="w-7 h-7 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/30">
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
             </div>
           </div>
           
           <div className="flex items-center gap-2">
             <span className={cn(
-              "px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide",
-              isAdmin ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+              "px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide",
+              isAdmin 
+                ? "bg-primary/15 text-primary border border-primary/20" 
+                : "bg-secondary text-muted-foreground border border-border/30"
             )}>
               {isAdmin ? 'Admin' : 'Staff'}
             </span>
@@ -76,22 +78,25 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm animate-fade-in" 
+          className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in" 
           onClick={() => setSidebarOpen(false)} 
         />
       )}
 
       {/* Sidebar / Drawer */}
       <aside className={cn(
-        "fixed top-0 left-0 z-50 h-full w-72 bg-card border-r border-border/50 shadow-2xl flex flex-col",
+        "fixed top-0 left-0 z-50 h-full w-72 flex flex-col",
+        "bg-card/95 backdrop-blur-xl border-r border-border/30",
         "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-        "lg:translate-x-0 lg:shadow-none",
+        "lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
+      )}
+        style={{ boxShadow: sidebarOpen ? 'var(--shadow-elevated)' : 'none' }}
+      >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between h-14 px-4 border-b border-border/50 shrink-0">
+        <div className="flex items-center justify-between h-14 px-4 border-b border-border/30 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white shadow-sm">
+            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 border border-border/30">
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
             </div>
             <div>
@@ -103,12 +108,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             onClick={() => setSidebarOpen(false)} 
             className="lg:hidden p-2 rounded-xl hover:bg-secondary active:scale-95 transition-all"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
 
         {/* User Info */}
-        <div className="p-4 border-b border-border/50 shrink-0">
+        <div className="p-4 border-b border-border/30 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden ring-2 ring-primary/20">
               {profile?.avatar_url ? (
@@ -121,7 +126,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <p className="font-semibold text-sm text-foreground truncate">
                 {profile?.full_name || 'Usuário'}
               </p>
-              <div className="flex items-center gap-1 mt-0.5">
+              <div className="flex items-center gap-1.5 mt-0.5">
                 {isAdmin && <Shield className="w-3 h-3 text-primary" />}
                 <span className="text-[10px] text-muted-foreground">
                   {isAdmin ? 'Administrador' : 'Funcionário'}
@@ -130,12 +135,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </div>
           {/* Points Display */}
-          <div className="mt-3 pt-3 border-t border-border/50">
+          <div className="mt-3 pt-3 border-t border-border/30">
             <PointsDisplay isPulsing={isPulsing} />
           </div>
         </div>
 
-        {/* Navigation - scrollable */}
+        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
           {filteredNavItems.map(item => {
             const isActive = location.pathname === item.href;
@@ -147,19 +152,22 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-[0.98]"
+                    ? "bg-primary/15 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground active:scale-[0.98]"
                 )}
               >
-                <item.icon className="w-5 h-5 shrink-0" />
+                <item.icon className={cn("w-5 h-5 shrink-0", isActive && "text-primary")} />
                 <span className="flex-1">{item.label}</span>
+                {isActive && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Logout - fixed at bottom */}
-        <div className="shrink-0 p-3 border-t border-border/50">
+        {/* Logout */}
+        <div className="shrink-0 p-3 border-t border-border/30">
           <button
             onClick={handleSignOut}
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98]"
