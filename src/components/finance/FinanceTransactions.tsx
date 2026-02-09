@@ -16,39 +16,37 @@ import {
   DragStartEvent,
   TouchSensor,
   MouseSensor,
-  KeyboardSensor,
   useSensor,
   useSensors,
-  closestCenter,
+  rectIntersection,
   useDroppable,
+  useDraggable,
 } from '@dnd-kit/core';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
 // Droppable date zone
-function DateDropZone({ dateStr, children, isOver }: { dateStr: string; children: React.ReactNode; isOver?: boolean }) {
-  const { setNodeRef, isOver: dropIsOver } = useDroppable({ id: `date-${dateStr}` });
-  const active = isOver ?? dropIsOver;
+function DateDropZone({ dateStr, children }: { dateStr: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `date-${dateStr}` });
   return (
-    <div ref={setNodeRef} className={active ? 'bg-primary/5 rounded-lg transition-colors' : 'transition-colors'}>
+    <div
+      ref={setNodeRef}
+      className={isOver ? 'bg-primary/10 rounded-lg ring-2 ring-primary/30 transition-all duration-200' : 'transition-all duration-200'}
+    >
       {children}
     </div>
   );
 }
 
 // Draggable transaction wrapper
-function DraggableTransaction({ transaction, children }: { transaction: FinanceTransaction; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: transaction.id,
-    data: { type: 'transaction', transaction },
+function DraggableTransaction({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id,
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-    touchAction: 'none' as const,
+  const style: React.CSSProperties = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    opacity: isDragging ? 0.3 : 1,
+    zIndex: isDragging ? 50 : undefined,
+    position: isDragging ? 'relative' as const : undefined,
   };
 
   return (
@@ -93,13 +91,10 @@ export function FinanceTransactions({
  
   const sensors = useSensors(
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
+      activationConstraint: { delay: 300, tolerance: 8 },
     }),
     useSensor(MouseSensor, {
       activationConstraint: { delay: 200, tolerance: 5 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
@@ -209,7 +204,7 @@ export function FinanceTransactions({
       {hasTransactions ? (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={rectIntersection}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={() => setActiveTransaction(null)}
@@ -238,7 +233,7 @@ export function FinanceTransactions({
                   {/* Transactions for this date */}
                   <div className="space-y-2">
                     {transactions.map(transaction => (
-                       <DraggableTransaction key={transaction.id} transaction={transaction}>
+                       <DraggableTransaction key={transaction.id} id={transaction.id}>
                          <div className="relative">
                            {transaction.is_recurring && transaction.installment_group_id && (
                              <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
