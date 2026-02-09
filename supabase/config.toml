@@ -3,5 +3,5 @@ project_id = "uovuggxuurcdnprewtyl"
 [functions.management-ai]
 verify_jwt = false
 
-[functions.push-notifications]
+[functions.push-notifier]
 verify_jwt = false

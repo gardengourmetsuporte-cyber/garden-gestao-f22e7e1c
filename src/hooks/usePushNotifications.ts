@@ -25,7 +25,6 @@ export function usePushNotifications() {
     setIsSupported(supported);
     if (supported) {
       setPermission(Notification.permission);
-      // Check if already subscribed
       checkExistingSubscription();
     }
   }, []);
@@ -52,27 +51,24 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Get VAPID public key from edge function
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const vapidRes = await fetch(
-        `${supabaseUrl}/functions/v1/push-notifications?action=vapid-key`,
+        `${supabaseUrl}/functions/v1/push-notifier?action=vapid-key`,
         { headers: { 'Content-Type': 'application/json' } }
       );
       
       if (!vapidRes.ok) throw new Error('Failed to get VAPID key');
       const { publicKey } = await vapidRes.json();
 
-      // Subscribe to push
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
 
-      // Send subscription to server
       const { data: { session } } = await supabase.auth.getSession();
       const saveRes = await fetch(
-        `${supabaseUrl}/functions/v1/push-notifications?action=subscribe`,
+        `${supabaseUrl}/functions/v1/push-notifier?action=subscribe`,
         {
           method: 'POST',
           headers: {
@@ -106,7 +102,7 @@ export function usePushNotifications() {
         const { data: { session } } = await supabase.auth.getSession();
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         await fetch(
-          `${supabaseUrl}/functions/v1/push-notifications?action=unsubscribe`,
+          `${supabaseUrl}/functions/v1/push-notifier?action=unsubscribe`,
           {
             method: 'POST',
             headers: {
