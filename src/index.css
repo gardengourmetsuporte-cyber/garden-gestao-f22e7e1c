@@ -5,11 +5,71 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* =========================================================
-   DESIGN SYSTEM UNIFICADO - Garden Gestão
+   DESIGN SYSTEM - Garden Gestão (Premium Dark Mode)
    ========================================================= */
 
 @layer base {
   :root {
+    /* Dark mode as DEFAULT */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 40% 9%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 40% 10%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 222 30% 14%;
+    --secondary-foreground: 210 40% 85%;
+
+    --muted: 222 25% 15%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 222 30% 14%;
+    --accent-foreground: 210 40% 90%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 222 20% 16%;
+    --input: 222 25% 13%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.875rem;
+
+    /* Glow & Shadow tokens */
+    --glow-primary: 0 0 20px hsl(217 91% 60% / 0.15);
+    --glow-success: 0 0 20px hsl(142 71% 45% / 0.15);
+    --glow-destructive: 0 0 20px hsl(0 84% 60% / 0.15);
+    --glow-warning: 0 0 20px hsl(38 92% 50% / 0.15);
+
+    --shadow-card: 0 1px 3px hsl(222 47% 3% / 0.4), 0 4px 16px hsl(222 47% 3% / 0.2);
+    --shadow-card-hover: 0 4px 20px hsl(222 47% 3% / 0.5), 0 8px 32px hsl(222 47% 3% / 0.25);
+    --shadow-elevated: 0 8px 32px hsl(222 47% 3% / 0.6);
+
+    /* Coin animation tokens */
+    --coin-1: 190 90% 55%;
+    --coin-1-glow: 190 90% 55% / 0.9;
+    --coin-2: 45 96% 56%;
+    --coin-2-glow: 45 96% 56% / 0.9;
+    --coin-3: 328 92% 62%;
+    --coin-3-glow: 328 92% 62% / 0.9;
+    --coin-4: 262 92% 70%;
+    --coin-4-glow: 262 92% 70% / 0.9;
+  }
+
+  /* Light mode override (optional) */
+  .light {
     --background: 210 20% 98%;
     --foreground: 220 25% 10%;
 
@@ -43,54 +103,6 @@
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 220 70% 50%;
-
-    --radius: 1rem;
-
-    /* Coin animation tokens */
-    --coin-1: 190 90% 55%;
-    --coin-1-glow: 190 90% 55% / 0.9;
-    --coin-2: 45 96% 56%;
-    --coin-2-glow: 45 96% 56% / 0.9;
-    --coin-3: 328 92% 62%;
-    --coin-3-glow: 328 92% 62% / 0.9;
-    --coin-4: 262 92% 70%;
-    --coin-4-glow: 262 92% 70% / 0.9;
-  }
-
-  .dark {
-    --background: 220 25% 6%;
-    --foreground: 210 20% 98%;
-
-    --card: 220 25% 10%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 220 25% 10%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 220 70% 55%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 60%;
-
-    --accent: 220 20% 18%;
-    --accent-foreground: 210 20% 98%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 220 70% 55%;
   }
 }
 
@@ -118,39 +130,49 @@
 }
 
 /* =========================================================
-   COMPONENTES DO DESIGN SYSTEM
+   DESIGN SYSTEM COMPONENTS
    ========================================================= */
 
 @layer components {
-  /* Touch target padrão para mobile */
+  /* Touch target for mobile */
   .touch-target {
     @apply min-h-[48px] min-w-[48px];
   }
 
-  /* ========== CARDS UNIFICADOS ========== */
+  /* ========== CARDS ========== */
   
   .card-base {
-    @apply bg-card rounded-2xl border border-border shadow-sm;
+    @apply bg-card rounded-2xl border border-border/60 transition-all duration-200;
+    box-shadow: var(--shadow-card);
   }
 
   .card-interactive {
-    @apply bg-card rounded-2xl border border-border shadow-sm 
+    @apply bg-card rounded-2xl border border-border/60
            cursor-pointer transition-all duration-200
-           hover:shadow-md hover:border-primary/20
-           active:scale-[0.97];
+           hover:border-primary/20 active:scale-[0.97];
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-interactive:hover {
+    box-shadow: var(--shadow-card-hover);
   }
 
   .card-gradient {
     @apply rounded-2xl p-5 text-white transition-all duration-200
            border border-white/10
-           hover:scale-[1.01] hover:shadow-xl 
-           active:scale-[0.98];
+           hover:scale-[1.01] active:scale-[0.98];
+    box-shadow: var(--shadow-elevated);
   }
 
-  /* ========== HEADERS DE PÁGINA ========== */
+  .card-glow {
+    @apply bg-card rounded-2xl border border-border/40 transition-all duration-300;
+    box-shadow: var(--shadow-card), var(--glow-primary);
+  }
+
+  /* ========== PAGE HEADERS ========== */
   
   .page-header {
-    @apply bg-card/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-40;
+    @apply bg-card/60 backdrop-blur-xl border-b border-border/40 sticky top-0 z-40;
   }
 
   .page-header-content {
@@ -169,7 +191,7 @@
     @apply text-xs text-muted-foreground;
   }
 
-  /* ========== STATS E MÉTRICAS ========== */
+  /* ========== STATS & METRICS ========== */
 
   .stat-card {
     @apply card-interactive p-4;
@@ -187,18 +209,18 @@
     @apply text-sm font-medium text-muted-foreground;
   }
 
-  /* ========== LISTAS ========== */
+  /* ========== LISTS ========== */
 
   .list-item {
     @apply flex items-center justify-between p-3 rounded-xl 
-           bg-secondary/50 hover:bg-secondary transition-colors;
+           bg-secondary/50 hover:bg-secondary/80 transition-colors;
   }
 
   .list-item-interactive {
     @apply list-item cursor-pointer active:scale-[0.99];
   }
 
-  /* ========== BADGES DE STATUS ========== */
+  /* ========== STATUS BADGES ========== */
 
   .badge-status {
     @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
@@ -220,7 +242,7 @@
     @apply bg-primary/15 text-primary;
   }
 
-  /* ========== SEÇÕES ========== */
+  /* ========== SECTIONS ========== */
 
   .section-title {
     @apply text-base font-semibold text-foreground tracking-tight;
@@ -230,7 +252,7 @@
     @apply text-xs font-semibold text-muted-foreground uppercase tracking-wider;
   }
 
-  /* ========== BOTÕES DE AÇÃO ========== */
+  /* ========== ACTION BUTTONS ========== */
 
   .action-button {
     @apply touch-target flex items-center justify-center gap-2 
@@ -240,36 +262,41 @@
 
   .action-button-primary {
     @apply action-button bg-primary text-primary-foreground hover:bg-primary/90;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.25);
   }
 
   .action-button-success {
     @apply action-button bg-success text-success-foreground hover:bg-success/90;
+    box-shadow: 0 4px 14px hsl(142 71% 45% / 0.25);
   }
 
   .action-button-destructive {
     @apply action-button bg-destructive text-destructive-foreground hover:bg-destructive/90;
+    box-shadow: 0 4px 14px hsl(0 84% 60% / 0.25);
   }
 
   /* ========== INPUTS ========== */
 
   .input-large {
-    @apply h-14 text-lg px-4 rounded-xl border border-input bg-background;
+    @apply h-14 text-lg px-4 rounded-xl border border-input bg-input/50 
+           focus:ring-2 focus:ring-primary/30 focus:border-primary/50 
+           transition-all duration-200;
   }
 
-  /* ========== FLOATING ACTION BUTTON ========== */
+  /* ========== FAB ========== */
 
   .fab {
     @apply fixed bottom-6 right-6 w-14 h-14 
            rounded-2xl bg-primary text-primary-foreground 
-           shadow-lg shadow-primary/30
            flex items-center justify-center 
            z-50 active:scale-95 transition-transform;
+    box-shadow: 0 8px 24px hsl(217 91% 60% / 0.35);
   }
 
   /* ========== VIEW TOGGLES ========== */
 
   .view-toggle-group {
-    @apply flex gap-1 bg-secondary p-1 rounded-xl;
+    @apply flex gap-1 bg-secondary/60 p-1 rounded-xl;
   }
 
   .view-toggle-item {
@@ -278,34 +305,34 @@
   }
 
   .view-toggle-active {
-    @apply bg-card shadow-sm text-foreground;
+    @apply bg-card shadow-sm text-foreground border border-border/40;
   }
 
   .view-toggle-inactive {
     @apply text-muted-foreground hover:text-foreground;
   }
 
-  /* ========== ALERTAS ========== */
+  /* ========== ALERTS ========== */
 
   .alert-card {
     @apply card-base p-4 flex items-start gap-3;
   }
 
   .alert-warning {
-    @apply border-warning/30 bg-warning/5;
+    @apply border-warning/20 bg-warning/5;
   }
 
   .alert-error {
-    @apply border-destructive/30 bg-destructive/5;
+    @apply border-destructive/20 bg-destructive/5;
   }
 
   .alert-info {
-    @apply border-primary/30 bg-primary/5;
+    @apply border-primary/20 bg-primary/5;
   }
 }
 
 /* =========================================================
-   ANIMAÇÕES
+   ANIMATIONS
    ========================================================= */
 
 @layer utilities {
@@ -319,6 +346,10 @@
 
   .animate-scale-in {
     animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
   }
 
   @keyframes slideUp {
@@ -352,6 +383,15 @@
     }
   }
 
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow: var(--shadow-card);
+    }
+    50% {
+      box-shadow: var(--shadow-card), var(--glow-primary);
+    }
+  }
+
   /* Stagger animation delays */
   .stagger-1 { animation-delay: 0ms; }
   .stagger-2 { animation-delay: 60ms; }
@@ -361,4 +401,40 @@
   .stagger-6 { animation-delay: 300ms; }
   .stagger-7 { animation-delay: 360ms; }
   .stagger-8 { animation-delay: 420ms; }
+}
+
+/* =========================================================
+   GLOBAL OVERRIDES FOR DARK PREMIUM FEEL
+   ========================================================= */
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(222 20% 25%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(222 20% 35%);
+}
+
+/* Selection */
+::selection {
+  background: hsl(217 91% 60% / 0.3);
+  color: hsl(210 40% 96%);
+}
+
+/* Input focus glow */
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 2px hsl(217 91% 60% / 0.15);
 }
