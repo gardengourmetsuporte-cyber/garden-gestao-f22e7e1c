@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Trash2, Edit2, Tag } from 'lucide-react';
+import { Plus, Trash2, Edit2, Tag, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
+import { SortableList, DragHandle } from '@/components/ui/sortable-list';
+import { cn } from '@/lib/utils';
 
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
@@ -14,7 +16,7 @@ const colorOptions = [
 ];
 
 export function CategorySettings() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
+  const { categories, addCategory, updateCategory, deleteCategory, reorderCategories } = useCategories();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: string; name: string; color: string } | null>(null);
   const [name, setName] = useState('');
@@ -79,13 +81,20 @@ export function CategorySettings() {
         </Button>
       </div>
 
-      <div className="space-y-2">
-        {categories.map((category) => (
+      <SortableList
+        items={categories}
+        getItemId={(cat) => cat.id}
+        onReorder={reorderCategories}
+        className="space-y-2"
+        renderItem={(category, { isDragging, dragHandleProps }) => (
           <div
-            key={category.id}
-            className="flex items-center justify-between p-3 rounded-xl bg-secondary/50"
+            className={cn(
+              "flex items-center justify-between p-3 rounded-xl bg-secondary/50 transition-all",
+              isDragging && "shadow-lg ring-2 ring-primary/30 bg-card"
+            )}
           >
             <div className="flex items-center gap-3">
+              <DragHandle dragHandleProps={dragHandleProps} />
               <div
                 className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: category.color }}
@@ -107,13 +116,13 @@ export function CategorySettings() {
               </button>
             </div>
           </div>
-        ))}
-        {categories.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Nenhuma categoria cadastrada
-          </p>
         )}
-      </div>
+      />
+      {categories.length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-4">
+          Nenhuma categoria cadastrada
+        </p>
+      )}
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">

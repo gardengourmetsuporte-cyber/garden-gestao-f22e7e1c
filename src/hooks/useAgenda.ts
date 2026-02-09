@@ -203,6 +203,24 @@ export function useAgenda() {
     },
   });
 
+  // Reorder categories mutation
+  const reorderCategoriesMutation = useMutation({
+    mutationFn: async (reorderedCategories: TaskCategory[]) => {
+      const promises = reorderedCategories.map((cat, index) =>
+        supabase
+          .from('task_categories' as any)
+          .update({ sort_order: index } as any)
+          .eq('id', cat.id)
+      );
+      const results = await Promise.all(promises);
+      const error = results.find(r => r.error)?.error;
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task-categories'] });
+    },
+  });
+
   return {
     tasks,
     categories,
@@ -214,6 +232,7 @@ export function useAgenda() {
     addCategory: addCategoryMutation.mutate,
     deleteCategory: deleteCategoryMutation.mutate,
     reorderTasks: reorderTasksMutation.mutate,
+    reorderCategories: reorderCategoriesMutation.mutate,
     isAddingTask: addTaskMutation.isPending,
     isUpdatingTask: updateTaskMutation.isPending,
   };

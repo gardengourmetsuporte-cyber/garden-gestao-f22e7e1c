@@ -25,19 +25,20 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
  export default function Recipes() {
    const { isAdmin } = useAuth();
    const {
-     recipes,
-     categories,
-     inventoryItems,
-     isLoading,
-     addRecipe,
-     updateRecipe,
-     toggleActive,
-     duplicateRecipe,
-     deleteRecipe,
-     isAddingRecipe,
-     isUpdatingRecipe,
+    recipes,
+    categories,
+    inventoryItems,
+    isLoading,
+    addRecipe,
+    updateRecipe,
+    toggleActive,
+    duplicateRecipe,
+    deleteRecipe,
+    isAddingRecipe,
+    isUpdatingRecipe,
     getAvailableSubRecipes,
-   } = useRecipes();
+    reorderCategories,
+  } = useRecipes();
    
    const [search, setSearch] = useState('');
    const [sheetOpen, setSheetOpen] = useState(false);

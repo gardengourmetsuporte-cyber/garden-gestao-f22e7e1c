@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ListChecks, Plus, CheckCircle2, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { SortableList, DragHandle } from '@/components/ui/sortable-list';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,38 +15,6 @@ import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
 
 type ViewMode = 'list' | 'calendar';
-
-function SortableTaskItem({ 
-  task, 
-  onToggle, 
-  onDelete, 
-  onClick 
-}: { 
-  task: ManagerTask; 
-  onToggle: (id: string) => void; 
-  onDelete: (id: string) => void; 
-  onClick: () => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <TaskItem
-        task={task}
-        onToggle={onToggle}
-        onDelete={onDelete}
-        onClick={onClick}
-        isDragging={isDragging}
-        dragHandleProps={{ ...attributes, ...listeners }}
-      />
-    </div>
-  );
-}
 
 export default function Agenda() {
   const { isAdmin } = useAuth();
@@ -71,14 +37,10 @@ export default function Agenda() {
     addCategory,
     deleteCategory,
     reorderTasks,
+    reorderCategories,
     isAddingTask,
     isUpdatingTask,
   } = useAgenda();
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
 
   useEffect(() => {
     if (!isAdmin) {
@@ -103,26 +65,12 @@ export default function Agenda() {
   const pendingTasks = filteredTasks.filter(t => !t.is_completed);
   const completedTasks = filteredTasks.filter(t => t.is_completed);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (over && active.id !== over.id) {
-      const oldIndex = pendingTasks.findIndex(t => t.id === active.id);
-      const newIndex = pendingTasks.findIndex(t => t.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const reorderedTasks = arrayMove(pendingTasks, oldIndex, newIndex);
-        
-        // Create update array with new sort_order values
-        const updates = reorderedTasks.map((task, index) => ({
-          id: task.id,
-          sort_order: index
-        }));
-        
-        // Persist to database
-        reorderTasks(updates);
-      }
-    }
+  const handleReorderPendingTasks = (reorderedTasks: ManagerTask[]) => {
+    const updates = reorderedTasks.map((task, index) => ({
+      id: task.id,
+      sort_order: index
+    }));
+    reorderTasks(updates);
   };
 
   if (!isAdmin) return null;
@@ -190,6 +138,7 @@ export default function Agenda() {
             selectedCategoryId={selectedCategoryId}
             onSelectCategory={setSelectedCategoryId}
             onDeleteCategory={deleteCategory}
+            onReorderCategories={reorderCategories}
           />
         )}
 
@@ -230,19 +179,23 @@ export default function Agenda() {
                     </Button>
                   </div>
                 ) : (
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                      {pendingTasks.map(task => (
-                        <SortableTaskItem
-                          key={task.id}
-                          task={task}
-                          onToggle={toggleTask}
-                          onDelete={deleteTask}
-                          onClick={() => handleEditTask(task)}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
+                  <SortableList
+                    items={pendingTasks}
+                    getItemId={(t) => t.id}
+                    onReorder={handleReorderPendingTasks}
+                    className="space-y-2"
+                    renderItem={(task, { isDragging, dragHandleProps }) => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onToggle={toggleTask}
+                        onDelete={deleteTask}
+                        onClick={() => handleEditTask(task)}
+                        isDragging={isDragging}
+                        dragHandleProps={dragHandleProps}
+                      />
+                    )}
+                  />
                 )}
               </CollapsibleContent>
             </Collapsible>
