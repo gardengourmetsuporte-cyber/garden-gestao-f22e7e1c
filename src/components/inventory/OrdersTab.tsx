@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText } from 'lucide-react';
+import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, CheckCircle2 } from 'lucide-react';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -156,6 +156,16 @@ export function OrdersTab({
     }
   };
 
+  const [orderTab, setOrderTab] = useState<'pending' | 'done'>('pending');
+
+  const pendingOrders = useMemo(() => 
+    orders.filter(o => o.status === 'draft' || o.status === 'sent'), [orders]);
+  
+  const doneOrders = useMemo(() => 
+    orders.filter(o => o.status === 'received' || o.status === 'cancelled'), [orders]);
+
+  const displayOrders = orderTab === 'pending' ? pendingOrders : doneOrders;
+
   return (
     <div className="space-y-6">
       {/* Low Stock Summary by Supplier */}
@@ -226,101 +236,141 @@ export function OrdersTab({
         </div>
       )}
 
-      {/* Recent Orders */}
+      {/* Orders with Tabs */}
       {orders.length > 0 && (
         <div className="space-y-3">
-          <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            Pedidos Recentes
-          </h3>
+          <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+            <button
+              onClick={() => setOrderTab('pending')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all",
+                orderTab === 'pending'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Clock className="w-4 h-4" />
+              Pendentes
+              {pendingOrders.length > 0 && (
+                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary">
+                  {pendingOrders.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setOrderTab('done')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all",
+                orderTab === 'done'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              Concluídos
+              {doneOrders.length > 0 && (
+                <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-success/10 text-success">
+                  {doneOrders.length}
+                </span>
+              )}
+            </button>
+          </div>
 
-          {orders.slice(0, 10).map(order => (
-            <div key={order.id} className="bg-card rounded-xl border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="font-semibold text-foreground">{order.supplier?.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(order.created_at).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-                {getStatusBadge(order.status)}
-              </div>
-
-              <div className="text-sm text-muted-foreground mb-3">
-                {order.order_items?.map(oi => (
-                  <span key={oi.id} className="inline-block mr-2">
-                    {oi.item?.name} ({oi.quantity})
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex gap-2">
-                {order.status === 'draft' && (
-                  <>
-                    {hasValidWhatsApp(order.supplier?.phone || null) ? (
-                      <Button
-                        size="sm"
-                        onClick={() => handleSendWhatsApp(order)}
-                        className="gap-2 bg-green-600 hover:bg-green-700"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        Enviar WhatsApp
-                      </Button>
-                    ) : (
-                      <span className="text-xs text-warning flex items-center gap-1">
-                        <MessageCircle className="w-4 h-4" />
-                        Sem WhatsApp
-                      </span>
-                    )}
-                  </>
-                )}
-                {order.status === 'sent' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setOrderToReceive(order);
-                      setReceiveOrderOpen(true);
-                    }}
-                    className="gap-2 bg-success/10 hover:bg-success/20 text-success border-success/30"
-                  >
-                    <PackageCheck className="w-4 h-4" />
-                    Receber Pedido
-                  </Button>
-                )}
-                {order.status === 'received' && onRegisterInvoice && !order.supplier_invoice_id && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setOrderForInvoice(order);
-                      setInvoiceSheetOpen(true);
-                    }}
-                    className="gap-2 bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Cadastrar Despesa
-                  </Button>
-                )}
-                {order.status === 'received' && order.supplier_invoice_id && (
-                  <span className="text-xs text-success flex items-center gap-1">
-                    <FileText className="w-4 h-4" />
-                    Despesa cadastrada
-                  </span>
-                )}
-                {(order.status === 'draft' || order.status === 'sent' || order.status === 'received') && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onDeleteOrder(order.id)}
-                    className="gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
+          {displayOrders.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="text-sm">
+                {orderTab === 'pending' ? 'Nenhum pedido pendente' : 'Nenhum pedido concluído'}
+              </p>
             </div>
-          ))}
+          ) : (
+            displayOrders.map(order => (
+              <div key={order.id} className="bg-card rounded-xl border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-semibold text-foreground">{order.supplier?.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(order.created_at).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                  {getStatusBadge(order.status)}
+                </div>
+
+                <div className="text-sm text-muted-foreground mb-3">
+                  {order.order_items?.map(oi => (
+                    <span key={oi.id} className="inline-block mr-2">
+                      {oi.item?.name} ({oi.quantity})
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  {order.status === 'draft' && (
+                    <>
+                      {hasValidWhatsApp(order.supplier?.phone || null) ? (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSendWhatsApp(order)}
+                          className="gap-2 bg-green-600 hover:bg-green-700"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          Enviar WhatsApp
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-warning flex items-center gap-1">
+                          <MessageCircle className="w-4 h-4" />
+                          Sem WhatsApp
+                        </span>
+                      )}
+                    </>
+                  )}
+                  {order.status === 'sent' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setOrderToReceive(order);
+                        setReceiveOrderOpen(true);
+                      }}
+                      className="gap-2 bg-success/10 hover:bg-success/20 text-success border-success/30"
+                    >
+                      <PackageCheck className="w-4 h-4" />
+                      Receber Pedido
+                    </Button>
+                  )}
+                  {order.status === 'received' && onRegisterInvoice && !order.supplier_invoice_id && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setOrderForInvoice(order);
+                        setInvoiceSheetOpen(true);
+                      }}
+                      className="gap-2 bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Cadastrar Despesa
+                    </Button>
+                  )}
+                  {order.status === 'received' && order.supplier_invoice_id && (
+                    <span className="text-xs text-success flex items-center gap-1">
+                      <FileText className="w-4 h-4" />
+                      Despesa cadastrada
+                    </span>
+                  )}
+                  {(order.status === 'draft' || order.status === 'sent' || order.status === 'received') && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onDeleteOrder(order.id)}
+                      className="gap-2 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
