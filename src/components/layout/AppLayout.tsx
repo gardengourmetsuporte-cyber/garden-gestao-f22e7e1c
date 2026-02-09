@@ -1,12 +1,13 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X, User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users } from 'lucide-react';
+import { LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X, User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -36,6 +37,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { profile, isAdmin, signOut } = useAuth();
   const { isPulsing } = useCoinAnimation();
+  const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -146,6 +148,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
           {filteredNavItems.map(item => {
             const isActive = location.pathname === item.href;
+            const showBadge = item.href === '/' && unreadCount > 0;
             return (
               <Link
                 key={item.href}
@@ -158,7 +161,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground active:scale-[0.98]"
                 )}
               >
-                <item.icon className={cn("w-5 h-5 shrink-0", isActive && "text-primary")} />
+                <div className="relative">
+                  <item.icon className={cn("w-5 h-5 shrink-0", isActive && "text-primary")} />
+                  {showBadge && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </div>
                 <span className="flex-1">{item.label}</span>
                 {isActive && (
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />

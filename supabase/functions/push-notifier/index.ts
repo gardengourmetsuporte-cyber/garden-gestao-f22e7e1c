@@ -231,6 +231,31 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Send push to a specific user (triggered by DB webhook or internal call)
+    if (action === 'send-push') {
+      const body = await req.json();
+      const { user_id, title, message, url: targetUrl, tag } = body;
+      if (!user_id || !title) {
+        return new Response(JSON.stringify({ error: 'user_id and title required' }), { status: 400, headers: corsHeaders });
+      }
+      const config = await getConfig();
+      const { data: subs } = await supabaseAdmin.from('push_subscriptions').select('*').eq('user_id', user_id);
+      let sent = 0, failed = 0;
+      for (const s of (subs || [])) {
+        try {
+          const r = await sendPush(
+            { endpoint: s.endpoint, p256dh: s.p256dh, auth: s.auth },
+            JSON.stringify({ title, body: message || '', url: targetUrl || '/', tag: tag || 'notification' }),
+            config.vapid_public_key, config.vapid_private_key, config.vapid_subject
+          );
+          if (r.ok) sent++; else { failed++; if (r.status === 410 || r.status === 404) await supabaseAdmin.from('push_subscriptions').delete().eq('id', s.id); }
+        } catch { failed++; }
+      }
+      return new Response(JSON.stringify({ sent, failed }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (action === 'check-alerts') {
       const config = await getConfig();
       const { data: adminRoles } = await supabaseAdmin.from('user_roles').select('user_id').eq('role', 'admin');
