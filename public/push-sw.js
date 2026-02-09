@@ -1,6 +1,25 @@
-// Push notification handler for Service Worker
+// Push notification handler - imported by Workbox service worker
+// This file handles push events and notification clicks
+
 self.addEventListener('push', function(event) {
-  const data = event.data ? event.data.json() : {};
+  console.log('[Push-SW] Push event received!', event);
+  
+  let data = {};
+  try {
+    if (event.data) {
+      data = event.data.json();
+    }
+  } catch (e) {
+    console.error('[Push-SW] Error parsing push data:', e);
+    try {
+      data = { title: 'Garden Gestão', body: event.data ? event.data.text() : 'Nova notificação' };
+    } catch (e2) {
+      data = { title: 'Garden Gestão', body: 'Nova notificação' };
+    }
+  }
+  
+  console.log('[Push-SW] Push data:', JSON.stringify(data));
+  
   const title = data.title || 'Garden Gestão';
   const options = {
     body: data.body || '',
@@ -11,24 +30,42 @@ self.addEventListener('push', function(event) {
     tag: data.tag || 'default',
     renotify: true,
     requireInteraction: true,
+    actions: [
+      { action: 'open', title: 'Abrir' },
+      { action: 'close', title: 'Fechar' },
+    ],
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+      .then(function() {
+        console.log('[Push-SW] Notification shown successfully');
+      })
+      .catch(function(err) {
+        console.error('[Push-SW] Failed to show notification:', err);
+      })
+  );
 });
 
 self.addEventListener('notificationclick', function(event) {
+  console.log('[Push-SW] Notification clicked, action:', event.action);
   event.notification.close();
+  
+  if (event.action === 'close') return;
+  
   const url = event.notification.data?.url || '/';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      // Focus existing window if available
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           client.navigate(url);
           return client.focus();
         }
       }
-      // Open new window
       return clients.openWindow(url);
     })
   );
 });
+
+// Log that push-sw.js was loaded successfully
+console.log('[Push-SW] Push notification handler loaded successfully');
