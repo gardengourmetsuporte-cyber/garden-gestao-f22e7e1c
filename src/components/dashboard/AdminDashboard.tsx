@@ -4,6 +4,7 @@ import {
   Settings, AlertCircle, Receipt, Wallet, ChefHat, CalendarDays
 } from 'lucide-react';
 import { Leaderboard } from './Leaderboard';
+import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useOrders } from '@/hooks/useOrders';
@@ -157,6 +158,9 @@ export function AdminDashboard() {
           <p className="text-white/60 text-xs mt-1 capitalize">{currentDate}</p>
         </div>
       </div>
+
+      {/* Notifications */}
+      <NotificationCard />
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-2 gap-3">
