@@ -11,6 +11,7 @@ export function useCategories() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
+        .order('sort_order')
         .order('name');
 
       if (error) throw error;
@@ -27,16 +28,20 @@ export function useCategories() {
   }, [fetchCategories]);
 
   const addCategory = useCallback(async (name: string, color: string, icon: string) => {
+    const maxOrder = categories.length > 0 
+      ? Math.max(...categories.map(c => c.sort_order ?? 0)) + 1 
+      : 0;
+
     const { data, error } = await supabase
       .from('categories')
-      .insert({ name, color, icon })
+      .insert({ name, color, icon, sort_order: maxOrder })
       .select()
       .single();
 
     if (error) throw error;
-    setCategories(prev => [...prev, data as Category].sort((a, b) => a.name.localeCompare(b.name)));
+    setCategories(prev => [...prev, data as Category]);
     return data as Category;
-  }, []);
+  }, [categories]);
 
   const updateCategory = useCallback(async (id: string, updates: Partial<Category>) => {
     const { error } = await supabase
@@ -58,12 +63,32 @@ export function useCategories() {
     setCategories(prev => prev.filter(cat => cat.id !== id));
   }, []);
 
+  const reorderCategories = useCallback(async (reorderedCategories: Category[]) => {
+    // Optimistic update
+    setCategories(reorderedCategories);
+
+    const promises = reorderedCategories.map((cat, index) =>
+      supabase
+        .from('categories')
+        .update({ sort_order: index })
+        .eq('id', cat.id)
+    );
+
+    const results = await Promise.all(promises);
+    const error = results.find(r => r.error)?.error;
+    if (error) {
+      // Revert on error
+      await fetchCategories();
+    }
+  }, [fetchCategories]);
+
   return {
     categories,
     isLoading,
     addCategory,
     updateCategory,
     deleteCategory,
+    reorderCategories,
     refetch: fetchCategories,
   };
 }

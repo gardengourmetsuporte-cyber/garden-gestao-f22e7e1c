@@ -374,26 +374,45 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
        
        if (error) throw error;
      },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
-       toast({ title: 'Categoria criada com sucesso!' });
-     },
-   });
- 
-   return {
-     recipes,
-     categories,
-     inventoryItems,
-     isLoading: recipesLoading || categoriesLoading,
-     addRecipe: addRecipeMutation.mutateAsync,
-     updateRecipe: updateRecipeMutation.mutateAsync,
-     toggleActive: toggleActiveMutation.mutate,
-     duplicateRecipe: duplicateRecipeMutation.mutate,
-     deleteRecipe: deleteRecipeMutation.mutate,
-     addCategory: addCategoryMutation.mutateAsync,
-     isAddingRecipe: addRecipeMutation.isPending,
-     isUpdatingRecipe: updateRecipeMutation.isPending,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
+      toast({ title: 'Categoria criada com sucesso!' });
+    },
+  });
+
+  // Reorder recipe categories mutation
+  const reorderCategoriesMutation = useMutation({
+    mutationFn: async (reorderedCategories: RecipeCategory[]) => {
+      const promises = reorderedCategories.map((cat, index) =>
+        supabase
+          .from('recipe_categories')
+          .update({ sort_order: index })
+          .eq('id', cat.id)
+      );
+      const results = await Promise.all(promises);
+      const error = results.find(r => r.error)?.error;
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
+    },
+  });
+
+  return {
+    recipes,
+    categories,
+    inventoryItems,
+    isLoading: recipesLoading || categoriesLoading,
+    addRecipe: addRecipeMutation.mutateAsync,
+    updateRecipe: updateRecipeMutation.mutateAsync,
+    toggleActive: toggleActiveMutation.mutate,
+    duplicateRecipe: duplicateRecipeMutation.mutate,
+    deleteRecipe: deleteRecipeMutation.mutate,
+    addCategory: addCategoryMutation.mutateAsync,
+    reorderCategories: reorderCategoriesMutation.mutate,
+    isAddingRecipe: addRecipeMutation.isPending,
+    isUpdatingRecipe: updateRecipeMutation.isPending,
     getAvailableSubRecipes,
     hasCircularDependency,
-   };
- }
+  };
+}

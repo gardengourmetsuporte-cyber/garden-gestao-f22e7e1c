@@ -254,8 +254,14 @@ export default function InventoryPage() {
     filteredByCategory[categoryName].push(item);
   });
 
-  // Sort categories alphabetically
-  const sortedCategories = Object.keys(filteredByCategory).sort();
+  // Sort categories by sort_order (from useCategories)
+  const sortedCategories = Object.keys(filteredByCategory).sort((a, b) => {
+    const catA = categories.find(c => c.name === a);
+    const catB = categories.find(c => c.name === b);
+    const orderA = catA?.sort_order ?? 999;
+    const orderB = catB?.sort_order ?? 999;
+    return orderA - orderB;
+  });
 
   // Count items needing orders
   const itemsNeedingOrder = items.filter(i => i.current_stock <= i.min_stock).length;

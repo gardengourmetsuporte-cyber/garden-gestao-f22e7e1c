@@ -13,6 +13,7 @@ import { getLucideIcon } from '@/lib/icons';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { SortableList, DragHandle } from '@/components/ui/sortable-list';
 
 interface CategoryManagementProps {
   open: boolean;
@@ -245,13 +246,30 @@ export function CategoryManagement({
                 </TabsList>
               </Tabs>
 
-              {/* List of categories */}
-              <div className="space-y-2">
-                {filteredCategories.map(category => {
+              {/* List of categories with DnD */}
+              <SortableList
+                items={filteredCategories}
+                getItemId={(cat) => cat.id}
+                onReorder={async (reordered) => {
+                  const promises = reordered.map((cat, index) =>
+                    supabase
+                      .from('finance_categories')
+                      .update({ sort_order: index })
+                      .eq('id', cat.id)
+                  );
+                  await Promise.all(promises);
+                  await onRefresh();
+                }}
+                className="space-y-2"
+                renderItem={(category, { isDragging, dragHandleProps }) => {
                   const CatIcon = getLucideIcon(category.icon);
                   return (
                     <div key={category.id}>
-                      <div className="flex items-center gap-3 p-3 bg-card border rounded-xl">
+                      <div className={cn(
+                        "flex items-center gap-3 p-3 bg-card border rounded-xl transition-all",
+                        isDragging && "shadow-lg ring-2 ring-primary/30"
+                      )}>
+                        <DragHandle dragHandleProps={dragHandleProps} />
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center"
                           style={{ backgroundColor: category.color + '20' }}
@@ -311,8 +329,8 @@ export function CategoryManagement({
                       )}
                     </div>
                   );
-                })}
-              </div>
+                }}
+              />
 
               {/* Add button */}
               <Button 
