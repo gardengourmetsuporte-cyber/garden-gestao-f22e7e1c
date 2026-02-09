@@ -352,6 +352,47 @@ export function TransactionSheet({
               </TabsList>
             </Tabs>
 
+            {/* Description - first field for quick autocomplete */}
+            <div className="space-y-2">
+              <Label>Descrição</Label>
+              <div className="relative">
+                <Input
+                  ref={descriptionInputRef}
+                  value={description}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    setShowSuggestions(e.target.value.length >= 2);
+                  }}
+                  onFocus={() => setShowSuggestions(description.length >= 2)}
+                  onBlur={() => {
+                    // Delay to allow click on suggestion
+                    setTimeout(() => setShowSuggestions(false), 200);
+                  }}
+                  placeholder="Ex: Compra de carnes"
+                  className="h-12"
+                  autoComplete="off"
+                />
+                {showSuggestions && !editingTransaction && (
+                  <TransactionSuggestions
+                    searchTerm={description}
+                    transactions={allTransactions}
+                    categories={categories}
+                    accounts={accounts}
+                    onSelect={(suggestion) => {
+                      setDescription(suggestion.description);
+                      if (suggestion.category) {
+                        setCategoryId(suggestion.category.id);
+                      }
+                      if (suggestion.account) {
+                        setAccountId(suggestion.account.id);
+                      }
+                      setShowSuggestions(false);
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+
             {/* Amount */}
             <div className="space-y-2">
               <Label>Valor</Label>
@@ -462,47 +503,6 @@ export function TransactionSheet({
                 </select>
               </div>
             )}
-
-            {/* Description */}
-            <div className="space-y-2">
-              <Label>Descrição</Label>
-              <div className="relative">
-                <Input
-                  ref={descriptionInputRef}
-                  value={description}
-                  onChange={(e) => {
-                    setDescription(e.target.value);
-                    setShowSuggestions(e.target.value.length >= 2);
-                  }}
-                  onFocus={() => setShowSuggestions(description.length >= 2)}
-                  onBlur={() => {
-                    // Delay to allow click on suggestion
-                    setTimeout(() => setShowSuggestions(false), 200);
-                  }}
-                  placeholder="Ex: Compra de carnes"
-                  className="h-12"
-                  autoComplete="off"
-                />
-                {showSuggestions && !editingTransaction && (
-                  <TransactionSuggestions
-                    searchTerm={description}
-                    transactions={allTransactions}
-                    categories={categories}
-                    accounts={accounts}
-                    onSelect={(suggestion) => {
-                      setDescription(suggestion.description);
-                      if (suggestion.category) {
-                        setCategoryId(suggestion.category.id);
-                      }
-                      if (suggestion.account) {
-                        setAccountId(suggestion.account.id);
-                      }
-                      setShowSuggestions(false);
-                    }}
-                  />
-                )}
-              </div>
-            </div>
 
             {/* Advanced options */}
               <div className="space-y-4 pt-4 border-t">
