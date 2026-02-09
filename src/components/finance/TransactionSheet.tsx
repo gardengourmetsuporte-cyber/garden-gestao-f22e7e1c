@@ -20,7 +20,7 @@ import {
   TransactionFormData,
   FinanceTransaction
 } from '@/types/finance';
-import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay } from 'date-fns';
+import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, ChevronDown, ChevronUp, Loader2, Trash2, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -101,7 +101,9 @@ export function TransactionSheet({
         setCategoryId(editingTransaction.category_id);
         setAccountId(editingTransaction.account_id);
         setToAccountId(editingTransaction.to_account_id);
-        setDate(new Date(editingTransaction.date));
+        // Parse date string as local date (not UTC) to avoid timezone shift
+        const [year, month, day] = editingTransaction.date.split('-').map(Number);
+        setDate(new Date(year, month - 1, day));
         setIsPaid(editingTransaction.is_paid);
         setIsFixed(editingTransaction.is_fixed);
         setIsRecurring(editingTransaction.is_recurring);
