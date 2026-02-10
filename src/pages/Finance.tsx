@@ -40,6 +40,7 @@ export default function Finance() {
     deleteAccount,
     updateRecurringTransaction,
     reorderTransactions,
+    updateTransactionDate,
     refetch
   } = useFinance(selectedMonth);
 
@@ -78,7 +79,7 @@ export default function Finance() {
   };
 
   const handleUpdateTransactionDate = async (id: string, newDate: string) => {
-    await updateTransaction(id, { date: newDate });
+    await updateTransactionDate(id, newDate);
   };
 
   const handleRefreshCategories = async () => {

@@ -419,6 +419,25 @@ export function useFinance(selectedMonth: Date) {
     );
   }, []);
 
+  const updateTransactionDate = useCallback(async (id: string, newDate: string) => {
+    // Optimistic update - move the transaction to the new date locally
+    setTransactions(prev => {
+      return prev.map(t => t.id === id ? { ...t, date: newDate } : t);
+    });
+
+    // Persist to DB
+    const { error } = await supabase
+      .from('finance_transactions')
+      .update({ date: newDate })
+      .eq('id', id);
+
+    if (error) {
+      toast.error('Erro ao mover transação');
+      // Revert on error
+      await fetchTransactions();
+    }
+  }, [fetchTransactions]);
+
   return {
     accounts,
     categories,
@@ -436,6 +455,7 @@ export function useFinance(selectedMonth: Date) {
     deleteAccount,
     updateRecurringTransaction,
     reorderTransactions,
+    updateTransactionDate,
     refetch: () => Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]),
   };
 }
