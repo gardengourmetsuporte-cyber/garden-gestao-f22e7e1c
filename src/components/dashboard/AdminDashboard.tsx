@@ -22,31 +22,31 @@ interface MetricCardProps {
   value: string;
   icon: React.ElementType;
   onClick: () => void;
-  gradient: string;
+  variant: string;
   subtitle?: string;
   index: number;
 }
 
-function MetricCard({ title, value, icon: Icon, onClick, gradient, subtitle, index }: MetricCardProps) {
+function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, index }: MetricCardProps) {
   return (
     <div
       onClick={onClick}
       className={cn(
-        "card-gradient group cursor-pointer animate-slide-up p-4",
-        gradient,
+        "stat-command group cursor-pointer animate-slide-up p-4",
+        variant,
         `stagger-${index + 1}`
       )}
     >
       <div className="flex items-start justify-between">
-        <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <Icon className="w-5 h-5" />
+        <div className="w-10 h-10 rounded-xl bg-card/80 backdrop-blur-sm flex items-center justify-center border border-border/30">
+          <Icon className="w-5 h-5 text-foreground" />
         </div>
-        <ArrowUpRight className="w-4 h-4 opacity-50 group-active:opacity-100 transition-opacity" />
+        <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
       </div>
       <div className="mt-3">
-        <p className="text-2xl font-bold tracking-tight">{value}</p>
-        <p className="text-white/80 text-xs font-medium mt-0.5">{title}</p>
-        {subtitle && <p className="text-white/50 text-[10px] mt-0.5">{subtitle}</p>}
+        <p className="text-2xl font-bold tracking-tight text-foreground">{value}</p>
+        <p className="text-muted-foreground text-xs font-medium mt-0.5">{title}</p>
+        {subtitle && <p className="text-muted-foreground/60 text-[10px] mt-0.5">{subtitle}</p>}
       </div>
     </div>
   );
@@ -67,12 +67,12 @@ function QuickAccessCard({ title, subtitle, icon: Icon, onClick, iconBg, iconCol
     <div
       onClick={onClick}
       className={cn(
-        "card-interactive p-4 flex flex-col items-center text-center animate-slide-up",
+        "card-command-info p-4 flex flex-col items-center text-center animate-slide-up cursor-pointer hover:scale-[1.02] active:scale-[0.97] transition-all",
         `stagger-${index + 1}`
       )}
     >
       <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-2", iconBg)}>
-        <Icon className={cn("w-5 h-5", iconColor)} />
+        <Icon className={cn("w-6 h-6", iconColor)} />
       </div>
       <p className="font-semibold text-sm text-foreground">{title}</p>
       <p className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</p>
@@ -94,10 +94,19 @@ function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
     info: 'text-primary bg-primary/10',
   };
 
+  const borderColor = {
+    error: 'border-l-destructive/50',
+    warning: 'border-l-warning/50',
+    info: 'border-l-primary/50',
+  };
+
   return (
     <div 
       onClick={onClick}
-      className="flex items-center justify-between py-2 px-2 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors active:scale-[0.98] group"
+      className={cn(
+        "flex items-center justify-between py-2 px-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors active:scale-[0.98] group border-l-2",
+        borderColor[severity]
+      )}
     >
       <div className="flex items-center gap-2.5">
         <AlertCircle className={cn("w-4 h-4", severity === 'error' ? 'text-destructive' : severity === 'warning' ? 'text-warning' : 'text-primary')} />
@@ -151,11 +160,11 @@ export function AdminDashboard() {
     <div className="space-y-5 p-4 lg:p-6">
       {/* Welcome Header */}
       <div className="animate-slide-up stagger-1">
-        <div className="card-gradient bg-gradient-to-br from-primary/90 via-primary to-blue-700 p-5">
-          <h2 className="text-xl font-bold">
+        <div className="card-command p-5">
+          <h2 className="text-xl font-bold text-foreground">
             Olá, {profile?.full_name?.split(' ')[0] || 'Admin'}! 👋
           </h2>
-          <p className="text-white/60 text-xs mt-1 capitalize">{currentDate}</p>
+          <p className="text-muted-foreground text-xs mt-1 capitalize">{currentDate}</p>
         </div>
       </div>
 
@@ -168,7 +177,7 @@ export function AdminDashboard() {
           title="Saldo do Mês"
           value={formatCurrency(animatedBalance)}
           icon={Wallet}
-          gradient={monthStats.balance >= 0 ? "bg-gradient-to-br from-emerald-600 to-emerald-800" : "bg-gradient-to-br from-red-600 to-red-800"}
+          variant={monthStats.balance >= 0 ? "stat-command-green" : "stat-command-red"}
           onClick={() => navigate('/finance')}
           subtitle={monthStats.balance >= 0 ? 'positivo' : 'negativo'}
           index={0}
@@ -177,7 +186,7 @@ export function AdminDashboard() {
           title="Pedidos Pendentes"
           value={String(animatedOrders)}
           icon={ShoppingCart}
-          gradient="bg-gradient-to-br from-amber-600 to-amber-800"
+          variant="stat-command-amber"
           onClick={() => navigate('/inventory', { state: { activeTab: 'orders' } })}
           subtitle={pendingOrders > 0 ? 'aguardando' : 'nenhum'}
           index={1}
@@ -186,7 +195,7 @@ export function AdminDashboard() {
           title="Fichas Técnicas"
           value={String(animatedRecipes)}
           icon={ChefHat}
-          gradient="bg-gradient-to-br from-violet-600 to-violet-800"
+          variant="stat-command-purple"
           onClick={() => navigate('/recipes')}
           subtitle="cadastradas"
           index={2}
@@ -195,7 +204,7 @@ export function AdminDashboard() {
           title="Estoque Crítico"
           value={String(animatedCritical)}
           icon={AlertTriangle}
-          gradient="bg-gradient-to-br from-rose-600 to-rose-800"
+          variant="stat-command-red"
           onClick={() => navigate('/inventory', { state: { stockFilter: 'critical' } })}
           subtitle={criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
           index={3}
@@ -204,29 +213,27 @@ export function AdminDashboard() {
 
       {/* Alerts Section */}
       {hasAlerts && (
-        <div className="alert-card alert-warning animate-slide-up stagger-5">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="w-4 h-4 text-warning" />
-              <h3 className="font-semibold text-sm text-foreground">Ações Pendentes</h3>
-            </div>
-            <div className="space-y-0.5">
-              {outOfStockItems.length > 0 && (
-                <AlertItem message="Itens zerados no estoque" count={outOfStockItems.length} severity="error" onClick={() => navigate('/inventory', { state: { stockFilter: 'zero' } })} />
-              )}
-              {lowStockItems.length > 0 && (
-                <AlertItem message="Itens com estoque baixo" count={lowStockItems.length} severity="warning" onClick={() => navigate('/inventory', { state: { stockFilter: 'low' } })} />
-              )}
-              {pendingRedemptions > 0 && (
-                <AlertItem message="Resgates aguardando" count={pendingRedemptions} severity="info" onClick={() => navigate('/rewards')} />
-              )}
-              {pendingClosings > 0 && (
-                <AlertItem message="Fechamentos pendentes" count={pendingClosings} severity="warning" onClick={() => navigate('/cash-closing')} />
-              )}
-              {pendingExpenses > 0 && (
-                <AlertItem message="Despesas a pagar" count={Math.round(pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
-              )}
-            </div>
+        <div className="card-command-warning p-4 animate-slide-up stagger-5">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-4 h-4 text-warning" />
+            <h3 className="font-semibold text-sm text-foreground">Ações Pendentes</h3>
+          </div>
+          <div className="space-y-1">
+            {outOfStockItems.length > 0 && (
+              <AlertItem message="Itens zerados no estoque" count={outOfStockItems.length} severity="error" onClick={() => navigate('/inventory', { state: { stockFilter: 'zero' } })} />
+            )}
+            {lowStockItems.length > 0 && (
+              <AlertItem message="Itens com estoque baixo" count={lowStockItems.length} severity="warning" onClick={() => navigate('/inventory', { state: { stockFilter: 'low' } })} />
+            )}
+            {pendingRedemptions > 0 && (
+              <AlertItem message="Resgates aguardando" count={pendingRedemptions} severity="info" onClick={() => navigate('/rewards')} />
+            )}
+            {pendingClosings > 0 && (
+              <AlertItem message="Fechamentos pendentes" count={pendingClosings} severity="warning" onClick={() => navigate('/cash-closing')} />
+            )}
+            {pendingExpenses > 0 && (
+              <AlertItem message="Despesas a pagar" count={Math.round(pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
+            )}
           </div>
         </div>
       )}
@@ -235,13 +242,13 @@ export function AdminDashboard() {
       <div>
         <h3 className="section-label mb-2">Acesso Rápido</h3>
         <div className="grid grid-cols-3 gap-2.5">
-          <QuickAccessCard title="Financeiro" subtitle="Receitas e despesas" icon={Wallet} iconBg="bg-emerald-500/10" iconColor="text-emerald-600" onClick={() => navigate('/finance')} index={0} />
-          <QuickAccessCard title="Fichas" subtitle={`${recipes.length} receitas`} icon={ChefHat} iconBg="bg-purple-500/10" iconColor="text-purple-600" onClick={() => navigate('/recipes')} index={1} />
-          <QuickAccessCard title="Agenda" subtitle="Tarefas" icon={CalendarDays} iconBg="bg-blue-500/10" iconColor="text-blue-600" onClick={() => navigate('/agenda')} index={2} />
+          <QuickAccessCard title="Financeiro" subtitle="Receitas e despesas" icon={Wallet} iconBg="bg-success/10" iconColor="text-success" onClick={() => navigate('/finance')} index={0} />
+          <QuickAccessCard title="Fichas" subtitle={`${recipes.length} receitas`} icon={ChefHat} iconBg="bg-purple-500/10" iconColor="text-purple-500" onClick={() => navigate('/recipes')} index={1} />
+          <QuickAccessCard title="Agenda" subtitle="Tarefas" icon={CalendarDays} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/agenda')} index={2} />
           <QuickAccessCard title="Estoque" subtitle={`${items.length} itens`} icon={Package} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/inventory')} index={3} />
           <QuickAccessCard title="Checklists" subtitle="Tarefas diárias" icon={ClipboardCheck} iconBg="bg-success/10" iconColor="text-success" onClick={() => navigate('/checklists')} index={4} />
-          <QuickAccessCard title="Fechamento" subtitle={pendingClosings > 0 ? `${pendingClosings} pendentes` : 'Caixas'} icon={Receipt} iconBg="bg-cyan-500/10" iconColor="text-cyan-600" onClick={() => navigate('/cash-closing')} index={5} />
-          <QuickAccessCard title="Recompensas" subtitle={pendingRedemptions > 0 ? `${pendingRedemptions} pendentes` : 'Prêmios'} icon={Gift} iconBg="bg-amber-500/10" iconColor="text-amber-500" onClick={() => navigate('/rewards')} index={6} />
+          <QuickAccessCard title="Fechamento" subtitle={pendingClosings > 0 ? `${pendingClosings} pendentes` : 'Caixas'} icon={Receipt} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/cash-closing')} index={5} />
+          <QuickAccessCard title="Recompensas" subtitle={pendingRedemptions > 0 ? `${pendingRedemptions} pendentes` : 'Prêmios'} icon={Gift} iconBg="bg-warning/10" iconColor="text-warning" onClick={() => navigate('/rewards')} index={6} />
           <QuickAccessCard title="Config." subtitle={`${users.length} usuários`} icon={Settings} iconBg="bg-secondary" iconColor="text-secondary-foreground" onClick={() => navigate('/settings')} index={7} />
         </div>
       </div>

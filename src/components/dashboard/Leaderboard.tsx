@@ -22,18 +22,18 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
     }
   };
 
-  const getRankBg = (rank: number) => {
+  const getRankBorder = (rank: number) => {
     switch (rank) {
-      case 1: return 'bg-gradient-to-r from-amber-500/10 to-transparent border-amber-500/20';
-      case 2: return 'bg-gradient-to-r from-gray-400/10 to-transparent border-gray-400/20';
-      case 3: return 'bg-gradient-to-r from-amber-700/10 to-transparent border-amber-700/20';
-      default: return 'bg-card';
+      case 1: return 'border-l-amber-500/60';
+      case 2: return 'border-l-gray-400/60';
+      case 3: return 'border-l-amber-700/60';
+      default: return 'border-l-border/30';
     }
   };
 
   if (isLoading) {
     return (
-      <div className="card-base p-4">
+      <div className="card-command p-4">
         <div className="flex items-center gap-2 mb-3">
           <Trophy className="w-4 h-4 text-amber-500" />
           <h3 className="font-semibold text-sm text-foreground">Ranking de Pontos</h3>
@@ -48,16 +48,16 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
   }
 
   return (
-    <div className="card-base p-4">
+    <div className="card-command p-4">
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="w-4 h-4 text-amber-500" />
         <h3 className="font-semibold text-sm text-foreground">Ranking de Pontos</h3>
       </div>
       <div className="space-y-1.5">
         {displayEntries.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground">
-            <Trophy className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">Nenhum ponto registrado</p>
+          <div className="empty-state py-6">
+            <Trophy className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
+            <p className="text-sm text-muted-foreground">Nenhum ponto registrado</p>
           </div>
         ) : (
           displayEntries.map((entry, idx) => {
@@ -66,9 +66,9 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
               <div
                 key={entry.user_id}
                 className={cn(
-                  "flex items-center gap-2.5 p-2.5 rounded-xl border transition-all animate-slide-up",
-                  getRankBg(entry.rank),
-                  isCurrentUser && "ring-2 ring-primary/30 ring-offset-1",
+                  "list-command flex items-center gap-2.5 p-2.5 border-l-3 animate-slide-up",
+                  getRankBorder(entry.rank),
+                  isCurrentUser && "ring-1 ring-primary/30",
                   `stagger-${Math.min(idx + 1, 8)}`
                 )}
               >

@@ -29,12 +29,15 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
   const categoryColor = item.category?.color || '#6b7280';
 
   return (
-    <div className="card-interactive p-4 w-full animate-slide-up">
+    <div 
+      className="list-command w-full animate-slide-up"
+      style={{ borderLeftColor: categoryColor }}
+    >
       <div className="flex items-center gap-3">
         {/* Category Color Indicator */}
         <div 
           className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-          style={{ backgroundColor: `${categoryColor}20` }}
+          style={{ backgroundColor: `${categoryColor}15` }}
         >
           <Package 
             className="w-6 h-6"
