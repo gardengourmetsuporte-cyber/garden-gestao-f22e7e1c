@@ -1,75 +1,191 @@
 
 
-# Plano: Vincular Funcionarios e Fornecedores nas Transacoes + Drill-down Natural nos Graficos
+# Refatoracao Visual: "Dark Command Center"
 
-## Resumo
+Refatoracao puramente visual/UX de todo o aplicativo, mantendo 100% das funcionalidades, dados e logica de negocio intactos. Inspirado na referencia enviada (estilo central de controle com bordas neon e cards assimetricos).
 
-O fluxo atual exige clicar em uma categoria e depois clicar em botoes extras ("Ver por Funcionario" / "Ver por Fornecedor"). A proposta e tornar isso natural: ao clicar em "Salarios" no grafico, o sistema mostra automaticamente o detalhamento por funcionario. Para isso funcionar, precisamos que as transacoes tenham vinculo direto com funcionarios e fornecedores.
+---
 
-## O que muda
+## Fase 1: Design System (Base CSS + Tokens)
 
-### 1. Banco de dados
-- Adicionar coluna `employee_id` (uuid, nullable, FK para `employees`) na tabela `finance_transactions`
-- Isso permite vincular qualquer transacao diretamente a um funcionario, similar ao que ja existe com `supplier_id`
+**Arquivo: `src/index.css`**
 
-### 2. Formulario de Transacao (TransactionSheet)
-- Adicionar campo **"Fornecedor"** (select) -- visivel apenas para despesas
-- Adicionar campo **"Funcionario"** (select) -- visivel apenas para despesas
-- Ambos sao opcionais e aparecem na secao de opcoes avancadas
-- Os fornecedores vem do cadastro existente (`useSuppliers`)
-- Os funcionarios vem do cadastro existente (`employees`)
-- O `TransactionSheet` recebe as listas de fornecedores e funcionarios como props
+- Ajustar tokens de cor para fundo mais profundo (preto azulado mais intenso)
+- Adicionar tokens de glow neon (cyan, verde, vermelho, amarelo) para bordas dos cards
+- Criar novas classes utilitarias:
+  - `.card-command` -- card principal com borda gradient neon (estilo da referencia)
+  - `.card-command-success` -- borda verde sutil
+  - `.card-command-danger` -- borda vermelha sutil
+  - `.card-command-warning` -- borda amarela/laranja sutil
+  - `.card-command-info` -- borda cyan/azul sutil
+- Glassmorphism mais pronunciado nos cards (bg mais translucido, blur mais forte)
+- Atualizar sombras para glows coloridos sutis
 
-### 3. Graficos com drill-down automatico
-- Remover os botoes "Ver por Funcionario" e "Ver por Fornecedor"
-- Ao clicar em uma categoria (ex: "Folha de Pagamento"), o sistema:
-  - Mostra subcategorias (como ja faz)
-  - Detecta automaticamente se ha transacoes com `employee_id` ou `supplier_id` vinculados
-  - Se houver, exibe o detalhamento por entidade diretamente (sem botao extra)
-- Ao clicar em "Materia-prima", mostra direto o detalhamento por fornecedor
-- Ao clicar em "Salarios", mostra direto o detalhamento por funcionario
+**Arquivo: `tailwind.config.ts`**
+- Adicionar animacao `glow-border` para pulso sutil nas bordas neon
+- Adicionar cores de glow neon nos tokens
 
-### 4. Integracao com modulo de Funcionarios
-- O modulo de funcionarios ja cria transacoes financeiras ao confirmar pagamentos (via `finance_transaction_id` na tabela `employee_payments`)
-- Atualizar essa logica para tambem preencher o `employee_id` na transacao criada, garantindo que pagamentos feitos pelo modulo de funcionarios ja aparecam corretamente nos graficos
+---
 
-## Detalhes Tecnicos
+## Fase 2: Header Mobile e Sidebar
 
-### Migracao SQL
-```sql
-ALTER TABLE public.finance_transactions
-ADD COLUMN employee_id uuid REFERENCES public.employees(id) ON DELETE SET NULL;
-```
+**Arquivo: `src/components/layout/AppLayout.tsx`**
 
-### Arquivos modificados
-- **`src/components/finance/TransactionSheet.tsx`** -- adicionar selects de fornecedor e funcionario
-- **`src/types/finance.ts`** -- adicionar `employee_id` ao tipo `FinanceTransaction` e `TransactionFormData`
-- **`src/hooks/useFinance.ts`** -- incluir join com `employees` na query e salvar `employee_id`/`supplier_id`
-- **`src/hooks/useFinanceStats.ts`** -- simplificar `getEmployeeStats` para usar `employee_id` direto da transacao (sem query extra)
-- **`src/components/finance/FinanceCharts.tsx`** -- remover botoes de entidade, implementar deteccao automatica no drill-down
-- **`src/pages/Finance.tsx`** -- passar listas de fornecedores e funcionarios para o `TransactionSheet`
-- **`src/hooks/useEmployees.ts`** (ou equivalente) -- garantir que ao confirmar pagamento, o `employee_id` seja salvo na transacao financeira
+Header mobile:
+- Transformar em "barra de status" com informacoes contextuais
+- Mostrar nome do usuario, badge admin, e icone de notificacoes com contador
+- Visual mais denso e informativo (menos "vazio")
+- Borda inferior com glow sutil
 
-### Fluxo do drill-down simplificado
-```text
-Grafico de Pizza (categorias)
-  |
-  +-- Clica em "Folha de Pagamento"
-  |     |
-  |     +-- Mostra subcategorias (Salarios, FGTS, etc.)
-  |     |     |
-  |     |     +-- Clica em "Salarios"
-  |     |           |
-  |     |           +-- Detecta employee_id nas transacoes
-  |     |           +-- Mostra detalhamento por funcionario automaticamente
-  |
-  +-- Clica em "Materia-prima"
-        |
-        +-- Mostra subcategorias (Carnes, Bebidas, etc.)
-              |
-              +-- Clica em "Carnes"
-                    |
-                    +-- Detecta supplier_id nas transacoes
-                    +-- Mostra detalhamento por fornecedor automaticamente
-```
+Sidebar:
+- Icones maiores (w-6 h-6 em vez de w-5 h-5)
+- Item ativo com borda lateral luminosa (borda esquerda neon azul) em vez de apenas fundo
+- Separadores visuais entre grupos de modulos
+- Avatar com anel luminoso
+- Badges de alerta nos itens relevantes (estoque critico, pendencias)
+
+---
+
+## Fase 3: Finance Home (Referencia principal)
+
+**Arquivo: `src/components/finance/FinanceHome.tsx`**
+
+Redesign inspirado diretamente na imagem de referencia:
+
+1. **Card Saldo Principal** (dominante, assimetrico):
+   - Ocupar largura total com padding generoso
+   - Borda com gradiente neon (cyan -> roxo -> azul, como na referencia)
+   - Numero do saldo em fonte extra-grande (~text-4xl) com cor cyan
+   - Fundo escuro com leve transparencia
+   - Sombra com glow da borda
+
+2. **Cards Receita/Despesa** (dupla, menores):
+   - Grid 2 colunas
+   - Borda verde sutil para receitas, vermelha para despesas
+   - Icones de seta com mais presenca
+   - Valores em negrito, labels discretos
+
+3. **Card Pendencias**:
+   - Borda laranja/amarela
+   - Layout mais claro com valores coloridos (vermelho para despesas, verde para receitas)
+
+4. **Botoes de Acao** (Receita, Despesa, Transf.):
+   - Estilo circular com icone no centro (como na referencia)
+   - Label abaixo do icone
+   - Bordas coloridas circulares (verde, vermelho, azul)
+
+5. **Lista de Contas**:
+   - Cards menores com borda sutil baseada na cor da conta
+
+**Arquivo: `src/components/finance/MonthSelector.tsx`**
+- Visual mais integrado ao header, menos "solto"
+
+---
+
+## Fase 4: Finance Bottom Nav
+
+**Arquivo: `src/components/finance/FinanceBottomNav.tsx`**
+
+- Fundo com glassmorphism mais forte (bg-card/80 backdrop-blur-2xl)
+- Borda superior com glow sutil
+- FAB central com gradiente e glow animado
+- Item ativo com indicador luminoso (dot ou barra inferior brilhante)
+
+---
+
+## Fase 5: Dashboard Admin
+
+**Arquivo: `src/components/dashboard/AdminDashboard.tsx`**
+
+- Card de boas-vindas com borda neon sutil
+- **Card Saldo do Mes** dominante (maior que os outros, colspan-2 no grid)
+- Cards secundarios (Pedidos, Fichas, Estoque) menores e assimetricos
+- Secao "Acoes Pendentes" com cards de alerta coloridos por urgencia:
+  - Vermelho: itens zerados
+  - Amarelo: estoque baixo, fechamentos
+  - Azul: resgates, despesas
+- Quick Access com icones maiores e efeito hover com glow
+- Leaderboard com visual refinado
+
+---
+
+## Fase 6: Dashboard Employee
+
+**Arquivo: `src/components/dashboard/EmployeeDashboard.tsx`**
+
+- Mesmo tratamento visual do admin (cards com bordas neon)
+- Card de pontos com borda dourada/amber
+
+---
+
+## Fase 7: Finance Transactions e Charts
+
+**Arquivo: `src/components/finance/FinanceTransactions.tsx`**
+- Summary header com visual "command center" (bordas e glows)
+- Date headers com mais presenca visual
+
+**Arquivo: `src/components/finance/TransactionItem.tsx`**
+- Icones de tipo mais expressivos (fundo colorido arredondado)
+- Valores com mais destaque visual
+
+**Arquivo: `src/components/finance/FinanceCharts.tsx`**
+- Tabs com estilo mais refinado
+- Graficos com cores consistentes com o novo design system
+- Cards de categoria na lista com bordas laterais coloridas
+
+---
+
+## Fase 8: Tela de Login
+
+**Arquivo: `src/pages/Auth.tsx`**
+- Orbs de fundo mais pronunciadas
+- Card de login com borda neon sutil
+- Botao de submit com glow
+
+---
+
+## Fase 9: Componentes compartilhados
+
+**Arquivo: `src/components/finance/FinanceMore.tsx`**
+- Menu items com bordas e icones maiores
+
+**Arquivo: `src/components/dashboard/Leaderboard.tsx`**
+- Cards de ranking com bordas laterais coloridas por posicao
+- Top 3 com glow sutil
+
+**Arquivo: `src/components/dashboard/UserPointsCard.tsx`**
+- Borda dourada/amber no card inteiro
+
+---
+
+## Resumo de Arquivos Modificados
+
+| Arquivo | Tipo de mudanca |
+|---|---|
+| `src/index.css` | Novos tokens, classes utilitarias, glows |
+| `tailwind.config.ts` | Animacoes e tokens de glow |
+| `src/components/layout/AppLayout.tsx` | Header + Sidebar redesign |
+| `src/components/finance/FinanceHome.tsx` | Redesign completo (referencia) |
+| `src/components/finance/FinanceBottomNav.tsx` | Glassmorphism + glow |
+| `src/components/finance/MonthSelector.tsx` | Estilo integrado |
+| `src/components/finance/FinanceTransactions.tsx` | Visual refinado |
+| `src/components/finance/TransactionItem.tsx` | Icones e valores |
+| `src/components/finance/FinanceCharts.tsx` | Tabs e cores |
+| `src/components/finance/FinanceMore.tsx` | Menu refinado |
+| `src/components/dashboard/AdminDashboard.tsx` | Cards assimetricos + alertas |
+| `src/components/dashboard/EmployeeDashboard.tsx` | Mesmo tratamento |
+| `src/components/dashboard/Leaderboard.tsx` | Bordas e glow |
+| `src/components/dashboard/UserPointsCard.tsx` | Borda amber |
+| `src/pages/Auth.tsx` | Glow no login |
+
+## Restricoes Mantidas
+
+- Zero alteracoes em logica de negocios, hooks, queries ou tipos
+- Todos os modulos, rotas e fluxos permanecem identicos
+- Apenas classes CSS, estrutura JSX visual e estilos sao modificados
+- Nenhuma funcionalidade removida ou escondida
+
+## Nota sobre escopo
+
+Esta e uma refatoracao extensa (15+ arquivos). Para garantir qualidade, sugiro implementar em 2-3 mensagens: primeiro o design system base + financeiro (fases 1-4), depois dashboards (fases 5-7), e por fim login e componentes restantes (fases 8-9).
 
