@@ -1,8 +1,7 @@
-import { ArrowUpCircle, ArrowDownCircle, AlertCircle, Plus, ArrowLeftRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowUpCircle, ArrowDownCircle, AlertCircle } from 'lucide-react';
 import { MonthSelector } from './MonthSelector';
 import { AccountCard } from './AccountCard';
-import { FinanceAccount, MonthlyStats, TransactionType } from '@/types/finance';
+import { FinanceAccount, MonthlyStats } from '@/types/finance';
 import { cn } from '@/lib/utils';
 
 interface FinanceHomeProps {
@@ -11,8 +10,6 @@ interface FinanceHomeProps {
   accounts: FinanceAccount[];
   totalBalance: number;
   monthStats: MonthlyStats;
-  onAddTransaction: (type: TransactionType) => void;
-  onAddAccount?: () => void;
 }
 
 export function FinanceHome({
@@ -21,8 +18,6 @@ export function FinanceHome({
   accounts,
   totalBalance,
   monthStats,
-  onAddTransaction,
-  onAddAccount
 }: FinanceHomeProps) {
   const formatCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -91,54 +86,10 @@ export function FinanceHome({
         </div>
       )}
 
-      {/* Quick Actions - circular command style */}
-      <div className="flex justify-center gap-6 py-2 animate-slide-up stagger-4">
-        <button
-          className="flex flex-col items-center gap-2 group"
-          onClick={() => onAddTransaction('income')}
-        >
-          <div className="w-14 h-14 rounded-full flex items-center justify-center
-            border-2 border-success/30 bg-success/10
-            group-active:scale-90 transition-all duration-200
-            group-hover:border-success/50 group-hover:shadow-glow-success">
-            <ArrowUpCircle className="w-6 h-6 text-success" />
-          </div>
-          <span className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors">Receita</span>
-        </button>
-        <button
-          className="flex flex-col items-center gap-2 group"
-          onClick={() => onAddTransaction('expense')}
-        >
-          <div className="w-14 h-14 rounded-full flex items-center justify-center
-            border-2 border-destructive/30 bg-destructive/10
-            group-active:scale-90 transition-all duration-200
-            group-hover:border-destructive/50 group-hover:shadow-glow-destructive">
-            <ArrowDownCircle className="w-6 h-6 text-destructive" />
-          </div>
-          <span className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors">Despesa</span>
-        </button>
-        <button
-          className="flex flex-col items-center gap-2 group"
-          onClick={() => onAddTransaction('transfer')}
-        >
-          <div className="w-14 h-14 rounded-full flex items-center justify-center
-            border-2 border-primary/30 bg-primary/10
-            group-active:scale-90 transition-all duration-200
-            group-hover:border-primary/50 group-hover:shadow-glow-primary">
-            <ArrowLeftRight className="w-6 h-6 text-primary" />
-          </div>
-          <span className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors">Transf.</span>
-        </button>
-      </div>
-
       {/* Accounts List */}
-      <div className="space-y-3 animate-slide-up stagger-5">
+      <div className="space-y-3 animate-slide-up stagger-4">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Contas</h2>
-          <Button variant="ghost" size="sm" className="text-primary text-xs" onClick={onAddAccount}>
-            <Plus className="w-4 h-4 mr-1" />
-            Nova
-          </Button>
         </div>
         <div className="space-y-2">
           {accounts.map(account => (
