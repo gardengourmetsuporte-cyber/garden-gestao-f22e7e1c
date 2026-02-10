@@ -36,56 +36,50 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
 
       {/* Radial Menu */}
       {menuOpen && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-end gap-5">
+      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-end gap-6">
           {/* Income */}
           <button
             onClick={() => handleAction('income')}
-            className="flex flex-col items-center gap-1.5 animate-scale-in"
+            className="flex flex-col items-center gap-2 animate-scale-in"
             style={{ animationDelay: '0ms' }}
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center
-              border-2 border-success/40 bg-card/90 backdrop-blur-sm
-              active:scale-90 transition-all duration-200
-              hover:border-success/70"
-              style={{ boxShadow: '0 0 20px hsl(142 71% 45% / 0.25)' }}
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-emerald-500/50 active:scale-90 transition-transform duration-150"
+              style={{ boxShadow: '0 0 16px rgba(16, 185, 129, 0.3)' }}
             >
-              <ArrowUpCircle className="w-6 h-6 text-success" />
+              <ArrowUpCircle className="w-7 h-7 text-emerald-400" />
             </div>
-            <span className="text-[10px] font-semibold text-success">Receita</span>
+            <span className="text-[11px] font-semibold text-emerald-400">Receita</span>
           </button>
 
           {/* Expense */}
           <button
             onClick={() => handleAction('expense')}
-            className="flex flex-col items-center gap-1.5 animate-scale-in -mt-6"
+            className="flex flex-col items-center gap-2 animate-scale-in -mt-4"
             style={{ animationDelay: '50ms' }}
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center
-              border-2 border-destructive/40 bg-card/90 backdrop-blur-sm
-              active:scale-90 transition-all duration-200
-              hover:border-destructive/70"
-              style={{ boxShadow: '0 0 20px hsl(0 84% 60% / 0.25)' }}
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-red-500/50 active:scale-90 transition-transform duration-150"
+              style={{ boxShadow: '0 0 16px rgba(239, 68, 68, 0.3)' }}
             >
-              <ArrowDownCircle className="w-6 h-6 text-destructive" />
+              <ArrowDownCircle className="w-7 h-7 text-red-400" />
             </div>
-            <span className="text-[10px] font-semibold text-destructive">Despesa</span>
+            <span className="text-[11px] font-semibold text-red-400">Despesa</span>
           </button>
 
           {/* Transfer */}
           <button
             onClick={() => handleAction('transfer')}
-            className="flex flex-col items-center gap-1.5 animate-scale-in"
+            className="flex flex-col items-center gap-2 animate-scale-in"
             style={{ animationDelay: '100ms' }}
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center
-              border-2 border-[hsl(var(--neon-cyan))]/40 bg-card/90 backdrop-blur-sm
-              active:scale-90 transition-all duration-200
-              hover:border-[hsl(var(--neon-cyan))]/70"
-              style={{ boxShadow: '0 0 20px hsl(190 90% 55% / 0.25)' }}
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-cyan-500/50 active:scale-90 transition-transform duration-150"
+              style={{ boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)' }}
             >
-              <ArrowLeftRight className="w-6 h-6 text-[hsl(var(--neon-cyan))]" />
+              <ArrowLeftRight className="w-7 h-7 text-cyan-400" />
             </div>
-            <span className="text-[10px] font-semibold text-[hsl(var(--neon-cyan))]">Transf.</span>
+            <span className="text-[11px] font-semibold text-cyan-400">Transf.</span>
           </button>
         </div>
       )}

@@ -53,10 +53,11 @@ function SortableItemWrapper({
     isDragging,
   } = useSortable({ id });
 
-  const style = {
+  const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || 'transform 150ms ease',
     opacity: isDragging ? 0.4 : 1,
+    willChange: 'transform',
   };
 
   return (
@@ -141,7 +142,7 @@ export function SortableList<T>({
           ))}
         </div>
       </SortableContext>
-      <DragOverlay dropAnimation={null}>
+      <DragOverlay dropAnimation={{ duration: 150, easing: 'ease-out' }}>
         {activeItem ? renderItem(activeItem, { isDragging: true, dragHandleProps: {} }) : null}
       </DragOverlay>
     </DndContext>
