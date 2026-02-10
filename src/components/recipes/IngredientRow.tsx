@@ -36,6 +36,7 @@ interface IngredientRowProps {
   onChange: (updates: Partial<IngredientRowProps['ingredient']>) => void;
   onRemove: () => void;
   onUpdateGlobalPrice?: (itemId: string, newPrice: number) => Promise<void>;
+  onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
 }
 
 const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
@@ -46,11 +47,13 @@ const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
   { value: 'ml', label: 'ml' },
 ];
 
-export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPrice }: IngredientRowProps) {
+export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPrice, onUpdateItemUnit }: IngredientRowProps) {
   const [editingPrice, setEditingPrice] = useState(false);
   const [newPriceValue, setNewPriceValue] = useState('');
   const [showGlobalWarning, setShowGlobalWarning] = useState(false);
   const [isSavingPrice, setIsSavingPrice] = useState(false);
+  const [editingBaseUnit, setEditingBaseUnit] = useState(false);
+  const [isSavingUnit, setIsSavingUnit] = useState(false);
 
   const isSubRecipe = ingredient.source_type === 'recipe';
   const baseUnit = isSubRecipe ? ingredient.source_recipe_unit : ingredient.item_unit;
@@ -131,9 +134,61 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
             </div>
             <div className="min-w-0">
               <p className="font-medium text-sm truncate">{displayName}</p>
-              <p className="text-xs text-muted-foreground">
-                {isSubRecipe ? 'Sub-receita' : `Estoque: ${displayUnit}`}
-              </p>
+              {isSubRecipe ? (
+                <p className="text-xs text-muted-foreground">Sub-receita</p>
+              ) : editingBaseUnit ? (
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-xs text-muted-foreground">Base:</span>
+                  <Select
+                    value={displayUnit}
+                    onValueChange={async (newUnit) => {
+                      if (!ingredient.item_id || !onUpdateItemUnit) return;
+                      setIsSavingUnit(true);
+                      try {
+                        await onUpdateItemUnit(ingredient.item_id, newUnit);
+                        // Update local state
+                        const newPrice = ingredient.item_price || 0;
+                        const total_cost = calculateIngredientCost(newPrice, newUnit, ingredient.quantity, ingredient.unit_type);
+                        onChange({ item_unit: newUnit, total_cost });
+                      } finally {
+                        setIsSavingUnit(false);
+                        setEditingBaseUnit(false);
+                      }
+                    }}
+                    disabled={isSavingUnit}
+                  >
+                    <SelectTrigger className="h-6 w-16 text-xs px-1.5 py-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UNIT_OPTIONS.map((unit) => (
+                        <SelectItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 text-muted-foreground"
+                    onClick={() => setEditingBaseUnit(false)}
+                  >
+                    <XCircle className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
+                  onClick={() => onUpdateItemUnit && setEditingBaseUnit(true)}
+                  disabled={!onUpdateItemUnit}
+                >
+                  Estoque: {displayUnit}
+                  {onUpdateItemUnit && <Pencil className="h-2.5 w-2.5" />}
+                </button>
+              )}
             </div>
           </div>
           <Button

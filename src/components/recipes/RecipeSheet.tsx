@@ -60,6 +60,7 @@ interface RecipeSheetProps {
   isSaving: boolean;
   defaultCategoryId?: string | null;
   onUpdateItemPrice?: (itemId: string, newPrice: number) => Promise<void>;
+  onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
 }
 
 export function RecipeSheet({
@@ -73,6 +74,7 @@ export function RecipeSheet({
   isSaving,
   defaultCategoryId,
   onUpdateItemPrice,
+  onUpdateItemUnit,
 }: RecipeSheetProps) {
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
@@ -387,6 +389,7 @@ export function RecipeSheet({
                         onChange={(updates) => handleIngredientChange(index, updates)}
                         onRemove={() => handleRemoveIngredient(index)}
                         onUpdateGlobalPrice={onUpdateItemPrice}
+                        onUpdateItemUnit={onUpdateItemUnit}
                       />
                     ))}
                   </div>

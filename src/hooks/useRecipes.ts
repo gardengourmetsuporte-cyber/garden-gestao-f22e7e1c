@@ -398,8 +398,28 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
     },
   });
 
-  // Update inventory item price globally
-  const updateItemPriceMutation = useMutation({
+   // Update inventory item base unit for recipes
+   const updateItemUnitMutation = useMutation({
+     mutationFn: async ({ itemId, unitType }: { itemId: string; unitType: string }) => {
+       const { error } = await supabase
+         .from('inventory_items')
+         .update({ recipe_unit_type: unitType })
+         .eq('id', itemId);
+
+       if (error) throw error;
+     },
+     onSuccess: () => {
+       queryClient.invalidateQueries({ queryKey: ['recipes'] });
+       queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
+       toast({ title: 'Unidade base atualizada!' });
+     },
+     onError: () => {
+       toast({ title: 'Erro ao atualizar unidade', variant: 'destructive' });
+     },
+   });
+
+   // Update inventory item price globally
+   const updateItemPriceMutation = useMutation({
     mutationFn: async ({ itemId, price }: { itemId: string; price: number }) => {
       // Check if item has recipe-specific unit/price configured
       const { data: item } = await supabase
@@ -446,6 +466,7 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
     isUpdatingRecipe: updateRecipeMutation.isPending,
     getAvailableSubRecipes,
     hasCircularDependency,
-    updateItemPrice: updateItemPriceMutation.mutateAsync,
-  };
-}
+     updateItemPrice: updateItemPriceMutation.mutateAsync,
+     updateItemUnit: updateItemUnitMutation.mutateAsync,
+   };
+ }
