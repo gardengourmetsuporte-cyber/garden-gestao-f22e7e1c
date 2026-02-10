@@ -1,11 +1,12 @@
-import { Home, FileText, Plus, PieChart, MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
+import { Home, FileText, Plus, PieChart, MoreHorizontal, ArrowUpCircle, ArrowDownCircle, ArrowLeftRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FinanceTab } from '@/types/finance';
+import { FinanceTab, TransactionType } from '@/types/finance';
 
 interface FinanceBottomNavProps {
   activeTab: FinanceTab;
   onTabChange: (tab: FinanceTab) => void;
-  onAddPress: () => void;
+  onAddTransaction: (type: TransactionType) => void;
 }
 
 const tabs: { id: FinanceTab; icon: typeof Home; label: string }[] = [
@@ -15,68 +16,143 @@ const tabs: { id: FinanceTab; icon: typeof Home; label: string }[] = [
   { id: 'more', icon: MoreHorizontal, label: 'Mais' },
 ];
 
-export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: FinanceBottomNavProps) {
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 lg:left-72 z-40 bg-card/85 backdrop-blur-2xl border-t border-border/15" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      {/* Top glow line */}
-      <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
-        {/* Left tabs */}
-        {tabs.slice(0, 2).map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={cn(
-              "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
-              activeTab === tab.id
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <tab.icon className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{tab.label}</span>
-            {activeTab === tab.id && (
-              <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary shadow-glow-primary" />
-            )}
-          </button>
-        ))}
+export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: FinanceBottomNavProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
 
-        {/* Center FAB */}
-        <div className="flex-1 flex items-center justify-center">
+  const handleAction = (type: TransactionType) => {
+    setMenuOpen(false);
+    onAddTransaction(type);
+  };
+
+  return (
+    <>
+      {/* Overlay */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Radial Menu */}
+      {menuOpen && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-end gap-5">
+          {/* Income */}
           <button
-            onClick={onAddPress}
-            className="absolute -top-6 w-14 h-14 rounded-full 
-              bg-gradient-to-br from-primary via-primary to-[hsl(var(--neon-cyan))]
-              text-primary-foreground
-              flex items-center justify-center 
-              hover:scale-105 active:scale-95 transition-all
-              animate-glow-pulse"
-            style={{ boxShadow: '0 4px 20px hsl(217 91% 60% / 0.4), 0 0 40px hsl(190 90% 55% / 0.15)' }}
+            onClick={() => handleAction('income')}
+            className="flex flex-col items-center gap-1.5 animate-scale-in"
+            style={{ animationDelay: '0ms' }}
           >
-            <Plus className="w-7 h-7" />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center
+              border-2 border-success/40 bg-card/90 backdrop-blur-sm
+              active:scale-90 transition-all duration-200
+              hover:border-success/70"
+              style={{ boxShadow: '0 0 20px hsl(142 71% 45% / 0.25)' }}
+            >
+              <ArrowUpCircle className="w-6 h-6 text-success" />
+            </div>
+            <span className="text-[10px] font-semibold text-success">Receita</span>
+          </button>
+
+          {/* Expense */}
+          <button
+            onClick={() => handleAction('expense')}
+            className="flex flex-col items-center gap-1.5 animate-scale-in -mt-6"
+            style={{ animationDelay: '50ms' }}
+          >
+            <div className="w-14 h-14 rounded-full flex items-center justify-center
+              border-2 border-destructive/40 bg-card/90 backdrop-blur-sm
+              active:scale-90 transition-all duration-200
+              hover:border-destructive/70"
+              style={{ boxShadow: '0 0 20px hsl(0 84% 60% / 0.25)' }}
+            >
+              <ArrowDownCircle className="w-6 h-6 text-destructive" />
+            </div>
+            <span className="text-[10px] font-semibold text-destructive">Despesa</span>
+          </button>
+
+          {/* Transfer */}
+          <button
+            onClick={() => handleAction('transfer')}
+            className="flex flex-col items-center gap-1.5 animate-scale-in"
+            style={{ animationDelay: '100ms' }}
+          >
+            <div className="w-14 h-14 rounded-full flex items-center justify-center
+              border-2 border-[hsl(var(--neon-cyan))]/40 bg-card/90 backdrop-blur-sm
+              active:scale-90 transition-all duration-200
+              hover:border-[hsl(var(--neon-cyan))]/70"
+              style={{ boxShadow: '0 0 20px hsl(190 90% 55% / 0.25)' }}
+            >
+              <ArrowLeftRight className="w-6 h-6 text-[hsl(var(--neon-cyan))]" />
+            </div>
+            <span className="text-[10px] font-semibold text-[hsl(var(--neon-cyan))]">Transf.</span>
           </button>
         </div>
+      )}
 
-        {/* Right tabs */}
-        {tabs.slice(2).map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={cn(
-              "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
-              activeTab === tab.id
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <tab.icon className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{tab.label}</span>
-            {activeTab === tab.id && (
-              <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary shadow-glow-primary" />
-            )}
-          </button>
-        ))}
-      </div>
-    </nav>
+      <nav className="fixed bottom-0 left-0 right-0 lg:left-72 z-40 bg-card/90 backdrop-blur-2xl border-t border-border/15" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        {/* Top glow line */}
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+        <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
+          {/* Left tabs */}
+          {tabs.slice(0, 2).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={cn(
+                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
+                activeTab === tab.id
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <tab.icon className="w-6 h-6" />
+              <span className="text-[10px] font-medium">{tab.label}</span>
+              {activeTab === tab.id && (
+                <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary" style={{ boxShadow: '0 0 8px hsl(217 91% 60% / 0.5)' }} />
+              )}
+            </button>
+          ))}
+
+          {/* Center FAB */}
+          <div className="flex-1 flex items-center justify-center">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={cn(
+                "absolute -top-6 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300",
+                menuOpen ? "rotate-45 scale-95" : "hover:scale-105 active:scale-95"
+              )}
+            >
+              {/* Neon rotating border */}
+              <div className="absolute inset-0 rounded-full fab-neon-border" />
+              {/* Inner background */}
+              <div className="absolute inset-[2px] rounded-full bg-card" />
+              {/* Icon */}
+              <Plus className="w-8 h-8 text-[hsl(var(--neon-cyan))] relative z-10" />
+            </button>
+          </div>
+
+          {/* Right tabs */}
+          {tabs.slice(2).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={cn(
+                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
+                activeTab === tab.id
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <tab.icon className="w-6 h-6" />
+              <span className="text-[10px] font-medium">{tab.label}</span>
+              {activeTab === tab.id && (
+                <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary" style={{ boxShadow: '0 0 8px hsl(217 91% 60% / 0.5)' }} />
+              )}
+            </button>
+          ))}
+        </div>
+      </nav>
+    </>
   );
 }

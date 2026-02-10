@@ -108,8 +108,6 @@ export default function Finance() {
             accounts={accounts}
             totalBalance={totalBalance}
             monthStats={monthStats}
-            onAddTransaction={handleAddTransaction}
-            onAddAccount={() => setAccountManagementOpen(true)}
           />
         )}
 
@@ -160,7 +158,7 @@ export default function Finance() {
       <FinanceBottomNav
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onAddPress={() => handleAddTransaction('expense')}
+        onAddTransaction={handleAddTransaction}
       />
 
       {/* Transaction Sheet */}

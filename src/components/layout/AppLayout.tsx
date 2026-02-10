@@ -63,7 +63,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               className="p-2.5 rounded-xl hover:bg-secondary active:scale-95 transition-all touch-manipulation"
               style={{ minWidth: 44, minHeight: 44 }}
             >
-              <Menu className="w-5 h-5 text-muted-foreground" />
+              <Menu className="w-[22px] h-[22px] text-muted-foreground" />
             </button>
             <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20">
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
@@ -88,7 +88,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               onClick={() => navigate('/')}
               className="relative p-2 rounded-lg hover:bg-secondary transition-all"
             >
-              <Bell className="w-4 h-4 text-muted-foreground" />
+              <Bell className="w-[22px] h-[22px] text-muted-foreground" />
               {unreadCount > 0 && (
                 <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
@@ -194,7 +194,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-primary shadow-glow-primary" />
                   )}
                   <div className="relative">
-                    <item.icon className={cn("w-[22px] h-[22px] shrink-0", isActive && "text-primary")} />
+                    <item.icon className={cn("w-6 h-6 shrink-0", isActive && "text-primary")} />
                     {showBadge && (
                       <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -214,7 +214,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             onClick={handleSignOut}
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98]"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-6 h-6" />
             <span className="font-medium">Sair</span>
           </button>
         </div>

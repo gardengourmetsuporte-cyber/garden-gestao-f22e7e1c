@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+@property --neon-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -326,7 +332,19 @@
            transition-all duration-200;
   }
 
-  /* ========== FAB ========== */
+  /* ========== FAB NEON ========== */
+
+  .fab-neon-border {
+    background: conic-gradient(
+      from var(--neon-angle, 0deg),
+      hsl(var(--neon-cyan)),
+      hsl(var(--neon-purple)),
+      hsl(var(--primary)),
+      hsl(var(--neon-cyan))
+    );
+    animation: neonRotate 3s linear infinite;
+    box-shadow: 0 0 16px hsl(var(--neon-cyan) / 0.3), 0 0 32px hsl(var(--neon-purple) / 0.15);
+  }
 
   .fab {
     @apply fixed bottom-6 right-6 w-14 h-14 
@@ -448,6 +466,11 @@
       border-color: hsl(var(--neon-cyan) / 0.4);
       box-shadow: var(--shadow-card), 0 0 24px hsl(var(--neon-cyan) / 0.2);
     }
+  }
+
+  @keyframes neonRotate {
+    from { --neon-angle: 0deg; }
+    to { --neon-angle: 360deg; }
   }
 
   /* Stagger animation delays */
