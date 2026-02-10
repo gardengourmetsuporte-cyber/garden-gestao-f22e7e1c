@@ -12,13 +12,11 @@ import { FinanceCategory, FinanceAccount } from '@/types/finance';
 import {
   DndContext,
   DragEndEvent,
-  DragStartEvent,
   TouchSensor,
   MouseSensor,
   useSensor,
   useSensors,
   closestCenter,
-  useDroppable,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -28,20 +26,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Droppable date zone (for cross-date drops)
-function DateDropZone({ dateStr, children }: { dateStr: string; children: React.ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `date-${dateStr}` });
-  return (
-    <div
-      ref={setNodeRef}
-      className={isOver ? 'bg-primary/10 rounded-lg ring-2 ring-primary/30 transition-all duration-200' : 'transition-all duration-200'}
-    >
-      {children}
-    </div>
-  );
-}
-
-// Sortable transaction wrapper (supports both reordering within day and cross-day drag)
+// Sortable transaction wrapper (reordering within same day only)
 function SortableTransaction({ id, children }: { id: string; children: React.ReactNode }) {
   const {
     attributes,
@@ -80,7 +65,6 @@ interface FinanceTransactionsProps {
   onTransactionClick: (transaction: FinanceTransaction) => void;
   onTogglePaid: (id: string, isPaid: boolean) => Promise<void>;
   onDeleteTransaction: (id: string) => Promise<void>;
-  onUpdateTransactionDate?: (id: string, newDate: string) => Promise<void>;
   onReorderTransactions?: (dateStr: string, orderedIds: string[]) => Promise<void>;
   categories: FinanceCategory[];
   accounts: FinanceAccount[];
@@ -94,7 +78,6 @@ export function FinanceTransactions({
   onTransactionClick,
   onTogglePaid,
   onDeleteTransaction,
-  onUpdateTransactionDate,
   onReorderTransactions,
   categories,
   accounts
@@ -142,55 +125,38 @@ export function FinanceTransactions({
     return Object.keys(filteredTransactionsByDate).sort((a, b) => b.localeCompare(a));
   }, [filteredTransactionsByDate]);
 
-  // Build a flat map of transaction ID -> date
-  const transactionDateMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    Object.entries(filteredTransactionsByDate).forEach(([date, txns]) => {
-      txns.forEach(t => { map[t.id] = date; });
-    });
-    return map;
-  }, [filteredTransactionsByDate]);
-
   const hasTransactions = sortedDates.length > 0;
   const hasActiveFilters = filters.status !== 'all' || filters.categoryId || filters.accountId;
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over) return;
+    if (!over || active.id === over.id) return;
 
     const txnId = String(active.id);
     const overId = String(over.id);
-    const currentDate = transactionDateMap[txnId];
 
-    // Check if dropping on a date zone (cross-date move)
-    if (overId.startsWith('date-')) {
-      const targetDate = overId.replace('date-', '');
-      if (targetDate !== currentDate && onUpdateTransactionDate) {
-        await onUpdateTransactionDate(txnId, targetDate);
+    // Find which date both belong to — only allow same-day reorder
+    let sharedDate: string | null = null;
+    for (const [date, txns] of Object.entries(filteredTransactionsByDate)) {
+      const hasActive = txns.some(t => t.id === txnId);
+      const hasOver = txns.some(t => t.id === overId);
+      if (hasActive && hasOver) {
+        sharedDate = date;
+        break;
       }
-      return;
     }
 
-    // Check if dropping on another transaction
-    const targetDate = transactionDateMap[overId];
-    
-    if (targetDate && targetDate === currentDate && onReorderTransactions) {
-      // Same day reorder
-      const dayTxns = filteredTransactionsByDate[currentDate];
-      if (!dayTxns) return;
-      
-      const oldIndex = dayTxns.findIndex(t => t.id === txnId);
-      const newIndex = dayTxns.findIndex(t => t.id === overId);
-      
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        const reordered = arrayMove(dayTxns, oldIndex, newIndex);
-        await onReorderTransactions(currentDate, reordered.map(t => t.id));
-      }
-    } else if (targetDate && targetDate !== currentDate && onUpdateTransactionDate) {
-      // Cross-date move (dropped on a transaction in another date)
-      await onUpdateTransactionDate(txnId, targetDate);
+    if (!sharedDate || !onReorderTransactions) return;
+
+    const dayTxns = filteredTransactionsByDate[sharedDate];
+    const oldIndex = dayTxns.findIndex(t => t.id === txnId);
+    const newIndex = dayTxns.findIndex(t => t.id === overId);
+
+    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+      const reordered = arrayMove(dayTxns, oldIndex, newIndex);
+      await onReorderTransactions(sharedDate, reordered.map(t => t.id));
     }
-  }, [filteredTransactionsByDate, transactionDateMap, onUpdateTransactionDate, onReorderTransactions]);
+  }, [filteredTransactionsByDate, onReorderTransactions]);
 
   return (
     <>
@@ -240,7 +206,7 @@ export function FinanceTransactions({
                 }, 0);
 
                 return (
-                  <DateDropZone key={dateStr} dateStr={dateStr}>
+                  <div key={dateStr}>
                     {/* Date Header */}
                     <div className="flex items-center justify-between py-2 px-1">
                       <span className="text-sm font-medium text-muted-foreground capitalize">
@@ -274,7 +240,7 @@ export function FinanceTransactions({
                         ))}
                       </div>
                     </SortableContext>
-                  </DateDropZone>
+                  </div>
                 );
               })}
             </div>
