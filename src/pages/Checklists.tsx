@@ -148,7 +148,7 @@ export default function ChecklistsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
-        <header className="page-header">
+        <header className="page-header-bar">
           <div className="page-header-content">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -204,57 +204,29 @@ export default function ChecklistsPage() {
               </Popover>
 
               {/* Checklist Type Selector */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="tab-command">
                 <button
                   onClick={() => setChecklistType('abertura')}
                   className={cn(
-                    "card-interactive flex flex-col items-center gap-2 p-4",
-                    checklistType === 'abertura'
-                      ? "border-2 border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 shadow-lg shadow-amber-500/20"
-                      : "hover:border-amber-300"
+                    "tab-command-item gap-2",
+                    checklistType === 'abertura' ? "tab-command-active" : "tab-command-inactive"
                   )}
+                  style={checklistType === 'abertura' ? { borderColor: 'hsl(38 92% 50% / 0.4)', boxShadow: '0 0 12px hsl(38 92% 50% / 0.15)' } : undefined}
                 >
-                  <div className={cn(
-                    "w-14 h-14 rounded-xl flex items-center justify-center transition-all",
-                    checklistType === 'abertura'
-                      ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg"
-                      : "bg-amber-100 dark:bg-amber-900/30 text-amber-600"
-                  )}>
-                    <Sun className="w-7 h-7" />
-                  </div>
-                  <div className="text-center">
-                    <p className={cn(
-                      "font-bold text-sm",
-                      checklistType === 'abertura' ? "text-amber-700 dark:text-amber-400" : "text-foreground"
-                    )}>Abertura</p>
-                    <p className="text-xs text-muted-foreground">Manhã</p>
-                  </div>
+                  <Sun className="w-5 h-5" />
+                  <span className="font-bold text-sm">Abertura</span>
                 </button>
 
                 <button
                   onClick={() => setChecklistType('fechamento')}
                   className={cn(
-                    "card-interactive flex flex-col items-center gap-2 p-4",
-                    checklistType === 'fechamento'
-                      ? "border-2 border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/20 shadow-lg shadow-indigo-500/20"
-                      : "hover:border-indigo-300"
+                    "tab-command-item gap-2",
+                    checklistType === 'fechamento' ? "tab-command-active" : "tab-command-inactive"
                   )}
+                  style={checklistType === 'fechamento' ? { borderColor: 'hsl(262 80% 65% / 0.4)', boxShadow: '0 0 12px hsl(262 80% 65% / 0.15)' } : undefined}
                 >
-                  <div className={cn(
-                    "w-14 h-14 rounded-xl flex items-center justify-center transition-all",
-                    checklistType === 'fechamento'
-                      ? "bg-gradient-to-br from-indigo-400 to-purple-500 text-white shadow-lg"
-                      : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600"
-                  )}>
-                    <Moon className="w-7 h-7" />
-                  </div>
-                  <div className="text-center">
-                    <p className={cn(
-                      "font-bold text-sm",
-                      checklistType === 'fechamento' ? "text-indigo-700 dark:text-indigo-400" : "text-foreground"
-                    )}>Fechamento</p>
-                    <p className="text-xs text-muted-foreground">Noite</p>
-                  </div>
+                  <Moon className="w-5 h-5" />
+                  <span className="font-bold text-sm">Fechamento</span>
                 </button>
               </div>
 
@@ -274,7 +246,7 @@ export default function ChecklistsPage() {
           ) : (
             <>
               {/* Settings Header */}
-              <div className="card-base p-4">
+              <div className="card-command p-4">
                 <div className="flex items-center gap-3">
                   <ClipboardCheck className="w-5 h-5 text-primary" />
                   <div>
@@ -287,15 +259,14 @@ export default function ChecklistsPage() {
               </div>
 
               {/* Type Selector */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="tab-command">
                 <button
                   onClick={() => setSettingsType('abertura')}
                   className={cn(
-                    "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all",
-                    settingsType === 'abertura' 
-                      ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" 
-                      : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                    "tab-command-item gap-2",
+                    settingsType === 'abertura' ? "tab-command-active" : "tab-command-inactive"
                   )}
+                  style={settingsType === 'abertura' ? { borderColor: 'hsl(38 92% 50% / 0.4)', boxShadow: '0 0 12px hsl(38 92% 50% / 0.15)' } : undefined}
                 >
                   <Sun className="w-5 h-5" />
                   <span className="font-semibold">Abertura</span>
@@ -303,11 +274,10 @@ export default function ChecklistsPage() {
                 <button
                   onClick={() => setSettingsType('fechamento')}
                   className={cn(
-                    "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all",
-                    settingsType === 'fechamento' 
-                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400" 
-                      : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                    "tab-command-item gap-2",
+                    settingsType === 'fechamento' ? "tab-command-active" : "tab-command-inactive"
                   )}
+                  style={settingsType === 'fechamento' ? { borderColor: 'hsl(262 80% 65% / 0.4)', boxShadow: '0 0 12px hsl(262 80% 65% / 0.15)' } : undefined}
                 >
                   <Moon className="w-5 h-5" />
                   <span className="font-semibold">Fechamento</span>

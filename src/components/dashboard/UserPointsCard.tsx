@@ -16,7 +16,7 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
 
   if (isLoading) {
     return (
-      <div className={cn("card-base animate-pulse", className)}>
+      <div className={cn("card-command animate-pulse", className)}>
         <div className="p-5">
           <div className="h-20 bg-secondary rounded-xl" />
         </div>
@@ -28,37 +28,37 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
   const progress = earnedPoints > 0 ? ((earnedPoints % 50) / 50) * 100 : 0;
 
   return (
-    <div className={cn("card-base overflow-hidden", className)}>
+    <div className={cn("card-command-warning overflow-hidden", className)}>
       {/* Main Balance Section */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white">
+      <div className="p-5">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-amber-100 text-xs">Seu saldo atual</p>
+            <p className="text-muted-foreground text-xs">Seu saldo atual</p>
             <div className="flex items-center gap-2 mt-1">
-              <Star className="w-7 h-7 fill-current" />
-              <span className="text-3xl font-bold tracking-tight">{animatedBalance}</span>
-              <span className="text-sm text-amber-100">pts</span>
+              <Star className="w-7 h-7 text-warning fill-warning" />
+              <span className="text-3xl font-bold tracking-tight text-foreground">{animatedBalance}</span>
+              <span className="text-sm text-muted-foreground">pts</span>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
-            <Gift className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center border border-warning/20">
+            <Gift className="w-6 h-6 text-warning" />
           </div>
         </div>
 
         <div>
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-amber-100">Próxima conquista</span>
-            <span className="font-medium">{earnedPoints}/{nextMilestone}</span>
+            <span className="text-muted-foreground">Próxima conquista</span>
+            <span className="font-medium text-foreground">{earnedPoints}/{nextMilestone}</span>
           </div>
           <Progress 
             value={progress} 
-            className="h-1.5 bg-white/20 [&>div]:bg-white"
+            className="h-1.5 bg-secondary [&>div]:bg-warning"
           />
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 divide-x">
+      <div className="grid grid-cols-2 divide-x divide-border/30 border-t border-border/30">
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-success mb-0.5">
             <TrendingUp className="w-3.5 h-3.5" />

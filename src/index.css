@@ -224,6 +224,16 @@
     @apply bg-card/60 backdrop-blur-xl border-b border-border/40 sticky top-0 z-40;
   }
 
+  .page-header-bar {
+    @apply bg-card/80 backdrop-blur-2xl sticky top-0 z-40;
+    border-bottom: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: 0 1px 0 hsl(var(--neon-cyan) / 0.08), 0 4px 16px hsl(222 50% 3% / 0.4);
+  }
+
+  .page-header-bar .page-header-content {
+    @apply px-4 py-3 lg:px-6;
+  }
+
   .page-header-content {
     @apply px-4 py-3 lg:px-6;
   }
@@ -246,6 +256,41 @@
     @apply card-interactive p-4;
   }
 
+  .stat-command {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl p-4 transition-all duration-300 cursor-pointer active:scale-[0.97];
+    border: 1px solid hsl(var(--border) / 0.4);
+    box-shadow: var(--shadow-card);
+  }
+
+  .stat-command:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .stat-command-cyan {
+    border-color: hsl(var(--neon-cyan) / 0.3);
+    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-cyan) / 0.1);
+  }
+
+  .stat-command-green {
+    border-color: hsl(var(--neon-green) / 0.3);
+    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-green) / 0.1);
+  }
+
+  .stat-command-red {
+    border-color: hsl(var(--neon-red) / 0.3);
+    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-red) / 0.1);
+  }
+
+  .stat-command-amber {
+    border-color: hsl(var(--neon-amber) / 0.3);
+    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-amber) / 0.1);
+  }
+
+  .stat-command-purple {
+    border-color: hsl(var(--neon-purple) / 0.3);
+    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-purple) / 0.1);
+  }
+
   .stat-icon {
     @apply w-10 h-10 rounded-xl flex items-center justify-center;
   }
@@ -256,6 +301,59 @@
 
   .stat-label {
     @apply text-sm font-medium text-muted-foreground;
+  }
+
+  /* ========== LIST COMMAND ========== */
+
+  .list-command {
+    @apply bg-card/60 backdrop-blur-sm rounded-xl p-4 transition-all duration-200 cursor-pointer;
+    border: 1px solid hsl(var(--border) / 0.3);
+    border-left: 3px solid hsl(var(--neon-cyan) / 0.4);
+  }
+
+  .list-command:hover {
+    @apply bg-card/90;
+    border-left-color: hsl(var(--neon-cyan) / 0.7);
+    box-shadow: 0 0 12px hsl(var(--neon-cyan) / 0.08);
+  }
+
+  /* ========== TAB COMMAND ========== */
+
+  .tab-command {
+    @apply flex gap-1 bg-card/60 backdrop-blur-sm p-1 rounded-xl;
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .tab-command-item {
+    @apply flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all duration-200;
+  }
+
+  .tab-command-active {
+    @apply bg-card text-foreground;
+    border: 1px solid hsl(var(--neon-cyan) / 0.3);
+    box-shadow: 0 0 12px hsl(var(--neon-cyan) / 0.1);
+  }
+
+  .tab-command-inactive {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  /* ========== EMPTY STATE ========== */
+
+  .empty-state {
+    @apply text-center py-16;
+  }
+
+  .empty-state-icon {
+    @apply w-16 h-16 mx-auto mb-4 text-muted-foreground/30;
+  }
+
+  .empty-state-title {
+    @apply font-semibold text-foreground mb-1;
+  }
+
+  .empty-state-text {
+    @apply text-sm text-muted-foreground;
   }
 
   /* ========== LISTS ========== */

@@ -270,7 +270,7 @@ export default function InventoryPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
-        <header className="page-header">
+        <header className="page-header-bar">
           <div className="page-header-content">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -344,7 +344,7 @@ export default function InventoryPage() {
 
           {/* Alerts */}
           {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
-            <div className="alert-card alert-warning">
+            <div className="card-command-warning p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-foreground">Atenção ao Estoque</p>
@@ -365,12 +365,12 @@ export default function InventoryPage() {
           )}
 
           {/* View Toggle */}
-          <div className="view-toggle-group">
+          <div className="tab-command">
             <button
               onClick={() => { setView('items'); }}
               className={cn(
-                "view-toggle-item",
-                view === 'items' ? 'view-toggle-active' : 'view-toggle-inactive'
+                "tab-command-item",
+                view === 'items' ? 'tab-command-active' : 'tab-command-inactive'
               )}
             >
               <ClipboardList className="w-4 h-4" />
@@ -379,8 +379,8 @@ export default function InventoryPage() {
             <button
               onClick={() => { setView('history'); setStockFilter(null); }}
               className={cn(
-                "view-toggle-item",
-                view === 'history' ? 'view-toggle-active' : 'view-toggle-inactive'
+                "tab-command-item",
+                view === 'history' ? 'tab-command-active' : 'tab-command-inactive'
               )}
             >
               <History className="w-4 h-4" />
@@ -390,8 +390,8 @@ export default function InventoryPage() {
               <button
                 onClick={() => { setView('orders'); setStockFilter(null); }}
                 className={cn(
-                  "view-toggle-item relative",
-                  view === 'orders' ? 'view-toggle-active' : 'view-toggle-inactive'
+                  "tab-command-item relative",
+                  view === 'orders' ? 'tab-command-active' : 'tab-command-inactive'
                 )}
               >
                 <ShoppingCart className="w-4 h-4" />

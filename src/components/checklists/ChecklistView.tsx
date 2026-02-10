@@ -172,10 +172,8 @@ export function ChecklistView({
     <div className="space-y-4">
       {/* Progress Header */}
       <div className={cn(
-        "card-base p-5 transition-all duration-500",
-        progressPercent === 100
-          ? "bg-gradient-to-br from-success/20 to-success/5 border-2 border-success/30"
-          : "bg-gradient-to-br from-primary/10 to-primary/5"
+        "card-command p-5 transition-all duration-500",
+        progressPercent === 100 && "card-command-success"
       )}>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -205,10 +203,15 @@ export function ChecklistView({
             className={cn(
               "h-full rounded-full transition-all duration-500 ease-out",
               progressPercent === 100
-                ? "bg-gradient-to-r from-success to-success/70"
-                : "bg-gradient-to-r from-primary to-primary/70"
+                ? "bg-success"
+                : "bg-primary"
             )}
-            style={{ width: `${progressPercent}%` }}
+            style={{ 
+              width: `${progressPercent}%`,
+              boxShadow: progressPercent === 100 
+                ? '0 0 12px hsl(var(--neon-green) / 0.4)' 
+                : '0 0 12px hsl(var(--primary) / 0.3)' 
+            }}
           />
         </div>
         
@@ -232,8 +235,8 @@ export function ChecklistView({
               className={cn(
                 "w-full flex items-center justify-between p-4 rounded-xl transition-all",
                 sectorComplete 
-                  ? "bg-success/10 border border-success/20" 
-                  : "card-base"
+                  ? "card-command-success" 
+                  : "card-command"
               )}
             >
               <div className="flex items-center gap-3">
