@@ -8,7 +8,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragOverlay,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -53,13 +52,17 @@ function SortableItemWrapper({
     isDragging,
   } = useSortable({ id });
 
-  // Only apply Y translation for reordering animation, never X
-  // When actively dragging, hide the original item (overlay handles display)
   const style: React.CSSProperties = {
     transform: CSS.Translate.toString(transform),
-    transition: transition || 'transform 150ms ease',
-    opacity: isDragging ? 0.3 : 1,
-    zIndex: isDragging ? 0 : 'auto',
+    transition,
+    zIndex: isDragging ? 50 : 'auto',
+    position: 'relative' as const,
+    ...(isDragging && {
+      scale: '1.02',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px hsl(var(--neon-cyan) / 0.2)',
+      borderRadius: '16px',
+      opacity: 0.95,
+    }),
   };
 
   return (
@@ -81,8 +84,6 @@ export function SortableList<T>({
   className,
   direction = 'vertical',
 }: SortableListProps<T>) {
-  const [activeId, setActiveId] = React.useState<string | null>(null);
-
   const sensors = useSensors(
     useSensor(TouchSensor, {
       activationConstraint: { delay: 250, tolerance: 5 },
@@ -94,8 +95,6 @@ export function SortableList<T>({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  const activeItem = activeId ? items.find(item => getItemId(item) === activeId) : null;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -126,12 +125,7 @@ export function SortableList<T>({
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragStart={(event) => setActiveId(String(event.active.id))}
-      onDragEnd={(event) => {
-        setActiveId(null);
-        handleDragEnd(event);
-      }}
-      onDragCancel={() => setActiveId(null)}
+      onDragEnd={handleDragEnd}
     >
       <SortableContext items={items.map(getItemId)} strategy={strategy}>
         <div className={className}>
@@ -144,9 +138,6 @@ export function SortableList<T>({
           ))}
         </div>
       </SortableContext>
-      <DragOverlay dropAnimation={{ duration: 150, easing: 'ease-out' }}>
-        {activeItem ? renderItem(activeItem, { isDragging: true, dragHandleProps: {} }) : null}
-      </DragOverlay>
     </DndContext>
   );
 }
