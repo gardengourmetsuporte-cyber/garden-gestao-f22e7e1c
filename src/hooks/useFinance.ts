@@ -74,6 +74,7 @@ export function useFinance(selectedMonth: Date) {
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: false })
+      .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
     
     setTransactions((data || []) as FinanceTransaction[]);
@@ -385,15 +386,38 @@ export function useFinance(selectedMonth: Date) {
     return accounts.reduce((sum, acc) => sum + Number(acc.balance), 0);
   }, [accounts]);
 
-  // Transactions grouped by date
+  // Transactions grouped by date (sorted by sort_order within each date)
   const transactionsByDate = useMemo(() => {
     const grouped: Record<string, FinanceTransaction[]> = {};
     transactions.forEach(t => {
       if (!grouped[t.date]) grouped[t.date] = [];
       grouped[t.date].push(t);
     });
+    // Sort within each date by sort_order
+    Object.values(grouped).forEach(txns => {
+      txns.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    });
     return grouped;
   }, [transactions]);
+
+  const reorderTransactions = useCallback(async (dateStr: string, orderedIds: string[]) => {
+    // Optimistic update
+    setTransactions(prev => {
+      const updated = [...prev];
+      orderedIds.forEach((id, index) => {
+        const txn = updated.find(t => t.id === id);
+        if (txn) txn.sort_order = index;
+      });
+      return updated;
+    });
+
+    // Persist to DB
+    await Promise.all(
+      orderedIds.map((id, index) =>
+        supabase.from('finance_transactions').update({ sort_order: index }).eq('id', id)
+      )
+    );
+  }, []);
 
   return {
     accounts,
@@ -411,6 +435,7 @@ export function useFinance(selectedMonth: Date) {
     updateAccount,
     deleteAccount,
     updateRecurringTransaction,
+    reorderTransactions,
     refetch: () => Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]),
   };
 }

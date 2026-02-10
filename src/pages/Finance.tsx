@@ -39,6 +39,7 @@ export default function Finance() {
     updateAccount,
     deleteAccount,
     updateRecurringTransaction,
+    reorderTransactions,
     refetch
   } = useFinance(selectedMonth);
 
@@ -121,6 +122,7 @@ export default function Finance() {
             onTogglePaid={toggleTransactionPaid}
             onDeleteTransaction={deleteTransaction}
             onUpdateTransactionDate={handleUpdateTransactionDate}
+            onReorderTransactions={reorderTransactions}
              categories={categories}
              accounts={accounts}
           />
