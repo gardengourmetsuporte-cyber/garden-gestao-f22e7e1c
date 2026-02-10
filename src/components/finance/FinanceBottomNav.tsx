@@ -17,7 +17,9 @@ const tabs: { id: FinanceTab; icon: typeof Home; label: string }[] = [
 
 export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: FinanceBottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 lg:left-72 z-40 bg-card border-t shadow-lg" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 lg:left-72 z-40 bg-card/85 backdrop-blur-2xl border-t border-border/15" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      {/* Top glow line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
         {/* Left tabs */}
         {tabs.slice(0, 2).map(tab => (
@@ -25,7 +27,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: Finance
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors",
+              "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
               activeTab === tab.id
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
@@ -33,6 +35,9 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: Finance
           >
             <tab.icon className="w-5 h-5" />
             <span className="text-[10px] font-medium">{tab.label}</span>
+            {activeTab === tab.id && (
+              <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary shadow-glow-primary" />
+            )}
           </button>
         ))}
 
@@ -40,10 +45,13 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: Finance
         <div className="flex-1 flex items-center justify-center">
           <button
             onClick={onAddPress}
-            className="absolute -top-6 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 
-              text-primary-foreground shadow-lg shadow-primary/30 
+            className="absolute -top-6 w-14 h-14 rounded-full 
+              bg-gradient-to-br from-primary via-primary to-[hsl(var(--neon-cyan))]
+              text-primary-foreground
               flex items-center justify-center 
-              hover:scale-105 active:scale-95 transition-all"
+              hover:scale-105 active:scale-95 transition-all
+              animate-glow-pulse"
+            style={{ boxShadow: '0 4px 20px hsl(217 91% 60% / 0.4), 0 0 40px hsl(190 90% 55% / 0.15)' }}
           >
             <Plus className="w-7 h-7" />
           </button>
@@ -55,7 +63,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: Finance
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors",
+              "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
               activeTab === tab.id
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
@@ -63,6 +71,9 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddPress }: Finance
           >
             <tab.icon className="w-5 h-5" />
             <span className="text-[10px] font-medium">{tab.label}</span>
+            {activeTab === tab.id && (
+              <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary shadow-glow-primary" />
+            )}
           </button>
         ))}
       </div>

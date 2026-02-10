@@ -5,31 +5,31 @@
 @tailwind utilities;
 
 /* =========================================================
-   DESIGN SYSTEM - Garden Gestão (Premium Dark Mode)
+   DESIGN SYSTEM - Garden Gestão (Dark Command Center)
    ========================================================= */
 
 @layer base {
   :root {
-    /* Dark mode as DEFAULT */
-    --background: 222 47% 6%;
+    /* Dark Command Center palette */
+    --background: 222 50% 5%;
     --foreground: 210 40% 96%;
 
-    --card: 222 40% 9%;
+    --card: 222 45% 8%;
     --card-foreground: 210 40% 96%;
 
-    --popover: 222 40% 10%;
+    --popover: 222 45% 9%;
     --popover-foreground: 210 40% 96%;
 
     --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 6%;
+    --primary-foreground: 222 50% 5%;
 
-    --secondary: 222 30% 14%;
+    --secondary: 222 35% 12%;
     --secondary-foreground: 210 40% 85%;
 
-    --muted: 222 25% 15%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 222 30% 14%;
+    --muted-foreground: 215 20% 50%;
 
-    --accent: 222 30% 14%;
+    --accent: 222 35% 12%;
     --accent-foreground: 210 40% 90%;
 
     --destructive: 0 84% 60%;
@@ -41,21 +41,29 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 222 20% 16%;
-    --input: 222 25% 13%;
+    --border: 222 20% 14%;
+    --input: 222 30% 11%;
     --ring: 217 91% 60%;
 
     --radius: 0.875rem;
 
-    /* Glow & Shadow tokens */
-    --glow-primary: 0 0 20px hsl(217 91% 60% / 0.15);
-    --glow-success: 0 0 20px hsl(142 71% 45% / 0.15);
-    --glow-destructive: 0 0 20px hsl(0 84% 60% / 0.15);
-    --glow-warning: 0 0 20px hsl(38 92% 50% / 0.15);
+    /* Neon glow tokens */
+    --neon-cyan: 190 90% 55%;
+    --neon-green: 142 71% 45%;
+    --neon-red: 0 84% 60%;
+    --neon-amber: 38 92% 50%;
+    --neon-purple: 262 80% 65%;
 
-    --shadow-card: 0 1px 3px hsl(222 47% 3% / 0.4), 0 4px 16px hsl(222 47% 3% / 0.2);
-    --shadow-card-hover: 0 4px 20px hsl(222 47% 3% / 0.5), 0 8px 32px hsl(222 47% 3% / 0.25);
-    --shadow-elevated: 0 8px 32px hsl(222 47% 3% / 0.6);
+    /* Glow & Shadow tokens */
+    --glow-primary: 0 0 24px hsl(217 91% 60% / 0.2), 0 0 48px hsl(217 91% 60% / 0.08);
+    --glow-success: 0 0 24px hsl(142 71% 45% / 0.2), 0 0 48px hsl(142 71% 45% / 0.08);
+    --glow-destructive: 0 0 24px hsl(0 84% 60% / 0.2), 0 0 48px hsl(0 84% 60% / 0.08);
+    --glow-warning: 0 0 24px hsl(38 92% 50% / 0.2), 0 0 48px hsl(38 92% 50% / 0.08);
+    --glow-cyan: 0 0 24px hsl(190 90% 55% / 0.2), 0 0 48px hsl(190 90% 55% / 0.08);
+
+    --shadow-card: 0 2px 8px hsl(222 50% 3% / 0.5), 0 4px 20px hsl(222 50% 3% / 0.3);
+    --shadow-card-hover: 0 4px 24px hsl(222 50% 3% / 0.6), 0 8px 40px hsl(222 50% 3% / 0.3);
+    --shadow-elevated: 0 8px 40px hsl(222 50% 3% / 0.7), 0 16px 64px hsl(222 50% 3% / 0.3);
 
     /* Coin animation tokens */
     --coin-1: 190 90% 55%;
@@ -142,14 +150,14 @@
   /* ========== CARDS ========== */
   
   .card-base {
-    @apply bg-card rounded-2xl border border-border/60 transition-all duration-200;
+    @apply bg-card rounded-2xl border border-border/50 transition-all duration-200;
     box-shadow: var(--shadow-card);
   }
 
   .card-interactive {
-    @apply bg-card rounded-2xl border border-border/60
+    @apply bg-card rounded-2xl border border-border/50
            cursor-pointer transition-all duration-200
-           hover:border-primary/20 active:scale-[0.97];
+           hover:border-primary/25 active:scale-[0.97];
     box-shadow: var(--shadow-card);
   }
 
@@ -167,6 +175,41 @@
   .card-glow {
     @apply bg-card rounded-2xl border border-border/40 transition-all duration-300;
     box-shadow: var(--shadow-card), var(--glow-primary);
+  }
+
+  /* ========== COMMAND CENTER CARDS ========== */
+
+  .card-command {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl border transition-all duration-300;
+    border-image: linear-gradient(135deg, hsl(var(--neon-cyan) / 0.4), hsl(var(--neon-purple) / 0.3), hsl(var(--primary) / 0.4)) 1;
+    border-width: 1px;
+    border-style: solid;
+    border-color: hsl(var(--neon-cyan) / 0.25);
+    box-shadow: var(--shadow-card), var(--glow-cyan);
+  }
+
+  .card-command-success {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
+    border: 1px solid hsl(var(--neon-green) / 0.25);
+    box-shadow: var(--shadow-card), var(--glow-success);
+  }
+
+  .card-command-danger {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
+    border: 1px solid hsl(var(--neon-red) / 0.25);
+    box-shadow: var(--shadow-card), var(--glow-destructive);
+  }
+
+  .card-command-warning {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
+    border: 1px solid hsl(var(--neon-amber) / 0.25);
+    box-shadow: var(--shadow-card), var(--glow-warning);
+  }
+
+  .card-command-info {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
+    border: 1px solid hsl(var(--neon-cyan) / 0.25);
+    box-shadow: var(--shadow-card), var(--glow-cyan);
   }
 
   /* ========== PAGE HEADERS ========== */
@@ -352,6 +395,10 @@
     animation: glowPulse 2s ease-in-out infinite;
   }
 
+  .animate-neon-border {
+    animation: neonBorderPulse 3s ease-in-out infinite;
+  }
+
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -392,6 +439,17 @@
     }
   }
 
+  @keyframes neonBorderPulse {
+    0%, 100% {
+      border-color: hsl(var(--neon-cyan) / 0.2);
+      box-shadow: var(--shadow-card), 0 0 16px hsl(var(--neon-cyan) / 0.1);
+    }
+    50% {
+      border-color: hsl(var(--neon-cyan) / 0.4);
+      box-shadow: var(--shadow-card), 0 0 24px hsl(var(--neon-cyan) / 0.2);
+    }
+  }
+
   /* Stagger animation delays */
   .stagger-1 { animation-delay: 0ms; }
   .stagger-2 { animation-delay: 60ms; }
@@ -409,8 +467,8 @@
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -418,12 +476,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(222 20% 25%);
+  background: hsl(222 20% 20%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(222 20% 35%);
+  background: hsl(222 20% 30%);
 }
 
 /* Selection */

@@ -77,6 +77,7 @@ export default {
         'glow-success': 'var(--glow-success)',
         'glow-destructive': 'var(--glow-destructive)',
         'glow-warning': 'var(--glow-warning)',
+        'glow-cyan': 'var(--glow-cyan)',
       },
       keyframes: {
         "accordion-down": {
@@ -104,6 +105,10 @@ export default {
           "0%, 100%": { opacity: "0.5" },
           "50%": { opacity: "1" },
         },
+        "glow-border": {
+          "0%, 100%": { borderColor: "hsl(190 90% 55% / 0.2)" },
+          "50%": { borderColor: "hsl(190 90% 55% / 0.45)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -112,6 +117,7 @@ export default {
         "slide-up": "slide-up 0.3s ease-out",
         "coin-pulse": "coin-pulse 0.3s ease-out",
         "glow": "glow 2s ease-in-out infinite",
+        "glow-border": "glow-border 3s ease-in-out infinite",
       },
     },
   },
