@@ -36,7 +36,8 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
 
       {/* Radial Menu */}
       {menuOpen && (
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-end gap-6">
+      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="flex items-end gap-6 mb-4">
           {/* Income */}
           <button
             onClick={() => handleAction('income')}
@@ -44,7 +45,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
             style={{ animationDelay: '0ms' }}
           >
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-emerald-500/50 active:scale-90 transition-transform duration-150"
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-emerald-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
               style={{ boxShadow: '0 0 16px rgba(16, 185, 129, 0.3)' }}
             >
               <ArrowUpCircle className="w-7 h-7 text-emerald-400" />
@@ -59,7 +60,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
             style={{ animationDelay: '50ms' }}
           >
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-red-500/50 active:scale-90 transition-transform duration-150"
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-red-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
               style={{ boxShadow: '0 0 16px rgba(239, 68, 68, 0.3)' }}
             >
               <ArrowDownCircle className="w-7 h-7 text-red-400" />
@@ -74,13 +75,14 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
             style={{ animationDelay: '100ms' }}
           >
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-cyan-500/50 active:scale-90 transition-transform duration-150"
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-cyan-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
               style={{ boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)' }}
             >
               <ArrowLeftRight className="w-7 h-7 text-cyan-400" />
             </div>
             <span className="text-[11px] font-semibold text-cyan-400">Transf.</span>
           </button>
+        </div>
         </div>
       )}
 
