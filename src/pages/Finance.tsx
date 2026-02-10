@@ -9,6 +9,8 @@ import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
+import { useSuppliers } from '@/hooks/useSuppliers';
+import { useEmployees } from '@/hooks/useEmployees';
 import { FinanceTab, TransactionType, FinanceTransaction, TransactionFormData } from '@/types/finance';
 import { Loader2 } from 'lucide-react';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
@@ -49,6 +51,9 @@ export default function Finance() {
     getSupplierStats,
     getEmployeeStats
   } = useFinanceStats(transactions, categories);
+
+  const { suppliers } = useSuppliers();
+  const { employees } = useEmployees();
 
 
   const handleAddTransaction = (type: TransactionType) => {
@@ -135,6 +140,7 @@ export default function Finance() {
             getSubcategoryStats={getSubcategoryStats}
             getSupplierStats={getSupplierStats}
             getEmployeeStats={getEmployeeStats}
+            transactions={transactions}
           />
         )}
 
@@ -164,6 +170,8 @@ export default function Finance() {
         defaultType={transactionType}
         categories={categories}
         accounts={accounts}
+        suppliers={suppliers}
+        employees={employees}
         onSave={handleSaveTransaction}
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}

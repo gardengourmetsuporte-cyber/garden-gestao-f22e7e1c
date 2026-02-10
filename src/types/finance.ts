@@ -43,6 +43,7 @@ export interface FinanceTransaction {
   account_id: string | null;
   to_account_id: string | null;
   supplier_id: string | null;
+  employee_id: string | null;
   date: string;
   is_paid: boolean;
   is_fixed: boolean;
@@ -63,8 +64,8 @@ export interface FinanceTransaction {
   account?: FinanceAccount;
   to_account?: FinanceAccount;
   supplier?: { id: string; name: string };
+  employee?: { id: string; full_name: string };
 }
-
 export interface FinanceBudget {
   id: string;
   user_id: string;
@@ -159,6 +160,8 @@ export interface TransactionFormData {
   tags?: string[];
   notes?: string;
   attachment_url?: string;
+  supplier_id?: string | null;
+  employee_id?: string | null;
   // Credit card specific
   credit_card_invoice_id?: string | null;
   installment_number?: number | null;

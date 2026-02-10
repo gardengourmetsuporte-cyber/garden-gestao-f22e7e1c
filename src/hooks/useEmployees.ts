@@ -237,7 +237,7 @@ export function useEmployeePayments(employeeId?: string) {
       
       const description = `${typeLabels[payment.type]} - ${payment.employee.full_name}`;
       
-      // Create finance transaction
+      // Create finance transaction with employee_id linked
       const { data: transaction, error: transError } = await supabase
         .from('finance_transactions')
         .insert({
@@ -249,6 +249,7 @@ export function useEmployeePayments(employeeId?: string) {
           account_id: accountId,
           is_paid: true,
           is_fixed: false,
+          employee_id: payment.employee_id,
         })
         .select('id')
         .single();

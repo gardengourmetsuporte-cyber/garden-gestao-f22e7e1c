@@ -136,8 +136,8 @@ export function useFinanceStats(
       .sort((a, b) => b.amount - a.amount);
   }, [transactions]);
 
-  // Get employee stats from employee_payments linked to finance transactions
-  const getEmployeeStats = useCallback(async (categoryId: string): Promise<EntityStats[]> => {
+  // Get employee stats directly from employee_id on transactions
+  const getEmployeeStats = useCallback((categoryId: string): EntityStats[] => {
     const relevantTransactions = transactions.filter(t => {
       if (!t.is_paid) return false;
       if (t.type !== 'expense' && t.type !== 'credit_card') return false;
@@ -145,46 +145,16 @@ export function useFinanceStats(
       return t.category.id === categoryId || t.category.parent_id === categoryId;
     });
 
-    const transactionIds = relevantTransactions.map(t => t.id);
-    if (transactionIds.length === 0) return [];
-
-    const { data: payments } = await supabase
-      .from('employee_payments')
-      .select('*, employee:employees(id, full_name)')
-      .in('finance_transaction_id', transactionIds);
-
-    if (!payments || payments.length === 0) {
-      // Fallback: group by description
-      const total = relevantTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
-      const byDesc: Record<string, { amount: number; count: number }> = {};
-      relevantTransactions.forEach(t => {
-        const key = t.description;
-        if (!byDesc[key]) byDesc[key] = { amount: 0, count: 0 };
-        byDesc[key].amount += Number(t.amount);
-        byDesc[key].count += 1;
-      });
-      return Object.entries(byDesc)
-        .map(([name, item], index) => ({
-          id: name,
-          name,
-          amount: item.amount,
-          percentage: total > 0 ? (item.amount / total) * 100 : 0,
-          count: item.count,
-          color: ENTITY_COLORS[index % ENTITY_COLORS.length],
-        }))
-        .sort((a, b) => b.amount - a.amount);
-    }
-
-    const total = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const total = relevantTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
     const byEmployee: Record<string, { name: string; amount: number; count: number }> = {};
 
-    payments.forEach((p: any) => {
-      const empId = p.employee_id;
-      const empName = p.employee?.full_name || 'Funcionário';
+    relevantTransactions.forEach(t => {
+      const empId = t.employee_id || 'sem-funcionario';
+      const empName = t.employee?.full_name || 'Sem funcionário';
       if (!byEmployee[empId]) {
         byEmployee[empId] = { name: empName, amount: 0, count: 0 };
       }
-      byEmployee[empId].amount += Number(p.amount);
+      byEmployee[empId].amount += Number(t.amount);
       byEmployee[empId].count += 1;
     });
 

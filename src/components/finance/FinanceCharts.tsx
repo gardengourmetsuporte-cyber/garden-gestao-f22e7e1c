@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Users, Truck, Loader2 } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { MonthSelector } from './MonthSelector';
-import { CategoryStats, FinanceCategory } from '@/types/finance';
+import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { EntityStats } from '@/hooks/useFinanceStats';
 import { cn } from '@/lib/utils';
 
@@ -17,20 +17,10 @@ interface FinanceChartsProps {
   dailyIncome: { date: string; amount: number }[];
   getSubcategoryStats: (parentId: string) => CategoryStats[];
   getSupplierStats: (categoryId: string) => EntityStats[];
-  getEmployeeStats: (categoryId: string) => Promise<EntityStats[]>;
+  getEmployeeStats: (categoryId: string) => EntityStats[];
+  transactions: FinanceTransaction[];
 }
 
-// Known category patterns for entity drill-down
-const EMPLOYEE_CATEGORY_NAMES = ['folha de pagamento', 'salários', 'salario', 'funcionários', 'funcionarios'];
-const SUPPLIER_CATEGORY_NAMES = ['matéria-prima', 'materia-prima', 'matéria prima', 'insumos', 'mercado', 'fornecedores'];
-
-function isEmployeeCategory(name: string): boolean {
-  return EMPLOYEE_CATEGORY_NAMES.some(n => name.toLowerCase().includes(n));
-}
-
-function isSupplierCategory(name: string): boolean {
-  return SUPPLIER_CATEGORY_NAMES.some(n => name.toLowerCase().includes(n));
-}
 
 export function FinanceCharts({
   selectedMonth,
@@ -41,14 +31,15 @@ export function FinanceCharts({
   dailyIncome,
   getSubcategoryStats,
   getSupplierStats,
-  getEmployeeStats
+  getEmployeeStats,
+  transactions
 }: FinanceChartsProps) {
   const [viewType, setViewType] = useState<'categories' | 'timeline' | 'bars'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
   const [drillDownCategory, setDrillDownCategory] = useState<FinanceCategory | null>(null);
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
   const [entityData, setEntityData] = useState<EntityStats[]>([]);
-  const [entityLoading, setEntityLoading] = useState(false);
+  
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -60,16 +51,40 @@ export function FinanceCharts({
   const displayData = drillDownCategory ? subcategoryData : categoryData;
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
 
-  // Check if current drill-down category supports entity view
-  const canShowEmployees = drillDownCategory && isEmployeeCategory(drillDownCategory.name);
-  const canShowSuppliers = drillDownCategory && isSupplierCategory(drillDownCategory.name);
-  const canShowEntities = canShowEmployees || canShowSuppliers;
+  // Auto-detect entity data for subcategory drill-down
+  const detectEntityData = useCallback((categoryId: string): { type: 'employees' | 'suppliers' | null; data: EntityStats[] } => {
+    // Check if transactions in this category have employee_id or supplier_id
+    const relevantTxs = transactions.filter(t => {
+      if (!t.is_paid) return false;
+      if (t.type !== 'expense' && t.type !== 'credit_card') return false;
+      if (!t.category) return false;
+      return t.category.id === categoryId || t.category.parent_id === categoryId;
+    });
+
+    const hasEmployees = relevantTxs.some(t => t.employee_id);
+    const hasSuppliers = relevantTxs.some(t => t.supplier_id);
+
+    if (hasEmployees) {
+      return { type: 'employees', data: getEmployeeStats(categoryId) };
+    }
+    if (hasSuppliers) {
+      return { type: 'suppliers', data: getSupplierStats(categoryId) };
+    }
+    return { type: null, data: [] };
+  }, [transactions, getEmployeeStats, getSupplierStats]);
 
   const handleCategoryClick = (category: FinanceCategory) => {
     if (!drillDownCategory) {
       setDrillDownCategory(category);
       setEntityView(null);
       setEntityData([]);
+    } else if (!entityView) {
+      // Second level click (subcategory) - auto-detect entity
+      const detected = detectEntityData(category.id);
+      if (detected.type) {
+        setEntityView(detected.type);
+        setEntityData(detected.data);
+      }
     }
   };
 
@@ -79,26 +94,6 @@ export function FinanceCharts({
       setEntityData([]);
     } else {
       setDrillDownCategory(null);
-    }
-  };
-
-  const handleShowEntities = async (type: 'employees' | 'suppliers') => {
-    if (!drillDownCategory) return;
-    setEntityLoading(true);
-    setEntityView(type);
-
-    try {
-      if (type === 'suppliers') {
-        const stats = getSupplierStats(drillDownCategory.id);
-        setEntityData(stats);
-      } else {
-        const stats = await getEmployeeStats(drillDownCategory.id);
-        setEntityData(stats);
-      }
-    } catch {
-      setEntityData([]);
-    } finally {
-      setEntityLoading(false);
     }
   };
 
@@ -189,44 +184,16 @@ export function FinanceCharts({
                   </div>
                 </div>
 
-                {/* Entity drill-down buttons */}
-                {canShowEntities && drillDownCategory && (
-                  <div className="flex gap-2">
-                    {canShowEmployees && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 gap-2"
-                        onClick={() => handleShowEntities('employees')}
-                      >
-                        <Users className="w-4 h-4" />
-                        Ver por Funcionário
-                      </Button>
-                    )}
-                    {canShowSuppliers && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 gap-2"
-                        onClick={() => handleShowEntities('suppliers')}
-                      >
-                        <Truck className="w-4 h-4" />
-                        Ver por Fornecedor
-                      </Button>
-                    )}
-                  </div>
-                )}
-
                 {/* Category List */}
                 <div className="space-y-2">
                   {displayData.map((item) => (
                     <button
                       key={item.category.id}
                       onClick={() => handleCategoryClick(item.category)}
-                      disabled={!!drillDownCategory}
+                      disabled={!!entityView}
                       className={cn(
                         "flex items-center gap-3 w-full p-3 rounded-xl bg-card border transition-colors",
-                        !drillDownCategory && "hover:bg-secondary"
+                        !entityView && "hover:bg-secondary"
                       )}
                     >
                       <div
@@ -250,12 +217,8 @@ export function FinanceCharts({
 
         {/* Entity View (Employees / Suppliers) */}
         {viewType === 'categories' && entityView && (
-          <div className="space-y-6">
-            {entityLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : entityData.length > 0 ? (
+           <div className="space-y-6">
+            {entityData.length > 0 ? (
               <>
                 <div className="h-64 relative">
                   <ResponsiveContainer width="100%" height="100%">

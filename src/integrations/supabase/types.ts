@@ -672,6 +672,7 @@ export type Database = {
           credit_card_invoice_id: string | null
           date: string
           description: string
+          employee_id: string | null
           id: string
           installment_group_id: string | null
           installment_number: number | null
@@ -697,6 +698,7 @@ export type Database = {
           credit_card_invoice_id?: string | null
           date?: string
           description: string
+          employee_id?: string | null
           id?: string
           installment_group_id?: string | null
           installment_number?: number | null
@@ -722,6 +724,7 @@ export type Database = {
           credit_card_invoice_id?: string | null
           date?: string
           description?: string
+          employee_id?: string | null
           id?: string
           installment_group_id?: string | null
           installment_number?: number | null
@@ -758,6 +761,13 @@ export type Database = {
             columns: ["credit_card_invoice_id"]
             isOneToOne: false
             referencedRelation: "credit_card_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_transactions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
           {

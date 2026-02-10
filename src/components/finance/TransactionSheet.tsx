@@ -35,6 +35,8 @@ interface TransactionSheetProps {
   defaultType: TransactionType;
   categories: FinanceCategory[];
   accounts: FinanceAccount[];
+  suppliers?: { id: string; name: string }[];
+  employees?: { id: string; full_name: string }[];
   onSave: (data: TransactionFormData) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
@@ -61,6 +63,8 @@ export function TransactionSheet({
   defaultType,
   categories,
   accounts,
+  suppliers = [],
+  employees = [],
   onSave,
   onDelete,
   editingTransaction,
@@ -83,6 +87,8 @@ export function TransactionSheet({
   const [recurringInterval, setRecurringInterval] = useState<string>('monthly');
   const [recurringCount, setRecurringCount] = useState<string>('2');
   const [notes, setNotes] = useState('');
+  const [supplierId, setSupplierId] = useState<string | null>(null);
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showRecurringConfig, setShowRecurringConfig] = useState(false);
@@ -109,6 +115,8 @@ export function TransactionSheet({
         setIsRecurring(editingTransaction.is_recurring);
         setRecurringInterval(editingTransaction.recurring_interval || 'monthly');
         setNotes(editingTransaction.notes || '');
+        setSupplierId(editingTransaction.supplier_id || null);
+        setEmployeeId(editingTransaction.employee_id || null);
         setRecurringEditMode('single');
         // Reset recurring count to prevent showing wrong value
         if (editingTransaction.total_installments) {
@@ -132,6 +140,8 @@ export function TransactionSheet({
         setRecurringInterval('monthly');
         setRecurringCount('2');
         setNotes('');
+        setSupplierId(null);
+        setEmployeeId(null);
         setShowRecurringConfig(false);
       }
     }
@@ -200,6 +210,8 @@ export function TransactionSheet({
           is_recurring: true,
           recurring_interval: recurringInterval,
           notes: notes.trim() || undefined,
+          supplier_id: supplierId || undefined,
+          employee_id: employeeId || undefined,
           installment_number: i + 1,
           total_installments: count,
           installment_group_id: groupId
@@ -220,7 +232,9 @@ export function TransactionSheet({
         is_fixed: isFixed,
         is_recurring: isRecurring,
         recurring_interval: isRecurring ? recurringInterval : undefined,
-        notes: notes.trim() || undefined
+        notes: notes.trim() || undefined,
+        supplier_id: supplierId || undefined,
+        employee_id: employeeId || undefined,
       });
     }
     
@@ -245,7 +259,9 @@ export function TransactionSheet({
       is_paid: isPaid,
       is_fixed: isFixed,
       is_recurring: false,
-      notes: notes.trim() || undefined
+      notes: notes.trim() || undefined,
+      supplier_id: supplierId || undefined,
+      employee_id: employeeId || undefined,
     });
     
     setIsLoading(false);
@@ -254,6 +270,8 @@ export function TransactionSheet({
     setAmount('');
     setDescription('');
     setNotes('');
+    setSupplierId(null);
+    setEmployeeId(null);
     setIsRecurring(false);
     setShowRecurringConfig(false);
   };
@@ -504,6 +522,42 @@ export function TransactionSheet({
                   ))}
                 </select>
               </div>
+            )}
+
+            {/* Supplier & Employee - only for expenses */}
+            {(type === 'expense' || type === 'credit_card') && (
+              <>
+                {suppliers.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Fornecedor</Label>
+                    <select
+                      value={supplierId || ''}
+                      onChange={(e) => setSupplierId(e.target.value || null)}
+                      className="w-full h-12 px-3 rounded-md border bg-background"
+                    >
+                      <option value="">Nenhum</option>
+                      {suppliers.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {employees.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Funcionário</Label>
+                    <select
+                      value={employeeId || ''}
+                      onChange={(e) => setEmployeeId(e.target.value || null)}
+                      className="w-full h-12 px-3 rounded-md border bg-background"
+                    >
+                      <option value="">Nenhum</option>
+                      {employees.map(e => (
+                        <option key={e.id} value={e.id}>{e.full_name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Advanced options */}
