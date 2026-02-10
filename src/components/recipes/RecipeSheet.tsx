@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, AlertTriangle, TrendingUp, Package, Percent, Building2 } from 'lucide-react';
+import { Plus, AlertTriangle, TrendingUp, Package, Percent, Building2, ArrowLeft } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -275,9 +275,20 @@ export function RecipeSheet({
         <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col [&>button]:hidden">
           {/* Fixed Header */}
           <SheetHeader className="p-4 border-b shrink-0">
-            <div className="flex items-center justify-between">
-              <SheetTitle>{recipe ? 'Editar Ficha' : 'Nova Ficha Técnica'}</SheetTitle>
-              <Button onClick={handleSubmit} disabled={isSaving || !name.trim()}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => onOpenChange(false)}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <SheetTitle className="text-base">{recipe ? 'Editar Ficha' : 'Nova Ficha Técnica'}</SheetTitle>
+              </div>
+              <Button size="sm" onClick={handleSubmit} disabled={isSaving || !name.trim()}>
                 {isSaving ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>

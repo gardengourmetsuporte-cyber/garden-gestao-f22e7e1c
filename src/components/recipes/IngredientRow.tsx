@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost, getCompatibleUnits } from '@/types/recipe';
+import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost } from '@/types/recipe';
 import { cn } from '@/lib/utils';
 
 interface IngredientRowProps {
@@ -54,7 +54,8 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
 
   const isSubRecipe = ingredient.source_type === 'recipe';
   const baseUnit = isSubRecipe ? ingredient.source_recipe_unit : ingredient.item_unit;
-  const compatibleUnits = getCompatibleUnits(baseUnit || 'unidade');
+  // Allow all units freely - the recipe's "usage unit" is independent from stock
+  const allUnits: RecipeUnitType[] = ['unidade', 'kg', 'g', 'litro', 'ml'];
 
   const basePrice = isSubRecipe
     ? ingredient.source_recipe_cost || 0
@@ -131,7 +132,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
             <div className="min-w-0">
               <p className="font-medium text-sm truncate">{displayName}</p>
               <p className="text-xs text-muted-foreground">
-                {isSubRecipe ? 'Sub-receita' : 'Estoque'}
+                {isSubRecipe ? 'Sub-receita' : `Estoque: ${displayUnit}`}
               </p>
             </div>
           </div>
@@ -146,27 +147,37 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           </Button>
         </div>
 
-        {/* Price Row */}
-        <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">
-            {isSubRecipe ? 'Custo por porção (ficha técnica)' : 'Preço base (estoque)'}
-          </Label>
+        {/* Alert for no price */}
+        {hasNoPrice && (
+          <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/20 px-2 py-1.5 rounded-md">
+            <AlertTriangle className="h-3 w-3 shrink-0" />
+            <span>Sem preço definido — custo não será calculado</span>
+          </div>
+        )}
 
-          {hasNoPrice && (
-            <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/20 px-2 py-1 rounded-md">
-              <AlertTriangle className="h-3 w-3 shrink-0" />
-              <span>Ingrediente sem preço definido — custo não será calculado</span>
-            </div>
-          )}
+        {/* Price Section */}
+        <div className="bg-muted/30 rounded-lg p-3 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+              {isSubRecipe ? 'Custo por porção' : 'Preço global'}
+            </Label>
+            {isSubRecipe ? (
+              <Badge variant="outline" className="text-[10px] h-5">Sincronizado</Badge>
+            ) : onUpdateGlobalPrice && !editingPrice ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs text-muted-foreground hover:text-primary"
+                onClick={handleStartEditPrice}
+              >
+                <Pencil className="h-3 w-3 mr-1" />
+                Editar
+              </Button>
+            ) : null}
+          </div>
 
-          {isSubRecipe ? (
-            <div className="h-9 px-3 flex items-center bg-muted/50 rounded-md text-sm">
-              {formatCurrency(basePrice)}/{displayUnit}
-              <Badge variant="outline" className="ml-auto text-[10px] h-5">
-                Sincronizado
-              </Badge>
-            </div>
-          ) : editingPrice ? (
+          {editingPrice ? (
             <div className="flex items-center gap-1">
               <span className="text-muted-foreground text-sm">R$</span>
               <Input
@@ -175,89 +186,70 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                 min="0"
                 value={newPriceValue}
                 onChange={(e) => setNewPriceValue(e.target.value)}
-                className="h-9 flex-1"
+                className="h-8 flex-1 text-sm"
                 autoFocus
               />
-              <span className="text-muted-foreground text-sm">/{displayUnit}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-primary shrink-0"
-                onClick={handleConfirmPriceEdit}
-              >
+              <span className="text-muted-foreground text-xs">/{displayUnit}</span>
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-primary shrink-0" onClick={handleConfirmPriceEdit}>
                 <Check className="h-4 w-4" />
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground shrink-0"
-                onClick={() => setEditingPrice(false)}
-              >
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground shrink-0" onClick={() => setEditingPrice(false)}>
                 <XCircle className="h-4 w-4" />
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <div className="h-9 px-3 flex items-center bg-muted/50 rounded-md text-sm flex-1">
-                {formatCurrency(basePrice)}/{displayUnit}
-              </div>
-              {onUpdateGlobalPrice && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0"
-                  onClick={handleStartEditPrice}
-                  title="Alterar preço global"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-              )}
-            </div>
+            <p className="text-sm font-semibold">{formatCurrency(basePrice)}/{displayUnit}</p>
           )}
         </div>
 
-        {/* Quantity Row */}
-        <div className="flex items-end gap-3">
-          <div className="flex-1 space-y-1">
-            <Label className="text-xs text-muted-foreground">Quantidade</Label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                value={ingredient.quantity || ''}
-                onChange={(e) => handleQuantityChange(e.target.value)}
-                className="h-9 flex-1"
-                placeholder="0"
-                min="0"
-                step="0.01"
-              />
-              <Select value={ingredient.unit_type} onValueChange={handleUnitChange}>
-                <SelectTrigger className="w-20 h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNIT_OPTIONS.filter((u) => compatibleUnits.includes(u.value)).map((unit) => (
-                    <SelectItem key={unit.value} value={unit.value}>
-                      {unit.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Quantity + Unit + Cost */}
+        <div className="grid grid-cols-[1fr_auto_auto] gap-3 items-end">
+          <div className="space-y-1">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Quantidade</Label>
+            <Input
+              type="number"
+              value={ingredient.quantity || ''}
+              onChange={(e) => handleQuantityChange(e.target.value)}
+              className="h-9"
+              placeholder="0"
+              min="0"
+              step="0.01"
+            />
           </div>
 
-          <div className="text-right pb-1">
-            <p className="text-xs text-muted-foreground">Custo</p>
+          <div className="space-y-1">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Unidade</Label>
+            <Select value={ingredient.unit_type} onValueChange={handleUnitChange}>
+              <SelectTrigger className="w-20 h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {UNIT_OPTIONS.filter((u) => allUnits.includes(u.value)).map((unit) => (
+                  <SelectItem key={unit.value} value={unit.value}>
+                    {unit.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="text-right pb-0.5">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Custo</Label>
             <p className={cn(
-              "text-lg font-bold",
+              "text-base font-bold mt-1",
               hasNoPrice ? "text-amber-500" : "text-primary"
             )}>
               {hasNoPrice ? '—' : formatCurrency(ingredient.total_cost)}
             </p>
           </div>
         </div>
+
+        {/* Conversion info */}
+        {!hasNoPrice && ingredient.unit_type !== displayUnit && (
+          <p className="text-[11px] text-muted-foreground italic">
+            Conversão: {ingredient.quantity} {UNIT_OPTIONS.find(u => u.value === ingredient.unit_type)?.label} → {displayUnit} (automática)
+          </p>
+        )}
       </div>
 
       {/* Global Price Warning Dialog */}
