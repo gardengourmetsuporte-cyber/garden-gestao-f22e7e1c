@@ -7,8 +7,8 @@ import { EmployeePayments } from '@/components/employees/EmployeePayments';
 import { MyPayslips } from '@/components/employees/MyPayslips';
 import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
+import { SwipeableTabs } from '@/components/ui/swipeable-tabs';
 import { Users, Calendar } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Employees() {
   const { isAdmin } = useAuth();
@@ -16,18 +16,18 @@ export default function Employees() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-24">
         {/* Header */}
-        <div className="page-header-unified">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        <div className="page-header-bar">
+          <div className="page-header-content flex items-center gap-3">
+            <div className="page-header-icon bg-primary/10">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">
+              <h1 className="page-title">
                 {isAdmin ? 'Funcionários' : 'Meus Dados'}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="page-subtitle">
                 {isAdmin 
                   ? 'Gerencie funcionários, pagamentos e folgas' 
                   : 'Consulte seus holerites e solicite folgas'}
@@ -36,7 +36,6 @@ export default function Employees() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="px-4 py-4">
           {isAdmin ? (
             selectedEmployee ? (
@@ -45,44 +44,40 @@ export default function Employees() {
                 onBack={() => setSelectedEmployee(null)}
               />
             ) : (
-              <Tabs defaultValue="employees" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="employees">
-                    <Users className="w-4 h-4 mr-2" />
-                    Funcionários
-                  </TabsTrigger>
-                  <TabsTrigger value="schedules">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Folgas
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="employees">
-                  <EmployeeList onSelectEmployee={setSelectedEmployee} />
-                </TabsContent>
-                <TabsContent value="schedules">
-                  <ScheduleManagement />
-                </TabsContent>
-              </Tabs>
+              <SwipeableTabs
+                tabs={[
+                  {
+                    key: 'employees',
+                    label: 'Funcionários',
+                    icon: <Users className="w-4 h-4" />,
+                    content: <EmployeeList onSelectEmployee={setSelectedEmployee} />,
+                  },
+                  {
+                    key: 'schedules',
+                    label: 'Folgas',
+                    icon: <Calendar className="w-4 h-4" />,
+                    content: <ScheduleManagement />,
+                  },
+                ]}
+              />
             )
           ) : (
-            <Tabs defaultValue="payslips" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
-                <TabsTrigger value="payslips">
-                  <Users className="w-4 h-4 mr-2" />
-                  Holerites
-                </TabsTrigger>
-                <TabsTrigger value="schedules">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Folgas
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="payslips">
-                <MyPayslips />
-              </TabsContent>
-              <TabsContent value="schedules">
-                <EmployeeScheduleRequest />
-              </TabsContent>
-            </Tabs>
+            <SwipeableTabs
+              tabs={[
+                {
+                  key: 'payslips',
+                  label: 'Holerites',
+                  icon: <Users className="w-4 h-4" />,
+                  content: <MyPayslips />,
+                },
+                {
+                  key: 'schedules',
+                  label: 'Folgas',
+                  icon: <Calendar className="w-4 h-4" />,
+                  content: <EmployeeScheduleRequest />,
+                },
+              ]}
+            />
           )}
         </div>
       </div>

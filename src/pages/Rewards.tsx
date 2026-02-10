@@ -6,6 +6,7 @@ import { RedemptionHistory } from '@/components/rewards/RedemptionHistory';
 import { usePoints } from '@/hooks/usePoints';
 import { useRewards, RewardProduct } from '@/hooks/useRewards';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,28 +56,28 @@ export default function RewardsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
-        <header className="page-header">
-          <div className="page-header-content">
-            <div className="flex items-center gap-3">
-              <div className="page-header-icon bg-gradient-to-br from-amber-500 to-orange-500">
-                <Gift className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="page-title">Loja de Recompensas</h1>
-                <p className="page-subtitle">Troque seus pontos por prêmios!</p>
-              </div>
+        <div className="page-header-bar">
+          <div className="page-header-content flex items-center gap-3">
+            <div className="page-header-icon bg-warning/10">
+              <Gift className="w-5 h-5 text-warning" />
+            </div>
+            <div>
+              <h1 className="page-title">Loja de Recompensas</h1>
+              <p className="page-subtitle">Troque seus pontos por prêmios!</p>
             </div>
           </div>
-        </header>
+        </div>
 
-        <div className="px-4 py-6 lg:px-6 space-y-6">
+        <div className="px-4 py-4 space-y-6">
           {/* Points Balance */}
-          <div className="card-gradient bg-gradient-to-r from-amber-500 to-orange-500 p-6">
-            <p className="text-amber-100 text-sm mb-1">Seu saldo</p>
+          <div className="card-command-warning p-6">
+            <p className="text-sm text-muted-foreground mb-1">Seu saldo</p>
             <div className="flex items-center gap-3">
-              <Star className="w-8 h-8 fill-current" />
-              <span className="text-4xl font-bold">{balance}</span>
-              <span className="text-lg text-amber-100">pontos</span>
+              <div className="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center">
+                <Star className="w-6 h-6 text-warning fill-warning" />
+              </div>
+              <span className="text-4xl font-bold text-foreground">{balance}</span>
+              <span className="text-lg text-muted-foreground">pontos</span>
             </div>
           </div>
 
@@ -85,9 +86,10 @@ export default function RewardsPage() {
             <h2 className="section-title mb-4">Prêmios Disponíveis</h2>
             
             {activeProducts.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Gift className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p>Nenhum prêmio disponível no momento.</p>
+              <div className="empty-state">
+                <Gift className="empty-state-icon" />
+                <p className="empty-state-title">Nenhum prêmio disponível</p>
+                <p className="empty-state-text">Volte mais tarde para conferir novidades.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
