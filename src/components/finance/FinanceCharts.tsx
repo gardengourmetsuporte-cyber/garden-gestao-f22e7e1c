@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { MonthSelector } from './MonthSelector';
@@ -115,27 +114,42 @@ export function FinanceCharts({
 
       {/* Data Type Toggle */}
       <div className="px-4">
-        <Tabs value={dataType} onValueChange={(v) => { setDataType(v as 'expense' | 'income'); }}>
-          <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="expense" className="data-[state=active]:bg-destructive data-[state=active]:text-white">
-              Despesas
-            </TabsTrigger>
-            <TabsTrigger value="income" className="data-[state=active]:bg-success data-[state=active]:text-white">
-              Receitas
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="tab-command">
+          {['expense', 'income'].map(type => (
+            <button
+              key={type}
+              onClick={() => setDataType(type as 'expense' | 'income')}
+              className={cn(
+                "tab-command-item",
+                dataType === type && "tab-command-item-active"
+              )}
+            >
+              {type === 'expense' ? 'Despesas' : 'Receitas'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* View Type Toggle */}
       <div className="px-4">
-        <Tabs value={viewType} onValueChange={(v) => setViewType(v as 'categories' | 'timeline' | 'bars')}>
-          <TabsList className="grid grid-cols-3 w-full">
-            <TabsTrigger value="categories">Categorias</TabsTrigger>
-            <TabsTrigger value="timeline">Linha</TabsTrigger>
-            <TabsTrigger value="bars">Barras</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="tab-command">
+          {[
+            { value: 'categories', label: 'Categorias' },
+            { value: 'timeline', label: 'Linha' },
+            { value: 'bars', label: 'Barras' },
+          ].map(tab => (
+            <button
+              key={tab.value}
+              onClick={() => setViewType(tab.value as 'categories' | 'timeline' | 'bars')}
+              className={cn(
+                "tab-command-item",
+                viewType === tab.value && "tab-command-item-active"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Drill-down header */}
@@ -191,10 +205,8 @@ export function FinanceCharts({
                       key={item.category.id}
                       onClick={() => handleCategoryClick(item.category)}
                       disabled={!!entityView}
-                      className={cn(
-                        "flex items-center gap-3 w-full p-3 rounded-xl bg-card border transition-colors",
-                        !entityView && "hover:bg-secondary"
-                      )}
+                      className="list-command w-full flex items-center gap-3 p-3 text-left"
+                      style={{ borderLeftColor: item.category.color }}
                     >
                       <div
                         className="w-4 h-4 rounded-full shrink-0"
@@ -250,7 +262,8 @@ export function FinanceCharts({
                   {entityData.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 w-full p-3 rounded-xl bg-card border"
+                      className="list-command flex items-center gap-3 w-full p-3"
+                      style={{ borderLeftColor: item.color }}
                     >
                       <div
                         className="w-4 h-4 rounded-full shrink-0"

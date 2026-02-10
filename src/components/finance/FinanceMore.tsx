@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Wallet, Tag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Wallet, Tag, ChevronRight } from 'lucide-react';
 import { AccountManagement } from './AccountManagement';
 import { CategoryManagement } from './CategoryManagement';
 import { FinanceAccount, FinanceCategory } from '@/types/finance';
@@ -26,8 +25,8 @@ export function FinanceMore({
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   const menuItems = [
-    { icon: Wallet, label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true) },
-    { icon: Tag, label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true) },
+    { icon: Wallet, label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
+    { icon: Tag, label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
   ];
 
   return (
@@ -36,15 +35,21 @@ export function FinanceMore({
         <h1 className="text-xl font-bold mb-4">Mais Opções</h1>
         
         {menuItems.map((item, index) => (
-          <Button
+          <button
             key={index}
-            variant="ghost"
-            className="w-full justify-start h-14 text-left gap-3"
             onClick={item.onClick}
+            className="list-command w-full flex items-center gap-3 p-4 text-left animate-slide-up"
+            style={{ borderLeftColor: item.color, animationDelay: `${index * 50}ms` }}
           >
-            <item.icon className="w-5 h-5 text-muted-foreground" />
-            <span className="font-medium">{item.label}</span>
-          </Button>
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: `${item.color}15` }}
+            >
+              <item.icon className="w-5 h-5" style={{ color: item.color }} />
+            </div>
+            <span className="flex-1 font-medium">{item.label}</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
         ))}
       </div>
 

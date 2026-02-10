@@ -187,7 +187,7 @@ export function FinanceTransactions({
       </div>
 
       {/* Summary Header */}
-      <div className="px-4 py-3 bg-secondary/50 border-y">
+      <div className="mx-4 card-command p-3">
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Saldo do mês</span>
           <span className={monthStats.balance >= 0 ? 'text-success font-semibold' : 'text-destructive font-semibold'}>
@@ -267,7 +267,7 @@ export function FinanceTransactions({
           </DragOverlay>
         </DndContext>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+        <div className="empty-state">
           <FileText className="w-12 h-12 mb-4 opacity-50" />
           <p className="text-lg font-medium">Nenhuma transação</p>
           <p className="text-sm">Toque em + para adicionar</p>
