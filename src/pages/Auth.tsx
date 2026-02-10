@@ -87,16 +87,20 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-      {/* Subtle background gradient orbs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-primary/3 rounded-full blur-3xl" />
+      {/* Neon background orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.08), transparent 70%)' }} />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full blur-3xl" style={{ background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.06), transparent 70%)' }} />
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative z-10">
         <div className="w-full max-w-sm space-y-8 animate-slide-up">
           {/* Logo */}
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-border/30 p-2"
-              style={{ boxShadow: '0 8px 32px hsl(222 47% 3% / 0.4)' }}
+            <div className="w-24 h-24 rounded-2xl overflow-hidden p-2 relative"
+              style={{
+                background: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--neon-cyan) / 0.3)',
+                boxShadow: '0 0 30px hsl(var(--neon-cyan) / 0.15), 0 8px 32px hsl(222 47% 3% / 0.4)',
+              }}
             >
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg" />
             </div>
@@ -107,7 +111,7 @@ export default function Auth() {
           </div>
 
           {/* Form Card */}
-          <div className="card-base p-6 space-y-6">
+          <div className="card-command p-6 space-y-6 animate-neon-border">
             <div className="text-center">
               <h2 className="text-xl font-semibold text-foreground">
                 {isLogin ? 'Entrar' : 'Criar Conta'}
@@ -151,7 +155,7 @@ export default function Auth() {
               </div>
 
               <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold"
-                style={{ boxShadow: '0 4px 14px hsl(217 91% 60% / 0.3)' }}
+                style={{ boxShadow: '0 4px 20px hsl(var(--neon-cyan) / 0.3)' }}
               >
                 {isSubmitting ? (
                   <span className="animate-pulse">Aguarde...</span>

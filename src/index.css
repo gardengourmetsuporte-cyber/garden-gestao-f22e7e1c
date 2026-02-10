@@ -328,7 +328,8 @@
     @apply flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all duration-200;
   }
 
-  .tab-command-active {
+  .tab-command-active,
+  .tab-command-item-active {
     @apply bg-card text-foreground;
     border: 1px solid hsl(var(--neon-cyan) / 0.3);
     box-shadow: 0 0 12px hsl(var(--neon-cyan) / 0.1);
