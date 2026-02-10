@@ -106,8 +106,9 @@ async function encryptPayload(
   const cek = new Uint8Array(await crypto.subtle.sign('HMAC', cePrkKey, concatBytes(cekInfo, new Uint8Array([1])))).slice(0, 16);
   const nonce = new Uint8Array(await crypto.subtle.sign('HMAC', cePrkKey, concatBytes(nonceInfo, new Uint8Array([1])))).slice(0, 12);
 
-  // Pad and encrypt
-  const paddedPayload = concatBytes(new Uint8Array(2), enc.encode(payloadStr));
+  // Pad and encrypt (RFC 8188: data || 0x02 delimiter for final record)
+  const payloadBytes = enc.encode(payloadStr);
+  const paddedPayload = concatBytes(payloadBytes, new Uint8Array([2]));
   const aesKey = await crypto.subtle.importKey('raw', cek, { name: 'AES-GCM' }, false, ['encrypt']);
   const encrypted = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, aesKey, paddedPayload));
 
