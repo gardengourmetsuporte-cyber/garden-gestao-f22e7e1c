@@ -342,27 +342,8 @@ export default function InventoryPage() {
             </div>
           )}
 
-          {/* Alerts */}
-          {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
-            <div className="card-command-warning p-4 flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-foreground">Atenção ao Estoque</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {outOfStockItems.length > 0 && (
-                    <span className="text-destructive font-medium">
-                      {outOfStockItems.length} item(ns) zerado(s).{' '}
-                    </span>
-                  )}
-                  {lowStockItems.length > 0 && (
-                    <span className="text-warning font-medium">
-                      {lowStockItems.length} item(ns) com estoque baixo.
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
+
+
 
           {/* View Toggle */}
           <div className="tab-command">
