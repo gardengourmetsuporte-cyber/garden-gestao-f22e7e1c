@@ -54,6 +54,7 @@ export interface FinanceTransaction {
   attachment_url: string | null;
   created_at: string;
   updated_at: string;
+  sort_order: number;
   // Credit card fields
   credit_card_invoice_id: string | null;
   installment_number: number | null;

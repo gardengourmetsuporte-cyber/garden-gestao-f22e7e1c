@@ -681,6 +681,7 @@ export type Database = {
           is_recurring: boolean
           notes: string | null
           recurring_interval: string | null
+          sort_order: number
           supplier_id: string | null
           tags: string[] | null
           to_account_id: string | null
@@ -707,6 +708,7 @@ export type Database = {
           is_recurring?: boolean
           notes?: string | null
           recurring_interval?: string | null
+          sort_order?: number
           supplier_id?: string | null
           tags?: string[] | null
           to_account_id?: string | null
@@ -733,6 +735,7 @@ export type Database = {
           is_recurring?: boolean
           notes?: string | null
           recurring_interval?: string | null
+          sort_order?: number
           supplier_id?: string | null
           tags?: string[] | null
           to_account_id?: string | null
