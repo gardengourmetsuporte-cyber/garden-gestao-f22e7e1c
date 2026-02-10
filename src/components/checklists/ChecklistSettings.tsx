@@ -19,7 +19,8 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  TouchSensor,
+  MouseSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -90,7 +91,7 @@ interface ChecklistSettingsProps {
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
 
-// Sortable Item Component
+// Sortable Item Component - touch-friendly, no grip handle
 function SortableItem({ 
   id, 
   children, 
@@ -109,27 +110,28 @@ function SortableItem({
     isDragging,
   } = useSortable({ id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
+  const style: React.CSSProperties = {
+    transform: CSS.Translate.toString(transform),
     transition,
+    zIndex: isDragging ? 50 : 'auto',
+    position: 'relative' as const,
+    ...(isDragging && {
+      scale: '1.02',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px hsl(var(--neon-cyan) / 0.2)',
+      borderRadius: '16px',
+      opacity: 0.95,
+    }),
   };
 
   return (
     <div 
       ref={setNodeRef} 
       style={style} 
-      className={cn(className, isDragging && "opacity-50 z-50")}
+      className={className}
+      {...attributes}
+      {...listeners}
     >
-      <div className="flex items-center gap-2">
-        <button 
-          {...attributes} 
-          {...listeners}
-          className="p-1 cursor-grab active:cursor-grabbing touch-none"
-        >
-          <GripVertical className="w-4 h-4 text-muted-foreground" />
-        </button>
-        <div className="flex-1">{children}</div>
-      </div>
+      {children}
     </div>
   );
 }
@@ -177,10 +179,11 @@ export function ChecklistSettings({
   const [itemPoints, setItemPoints] = useState<number>(1);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
