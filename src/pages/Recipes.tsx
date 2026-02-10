@@ -29,16 +29,17 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
     categories,
     inventoryItems,
     isLoading,
-    addRecipe,
-    updateRecipe,
-    toggleActive,
-    duplicateRecipe,
-    deleteRecipe,
-    isAddingRecipe,
-    isUpdatingRecipe,
-    getAvailableSubRecipes,
-    reorderCategories,
-  } = useRecipes();
+     addRecipe,
+     updateRecipe,
+     toggleActive,
+     duplicateRecipe,
+     deleteRecipe,
+     isAddingRecipe,
+     isUpdatingRecipe,
+     getAvailableSubRecipes,
+     reorderCategories,
+     updateItemPrice,
+   } = useRecipes();
    
    const [search, setSearch] = useState('');
    const [sheetOpen, setSheetOpen] = useState(false);
@@ -316,9 +317,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
           cost_per_portion: r.cost_per_portion,
           category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
         }))}
-         onSave={handleSave}
-         isSaving={isAddingRecipe || isUpdatingRecipe}
-       />
+          onSave={handleSave}
+          isSaving={isAddingRecipe || isUpdatingRecipe}
+          onUpdateItemPrice={async (itemId, price) => {
+            await updateItemPrice({ itemId, price });
+          }}
+        />
        
        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
          <AlertDialogContent>

@@ -398,6 +398,38 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
     },
   });
 
+  // Update inventory item price globally
+  const updateItemPriceMutation = useMutation({
+    mutationFn: async ({ itemId, price }: { itemId: string; price: number }) => {
+      // Check if item has recipe-specific unit/price configured
+      const { data: item } = await supabase
+        .from('inventory_items')
+        .select('recipe_unit_type, recipe_unit_price')
+        .eq('id', itemId)
+        .single();
+
+      // Update the appropriate price field
+      const updateData = item?.recipe_unit_type
+        ? { recipe_unit_price: price }
+        : { unit_price: price };
+
+      const { error } = await supabase
+        .from('inventory_items')
+        .update(updateData)
+        .eq('id', itemId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recipes'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
+      toast({ title: 'Preço atualizado em todas as receitas!' });
+    },
+    onError: () => {
+      toast({ title: 'Erro ao atualizar preço', variant: 'destructive' });
+    },
+  });
+
   return {
     recipes,
     categories,
@@ -414,5 +446,6 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
     isUpdatingRecipe: updateRecipeMutation.isPending,
     getAvailableSubRecipes,
     hasCircularDependency,
+    updateItemPrice: updateItemPriceMutation.mutateAsync,
   };
 }
