@@ -38,8 +38,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
      isUpdatingRecipe,
      getAvailableSubRecipes,
      reorderCategories,
-     updateItemPrice,
-   } = useRecipes();
+      updateItemPrice,
+      updateItemUnit,
+    } = useRecipes();
    
    const [search, setSearch] = useState('');
    const [sheetOpen, setSheetOpen] = useState(false);
@@ -319,9 +320,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
         }))}
           onSave={handleSave}
           isSaving={isAddingRecipe || isUpdatingRecipe}
-          onUpdateItemPrice={async (itemId, price) => {
-            await updateItemPrice({ itemId, price });
-          }}
+           onUpdateItemPrice={async (itemId, price) => {
+             await updateItemPrice({ itemId, price });
+           }}
+           onUpdateItemUnit={async (itemId, unitType) => {
+             await updateItemUnit({ itemId, unitType });
+           }}
         />
        
        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
