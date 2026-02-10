@@ -1,5 +1,21 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { FinanceTransaction, FinanceCategory, CategoryStats } from '@/types/finance';
+
+export interface EntityStats {
+  id: string;
+  name: string;
+  amount: number;
+  percentage: number;
+  count: number;
+  color: string;
+}
+
+const ENTITY_COLORS = [
+  '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6',
+  '#3b82f6', '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e',
+  '#84cc16', '#06b6d4', '#0ea5e9', '#a855f7', '#d946ef',
+];
 
 export function useFinanceStats(
   transactions: FinanceTransaction[],
@@ -53,7 +69,6 @@ export function useFinanceStats(
         t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid
       );
       
-      // Filter transactions that belong to this parent category or its subcategories
       const relevantTransactions = expenseTransactions.filter(t => {
         if (!t.category) return false;
         if (t.category.id === parentCategoryId) return true;
@@ -85,6 +100,104 @@ export function useFinanceStats(
         }))
         .sort((a, b) => b.amount - a.amount);
     };
+  }, [transactions]);
+
+  // Get entity stats (suppliers or employees) for a category
+  const getSupplierStats = useCallback((categoryId: string): EntityStats[] => {
+    const relevantTransactions = transactions.filter(t => {
+      if (!t.is_paid) return false;
+      if (t.type !== 'expense' && t.type !== 'credit_card') return false;
+      if (!t.category) return false;
+      return t.category.id === categoryId || t.category.parent_id === categoryId;
+    });
+
+    const total = relevantTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    const bySupplier: Record<string, { name: string; amount: number; count: number }> = {};
+
+    relevantTransactions.forEach(t => {
+      const supplierId = t.supplier_id || 'sem-fornecedor';
+      const supplierName = t.supplier?.name || 'Sem fornecedor';
+      if (!bySupplier[supplierId]) {
+        bySupplier[supplierId] = { name: supplierName, amount: 0, count: 0 };
+      }
+      bySupplier[supplierId].amount += Number(t.amount);
+      bySupplier[supplierId].count += 1;
+    });
+
+    return Object.entries(bySupplier)
+      .map(([id, item], index) => ({
+        id,
+        name: item.name,
+        amount: item.amount,
+        percentage: total > 0 ? (item.amount / total) * 100 : 0,
+        count: item.count,
+        color: ENTITY_COLORS[index % ENTITY_COLORS.length],
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [transactions]);
+
+  // Get employee stats from employee_payments linked to finance transactions
+  const getEmployeeStats = useCallback(async (categoryId: string): Promise<EntityStats[]> => {
+    const relevantTransactions = transactions.filter(t => {
+      if (!t.is_paid) return false;
+      if (t.type !== 'expense' && t.type !== 'credit_card') return false;
+      if (!t.category) return false;
+      return t.category.id === categoryId || t.category.parent_id === categoryId;
+    });
+
+    const transactionIds = relevantTransactions.map(t => t.id);
+    if (transactionIds.length === 0) return [];
+
+    const { data: payments } = await supabase
+      .from('employee_payments')
+      .select('*, employee:employees(id, full_name)')
+      .in('finance_transaction_id', transactionIds);
+
+    if (!payments || payments.length === 0) {
+      // Fallback: group by description
+      const total = relevantTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+      const byDesc: Record<string, { amount: number; count: number }> = {};
+      relevantTransactions.forEach(t => {
+        const key = t.description;
+        if (!byDesc[key]) byDesc[key] = { amount: 0, count: 0 };
+        byDesc[key].amount += Number(t.amount);
+        byDesc[key].count += 1;
+      });
+      return Object.entries(byDesc)
+        .map(([name, item], index) => ({
+          id: name,
+          name,
+          amount: item.amount,
+          percentage: total > 0 ? (item.amount / total) * 100 : 0,
+          count: item.count,
+          color: ENTITY_COLORS[index % ENTITY_COLORS.length],
+        }))
+        .sort((a, b) => b.amount - a.amount);
+    }
+
+    const total = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const byEmployee: Record<string, { name: string; amount: number; count: number }> = {};
+
+    payments.forEach((p: any) => {
+      const empId = p.employee_id;
+      const empName = p.employee?.full_name || 'Funcionário';
+      if (!byEmployee[empId]) {
+        byEmployee[empId] = { name: empName, amount: 0, count: 0 };
+      }
+      byEmployee[empId].amount += Number(p.amount);
+      byEmployee[empId].count += 1;
+    });
+
+    return Object.entries(byEmployee)
+      .map(([id, item], index) => ({
+        id,
+        name: item.name,
+        amount: item.amount,
+        percentage: total > 0 ? (item.amount / total) * 100 : 0,
+        count: item.count,
+        color: ENTITY_COLORS[index % ENTITY_COLORS.length],
+      }))
+      .sort((a, b) => b.amount - a.amount);
   }, [transactions]);
 
   // Income by category
@@ -162,6 +275,8 @@ export function useFinanceStats(
     expensesByCategory,
     incomeByCategory,
     getSubcategoryStats,
+    getSupplierStats,
+    getEmployeeStats,
     dailyExpenses,
     dailyIncome
   };

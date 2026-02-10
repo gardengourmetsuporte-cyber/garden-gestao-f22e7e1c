@@ -45,7 +45,9 @@ export default function Finance() {
     incomeByCategory,
     dailyExpenses,
     dailyIncome,
-    getSubcategoryStats
+    getSubcategoryStats,
+    getSupplierStats,
+    getEmployeeStats
   } = useFinanceStats(transactions, categories);
 
 
@@ -131,6 +133,8 @@ export default function Finance() {
             dailyExpenses={dailyExpenses}
             dailyIncome={dailyIncome}
             getSubcategoryStats={getSubcategoryStats}
+            getSupplierStats={getSupplierStats}
+            getEmployeeStats={getEmployeeStats}
           />
         )}
 
