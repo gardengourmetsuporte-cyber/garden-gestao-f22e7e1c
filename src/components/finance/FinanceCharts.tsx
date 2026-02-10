@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Users, Truck, Loader2 } from 'lucide-react';
 import { MonthSelector } from './MonthSelector';
 import { CategoryStats, FinanceCategory } from '@/types/finance';
+import { EntityStats } from '@/hooks/useFinanceStats';
 import { cn } from '@/lib/utils';
 
 interface FinanceChartsProps {
@@ -15,6 +16,20 @@ interface FinanceChartsProps {
   dailyExpenses: { date: string; amount: number }[];
   dailyIncome: { date: string; amount: number }[];
   getSubcategoryStats: (parentId: string) => CategoryStats[];
+  getSupplierStats: (categoryId: string) => EntityStats[];
+  getEmployeeStats: (categoryId: string) => Promise<EntityStats[]>;
+}
+
+// Known category patterns for entity drill-down
+const EMPLOYEE_CATEGORY_NAMES = ['folha de pagamento', 'salários', 'salario', 'funcionários', 'funcionarios'];
+const SUPPLIER_CATEGORY_NAMES = ['matéria-prima', 'materia-prima', 'matéria prima', 'insumos', 'mercado', 'fornecedores'];
+
+function isEmployeeCategory(name: string): boolean {
+  return EMPLOYEE_CATEGORY_NAMES.some(n => name.toLowerCase().includes(n));
+}
+
+function isSupplierCategory(name: string): boolean {
+  return SUPPLIER_CATEGORY_NAMES.some(n => name.toLowerCase().includes(n));
 }
 
 export function FinanceCharts({
@@ -24,34 +39,77 @@ export function FinanceCharts({
   incomeByCategory,
   dailyExpenses,
   dailyIncome,
-  getSubcategoryStats
+  getSubcategoryStats,
+  getSupplierStats,
+  getEmployeeStats
 }: FinanceChartsProps) {
   const [viewType, setViewType] = useState<'categories' | 'timeline' | 'bars'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
   const [drillDownCategory, setDrillDownCategory] = useState<FinanceCategory | null>(null);
+  const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
+  const [entityData, setEntityData] = useState<EntityStats[]>([]);
+  const [entityLoading, setEntityLoading] = useState(false);
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
-  const totalAmount = categoryData.reduce((sum, c) => sum + c.amount, 0);
 
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id) : [];
 
   const displayData = drillDownCategory ? subcategoryData : categoryData;
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
 
-  const chartColors = displayData.map(d => d.category.color);
+  // Check if current drill-down category supports entity view
+  const canShowEmployees = drillDownCategory && isEmployeeCategory(drillDownCategory.name);
+  const canShowSuppliers = drillDownCategory && isSupplierCategory(drillDownCategory.name);
+  const canShowEntities = canShowEmployees || canShowSuppliers;
 
   const handleCategoryClick = (category: FinanceCategory) => {
     if (!drillDownCategory) {
       setDrillDownCategory(category);
+      setEntityView(null);
+      setEntityData([]);
     }
   };
 
   const handleBack = () => {
-    setDrillDownCategory(null);
+    if (entityView) {
+      setEntityView(null);
+      setEntityData([]);
+    } else {
+      setDrillDownCategory(null);
+    }
   };
+
+  const handleShowEntities = async (type: 'employees' | 'suppliers') => {
+    if (!drillDownCategory) return;
+    setEntityLoading(true);
+    setEntityView(type);
+
+    try {
+      if (type === 'suppliers') {
+        const stats = getSupplierStats(drillDownCategory.id);
+        setEntityData(stats);
+      } else {
+        const stats = await getEmployeeStats(drillDownCategory.id);
+        setEntityData(stats);
+      }
+    } catch {
+      setEntityData([]);
+    } finally {
+      setEntityLoading(false);
+    }
+  };
+
+  // Reset when changing data type
+  useEffect(() => {
+    setDrillDownCategory(null);
+    setEntityView(null);
+    setEntityData([]);
+  }, [dataType]);
+
+  const entityTotal = entityData.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div className="space-y-4">
@@ -62,7 +120,7 @@ export function FinanceCharts({
 
       {/* Data Type Toggle */}
       <div className="px-4">
-        <Tabs value={dataType} onValueChange={(v) => { setDataType(v as 'expense' | 'income'); setDrillDownCategory(null); }}>
+        <Tabs value={dataType} onValueChange={(v) => { setDataType(v as 'expense' | 'income'); }}>
           <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="expense" className="data-[state=active]:bg-destructive data-[state=active]:text-white">
               Despesas
@@ -86,20 +144,25 @@ export function FinanceCharts({
       </div>
 
       {/* Drill-down header */}
-      {drillDownCategory && (
-        <div className="px-4">
+      {(drillDownCategory || entityView) && (
+        <div className="px-4 flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={handleBack} className="gap-1">
             <ChevronLeft className="w-4 h-4" />
-            {drillDownCategory.name}
+            Voltar
           </Button>
+          <span className="text-sm font-medium text-muted-foreground">
+            {entityView 
+              ? `${drillDownCategory?.name} › ${entityView === 'employees' ? 'Funcionários' : 'Fornecedores'}`
+              : drillDownCategory?.name
+            }
+          </span>
         </div>
       )}
 
       {/* Charts */}
       <div className="px-4 pb-24">
-        {viewType === 'categories' && (
+        {viewType === 'categories' && !entityView && (
           <div className="space-y-6">
-            {/* Pie Chart */}
             {displayData.length > 0 ? (
               <>
                 <div className="h-64 relative">
@@ -126,6 +189,34 @@ export function FinanceCharts({
                   </div>
                 </div>
 
+                {/* Entity drill-down buttons */}
+                {canShowEntities && drillDownCategory && (
+                  <div className="flex gap-2">
+                    {canShowEmployees && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 gap-2"
+                        onClick={() => handleShowEntities('employees')}
+                      >
+                        <Users className="w-4 h-4" />
+                        Ver por Funcionário
+                      </Button>
+                    )}
+                    {canShowSuppliers && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 gap-2"
+                        onClick={() => handleShowEntities('suppliers')}
+                      >
+                        <Truck className="w-4 h-4" />
+                        Ver por Fornecedor
+                      </Button>
+                    )}
+                  </div>
+                )}
+
                 {/* Category List */}
                 <div className="space-y-2">
                   {displayData.map((item) => (
@@ -139,12 +230,12 @@ export function FinanceCharts({
                       )}
                     >
                       <div
-                        className="w-4 h-4 rounded-full"
+                        className="w-4 h-4 rounded-full shrink-0"
                         style={{ backgroundColor: item.category.color }}
                       />
-                      <span className="flex-1 text-left font-medium">{item.category.name}</span>
-                      <span className="text-muted-foreground text-sm">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold">{formatCurrency(item.amount)}</span>
+                      <span className="flex-1 text-left font-medium text-sm">{item.category.name}</span>
+                      <span className="text-muted-foreground text-xs">{item.percentage.toFixed(1)}%</span>
+                      <span className="font-semibold text-sm">{formatCurrency(item.amount)}</span>
                     </button>
                   ))}
                 </div>
@@ -152,6 +243,77 @@ export function FinanceCharts({
             ) : (
               <div className="text-center py-16 text-muted-foreground">
                 <p>Sem dados para exibir</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Entity View (Employees / Suppliers) */}
+        {viewType === 'categories' && entityView && (
+          <div className="space-y-6">
+            {entityLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : entityData.length > 0 ? (
+              <>
+                <div className="h-64 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={entityData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={100}
+                        dataKey="amount"
+                        nameKey="name"
+                      >
+                        {entityData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <p className="text-2xl font-bold">{formatCurrency(entityTotal)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {entityView === 'employees' ? 'funcionários' : 'fornecedores'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {entityData.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 w-full p-3 rounded-xl bg-card border"
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full shrink-0"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.count} lançamento{item.count !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      <span className="text-muted-foreground text-xs">{item.percentage.toFixed(1)}%</span>
+                      <span className="font-semibold text-sm">{formatCurrency(item.amount)}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <p>Sem {entityView === 'employees' ? 'funcionários' : 'fornecedores'} vinculados</p>
+                <p className="text-xs mt-1">
+                  {entityView === 'employees' 
+                    ? 'Os pagamentos precisam estar vinculados ao cadastro de funcionários'
+                    : 'As transações precisam ter um fornecedor vinculado'
+                  }
+                </p>
               </div>
             )}
           </div>
@@ -189,9 +351,9 @@ export function FinanceCharts({
         {viewType === 'bars' && (
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={displayData}>
+              <BarChart data={entityView ? entityData : displayData}>
                 <XAxis 
-                  dataKey="category.name" 
+                  dataKey={entityView ? "name" : "category.name"}
                   tick={false}
                 />
                 <YAxis 
@@ -200,11 +362,14 @@ export function FinanceCharts({
                 />
                 <Tooltip 
                   formatter={(value: number) => formatCurrency(value)}
-                  labelFormatter={(_, payload) => payload[0]?.payload?.category?.name || ''}
+                  labelFormatter={(_, payload) => {
+                    if (entityView) return payload[0]?.payload?.name || '';
+                    return payload[0]?.payload?.category?.name || '';
+                  }}
                 />
                 <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                  {displayData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.category.color} />
+                  {(entityView ? entityData : displayData).map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entityView ? entry.color : entry.category?.color} />
                   ))}
                 </Bar>
               </BarChart>

@@ -66,7 +66,8 @@ export function useFinance(selectedMonth: Date) {
         *,
         category:finance_categories(*),
         account:finance_accounts!finance_transactions_account_id_fkey(*),
-        to_account:finance_accounts!finance_transactions_to_account_id_fkey(*)
+        to_account:finance_accounts!finance_transactions_to_account_id_fkey(*),
+        supplier:suppliers!finance_transactions_supplier_id_fkey(id, name)
       `)
       .eq('user_id', user.id)
       .gte('date', startDate)
