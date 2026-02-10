@@ -154,7 +154,7 @@ export function AdminDashboard() {
     month: 'long',
   });
 
-  const hasAlerts = outOfStockItems.length > 0 || lowStockItems.length > 0 || pendingRedemptions > 0 || pendingClosings > 0 || pendingExpenses > 0;
+  const hasAlerts = pendingRedemptions > 0 || pendingClosings > 0 || pendingExpenses > 0;
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
@@ -219,12 +219,6 @@ export function AdminDashboard() {
             <h3 className="font-semibold text-sm text-foreground">Ações Pendentes</h3>
           </div>
           <div className="space-y-1">
-            {outOfStockItems.length > 0 && (
-              <AlertItem message="Itens zerados no estoque" count={outOfStockItems.length} severity="error" onClick={() => navigate('/inventory', { state: { stockFilter: 'zero' } })} />
-            )}
-            {lowStockItems.length > 0 && (
-              <AlertItem message="Itens com estoque baixo" count={lowStockItems.length} severity="warning" onClick={() => navigate('/inventory', { state: { stockFilter: 'low' } })} />
-            )}
             {pendingRedemptions > 0 && (
               <AlertItem message="Resgates aguardando" count={pendingRedemptions} severity="info" onClick={() => navigate('/rewards')} />
             )}

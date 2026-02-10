@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
@@ -45,6 +45,19 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
+  const navRef = useRef<HTMLElement>(null);
+
+  // Scroll sidebar nav to active item when opened
+  useEffect(() => {
+    if (sidebarOpen && navRef.current) {
+      const activeLink = navRef.current.querySelector('[data-active="true"]');
+      if (activeLink) {
+        setTimeout(() => {
+          activeLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }, 50);
+      }
+    }
+  }, [sidebarOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -207,7 +220,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-5">
+        <nav ref={navRef} className="flex-1 overflow-y-auto px-3 pb-3 space-y-5">
           {groupedNav.map((group) => (
             <div key={group.label}>
               {/* Group Label */}
@@ -226,6 +239,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     <Link
                       key={item.href}
                       to={item.href}
+                      data-active={isActive}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
