@@ -53,11 +53,13 @@ function SortableItemWrapper({
     isDragging,
   } = useSortable({ id });
 
+  // Only apply Y translation for reordering animation, never X
+  // When actively dragging, hide the original item (overlay handles display)
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition: transition || 'transform 150ms ease',
-    opacity: isDragging ? 0.4 : 1,
-    willChange: 'transform',
+    opacity: isDragging ? 0.3 : 1,
+    zIndex: isDragging ? 0 : 'auto',
   };
 
   return (
