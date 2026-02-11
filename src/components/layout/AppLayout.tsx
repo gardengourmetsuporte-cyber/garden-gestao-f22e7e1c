@@ -9,6 +9,7 @@ import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimatio
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
+import { getThemeColor } from '@/lib/unitThemes';
 import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -43,7 +44,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
   const { profile, isAdmin, signOut } = useAuth();
-  const { units, activeUnit, setActiveUnitId } = useUnit();
+  const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
   const location = useLocation();
@@ -227,7 +228,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                       )}
                     >
-                      <Building2 className="w-3.5 h-3.5 shrink-0" />
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ background: getThemeColor(unit.slug) }}
+                      />
                       <span className="truncate">{unit.name}</span>
                     </button>
                   ))}
@@ -385,6 +389,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         {children}
       </main>
+
+      {/* Unit transition overlay */}
+      {isTransitioning && (
+        <div
+          className="fixed inset-0 z-[100] pointer-events-none animate-unit-flash"
+          style={{ background: 'hsl(var(--primary) / 0.12)' }}
+        />
+      )}
 
       <CoinAnimationLayer />
       <PushNotificationPrompt />

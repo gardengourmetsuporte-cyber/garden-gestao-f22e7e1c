@@ -572,6 +572,16 @@
     to { --neon-angle: 360deg; }
   }
 
+  @keyframes unitFlash {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .animate-unit-flash {
+    animation: unitFlash 500ms ease-out forwards;
+  }
+
   /* Stagger animation delays */
   .stagger-1 { animation-delay: 0ms; }
   .stagger-2 { animation-delay: 60ms; }
