@@ -1,5 +1,5 @@
 // Database types matching Supabase schema
-export type AppRole = 'admin' | 'funcionario';
+export type AppRole = 'admin' | 'funcionario' | 'super_admin';
 export type UnitType = 'unidade' | 'kg' | 'litro';
 export type MovementType = 'entrada' | 'saida';
 export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';

@@ -33,6 +33,7 @@ export type Database = {
           receipt_url: string
           status: Database["public"]["Enums"]["cash_closing_status"]
           total_amount: number | null
+          unit_id: string | null
           unit_name: string
           updated_at: string
           user_id: string
@@ -58,6 +59,7 @@ export type Database = {
           receipt_url: string
           status?: Database["public"]["Enums"]["cash_closing_status"]
           total_amount?: number | null
+          unit_id?: string | null
           unit_name?: string
           updated_at?: string
           user_id: string
@@ -83,6 +85,7 @@ export type Database = {
           receipt_url?: string
           status?: Database["public"]["Enums"]["cash_closing_status"]
           total_amount?: number | null
+          unit_id?: string | null
           unit_name?: string
           updated_at?: string
           user_id?: string
@@ -90,7 +93,15 @@ export type Database = {
           validated_by?: string | null
           validation_notes?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cash_closings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
@@ -100,6 +111,7 @@ export type Database = {
           id: string
           name: string
           sort_order: number
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -109,6 +121,7 @@ export type Database = {
           id?: string
           name: string
           sort_order?: number
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -118,9 +131,18 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number
+          unit_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       checklist_completions: {
         Row: {
@@ -133,6 +155,7 @@ export type Database = {
           item_id: string
           notes: string | null
           points_awarded: number
+          unit_id: string | null
         }
         Insert: {
           awarded_points?: boolean
@@ -144,6 +167,7 @@ export type Database = {
           item_id: string
           notes?: string | null
           points_awarded?: number
+          unit_id?: string | null
         }
         Update: {
           awarded_points?: boolean
@@ -155,6 +179,7 @@ export type Database = {
           item_id?: string
           notes?: string | null
           points_awarded?: number
+          unit_id?: string | null
         }
         Relationships: [
           {
@@ -162,6 +187,13 @@ export type Database = {
             columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_completions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -179,6 +211,7 @@ export type Database = {
           points: number
           sort_order: number
           subcategory_id: string
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -193,6 +226,7 @@ export type Database = {
           points?: number
           sort_order?: number
           subcategory_id: string
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -207,6 +241,7 @@ export type Database = {
           points?: number
           sort_order?: number
           subcategory_id?: string
+          unit_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -215,6 +250,13 @@ export type Database = {
             columns: ["subcategory_id"]
             isOneToOne: false
             referencedRelation: "checklist_subcategories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -227,6 +269,7 @@ export type Database = {
           id: string
           name: string
           sort_order: number
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -236,6 +279,7 @@ export type Database = {
           id?: string
           name: string
           sort_order?: number
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -245,9 +289,18 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number
+          unit_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "checklist_sectors_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       checklist_subcategories: {
         Row: {
@@ -256,6 +309,7 @@ export type Database = {
           name: string
           sector_id: string
           sort_order: number
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -264,6 +318,7 @@ export type Database = {
           name: string
           sector_id: string
           sort_order?: number
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -272,6 +327,7 @@ export type Database = {
           name?: string
           sector_id?: string
           sort_order?: number
+          unit_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -280,6 +336,13 @@ export type Database = {
             columns: ["sector_id"]
             isOneToOne: false
             referencedRelation: "checklist_sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_subcategories_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -296,6 +359,7 @@ export type Database = {
           paid_at: string | null
           paid_from_account_id: string | null
           total_amount: number
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -310,6 +374,7 @@ export type Database = {
           paid_at?: string | null
           paid_from_account_id?: string | null
           total_amount?: number
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -324,6 +389,7 @@ export type Database = {
           paid_at?: string | null
           paid_from_account_id?: string | null
           total_amount?: number
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -340,6 +406,13 @@ export type Database = {
             columns: ["paid_from_account_id"]
             isOneToOne: false
             referencedRelation: "finance_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_card_invoices_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -379,6 +452,7 @@ export type Database = {
           total_earnings: number | null
           transport_allowance: number | null
           type: string
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -415,6 +489,7 @@ export type Database = {
           total_earnings?: number | null
           transport_allowance?: number | null
           type: string
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -451,6 +526,7 @@ export type Database = {
           total_earnings?: number | null
           transport_allowance?: number | null
           type?: string
+          unit_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -459,6 +535,13 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_payments_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -475,6 +558,7 @@ export type Database = {
           is_active: boolean
           notes: string | null
           role: string | null
+          unit_id: string | null
           updated_at: string
           user_id: string | null
         }
@@ -489,6 +573,7 @@ export type Database = {
           is_active?: boolean
           notes?: string | null
           role?: string | null
+          unit_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -503,10 +588,19 @@ export type Database = {
           is_active?: boolean
           notes?: string | null
           role?: string | null
+          unit_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       finance_accounts: {
         Row: {
@@ -518,6 +612,7 @@ export type Database = {
           is_active: boolean
           name: string
           type: string
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -530,6 +625,7 @@ export type Database = {
           is_active?: boolean
           name: string
           type?: string
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -542,10 +638,19 @@ export type Database = {
           is_active?: boolean
           name?: string
           type?: string
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "finance_accounts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       finance_budgets: {
         Row: {
@@ -554,6 +659,7 @@ export type Database = {
           id: string
           month: number
           planned_amount: number
+          unit_id: string | null
           updated_at: string
           user_id: string
           year: number
@@ -564,6 +670,7 @@ export type Database = {
           id?: string
           month: number
           planned_amount: number
+          unit_id?: string | null
           updated_at?: string
           user_id: string
           year: number
@@ -574,6 +681,7 @@ export type Database = {
           id?: string
           month?: number
           planned_amount?: number
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
           year?: number
@@ -584,6 +692,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_budgets_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -599,6 +714,7 @@ export type Database = {
           parent_id: string | null
           sort_order: number
           type: string
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -612,6 +728,7 @@ export type Database = {
           parent_id?: string | null
           sort_order?: number
           type: string
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -625,6 +742,7 @@ export type Database = {
           parent_id?: string | null
           sort_order?: number
           type?: string
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -636,6 +754,13 @@ export type Database = {
             referencedRelation: "finance_categories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "finance_categories_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       finance_tags: {
@@ -644,6 +769,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          unit_id: string | null
           user_id: string
         }
         Insert: {
@@ -651,6 +777,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          unit_id?: string | null
           user_id: string
         }
         Update: {
@@ -658,9 +785,18 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          unit_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "finance_tags_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       finance_transactions: {
         Row: {
@@ -687,6 +823,7 @@ export type Database = {
           to_account_id: string | null
           total_installments: number | null
           type: Database["public"]["Enums"]["transaction_type"]
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -714,6 +851,7 @@ export type Database = {
           to_account_id?: string | null
           total_installments?: number | null
           type: Database["public"]["Enums"]["transaction_type"]
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -741,6 +879,7 @@ export type Database = {
           to_account_id?: string | null
           total_installments?: number | null
           type?: Database["public"]["Enums"]["transaction_type"]
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -787,6 +926,13 @@ export type Database = {
             referencedRelation: "finance_accounts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "finance_transactions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       inventory_items: {
@@ -800,6 +946,7 @@ export type Database = {
           recipe_unit_price: number | null
           recipe_unit_type: string | null
           supplier_id: string | null
+          unit_id: string | null
           unit_price: number | null
           unit_type: Database["public"]["Enums"]["unit_type"]
           updated_at: string
@@ -814,6 +961,7 @@ export type Database = {
           recipe_unit_price?: number | null
           recipe_unit_type?: string | null
           supplier_id?: string | null
+          unit_id?: string | null
           unit_price?: number | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
           updated_at?: string
@@ -828,6 +976,7 @@ export type Database = {
           recipe_unit_price?: number | null
           recipe_unit_type?: string | null
           supplier_id?: string | null
+          unit_id?: string | null
           unit_price?: number | null
           unit_type?: Database["public"]["Enums"]["unit_type"]
           updated_at?: string
@@ -847,6 +996,13 @@ export type Database = {
             referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "inventory_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       manager_appointments: {
@@ -857,6 +1013,7 @@ export type Database = {
           notes: string | null
           scheduled_time: string
           title: string
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -867,6 +1024,7 @@ export type Database = {
           notes?: string | null
           scheduled_time: string
           title: string
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -877,10 +1035,19 @@ export type Database = {
           notes?: string | null
           scheduled_time?: string
           title?: string
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "manager_appointments_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       manager_tasks: {
         Row: {
@@ -900,6 +1067,7 @@ export type Database = {
           source_data: Json | null
           system_source: string | null
           title: string
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -920,6 +1088,7 @@ export type Database = {
           source_data?: Json | null
           system_source?: string | null
           title: string
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -940,6 +1109,7 @@ export type Database = {
           source_data?: Json | null
           system_source?: string | null
           title?: string
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -949,6 +1119,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "task_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manager_tasks_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -962,6 +1139,7 @@ export type Database = {
           read: boolean
           title: string
           type: string
+          unit_id: string | null
           user_id: string
         }
         Insert: {
@@ -972,6 +1150,7 @@ export type Database = {
           read?: boolean
           title: string
           type?: string
+          unit_id?: string | null
           user_id: string
         }
         Update: {
@@ -982,9 +1161,18 @@ export type Database = {
           read?: boolean
           title?: string
           type?: string
+          unit_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
@@ -994,6 +1182,7 @@ export type Database = {
           notes: string | null
           order_id: string
           quantity: number
+          unit_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1002,6 +1191,7 @@ export type Database = {
           notes?: string | null
           order_id: string
           quantity?: number
+          unit_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1010,6 +1200,7 @@ export type Database = {
           notes?: string | null
           order_id?: string
           quantity?: number
+          unit_id?: string | null
         }
         Relationships: [
           {
@@ -1026,6 +1217,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       orders: {
@@ -1038,6 +1236,7 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           supplier_id: string
           supplier_invoice_id: string | null
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -1049,6 +1248,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           supplier_id: string
           supplier_invoice_id?: string | null
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -1060,6 +1260,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           supplier_id?: string
           supplier_invoice_id?: string | null
+          unit_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1077,6 +1278,13 @@ export type Database = {
             referencedRelation: "supplier_invoices"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "orders_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       payment_method_settings: {
@@ -1091,6 +1299,7 @@ export type Database = {
           settlement_day_of_week: number | null
           settlement_days: number | null
           settlement_type: string
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -1105,6 +1314,7 @@ export type Database = {
           settlement_day_of_week?: number | null
           settlement_days?: number | null
           settlement_type?: string
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1119,10 +1329,19 @@ export type Database = {
           settlement_day_of_week?: number | null
           settlement_days?: number | null
           settlement_type?: string
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payment_method_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1404,6 +1623,7 @@ export type Database = {
           name: string
           points_cost: number
           stock: number | null
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -1415,6 +1635,7 @@ export type Database = {
           name: string
           points_cost: number
           stock?: number | null
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -1426,9 +1647,18 @@ export type Database = {
           name?: string
           points_cost?: number
           stock?: number | null
+          unit_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reward_products_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reward_redemptions: {
         Row: {
@@ -1438,6 +1668,7 @@ export type Database = {
           points_spent: number
           product_id: string
           status: Database["public"]["Enums"]["reward_status"]
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -1448,6 +1679,7 @@ export type Database = {
           points_spent: number
           product_id: string
           status?: Database["public"]["Enums"]["reward_status"]
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1458,6 +1690,7 @@ export type Database = {
           points_spent?: number
           product_id?: string
           status?: Database["public"]["Enums"]["reward_status"]
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1467,6 +1700,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "reward_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_redemptions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -1479,6 +1719,7 @@ export type Database = {
           notes: string | null
           quantity: number
           type: Database["public"]["Enums"]["movement_type"]
+          unit_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -1488,6 +1729,7 @@ export type Database = {
           notes?: string | null
           quantity: number
           type: Database["public"]["Enums"]["movement_type"]
+          unit_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -1497,6 +1739,7 @@ export type Database = {
           notes?: string | null
           quantity?: number
           type?: Database["public"]["Enums"]["movement_type"]
+          unit_id?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -1505,6 +1748,13 @@ export type Database = {
             columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -1523,6 +1773,7 @@ export type Database = {
           notes: string | null
           paid_at: string | null
           supplier_id: string
+          unit_id: string | null
           updated_at: string
           user_id: string
         }
@@ -1539,6 +1790,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           supplier_id: string
+          unit_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1555,6 +1807,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           supplier_id?: string
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1573,6 +1826,13 @@ export type Database = {
             referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "supplier_invoices_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       suppliers: {
@@ -1583,6 +1843,7 @@ export type Database = {
           name: string
           notes: string | null
           phone: string | null
+          unit_id: string | null
           updated_at: string
         }
         Insert: {
@@ -1592,6 +1853,7 @@ export type Database = {
           name: string
           notes?: string | null
           phone?: string | null
+          unit_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -1601,9 +1863,18 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string | null
+          unit_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       task_categories: {
         Row: {
@@ -1638,6 +1909,36 @@ export type Database = {
         }
         Relationships: []
       }
+      units: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1659,6 +1960,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_units: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          unit_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_units_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       work_schedules: {
         Row: {
           approved_by: string | null
@@ -1668,6 +2001,7 @@ export type Database = {
           month: number
           notes: string | null
           status: Database["public"]["Enums"]["schedule_status"]
+          unit_id: string | null
           updated_at: string
           user_id: string
           year: number
@@ -1680,6 +2014,7 @@ export type Database = {
           month: number
           notes?: string | null
           status?: Database["public"]["Enums"]["schedule_status"]
+          unit_id?: string | null
           updated_at?: string
           user_id: string
           year: number
@@ -1692,11 +2027,20 @@ export type Database = {
           month?: number
           notes?: string | null
           status?: Database["public"]["Enums"]["schedule_status"]
+          unit_id?: string | null
           updated_at?: string
           user_id?: string
           year?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "work_schedules_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -1711,6 +2055,10 @@ export type Database = {
         Returns: boolean
       }
       is_authenticated: { Args: never; Returns: boolean }
+      user_has_unit_access: {
+        Args: { _unit_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "funcionario" | "super_admin"
