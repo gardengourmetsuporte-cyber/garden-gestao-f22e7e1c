@@ -1984,6 +1984,259 @@ export type Database = {
           },
         ]
       }
+      tablet_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          product_id: string
+          quantity?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tablet_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "tablet_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tablet_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "tablet_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tablet_orders: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          pdv_response: Json | null
+          status: string
+          table_number: number
+          total: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          pdv_response?: Json | null
+          status?: string
+          table_number: number
+          total?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          pdv_response?: Json | null
+          status?: string
+          table_number?: number
+          total?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tablet_orders_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tablet_pdv_config: {
+        Row: {
+          auth_key: string
+          created_at: string
+          hub_url: string
+          id: string
+          is_active: boolean
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          hub_url: string
+          id?: string
+          is_active?: boolean
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          hub_url?: string
+          id?: string
+          is_active?: boolean
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tablet_pdv_config_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tablet_products: {
+        Row: {
+          category: string
+          codigo_pdv: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          price: number
+          sort_order: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          codigo_pdv?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          price?: number
+          sort_order?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          codigo_pdv?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          price?: number
+          sort_order?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tablet_products_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tablet_qr_confirmations: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          order_id: string
+          token: string
+          used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          order_id: string
+          token: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          order_id?: string
+          token?: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tablet_qr_confirmations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "tablet_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tablet_tables: {
+        Row: {
+          created_at: string
+          id: string
+          number: number
+          status: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          number: number
+          status?: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          number?: number
+          status?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tablet_tables_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_categories: {
         Row: {
           color: string
