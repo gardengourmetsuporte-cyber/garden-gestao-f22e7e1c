@@ -22,17 +22,18 @@ interface PaymentSetting {
    const [closings, setClosings] = useState<CashClosing[]>([]);
    const [isLoading, setIsLoading] = useState(true);
  
-   const fetchClosings = useCallback(async () => {
-     if (!user) return;
-     setIsLoading(true);
- 
-     try {
-       // Use type assertion since types.ts doesn't have this table yet
-       const { data, error } = await supabase
-         .from('cash_closings' as any)
-         .select('*')
-         .order('date', { ascending: false })
-         .order('created_at', { ascending: false });
+    const fetchClosings = useCallback(async () => {
+      if (!user || !activeUnitId) return;
+      setIsLoading(true);
+  
+      try {
+        // Use type assertion since types.ts doesn't have this table yet
+        const { data, error } = await supabase
+          .from('cash_closings' as any)
+          .select('*')
+          .eq('unit_id', activeUnitId)
+          .order('date', { ascending: false })
+          .order('created_at', { ascending: false });
  
        if (error) throw error;
  
@@ -69,11 +70,11 @@ interface PaymentSetting {
      } finally {
        setIsLoading(false);
      }
-   }, [user]);
- 
-   useEffect(() => {
-     fetchClosings();
-   }, [fetchClosings]);
+    }, [user, activeUnitId]);
+  
+    useEffect(() => {
+      fetchClosings();
+    }, [fetchClosings]);
  
    const uploadReceipt = async (file: File): Promise<string | null> => {
      if (!user) return null;
@@ -97,28 +98,29 @@ interface PaymentSetting {
      return publicUrl;
    };
  
-   const createClosing = async (formData: CashClosingFormData) => {
-     if (!user) return false;
- 
-     try {
-       const { error } = await supabase
-         .from('cash_closings' as any)
-         .insert({
-          date: formData.date,
-          unit_name: formData.unit_name,
-       initial_cash: formData.initial_cash,
-          cash_amount: formData.cash_amount,
-          debit_amount: formData.debit_amount,
-          credit_amount: formData.credit_amount,
-          pix_amount: formData.pix_amount,
-           meal_voucher_amount: formData.meal_voucher_amount || 0,
-          delivery_amount: formData.delivery_amount,
-          cash_difference: formData.cash_difference,
-          receipt_url: formData.receipt_url || '',
-          notes: formData.notes,
-          expenses: formData.expenses || [],
-           user_id: user.id,
-         } as any);
+    const createClosing = async (formData: CashClosingFormData) => {
+      if (!user || !activeUnitId) return false;
+  
+      try {
+        const { error } = await supabase
+          .from('cash_closings' as any)
+          .insert({
+           date: formData.date,
+           unit_name: formData.unit_name,
+           unit_id: activeUnitId,
+        initial_cash: formData.initial_cash,
+           cash_amount: formData.cash_amount,
+           debit_amount: formData.debit_amount,
+           credit_amount: formData.credit_amount,
+           pix_amount: formData.pix_amount,
+            meal_voucher_amount: formData.meal_voucher_amount || 0,
+           delivery_amount: formData.delivery_amount,
+           cash_difference: formData.cash_difference,
+           receipt_url: formData.receipt_url || '',
+           notes: formData.notes,
+           expenses: formData.expenses || [],
+            user_id: user.id,
+          } as any);
  
        if (error) {
          if (error.code === '23505') {
@@ -207,11 +209,13 @@ interface PaymentSetting {
         };
 
        // Get user's income categories for each payment method
-       const { data: categories } = await supabase
-         .from('finance_categories')
-         .select('*')
-         .eq('user_id', user.id)
-         .eq('type', 'income');
+        const categoryQuery = supabase
+          .from('finance_categories')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('type', 'income');
+        if (activeUnitId) categoryQuery.eq('unit_id', activeUnitId);
+        const { data: categories } = await categoryQuery;
  
         // Get accounts - Carteira for cash, Itaú for others
         const { data: accounts } = await supabase
@@ -512,13 +516,17 @@ interface PaymentSetting {
      if (!user) return false;
  
      try {
-       // Check if there are any checklist items for 'fechamento' type
-       const { data: items } = await supabase
-         .from('checklist_items')
-         .select('id')
-         .eq('checklist_type', 'fechamento')
-         .eq('is_active', true)
-         .is('deleted_at', null);
+        // Check if there are any checklist items for 'fechamento' type
+        const query = supabase
+          .from('checklist_items')
+          .select('id')
+          .eq('checklist_type', 'fechamento')
+          .eq('is_active', true)
+          .is('deleted_at', null);
+        
+        if (activeUnitId) query.eq('unit_id', activeUnitId);
+        
+        const { data: items } = await query;
  
        if (!items || items.length === 0) {
          // No checklist items configured, allow closing
