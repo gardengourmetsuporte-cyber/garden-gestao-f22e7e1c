@@ -350,6 +350,7 @@ interface PaymentSetting {
 
             transactions.push({
               user_id: user.id,
+              unit_id: activeUnitId,
               type: 'expense',
               amount: feeAmount,
               description: `Taxa Débito - ${debitSetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
