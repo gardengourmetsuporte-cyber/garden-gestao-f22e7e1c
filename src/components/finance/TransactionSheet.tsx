@@ -22,7 +22,7 @@ import {
 } from '@/types/finance';
 import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, ChevronDown, ChevronUp, Loader2, Trash2, Repeat } from 'lucide-react';
+import { CalendarIcon, ChevronDown, ChevronUp, Loader2, Trash2, Repeat, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
 import { toast } from 'sonner';
@@ -37,6 +37,8 @@ interface TransactionSheetProps {
   accounts: FinanceAccount[];
   suppliers?: { id: string; name: string }[];
   employees?: { id: string; full_name: string }[];
+  onAddSupplier?: (name: string) => Promise<{ id: string; name: string }>;
+  onAddEmployee?: (name: string) => Promise<void>;
   onSave: (data: TransactionFormData) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
@@ -65,6 +67,8 @@ export function TransactionSheet({
   accounts,
   suppliers = [],
   employees = [],
+  onAddSupplier,
+  onAddEmployee,
   onSave,
   onDelete,
   editingTransaction,
@@ -120,6 +124,12 @@ export function TransactionSheet({
   const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
   const [recurringEditMode, setRecurringEditMode] = useState<RecurringEditMode>('single');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState('');
+  const [showNewSupplier, setShowNewSupplier] = useState(false);
+  const [newEmployeeName, setNewEmployeeName] = useState('');
+  const [showNewEmployee, setShowNewEmployee] = useState(false);
+  const [isAddingSupplier, setIsAddingSupplier] = useState(false);
+  const [isAddingEmployee, setIsAddingEmployee] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
   const draftRestoredRef = useRef(false);
 
@@ -376,6 +386,36 @@ export function TransactionSheet({
     onOpenChange(false);
   };
 
+  const handleQuickAddSupplier = async () => {
+    if (!onAddSupplier || !newSupplierName.trim()) return;
+    setIsAddingSupplier(true);
+    try {
+      const newSupplier = await onAddSupplier(newSupplierName.trim());
+      setSupplierId(newSupplier.id);
+      setNewSupplierName('');
+      setShowNewSupplier(false);
+      toast.success('Fornecedor criado!');
+    } catch {
+      toast.error('Erro ao criar fornecedor');
+    } finally {
+      setIsAddingSupplier(false);
+    }
+  };
+
+  const handleQuickAddEmployee = async () => {
+    if (!onAddEmployee || !newEmployeeName.trim()) return;
+    setIsAddingEmployee(true);
+    try {
+      await onAddEmployee(newEmployeeName.trim());
+      setNewEmployeeName('');
+      setShowNewEmployee(false);
+    } catch {
+      toast.error('Erro ao criar funcionário');
+    } finally {
+      setIsAddingEmployee(false);
+    }
+  };
+
   const selectedCategory = categories.flatMap(c => [c, ...(c.subcategories || [])]).find(c => c.id === categoryId);
   const selectedAccount = accounts.find(a => a.id === accountId);
 
@@ -589,9 +629,45 @@ export function TransactionSheet({
             {/* Supplier & Employee - only for expenses */}
             {(type === 'expense' || type === 'credit_card') && (
               <>
-                {suppliers.length > 0 && (
-                  <div className="space-y-2">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
                     <Label>Fornecedor</Label>
+                    {onAddSupplier && (
+                      <button
+                        type="button"
+                        onClick={() => setShowNewSupplier(!showNewSupplier)}
+                        className="text-xs text-primary flex items-center gap-1 hover:underline"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Novo
+                      </button>
+                    )}
+                  </div>
+                  {showNewSupplier && onAddSupplier ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={newSupplierName}
+                        onChange={(e) => setNewSupplierName(e.target.value)}
+                        placeholder="Nome do fornecedor"
+                        className="h-10 flex-1"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newSupplierName.trim()) {
+                            e.preventDefault();
+                            handleQuickAddSupplier();
+                          }
+                        }}
+                      />
+                      <Button
+                        size="sm"
+                        className="h-10"
+                        disabled={!newSupplierName.trim() || isAddingSupplier}
+                        onClick={handleQuickAddSupplier}
+                      >
+                        {isAddingSupplier ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar'}
+                      </Button>
+                    </div>
+                  ) : (
                     <select
                       value={supplierId || ''}
                       onChange={(e) => setSupplierId(e.target.value || null)}
@@ -602,11 +678,48 @@ export function TransactionSheet({
                         <option key={s.id} value={s.id}>{s.name}</option>
                       ))}
                     </select>
-                  </div>
-                )}
-                {employees.length > 0 && (
-                  <div className="space-y-2">
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
                     <Label>Funcionário</Label>
+                    {onAddEmployee && (
+                      <button
+                        type="button"
+                        onClick={() => setShowNewEmployee(!showNewEmployee)}
+                        className="text-xs text-primary flex items-center gap-1 hover:underline"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Novo
+                      </button>
+                    )}
+                  </div>
+                  {showNewEmployee && onAddEmployee ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={newEmployeeName}
+                        onChange={(e) => setNewEmployeeName(e.target.value)}
+                        placeholder="Nome do funcionário"
+                        className="h-10 flex-1"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newEmployeeName.trim()) {
+                            e.preventDefault();
+                            handleQuickAddEmployee();
+                          }
+                        }}
+                      />
+                      <Button
+                        size="sm"
+                        className="h-10"
+                        disabled={!newEmployeeName.trim() || isAddingEmployee}
+                        onClick={handleQuickAddEmployee}
+                      >
+                        {isAddingEmployee ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar'}
+                      </Button>
+                    </div>
+                  ) : (
                     <select
                       value={employeeId || ''}
                       onChange={(e) => setEmployeeId(e.target.value || null)}
@@ -617,8 +730,8 @@ export function TransactionSheet({
                         <option key={e.id} value={e.id}>{e.full_name}</option>
                       ))}
                     </select>
-                  </div>
-                )}
+                  )}
+                </div>
               </>
             )}
 

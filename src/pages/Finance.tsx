@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
 import { FinanceHome } from '@/components/finance/FinanceHome';
@@ -54,8 +54,8 @@ export default function Finance() {
     getEmployeeStats
   } = useFinanceStats(transactions, categories);
 
-  const { suppliers } = useSuppliers();
-  const { employees } = useEmployees();
+  const { suppliers, addSupplier } = useSuppliers();
+  const { employees, addEmployee } = useEmployees();
 
 
   const handleAddTransaction = (type: TransactionType) => {
@@ -85,6 +85,15 @@ export default function Finance() {
   const handleRefreshAll = async () => {
     await refetch();
   };
+
+  const handleQuickAddSupplier = useCallback(async (name: string) => {
+    const result = await addSupplier({ name });
+    return { id: result.id, name: result.name };
+  }, [addSupplier]);
+
+  const handleQuickAddEmployee = useCallback(async (name: string) => {
+    await addEmployee({ full_name: name, base_salary: 0, is_active: true, user_id: null, cpf: null, role: null, department: null, admission_date: null, notes: null });
+  }, [addEmployee]);
 
   if (isLoading) {
     return (
@@ -168,6 +177,8 @@ export default function Finance() {
         accounts={accounts}
         suppliers={suppliers}
         employees={employees}
+        onAddSupplier={handleQuickAddSupplier}
+        onAddEmployee={handleQuickAddEmployee}
         onSave={handleSaveTransaction}
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}
