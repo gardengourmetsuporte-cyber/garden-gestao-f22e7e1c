@@ -207,12 +207,23 @@ export function UnitManagement() {
 
   // ─── Wizard ──────────────────────────────────────────────
 
-  const openWizard = () => {
+  const openWizard = async () => {
     setWName(''); setWSlug(''); setWSourceId(''); setWCreatedUnitId(null); setWResults([]);
     setWCloneOpts(new Set(CLONE_OPTIONS.map(o => o.key)));
     setWUsers([]);
     setWizardStep('info');
     setWizardOpen(true);
+    // Pre-load users list
+    setWLoadingUsers(true);
+    try {
+      const { data: profiles } = await supabase.from('profiles').select('user_id, full_name').order('full_name');
+      setWUsers((profiles || []).map(p => ({
+        user_id: p.user_id, full_name: p.full_name,
+        is_assigned: p.user_id === user!.id, // pre-select creator
+        is_default: false,
+      })));
+    } catch { /* silent */ }
+    finally { setWLoadingUsers(false); }
   };
 
   const wizardStepIndex = WIZARD_STEPS.findIndex(s => s.key === wizardStep);
@@ -223,7 +234,9 @@ export function UnitManagement() {
       if (!wName.trim()) { toast.error('Nome é obrigatório'); return; }
       setWizardStep('templates');
     } else if (wizardStep === 'templates') {
-      // Create the unit and clone templates
+      setWizardStep('users');
+    } else if (wizardStep === 'users') {
+      // CREATE unit + clone + assign users all at once
       setWSaving(true);
       try {
         const slug = wSlug.trim() || generateSlug(wName);
@@ -233,54 +246,24 @@ export function UnitManagement() {
         if (error) throw error;
         setWCreatedUnitId(newUnit.id);
 
-        // Auto-assign creator
-        await supabase.from('user_units').insert({ user_id: user!.id, unit_id: newUnit.id, is_default: false });
-
         // Clone templates if selected
         if (wSourceId && wSourceId !== 'none' && wCloneOpts.size > 0) {
           const results = await cloneTemplates(wSourceId, newUnit.id, wCloneOpts);
           setWResults(results);
         }
 
-        await refetchUnits();
-        // Go to users step
-        setWizardStep('users');
-        setWLoadingUsers(true);
-        try {
-          const [profilesRes, assignmentsRes] = await Promise.all([
-            supabase.from('profiles').select('user_id, full_name').order('full_name'),
-            supabase.from('user_units').select('user_id, is_default').eq('unit_id', newUnit.id),
-          ]);
-          const profiles = profilesRes.data || [];
-          const assignments = assignmentsRes.data || [];
-          const assignMap = new Map(assignments.map(a => [a.user_id, a]));
-          setWUsers(profiles.map(p => ({
-            user_id: p.user_id, full_name: p.full_name,
-            is_assigned: assignMap.has(p.user_id),
-            is_default: assignMap.get(p.user_id)?.is_default || false,
-          })));
-        } catch { /* silent */ }
-        finally { setWLoadingUsers(false); }
-      } catch (err: any) {
-        toast.error(err.message || 'Erro ao criar unidade');
-      } finally {
-        setWSaving(false);
-      }
-    } else if (wizardStep === 'users') {
-      // Save user assignments
-      setWSaving(true);
-      try {
-        await supabase.from('user_units').delete().eq('unit_id', wCreatedUnitId!);
+        // Save user assignments
         const toInsert = wUsers.filter(u => u.is_assigned).map(u => ({
-          user_id: u.user_id, unit_id: wCreatedUnitId!, is_default: u.is_default,
+          user_id: u.user_id, unit_id: newUnit.id, is_default: u.is_default,
         }));
         if (toInsert.length > 0) {
           await supabase.from('user_units').insert(toInsert);
         }
+
         await refetchUnits();
         setWizardStep('done');
       } catch (err: any) {
-        toast.error(err.message || 'Erro ao salvar equipe');
+        toast.error(err.message || 'Erro ao criar unidade');
       } finally {
         setWSaving(false);
       }
@@ -618,7 +601,7 @@ export function UnitManagement() {
                 )}
                 <Button onClick={wizardNext} disabled={wSaving} className="flex-1">
                   {wSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  {wizardStep === 'info' ? 'Próximo' : wizardStep === 'templates' ? 'Criar Unidade' : 'Concluir'}
+                  {wizardStep === 'info' ? 'Próximo' : wizardStep === 'templates' ? 'Próximo' : 'Criar Unidade'}
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </>
