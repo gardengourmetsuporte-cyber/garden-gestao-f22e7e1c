@@ -5,11 +5,11 @@ import { useUnit, Unit } from '@/contexts/UnitContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Building2, Plus, Pencil, Users, Loader2, Check, Copy, ChevronRight, ChevronLeft, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Building2, Plus, Pencil, Users, Loader2, Check, Copy, ChevronRight, ChevronLeft, Sparkles, CheckCircle2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -172,8 +172,10 @@ export function UnitManagement() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
   const [editName, setEditName] = useState('');
   const [editSlug, setEditSlug] = useState('');
-  const [editActive, setEditActive] = useState(true);
   const [editSaving, setEditSaving] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingUnit, setDeletingUnit] = useState<Unit | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Clone sheet state
   const [cloneSheetOpen, setCloneSheetOpen] = useState(false);
@@ -281,7 +283,7 @@ export function UnitManagement() {
   // ─── Edit Sheet ──────────────────────────────────────────
 
   const openEditSheet = (unit: Unit) => {
-    setEditingUnit(unit); setEditName(unit.name); setEditSlug(unit.slug); setEditActive(unit.is_active);
+    setEditingUnit(unit); setEditName(unit.name); setEditSlug(unit.slug);
     setEditSheetOpen(true);
   };
 
@@ -290,7 +292,7 @@ export function UnitManagement() {
     setEditSaving(true);
     try {
       const { error } = await supabase.from('units')
-        .update({ name: editName.trim(), slug: editSlug.trim() || generateSlug(editName), is_active: editActive })
+        .update({ name: editName.trim(), slug: editSlug.trim() || generateSlug(editName) })
         .eq('id', editingUnit.id);
       if (error) throw error;
       toast.success('Unidade atualizada');
@@ -298,6 +300,20 @@ export function UnitManagement() {
       await refetchUnits();
     } catch (err: any) { toast.error(err.message || 'Erro'); }
     finally { setEditSaving(false); }
+  };
+
+  const handleDeleteUnit = async () => {
+    if (!deletingUnit) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.rpc('delete_unit_cascade', { p_unit_id: deletingUnit.id });
+      if (error) throw error;
+      toast.success(`Unidade "${deletingUnit.name}" excluída`);
+      setDeleteConfirmOpen(false);
+      setDeletingUnit(null);
+      await refetchUnits();
+    } catch (err: any) { toast.error(err.message || 'Erro ao excluir'); }
+    finally { setDeleting(false); }
   };
 
   // ─── Clone Sheet ─────────────────────────────────────────
@@ -457,6 +473,11 @@ export function UnitManagement() {
                 <span className="text-xs text-muted-foreground">{unit.slug}</span>
               </div>
               {!unit.is_active && <Badge variant="secondary" className="text-xs">Inativa</Badge>}
+              {units.length > 1 && (
+                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => { setDeletingUnit(unit); setDeleteConfirmOpen(true); }} title="Excluir">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
             </div>
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="icon" onClick={() => openCloneSheet(unit)} title="Copiar templates">
@@ -623,10 +644,6 @@ export function UnitManagement() {
               <Label>Slug</Label>
               <Input value={editSlug} onChange={e => setEditSlug(e.target.value)} />
             </div>
-            <div className="flex items-center justify-between">
-              <Label>Ativa</Label>
-              <Switch checked={editActive} onCheckedChange={setEditActive} />
-            </div>
             <Button onClick={handleEditSave} disabled={editSaving} className="w-full">
               {editSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Salvar
@@ -680,6 +697,25 @@ export function UnitManagement() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* ═══ Delete Confirmation ═══ */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir unidade "{deletingUnit?.name}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é irreversível. Todos os dados da unidade serão excluídos permanentemente: estoque, categorias, fornecedores, checklists, financeiro, funcionários e mais.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUnit} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              Excluir Permanentemente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
