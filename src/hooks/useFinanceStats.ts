@@ -64,12 +64,12 @@ export function useFinanceStats(
 
   // Stats by subcategory (for drill-down)
   const getSubcategoryStats = useMemo(() => {
-    return (parentCategoryId: string): CategoryStats[] => {
-      const expenseTransactions = transactions.filter(
-        t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid
-      );
+    return (parentCategoryId: string, type: 'expense' | 'income' = 'expense'): CategoryStats[] => {
+      const filteredTransactions = type === 'income'
+        ? transactions.filter(t => t.type === 'income' && t.is_paid)
+        : transactions.filter(t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid);
       
-      const relevantTransactions = expenseTransactions.filter(t => {
+      const relevantTransactions = filteredTransactions.filter(t => {
         if (!t.category) return false;
         if (t.category.id === parentCategoryId) return true;
         if (t.category.parent_id === parentCategoryId) return true;

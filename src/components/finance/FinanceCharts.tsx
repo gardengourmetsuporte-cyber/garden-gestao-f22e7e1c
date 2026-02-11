@@ -18,7 +18,7 @@ interface FinanceChartsProps {
   incomeByCategory: CategoryStats[];
   dailyExpenses: { date: string; amount: number }[];
   dailyIncome: { date: string; amount: number }[];
-  getSubcategoryStats: (parentId: string) => CategoryStats[];
+  getSubcategoryStats: (parentId: string, type?: 'expense' | 'income') => CategoryStats[];
   getSupplierStats: (categoryId: string) => EntityStats[];
   getEmployeeStats: (categoryId: string) => EntityStats[];
   transactions: FinanceTransaction[];
@@ -63,7 +63,7 @@ export function FinanceCharts({
   const [entityData, setEntityData] = useState<EntityStats[]>([]);
 
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
-  const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id) : [];
+  const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id, dataType) : [];
   const displayData = drillDownCategory ? subcategoryData : categoryData;
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
 

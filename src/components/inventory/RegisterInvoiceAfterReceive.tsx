@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { FileText, Camera, Calendar } from 'lucide-react';
+import { FileText, CalendarIcon } from 'lucide-react';
 import { Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 interface RegisterInvoiceAfterReceiveProps {
   order: Order | null;
@@ -32,12 +35,13 @@ export function RegisterInvoiceAfterReceive({
   onSkip,
 }: RegisterInvoiceAfterReceiveProps) {
   const [amount, setAmount] = useState('');
-  const [dueDate, setDueDate] = useState(format(addDays(new Date(), 30), 'yyyy-MM-dd'));
+  const [dueDate, setDueDate] = useState<Date>(addDays(new Date(), 30));
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDueCalendar, setShowDueCalendar] = useState(false);
 
   const handleSubmit = async () => {
-    if (!order?.id || !order?.supplier_id || !amount || !dueDate) {
+    if (!order?.id || !order?.supplier_id || !amount) {
       toast.error('Preencha o valor e a data de vencimento');
       return;
     }
@@ -54,14 +58,14 @@ export function RegisterInvoiceAfterReceive({
         orderId: order.id,
         supplierId: order.supplier_id,
         amount: parsedAmount,
-        dueDate,
+        dueDate: format(dueDate, 'yyyy-MM-dd'),
         description: `Pedido para ${order.supplier?.name}`,
         invoiceNumber: invoiceNumber || undefined,
       });
       onOpenChange(false);
       // Reset form
       setAmount('');
-      setDueDate(format(addDays(new Date(), 30), 'yyyy-MM-dd'));
+      setDueDate(addDays(new Date(), 30));
       setInvoiceNumber('');
     } catch (error) {
       console.error('Error registering invoice:', error);
@@ -75,7 +79,7 @@ export function RegisterInvoiceAfterReceive({
     onSkip();
     onOpenChange(false);
     setAmount('');
-    setDueDate(format(addDays(new Date(), 30), 'yyyy-MM-dd'));
+    setDueDate(addDays(new Date(), 30));
     setInvoiceNumber('');
   };
 
@@ -119,17 +123,31 @@ export function RegisterInvoiceAfterReceive({
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label htmlFor="dueDate" className="text-foreground flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
+            <Label className="text-foreground flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4" />
               Data de Vencimento
             </Label>
-            <Input
-              id="dueDate"
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="h-12"
-            />
+            <Popover open={showDueCalendar} onOpenChange={setShowDueCalendar}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full h-12 justify-start">
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  {format(dueDate, "dd/MM/yyyy", { locale: ptBR })}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  defaultMonth={new Date()}
+                  onSelect={(d) => {
+                    if (d) setDueDate(d);
+                    setShowDueCalendar(false);
+                  }}
+                  locale={ptBR}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Invoice Number (optional) */}
