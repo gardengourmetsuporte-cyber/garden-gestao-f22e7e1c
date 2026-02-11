@@ -221,7 +221,9 @@ export function UnitManagement() {
   const wizardNext = async () => {
     if (wizardStep === 'info') {
       if (!wName.trim()) { toast.error('Nome é obrigatório'); return; }
-      // Create the unit
+      setWizardStep('templates');
+    } else if (wizardStep === 'templates') {
+      // Create the unit and clone templates
       setWSaving(true);
       try {
         const slug = wSlug.trim() || generateSlug(wName);
@@ -241,31 +243,29 @@ export function UnitManagement() {
         }
 
         await refetchUnits();
-        setWizardStep('templates');
+        // Go to users step
+        setWizardStep('users');
+        setWLoadingUsers(true);
+        try {
+          const [profilesRes, assignmentsRes] = await Promise.all([
+            supabase.from('profiles').select('user_id, full_name').order('full_name'),
+            supabase.from('user_units').select('user_id, is_default').eq('unit_id', newUnit.id),
+          ]);
+          const profiles = profilesRes.data || [];
+          const assignments = assignmentsRes.data || [];
+          const assignMap = new Map(assignments.map(a => [a.user_id, a]));
+          setWUsers(profiles.map(p => ({
+            user_id: p.user_id, full_name: p.full_name,
+            is_assigned: assignMap.has(p.user_id),
+            is_default: assignMap.get(p.user_id)?.is_default || false,
+          })));
+        } catch { /* silent */ }
+        finally { setWLoadingUsers(false); }
       } catch (err: any) {
         toast.error(err.message || 'Erro ao criar unidade');
       } finally {
         setWSaving(false);
       }
-    } else if (wizardStep === 'templates') {
-      // Load users for assignment
-      setWizardStep('users');
-      setWLoadingUsers(true);
-      try {
-        const [profilesRes, assignmentsRes] = await Promise.all([
-          supabase.from('profiles').select('user_id, full_name').order('full_name'),
-          supabase.from('user_units').select('user_id, is_default').eq('unit_id', wCreatedUnitId!),
-        ]);
-        const profiles = profilesRes.data || [];
-        const assignments = assignmentsRes.data || [];
-        const assignMap = new Map(assignments.map(a => [a.user_id, a]));
-        setWUsers(profiles.map(p => ({
-          user_id: p.user_id, full_name: p.full_name,
-          is_assigned: assignMap.has(p.user_id),
-          is_default: assignMap.get(p.user_id)?.is_default || false,
-        })));
-      } catch { /* silent */ }
-      finally { setWLoadingUsers(false); }
     } else if (wizardStep === 'users') {
       // Save user assignments
       setWSaving(true);
@@ -536,52 +536,38 @@ export function UnitManagement() {
                   <Label>Slug (identificador)</Label>
                   <Input value={wSlug} onChange={e => setWSlug(e.target.value)} placeholder="filial-centro" />
                 </div>
-
-                {units.length > 0 && (
-                  <>
-                    <div className="h-px bg-border/50" />
-                    <div className="space-y-3">
-                      <Label className="text-sm font-semibold">Copiar templates de</Label>
-                      <Select value={wSourceId} onValueChange={setWSourceId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Começar do zero" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Começar do zero</SelectItem>
-                          {units.map(u => (
-                            <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {wSourceId && wSourceId !== 'none' && (
-                        <CloneOptionsUI opts={wCloneOpts} setOpts={setWCloneOpts} />
-                      )}
-                    </div>
-                  </>
-                )}
               </>
             )}
 
-            {/* Step 2: Templates Result */}
+            {/* Step 2: Templates */}
             {wizardStep === 'templates' && (
-              <div className="text-center space-y-4 py-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Unidade criada!</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {wResults.length > 0
-                      ? `Templates copiados: ${wResults.join(', ')}`
-                      : wSourceId && wSourceId !== 'none'
-                        ? 'Nenhum template encontrado na origem'
-                        : 'Unidade vazia criada com sucesso'}
+              <>
+                {units.length > 0 ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Selecione uma unidade existente para copiar seus templates, ou comece do zero.
+                    </p>
+                    <Select value={wSourceId} onValueChange={setWSourceId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Começar do zero" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Começar do zero</SelectItem>
+                        {units.map(u => (
+                          <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {wSourceId && wSourceId !== 'none' && (
+                      <CloneOptionsUI opts={wCloneOpts} setOpts={setWCloneOpts} />
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhuma unidade existente para copiar templates. A unidade será criada vazia.
                   </p>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  No próximo passo, atribua a equipe que terá acesso a esta unidade.
-                </p>
-              </div>
+                )}
+              </>
             )}
 
             {/* Step 3: Users */}
@@ -617,7 +603,6 @@ export function UnitManagement() {
             )}
           </div>
 
-          {/* Footer Actions */}
           <div className="shrink-0 pt-2 pb-4 flex gap-2">
             {wizardStep === 'done' ? (
               <Button onClick={wizardFinish} className="w-full">
@@ -626,14 +611,14 @@ export function UnitManagement() {
               </Button>
             ) : (
               <>
-                {(wizardStep === 'users' || wizardStep === 'templates') && (
+                {(wizardStep === 'templates' || wizardStep === 'users') && (
                   <Button variant="outline" onClick={() => setWizardStep(wizardStep === 'users' ? 'templates' : 'info')} className="shrink-0">
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                 )}
                 <Button onClick={wizardNext} disabled={wSaving} className="flex-1">
                   {wSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  {wizardStep === 'info' ? 'Criar Unidade' : wizardStep === 'templates' ? 'Atribuir Equipe' : 'Concluir'}
+                  {wizardStep === 'info' ? 'Próximo' : wizardStep === 'templates' ? 'Criar Unidade' : 'Concluir'}
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </>
