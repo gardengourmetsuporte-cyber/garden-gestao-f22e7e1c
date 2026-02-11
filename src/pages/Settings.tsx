@@ -1,7 +1,7 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator, ChevronRight } from 'lucide-react';
+import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator, ChevronRight, Building2 } from 'lucide-react';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
 import { SupplierSettings } from '@/components/settings/SupplierSettings';
@@ -10,6 +10,7 @@ import { ChecklistSettingsManager } from '@/components/settings/ChecklistSetting
 import { RewardSettings } from '@/components/settings/RewardSettings';
 import { PaymentMethodSettings } from '@/components/settings/PaymentMethodSettings';
 import { RecipeCostSettings } from '@/components/settings/RecipeCostSettings';
+import { UnitManagement } from '@/components/settings/UnitManagement';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,11 @@ const adminMenuItems = [
   { value: 'costs', icon: Calculator, label: 'Custos de Receitas', variant: 'red' as const },
 ];
 
+const superAdminMenuItems = [
+  ...adminMenuItems,
+  { value: 'units', icon: Building2, label: 'Unidades', variant: 'purple' as const },
+];
+
 const variantBorderColors: Record<string, string> = {
   cyan: 'hsl(var(--neon-cyan))',
   green: 'hsl(var(--neon-green))',
@@ -33,10 +39,10 @@ const variantBorderColors: Record<string, string> = {
 };
 
 export default function SettingsPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isSuperAdmin } = useAuth();
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const menuItems = isAdmin ? adminMenuItems : [adminMenuItems[0]];
+  const menuItems = isSuperAdmin ? superAdminMenuItems : isAdmin ? adminMenuItems : [adminMenuItems[0]];
 
   if (activeSection) {
     return (
@@ -61,6 +67,7 @@ export default function SettingsPage() {
               {activeSection === 'rewards' && <RewardSettings />}
               {activeSection === 'payments' && <PaymentMethodSettings />}
               {activeSection === 'costs' && <RecipeCostSettings />}
+              {activeSection === 'units' && <UnitManagement />}
             </div>
           </div>
         </div>
