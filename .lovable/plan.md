@@ -1,104 +1,91 @@
 
-# Chat Interno da Equipe
 
-Sistema de mensagens em tempo real para comunicacao entre funcionarios e envio de comunicados em grupo, integrado ao estilo "Dark Command Center" do sistema.
+# Plano de Otimizacao de Performance
 
-## Funcionalidades
+## Problema Identificado
 
-### Conversas Diretas (1:1)
-- Qualquer usuario pode iniciar uma conversa com outro membro da mesma unidade
-- Lista de contatos baseada nos perfis vinculados a unidade ativa
-- Indicador de mensagens nao lidas
+O app esta lento porque o Dashboard carrega **8 hooks simultaneamente**, cada um fazendo queries independentes ao banco. Alem disso, o `useChatUnreadCount` faz **N+2 queries** (uma por conversa), e a maioria dos hooks usa `useState/useEffect` puro sem cache, refazendo todas as queries toda vez que voce navega entre paginas.
 
-### Canal de Comunicados (Grupo da Unidade)
-- Canal automatico por unidade onde admins podem enviar avisos e comunicados
-- Todos os membros da unidade podem visualizar
-- Admins podem fixar (pin) mensagens importantes
-- Funcionarios podem reagir mas nao postar (apenas admins postam comunicados)
+### Fluxo atual de carregamento:
 
-### Chat em Grupo Livre
-- Admins podem criar grupos personalizados com membros da unidade
-- Qualquer membro do grupo pode enviar mensagens
+```text
+Auth (2 queries sequenciais)
+  -> Unit (2 queries sequenciais)
+    -> Dashboard monta e dispara simultaneamente:
+       - useLeaderboard (2+ queries)
+       - useInventoryDB (1 query pesada com joins)
+       - useOrders (1 query pesada com joins)
+       - useRewards (2 queries)
+       - useUsers (2 queries)
+       - useCashClosing (1 query)
+       - useFinance (3 queries + init defaults)
+       - useRecipes (2 queries)
+    -> AppLayout dispara:
+       - useNotifications (1 query + realtime)
+       - useChatUnreadCount (N+2 queries!)
+```
 
-### Interface
-- Nova pagina `/chat` acessivel pelo menu lateral (icone MessageCircle)
-- Layout dividido: lista de conversas a esquerda, area de mensagens a direita
-- No mobile: lista de conversas ocupa tela cheia, ao tocar abre a conversa em tela cheia com botao voltar
-- Mensagens com avatar, nome, hora e status de leitura
-- Input com suporte a texto e emoji
-- Badge de nao lidas no menu lateral (similar ao badge de notificacoes)
-- Realtime via Supabase para mensagens instantaneas
+**Total: ~20+ queries ao banco so para abrir o Dashboard**
+
+---
+
+## Solucao Proposta
+
+### 1. Migrar hooks do Dashboard para React Query (cache inteligente)
+
+Converter os hooks principais (`useInventoryDB`, `useOrders`, `useRewards`, `useUsers`, `useCashClosing`, `useLeaderboard`) para usar `useQuery` do TanStack React Query (que ja esta instalado mas subutilizado). Isso adiciona:
+
+- **Cache automatico**: dados ficam em memoria ao navegar entre paginas
+- **staleTime**: evita refetch desnecessario por 2-5 minutos
+- **Background refetch**: atualiza silenciosamente quando voce volta a pagina
+
+### 2. Criar hook leve `useDashboardStats` 
+
+Em vez de carregar TODOS os dados de cada modulo (todos os itens de estoque, todos os pedidos, etc), criar um hook dedicado que busca apenas as **contagens** necessarias para o Dashboard com queries otimizadas:
+
+```text
+- COUNT de itens com estoque critico
+- COUNT de pedidos pendentes
+- COUNT de resgates pendentes
+- COUNT de fechamentos pendentes
+- Stats financeiros do mes (ja existente)
+```
+
+### 3. Corrigir o N+1 do `useChatUnreadCount`
+
+Substituir o loop que faz uma query por conversa por uma unica query agregada que conta todas as mensagens nao lidas de uma vez.
+
+### 4. Adicionar skeleton loading ao Dashboard
+
+Substituir o "Carregando..." generico por skeletons nos cards, dando feedback visual imediato enquanto os dados carregam.
+
+### 5. Otimizar QueryClient
+
+Configurar `staleTime` e `gcTime` globais no QueryClient para que dados recentes nao sejam rebuscados imediatamente.
 
 ---
 
 ## Detalhes Tecnicos
 
-### Novas Tabelas no Banco de Dados
+### Arquivos que serao modificados:
 
-**`chat_conversations`** - Representa uma conversa (DM, grupo ou canal)
-- `id` (uuid, PK)
-- `unit_id` (uuid, FK units) - isolamento por unidade
-- `type` (enum: 'direct', 'group', 'announcement') 
-- `name` (text, nullable) - nome do grupo/canal
-- `created_by` (uuid)
-- `created_at`, `updated_at` (timestamptz)
+| Arquivo | Mudanca |
+|---|---|
+| `src/App.tsx` | Configurar QueryClient com staleTime global |
+| `src/hooks/useChatUnreadCount.ts` | Reescrever para query unica |
+| `src/hooks/useDashboardStats.ts` | **Novo** - hook leve para contagens |
+| `src/hooks/useInventoryDB.ts` | Migrar para useQuery |
+| `src/hooks/useOrders.ts` | Migrar para useQuery |
+| `src/hooks/useRewards.ts` | Migrar para useQuery |
+| `src/hooks/useUsers.ts` | Migrar para useQuery |
+| `src/hooks/useCashClosing.ts` | Migrar para useQuery |
+| `src/hooks/useLeaderboard.ts` | Migrar para useQuery |
+| `src/components/dashboard/AdminDashboard.tsx` | Usar `useDashboardStats` + skeletons |
 
-**`chat_participants`** - Membros de cada conversa
-- `id` (uuid, PK)
-- `conversation_id` (uuid, FK chat_conversations)
-- `user_id` (uuid)
-- `role` (text: 'member', 'admin') - admin do grupo
-- `last_read_at` (timestamptz) - para contagem de nao lidas
-- `joined_at` (timestamptz)
+### Resultado esperado:
 
-**`chat_messages`** - Mensagens
-- `id` (uuid, PK)
-- `conversation_id` (uuid, FK chat_conversations)
-- `sender_id` (uuid)
-- `content` (text)
-- `is_pinned` (boolean, default false)
-- `created_at` (timestamptz)
+- **Primeira carga**: ~8 queries (em vez de 20+)
+- **Navegacao entre paginas**: instantanea (dados em cache)
+- **Retorno ao Dashboard**: sem recarregamento por 2 min
+- **Chat unread**: 1 query em vez de N+2
 
-### Politicas RLS
-- Participantes podem ler mensagens de suas conversas
-- Participantes podem enviar mensagens em suas conversas
-- Em canais de comunicados (`announcement`), apenas admins podem enviar
-- Admins podem fixar mensagens
-
-### Realtime
-- Habilitar realtime na tabela `chat_messages` para mensagens instantaneas
-- Habilitar realtime na tabela `chat_participants` para atualizacoes de leitura
-
-### Novos Arquivos Frontend
-
-1. **`src/pages/Chat.tsx`** - Pagina principal do chat com AppLayout
-2. **`src/components/chat/ChatSidebar.tsx`** - Lista de conversas com busca e filtros
-3. **`src/components/chat/ChatWindow.tsx`** - Area de mensagens com input
-4. **`src/components/chat/ChatMessage.tsx`** - Componente de mensagem individual
-5. **`src/components/chat/NewConversationSheet.tsx`** - Sheet para criar nova conversa/grupo
-6. **`src/components/chat/ChatContactList.tsx`** - Lista de contatos da unidade
-7. **`src/hooks/useChat.ts`** - Hook principal com queries, mutations e realtime subscriptions
-
-### Alteracoes em Arquivos Existentes
-
-1. **`src/App.tsx`** - Adicionar rota `/chat`
-2. **`src/components/layout/AppLayout.tsx`** - Adicionar item "Chat" no menu lateral com badge de nao lidas (icone MessageCircle, grupo "principal")
-3. **`src/types/database.ts`** - Adicionar interfaces de tipos do chat
-
-### Fluxo de Dados
-
-- `useChat` hook gerencia:
-  - Fetch de conversas do usuario na unidade ativa (filtrado por `unit_id`)
-  - Fetch de mensagens de uma conversa selecionada
-  - Envio de mensagens com mutation
-  - Subscription realtime em `chat_messages` para novas mensagens
-  - Contagem de nao lidas comparando `last_read_at` com `created_at` das mensagens
-  - Atualizacao de `last_read_at` ao abrir uma conversa
-
-### Design Visual
-- Cards de conversa com glassmorphism e borda neon sutil
-- Bolhas de mensagem: enviadas alinhadas a direita com cor primary, recebidas a esquerda com cor card
-- Avatar circular com fallback de iniciais
-- Input fixo na parte inferior com bordas neon
-- Animacao de entrada escalonada (staggered) para mensagens
-- Scroll automatico para ultima mensagem
