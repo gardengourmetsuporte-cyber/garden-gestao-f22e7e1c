@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { useToast } from '@/hooks/use-toast';
 import type { ManagerTask, TaskCategory } from '@/types/agenda';
 
@@ -12,6 +13,7 @@ interface ReorderUpdate {
 
 export function useAgenda() {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -34,30 +36,32 @@ export function useAgenda() {
 
   // Fetch all tasks for user (not filtered by date)
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
-    queryKey: ['manager-tasks', user?.id],
+    queryKey: ['manager-tasks', user?.id, activeUnitId],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id || !activeUnitId) return [];
       const { data, error } = await supabase
         .from('manager_tasks')
         .select('*, category:task_categories(*)')
         .eq('user_id', user.id)
+        .eq('unit_id', activeUnitId)
         .order('sort_order', { ascending: true })
         .order('due_date', { ascending: true, nullsFirst: true });
       
       if (error) throw error;
       return data as ManagerTask[];
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!activeUnitId,
   });
 
   // Add task mutation
   const addTaskMutation = useMutation({
     mutationFn: async (task: { title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string }) => {
-      if (!user?.id) throw new Error('User not authenticated');
+      if (!user?.id || !activeUnitId) throw new Error('User not authenticated');
       const { error } = await supabase
         .from('manager_tasks')
         .insert({
           user_id: user.id,
+          unit_id: activeUnitId,
           title: task.title,
           notes: task.notes || null,
           due_date: task.due_date || null,
