@@ -248,28 +248,34 @@ interface PaymentSetting {
  
        const transactions = [];
 
-        // Helper functions for date calculations
-       const addBusinessDays = (dateStr: string, days: number): string => {
-          if (days === 0) return dateStr;
-         const date = new Date(dateStr);
-         let added = 0;
-         while (added < days) {
-           date.setDate(date.getDate() + 1);
-           const dayOfWeek = date.getDay();
-           if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-             added++;
-           }
-         }
-         return format(date, 'yyyy-MM-dd');
-       };
- 
-        const getNextDayOfWeek = (dateStr: string, targetDay: number): string => {
-          const date = new Date(dateStr);
-          const currentDay = date.getDay();
-          const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7;
-          date.setDate(date.getDate() + daysUntilTarget);
+        // Helper: format date label from 'yyyy-MM-dd' without timezone issues
+        const formatDateLabel = (dateStr: string): string => {
+          const [, month, day] = dateStr.split('-');
+          return `${day}/${month}`;
+        };
+
+         // Helper functions for date calculations (use T12:00 to avoid UTC midnight boundary)
+        const addBusinessDays = (dateStr: string, days: number): string => {
+           if (days === 0) return dateStr;
+          const date = new Date(dateStr + 'T12:00:00');
+          let added = 0;
+          while (added < days) {
+            date.setDate(date.getDate() + 1);
+            const dayOfWeek = date.getDay();
+            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+              added++;
+            }
+          }
           return format(date, 'yyyy-MM-dd');
         };
+  
+         const getNextDayOfWeek = (dateStr: string, targetDay: number): string => {
+           const date = new Date(dateStr + 'T12:00:00');
+           const currentDay = date.getDay();
+           const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7;
+           date.setDate(date.getDate() + daysUntilTarget);
+           return format(date, 'yyyy-MM-dd');
+         };
 
         const calculateSettlementDate = (baseDate: string, setting: PaymentSetting | null): { date: string; isPaid: boolean } => {
           if (!setting) return { date: baseDate, isPaid: true };
@@ -302,7 +308,7 @@ interface PaymentSetting {
              unit_id: activeUnitId,
              type: 'income',
               amount: netAmount,
-             description: `Dinheiro (${format(new Date(closing.date), 'dd/MM')})`,
+             description: `Dinheiro (${formatDateLabel(closing.date)})`,
              category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
              account_id: carteiraAccountId, // Dinheiro vai para Carteira
               date: settlementDate,
@@ -322,7 +328,7 @@ interface PaymentSetting {
               unit_id: activeUnitId,
               type: 'income',
               amount: closing.debit_amount,
-              description: `Débito (${format(new Date(closing.date), 'dd/MM')})`,
+              description: `Débito (${formatDateLabel(closing.date)})`,
               category_id: debitoSubcat?.id || balcaoCategory?.id || null,
               account_id: bankAccountId,
               date: settlementDate,
@@ -346,7 +352,7 @@ interface PaymentSetting {
               user_id: user.id,
               type: 'expense',
               amount: feeAmount,
-              description: `Taxa Débito - ${debitSetting?.fee_percentage}% (${format(new Date(closing.date), 'dd/MM')})`,
+              description: `Taxa Débito - ${debitSetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
               category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
               account_id: bankAccountId,
               date: settlementDate,
@@ -367,7 +373,7 @@ interface PaymentSetting {
               unit_id: activeUnitId,
               type: 'income',
               amount: closing.credit_amount,
-              description: `Crédito (${format(new Date(closing.date), 'dd/MM')})`,
+              description: `Crédito (${formatDateLabel(closing.date)})`,
               category_id: creditoSubcat?.id || balcaoCategory?.id || null,
               account_id: bankAccountId,
               date: settlementDate,
@@ -392,7 +398,7 @@ interface PaymentSetting {
                unit_id: activeUnitId,
                type: 'expense',
                amount: feeAmount,
-               description: `Taxa Crédito - ${creditSetting?.fee_percentage}% (${format(new Date(closing.date), 'dd/MM')})`,
+               description: `Taxa Crédito - ${creditSetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
                category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
                account_id: bankAccountId,
                date: settlementDate,
@@ -412,7 +418,7 @@ interface PaymentSetting {
              unit_id: activeUnitId,
              type: 'income',
               amount: netAmount,
-             description: `Pix (${format(new Date(closing.date), 'dd/MM')})`,
+             description: `Pix (${formatDateLabel(closing.date)})`,
              category_id: pixSubcat?.id || balcaoCategory?.id || null,
              account_id: bankAccountId,
               date: settlementDate,
@@ -431,7 +437,7 @@ interface PaymentSetting {
               unit_id: activeUnitId,
               type: 'income',
                amount: netAmount,
-              description: `Vale Alimentação (${format(new Date(closing.date), 'dd/MM')})`,
+              description: `Vale Alimentação (${formatDateLabel(closing.date)})`,
               category_id: voucherSubcat?.id || balcaoCategory?.id || null,
               account_id: bankAccountId,
                date: settlementDate,
@@ -440,24 +446,50 @@ interface PaymentSetting {
             });
          }
 
-       if (closing.delivery_amount > 0 && (getPaymentSetting('delivery_amount')?.create_transaction !== false)) {
+        if (closing.delivery_amount > 0 && (getPaymentSetting('delivery_amount')?.create_transaction !== false)) {
           const deliverySetting = getPaymentSetting('delivery_amount');
           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, deliverySetting);
-          const netAmount = applyFee(closing.delivery_amount, deliverySetting);
+          const feeAmount = deliverySetting?.fee_percentage ? closing.delivery_amount * (deliverySetting.fee_percentage / 100) : 0;
 
-           transactions.push({
-             user_id: user.id,
-             unit_id: activeUnitId,
-             type: 'income',
-              amount: netAmount,
-             description: `Delivery (${format(new Date(closing.date), 'dd/MM')})`,
-             category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
-             account_id: bankAccountId,
+           // Lançamento de entrada com valor bruto
+            transactions.push({
+              user_id: user.id,
+              unit_id: activeUnitId,
+              type: 'income',
+              amount: closing.delivery_amount,
+              description: `Delivery (${formatDateLabel(closing.date)})`,
+              category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
+              account_id: bankAccountId,
               date: settlementDate,
               is_paid: isPaid,
-              notes: `Fechamento de caixa${deliverySetting?.fee_percentage ? ` (taxa: ${deliverySetting.fee_percentage}%)` : ''}`,
-           });
-        }
+              notes: 'Fechamento de caixa',
+            });
+
+          // Lançamento de saída da taxa (se houver)
+          if (feeAmount > 0) {
+            const { data: expCategories } = await supabase
+              .from('finance_categories')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('type', 'expense');
+            
+            const taxasCategory = expCategories?.find(c => c.name === 'Taxas Operacionais' && !c.parent_id);
+            const deliveryFeeSubcat = expCategories?.find(c => (c.name === 'iFood' || c.name === 'Delivery') && c.parent_id === taxasCategory?.id);
+
+            transactions.push({
+              user_id: user.id,
+              unit_id: activeUnitId,
+              type: 'expense',
+              amount: feeAmount,
+              description: `Taxa Delivery - ${deliverySetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
+              category_id: deliveryFeeSubcat?.id || taxasCategory?.id || null,
+              account_id: bankAccountId,
+              date: settlementDate,
+              is_paid: isPaid,
+              notes: `Taxa automática sobre R$ ${closing.delivery_amount.toFixed(2)}`,
+            });
+          }
+         }
 
        // Create expense transactions from cash closing expenses
        if (closing.expenses && Array.isArray(closing.expenses)) {
