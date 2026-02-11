@@ -6,16 +6,11 @@ import {
 import { Leaderboard } from './Leaderboard';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
-import { useInventoryDB } from '@/hooks/useInventoryDB';
-import { useOrders } from '@/hooks/useOrders';
-import { useRewards } from '@/hooks/useRewards';
-import { useUsers } from '@/hooks/useUsers';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { useCashClosing } from '@/hooks/useCashClosing';
-import { useFinance } from '@/hooks/useFinance';
-import { useRecipes } from '@/hooks/useRecipes';
 import { useCountUp, useCountUpCurrency } from '@/hooks/useCountUp';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MetricCardProps {
   title: string;
@@ -25,9 +20,10 @@ interface MetricCardProps {
   variant: string;
   subtitle?: string;
   index: number;
+  isLoading?: boolean;
 }
 
-function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, index }: MetricCardProps) {
+function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, index, isLoading }: MetricCardProps) {
   return (
     <div
       onClick={onClick}
@@ -44,9 +40,18 @@ function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, inde
         <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
       </div>
       <div className="mt-3">
-        <p className="text-2xl font-bold tracking-tight text-foreground">{value}</p>
-        <p className="text-muted-foreground text-xs font-medium mt-0.5">{title}</p>
-        {subtitle && <p className="text-muted-foreground/60 text-[10px] mt-0.5">{subtitle}</p>}
+        {isLoading ? (
+          <>
+            <Skeleton className="h-7 w-20 mb-1" />
+            <Skeleton className="h-3 w-16" />
+          </>
+        ) : (
+          <>
+            <p className="text-2xl font-bold tracking-tight text-foreground">{value}</p>
+            <p className="text-muted-foreground text-xs font-medium mt-0.5">{title}</p>
+            {subtitle && <p className="text-muted-foreground/60 text-[10px] mt-0.5">{subtitle}</p>}
+          </>
+        )}
       </div>
     </div>
   );
@@ -124,26 +129,12 @@ export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
-  const { items, getLowStockItems, getOutOfStockItems } = useInventoryDB();
-  const { orders } = useOrders();
-  const { allRedemptions } = useRewards();
-  const { users } = useUsers();
-  const { closings } = useCashClosing();
-  const { monthStats } = useFinance(new Date());
-  const { recipes } = useRecipes();
+  const { stats, isLoading: statsLoading } = useDashboardStats();
 
-  const lowStockItems = getLowStockItems();
-  const outOfStockItems = getOutOfStockItems();
-  const criticalItems = lowStockItems.length + outOfStockItems.length;
-  const pendingOrders = orders.filter(o => o.status === 'draft' || o.status === 'sent').length;
-  const pendingRedemptions = allRedemptions.filter(r => r.status === 'pending').length;
-  const pendingClosings = closings.filter(c => c.status === 'pending').length;
-  const pendingExpenses = monthStats.pendingExpenses;
-
-  const animatedBalance = useCountUpCurrency(monthStats.balance);
-  const animatedCritical = useCountUp(criticalItems);
-  const animatedOrders = useCountUp(pendingOrders);
-  const animatedRecipes = useCountUp(recipes.length);
+  const animatedBalance = useCountUpCurrency(stats.monthBalance);
+  const animatedCritical = useCountUp(stats.criticalItems);
+  const animatedOrders = useCountUp(stats.pendingOrders);
+  const animatedRecipes = useCountUp(stats.recipesCount);
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -154,7 +145,7 @@ export function AdminDashboard() {
     month: 'long',
   });
 
-  const hasAlerts = pendingRedemptions > 0 || pendingClosings > 0 || pendingExpenses > 0;
+  const hasAlerts = stats.pendingRedemptions > 0 || stats.pendingClosings > 0 || stats.pendingExpenses > 0;
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
@@ -177,10 +168,11 @@ export function AdminDashboard() {
           title="Saldo do Mês"
           value={formatCurrency(animatedBalance)}
           icon={Wallet}
-          variant={monthStats.balance >= 0 ? "stat-command-green" : "stat-command-red"}
+          variant={stats.monthBalance >= 0 ? "stat-command-green" : "stat-command-red"}
           onClick={() => navigate('/finance')}
-          subtitle={monthStats.balance >= 0 ? 'positivo' : 'negativo'}
+          subtitle={stats.monthBalance >= 0 ? 'positivo' : 'negativo'}
           index={0}
+          isLoading={statsLoading}
         />
         <MetricCard
           title="Pedidos Pendentes"
@@ -188,8 +180,9 @@ export function AdminDashboard() {
           icon={ShoppingCart}
           variant="stat-command-amber"
           onClick={() => navigate('/inventory', { state: { activeTab: 'orders' } })}
-          subtitle={pendingOrders > 0 ? 'aguardando' : 'nenhum'}
+          subtitle={stats.pendingOrders > 0 ? 'aguardando' : 'nenhum'}
           index={1}
+          isLoading={statsLoading}
         />
         <MetricCard
           title="Fichas Técnicas"
@@ -199,6 +192,7 @@ export function AdminDashboard() {
           onClick={() => navigate('/recipes')}
           subtitle="cadastradas"
           index={2}
+          isLoading={statsLoading}
         />
         <MetricCard
           title="Estoque Crítico"
@@ -206,8 +200,9 @@ export function AdminDashboard() {
           icon={AlertTriangle}
           variant="stat-command-red"
           onClick={() => navigate('/inventory', { state: { stockFilter: 'critical' } })}
-          subtitle={criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
+          subtitle={stats.criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
           index={3}
+          isLoading={statsLoading}
         />
       </div>
 
@@ -219,14 +214,14 @@ export function AdminDashboard() {
             <h3 className="font-semibold text-sm text-foreground">Ações Pendentes</h3>
           </div>
           <div className="space-y-1">
-            {pendingRedemptions > 0 && (
-              <AlertItem message="Resgates aguardando" count={pendingRedemptions} severity="info" onClick={() => navigate('/rewards')} />
+            {stats.pendingRedemptions > 0 && (
+              <AlertItem message="Resgates aguardando" count={stats.pendingRedemptions} severity="info" onClick={() => navigate('/rewards')} />
             )}
-            {pendingClosings > 0 && (
-              <AlertItem message="Fechamentos pendentes" count={pendingClosings} severity="warning" onClick={() => navigate('/cash-closing')} />
+            {stats.pendingClosings > 0 && (
+              <AlertItem message="Fechamentos pendentes" count={stats.pendingClosings} severity="warning" onClick={() => navigate('/cash-closing')} />
             )}
-            {pendingExpenses > 0 && (
-              <AlertItem message="Despesas a pagar" count={Math.round(pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
+            {stats.pendingExpenses > 0 && (
+              <AlertItem message="Despesas a pagar" count={Math.round(stats.pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
             )}
           </div>
         </div>
@@ -237,13 +232,13 @@ export function AdminDashboard() {
         <h3 className="section-label mb-2">Acesso Rápido</h3>
         <div className="grid grid-cols-3 gap-2.5">
           <QuickAccessCard title="Financeiro" subtitle="Receitas e despesas" icon={Wallet} iconBg="bg-success/10" iconColor="text-success" onClick={() => navigate('/finance')} index={0} />
-          <QuickAccessCard title="Fichas" subtitle={`${recipes.length} receitas`} icon={ChefHat} iconBg="bg-purple-500/10" iconColor="text-purple-500" onClick={() => navigate('/recipes')} index={1} />
+          <QuickAccessCard title="Fichas" subtitle={`${stats.recipesCount} receitas`} icon={ChefHat} iconBg="bg-purple-500/10" iconColor="text-purple-500" onClick={() => navigate('/recipes')} index={1} />
           <QuickAccessCard title="Agenda" subtitle="Tarefas" icon={CalendarDays} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/agenda')} index={2} />
-          <QuickAccessCard title="Estoque" subtitle={`${items.length} itens`} icon={Package} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/inventory')} index={3} />
+          <QuickAccessCard title="Estoque" subtitle={`${stats.itemsCount} itens`} icon={Package} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/inventory')} index={3} />
           <QuickAccessCard title="Checklists" subtitle="Tarefas diárias" icon={ClipboardCheck} iconBg="bg-success/10" iconColor="text-success" onClick={() => navigate('/checklists')} index={4} />
-          <QuickAccessCard title="Fechamento" subtitle={pendingClosings > 0 ? `${pendingClosings} pendentes` : 'Caixas'} icon={Receipt} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/cash-closing')} index={5} />
-          <QuickAccessCard title="Recompensas" subtitle={pendingRedemptions > 0 ? `${pendingRedemptions} pendentes` : 'Prêmios'} icon={Gift} iconBg="bg-warning/10" iconColor="text-warning" onClick={() => navigate('/rewards')} index={6} />
-          <QuickAccessCard title="Config." subtitle={`${users.length} usuários`} icon={Settings} iconBg="bg-secondary" iconColor="text-secondary-foreground" onClick={() => navigate('/settings')} index={7} />
+          <QuickAccessCard title="Fechamento" subtitle={stats.pendingClosings > 0 ? `${stats.pendingClosings} pendentes` : 'Caixas'} icon={Receipt} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/cash-closing')} index={5} />
+          <QuickAccessCard title="Recompensas" subtitle={stats.pendingRedemptions > 0 ? `${stats.pendingRedemptions} pendentes` : 'Prêmios'} icon={Gift} iconBg="bg-warning/10" iconColor="text-warning" onClick={() => navigate('/rewards')} index={6} />
+          <QuickAccessCard title="Config." subtitle={`${stats.usersCount} usuários`} icon={Settings} iconBg="bg-secondary" iconColor="text-secondary-foreground" onClick={() => navigate('/settings')} index={7} />
         </div>
       </div>
 

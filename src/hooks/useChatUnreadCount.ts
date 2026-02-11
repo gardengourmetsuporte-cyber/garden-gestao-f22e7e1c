@@ -15,45 +15,54 @@ export function useChatUnreadCount() {
     }
 
     try {
-      // Get my participations
+      // Single query: get all my participations with conversation unit filter
       const { data: parts } = await supabase
         .from('chat_participants')
-        .select('conversation_id, last_read_at')
-        .eq('user_id', user.id);
+        .select('conversation_id, last_read_at, conversation:chat_conversations!inner(id, unit_id)')
+        .eq('user_id', user.id)
+        .eq('chat_conversations.unit_id', activeUnitId);
 
       if (!parts || parts.length === 0) {
         setUnreadCount(0);
         return;
       }
 
-      // Filter to only conversations in active unit
+      // Build a single query to count all unread messages across all conversations
+      // We use OR conditions for each conversation's last_read_at
       const convIds = parts.map(p => p.conversation_id);
-      const { data: convs } = await supabase
-        .from('chat_conversations')
-        .select('id')
-        .in('id', convIds)
-        .eq('unit_id', activeUnitId);
+      const oldestLastRead = parts
+        .filter(p => p.last_read_at)
+        .reduce((oldest, p) => {
+          if (!oldest || p.last_read_at! < oldest) return p.last_read_at!;
+          return oldest;
+        }, '' as string);
 
-      if (!convs || convs.length === 0) {
+      if (!oldestLastRead) {
         setUnreadCount(0);
         return;
       }
 
-      const unitConvIds = new Set(convs.map(c => c.id));
+      // Single count query: all messages in my conversations, after oldest last_read, not from me
+      const { data: messages } = await supabase
+        .from('chat_messages')
+        .select('conversation_id, created_at')
+        .in('conversation_id', convIds)
+        .gt('created_at', oldestLastRead)
+        .neq('sender_id', user.id);
+
+      if (!messages || messages.length === 0) {
+        setUnreadCount(0);
+        return;
+      }
+
+      // Client-side filter: count only messages after each conversation's last_read_at
+      const lastReadMap = new Map(parts.map(p => [p.conversation_id, p.last_read_at]));
       let total = 0;
-
-      for (const part of parts) {
-        if (!unitConvIds.has(part.conversation_id)) continue;
-        if (!part.last_read_at) continue;
-
-        const { count } = await supabase
-          .from('chat_messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', part.conversation_id)
-          .gt('created_at', part.last_read_at)
-          .neq('sender_id', user.id);
-
-        total += count || 0;
+      for (const msg of messages) {
+        const lastRead = lastReadMap.get(msg.conversation_id);
+        if (lastRead && msg.created_at > lastRead) {
+          total++;
+        }
       }
 
       setUnreadCount(total);
