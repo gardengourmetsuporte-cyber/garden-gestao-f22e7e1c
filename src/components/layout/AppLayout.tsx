@@ -30,7 +30,6 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
-  { icon: MessageCircle, label: 'Chat', href: '/chat', group: 'principal', groupLabel: 'Principal' },
   { icon: CalendarDays, label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
   { icon: DollarSign, label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: Package, label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
@@ -113,7 +112,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <span className={cn(
                 "px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase",
                 isAdmin
@@ -122,6 +121,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               )}>
                 {isAdmin ? 'Admin' : 'Staff'}
               </span>
+              <button
+                onClick={() => navigate('/chat')}
+                className="relative p-2 rounded-lg hover:bg-secondary transition-all"
+              >
+                <MessageCircle className="w-[22px] h-[22px] text-muted-foreground" />
+                {chatUnreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
+                    {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
+                  </span>
+                )}
+              </button>
               <button
                 onClick={() => navigate('/')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"

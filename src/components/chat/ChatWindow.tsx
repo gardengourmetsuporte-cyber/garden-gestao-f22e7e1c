@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChatMessage, ChatConversation } from '@/hooks/useChat';
 import { ChatMessageComponent } from './ChatMessage';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Send, Megaphone, Users, User, Pin } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -101,21 +102,32 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
         <button onClick={onBack} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-secondary transition-all">
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </button>
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-          style={{
-            background: 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--neon-cyan) / 0.08))',
-            border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-          }}
-        >
-          <TypeIcon className="w-4 h-4 text-primary" />
-        </div>
+        {conversation.type === 'direct' && otherParticipant ? (
+          <Avatar className="w-10 h-10">
+            <AvatarImage src={otherParticipant.profile?.avatar_url || undefined} />
+            <AvatarFallback className="text-sm bg-secondary font-semibold">
+              {displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        ) : (
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            style={{
+              background: conversation.type === 'announcement'
+                ? 'linear-gradient(135deg, hsl(45 100% 50% / 0.15), hsl(45 100% 50% / 0.05))'
+                : 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--neon-cyan) / 0.08))',
+              border: `1px solid ${conversation.type === 'announcement' ? 'hsl(45 100% 50% / 0.2)' : 'hsl(var(--neon-cyan) / 0.2)'}`,
+            }}
+          >
+            <TypeIcon className={cn('w-5 h-5', conversation.type === 'announcement' ? 'text-amber-400' : 'text-primary')} />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm text-foreground truncate">{displayName}</p>
           <p className="text-[10px] text-muted-foreground">
             {conversation.type === 'announcement' ? 'Canal de comunicados' :
              conversation.type === 'group' ? `${conversation.participants?.length || 0} membros` :
-             'Conversa direta'}
+             'Online'}
           </p>
         </div>
       </div>
