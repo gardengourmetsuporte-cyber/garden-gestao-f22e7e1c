@@ -73,6 +73,31 @@ export function TransactionSheet({
   onRefreshCategories,
   allTransactions = []
 }: TransactionSheetProps) {
+  const DRAFT_KEY = 'transaction-sheet-draft';
+
+  const loadDraft = () => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return null;
+  };
+
+  const saveDraft = () => {
+    if (!open || editingTransaction) return;
+    const draft = {
+      type, amount, description, categoryId, accountId, toAccountId,
+      date: date.toISOString(), isPaid, isFixed, isRecurring,
+      recurringInterval, recurringCount, notes, supplierId, employeeId,
+      timestamp: Date.now(),
+    };
+    try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch {}
+  };
+
+  const clearDraft = () => {
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
+  };
+
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
   const [amount, setAmount] = useState('');
@@ -96,6 +121,14 @@ export function TransactionSheet({
   const [recurringEditMode, setRecurringEditMode] = useState<RecurringEditMode>('single');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const draftRestoredRef = useRef(false);
+
+  // Save draft whenever form fields change (only for new transactions)
+  useEffect(() => {
+    if (open && !editingTransaction && (amount || description)) {
+      saveDraft();
+    }
+  }, [open, editingTransaction, type, amount, description, categoryId, accountId, toAccountId, date, isPaid, isFixed, isRecurring, recurringInterval, recurringCount, notes, supplierId, employeeId]);
 
   // Reset form when opened
   useEffect(() => {
@@ -107,7 +140,6 @@ export function TransactionSheet({
         setCategoryId(editingTransaction.category_id);
         setAccountId(editingTransaction.account_id);
         setToAccountId(editingTransaction.to_account_id);
-        // Parse date string as local date (not UTC) to avoid timezone shift
         const [year, month, day] = editingTransaction.date.split('-').map(Number);
         setDate(new Date(year, month - 1, day));
         setIsPaid(editingTransaction.is_paid);
@@ -118,32 +150,60 @@ export function TransactionSheet({
         setSupplierId(editingTransaction.supplier_id || null);
         setEmployeeId(editingTransaction.employee_id || null);
         setRecurringEditMode('single');
-        // Reset recurring count to prevent showing wrong value
         if (editingTransaction.total_installments) {
           setRecurringCount(String(editingTransaction.total_installments));
         } else {
           setRecurringCount('2');
         }
         setShowRecurringConfig(false);
+        draftRestoredRef.current = false;
       } else {
-        setType(defaultType);
-        setAmount('');
-        setDescription('');
-        setCategoryId(null);
-        const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
-        setAccountId(nonCreditCards[0]?.id || accounts[0]?.id || null);
-        setToAccountId(null);
-        setDate(new Date());
-        setIsPaid(true);
-        setIsFixed(false);
-        setIsRecurring(false);
-        setRecurringInterval('monthly');
-        setRecurringCount('2');
-        setNotes('');
-        setSupplierId(null);
-        setEmployeeId(null);
-        setShowRecurringConfig(false);
+        // Check for saved draft (only restore once per mount cycle)
+        const draft = loadDraft();
+        const isRecentDraft = draft && (Date.now() - draft.timestamp < 10 * 60 * 1000); // 10 min max
+        
+        if (isRecentDraft && !draftRestoredRef.current) {
+          draftRestoredRef.current = true;
+          setType(draft.type || defaultType);
+          setAmount(draft.amount || '');
+          setDescription(draft.description || '');
+          setCategoryId(draft.categoryId || null);
+          setAccountId(draft.accountId || null);
+          setToAccountId(draft.toAccountId || null);
+          setDate(draft.date ? new Date(draft.date) : new Date());
+          setIsPaid(draft.isPaid ?? true);
+          setIsFixed(draft.isFixed ?? false);
+          setIsRecurring(draft.isRecurring ?? false);
+          setRecurringInterval(draft.recurringInterval || 'monthly');
+          setRecurringCount(draft.recurringCount || '2');
+          setNotes(draft.notes || '');
+          setSupplierId(draft.supplierId || null);
+          setEmployeeId(draft.employeeId || null);
+          setShowRecurringConfig(false);
+        } else if (!isRecentDraft) {
+          draftRestoredRef.current = false;
+          clearDraft();
+          setType(defaultType);
+          setAmount('');
+          setDescription('');
+          setCategoryId(null);
+          const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
+          setAccountId(nonCreditCards[0]?.id || accounts[0]?.id || null);
+          setToAccountId(null);
+          setDate(new Date());
+          setIsPaid(true);
+          setIsFixed(false);
+          setIsRecurring(false);
+          setRecurringInterval('monthly');
+          setRecurringCount('2');
+          setNotes('');
+          setSupplierId(null);
+          setEmployeeId(null);
+          setShowRecurringConfig(false);
+        }
       }
+    } else {
+      draftRestoredRef.current = false;
     }
   }, [open, defaultType, accounts, editingTransaction]);
 
@@ -239,6 +299,7 @@ export function TransactionSheet({
     }
     
     setIsLoading(false);
+    clearDraft();
     onOpenChange(false);
   };
 
@@ -267,6 +328,7 @@ export function TransactionSheet({
     setIsLoading(false);
     
     // Reset form for next entry
+    clearDraft();
     setAmount('');
     setDescription('');
     setNotes('');
