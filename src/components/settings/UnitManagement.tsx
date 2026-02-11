@@ -41,7 +41,8 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
     const { data: cats } = await supabase.from('categories').select('name, color, icon, sort_order').eq('unit_id', sourceUnitId);
     if (cats && cats.length > 0) {
       const { error } = await supabase.from('categories').insert(cats.map(c => ({ ...c, unit_id: targetUnitId })));
-      if (!error) results.push(`${cats.length} categorias`);
+      if (error) console.error('Clone categories error:', error.message);
+      else results.push(`${cats.length} categorias`);
     }
   }
 
@@ -49,7 +50,8 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
     const { data: supps } = await supabase.from('suppliers').select('name, phone, email, notes').eq('unit_id', sourceUnitId);
     if (supps && supps.length > 0) {
       const { error } = await supabase.from('suppliers').insert(supps.map(s => ({ ...s, unit_id: targetUnitId })));
-      if (!error) results.push(`${supps.length} fornecedores`);
+      if (error) console.error('Clone suppliers error:', error.message);
+      else results.push(`${supps.length} fornecedores`);
     }
   }
 
@@ -624,8 +626,8 @@ export function UnitManagement() {
               </Button>
             ) : (
               <>
-                {wizardStep === 'users' && (
-                  <Button variant="outline" onClick={() => setWizardStep('templates')} className="shrink-0">
+                {(wizardStep === 'users' || wizardStep === 'templates') && (
+                  <Button variant="outline" onClick={() => setWizardStep(wizardStep === 'users' ? 'templates' : 'info')} className="shrink-0">
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                 )}
