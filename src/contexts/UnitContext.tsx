@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { getUnitTheme, applyUnitTheme } from '@/lib/unitThemes';
 
 export interface Unit {
   id: string;
@@ -18,6 +19,7 @@ interface UnitContextType {
   activeUnitId: string | null;
   setActiveUnitId: (id: string) => void;
   isLoading: boolean;
+  isTransitioning: boolean;
   refetchUnits: () => Promise<void>;
 }
 
@@ -30,6 +32,8 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const hasInitialized = useRef(false);
 
   const fetchUnits = useCallback(async () => {
     if (!user) {
@@ -100,12 +104,27 @@ export function UnitProvider({ children }: { children: ReactNode }) {
     fetchUnits();
   }, [fetchUnits]);
 
+  const activeUnit = units.find(u => u.id === activeUnitId) || null;
+
+  // Apply theme when activeUnit changes
+  useEffect(() => {
+    if (!activeUnit) return;
+    const theme = getUnitTheme(activeUnit.slug);
+    applyUnitTheme(theme);
+
+    // Only show transition after initial load
+    if (hasInitialized.current) {
+      setIsTransitioning(true);
+      const timer = setTimeout(() => setIsTransitioning(false), 500);
+      return () => clearTimeout(timer);
+    }
+    hasInitialized.current = true;
+  }, [activeUnit?.id, activeUnit?.slug]);
+
   const setActiveUnitId = useCallback((id: string) => {
     setActiveUnitIdState(id);
     localStorage.setItem(ACTIVE_UNIT_KEY, id);
   }, []);
-
-  const activeUnit = units.find(u => u.id === activeUnitId) || null;
 
   return (
     <UnitContext.Provider
@@ -115,6 +134,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
         activeUnitId,
         setActiveUnitId,
         isLoading,
+        isTransitioning,
         refetchUnits: fetchUnits,
       }}
     >
