@@ -20,6 +20,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const CashClosing = lazy(() => import("./pages/CashClosing"));
 const Recipes = lazy(() => import("./pages/Recipes"));
 const Employees = lazy(() => import("./pages/Employees"));
+const Chat = lazy(() => import("./pages/Chat"));
 
 const queryClient = new QueryClient();
 
@@ -127,6 +128,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Employees />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Chat />
             </ProtectedRoute>
           }
         />
