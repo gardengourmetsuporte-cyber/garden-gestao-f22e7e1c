@@ -103,6 +103,10 @@ export function CategoryManagement({
 
   const handleSave = async () => {
     if (!name.trim() || !user) return;
+    if (!activeUnitId) {
+      toast.error('Nenhuma unidade ativa selecionada');
+      return;
+    }
     setIsLoading(true);
     
     try {
@@ -123,14 +127,16 @@ export function CategoryManagement({
             color,
             parent_id: parentCategory?.id || null,
             is_system: false,
-            unit_id: activeUnitId || null
+            unit_id: activeUnitId
           });
         if (error) throw error;
       }
       await onRefresh();
       resetForm();
-    } catch (error) {
-      toast.error('Erro ao salvar categoria');
+      toast.success('Categoria salva!');
+    } catch (error: any) {
+      console.error('Erro ao salvar categoria:', error);
+      toast.error('Erro ao salvar categoria: ' + (error?.message || ''));
     }
     
     setIsLoading(false);
