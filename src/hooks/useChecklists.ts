@@ -400,15 +400,18 @@ export function useChecklists() {
       const targetUserId = completedByUserId || user?.id;
       
       // Add completion with points (0 means no points awarded)
+      // Use upsert to prevent duplicate completions
       const { data, error } = await supabase
         .from('checklist_completions')
-        .insert({
+        .upsert({
           item_id: itemId,
           checklist_type: checklistType,
           completed_by: targetUserId,
           date,
           awarded_points: points > 0,
           points_awarded: points,
+        }, {
+          onConflict: 'item_id,completed_by,date,checklist_type',
         })
         .select()
         .single();
