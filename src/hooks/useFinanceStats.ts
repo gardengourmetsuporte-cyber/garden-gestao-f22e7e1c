@@ -22,6 +22,15 @@ export function useFinanceStats(
   categories: FinanceCategory[]
 ) {
   // Stats by category (for pie chart)
+  // Build a flat lookup map for finding parents (categories array only has parents with nested subs)
+  const parentLookup = useMemo(() => {
+    const map: Record<string, FinanceCategory> = {};
+    categories.forEach(c => {
+      map[c.id] = c;
+    });
+    return map;
+  }, [categories]);
+
   const expensesByCategory = useMemo((): CategoryStats[] => {
     const expenseTransactions = transactions.filter(
       t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid
@@ -37,9 +46,9 @@ export function useFinanceStats(
     expenseTransactions.forEach(t => {
       let categoryData = t.category;
       
-      // If subcategory, find parent
+      // If subcategory, find parent from lookup or use parent_id from the joined category
       if (categoryData?.parent_id) {
-        const parent = categories.find(c => c.id === categoryData?.parent_id);
+        const parent = parentLookup[categoryData.parent_id];
         if (parent) categoryData = parent;
       }
       
@@ -186,7 +195,7 @@ export function useFinanceStats(
       let categoryData = t.category;
       
       if (categoryData?.parent_id) {
-        const parent = categories.find(c => c.id === categoryData?.parent_id);
+        const parent = parentLookup[categoryData.parent_id];
         if (parent) categoryData = parent;
       }
       
