@@ -1,6 +1,7 @@
  import { useState, useEffect, useCallback } from 'react';
  import { supabase } from '@/integrations/supabase/client';
  import { useAuth } from '@/contexts/AuthContext';
+ import { useUnit } from '@/contexts/UnitContext';
  import { CashClosing, CashClosingFormData, CashClosingStatus } from '@/types/cashClosing';
  import { format } from 'date-fns';
  import { toast } from 'sonner';
@@ -17,6 +18,7 @@ interface PaymentSetting {
  
  export function useCashClosing() {
    const { user, isAdmin } = useAuth();
+   const { activeUnitId } = useUnit();
    const [closings, setClosings] = useState<CashClosing[]>([]);
    const [isLoading, setIsLoading] = useState(true);
  

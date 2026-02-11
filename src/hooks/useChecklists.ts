@@ -8,16 +8,18 @@ import {
   ChecklistType 
 } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useChecklists() {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const [sectors, setSectors] = useState<ChecklistSector[]>([]);
   const [completions, setCompletions] = useState<ChecklistCompletion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchSectors = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('checklist_sectors')
         .select(`
           *,
@@ -30,6 +32,11 @@ export function useChecklists() {
         .order('sort_order', { referencedTable: 'checklist_subcategories' })
         .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
 
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       
       // Filter out soft-deleted items from the result
@@ -43,9 +50,9 @@ export function useChecklists() {
       
       setSectors(filteredData as ChecklistSector[]);
     } catch (error) {
-      // Silent fail - sectors will be empty
+      // Silent fail
     }
-  }, []);
+  }, [activeUnitId]);
 
   const fetchCompletions = useCallback(async (date: string, type: ChecklistType) => {
     try {

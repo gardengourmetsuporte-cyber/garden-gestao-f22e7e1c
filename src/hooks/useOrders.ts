@@ -2,15 +2,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Order, OrderItem, OrderStatus } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useOrders() {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrders = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
         .select(`
           *,
@@ -22,12 +24,17 @@ export function useOrders() {
         `)
         .order('created_at', { ascending: false });
 
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setOrders((data as Order[]) || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
-  }, []);
+  }, [activeUnitId]);
 
   useEffect(() => {
     if (user) {

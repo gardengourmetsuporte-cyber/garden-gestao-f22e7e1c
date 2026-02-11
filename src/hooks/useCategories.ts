@@ -1,27 +1,34 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Category } from '@/types/database';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useCategories() {
+  const { activeUnitId } = useUnit();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchCategories = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('categories')
         .select('*')
         .order('sort_order')
         .order('name');
 
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setCategories((data as Category[]) || []);
     } catch (error) {
-      // Silent fail - categories will be empty
+      // Silent fail
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [activeUnitId]);
 
   useEffect(() => {
     fetchCategories();
