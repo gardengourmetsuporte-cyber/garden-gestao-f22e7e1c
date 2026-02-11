@@ -38,6 +38,7 @@ const navItems: NavItem[] = [
   { icon: ChefHat, label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
   { icon: Users, label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: Gift, label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: MessageCircle, label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: Settings, label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
 ];
 
