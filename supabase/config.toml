@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.push-notifier]
 verify_jwt = false
+
+[functions.tablet-order]
+verify_jwt = false

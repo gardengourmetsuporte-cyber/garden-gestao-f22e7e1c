@@ -21,6 +21,10 @@ const CashClosing = lazy(() => import("./pages/CashClosing"));
 const Recipes = lazy(() => import("./pages/Recipes"));
 const Employees = lazy(() => import("./pages/Employees"));
 const Chat = lazy(() => import("./pages/Chat"));
+const TabletSelect = lazy(() => import("./pages/TabletSelect"));
+const TabletMenu = lazy(() => import("./pages/TabletMenu"));
+const TabletConfirm = lazy(() => import("./pages/TabletConfirm"));
+const TabletAdmin = lazy(() => import("./pages/TabletAdmin"));
 
 const queryClient = new QueryClient();
 
@@ -136,6 +140,19 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Chat />
+            </ProtectedRoute>
+          }
+        />
+        {/* Tablet routes (public, no auth) */}
+        <Route path="/tablet/:unitId" element={<TabletSelect />} />
+        <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
+        <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
+        {/* Tablet admin (protected) */}
+        <Route
+          path="/tablet-admin"
+          element={
+            <ProtectedRoute>
+              <TabletAdmin />
             </ProtectedRoute>
           }
         />
