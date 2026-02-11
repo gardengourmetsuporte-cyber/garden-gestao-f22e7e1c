@@ -1713,7 +1713,7 @@ export type Database = {
       is_authenticated: { Args: never; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "funcionario"
+      app_role: "admin" | "funcionario" | "super_admin"
       cash_closing_status: "pending" | "approved" | "divergent"
       checklist_type: "abertura" | "fechamento" | "limpeza"
       day_period: "morning" | "afternoon" | "evening"
@@ -1852,7 +1852,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "funcionario"],
+      app_role: ["admin", "funcionario", "super_admin"],
       cash_closing_status: ["pending", "approved", "divergent"],
       checklist_type: ["abertura", "fechamento", "limpeza"],
       day_period: ["morning", "afternoon", "evening"],
