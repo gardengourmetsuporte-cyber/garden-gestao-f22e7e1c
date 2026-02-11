@@ -71,7 +71,7 @@ export function useChecklists() {
             ...completion,
             awarded_points: completion.awarded_points ?? true,
             profile: profileData ? { full_name: profileData.full_name } : undefined
-          } as ChecklistCompletion;
+          } as unknown as ChecklistCompletion;
         })
       );
       

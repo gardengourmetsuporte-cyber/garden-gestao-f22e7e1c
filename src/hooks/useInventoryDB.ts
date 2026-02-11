@@ -2,16 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { InventoryItem, StockMovement, MovementType } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useInventoryDB() {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchItems = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('inventory_items')
         .select(`
           *,
@@ -20,17 +22,21 @@ export function useInventoryDB() {
         `)
         .order('name');
 
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setItems((data as InventoryItem[]) || []);
     } catch {
-      // Error handled silently - user sees empty state
+      // Error handled silently
     }
-  }, []);
+  }, [activeUnitId]);
 
   const fetchMovements = useCallback(async () => {
     try {
-      // Fetch movements
-      const { data: movementsData, error: movementsError } = await supabase
+      let query = supabase
         .from('stock_movements')
         .select(`
           *,
@@ -38,6 +44,12 @@ export function useInventoryDB() {
         `)
         .order('created_at', { ascending: false })
         .limit(100);
+
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
+      }
+
+      const { data: movementsData, error: movementsError } = await query;
 
       if (movementsError) throw movementsError;
 
@@ -67,7 +79,7 @@ export function useInventoryDB() {
     } catch {
       // Error handled silently - user sees empty state
     }
-  }, []);
+  }, [activeUnitId]);
 
   useEffect(() => {
     async function loadData() {
@@ -76,10 +88,10 @@ export function useInventoryDB() {
       setIsLoading(false);
     }
     
-    if (user) {
+    if (user && activeUnitId) {
       loadData();
     }
-  }, [user, fetchItems, fetchMovements]);
+  }, [user, activeUnitId, fetchItems, fetchMovements]);
 
   const addItem = useCallback(async (item: {
     name: string;
@@ -94,14 +106,14 @@ export function useInventoryDB() {
   }) => {
     const { data, error } = await supabase
       .from('inventory_items')
-      .insert(item)
+      .insert({ ...item, unit_id: activeUnitId })
       .select(`*, category:categories(*), supplier:suppliers(*)`)
       .single();
 
     if (error) throw error;
     setItems(prev => [...prev, data as InventoryItem]);
     return data as InventoryItem;
-  }, []);
+  }, [activeUnitId]);
 
   const updateItem = useCallback(async (id: string, updates: Partial<InventoryItem>) => {
     const { category, supplier, ...updateData } = updates;
@@ -146,6 +158,7 @@ export function useInventoryDB() {
         quantity,
         notes,
         user_id: user?.id,
+        unit_id: activeUnitId,
       });
 
     if (movementError) throw movementError;

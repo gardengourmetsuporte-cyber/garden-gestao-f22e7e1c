@@ -2,12 +2,13 @@ import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
-  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight
+  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown
 } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -40,7 +41,9 @@ const navItems: NavItem[] = [
 
 function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
   const { profile, isAdmin, signOut } = useAuth();
+  const { units, activeUnit, setActiveUnitId } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
   const location = useLocation();
@@ -99,6 +102,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20">
                 <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
               </div>
+              {activeUnit && (
+                <span className="text-xs font-medium text-muted-foreground truncate max-w-[120px]">
+                  {activeUnit.name}
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
@@ -175,6 +183,59 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {/* Divider line */}
         <div className="mx-4 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
 
+        {/* Unit Selector */}
+        {units.length > 0 && (
+          <div className="px-4 pt-3 shrink-0">
+            <div className="relative">
+              <button
+                onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--neon-cyan) / 0.04))',
+                  border: '1px solid hsl(var(--neon-cyan) / 0.15)',
+                }}
+              >
+                <Building2 className="w-4 h-4 text-primary shrink-0" />
+                <span className="flex-1 text-left truncate text-foreground">
+                  {activeUnit?.name || 'Selecionar Unidade'}
+                </span>
+                <ChevronDown className={cn(
+                  "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+                  unitDropdownOpen && "rotate-180"
+                )} />
+              </button>
+              {unitDropdownOpen && (
+                <div
+                  className="absolute top-full left-0 right-0 mt-1 z-50 rounded-xl overflow-hidden py-1"
+                  style={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border) / 0.4)',
+                    boxShadow: '0 8px 32px hsl(222 50% 3% / 0.6)',
+                  }}
+                >
+                  {units.map(unit => (
+                    <button
+                      key={unit.id}
+                      onClick={() => {
+                        setActiveUnitId(unit.id);
+                        setUnitDropdownOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-all",
+                        unit.id === activeUnit?.id
+                          ? "text-primary bg-primary/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      )}
+                    >
+                      <Building2 className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{unit.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {/* User Card */}
         <div className="p-4 shrink-0">
           <div
