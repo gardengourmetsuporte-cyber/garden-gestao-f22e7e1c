@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 import { SortableList, DragHandle } from '@/components/ui/sortable-list';
 
@@ -43,6 +44,7 @@ export function CategoryManagement({
   onRefresh
 }: CategoryManagementProps) {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const [activeType, setActiveType] = useState<'expense' | 'income'>('expense');
   const [isEditing, setIsEditing] = useState(false);
   const [editingCategory, setEditingCategory] = useState<FinanceCategory | null>(null);
@@ -120,7 +122,8 @@ export function CategoryManagement({
             icon,
             color,
             parent_id: parentCategory?.id || null,
-            is_system: false
+            is_system: false,
+            unit_id: activeUnitId || null
           });
         if (error) throw error;
       }
