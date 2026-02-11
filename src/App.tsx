@@ -26,7 +26,16 @@ const TabletMenu = lazy(() => import("./pages/TabletMenu"));
 const TabletConfirm = lazy(() => import("./pages/TabletConfirm"));
 const TabletAdmin = lazy(() => import("./pages/TabletAdmin"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      gcTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 function PageLoader() {
   return (
