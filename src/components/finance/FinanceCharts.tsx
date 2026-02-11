@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
+import {
+  PieChart, Pie, Cell, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip,
+  LineChart, Line, CartesianGrid, Area, AreaChart
+} from 'recharts';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { MonthSelector } from './MonthSelector';
@@ -20,6 +24,25 @@ interface FinanceChartsProps {
   transactions: FinanceTransaction[];
 }
 
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+
+const formatCompact = (value: number) => {
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+  return value.toFixed(0);
+};
+
+// Custom tooltip component
+function CustomTooltip({ active, payload, label, labelFormatter }: any) {
+  if (!active || !payload?.length) return null;
+  const displayLabel = labelFormatter ? labelFormatter(label, payload) : label;
+  return (
+    <div className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 shadow-xl">
+      <p className="text-xs text-muted-foreground mb-0.5">{displayLabel}</p>
+      <p className="text-sm font-bold text-foreground">{formatCurrency(payload[0].value)}</p>
+    </div>
+  );
+}
 
 export function FinanceCharts({
   selectedMonth,
@@ -38,37 +61,23 @@ export function FinanceCharts({
   const [drillDownCategory, setDrillDownCategory] = useState<FinanceCategory | null>(null);
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
   const [entityData, setEntityData] = useState<EntityStats[]>([]);
-  
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
-
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id) : [];
-
   const displayData = drillDownCategory ? subcategoryData : categoryData;
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
 
-  // Auto-detect entity data for subcategory drill-down
   const detectEntityData = useCallback((categoryId: string): { type: 'employees' | 'suppliers' | null; data: EntityStats[] } => {
-    // Check if transactions in this category have employee_id or supplier_id
     const relevantTxs = transactions.filter(t => {
       if (!t.is_paid) return false;
       if (t.type !== 'expense' && t.type !== 'credit_card') return false;
       if (!t.category) return false;
       return t.category.id === categoryId || t.category.parent_id === categoryId;
     });
-
     const hasEmployees = relevantTxs.some(t => t.employee_id);
     const hasSuppliers = relevantTxs.some(t => t.supplier_id);
-
-    if (hasEmployees) {
-      return { type: 'employees', data: getEmployeeStats(categoryId) };
-    }
-    if (hasSuppliers) {
-      return { type: 'suppliers', data: getSupplierStats(categoryId) };
-    }
+    if (hasEmployees) return { type: 'employees', data: getEmployeeStats(categoryId) };
+    if (hasSuppliers) return { type: 'suppliers', data: getSupplierStats(categoryId) };
     return { type: null, data: [] };
   }, [transactions, getEmployeeStats, getSupplierStats]);
 
@@ -78,7 +87,6 @@ export function FinanceCharts({
       setEntityView(null);
       setEntityData([]);
     } else if (!entityView) {
-      // Second level click (subcategory) - auto-detect entity
       const detected = detectEntityData(category.id);
       if (detected.type) {
         setEntityView(detected.type);
@@ -96,7 +104,6 @@ export function FinanceCharts({
     }
   };
 
-  // Reset when changing data type
   useEffect(() => {
     setDrillDownCategory(null);
     setEntityView(null);
@@ -105,9 +112,25 @@ export function FinanceCharts({
 
   const entityTotal = entityData.reduce((sum, e) => sum + e.amount, 0);
 
+  // Prepare bar chart data with proper names
+  const barData = (entityView ? entityData : displayData).map((entry: any) => ({
+    name: entityView ? entry.name : entry.category?.name || '',
+    amount: entry.amount,
+    color: entityView ? entry.color : entry.category?.color || '#6366f1',
+  }));
+
+  // Prepare area chart data with cumulative
+  const timelineData = (dataType === 'expense' ? dailyExpenses : dailyIncome).map(d => ({
+    ...d,
+    day: new Date(d.date + 'T12:00:00').getDate(),
+    label: new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+  }));
+
+  const strokeColor = dataType === 'expense' ? '#ef4444' : '#22c55e';
+  const gradientId = dataType === 'expense' ? 'expenseGradient' : 'incomeGradient';
+
   return (
     <div className="space-y-4">
-      {/* Month Selector */}
       <div className="px-4 pt-4">
         <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
       </div>
@@ -119,10 +142,7 @@ export function FinanceCharts({
             <button
               key={type}
               onClick={() => setDataType(type as 'expense' | 'income')}
-              className={cn(
-                "tab-command-item",
-                dataType === type && "tab-command-item-active"
-              )}
+              className={cn("tab-command-item", dataType === type && "tab-command-item-active")}
             >
               {type === 'expense' ? 'Despesas' : 'Receitas'}
             </button>
@@ -141,10 +161,7 @@ export function FinanceCharts({
             <button
               key={tab.value}
               onClick={() => setViewType(tab.value as 'categories' | 'timeline' | 'bars')}
-              className={cn(
-                "tab-command-item",
-                viewType === tab.value && "tab-command-item-active"
-              )}
+              className={cn("tab-command-item", viewType === tab.value && "tab-command-item-active")}
             >
               {tab.label}
             </button>
@@ -160,7 +177,7 @@ export function FinanceCharts({
             Voltar
           </Button>
           <span className="text-sm font-medium text-muted-foreground">
-            {entityView 
+            {entityView
               ? `${drillDownCategory?.name} › ${entityView === 'employees' ? 'Funcionários' : 'Fornecedores'}`
               : drillDownCategory?.name
             }
@@ -170,51 +187,56 @@ export function FinanceCharts({
 
       {/* Charts */}
       <div className="px-4 pb-24">
+
+        {/* ═══ PIE / DONUT — Categories ═══ */}
         {viewType === 'categories' && !entityView && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {displayData.length > 0 ? (
               <>
-                <div className="h-64 relative">
+                <div className="relative" style={{ height: 260 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={displayData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
+                        innerRadius={70}
+                        outerRadius={110}
                         dataKey="amount"
                         nameKey="category.name"
+                        paddingAngle={2}
+                        cornerRadius={4}
+                        stroke="none"
                       >
                         {displayData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.category.color} />
                         ))}
                       </Pie>
+                      <RechartsTooltip content={<CustomTooltip labelFormatter={(_: any, p: any) => p[0]?.payload?.category?.name || ''} />} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-2xl font-bold">{formatCurrency(displayTotal)}</p>
-                    <p className="text-sm text-muted-foreground">total</p>
+                    <p className="text-xl font-bold text-foreground">{formatCurrency(displayTotal)}</p>
+                    <p className="text-xs text-muted-foreground">total</p>
                   </div>
                 </div>
 
                 {/* Category List */}
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {displayData.map((item) => (
                     <button
                       key={item.category.id}
                       onClick={() => handleCategoryClick(item.category)}
                       disabled={!!entityView}
-                      className="list-command w-full flex items-center gap-3 p-3 text-left"
-                      style={{ borderLeftColor: item.category.color }}
+                      className="w-full flex items-center gap-3 p-3 rounded-lg bg-card/40 hover:bg-card/70 transition-colors border border-border/30 text-left"
                     >
                       <div
-                        className="w-4 h-4 rounded-full shrink-0"
+                        className="w-3 h-3 rounded-full shrink-0 ring-2 ring-offset-1 ring-offset-background"
                         style={{ backgroundColor: item.category.color }}
                       />
-                      <span className="flex-1 text-left font-medium text-sm">{item.category.name}</span>
-                      <span className="text-muted-foreground text-xs">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold text-sm">{formatCurrency(item.amount)}</span>
+                      <span className="flex-1 text-left font-medium text-sm truncate">{item.category.name}</span>
+                      <span className="text-muted-foreground text-xs tabular-nums">{item.percentage.toFixed(1)}%</span>
+                      <span className="font-semibold text-sm tabular-nums">{formatCurrency(item.amount)}</span>
                     </button>
                   ))}
                 </div>
@@ -227,46 +249,49 @@ export function FinanceCharts({
           </div>
         )}
 
-        {/* Entity View (Employees / Suppliers) */}
+        {/* ═══ PIE / DONUT — Entity View ═══ */}
         {viewType === 'categories' && entityView && (
-           <div className="space-y-6">
+          <div className="space-y-5">
             {entityData.length > 0 ? (
               <>
-                <div className="h-64 relative">
+                <div className="relative" style={{ height: 260 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={entityData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
+                        innerRadius={70}
+                        outerRadius={110}
                         dataKey="amount"
                         nameKey="name"
+                        paddingAngle={2}
+                        cornerRadius={4}
+                        stroke="none"
                       >
                         {entityData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
+                      <RechartsTooltip content={<CustomTooltip labelFormatter={(_: any, p: any) => p[0]?.payload?.name || ''} />} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-2xl font-bold">{formatCurrency(entityTotal)}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xl font-bold text-foreground">{formatCurrency(entityTotal)}</p>
+                    <p className="text-xs text-muted-foreground">
                       {entityView === 'employees' ? 'funcionários' : 'fornecedores'}
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {entityData.map((item) => (
                     <div
                       key={item.id}
-                      className="list-command flex items-center gap-3 w-full p-3"
-                      style={{ borderLeftColor: item.color }}
+                      className="flex items-center gap-3 w-full p-3 rounded-lg bg-card/40 border border-border/30"
                     >
                       <div
-                        className="w-4 h-4 rounded-full shrink-0"
+                        className="w-3 h-3 rounded-full shrink-0 ring-2 ring-offset-1 ring-offset-background"
                         style={{ backgroundColor: item.color }}
                       />
                       <div className="flex-1 min-w-0">
@@ -275,8 +300,8 @@ export function FinanceCharts({
                           {item.count} lançamento{item.count !== 1 ? 's' : ''}
                         </p>
                       </div>
-                      <span className="text-muted-foreground text-xs">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold text-sm">{formatCurrency(item.amount)}</span>
+                      <span className="text-muted-foreground text-xs tabular-nums">{item.percentage.toFixed(1)}%</span>
+                      <span className="font-semibold text-sm tabular-nums">{formatCurrency(item.amount)}</span>
                     </div>
                   ))}
                 </div>
@@ -285,7 +310,7 @@ export function FinanceCharts({
               <div className="text-center py-16 text-muted-foreground">
                 <p>Sem {entityView === 'employees' ? 'funcionários' : 'fornecedores'} vinculados</p>
                 <p className="text-xs mt-1">
-                  {entityView === 'employees' 
+                  {entityView === 'employees'
                     ? 'Os pagamentos precisam estar vinculados ao cadastro de funcionários'
                     : 'As transações precisam ter um fornecedor vinculado'
                   }
@@ -295,61 +320,153 @@ export function FinanceCharts({
           </div>
         )}
 
+        {/* ═══ AREA / LINE CHART ═══ */}
         {viewType === 'timeline' && (
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dataType === 'expense' ? dailyExpenses : dailyIncome}>
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={(d) => new Date(d).getDate().toString()}
-                  fontSize={12}
-                />
-                <YAxis 
-                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-                  fontSize={12}
-                />
-                <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
-                  labelFormatter={(d) => new Date(d).toLocaleDateString('pt-BR')}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
-                  stroke={dataType === 'expense' ? 'hsl(var(--destructive))' : 'hsl(var(--success))'}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="space-y-3">
+            {timelineData.length > 0 ? (
+              <div className="card-base p-3" style={{ height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={strokeColor} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={strokeColor} stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="hsl(var(--border))"
+                      opacity={0.3}
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey="day"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    />
+                    <YAxis
+                      tickFormatter={formatCompact}
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      width={45}
+                    />
+                    <RechartsTooltip
+                      content={<CustomTooltip labelFormatter={(d: any) => `Dia ${d}`} />}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="amount"
+                      stroke={strokeColor}
+                      strokeWidth={2.5}
+                      fill={`url(#${gradientId})`}
+                      dot={{ r: 3, fill: strokeColor, strokeWidth: 0 }}
+                      activeDot={{ r: 5, fill: strokeColor, stroke: 'hsl(var(--background))', strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <p>Sem dados para exibir</p>
+              </div>
+            )}
+
+            {/* Summary stats below chart */}
+            {timelineData.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                <div className="card-base p-3 text-center">
+                  <p className="text-xs text-muted-foreground mb-0.5">Total</p>
+                  <p className="text-sm font-bold tabular-nums">
+                    {formatCurrency(timelineData.reduce((s, d) => s + d.amount, 0))}
+                  </p>
+                </div>
+                <div className="card-base p-3 text-center">
+                  <p className="text-xs text-muted-foreground mb-0.5">Média/dia</p>
+                  <p className="text-sm font-bold tabular-nums">
+                    {formatCurrency(timelineData.reduce((s, d) => s + d.amount, 0) / (timelineData.length || 1))}
+                  </p>
+                </div>
+                <div className="card-base p-3 text-center">
+                  <p className="text-xs text-muted-foreground mb-0.5">Maior</p>
+                  <p className="text-sm font-bold tabular-nums">
+                    {formatCurrency(Math.max(...timelineData.map(d => d.amount)))}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
+        {/* ═══ BAR CHART ═══ */}
         {viewType === 'bars' && (
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={entityView ? entityData : displayData}>
-                <XAxis 
-                  dataKey={entityView ? "name" : "category.name"}
-                  tick={false}
-                />
-                <YAxis 
-                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-                  fontSize={12}
-                />
-                <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
-                  labelFormatter={(_, payload) => {
-                    if (entityView) return payload[0]?.payload?.name || '';
-                    return payload[0]?.payload?.category?.name || '';
-                  }}
-                />
-                <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                  {(entityView ? entityData : displayData).map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entityView ? entry.color : entry.category?.color} />
+          <div className="space-y-3">
+            {barData.length > 0 ? (
+              <>
+                <div className="card-base p-3" style={{ height: Math.max(300, barData.length * 50) }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={barData}
+                      layout="vertical"
+                      margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                        opacity={0.3}
+                        horizontal={false}
+                      />
+                      <XAxis
+                        type="number"
+                        tickFormatter={formatCompact}
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <YAxis
+                        type="category"
+                        dataKey="name"
+                        width={100}
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <RechartsTooltip
+                        content={<CustomTooltip labelFormatter={(_: any, p: any) => p[0]?.payload?.name || ''} />}
+                        cursor={{ fill: 'hsl(var(--muted))', opacity: 0.15 }}
+                      />
+                      <Bar dataKey="amount" radius={[0, 6, 6, 0]} barSize={28}>
+                        {barData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Legend below */}
+                <div className="space-y-1.5">
+                  {barData.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between px-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color }} />
+                        <span className="text-xs text-muted-foreground">{item.name}</span>
+                      </div>
+                      <span className="text-xs font-medium tabular-nums">{formatCurrency(item.amount)}</span>
+                    </div>
                   ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <p>Sem dados para exibir</p>
+              </div>
+            )}
           </div>
         )}
       </div>
