@@ -3,10 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { SupplierInvoice } from '@/types/supplier';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useSupplierInvoices() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
 
   // Fetch all supplier invoices
   const { data: invoices = [], isLoading } = useQuery({
@@ -60,6 +62,7 @@ export function useSupplierInvoices() {
         .insert({
           ...invoice,
           user_id: user?.id,
+          unit_id: activeUnitId,
         })
         .select('id')
         .single();
@@ -71,13 +74,14 @@ export function useSupplierInvoices() {
         .from('finance_transactions')
         .insert({
           user_id: user?.id,
-          type: 'expense',
+          type: 'expense' as const,
           description: supplierName,
           amount: invoice.amount,
           date: invoice.due_date,
           supplier_id: invoice.supplier_id,
           is_paid: false,
           is_fixed: false,
+          unit_id: activeUnitId,
         });
       
       if (transError) {
@@ -162,7 +166,7 @@ export function useSupplierInvoices() {
         .from('finance_transactions')
         .insert({
           user_id: user?.id,
-          type: 'expense',
+          type: 'expense' as const,
           description,
           amount: invoice.amount,
           date: new Date().toISOString().split('T')[0],
@@ -171,6 +175,7 @@ export function useSupplierInvoices() {
           supplier_id: invoice.supplier_id,
           is_paid: true,
           is_fixed: false,
+          unit_id: activeUnitId,
         })
         .select('id')
         .single();
