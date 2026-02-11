@@ -2047,6 +2047,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_unit_cascade: { Args: { p_unit_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
