@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
-  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown
+  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown, MessageCircle
 } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
@@ -13,6 +13,7 @@ import { getThemeColor } from '@/lib/unitThemes';
 import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -29,6 +30,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
+  { icon: MessageCircle, label: 'Chat', href: '/chat', group: 'principal', groupLabel: 'Principal' },
   { icon: CalendarDays, label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
   { icon: DollarSign, label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: Package, label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
@@ -47,6 +49,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
+  const chatUnreadCount = useChatUnreadCount();
   const location = useLocation();
   const navigate = useNavigate();
   const navRef = useRef<HTMLElement>(null);
@@ -298,7 +301,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const isActive = location.pathname === item.href;
-                  const showBadge = item.href === '/' && unreadCount > 0;
+                  const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
+                  const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
 
                   return (
                     <Link
@@ -347,7 +351,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )} />
                           {showBadge && (
                             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
-                              {unreadCount > 9 ? '9+' : unreadCount}
+                              {badgeCount > 9 ? '9+' : badgeCount}
                             </span>
                           )}
                         </div>

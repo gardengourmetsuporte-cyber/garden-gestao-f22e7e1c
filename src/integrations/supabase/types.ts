@@ -144,6 +144,114 @@ export type Database = {
           },
         ]
       }
+      chat_conversations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string | null
+          type: Database["public"]["Enums"]["chat_conversation_type"]
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name?: string | null
+          type?: Database["public"]["Enums"]["chat_conversation_type"]
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string | null
+          type?: Database["public"]["Enums"]["chat_conversation_type"]
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_pinned: boolean
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_participants: {
+        Row: {
+          conversation_id: string
+          id: string
+          joined_at: string
+          last_read_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       checklist_completions: {
         Row: {
           awarded_points: boolean
@@ -2048,6 +2156,10 @@ export type Database = {
     }
     Functions: {
       delete_unit_cascade: { Args: { p_unit_id: string }; Returns: undefined }
+      get_chat_conversation_type: {
+        Args: { _conversation_id: string }
+        Returns: Database["public"]["Enums"]["chat_conversation_type"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2056,6 +2168,14 @@ export type Database = {
         Returns: boolean
       }
       is_authenticated: { Args: never; Returns: boolean }
+      is_chat_admin: {
+        Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_chat_participant: {
+        Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
       user_has_unit_access: {
         Args: { _unit_id: string; _user_id: string }
         Returns: boolean
@@ -2064,6 +2184,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "funcionario" | "super_admin"
       cash_closing_status: "pending" | "approved" | "divergent"
+      chat_conversation_type: "direct" | "group" | "announcement"
       checklist_type: "abertura" | "fechamento" | "limpeza"
       day_period: "morning" | "afternoon" | "evening"
       movement_type: "entrada" | "saida"
@@ -2203,6 +2324,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "funcionario", "super_admin"],
       cash_closing_status: ["pending", "approved", "divergent"],
+      chat_conversation_type: ["direct", "group", "announcement"],
       checklist_type: ["abertura", "fechamento", "limpeza"],
       day_period: ["morning", "afternoon", "evening"],
       movement_type: ["entrada", "saida"],
