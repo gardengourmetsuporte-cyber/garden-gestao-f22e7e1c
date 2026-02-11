@@ -3,20 +3,23 @@ import { supabase } from '@/integrations/supabase/client';
 import { Employee, EmployeePayment, PaymentType } from '@/types/employee';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useEmployees() {
   const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
+  const { activeUnitId } = useUnit();
 
   // Fetch all employees (admin) or own employee record (user)
   const { data: employees = [], isLoading } = useQuery({
-    queryKey: ['employees'],
+    queryKey: ['employees', activeUnitId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('employees')
         .select('*')
         .order('full_name');
-      
+      if (activeUnitId) query = query.eq('unit_id', activeUnitId);
+      const { data, error } = await query;
       if (error) throw error;
       return data as Employee[];
     },

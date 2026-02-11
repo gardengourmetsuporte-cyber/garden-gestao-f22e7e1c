@@ -2,25 +2,32 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Supplier } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useSuppliers() {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchSuppliers = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('suppliers')
         .select('*')
         .order('name');
 
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       setSuppliers((data as Supplier[]) || []);
     } catch (error) {
-      // Silent fail - suppliers will be empty
+      // Silent fail
     }
-  }, []);
+  }, [activeUnitId]);
 
   useEffect(() => {
     if (user) {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { 
   FinanceAccount, 
   FinanceCategory, 
@@ -17,6 +18,7 @@ export type RecurringEditMode = 'single' | 'pending' | 'all';
 
 export function useFinance(selectedMonth: Date) {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const [accounts, setAccounts] = useState<FinanceAccount[]>([]);
   const [categories, setCategories] = useState<FinanceCategory[]>([]);
   const [transactions, setTransactions] = useState<FinanceTransaction[]>([]);
@@ -26,25 +28,28 @@ export function useFinance(selectedMonth: Date) {
   // Fetch accounts
   const fetchAccounts = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
+    let query = supabase
       .from('finance_accounts')
       .select('*')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('created_at');
+    if (activeUnitId) query = query.eq('unit_id', activeUnitId);
+    const { data } = await query;
     setAccounts((data || []) as FinanceAccount[]);
-  }, [user]);
+  }, [user, activeUnitId]);
 
   // Fetch categories with hierarchy
   const fetchCategories = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
+    let query = supabase
       .from('finance_categories')
       .select('*')
       .eq('user_id', user.id)
       .order('sort_order');
+    if (activeUnitId) query = query.eq('unit_id', activeUnitId);
+    const { data } = await query;
     
-    // Build hierarchy
     const all = (data || []) as FinanceCategory[];
     const parents = all.filter(c => !c.parent_id);
     const withSubs = parents.map(parent => ({
@@ -52,7 +57,7 @@ export function useFinance(selectedMonth: Date) {
       subcategories: all.filter(c => c.parent_id === parent.id)
     }));
     setCategories(withSubs);
-  }, [user]);
+  }, [user, activeUnitId]);
 
   // Fetch transactions for selected month
   const fetchTransactions = useCallback(async () => {
@@ -60,7 +65,7 @@ export function useFinance(selectedMonth: Date) {
     const startDate = format(startOfMonth(selectedMonth), 'yyyy-MM-dd');
     const endDate = format(endOfMonth(selectedMonth), 'yyyy-MM-dd');
     
-    const { data } = await supabase
+    let query = supabase
       .from('finance_transactions')
       .select(`
         *,
@@ -77,8 +82,11 @@ export function useFinance(selectedMonth: Date) {
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
     
+    if (activeUnitId) query = query.eq('unit_id', activeUnitId);
+    const { data } = await query;
+    
     setTransactions((data || []) as FinanceTransaction[]);
-  }, [user, selectedMonth]);
+  }, [user, selectedMonth, activeUnitId]);
 
   // Initialize default data if empty
   const initializeDefaults = useCallback(async () => {
@@ -177,18 +185,20 @@ export function useFinance(selectedMonth: Date) {
     }
   }, [user]);
 
-  // Initial load - only initialize defaults once
+  // Initial load - only initialize defaults once per unit
   useEffect(() => {
     async function load() {
-      if (!user || initialized) return;
+      if (!user || !activeUnitId) return;
       setIsLoading(true);
-      setInitialized(true);
-      await initializeDefaults();
+      if (!initialized) {
+        setInitialized(true);
+        await initializeDefaults();
+      }
       await Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]);
       setIsLoading(false);
     }
     load();
-  }, [user, initialized]);
+  }, [user, activeUnitId]);
 
   // Refetch transactions when month changes (only after initial load)
   useEffect(() => {
@@ -203,6 +213,7 @@ export function useFinance(selectedMonth: Date) {
     const { error } = await supabase.from('finance_transactions').insert({
       ...data,
       user_id: user.id,
+      unit_id: activeUnitId,
     });
     if (error) {
       toast.error('Erro ao salvar transação');
@@ -322,6 +333,7 @@ export function useFinance(selectedMonth: Date) {
     const { error } = await supabase.from('finance_accounts').insert({
       ...data,
       user_id: user.id,
+      unit_id: activeUnitId,
     });
     if (error) {
       toast.error('Erro ao criar conta');
