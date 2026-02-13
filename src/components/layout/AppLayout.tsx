@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
   User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown, MessageCircle, Monitor, MessageSquare, BookOpen
 } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
@@ -13,6 +14,7 @@ import { getThemeColor } from '@/lib/unitThemes';
 import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 import { useNotifications } from '@/hooks/useNotifications';
+import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
 import { useModuleStatus, type StatusLevel } from '@/hooks/useModuleStatus';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
@@ -113,14 +115,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               >
                 <Menu className="w-[22px] h-[22px] text-muted-foreground" />
               </button>
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20">
+              <button
+                onClick={() => navigate('/')}
+                className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20 active:scale-95 transition-transform"
+              >
                 <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
-              </div>
-              {activeUnit && (
-                <span className="text-xs font-medium text-muted-foreground truncate max-w-[120px]">
-                  {activeUnit.name}
-                </span>
-              )}
+              </button>
             </div>
 
             <div className="flex items-center gap-1">
@@ -143,17 +143,23 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </span>
                 )}
               </button>
-              <button
-                onClick={() => navigate('/')}
-                className="relative p-2 rounded-lg hover:bg-secondary transition-all"
-              >
-                <Bell className="w-[22px] h-[22px] text-muted-foreground" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className="relative p-2 rounded-lg hover:bg-secondary transition-all"
+                  >
+                    <Bell className="w-[22px] h-[22px] text-muted-foreground" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-[340px] p-0 rounded-2xl border-border/50 bg-card max-h-[70vh] overflow-y-auto" sideOffset={8}>
+                  <NotificationCard />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -171,7 +177,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       {/* ======= Sidebar ======= */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[280px] flex flex-col",
+          "fixed top-0 left-0 z-50 h-full w-[85vw] max-w-[360px] flex flex-col",
           "bg-background/95 backdrop-blur-2xl",
           "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
           "lg:translate-x-0",
@@ -444,7 +450,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
-        className={cn("min-h-screen lg:pt-0 lg:pl-[280px]", "transition-all duration-300")}
+        className={cn("min-h-screen lg:pt-0 lg:pl-[360px]", "transition-all duration-300")}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.75rem)' }}
       >
         {children}
