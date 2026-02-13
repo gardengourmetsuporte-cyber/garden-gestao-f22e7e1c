@@ -525,30 +525,6 @@ export type Database = {
           },
         ]
       }
-      dashboard_layouts: {
-        Row: {
-          created_at: string
-          id: string
-          updated_at: string
-          user_id: string
-          widgets: Json
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id: string
-          widgets?: Json
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string
-          widgets?: Json
-        }
-        Relationships: []
-      }
       employee_payments: {
         Row: {
           advance_deduction: number | null
