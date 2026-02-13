@@ -1,91 +1,112 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Supplier } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 
+async function fetchSuppliersData(activeUnitId: string | null) {
+  let query = supabase
+    .from('suppliers')
+    .select('*')
+    .order('name');
+
+  if (activeUnitId) {
+    query = query.eq('unit_id', activeUnitId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data as Supplier[]) || [];
+}
+
 export function useSuppliers() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchSuppliers = useCallback(async () => {
-    try {
-      let query = supabase
-        .from('suppliers')
-        .select('*')
-        .order('name');
+  const queryKey = ['suppliers', activeUnitId];
 
+  const { data: suppliers = [], isLoading } = useQuery({
+    queryKey,
+    queryFn: () => fetchSuppliersData(activeUnitId),
+    enabled: !!user,
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const addSupplierMut = useMutation({
+    mutationFn: async (supplier: {
+      name: string;
+      phone?: string;
+      email?: string;
+      notes?: string;
+    }) => {
+      const insertData: any = { ...supplier };
       if (activeUnitId) {
-        query = query.eq('unit_id', activeUnitId);
+        insertData.unit_id = activeUnitId;
       }
+      const { data, error } = await supabase
+        .from('suppliers')
+        .insert(insertData)
+        .select()
+        .single();
 
-      const { data, error } = await query;
       if (error) throw error;
-      setSuppliers((data as Supplier[]) || []);
-    } catch (error) {
-      // Silent fail
-    }
-  }, [activeUnitId]);
+      return data as Supplier;
+    },
+    onSuccess: (newSupplier) => {
+      // Optimistic: append to cache immediately
+      queryClient.setQueryData<Supplier[]>(queryKey, (old = []) => [...old, newSupplier]);
+    },
+  });
 
-  useEffect(() => {
-    if (user) {
-      setIsLoading(true);
-      fetchSuppliers().finally(() => setIsLoading(false));
-    }
-  }, [user, fetchSuppliers]);
+  const updateSupplierMut = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Supplier> }) => {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
 
-  const addSupplier = useCallback(async (supplier: {
-    name: string;
-    phone?: string;
-    email?: string;
-    notes?: string;
-  }) => {
-    const insertData: any = { ...supplier };
-    if (activeUnitId) {
-      insertData.unit_id = activeUnitId;
-    }
-    const { data, error } = await supabase
-      .from('suppliers')
-      .insert(insertData)
-      .select()
-      .single();
+      if (error) throw error;
+      return data as Supplier;
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData<Supplier[]>(queryKey, (old = []) =>
+        old.map(s => s.id === updated.id ? updated : s)
+      );
+    },
+  });
 
-    if (error) throw error;
-    setSuppliers(prev => [...prev, data as Supplier]);
-    return data as Supplier;
-  }, []);
+  const deleteSupplierMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('suppliers')
+        .delete()
+        .eq('id', id);
 
-  const updateSupplier = useCallback(async (id: string, updates: Partial<Supplier>) => {
-    const { data, error } = await supabase
-      .from('suppliers')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    setSuppliers(prev => prev.map(s => s.id === id ? (data as Supplier) : s));
-    return data as Supplier;
-  }, []);
-
-  const deleteSupplier = useCallback(async (id: string) => {
-    const { error } = await supabase
-      .from('suppliers')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    setSuppliers(prev => prev.filter(s => s.id !== id));
-  }, []);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      queryClient.setQueryData<Supplier[]>(queryKey, (old = []) =>
+        old.filter(s => s.id !== deletedId)
+      );
+    },
+  });
 
   return {
     suppliers,
     isLoading,
-    addSupplier,
-    updateSupplier,
-    deleteSupplier,
-    refetch: fetchSuppliers,
+    addSupplier: async (supplier: { name: string; phone?: string; email?: string; notes?: string }) => {
+      return addSupplierMut.mutateAsync(supplier);
+    },
+    updateSupplier: async (id: string, updates: Partial<Supplier>) => {
+      return updateSupplierMut.mutateAsync({ id, updates });
+    },
+    deleteSupplier: async (id: string) => {
+      await deleteSupplierMut.mutateAsync(id);
+    },
+    refetch: () => queryClient.invalidateQueries({ queryKey }),
   };
 }
