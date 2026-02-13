@@ -5,15 +5,22 @@ import { Leaderboard } from './Leaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRewards } from '@/hooks/useRewards';
+import { usePoints } from '@/hooks/usePoints';
+import { getRank, getNextRank } from '@/lib/ranks';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
 export function EmployeeDashboard() {
   const { user, profile } = useAuth();
   const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
   const { redemptions } = useRewards();
+  const { earnedPoints } = usePoints();
 
   const userRank = leaderboard.find(e => e.user_id === user?.id)?.rank;
   const pendingRedemptions = redemptions.filter(r => r.status === 'pending').length;
+
+  const currentRank = getRank(earnedPoints);
+  const nextRank = getNextRank(earnedPoints);
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
@@ -38,12 +45,38 @@ export function EmployeeDashboard() {
         <UserPointsCard />
       </div>
 
+      {/* Next Rank Progress */}
+      {nextRank && (
+        <div className="animate-slide-up stagger-3">
+          <div className="card-command p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold" style={{ color: currentRank.color }}>
+                  {currentRank.title}
+                </span>
+                <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                <span className="text-xs font-semibold text-foreground">
+                  {nextRank.title}
+                </span>
+              </div>
+              <span className="text-[10px] text-muted-foreground">
+                Faltam {nextRank.pointsNeeded} pts
+              </span>
+            </div>
+            <Progress
+              value={nextRank.pointsNeeded > 0 ? Math.max(5, 100 - (nextRank.pointsNeeded / (nextRank.pointsNeeded + earnedPoints)) * 100) : 100}
+              className="h-2 bg-secondary [&>div]:bg-gradient-to-r [&>div]:from-primary [&>div]:to-[hsl(var(--neon-cyan))]"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div className="grid grid-cols-3 gap-2.5">
         {[
-          { to: '/checklists', icon: ClipboardCheck, label: 'Checklists', sub: 'Ganhe pontos', bg: 'bg-success/10', color: 'text-success', borderClass: 'card-command-success', idx: 3 },
-          { to: '/cash-closing', icon: Receipt, label: 'Caixa', sub: 'Fechamento', bg: 'bg-primary/10', color: 'text-primary', borderClass: 'card-command-info', idx: 4 },
-          { to: '/rewards', icon: Gift, label: 'Recompensas', sub: 'Troque', bg: 'bg-warning/10', color: 'text-warning', borderClass: 'card-command-warning', idx: 5, badge: pendingRedemptions },
+          { to: '/checklists', icon: ClipboardCheck, label: 'Checklists', sub: 'Ganhe pontos', bg: 'bg-success/10', color: 'text-success', borderClass: 'card-command-success', idx: 4 },
+          { to: '/cash-closing', icon: Receipt, label: 'Caixa', sub: 'Fechamento', bg: 'bg-primary/10', color: 'text-primary', borderClass: 'card-command-info', idx: 5 },
+          { to: '/rewards', icon: Gift, label: 'Recompensas', sub: 'Troque', bg: 'bg-warning/10', color: 'text-warning', borderClass: 'card-command-warning', idx: 6, badge: pendingRedemptions },
         ].map(item => (
           <Link key={item.to} to={item.to}>
             <div className={cn(
@@ -67,7 +100,7 @@ export function EmployeeDashboard() {
       </div>
 
       {/* Leaderboard */}
-      <div className="animate-slide-up stagger-6">
+      <div className="animate-slide-up stagger-7">
         <Leaderboard 
           entries={leaderboard}
           currentUserId={user?.id}
@@ -77,7 +110,7 @@ export function EmployeeDashboard() {
 
       {/* Inventory Link */}
       <Link to="/inventory">
-        <div className="card-command-info p-3.5 flex items-center justify-between animate-slide-up stagger-7 cursor-pointer hover:scale-[1.01] active:scale-[0.98] transition-all">
+        <div className="card-command-info p-3.5 flex items-center justify-between animate-slide-up stagger-8 cursor-pointer hover:scale-[1.01] active:scale-[0.98] transition-all">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
               <Package className="w-4 h-4 text-muted-foreground" />

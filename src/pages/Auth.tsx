@@ -119,7 +119,7 @@ export default function Auth() {
         <div className="w-full max-w-sm space-y-8 animate-slide-up">
           {/* Logo */}
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-28 h-28 rounded-full overflow-hidden relative"
+            <div className="w-28 h-28 rounded-full overflow-hidden relative animate-float"
               style={{
                 background: 'white',
                 border: '2px solid hsl(var(--neon-cyan) / 0.3)',
@@ -129,8 +129,8 @@ export default function Auth() {
               <img alt="Logo" className="w-full h-full object-cover" src="/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg" />
             </div>
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-foreground">Sistema de Gestão</h1>
-              <p className="text-muted-foreground text-sm">Controle completo do seu negócio</p>
+              <h1 className="text-2xl font-bold text-foreground">Garden</h1>
+              <p className="text-muted-foreground text-sm">Gestão Inteligente</p>
             </div>
           </div>
 
@@ -206,8 +206,11 @@ export default function Auth() {
                 <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold"
                   style={{ boxShadow: '0 4px 20px hsl(var(--neon-cyan) / 0.3)' }}
                 >
-                  {isSubmitting ? (
-                    <span className="animate-pulse">Aguarde...</span>
+                {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Aguarde...
+                    </span>
                   ) : (
                     <>
                       {isLogin ? 'Entrar' : 'Cadastrar'}
@@ -235,7 +238,7 @@ export default function Auth() {
 
       {/* Footer */}
       <div className="p-4 text-center text-sm text-muted-foreground relative z-10">
-        © {new Date().getFullYear()} Sistema de Gestão
+        © {new Date().getFullYear()} Garden
       </div>
     </div>
   );

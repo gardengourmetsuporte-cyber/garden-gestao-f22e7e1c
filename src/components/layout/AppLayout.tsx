@@ -110,10 +110,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2.5 rounded-xl hover:bg-secondary active:scale-95 transition-all touch-manipulation"
+                className="relative p-2.5 rounded-xl hover:bg-secondary active:scale-95 transition-all touch-manipulation"
                 style={{ minWidth: 44, minHeight: 44 }}
               >
                 <Menu className="w-[22px] h-[22px] text-muted-foreground" />
+                {activeUnit && (
+                  <span
+                    className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full border-2 border-card"
+                    style={{ background: getThemeColor(activeUnit.slug), boxShadow: `0 0 6px ${getThemeColor(activeUnit.slug)}80` }}
+                  />
+                )}
               </button>
             </div>
 
@@ -445,7 +451,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
-        className={cn("min-h-screen lg:pt-0 lg:pl-[360px]", "transition-all duration-300")}
+        className={cn("min-h-screen lg:pt-0 lg:pl-[360px] animate-page-enter", "transition-all duration-300")}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.75rem)' }}
       >
         {children}
