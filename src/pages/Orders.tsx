@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,7 @@ export default function OrdersPage() {
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
   const [orderTab, setOrderTab] = useState<'to-order' | 'orders'>('to-order');
+  const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
 
   const lowStockItems = useMemo(() => items.filter(item => item.current_stock <= item.min_stock), [items]);
 
@@ -212,74 +214,77 @@ export default function OrdersPage() {
                 {Object.entries(itemsBySupplier).map(([supplierId, supplierItems], index) => {
                   const supplier = suppliers.find(s => s.id === supplierId);
                   const isNoSupplier = supplierId === 'no-supplier';
+                  const isExpanded = expandedSuppliers[supplierId] ?? false;
 
                   return (
                     <div
                       key={supplierId}
-                      className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5"
+                      className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 animate-fade-in"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      {/* Card header */}
-                      <div className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                            isNoSupplier ? "bg-muted" : "bg-primary/10"
-                          )}>
-                            <Package className={cn("w-5 h-5", isNoSupplier ? "text-muted-foreground" : "text-primary")} />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-foreground truncate">
-                              {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {supplierItems.length} ite{supplierItems.length !== 1 ? 'ns' : 'm'} abaixo do mínimo
-                            </p>
-                          </div>
-                        </div>
-                        {!isNoSupplier && supplier && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleOpenOrder(supplier)}
-                            className="gap-1.5 rounded-xl shadow-lg shadow-primary/20 shrink-0"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Pedir
-                          </Button>
-                        )}
-                      </div>
-
-                      {/* Items list */}
-                      <div className="border-t border-border/50">
-                        {supplierItems.slice(0, 4).map((item, i) => (
-                          <div
-                            key={item.id}
-                            className={cn(
-                              "flex items-center justify-between px-4 py-2.5",
-                              i < supplierItems.length - 1 && i < 3 && "border-b border-border/30"
-                            )}
-                          >
-                            <span className="text-sm text-foreground">{item.name}</span>
-                            <div className="flex items-center gap-2">
-                              <span className={cn(
-                                "text-xs font-semibold px-2 py-0.5 rounded-full",
-                                item.current_stock === 0
-                                  ? "bg-destructive/10 text-destructive"
-                                  : "bg-warning/10 text-warning"
-                              )}>
-                                {item.current_stock}/{item.min_stock}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground">{item.unit_type}</span>
+                      <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplierId]: open }))}>
+                        {/* Card header - always visible */}
+                        <div className="flex items-center justify-between p-4">
+                          <CollapsibleTrigger className="flex items-center gap-3 min-w-0 flex-1 text-left">
+                            <div className={cn(
+                              "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors",
+                              isNoSupplier ? "bg-muted" : "bg-primary/10"
+                            )}>
+                              <Package className={cn("w-5 h-5", isNoSupplier ? "text-muted-foreground" : "text-primary")} />
                             </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-foreground truncate">
+                                {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {supplierItems.length} ite{supplierItems.length !== 1 ? 'ns' : 'm'} abaixo do mínimo
+                              </p>
+                            </div>
+                            <ChevronDown className={cn(
+                              "w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0 mr-2",
+                              isExpanded && "rotate-180"
+                            )} />
+                          </CollapsibleTrigger>
+                          {!isNoSupplier && supplier && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleOpenOrder(supplier)}
+                              className="gap-1.5 rounded-xl shadow-lg shadow-primary/20 shrink-0"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Pedir
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Items list - collapsible */}
+                        <CollapsibleContent>
+                          <div className="border-t border-border/50">
+                            {supplierItems.map((item, i) => (
+                              <div
+                                key={item.id}
+                                className={cn(
+                                  "flex items-center justify-between px-4 py-2.5 transition-colors",
+                                  i < supplierItems.length - 1 && "border-b border-border/30"
+                                )}
+                              >
+                                <span className="text-sm text-foreground">{item.name}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className={cn(
+                                    "text-xs font-semibold px-2 py-0.5 rounded-full",
+                                    item.current_stock === 0
+                                      ? "bg-destructive/10 text-destructive"
+                                      : "bg-warning/10 text-warning"
+                                  )}>
+                                    {item.current_stock}/{item.min_stock}
+                                  </span>
+                                  <span className="text-[10px] text-muted-foreground">{item.unit_type}</span>
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                        {supplierItems.length > 4 && (
-                          <div className="px-4 py-2 text-xs text-muted-foreground flex items-center gap-1">
-                            +{supplierItems.length - 4} mais
-                            <ChevronRight className="w-3 h-3" />
-                          </div>
-                        )}
-                      </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </div>
                   );
                 })}
@@ -298,110 +303,190 @@ export default function OrdersPage() {
                 <p className="text-sm text-muted-foreground mt-1">Crie um pedido a partir das sugestões</p>
               </div>
             ) : (
-              <div className="space-y-3 animate-fade-in">
-                {orders.map((order, index) => {
-                  const status = getStatusConfig(order.status);
-                  return (
-                    <div
-                      key={order.id}
-                      className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      {/* Order header */}
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                              <ShoppingCart className="w-5 h-5 text-primary" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-foreground truncate">{order.supplier?.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(order.created_at).toLocaleDateString('pt-BR')}
-                              </p>
-                            </div>
+              <div className="space-y-6 animate-fade-in">
+                {/* Pending orders */}
+                {pendingOrders.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Pendentes</p>
+                    {pendingOrders.map((order, index) => {
+                      const status = getStatusConfig(order.status);
+                      return (
+                        <Collapsible key={order.id}>
+                          <div
+                            className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <CollapsibleTrigger className="w-full text-left">
+                              <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                                    <ShoppingCart className="w-5 h-5 text-primary" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-foreground truncate">{order.supplier?.name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {new Date(order.created_at).toLocaleDateString('pt-BR')} · {order.order_items?.length || 0} itens
+                                    </p>
+                                  </div>
+                                </div>
+                                <span className={cn("px-2.5 py-1 text-xs font-semibold rounded-full shrink-0", status.bg, status.text)}>
+                                  {status.label}
+                                </span>
+                              </div>
+                            </CollapsibleTrigger>
+
+                            <CollapsibleContent>
+                              <div className="border-t border-border/50 px-4 py-3 space-y-3">
+                                {/* Items */}
+                                <div className="space-y-1.5">
+                                  {order.order_items?.map(oi => (
+                                    <div key={oi.id} className="flex items-center justify-between py-1.5">
+                                      <span className="text-sm text-foreground">{oi.item?.name}</span>
+                                      <span className="text-xs font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
+                                        ×{oi.quantity} {oi.item?.unit_type}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex items-center gap-2 pt-1 border-t border-border/30">
+                                  {order.status === 'draft' && (
+                                    hasValidWhatsApp(order.supplier?.phone || null) ? (
+                                      <Button
+                                        size="sm"
+                                        onClick={(e) => { e.stopPropagation(); handleSendWhatsApp(order); }}
+                                        className="gap-1.5 rounded-xl bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] shadow-lg"
+                                      >
+                                        <MessageCircle className="w-4 h-4" />
+                                        WhatsApp
+                                      </Button>
+                                    ) : (
+                                      <span className="text-xs text-warning flex items-center gap-1 px-2 py-1 bg-warning/10 rounded-lg">
+                                        <MessageCircle className="w-3.5 h-3.5" />
+                                        Sem WhatsApp
+                                      </span>
+                                    )
+                                  )}
+                                  {order.status === 'sent' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={(e) => { e.stopPropagation(); setOrderToReceive(order); setReceiveOrderOpen(true); }}
+                                      className="gap-1.5 rounded-xl bg-success/10 hover:bg-success/20 text-success border-success/30"
+                                    >
+                                      <PackageCheck className="w-4 h-4" />
+                                      Receber
+                                    </Button>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }}
+                                    className="text-destructive hover:text-destructive rounded-xl ml-auto"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </CollapsibleContent>
                           </div>
-                          <span className={cn("px-2.5 py-1 text-xs font-semibold rounded-full", status.bg, status.text)}>
-                            {status.label}
-                          </span>
-                        </div>
+                        </Collapsible>
+                      );
+                    })}
+                  </div>
+                )}
 
-                        {/* Order items as tags */}
-                        <div className="flex flex-wrap gap-1.5 mb-3">
-                          {order.order_items?.slice(0, 5).map(oi => (
-                            <span key={oi.id} className="text-xs px-2 py-1 rounded-lg bg-secondary text-muted-foreground">
-                              {oi.item?.name} <span className="font-semibold text-foreground">×{oi.quantity}</span>
-                            </span>
-                          ))}
-                          {(order.order_items?.length || 0) > 5 && (
-                            <span className="text-xs px-2 py-1 rounded-lg bg-secondary text-muted-foreground">
-                              +{(order.order_items?.length || 0) - 5}
-                            </span>
-                          )}
-                        </div>
+                {/* Completed orders */}
+                {completedOrders.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Concluídos</p>
+                    {completedOrders.map((order, index) => {
+                      const status = getStatusConfig(order.status);
+                      return (
+                        <Collapsible key={order.id}>
+                          <div
+                            className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <CollapsibleTrigger className="w-full text-left">
+                              <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className={cn(
+                                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                                    order.status === 'received' ? "bg-success/10" : "bg-destructive/10"
+                                  )}>
+                                    {order.status === 'received'
+                                      ? <PackageCheck className="w-5 h-5 text-success" />
+                                      : <ShoppingCart className="w-5 h-5 text-destructive" />
+                                    }
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-foreground truncate">{order.supplier?.name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {new Date(order.created_at).toLocaleDateString('pt-BR')} · {order.order_items?.length || 0} itens
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {order.status === 'received' && order.supplier_invoice_id && (
+                                    <FileText className="w-4 h-4 text-success" />
+                                  )}
+                                  <span className={cn("px-2.5 py-1 text-xs font-semibold rounded-full", status.bg, status.text)}>
+                                    {status.label}
+                                  </span>
+                                </div>
+                              </div>
+                            </CollapsibleTrigger>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {order.status === 'draft' && (
-                            hasValidWhatsApp(order.supplier?.phone || null) ? (
-                              <Button
-                                size="sm"
-                                onClick={() => handleSendWhatsApp(order)}
-                                className="gap-1.5 rounded-xl bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20"
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                                WhatsApp
-                              </Button>
-                            ) : (
-                              <span className="text-xs text-warning flex items-center gap-1 px-2 py-1 bg-warning/10 rounded-lg">
-                                <MessageCircle className="w-3.5 h-3.5" />
-                                Sem WhatsApp
-                              </span>
-                            )
-                          )}
-                          {order.status === 'sent' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => { setOrderToReceive(order); setReceiveOrderOpen(true); }}
-                              className="gap-1.5 rounded-xl bg-success/10 hover:bg-success/20 text-success border-success/30"
-                            >
-                              <PackageCheck className="w-4 h-4" />
-                              Receber
-                            </Button>
-                          )}
-                          {order.status === 'received' && !order.supplier_invoice_id && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => { setOrderForInvoice(order); setInvoiceSheetOpen(true); }}
-                              className="gap-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
-                            >
-                              <FileText className="w-4 h-4" />
-                              Despesa
-                            </Button>
-                          )}
-                          {order.status === 'received' && order.supplier_invoice_id && (
-                            <span className="text-xs text-success flex items-center gap-1 px-2 py-1 bg-success/10 rounded-lg">
-                              <FileText className="w-3.5 h-3.5" />
-                              Despesa ok
-                            </span>
-                          )}
-                          {(order.status === 'draft' || order.status === 'sent' || order.status === 'received') && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteOrder(order.id)}
-                              className="text-destructive hover:text-destructive rounded-xl"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                            <CollapsibleContent>
+                              <div className="border-t border-border/50 px-4 py-3 space-y-3">
+                                <div className="space-y-1.5">
+                                  {order.order_items?.map(oi => (
+                                    <div key={oi.id} className="flex items-center justify-between py-1.5">
+                                      <span className="text-sm text-foreground">{oi.item?.name}</span>
+                                      <span className="text-xs font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
+                                        ×{oi.quantity} {oi.item?.unit_type}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                <div className="flex items-center gap-2 pt-1 border-t border-border/30">
+                                  {order.status === 'received' && !order.supplier_invoice_id && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={(e) => { e.stopPropagation(); setOrderForInvoice(order); setInvoiceSheetOpen(true); }}
+                                      className="gap-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
+                                    >
+                                      <FileText className="w-4 h-4" />
+                                      Despesa
+                                    </Button>
+                                  )}
+                                  {order.status === 'received' && order.supplier_invoice_id && (
+                                    <span className="text-xs text-success flex items-center gap-1 px-2 py-1 bg-success/10 rounded-lg">
+                                      <FileText className="w-3.5 h-3.5" />
+                                      Despesa registrada
+                                    </span>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }}
+                                    className="text-destructive hover:text-destructive rounded-xl ml-auto"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </CollapsibleContent>
+                          </div>
+                        </Collapsible>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )
           )}
