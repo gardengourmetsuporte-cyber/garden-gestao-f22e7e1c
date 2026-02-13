@@ -15,7 +15,7 @@ export function useDashboardLayout() {
   const { user, isAdmin } = useAuth();
   const [widgets, setWidgets] = useState<WidgetConfig[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [isEditing, setIsEditing] = useState(false);
 
   const defaultWidgets = isAdmin ? DEFAULT_ADMIN_WIDGETS : DEFAULT_EMPLOYEE_WIDGETS;
 
@@ -110,6 +110,8 @@ export function useDashboardLayout() {
   return {
     widgets,
     isLoading,
+    isEditing,
+    setIsEditing,
     reorderWidgets,
     resizeWidget,
     removeWidget,

@@ -1,5 +1,9 @@
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 
 export function NotificationsWidget() {
-  return <NotificationCard />;
+  return (
+    <div className="h-full overflow-hidden">
+      <NotificationCard />
+    </div>
+  );
 }
