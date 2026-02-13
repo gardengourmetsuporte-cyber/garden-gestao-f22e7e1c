@@ -44,7 +44,7 @@ export function PushNotificationPrompt() {
   };
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 lg:left-auto lg:right-6 lg:bottom-6 lg:w-96 z-50 animate-slide-up">
+    <div className="fixed bottom-20 left-4 right-4 lg:left-auto lg:right-6 lg:bottom-6 lg:w-96 z-[80] animate-slide-up">
       <div className="bg-card border border-border/50 rounded-2xl p-4 shadow-xl backdrop-blur-xl">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
