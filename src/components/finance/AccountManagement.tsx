@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { FinanceAccount, AccountType } from '@/types/finance';
 import { Plus, Pencil, Trash2, Wallet, Building2, CreditCard, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
 
 interface AccountManagementProps {
   open: boolean;
@@ -95,6 +96,30 @@ export function AccountManagement({
     setIsLoading(false);
   };
 
+  const getBankAvatar = (account: FinanceAccount) => {
+    const isWalletType = account.type === 'wallet';
+    const brand = isWalletType ? WALLET_BRAND : matchBankBrand(account.name);
+    if (brand) {
+      return (
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm"
+          style={{ backgroundColor: brand.bgColor, color: brand.textColor }}
+        >
+          {brand.abbr}
+        </div>
+      );
+    }
+    const Icon = getAccountIcon(account.type);
+    return (
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: account.color + '20' }}
+      >
+        <Icon className="w-5 h-5" style={{ color: account.color }} />
+      </div>
+    );
+  };
+
   const getAccountIcon = (accountType: string) => {
     const typeInfo = ACCOUNT_TYPES.find(t => t.value === accountType);
     return typeInfo?.icon || Wallet;
@@ -114,18 +139,12 @@ export function AccountManagement({
             {/* List of accounts */}
             <div className="space-y-2">
               {accounts.map(account => {
-                const Icon = getAccountIcon(account.type);
                 return (
                   <div
                     key={account.id}
                     className="flex items-center gap-3 p-4 bg-card border rounded-xl"
                   >
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: account.color + '20' }}
-                    >
-                      <Icon className="w-5 h-5" style={{ color: account.color }} />
-                    </div>
+                    {getBankAvatar(account)}
                     <div className="flex-1">
                       <p className="font-medium">{account.name}</p>
                       <p className="text-sm text-muted-foreground">
