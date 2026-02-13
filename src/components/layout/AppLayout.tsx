@@ -59,106 +59,31 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarDragX, setSidebarDragX] = useState<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const isDraggingSidebarRef = useRef(false);
-  const backSwipeRef = useRef<{ x: number; y: number; active: boolean; dx: number } | null>(null);
-  const pageWrapperRef = useRef<HTMLDivElement>(null);
-  const swipeIndicatorRef = useRef<HTMLDivElement>(null);
+  
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Edge swipe to open sidebar (from right edge) + left edge swipe to go back (DOM-based for 60fps)
+  // Edge swipe to open sidebar (from right edge)
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       if (sidebarOpen) return;
       const touch = e.touches[0];
-      // Right edge → sidebar
       if (touch.clientX > window.innerWidth - 20) {
         touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
       }
-      // Left edge → back navigation (only if not on dashboard)
-      if (touch.clientX < 30 && location.pathname !== '/') {
-        backSwipeRef.current = { x: touch.clientX, y: touch.clientY, active: false, dx: 0 };
-      }
     };
     const handleTouchMove = (e: TouchEvent) => {
-      if (sidebarOpen) return;
+      if (sidebarOpen || !touchStartRef.current) return;
       const touch = e.touches[0];
-      // Sidebar open gesture
-      if (touchStartRef.current) {
-        const dx = touchStartRef.current.x - touch.clientX;
-        const dy = Math.abs(touch.clientY - touchStartRef.current.y);
-        if (dx > 30 && dy < 50) {
-          setSidebarOpen(true);
-          touchStartRef.current = null;
-        }
-      }
-      // Back swipe gesture — direct DOM manipulation, no React state
-      if (backSwipeRef.current) {
-        const dx = touch.clientX - backSwipeRef.current.x;
-        const dy = Math.abs(touch.clientY - backSwipeRef.current.y);
-        if (!backSwipeRef.current.active && dx > 8 && dy < 40) {
-          backSwipeRef.current.active = true;
-        }
-        if (backSwipeRef.current.active) {
-          const clampedDx = Math.max(0, Math.min(dx, window.innerWidth));
-          backSwipeRef.current.dx = clampedDx;
-          // Direct DOM updates for smooth animation
-          if (pageWrapperRef.current) {
-            pageWrapperRef.current.style.transform = `translateX(${clampedDx}px)`;
-            pageWrapperRef.current.style.boxShadow = '-8px 0 30px rgba(0,0,0,0.4)';
-          }
-          if (swipeIndicatorRef.current) {
-            swipeIndicatorRef.current.style.display = 'flex';
-            swipeIndicatorRef.current.style.opacity = String(Math.min(clampedDx / 60, 1));
-            const isPast = clampedDx > window.innerWidth * 0.3;
-            const inner = swipeIndicatorRef.current.firstElementChild as HTMLElement;
-            if (inner) {
-              inner.style.background = isPast ? 'hsl(var(--neon-cyan) / 0.3)' : 'hsl(var(--card) / 0.8)';
-              inner.style.borderColor = isPast ? 'hsl(var(--neon-cyan) / 0.6)' : 'hsl(var(--border) / 0.5)';
-              inner.style.boxShadow = isPast ? '0 0 20px hsl(var(--neon-cyan) / 0.4)' : '0 4px 12px rgba(0,0,0,0.3)';
-              const svg = inner.querySelector('svg') as SVGElement;
-              if (svg) svg.style.color = isPast ? 'hsl(var(--neon-cyan))' : 'hsl(var(--muted-foreground))';
-            }
-          }
-        }
+      const dx = touchStartRef.current.x - touch.clientX;
+      const dy = Math.abs(touch.clientY - touchStartRef.current.y);
+      if (dx > 30 && dy < 50) {
+        setSidebarOpen(true);
+        touchStartRef.current = null;
       }
     };
     const handleTouchEnd = () => {
       if (!sidebarOpen) touchStartRef.current = null;
-      if (backSwipeRef.current?.active) {
-        const dx = backSwipeRef.current.dx;
-        const pastThreshold = dx > window.innerWidth * 0.3;
-        // Animate back or navigate
-        if (pageWrapperRef.current) {
-          pageWrapperRef.current.style.transition = 'transform 0.25s cubic-bezier(0.2, 0, 0, 1)';
-          if (pastThreshold) {
-            pageWrapperRef.current.style.transform = `translateX(${window.innerWidth}px)`;
-            setTimeout(() => {
-              // Navigate then reset
-              const event = new CustomEvent('app-back-swipe', { cancelable: true });
-              const prevented = !window.dispatchEvent(event);
-              if (!prevented) {
-                navigate('/');
-              }
-              // Reset DOM after navigation
-              if (pageWrapperRef.current) {
-                pageWrapperRef.current.style.transition = 'none';
-                pageWrapperRef.current.style.transform = '';
-                pageWrapperRef.current.style.boxShadow = '';
-              }
-            }, 200);
-          } else {
-            pageWrapperRef.current.style.transform = '';
-            pageWrapperRef.current.style.boxShadow = '';
-            setTimeout(() => {
-              if (pageWrapperRef.current) pageWrapperRef.current.style.transition = '';
-            }, 250);
-          }
-        }
-        if (swipeIndicatorRef.current) {
-          swipeIndicatorRef.current.style.display = 'none';
-        }
-      }
-      backSwipeRef.current = null;
     };
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
@@ -168,7 +93,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [sidebarOpen, location.pathname, navigate]);
+  }, [sidebarOpen]);
 
   // Sidebar drag-to-close handlers
   const sidebarTouchStart = (e: React.TouchEvent) => {
@@ -247,26 +172,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ======= Back Swipe Arrow Indicator (fixed, hidden by default, controlled via ref) ======= */}
-      <div
-        ref={swipeIndicatorRef}
-        className="lg:hidden fixed top-1/2 -translate-y-1/2 z-[90] items-center justify-center pointer-events-none"
-        style={{ display: 'none', left: 8 }}
-      >
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center"
-          style={{
-            background: 'hsl(var(--card) / 0.8)',
-            border: '1px solid hsl(var(--border) / 0.5)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          }}
-        >
-          <ChevronRight className="w-5 h-5 rotate-180" style={{ color: 'hsl(var(--muted-foreground))' }} />
-        </div>
-      </div>
-
-      {/* ======= Single Swipeable Page Wrapper (header + FAB + main) ======= */}
-      <div ref={pageWrapperRef} style={{ willChange: 'transform' }}>
+      
 
       {/* ======= Mobile Header ======= */}
       <header
@@ -361,9 +267,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {children}
       </main>
 
-      </div>{/* End single swipeable page wrapper */}
-
-      {/* ======= Sidebar Overlay (OUTSIDE swipeable wrapper) ======= */}
+      {/* ======= Sidebar Overlay ======= */}
       {sidebarOpen && (
         <div
           className="lg:hidden fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm animate-fade-in"
