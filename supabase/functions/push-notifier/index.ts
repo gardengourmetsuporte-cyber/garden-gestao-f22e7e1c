@@ -189,15 +189,12 @@ Deno.serve(async (req) => {
       if (!authHeader?.startsWith('Bearer ')) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
-      const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-        global: { headers: { Authorization: authHeader } },
-      });
       const token = authHeader.replace('Bearer ', '');
-      const { data: cd, error: ce } = await userClient.auth.getClaims(token);
-      if (ce || !cd?.claims) {
+      const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
+      if (userErr || !user) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
-      const userId = (cd.claims as Record<string, string>).sub;
+      const userId = user.id;
       const body = await req.json();
       const sub = body.subscription;
       await supabaseAdmin.from('push_subscriptions').upsert({
@@ -216,15 +213,12 @@ Deno.serve(async (req) => {
       if (!authHeader?.startsWith('Bearer ')) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
-      const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-        global: { headers: { Authorization: authHeader } },
-      });
       const token = authHeader.replace('Bearer ', '');
-      const { data: cd, error: ce } = await userClient.auth.getClaims(token);
-      if (ce || !cd?.claims) {
+      const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
+      if (userErr || !user) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
-      const userId = (cd.claims as Record<string, string>).sub;
+      const userId = user.id;
       const { endpoint } = await req.json();
       await supabaseAdmin.from('push_subscriptions').delete().eq('user_id', userId).eq('endpoint', endpoint);
       return new Response(JSON.stringify({ success: true }), {
