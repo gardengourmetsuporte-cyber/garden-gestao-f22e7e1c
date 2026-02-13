@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ListChecks, Plus, CheckCircle2, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
-import { SortableList, DragHandle } from '@/components/ui/sortable-list';
 import { cn } from '@/lib/utils';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAgenda } from '@/hooks/useAgenda';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
-import { CategoryChips } from '@/components/agenda/CategoryChips';
+
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -20,10 +19,10 @@ export default function Agenda() {
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [pendingOpen, setPendingOpen] = useState(true);
   const [completedOpen, setCompletedOpen] = useState(false);
   const [viewMode, setViewMode] = useState('list');
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
   const {
     tasks,
@@ -69,12 +68,19 @@ export default function Agenda() {
     if (!open) setEditingTask(null);
   };
 
-  const filteredTasks = selectedCategoryId
-    ? tasks.filter(t => t.category_id === selectedCategoryId)
-    : tasks;
+  const pendingTasks = tasks.filter(t => !t.is_completed);
+  const completedTasks = tasks.filter(t => t.is_completed);
 
-  const pendingTasks = filteredTasks.filter(t => !t.is_completed);
-  const completedTasks = filteredTasks.filter(t => t.is_completed);
+  // Group pending tasks by category
+  const uncategorizedTasks = pendingTasks.filter(t => !t.category_id);
+  const tasksByCategory = categories.map(cat => ({
+    category: cat,
+    tasks: pendingTasks.filter(t => t.category_id === cat.id),
+  })).filter(g => g.tasks.length > 0);
+
+  const toggleCategoryExpanded = (catId: string) => {
+    setExpandedCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
+  };
 
   const handleReorderPendingTasks = (reorderedTasks: ManagerTask[]) => {
     const updates = reorderedTasks.map((task, index) => ({
@@ -86,18 +92,24 @@ export default function Agenda() {
 
   if (!isAdmin) return null;
 
-  const ListContent = () => (
-    <div className="space-y-4">
-      {/* Categories */}
-      <CategoryChips
-        categories={categories}
-        selectedCategoryId={selectedCategoryId}
-        onSelectCategory={setSelectedCategoryId}
-        onDeleteCategory={deleteCategory}
-        onReorderCategories={reorderCategories}
-      />
+  const renderTaskItem = (task: ManagerTask, sortable?: { isDragging: boolean; dragHandleProps: Record<string, unknown> }) => (
+    <TaskItem
+      key={task.id}
+      task={task}
+      onToggle={toggleTask}
+      onDelete={deleteTask}
+      onClick={() => handleEditTask(task)}
+      onInlineUpdate={handleInlineUpdate}
+      onAddSubtask={handleAddSubtask}
+      onUpdateSubtask={handleUpdateSubtask}
+      isDragging={sortable?.isDragging}
+      dragHandleProps={sortable?.dragHandleProps}
+    />
+  );
 
-      {/* Pending Tasks */}
+  const ListContent = () => (
+    <div className="space-y-3">
+      {/* Pending section */}
       <Collapsible open={pendingOpen} onOpenChange={setPendingOpen}>
         <CollapsibleTrigger className="flex items-center justify-between w-full p-4 card-command-info">
           <div className="flex items-center gap-3">
@@ -111,7 +123,7 @@ export default function Agenda() {
           </div>
           {pendingOpen ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-2">
+        <CollapsibleContent className="mt-3 space-y-3">
           {isLoading ? (
             <p className="text-center text-muted-foreground py-8">Carregando...</p>
           ) : pendingTasks.length === 0 ? (
@@ -122,26 +134,39 @@ export default function Agenda() {
               </Button>
             </div>
           ) : (
-            <SortableList
-              items={pendingTasks}
-              getItemId={(t) => t.id}
-              onReorder={handleReorderPendingTasks}
-              className="space-y-2"
-              renderItem={(task, { isDragging, dragHandleProps }) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={toggleTask}
-                  onDelete={deleteTask}
-                  onClick={() => handleEditTask(task)}
-                  onInlineUpdate={handleInlineUpdate}
-                  onAddSubtask={handleAddSubtask}
-                  onUpdateSubtask={handleUpdateSubtask}
-                  isDragging={isDragging}
-                  dragHandleProps={dragHandleProps}
-                />
+            <>
+              {/* Category sections */}
+              {tasksByCategory.map(({ category, tasks: catTasks }) => {
+                const isExpanded = expandedCategories[category.id] !== false; // default open
+                return (
+                  <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl bg-card border border-border hover:border-primary/20 transition-all">
+                      <div className="flex items-center gap-3">
+                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
+                        <span className="font-semibold text-sm">{category.name}</span>
+                        <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                          {catTasks.length}
+                        </span>
+                      </div>
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2 space-y-2 pl-2">
+                      {catTasks.map(task => renderTaskItem(task))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                );
+              })}
+
+              {/* Uncategorized tasks */}
+              {uncategorizedTasks.length > 0 && (
+                <div className="space-y-2">
+                  {tasksByCategory.length > 0 && (
+                    <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
+                  )}
+                  {uncategorizedTasks.map(task => renderTaskItem(task))}
+                </div>
               )}
-            />
+            </>
           )}
         </CollapsibleContent>
       </Collapsible>
@@ -166,18 +191,7 @@ export default function Agenda() {
               <p className="empty-state-title">Nenhum lembrete concluído</p>
             </div>
           ) : (
-            completedTasks.map(task => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onToggle={toggleTask}
-                onDelete={deleteTask}
-                onClick={() => handleEditTask(task)}
-                onInlineUpdate={handleInlineUpdate}
-                onAddSubtask={handleAddSubtask}
-                onUpdateSubtask={handleUpdateSubtask}
-              />
-            ))
+            completedTasks.map(task => renderTaskItem(task))
           )}
         </CollapsibleContent>
       </Collapsible>
@@ -186,7 +200,7 @@ export default function Agenda() {
 
   const CalendarContent = () => (
     <AgendaCalendarView 
-      tasks={filteredTasks}
+      tasks={tasks}
       onTaskClick={handleEditTask}
       onToggleTask={toggleTask}
     />
