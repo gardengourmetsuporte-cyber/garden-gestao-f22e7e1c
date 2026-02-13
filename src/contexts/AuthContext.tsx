@@ -18,12 +18,34 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AUTH_CACHE_KEY = 'garden_auth_cache';
+
+function getCachedAuth() {
+  try {
+    const cached = localStorage.getItem(AUTH_CACHE_KEY);
+    if (cached) return JSON.parse(cached) as { profile: Profile | null; role: AppRole | null };
+  } catch {}
+  return null;
+}
+
+function setCachedAuth(profile: Profile | null, role: AppRole | null) {
+  try {
+    localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({ profile, role }));
+  } catch {}
+}
+
+function clearCachedAuth() {
+  localStorage.removeItem(AUTH_CACHE_KEY);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const cached = getCachedAuth();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(cached?.profile ?? null);
+  const [role, setRole] = useState<AppRole | null>(cached?.role ?? null);
+  // If we have cached auth data, skip the loading screen
+  const [isLoading, setIsLoading] = useState(!cached);
 
   useEffect(() => {
     let initialSessionHandled = false;
@@ -81,8 +103,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .maybeSingle(),
       ]);
       
-      setProfile(profileResult.data as Profile | null);
-      setRole((roleResult.data?.role as AppRole) ?? 'funcionario');
+      const p = profileResult.data as Profile | null;
+      const r = (roleResult.data?.role as AppRole) ?? 'funcionario';
+      setProfile(p);
+      setRole(r);
+      setCachedAuth(p, r);
     } catch {
       // Error handled silently
     } finally {
@@ -118,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setProfile(null);
     setRole(null);
+    clearCachedAuth();
   };
 
   const isAdmin = role === 'admin' || role === 'super_admin';
