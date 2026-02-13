@@ -128,8 +128,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const rank = getRank(earnedPoints);
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
+  const location = useLocation();
   const navigate = useNavigate();
   const navRef = useRef<HTMLElement>(null);
+
+  // Pages with bottom navigation bars that conflict with the FAB
+  const hasBottomNav = location.pathname === '/finance';
 
   // Scroll sidebar nav to active item when opened
   useEffect(() => {
@@ -513,7 +517,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           sidebarOpen ? "rotate-180 scale-90" : "hover:scale-105"
         )}
         style={{
-          bottom: 'calc(env(safe-area-inset-bottom) + 24px)',
+          bottom: hasBottomNav
+            ? 'calc(env(safe-area-inset-bottom) + 84px)'
+            : 'calc(env(safe-area-inset-bottom) + 24px)',
           right: '20px',
           background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
           boxShadow: '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
