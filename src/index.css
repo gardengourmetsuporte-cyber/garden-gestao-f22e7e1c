@@ -592,15 +592,7 @@
   .stagger-7 { animation-delay: 360ms; }
   .stagger-8 { animation-delay: 420ms; }
 
-  /* Widget edit mode wiggle */
-  .animate-wiggle {
-    animation: widgetWiggle 0.3s ease-in-out infinite alternate;
-  }
 
-  @keyframes widgetWiggle {
-    0% { transform: rotate(-0.5deg); }
-    100% { transform: rotate(0.5deg); }
-  }
 }
 
 /* =========================================================

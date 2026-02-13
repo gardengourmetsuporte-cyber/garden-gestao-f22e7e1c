@@ -1,13 +1,12 @@
 import { ReactNode } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { X, Maximize2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WidgetConfig, WidgetSize, WIDGET_DEFINITIONS } from '@/types/dashboard';
 
 interface WidgetWrapperProps {
   widget: WidgetConfig;
-  isEditing: boolean;
   onRemove: (id: string) => void;
   onResize: (id: string) => void;
   children: ReactNode;
@@ -19,7 +18,7 @@ const sizeLabel: Record<WidgetSize, string> = {
   large: 'G',
 };
 
-export function WidgetWrapper({ widget, isEditing, onRemove, onResize, children }: WidgetWrapperProps) {
+export function WidgetWrapper({ widget, onRemove, onResize, children }: WidgetWrapperProps) {
   const {
     attributes,
     listeners,
@@ -27,7 +26,7 @@ export function WidgetWrapper({ widget, isEditing, onRemove, onResize, children 
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: widget.id, disabled: !isEditing });
+  } = useSortable({ id: widget.id });
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -46,24 +45,21 @@ export function WidgetWrapper({ widget, isEditing, onRemove, onResize, children 
       className={cn(
         'relative transition-all',
         isFullWidth ? 'col-span-2' : 'col-span-1',
-        isDragging && 'scale-[1.02] opacity-90',
-        isEditing && !isDragging && 'animate-wiggle',
+        isDragging && 'scale-[1.03] opacity-90 shadow-2xl',
       )}
       {...attributes}
-      {...(isEditing ? listeners : {})}
+      {...listeners}
     >
-      {/* Remove button */}
-      {isEditing && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onRemove(widget.id); }}
-          className="absolute -top-2 -left-2 z-10 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-lg active:scale-90 transition-transform"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
-      )}
+      {/* Remove button - always visible */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(widget.id); }}
+        className="absolute -top-2 -left-2 z-10 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
 
-      {/* Resize button */}
-      {isEditing && canResize && (
+      {/* Resize button - always visible */}
+      {canResize && (
         <button
           onClick={(e) => { e.stopPropagation(); onResize(widget.id); }}
           className="absolute -bottom-2 -right-2 z-10 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg active:scale-90 transition-transform text-[10px] font-bold"
