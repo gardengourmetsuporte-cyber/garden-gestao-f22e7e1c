@@ -102,8 +102,8 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-background pb-24">
         <header className="page-header-bar">
           <div className="page-header-content flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-secondary/80 flex items-center justify-center">
-              <SettingsIcon className="w-5 h-5 text-muted-foreground" />
+             <div className="icon-glow icon-glow-md icon-glow-muted">
+               <SettingsIcon className="w-5 h-5" />
             </div>
             <div>
               <h1 className="text-lg font-bold">Configurações</h1>
@@ -132,10 +132,14 @@ export default function SettingsPage() {
                       style={{ borderLeftColor: borderColor }}
                     >
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: `${borderColor}15` }}
+                        className="icon-glow icon-glow-md shrink-0"
+                        style={{ 
+                          backgroundColor: `${borderColor}12`,
+                          borderColor: `${borderColor}30`,
+                          color: borderColor
+                        }}
                       >
-                        <item.icon className="w-5 h-5" style={{ color: borderColor }} />
+                        <item.icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="font-medium text-sm block">{item.label}</span>

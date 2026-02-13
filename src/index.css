@@ -239,60 +239,22 @@
   }
 
   .page-header-icon {
-    @apply w-9 h-9 rounded-xl flex items-center justify-center;
+    @apply w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm;
+    border: 1px solid hsl(var(--primary) / 0.15);
   }
 
-  .page-title {
-    @apply text-lg font-bold text-foreground tracking-tight;
-  }
-
-  .page-subtitle {
-    @apply text-xs text-muted-foreground;
-  }
-
-  /* ========== STATS & METRICS ========== */
-
-  .stat-card {
-    @apply card-interactive p-4;
-  }
-
-  .stat-command {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl p-4 transition-all duration-300 cursor-pointer active:scale-[0.97];
-    border: 1px solid hsl(var(--border) / 0.4);
-    box-shadow: var(--shadow-card);
-  }
-
-  .stat-command:hover {
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .stat-command-cyan {
-    border-color: hsl(var(--neon-cyan) / 0.3);
-    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-cyan) / 0.1);
-  }
-
-  .stat-command-green {
-    border-color: hsl(var(--neon-green) / 0.3);
-    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-green) / 0.1);
-  }
-
-  .stat-command-red {
-    border-color: hsl(var(--neon-red) / 0.3);
-    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-red) / 0.1);
-  }
-
-  .stat-command-amber {
-    border-color: hsl(var(--neon-amber) / 0.3);
-    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-amber) / 0.1);
-  }
-
-  .stat-command-purple {
-    border-color: hsl(var(--neon-purple) / 0.3);
-    box-shadow: var(--shadow-card), 0 0 12px hsl(var(--neon-purple) / 0.1);
+  .page-header-icon svg {
+    filter: drop-shadow(0 0 6px currentColor);
   }
 
   .stat-icon {
-    @apply w-10 h-10 rounded-xl flex items-center justify-center;
+    @apply w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm;
+    border: 1px solid currentColor;
+    border-color: hsl(0 0% 100% / 0.08);
+  }
+
+  .stat-icon svg {
+    filter: drop-shadow(0 0 5px currentColor);
   }
 
   .stat-value {
@@ -301,6 +263,73 @@
 
   .stat-label {
     @apply text-sm font-medium text-muted-foreground;
+  }
+
+  /* ========== ICON GLOW SYSTEM ========== */
+
+  .icon-glow {
+    @apply flex items-center justify-center rounded-xl backdrop-blur-sm;
+    border: 1px solid hsl(0 0% 100% / 0.06);
+  }
+
+  .icon-glow svg {
+    filter: drop-shadow(0 0 6px currentColor);
+    transition: filter 0.2s ease;
+  }
+
+  .icon-glow:hover svg,
+  .icon-glow:active svg {
+    filter: drop-shadow(0 0 10px currentColor);
+  }
+
+  .icon-glow-sm {
+    @apply w-8 h-8;
+  }
+
+  .icon-glow-md {
+    @apply w-10 h-10;
+  }
+
+  .icon-glow-lg {
+    @apply w-12 h-12;
+  }
+
+  /* Color variants */
+  .icon-glow-primary {
+    @apply bg-primary/10 text-primary;
+    border-color: hsl(var(--primary) / 0.2);
+  }
+
+  .icon-glow-cyan {
+    @apply text-[hsl(var(--neon-cyan))];
+    background: hsl(var(--neon-cyan) / 0.08);
+    border-color: hsl(var(--neon-cyan) / 0.2);
+  }
+
+  .icon-glow-success {
+    @apply bg-success/10 text-success;
+    border-color: hsl(var(--neon-green) / 0.2);
+  }
+
+  .icon-glow-warning {
+    @apply bg-warning/10 text-warning;
+    border-color: hsl(var(--neon-amber) / 0.2);
+  }
+
+  .icon-glow-destructive {
+    @apply bg-destructive/10 text-destructive;
+    border-color: hsl(var(--neon-red) / 0.2);
+  }
+
+  .icon-glow-purple {
+    background: hsl(var(--neon-purple) / 0.08);
+    color: hsl(var(--neon-purple));
+    border-color: hsl(var(--neon-purple) / 0.2);
+  }
+
+  .icon-glow-muted {
+    @apply bg-secondary/80 text-muted-foreground;
+    border-color: hsl(var(--border) / 0.3);
   }
 
   /* ========== LIST COMMAND ========== */

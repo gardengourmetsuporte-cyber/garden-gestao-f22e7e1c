@@ -240,8 +240,8 @@ export default function Recipes() {
         <div className="page-header-bar">
           <div className="page-header-content flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="page-header-icon bg-primary/10">
-                <ChefHat className="w-5 h-5 text-primary" />
+              <div className="icon-glow icon-glow-md icon-glow-primary">
+                <ChefHat className="w-5 h-5" />
               </div>
               <div>
                 <h1 className="page-title">Fichas Técnicas</h1>

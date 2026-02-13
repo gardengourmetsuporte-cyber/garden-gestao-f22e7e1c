@@ -44,14 +44,8 @@ export default function WhatsAppPage() {
         <div className="page-header-bar shrink-0">
           <div className="page-header-content">
             <div className="flex items-center gap-3">
-              <div
-                className="page-header-icon"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(var(--neon-green) / 0.15), hsl(var(--neon-cyan) / 0.08))',
-                  border: '1px solid hsl(var(--neon-green) / 0.3)',
-                }}
-              >
-                <MessageSquare className="w-5 h-5" style={{ color: 'hsl(var(--neon-green))' }} />
+              <div className="icon-glow icon-glow-md icon-glow-success">
+                <MessageSquare className="w-5 h-5" />
               </div>
               <div>
                 <h1 className="page-title">WhatsApp</h1>

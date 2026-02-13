@@ -55,8 +55,8 @@ export function FinanceHome({
           className="card-command-success p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl bg-success/15 flex items-center justify-center">
-              <ArrowUpCircle className="w-5 h-5 text-success" />
+            <div className="icon-glow icon-glow-sm icon-glow-success">
+              <ArrowUpCircle className="w-5 h-5" />
             </div>
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
@@ -69,8 +69,8 @@ export function FinanceHome({
           className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-xl bg-destructive/15 flex items-center justify-center">
-              <ArrowDownCircle className="w-5 h-5 text-destructive" />
+            <div className="icon-glow icon-glow-sm icon-glow-destructive">
+              <ArrowDownCircle className="w-5 h-5" />
             </div>
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
@@ -88,8 +88,8 @@ export function FinanceHome({
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-warning/15 flex items-center justify-center">
-                <AlertCircle className="w-4 h-4 text-warning" />
+              <div className="icon-glow icon-glow-sm icon-glow-warning" style={{ width: '1.75rem', height: '1.75rem' }}>
+                <AlertCircle className="w-4 h-4" />
               </div>
               <span className="font-semibold text-sm text-warning">Pendências</span>
             </div>

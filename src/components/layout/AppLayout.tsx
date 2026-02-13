@@ -196,7 +196,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"
               >
-                <MessageCircle className="w-[22px] h-[22px] text-muted-foreground" />
+                <MessageCircle className="w-[22px] h-[22px] text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                 {chatUnreadCount > 0 && (
                   <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
                     {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
@@ -208,7 +208,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <button
                     className="relative p-2 rounded-lg hover:bg-secondary transition-all"
                   >
-                    <Bell className="w-[22px] h-[22px] text-muted-foreground" />
+                    <Bell className="w-[22px] h-[22px] text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -465,14 +465,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               )}
                               style={isActive ? {
                                 background: 'hsl(var(--primary) / 0.15)',
-                                boxShadow: '0 0 8px hsl(var(--primary) / 0.1)'
+                                border: '1px solid hsl(var(--primary) / 0.2)',
+                                boxShadow: '0 0 10px hsl(var(--primary) / 0.15)'
                               } : undefined}
                             >
                               <div className="relative">
                                 <item.icon className={cn(
                                   "w-[18px] h-[18px]",
                                   isActive ? "text-primary" : ""
-                                )} />
+                                )} style={isActive ? { filter: 'drop-shadow(0 0 5px hsl(217 91% 60% / 0.6))' } : undefined} />
                                 {showBadge && (
                                   <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
                                     {badgeCount > 9 ? '9+' : badgeCount}
