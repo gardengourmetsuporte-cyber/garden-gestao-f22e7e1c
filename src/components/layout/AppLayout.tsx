@@ -16,6 +16,9 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
 import { useModuleStatus, type StatusLevel } from '@/hooks/useModuleStatus';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { RankedAvatar } from '@/components/profile/RankedAvatar';
+import { usePoints } from '@/hooks/usePoints';
+import { getRank } from '@/lib/ranks';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -54,6 +57,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
+  const { earned: earnedPoints } = usePoints();
+  const rank = getRank(earnedPoints);
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
   const navigate = useNavigate();
@@ -262,7 +267,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {/* User Card */}
         <div className="p-4 shrink-0">
           <div
-            className="rounded-xl p-3"
+            className="rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all"
+            onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
             style={{
               background: 'linear-gradient(135deg, hsl(var(--card)) 0%, hsl(222 45% 10%) 100%)',
               border: '1px solid hsl(var(--neon-cyan) / 0.15)',
@@ -270,28 +276,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             }}
           >
             <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--neon-cyan) / 0.1))',
-                  border: '2px solid hsl(var(--neon-cyan) / 0.3)',
-                  boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.15)'
-                }}
-              >
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-4 h-4 text-primary" />
-                )}
-              </div>
+              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={42} />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm text-foreground truncate">
                   {profile?.full_name || 'Usuário'}
                 </p>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  {isAdmin && <Shield className="w-3 h-3" style={{ color: 'hsl(var(--neon-cyan))' }} />}
-                  <span className="text-[10px]" style={{ color: 'hsl(var(--neon-cyan))' }}>
-                    {isAdmin ? 'Administrador' : 'Funcionário'}
+                  <span
+                    className="text-[9px] font-bold uppercase tracking-wider"
+                    style={{ color: rank.color }}
+                  >
+                    {rank.title}
+                  </span>
+                  <span className="text-[8px] text-muted-foreground">•</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {isAdmin ? 'Admin' : 'Staff'}
                   </span>
                 </div>
               </div>

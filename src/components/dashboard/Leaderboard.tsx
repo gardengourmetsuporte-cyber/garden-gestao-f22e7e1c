@@ -1,7 +1,9 @@
-import { Trophy, Medal, Star, User } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Trophy, Medal, Star } from 'lucide-react';
 import { LeaderboardEntry } from '@/hooks/useLeaderboard';
 import { cn } from '@/lib/utils';
+import { RankedAvatar } from '@/components/profile/RankedAvatar';
+import { getRank } from '@/lib/ranks';
+import { Link } from 'react-router-dom';
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -15,18 +17,18 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
-      case 1: return <Trophy className="w-4 h-4 text-amber-500" />;
-      case 2: return <Medal className="w-4 h-4 text-gray-400" />;
-      case 3: return <Medal className="w-4 h-4 text-amber-700" />;
+      case 1: return <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />;
+      case 2: return <Medal className="w-4 h-4 text-muted-foreground" />;
+      case 3: return <Medal className="w-4 h-4" style={{ color: 'hsl(30 60% 40%)' }} />;
       default: return <span className="w-4 text-center text-xs font-bold text-muted-foreground">{rank}</span>;
     }
   };
 
   const getRankBorder = (rank: number) => {
     switch (rank) {
-      case 1: return 'border-l-amber-500/60';
-      case 2: return 'border-l-gray-400/60';
-      case 3: return 'border-l-amber-700/60';
+      case 1: return 'border-l-[hsl(var(--neon-amber))]';
+      case 2: return 'border-l-muted-foreground/60';
+      case 3: return 'border-l-[hsl(30,60%,40%)]/60';
       default: return 'border-l-border/30';
     }
   };
@@ -35,7 +37,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
     return (
       <div className="card-command p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Trophy className="w-4 h-4 text-amber-500" />
+          <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
           <h3 className="font-semibold text-sm text-foreground">Ranking de Pontos</h3>
         </div>
         <div className="space-y-2">
@@ -49,8 +51,8 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
 
   return (
     <div className="card-command p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <Trophy className="w-4 h-4 text-amber-500" />
+        <div className="flex items-center gap-2 mb-3">
+          <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
         <h3 className="font-semibold text-sm text-foreground">Ranking de Pontos</h3>
       </div>
       <div className="space-y-1.5">
@@ -62,8 +64,10 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
         ) : (
           displayEntries.map((entry, idx) => {
             const isCurrentUser = entry.user_id === currentUserId;
+            const entryRank = getRank(entry.earned_points);
             return (
-              <div
+              <Link
+                to={`/profile/${entry.user_id}`}
                 key={entry.user_id}
                 className={cn(
                   "list-command flex items-center gap-2.5 p-2.5 border-l-3 animate-slide-up",
@@ -75,26 +79,21 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries }: L
                 <div className="w-6 flex items-center justify-center shrink-0">
                   {getRankIcon(entry.rank)}
                 </div>
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={entry.avatar_url || undefined} className="object-cover" />
-                  <AvatarFallback className="text-xs">
-                    <User className="w-4 h-4" />
-                  </AvatarFallback>
-                </Avatar>
+                <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_points} size={32} />
                 <div className="flex-1 min-w-0">
                   <p className={cn("font-medium text-xs truncate", isCurrentUser && "text-primary")}>
                     {entry.full_name}
                     {isCurrentUser && <span className="text-[10px] ml-1 text-muted-foreground">(você)</span>}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Saldo: {entry.balance} pts
+                  <p className="text-[10px]" style={{ color: entryRank.color }}>
+                    {entryRank.title} • Saldo: {entry.balance} pts
                   </p>
                 </div>
-                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 shrink-0">
-                  <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                  <span className="font-bold text-xs text-amber-600">{entry.earned_points}</span>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>
+                  <Star className="w-3 h-3 fill-current" style={{ color: 'hsl(var(--neon-amber))' }} />
+                  <span className="font-bold text-xs" style={{ color: 'hsl(var(--neon-amber))' }}>{entry.earned_points}</span>
                 </div>
-              </div>
+              </Link>
             );
           })
         )}
