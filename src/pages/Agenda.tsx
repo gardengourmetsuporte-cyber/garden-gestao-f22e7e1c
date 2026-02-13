@@ -13,6 +13,9 @@ import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { ManagerTask, TaskCategory } from '@/types/agenda';
 
 const CATEGORY_COLORS = [
@@ -20,7 +23,22 @@ const CATEGORY_COLORS = [
   '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280',
 ];
 
-export default function Agenda() {
+function SortableTaskItem({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+    scale: isDragging ? '1.02' : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
+}
+
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
@@ -29,6 +47,11 @@ export default function Agenda() {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(MouseSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+  );
 
   const {
     tasks,
@@ -91,17 +114,28 @@ export default function Agenda() {
 
   if (!isAdmin) return null;
 
+  const handleDragEnd = (event: DragEndEvent, taskList: ManagerTask[]) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = taskList.findIndex(t => t.id === active.id);
+    const newIndex = taskList.findIndex(t => t.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(taskList, oldIndex, newIndex);
+    reorderTasks(reordered.map((t, i) => ({ id: t.id, sort_order: i })));
+  };
+
   const renderTaskItem = (task: ManagerTask) => (
-    <TaskItem
-      key={task.id}
-      task={task}
-      onToggle={toggleTask}
-      onDelete={deleteTask}
-      onClick={() => handleEditTask(task)}
-      onInlineUpdate={handleInlineUpdate}
-      onAddSubtask={handleAddSubtask}
-      onUpdateSubtask={handleUpdateSubtask}
-    />
+    <SortableTaskItem key={task.id} id={task.id}>
+      <TaskItem
+        task={task}
+        onToggle={toggleTask}
+        onDelete={deleteTask}
+        onClick={() => handleEditTask(task)}
+        onInlineUpdate={handleInlineUpdate}
+        onAddSubtask={handleAddSubtask}
+        onUpdateSubtask={handleUpdateSubtask}
+      />
+    </SortableTaskItem>
   );
 
   const ListContent = () => (
@@ -132,7 +166,11 @@ export default function Agenda() {
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-2 space-y-2 pl-2">
-                  {catTasks.map(task => renderTaskItem(task))}
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
+                    <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                      {catTasks.map(task => renderTaskItem(task))}
+                    </SortableContext>
+                  </DndContext>
                 </CollapsibleContent>
               </Collapsible>
             );
@@ -144,7 +182,11 @@ export default function Agenda() {
               {tasksByCategory.length > 0 && (
                 <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
               )}
-              {uncategorizedTasks.map(task => renderTaskItem(task))}
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)}>
+                <SortableContext items={uncategorizedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                  {uncategorizedTasks.map(task => renderTaskItem(task))}
+                </SortableContext>
+              </DndContext>
             </div>
           )}
 
