@@ -351,33 +351,42 @@ serve(async (req) => {
     }
 
     // Gather context
-    const { data: recentMessages } = await supabase
-      .from("whatsapp_messages")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: false })
-      .limit(20);
-
-    const { data: menuItems } = await supabase
-      .from("tablet_products")
-      .select("id, name, price, category, description, is_active")
-      .eq("unit_id", unitId)
-      .eq("is_active", true)
-      .order("category")
-      .order("sort_order");
-
-    // Check for draft order
-    const { data: draftOrder } = await supabase
-      .from("whatsapp_orders")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .eq("status", "draft")
-      .single();
+    const [{ data: recentMessages }, { data: menuItems }, { data: draftOrder }, { data: knowledgeArticles }] = await Promise.all([
+      supabase
+        .from("whatsapp_messages")
+        .select("*")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabase
+        .from("tablet_products")
+        .select("id, name, price, category, description, is_active")
+        .eq("unit_id", unitId)
+        .eq("is_active", true)
+        .order("category")
+        .order("sort_order"),
+      supabase
+        .from("whatsapp_orders")
+        .select("*")
+        .eq("conversation_id", conversationId)
+        .eq("status", "draft")
+        .single(),
+      supabase
+        .from("whatsapp_knowledge_base")
+        .select("title, content, category")
+        .eq("unit_id", unitId)
+        .eq("is_active", true)
+        .order("sort_order"),
+    ]);
 
     // Build messages for AI
     const menuFormatted = (menuItems || [])
       .map((p: any) => `- ${p.name} (${p.category}): R$ ${p.price.toFixed(2)}${p.description ? ` - ${p.description}` : ""}`)
       .join("\n");
+
+    const knowledgeFormatted = (knowledgeArticles || [])
+      .map((a: any) => `[${a.title}]\n${a.content}`)
+      .join("\n\n");
 
     const historyMessages = (recentMessages || [])
       .reverse()
@@ -391,10 +400,12 @@ serve(async (req) => {
 REGRAS IMPORTANTES:
 - Nunca invente informações sobre produtos, preços ou disponibilidade.
 - Sempre consulte o cardápio fornecido antes de responder sobre produtos.
+- Use a BASE DE CONHECIMENTO para responder perguntas gerais (horários, endereço, pagamento, etc).
 - Se não souber responder algo, encaminhe para um atendente humano.
 - Seja simpático, claro e objetivo.
 - Responda em português brasileiro.
 
+${knowledgeFormatted ? `BASE DE CONHECIMENTO DO RESTAURANTE:\n\n${knowledgeFormatted}\n` : ""}
 CARDÁPIO ATUAL:
 ${menuFormatted || "Nenhum produto disponível no momento."}
 

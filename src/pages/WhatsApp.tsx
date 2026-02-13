@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { MessageSquare, Settings, ShoppingBag, Brain } from 'lucide-react';
+import { MessageSquare, Settings, ShoppingBag, Brain, BookOpen } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ConversationList } from '@/components/whatsapp/ConversationList';
 import { ConversationChat } from '@/components/whatsapp/ConversationChat';
 import { WhatsAppSettings } from '@/components/whatsapp/WhatsAppSettings';
 import { WhatsAppOrders } from '@/components/whatsapp/WhatsAppOrders';
 import { WhatsAppLogs } from '@/components/whatsapp/WhatsAppLogs';
+import { WhatsAppKnowledge } from '@/components/whatsapp/WhatsAppKnowledge';
 import { useWhatsAppConversations } from '@/hooks/useWhatsApp';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils';
 const tabs = [
   { key: 'conversations', label: 'Conversas', icon: MessageSquare },
   { key: 'orders', label: 'Pedidos', icon: ShoppingBag },
+  { key: 'knowledge', label: 'Base', icon: BookOpen },
   { key: 'logs', label: 'Logs IA', icon: Brain },
   { key: 'settings', label: 'Config', icon: Settings },
 ];
@@ -124,6 +126,11 @@ export default function WhatsAppPage() {
           {activeTab === 'orders' && (
             <div className="h-full overflow-y-auto">
               <WhatsAppOrders />
+            </div>
+          )}
+          {activeTab === 'knowledge' && (
+            <div className="h-full overflow-y-auto">
+              <WhatsAppKnowledge />
             </div>
           )}
           {activeTab === 'logs' && (
