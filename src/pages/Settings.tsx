@@ -49,7 +49,7 @@ export default function SettingsPage() {
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
           <header className="page-header-bar">
-            <div className="flex items-center gap-3">
+            <div className="page-header-content flex items-center gap-3">
               <button onClick={() => setActiveSection(null)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <ChevronRight className="w-5 h-5 rotate-180" />
               </button>
@@ -79,7 +79,7 @@ export default function SettingsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <header className="page-header-bar">
-          <div className="flex items-center gap-3">
+          <div className="page-header-content flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-secondary/80 flex items-center justify-center">
               <SettingsIcon className="w-5 h-5 text-muted-foreground" />
             </div>

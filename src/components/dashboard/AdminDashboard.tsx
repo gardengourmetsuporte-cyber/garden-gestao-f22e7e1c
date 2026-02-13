@@ -87,7 +87,7 @@ function QuickAccessCard({ title, subtitle, icon: Icon, onClick, iconBg, iconCol
 
 interface AlertItemProps {
   message: string;
-  count: number;
+  count: number | string;
   severity: 'error' | 'warning' | 'info';
   onClick: () => void;
 }
@@ -221,7 +221,7 @@ export function AdminDashboard() {
               <AlertItem message="Fechamentos pendentes" count={stats.pendingClosings} severity="warning" onClick={() => navigate('/cash-closing')} />
             )}
             {stats.pendingExpenses > 0 && (
-              <AlertItem message="Despesas a pagar" count={Math.round(stats.pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
+              <AlertItem message="Despesas a pagar" count={formatCurrency(stats.pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
             )}
           </div>
         </div>
