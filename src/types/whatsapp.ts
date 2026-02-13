@@ -81,3 +81,15 @@ export interface WhatsAppAILog {
   context_used: Record<string, unknown> | null;
   created_at: string;
 }
+
+export interface WhatsAppKnowledgeArticle {
+  id: string;
+  unit_id: string;
+  title: string;
+  content: string;
+  category: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
