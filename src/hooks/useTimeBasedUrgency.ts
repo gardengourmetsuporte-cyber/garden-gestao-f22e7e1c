@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { parseISO, isToday } from 'date-fns';
+import { useTimeAlertSettings, type EffectiveAlertSetting } from '@/hooks/useTimeAlertSettings';
 
 export type UrgencyLevel = 'ok' | 'attention' | 'warning' | 'critical';
 
@@ -21,56 +22,57 @@ function getUrgencyBucket(hour: number): string {
   return '0';
 }
 
-function computeModuleUrgency(currentHour: number): ModuleUrgency {
-  // Finance: attention base -> warning at 16 -> critical at 18
-  let finance: UrgencyLevel = 'attention';
-  if (currentHour >= 18) finance = 'critical';
-  else if (currentHour >= 16) finance = 'warning';
+function computeUrgency(
+  currentHour: number,
+  setting: EffectiveAlertSetting | undefined
+): UrgencyLevel {
+  if (!setting || !setting.enabled) return 'ok';
+  if (setting.criticalHour != null && currentHour >= setting.criticalHour) return 'critical';
+  if (setting.warningHour != null && currentHour >= setting.warningHour) return 'warning';
+  return 'attention';
+}
 
-  // Checklist abertura: attention base -> warning at 12 -> critical at 14
-  let checklistAbertura: UrgencyLevel = 'attention';
-  if (currentHour >= 14) checklistAbertura = 'critical';
-  else if (currentHour >= 12) checklistAbertura = 'warning';
-
-  // Checklist fechamento: attention from 14 -> warning at 18:30 -> critical at 21
-  let checklistFechamento: UrgencyLevel = 'attention';
-  if (currentHour >= 21) checklistFechamento = 'critical';
-  else if (currentHour >= 18.5) checklistFechamento = 'warning';
-
-  // Cash closing: attention base -> critical at 22
-  let cashClosing: UrgencyLevel = 'attention';
-  if (currentHour >= 22) cashClosing = 'critical';
-
-  return { finance, checklistAbertura, checklistFechamento, cashClosing };
+function computeModuleUrgency(
+  currentHour: number,
+  settings: Record<string, EffectiveAlertSetting>
+): ModuleUrgency {
+  return {
+    finance: computeUrgency(currentHour, settings.finance),
+    checklistAbertura: computeUrgency(currentHour, settings.checklist_abertura),
+    checklistFechamento: computeUrgency(currentHour, settings.checklist_fechamento),
+    cashClosing: computeUrgency(currentHour, settings.cash_closing),
+  };
 }
 
 export function useTimeBasedUrgency() {
+  const { settings } = useTimeAlertSettings();
   const now = new Date();
   const currentHour = now.getHours() + now.getMinutes() / 60;
   const [urgencyBucket, setUrgencyBucket] = useState(() => getUrgencyBucket(currentHour));
-  const [moduleUrgency, setModuleUrgency] = useState<ModuleUrgency>(() => computeModuleUrgency(currentHour));
+  const [moduleUrgency, setModuleUrgency] = useState<ModuleUrgency>(() =>
+    computeModuleUrgency(currentHour, settings)
+  );
 
   useEffect(() => {
     const update = () => {
       const n = new Date();
       const h = n.getHours() + n.getMinutes() / 60;
-      const bucket = getUrgencyBucket(h);
-      setUrgencyBucket(bucket);
-      setModuleUrgency(computeModuleUrgency(h));
+      setUrgencyBucket(getUrgencyBucket(h));
+      setModuleUrgency(computeModuleUrgency(h, settings));
     };
+
+    // Recalculate immediately when settings change
+    update();
 
     const interval = setInterval(update, 60_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [settings]);
 
   return { moduleUrgency, urgencyBucket };
 }
 
 /**
  * Returns urgency color class for a task's clock icon based on due time proximity.
- * - Green: >2h remaining
- * - Amber/Orange: <2h remaining  
- * - Red pulsing: <30min or overdue
  */
 export function getTaskUrgencyColor(dueDate: string | null, dueTime: string | null): {
   colorClass: string;
@@ -82,21 +84,17 @@ export function getTaskUrgencyColor(dueDate: string | null, dueTime: string | nu
   const date = parseISO(dueDate);
 
   if (!isToday(date)) {
-    // Future date: muted. Past date: red.
     if (date > now) return { colorClass: 'text-muted-foreground', pulse: false };
     return { colorClass: 'text-destructive', pulse: true };
   }
 
-  // Today - calculate time remaining
   if (!dueTime) {
-    // No specific time, just today
     const hour = now.getHours();
     if (hour >= 20) return { colorClass: 'text-destructive', pulse: true };
     if (hour >= 16) return { colorClass: 'text-warning', pulse: false };
     return { colorClass: 'text-success', pulse: false };
   }
 
-  // Parse due time (HH:MM)
   const [h, m] = dueTime.split(':').map(Number);
   const dueMs = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m).getTime();
   const diffMin = (dueMs - now.getTime()) / 60_000;

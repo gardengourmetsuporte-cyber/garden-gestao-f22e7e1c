@@ -2783,6 +2783,50 @@ export type Database = {
         }
         Relationships: []
       }
+      time_alert_settings: {
+        Row: {
+          created_at: string
+          critical_hour: number | null
+          enabled: boolean
+          id: string
+          module_key: string
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+          warning_hour: number | null
+        }
+        Insert: {
+          created_at?: string
+          critical_hour?: number | null
+          enabled?: boolean
+          id?: string
+          module_key: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+          warning_hour?: number | null
+        }
+        Update: {
+          created_at?: string
+          critical_hour?: number | null
+          enabled?: boolean
+          id?: string
+          module_key?: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+          warning_hour?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_alert_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       units: {
         Row: {
           created_at: string
