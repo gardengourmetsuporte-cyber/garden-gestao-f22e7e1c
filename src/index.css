@@ -601,8 +601,8 @@
   }
 
   @keyframes neonPulse {
-    0%, 100% { box-shadow: 0 0 10px hsl(var(--neon-cyan) / 0.4), 0 0 3px hsl(var(--neon-cyan) / 0.25); }
-    50% { box-shadow: 0 0 20px hsl(var(--neon-cyan) / 0.6), 0 0 6px hsl(var(--neon-cyan) / 0.4); }
+    0%, 100% { box-shadow: 0 0 6px hsl(var(--neon-cyan) / 0.2), 0 0 2px hsl(var(--neon-cyan) / 0.15); }
+    50% { box-shadow: 0 0 14px hsl(var(--neon-cyan) / 0.35), 0 0 4px hsl(var(--neon-cyan) / 0.25); }
   }
 
   /* Stagger animation delays */
