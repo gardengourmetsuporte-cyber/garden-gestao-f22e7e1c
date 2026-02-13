@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -13,29 +13,42 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
+/** Get SW registration with a timeout to avoid infinite waits */
+async function getRegistration(timeoutMs = 5000): Promise<ServiceWorkerRegistration | null> {
+  // If there's already an active registration, return immediately
+  const regs = await navigator.serviceWorker.getRegistrations();
+  const active = regs.find(r => r.active);
+  if (active) return active;
+
+  // Otherwise wait for ready with a timeout
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+  ]);
+}
+
 export function usePushNotifications() {
   const { user } = useAuth();
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isLoading, setIsLoading] = useState(false);
+  const checkedRef = useRef(false);
 
   useEffect(() => {
     const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
     setIsSupported(supported);
     if (supported) {
       setPermission(Notification.permission);
-      checkExistingSubscription();
-    }
-  }, []);
-
-  const checkExistingSubscription = useCallback(async () => {
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await (registration as any).pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
-    } catch {
-      // Silently fail
+      // Non-blocking check — fire and forget with short timeout
+      if (!checkedRef.current) {
+        checkedRef.current = true;
+        getRegistration(3000).then(reg => {
+          if (reg) {
+            (reg as any).pushManager.getSubscription().then((sub: any) => setIsSubscribed(!!sub)).catch(() => {});
+          }
+        }).catch(() => {});
+      }
     }
   }, []);
 
@@ -44,6 +57,7 @@ export function usePushNotifications() {
     setIsLoading(true);
 
     try {
+      // Request permission first (instant UI)
       const perm = await Notification.requestPermission();
       setPermission(perm);
       if (perm !== 'granted') {
@@ -51,16 +65,20 @@ export function usePushNotifications() {
         return false;
       }
 
+      // Fetch VAPID key and wait for SW in parallel
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const vapidRes = await fetch(
-        `${supabaseUrl}/functions/v1/push-notifier?action=vapid-key`,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-      
+      const [vapidRes, registration] = await Promise.all([
+        fetch(`${supabaseUrl}/functions/v1/push-notifier?action=vapid-key`, {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        getRegistration(8000),
+      ]);
+
       if (!vapidRes.ok) throw new Error('Failed to get VAPID key');
+      if (!registration) throw new Error('Service Worker not available');
+
       const { publicKey } = await vapidRes.json();
 
-      const registration = await navigator.serviceWorker.ready;
       const subscription = await (registration as any).pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
@@ -93,7 +111,8 @@ export function usePushNotifications() {
 
   const unsubscribe = useCallback(async () => {
     try {
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await getRegistration(5000);
+      if (!registration) return;
       const subscription = await (registration as any).pushManager.getSubscription();
       if (subscription) {
         const endpoint = subscription.endpoint;
