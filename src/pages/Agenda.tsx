@@ -10,7 +10,7 @@ import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { CategoryChips } from '@/components/agenda/CategoryChips';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
-import { SwipeableTabs } from '@/components/ui/swipeable-tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { ManagerTask } from '@/types/agenda';
 
@@ -206,25 +206,24 @@ export default function Agenda() {
           </div>
         </div>
 
-        <div className="px-4 py-4">
-          <SwipeableTabs
-            tabs={[
-              {
-                key: 'list',
-                label: 'Lista',
-                icon: <ListChecks className="w-4 h-4" />,
-                content: <ListContent />,
-              },
-              {
-                key: 'calendar',
-                label: 'Calendário',
-                icon: <Calendar className="w-4 h-4" />,
-                content: <CalendarContent />,
-              },
-            ]}
-            activeTab={viewMode}
-            onTabChange={setViewMode}
-          />
+        <div className="px-4 py-4 space-y-4">
+          <ToggleGroup
+            type="single"
+            value={viewMode}
+            onValueChange={(v) => v && setViewMode(v)}
+            className="w-full bg-muted/50 rounded-xl p-1"
+          >
+            <ToggleGroupItem value="list" className="flex-1 rounded-lg text-sm gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm">
+              <ListChecks className="w-4 h-4" />
+              Lista
+            </ToggleGroupItem>
+            <ToggleGroupItem value="calendar" className="flex-1 rounded-lg text-sm gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm">
+              <Calendar className="w-4 h-4" />
+              Calendário
+            </ToggleGroupItem>
+          </ToggleGroup>
+
+          {viewMode === 'list' ? <ListContent /> : <CalendarContent />}
         </div>
       </div>
 
