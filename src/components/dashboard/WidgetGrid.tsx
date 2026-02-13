@@ -4,8 +4,9 @@ import { Plus, RotateCcw, Check } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import { WidgetRenderer } from './WidgetRenderer';
 import { WidgetCatalog } from './WidgetCatalog';
+import { WidgetContextMenu } from './WidgetContextMenu';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 export function WidgetGrid() {
@@ -22,7 +23,7 @@ export function WidgetGrid() {
   } = useDashboardLayout();
 
   const [catalogOpen, setCatalogOpen] = useState(false);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [contextWidgetId, setContextWidgetId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -36,25 +37,28 @@ export function WidgetGrid() {
     }
   };
 
-  // Long-press on a widget enters edit mode (like iOS)
-  const handleWidgetLongPress = useCallback(() => {
+  // Per-widget long-press opens context menu for THAT widget only
+  const handleWidgetLongPress = useCallback((widgetId: string) => {
     if (!isEditing) {
-      setIsEditing(true);
+      setContextWidgetId(widgetId);
     }
-  }, [isEditing, setIsEditing]);
+  }, [isEditing]);
 
-  const handleWidgetTouchStart = useCallback(() => {
-    if (!isEditing) {
-      longPressTimer.current = setTimeout(handleWidgetLongPress, 500);
-    }
-  }, [isEditing, handleWidgetLongPress]);
+  const handleEnterEditMode = useCallback(() => {
+    setContextWidgetId(null);
+    setIsEditing(true);
+  }, [setIsEditing]);
 
-  const handleWidgetTouchEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
+  const handleContextRemove = useCallback((id: string) => {
+    setContextWidgetId(null);
+    removeWidget(id);
+  }, [removeWidget]);
+
+  const handleContextResize = useCallback((id: string) => {
+    resizeWidget(id);
+  }, [resizeWidget]);
+
+  const contextWidget = contextWidgetId ? widgets.find(w => w.id === contextWidgetId) : null;
 
   if (isLoading) {
     return (
@@ -68,7 +72,7 @@ export function WidgetGrid() {
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Header Actions - only in edit mode */}
+      {/* Header Actions - only in edit mode (jiggle mode) */}
       {isEditing && (
         <div className="flex items-center justify-end gap-2 px-4 pt-4 pb-2">
           <button
@@ -95,29 +99,20 @@ export function WidgetGrid() {
         </div>
       )}
 
-      {/* Widget Grid - uniform squares like iOS */}
+      {/* Widget Grid */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={widgets.map(w => w.id)} strategy={rectSortingStrategy}>
-          <div
-            className={cn("grid grid-cols-2 gap-3 px-4", !isEditing && "pt-4")}
-            onTouchStart={handleWidgetTouchStart}
-            onTouchEnd={handleWidgetTouchEnd}
-            onTouchCancel={handleWidgetTouchEnd}
-            onMouseDown={handleWidgetTouchStart}
-            onMouseUp={handleWidgetTouchEnd}
-            onMouseLeave={handleWidgetTouchEnd}
-          >
+          <div className={cn("grid grid-cols-2 gap-3 px-4", !isEditing && "pt-4")}>
             {widgets.map((widget) => (
               <WidgetWrapper
                 key={widget.id}
                 widget={widget}
                 isEditing={isEditing}
-                onRemove={removeWidget}
-                onResize={resizeWidget}
+                onLongPress={handleWidgetLongPress}
               >
                 <WidgetRenderer widget={widget} />
               </WidgetWrapper>
@@ -125,6 +120,16 @@ export function WidgetGrid() {
           </div>
         </SortableContext>
       </DndContext>
+
+      {/* Per-widget Context Menu (iOS style) */}
+      <WidgetContextMenu
+        widget={contextWidget ?? null}
+        open={!!contextWidgetId}
+        onOpenChange={(open) => { if (!open) setContextWidgetId(null); }}
+        onRemove={handleContextRemove}
+        onResize={handleContextResize}
+        onEditLayout={handleEnterEditMode}
+      />
 
       {/* Catalog */}
       <WidgetCatalog
