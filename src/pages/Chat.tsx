@@ -133,9 +133,18 @@ export default function Chat() {
   const renderConversationList = () => (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="shrink-0 px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-bold text-foreground">Mensagens</h2>
+      <div className="shrink-0">
+        <header className="page-header-bar">
+          <div className="page-header-content flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-secondary/80 flex items-center justify-center">
+                <Users className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold">Mensagens</h1>
+                <p className="text-xs text-muted-foreground">Conversas da equipe</p>
+              </div>
+            </div>
           {isAdmin && (
             <div className="flex items-center gap-1">
               <Button
@@ -158,7 +167,9 @@ export default function Chat() {
               </Button>
             </div>
           )}
-        </div>
+          </div>
+        </header>
+        <div className="px-4 pt-3 pb-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
           <Input
@@ -167,6 +178,7 @@ export default function Chat() {
             placeholder="Pesquisar..."
             className="pl-9 h-10 rounded-full bg-secondary/50 border-border/20 text-sm"
           />
+        </div>
         </div>
       </div>
 

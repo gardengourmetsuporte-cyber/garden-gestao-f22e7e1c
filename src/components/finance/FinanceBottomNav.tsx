@@ -105,7 +105,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               <tab.icon className="w-6 h-6" />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
-                <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary" style={{ boxShadow: '0 0 8px hsl(217 91% 60% / 0.5)' }} />
+                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />
               )}
             </button>
           ))}
@@ -143,7 +143,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               <tab.icon className="w-6 h-6" />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
-                <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-primary" style={{ boxShadow: '0 0 8px hsl(217 91% 60% / 0.5)' }} />
+                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />
               )}
             </button>
           ))}

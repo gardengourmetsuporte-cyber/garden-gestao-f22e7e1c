@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { UnitProvider } from "@/contexts/UnitContext";
+import { PageLoader } from "@/components/PageLoader";
 
 // Lazy load all pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
@@ -39,13 +40,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function PageLoader() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="animate-pulse text-muted-foreground">Carregando...</div>
-    </div>
-  );
-}
+// PageLoader imported from @/components/PageLoader
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
