@@ -14,6 +14,8 @@ import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
+import { useModuleStatus, type StatusLevel } from '@/hooks/useModuleStatus';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -53,7 +55,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
   const chatUnreadCount = useChatUnreadCount();
-  const location = useLocation();
+  const moduleStatuses = useModuleStatus();
   const navigate = useNavigate();
   const navRef = useRef<HTMLElement>(null);
 
@@ -317,67 +319,108 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   const isActive = location.pathname === item.href;
                   const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                   const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
+                  const moduleStatus = moduleStatuses[item.href];
 
                   return (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      data-active={isActive}
-                      onClick={() => setSidebarOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
-                        isActive
-                          ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
-                      )}
-                      style={isActive ? {
-                        background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
-                        border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-                        boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
-                      } : undefined}
-                    >
-                      {/* Active indicator bar */}
-                      {isActive && (
-                        <div
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
-                          style={{
-                            background: 'hsl(var(--neon-cyan))',
-                            boxShadow: '0 0 8px hsl(var(--neon-cyan) / 0.5)'
-                          }}
-                        />
-                      )}
+                    <TooltipProvider key={item.href}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link
+                            to={item.href}
+                            data-active={isActive}
+                            onClick={() => setSidebarOpen(false)}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
+                              isActive
+                                ? "text-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
+                            )}
+                            style={isActive ? {
+                              background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
+                              border: '1px solid hsl(var(--neon-cyan) / 0.2)',
+                              boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
+                            } : undefined}
+                          >
+                            {/* Active indicator bar */}
+                            {isActive && (
+                              <div
+                                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
+                                style={{
+                                  background: 'hsl(var(--neon-cyan))',
+                                  boxShadow: '0 0 8px hsl(var(--neon-cyan) / 0.5)'
+                                }}
+                              />
+                            )}
 
-                      {/* Icon container */}
-                      <div
-                        className={cn(
-                          "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200",
-                          isActive ? "" : "group-hover:bg-secondary/60"
+                            {/* Icon container */}
+                            <div
+                              className={cn(
+                                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200",
+                                isActive ? "" : "group-hover:bg-secondary/60"
+                              )}
+                              style={isActive ? {
+                                background: 'hsl(var(--primary) / 0.15)',
+                                boxShadow: '0 0 8px hsl(var(--primary) / 0.1)'
+                              } : undefined}
+                            >
+                              <div className="relative">
+                                <item.icon className={cn(
+                                  "w-[18px] h-[18px]",
+                                  isActive ? "text-primary" : ""
+                                )} />
+                                {showBadge && (
+                                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
+                                    {badgeCount > 9 ? '9+' : badgeCount}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <span className="flex-1">{item.label}</span>
+
+                            {/* Module status indicators */}
+                            {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 ? (
+                              <div className="flex items-center gap-1.5">
+                                <span
+                                  className={cn(
+                                    "w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center shrink-0",
+                                    moduleStatus.level === 'critical' && "animate-pulse"
+                                  )}
+                                  style={{
+                                    background: moduleStatus.level === 'critical'
+                                      ? 'hsl(var(--neon-red))'
+                                      : 'hsl(var(--neon-amber))',
+                                    color: moduleStatus.level === 'critical'
+                                      ? 'hsl(0 0% 100%)'
+                                      : 'hsl(0 0% 0%)',
+                                    boxShadow: moduleStatus.level === 'critical'
+                                      ? '0 0 8px hsl(var(--neon-red) / 0.5)'
+                                      : '0 0 8px hsl(var(--neon-amber) / 0.4)',
+                                  }}
+                                >
+                                  {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
+                                </span>
+                              </div>
+                            ) : moduleStatus && moduleStatus.level === 'ok' ? (
+                              <div
+                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                style={{
+                                  background: 'hsl(var(--neon-green))',
+                                  boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
+                                }}
+                              />
+                            ) : isActive ? (
+                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
+                            ) : null}
+                          </Link>
+                        </TooltipTrigger>
+                        {moduleStatus && (
+                          <TooltipContent side="right" className="text-xs">
+                            {moduleStatus.tooltip}
+                          </TooltipContent>
                         )}
-                        style={isActive ? {
-                          background: 'hsl(var(--primary) / 0.15)',
-                          boxShadow: '0 0 8px hsl(var(--primary) / 0.1)'
-                        } : undefined}
-                      >
-                        <div className="relative">
-                          <item.icon className={cn(
-                            "w-[18px] h-[18px]",
-                            isActive ? "text-primary" : ""
-                          )} />
-                          {showBadge && (
-                            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
-                              {badgeCount > 9 ? '9+' : badgeCount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <span className="flex-1">{item.label}</span>
-
-                      {/* Active chevron */}
-                      {isActive && (
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
-                      )}
-                    </Link>
+                      </Tooltip>
+                    </TooltipProvider>
                   );
                 })}
               </div>
