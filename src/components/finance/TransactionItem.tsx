@@ -169,7 +169,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
         className={cn(
           'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
           !is_paid && 'text-muted-foreground',
-          isNew && 'ring-1 ring-[hsl(var(--neon-cyan))] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.4),inset_0_0_8px_hsl(var(--neon-cyan)/0.05)] animate-[neonPulse_2s_ease-in-out_infinite]',
+          isNew && 'border-[hsl(var(--neon-cyan))] shadow-[0_0_14px_hsl(var(--neon-cyan)/0.5),0_0_4px_hsl(var(--neon-cyan)/0.3)] animate-[neonPulse_2s_ease-in-out_infinite]',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
         style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
