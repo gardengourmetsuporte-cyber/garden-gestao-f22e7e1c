@@ -1,109 +1,63 @@
 
-# Perfil Publico, Titulos de Ranking e Molduras de Avatar
+# Cards Clicaveis no Modulo Financeiro e Sistema Inteiro
 
 ## Visao Geral
 
-Criar um sistema de perfil publico para cada funcionario com conquistas, titulos baseados em ranking (inspirado no League of Legends) e molduras decorativas ao redor do avatar que refletem o nivel do usuario.
+Tornar todos os cards informativos do sistema clicaveis, com navegacao contextual e feedback visual (hover/active states). O foco principal e o modulo financeiro (tela Home), mas a logica sera replicada em outros modulos.
 
 ---
 
-## 1. Sistema de Titulos e Molduras por Ranking
+## 1. Finance Home - Cards Clicaveis
 
-Definir faixas de pontos que geram titulos e molduras, similar ao sistema de elos do LoL:
+Cada card na tela principal do financeiro tera uma acao ao ser clicado:
 
-```text
-Pontos Ganhos    Titulo           Cor da Moldura
-0-9              Iniciante        Cinza (border simples)
-10-24            Aprendiz         Verde (neon verde)
-25-49            Dedicado         Azul (neon cyan)
-50-99            Veterano         Roxo (neon purple)
-100-199          Mestre           Dourado (neon amber)
-200-499          Lenda            Vermelho (neon red)
-500+             Mitico           Gradiente animado (rainbow)
-```
+| Card | Acao ao Clicar |
+|------|----------------|
+| **Saldo em Contas** | Abre aba "Mais" (gestao de contas) |
+| **Receitas** | Navega para aba "Transacoes" com filtro de receitas |
+| **Despesas** | Navega para aba "Transacoes" com filtro de despesas |
+| **Pendencias** | Navega para aba "Transacoes" com filtro de pendentes |
+| **Conta individual** | Abre sheet de edicao da conta (AccountManagement) |
 
-**Arquivo novo:** `src/lib/ranks.ts` -- funcoes puras que recebem `earned_points` e retornam titulo, cor, nivel e estilo da moldura.
+**Arquivo editado:** `src/components/finance/FinanceHome.tsx`
+- Adicionar props `onTabChange`, `onAccountClick` e callbacks de filtro
+- Envolver cada card em botao/div clicavel com `cursor-pointer`, `hover:scale-[1.01]`, `active:scale-[0.98]`
 
----
-
-## 2. Componente de Avatar com Moldura (`RankedAvatar`)
-
-Um componente reutilizavel que envolve o avatar do usuario com uma borda decorativa baseada no ranking. Os niveis mais altos terao:
-- Borda mais grossa com glow neon
-- Animacao sutil de brilho rotativo para niveis altos (Lenda, Mitico)
-- Badge com o titulo abaixo ou ao lado do avatar
-
-**Arquivo novo:** `src/components/profile/RankedAvatar.tsx`
-
-Sera usado em:
-- Sidebar (substituir o avatar atual)
-- Leaderboard (substituir o avatar simples)
-- Pagina de Perfil Publico (versao grande)
+**Arquivo editado:** `src/pages/Finance.tsx`
+- Passar as novas props para `FinanceHome`
+- Implementar logica de navegacao entre abas com filtros pre-aplicados
 
 ---
 
-## 3. Pagina de Perfil Publico
+## 2. Feedback Visual nos Cards
 
-Nova rota `/profile/:userId` acessivel por qualquer usuario logado, mostrando:
-
-- **Header**: Avatar grande com moldura de ranking + Nome + Titulo + Cargo
-- **Card de Pontos**: Pontos ganhos, gastos, saldo (similar ao UserPointsCard)
-- **Conquistas**: Lista de marcos atingidos (ex: "Primeira tarefa", "50 pontos", "100 tarefas")
-- **Historico de Ranking**: Posicao atual no leaderboard
-
-**Arquivos novos:**
-- `src/pages/Profile.tsx` -- pagina principal
-- `src/components/profile/AchievementList.tsx` -- lista de conquistas
-- `src/components/profile/ProfileHeader.tsx` -- header com avatar grande + moldura
-
-**Rota nova em `App.tsx`:** `/profile/:userId`
+Adicionar micro-interacoes consistentes em todos os cards clicaveis:
+- `cursor-pointer` para indicar clicabilidade
+- `hover:scale-[1.01]` e `active:scale-[0.98]` para feedback tatil
+- `transition-all duration-200` para suavidade
+- Seta discreta (ChevronRight ou ArrowUpRight) nos cards de conta
 
 ---
 
-## 4. Sistema de Conquistas
+## 3. Replicar em Outros Modulos
 
-Conquistas calculadas no frontend baseadas nos dados existentes (sem tabela nova no banco):
+### Dashboard (AdminDashboard / EmployeeDashboard)
+- Ja possui cards clicaveis -- sem alteracoes necessarias
 
-- "Primeiro Passo" -- Completou primeira tarefa
-- "Fiel Escudeiro" -- 10 tarefas completadas
-- "Incansavel" -- 50 tarefas completadas
-- "Centuriao" -- 100 tarefas completadas
-- "Colecionador" -- Resgatou primeira recompensa
-- Conquistas por faixas de pontos (alinhadas com os titulos)
+### Inventario (StatsCard)
+- Ja possui `onClick` -- apenas garantir feedback visual consistente
 
-**Arquivo novo:** `src/lib/achievements.ts` -- logica pura para calcular conquistas
+### Perfil (Profile)
+- Cards de pontos e conquistas podem navegar para leaderboard/recompensas
 
 ---
 
-## 5. Integracao nos Componentes Existentes
-
-- **Sidebar (`AppLayout.tsx`)**: Trocar avatar simples pelo `RankedAvatar`, adicionar titulo abaixo do nome. Clicar no card do usuario navega para `/profile/me`.
-- **Leaderboard (`Leaderboard.tsx`)**: Usar `RankedAvatar` com moldura menor, mostrar titulo ao lado do nome.
-- **Dashboard cards**: Links para perfis dos usuarios no ranking.
-
----
-
-## 6. Hook de Dados do Perfil
-
-**Arquivo novo:** `src/hooks/useProfile.ts`
-
-Hook que busca dados de um usuario especifico (pontos, completions, redemptions) para montar a pagina de perfil. Reutiliza as funcoes de `src/lib/points.ts`.
-
----
-
-## Resumo de Arquivos
+## 4. Resumo Tecnico de Alteracoes
 
 | Arquivo | Acao | Descricao |
 |---------|------|-----------|
-| `src/lib/ranks.ts` | Criar | Logica de titulos, niveis e cores por pontos |
-| `src/lib/achievements.ts` | Criar | Logica de conquistas baseada em dados existentes |
-| `src/components/profile/RankedAvatar.tsx` | Criar | Avatar com moldura decorativa de ranking |
-| `src/components/profile/ProfileHeader.tsx` | Criar | Header do perfil publico |
-| `src/components/profile/AchievementList.tsx` | Criar | Lista de conquistas |
-| `src/pages/Profile.tsx` | Criar | Pagina de perfil publico |
-| `src/hooks/useProfile.ts` | Criar | Hook para dados do perfil |
-| `src/App.tsx` | Editar | Adicionar rota `/profile/:userId` |
-| `src/components/layout/AppLayout.tsx` | Editar | Usar RankedAvatar + titulo + link para perfil |
-| `src/components/dashboard/Leaderboard.tsx` | Editar | Usar RankedAvatar + titulo no ranking |
+| `src/components/finance/FinanceHome.tsx` | Editar | Adicionar onClick nos cards de saldo, receitas, despesas, pendencias e contas |
+| `src/pages/Finance.tsx` | Editar | Passar callbacks de navegacao para FinanceHome |
+| `src/components/finance/AccountCard.tsx` | Editar | Adicionar visual feedback (hover/active states) |
 
-Nenhuma alteracao no banco de dados e necessaria -- tudo e calculado a partir das tabelas existentes (`checklist_completions`, `reward_redemptions`, `profiles`).
+A maior parte do sistema ja possui cards clicaveis (Dashboard, Inventario). O foco principal e o modulo financeiro que ainda nao tem interatividade nos cards informativos.
