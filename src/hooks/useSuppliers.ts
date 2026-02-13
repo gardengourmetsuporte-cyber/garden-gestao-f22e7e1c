@@ -42,9 +42,13 @@ export function useSuppliers() {
     email?: string;
     notes?: string;
   }) => {
+    const insertData: any = { ...supplier };
+    if (activeUnitId) {
+      insertData.unit_id = activeUnitId;
+    }
     const { data, error } = await supabase
       .from('suppliers')
-      .insert(supplier)
+      .insert(insertData)
       .select()
       .single();
 
