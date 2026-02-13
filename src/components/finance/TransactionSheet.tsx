@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CategoryPicker } from './CategoryPicker';
 import { TransactionSuggestions } from './TransactionSuggestions';
+import { ListPicker } from '@/components/ui/list-picker';
 import { 
   TransactionType, 
   FinanceCategory, 
@@ -124,6 +125,10 @@ export function TransactionSheet({
   const [showRecurringEditDialog, setShowRecurringEditDialog] = useState(false);
   const [recurringEditMode, setRecurringEditMode] = useState<RecurringEditMode>('single');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAccountPicker, setShowAccountPicker] = useState(false);
+  const [showToAccountPicker, setShowToAccountPicker] = useState(false);
+  const [showSupplierPicker, setShowSupplierPicker] = useState(false);
+  const [showEmployeePicker, setShowEmployeePicker] = useState(false);
   const [newSupplierName, setNewSupplierName] = useState('');
   const [showNewSupplier, setShowNewSupplier] = useState(false);
   const [newEmployeeName, setNewEmployeeName] = useState('');
@@ -597,32 +602,28 @@ export function TransactionSheet({
             {/* Account */}
             <div className="space-y-2">
               <Label>{type === 'transfer' ? 'Conta de origem' : type === 'credit_card' ? 'Cartão' : 'Conta'}</Label>
-              <select
-                value={accountId || ''}
-                onChange={(e) => setAccountId(e.target.value || null)}
-                className="w-full h-12 px-3 rounded-md border bg-background"
+              <Button
+                variant="outline"
+                className="w-full justify-between h-12"
+                onClick={() => setShowAccountPicker(true)}
               >
-                <option value="">Selecionar {type === 'credit_card' ? 'cartão' : 'conta'}</option>
-                {availableAccounts.map(acc => (
-                  <option key={acc.id} value={acc.id}>{acc.name}</option>
-                ))}
-              </select>
+                <span>{availableAccounts.find(a => a.id === accountId)?.name || `Selecionar ${type === 'credit_card' ? 'cartão' : 'conta'}`}</span>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </Button>
             </div>
 
             {/* To Account (for transfers) */}
             {type === 'transfer' && (
               <div className="space-y-2">
                 <Label>Conta de destino</Label>
-                <select
-                  value={toAccountId || ''}
-                  onChange={(e) => setToAccountId(e.target.value || null)}
-                  className="w-full h-12 px-3 rounded-md border bg-background"
+                <Button
+                  variant="outline"
+                  className="w-full justify-between h-12"
+                  onClick={() => setShowToAccountPicker(true)}
                 >
-                  <option value="">Selecionar conta</option>
-                  {accounts.filter(a => a.id !== accountId && a.type !== 'credit_card').map(acc => (
-                    <option key={acc.id} value={acc.id}>{acc.name}</option>
-                  ))}
-                </select>
+                  <span>{accounts.find(a => a.id === toAccountId)?.name || 'Selecionar conta'}</span>
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                </Button>
               </div>
             )}
 
@@ -668,16 +669,14 @@ export function TransactionSheet({
                       </Button>
                     </div>
                   ) : (
-                    <select
-                      value={supplierId || ''}
-                      onChange={(e) => setSupplierId(e.target.value || null)}
-                      className="w-full h-12 px-3 rounded-md border bg-background"
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between h-12"
+                      onClick={() => setShowSupplierPicker(true)}
                     >
-                      <option value="">Nenhum</option>
-                      {suppliers.map(s => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
+                      <span>{suppliers.find(s => s.id === supplierId)?.name || 'Nenhum'}</span>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </Button>
                   )}
                 </div>
 
@@ -720,16 +719,14 @@ export function TransactionSheet({
                       </Button>
                     </div>
                   ) : (
-                    <select
-                      value={employeeId || ''}
-                      onChange={(e) => setEmployeeId(e.target.value || null)}
-                      className="w-full h-12 px-3 rounded-md border bg-background"
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between h-12"
+                      onClick={() => setShowEmployeePicker(true)}
                     >
-                      <option value="">Nenhum</option>
-                      {employees.map(e => (
-                        <option key={e.id} value={e.id}>{e.full_name}</option>
-                      ))}
-                    </select>
+                      <span>{employees.find(e => e.id === employeeId)?.full_name || 'Nenhum'}</span>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </Button>
                   )}
                 </div>
               </>
@@ -882,6 +879,46 @@ export function TransactionSheet({
         selectedId={categoryId}
         onSelect={(cat) => setCategoryId(cat.id)}
         onRefreshCategories={onRefreshCategories}
+      />
+
+      <ListPicker
+        open={showAccountPicker}
+        onOpenChange={setShowAccountPicker}
+        title={type === 'credit_card' ? 'Selecionar cartão' : 'Selecionar conta'}
+        items={availableAccounts.map(a => ({ id: a.id, label: a.name }))}
+        selectedId={accountId}
+        onSelect={setAccountId}
+      />
+
+      <ListPicker
+        open={showToAccountPicker}
+        onOpenChange={setShowToAccountPicker}
+        title="Conta de destino"
+        items={accounts.filter(a => a.id !== accountId && a.type !== 'credit_card').map(a => ({ id: a.id, label: a.name }))}
+        selectedId={toAccountId}
+        onSelect={setToAccountId}
+      />
+
+      <ListPicker
+        open={showSupplierPicker}
+        onOpenChange={setShowSupplierPicker}
+        title="Selecionar fornecedor"
+        items={suppliers.map(s => ({ id: s.id, label: s.name }))}
+        selectedId={supplierId}
+        onSelect={setSupplierId}
+        allowNone
+        noneLabel="Nenhum"
+      />
+
+      <ListPicker
+        open={showEmployeePicker}
+        onOpenChange={setShowEmployeePicker}
+        title="Selecionar funcionário"
+        items={employees.map(e => ({ id: e.id, label: e.full_name }))}
+        selectedId={employeeId}
+        onSelect={setEmployeeId}
+        allowNone
+        noneLabel="Nenhum"
       />
       
       {/* Recurring Edit Mode Dialog */}
