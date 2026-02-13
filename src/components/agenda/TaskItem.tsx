@@ -13,6 +13,7 @@ interface TaskItemProps {
   onClick?: () => void;
   onInlineUpdate?: (id: string, title: string, notes: string) => void;
   onAddSubtask?: (parentId: string, title: string) => void;
+  onUpdateSubtask?: (id: string, title: string) => void;
   isDragging?: boolean;
   dragHandleProps?: Record<string, unknown>;
 }
@@ -31,7 +32,7 @@ function isOverdue(dateStr: string | null): boolean {
   return isPast(parseISO(dateStr)) && !isToday(parseISO(dateStr));
 }
 
-export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, onAddSubtask, isDragging, dragHandleProps }: TaskItemProps) {
+export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, onAddSubtask, onUpdateSubtask, isDragging, dragHandleProps }: TaskItemProps) {
   const dueLabel = formatDueDate(task.due_date || null, task.due_time || null);
   const overdue = !task.is_completed && isOverdue(task.due_date || null);
   const subtasks = task.subtasks || [];
@@ -52,6 +53,11 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const [addingSubtask, setAddingSubtask] = useState(false);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const subtaskInputRef = useRef<HTMLInputElement>(null);
+
+  // Inline edit subtask
+  const [editingSubId, setEditingSubId] = useState<string | null>(null);
+  const [editingSubTitle, setEditingSubTitle] = useState('');
+  const editSubRef = useRef<HTMLInputElement>(null);
 
   const SWIPE_THRESHOLD = -70;
   const MAX_SWIPE = -160;
@@ -209,64 +215,82 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
 
         {/* Expanded subtasks */}
         {expanded && (
-          <div className="border-t border-border bg-secondary/30">
+          <div className="border-t border-border/50">
             {subtasks.map(sub => (
-              <div key={sub.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 last:border-b-0">
-                <div className="w-6" /> {/* Indent spacer */}
+              <div key={sub.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/30 last:border-b-0">
+                <div className="w-4" />
                 <Checkbox
                   checked={sub.is_completed}
                   onCheckedChange={() => onToggle(sub.id)}
                   className="w-5 h-5 rounded-full border-2 shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
                 />
-                <span className={cn(
-                  'text-sm flex-1',
-                  sub.is_completed && 'line-through text-muted-foreground'
-                )}>
-                  {sub.title}
-                </span>
+                {editingSubId === sub.id ? (
+                  <input
+                    ref={editSubRef}
+                    value={editingSubTitle}
+                    onChange={(e) => setEditingSubTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const t = editingSubTitle.trim();
+                        if (t && t !== sub.title) onUpdateSubtask?.(sub.id, t);
+                        setEditingSubId(null);
+                      }
+                      if (e.key === 'Escape') setEditingSubId(null);
+                    }}
+                    onBlur={() => {
+                      const t = editingSubTitle.trim();
+                      if (t && t !== sub.title) onUpdateSubtask?.(sub.id, t);
+                      setEditingSubId(null);
+                    }}
+                    className="flex-1 text-sm bg-transparent border-none outline-none caret-primary"
+                    autoFocus
+                  />
+                ) : (
+                  <button
+                    className="flex-1 text-left"
+                    onClick={() => {
+                      if (sub.is_completed) return;
+                      setEditingSubId(sub.id);
+                      setEditingSubTitle(sub.title);
+                      setTimeout(() => editSubRef.current?.focus(), 50);
+                    }}
+                  >
+                    <span className={cn(
+                      'text-sm',
+                      sub.is_completed && 'line-through text-muted-foreground'
+                    )}>
+                      {sub.title}
+                    </span>
+                  </button>
+                )}
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(sub.id); }}
-                  className="p-1 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                  className="p-1 rounded-lg text-muted-foreground/40 hover:text-destructive transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
 
-            {/* Add subtask input */}
-            {addingSubtask ? (
-              <div className="flex items-center gap-3 px-4 py-2.5">
-                <div className="w-6" />
-                <div className="w-5 flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-primary" />
-                </div>
-                <input
-                  ref={subtaskInputRef}
-                  value={newSubtaskTitle}
-                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                  onKeyDown={handleSubtaskKeyDown}
-                  onBlur={() => {
-                    if (!newSubtaskTitle.trim()) setAddingSubtask(false);
-                    else handleAddSubtask();
-                  }}
-                  placeholder="Nova subtarefa..."
-                  className="flex-1 text-sm bg-transparent outline-none placeholder:text-muted-foreground/50"
-                  autoFocus
-                />
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setAddingSubtask(true);
-                  setTimeout(() => subtaskInputRef.current?.focus(), 50);
+            {/* Add subtask inline */}
+            <div className="flex items-center gap-3 px-4 py-2.5">
+              <div className="w-4" />
+              <Plus className="w-4 h-4 text-primary shrink-0" />
+              <input
+                ref={subtaskInputRef}
+                value={newSubtaskTitle}
+                onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                onKeyDown={handleSubtaskKeyDown}
+                onFocus={() => setAddingSubtask(true)}
+                onBlur={() => {
+                  if (newSubtaskTitle.trim()) handleAddSubtask();
+                  setAddingSubtask(false);
                 }}
-                className="flex items-center gap-3 px-4 py-2.5 w-full text-left text-primary hover:bg-primary/5 transition-colors"
-              >
-                <div className="w-6" />
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">Adicionar subtarefa</span>
-              </button>
-            )}
+                placeholder="Nova subtarefa..."
+                className="flex-1 text-sm bg-transparent border-none outline-none caret-primary placeholder:text-muted-foreground/40"
+              />
+            </div>
           </div>
         )}
       </div>
