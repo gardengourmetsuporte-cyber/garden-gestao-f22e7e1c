@@ -127,9 +127,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               >
                 <Menu className="w-[22px] h-[22px] text-muted-foreground" />
               </button>
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20">
+              <button
+                onClick={() => navigate('/')}
+                className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20 active:scale-95 transition-transform"
+              >
                 <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
-              </div>
+              </button>
               {activeUnit && (
                 <span className="text-xs font-medium text-muted-foreground truncate max-w-[120px]">
                   {activeUnit.name}
@@ -340,7 +343,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   let longPressTimer: ReturnType<typeof setTimeout> | null = null;
                   let didLongPress = false;
 
-                  const handleTouchStart = () => {
+                  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
                     if (!canAddWidget) return;
                     didLongPress = false;
                     longPressTimer = setTimeout(() => {
@@ -349,7 +352,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       toast.success(`"${item.label}" adicionado ao Dashboard`);
                       setSidebarOpen(false);
                       navigate('/');
-                    }, 500);
+                    }, 600);
                   };
 
                   const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
@@ -360,6 +363,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     if (didLongPress) {
                       e.preventDefault();
                     }
+                  };
+
+                  const handleContextMenu = (e: React.MouseEvent) => {
+                    if (canAddWidget) e.preventDefault();
                   };
 
                   return (
@@ -380,18 +387,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               onMouseDown={handleTouchStart}
                               onMouseUp={handleTouchEnd}
                               onMouseLeave={() => { if (longPressTimer) clearTimeout(longPressTimer); }}
+                              onContextMenu={handleContextMenu}
                               className={cn(
-                                "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
+                                "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group select-none",
                                 isActive
                                   ? "text-foreground"
-                                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]",
-                                canAddWidget && "cursor-grab"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
                               )}
-                              style={isActive ? {
-                                background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
-                                border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-                                boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
-                              } : undefined}
+                              style={{
+                                ...(isActive ? {
+                                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
+                                  border: '1px solid hsl(var(--neon-cyan) / 0.2)',
+                                  boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
+                                } : {}),
+                                WebkitTouchCallout: 'none',
+                              } as React.CSSProperties}
                             >
                               {/* Active indicator bar */}
                               {isActive && (
