@@ -93,34 +93,29 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
 
-    const diffX = startXRef.current - currentX; // + = swipe left
+    const diffX = startXRef.current - currentX;
     const diffY = startYRef.current - currentY;
 
     if (!isGestureLocked.current) {
       const absX = Math.abs(diffX);
       const absY = Math.abs(diffY);
 
-      // deadzone maior pra não abrir no scroll
       if (absX < 14 && absY < 14) return;
 
-      // Só considera "horizontal" se for claramente dominante
-      // (evita abrir quando você está rolando e tem micro-movimento lateral)
       const isHorizontal = absX > absY * 1.6 && absX >= 18;
       const isVertical = absY > absX * 1.2 && absY >= 14;
 
       if (isHorizontal) isGestureLocked.current = 'horizontal';
       else if (isVertical) isGestureLocked.current = 'vertical';
-      else return; // ainda indefinido
+      else return;
     }
 
     if (isGestureLocked.current === 'vertical') {
-      // scrolling: fecha e não tenta mais mexer no offset nessa interação
       setSwipeOffset((prev) => (prev === 0 ? 0 : 0));
       isSwiping.current = false;
       return;
     }
 
-    // clamp: only allow left swipe
     const clamped = Math.max(0, Math.min(diffX, MAX_SWIPE));
     setSwipeOffset(clamped);
   }, []);
@@ -133,10 +128,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
   }, []);
 
   return (
-    <div className={cn(
-      "relative isolate overflow-hidden rounded-xl",
-      isNew && "ring-1 ring-[hsl(var(--neon-cyan))] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.4),inset_0_0_8px_hsl(var(--neon-cyan)/0.05)] animate-[neonPulse_2s_ease-in-out_infinite]"
-    )}>
+    <div className="relative isolate overflow-hidden rounded-xl">
       {/* Swipe action buttons - behind */}
       <div
         className={cn(
@@ -176,8 +168,8 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
       <div
         className={cn(
           'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
-          // Não usar opacity no container (senão vaza o fundo/ações atrás); só “diminui” o conteúdo.
           !is_paid && 'text-muted-foreground',
+          isNew && 'ring-1 ring-[hsl(var(--neon-cyan))] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.4),inset_0_0_8px_hsl(var(--neon-cyan)/0.05)] animate-[neonPulse_2s_ease-in-out_infinite]',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
         style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
