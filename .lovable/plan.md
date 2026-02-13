@@ -1,81 +1,87 @@
 
-# Padronizar Selects com Bottom-Sheet (Mesmo Padrao do CategoryPicker)
 
-## Problema
+# Auditoria Completa e Melhorias de Profissionalismo
 
-Os selects nativos do HTML (`<select>`) usados no formulario de transacoes (Conta, Fornecedor, Funcionario) aparecem como dropdowns brancos/cinza que quebram completamente a estetica dark do app. A tela de Categorias ja usa o padrao correto (bottom-sheet escuro com lista estilizada).
-
-## Solucao
-
-Criar um componente reutilizavel `ListPicker` que replica o padrao visual do `CategoryPicker` para qualquer lista simples, e substituir todos os selects nativos do `TransactionSheet` por ele. Tambem atualizar o `SelectContent` do Radix para usar bottom-sheet no mobile (mesma logica que o Sheet ja faz com Drawer).
+Apos revisar todos os modulos, componentes e paginas do sistema, identifiquei os seguintes pontos de melhoria para elevar o nivel de profissionalismo e consistencia visual.
 
 ---
 
-## Implementacao
+## 1. Pagina 404 (NotFound) fora do padrao
 
-### 1. Novo componente: `src/components/ui/list-picker.tsx`
+A pagina 404 usa `bg-muted`, texto em ingles ("Oops! Page not found"), e nao segue o design system dark. Precisa ser refeita com a estetica Command Center, texto em portugues e um visual premium.
 
-Componente generico de selecao em bottom-sheet, inspirado no CategoryPicker mas para listas simples (sem subcategorias/icones). Recebe:
-
-- `open` / `onOpenChange` - controle de estado
-- `title` - titulo do sheet (ex: "Selecionar conta")
-- `items` - array de `{ id, label }` 
-- `selectedId` - item selecionado
-- `onSelect` - callback de selecao
-- `allowNone` - se mostra opcao "Nenhum" (default: false)
-- `noneLabel` - label customizado para "nenhum" (default: "Nenhum")
-
-Renderiza como Sheet (que automaticamente vira Drawer no mobile com swipe-to-dismiss), com lista de items estilizados no padrao dark -- fundo escuro, hover com `bg-secondary`, check icon no item selecionado, tipografia consistente.
-
-### 2. Modificar `TransactionSheet.tsx`
-
-Substituir os 4 selects nativos por botoes que abrem o `ListPicker`:
-
-| Select atual | Picker |
-|---|---|
-| Conta (accountId) | ListPicker com contas disponiveis |
-| Conta destino (toAccountId) | ListPicker com contas filtradas |
-| Fornecedor (supplierId) | ListPicker com fornecedores |
-| Funcionario (employeeId) | ListPicker com funcionarios |
-
-Cada um tera um botao trigger identico ao da Categoria (outline, h-12, com chevron), abrindo o bottom-sheet correspondente.
-
-### 3. Atualizar `SelectContent` no Radix Select (`select.tsx`)
-
-Aplicar a mesma logica mobile/desktop que o Sheet ja usa: no mobile, renderizar o `SelectContent` dentro de um Drawer (bottom-sheet) ao inves do popover flutuante nativo do Radix. Isso padroniza automaticamente todos os ~20 usos de `<Select>` espalhados pelo app (agenda, receitas, configuracoes, etc).
+**Arquivo:** `src/pages/NotFound.tsx`
 
 ---
 
-## Arquivos
+## 2. Settings - Header sem `page-header-content` wrapper
 
-| Arquivo | Acao |
-|---|---|
-| `src/components/ui/list-picker.tsx` | **Novo** - Componente generico de selecao em bottom-sheet |
-| `src/components/finance/TransactionSheet.tsx` | Substituir 4 selects nativos por ListPicker |
-| `src/components/ui/select.tsx` | Adicionar branching mobile (Drawer) no SelectContent |
+Na pagina de Configuracoes, o header principal e o header de sub-secao usam `page-header-bar` mas nao envolvem o conteudo em `page-header-content`, causando padding inconsistente comparado com outras paginas.
+
+**Arquivo:** `src/pages/Settings.tsx` (linhas 51-58 e 81-93)
 
 ---
 
-## Secao Tecnica
+## 3. PageLoader generico demais
 
-### ListPicker - Estrutura
+O `PageLoader` global (App.tsx) e os loading states individuais de cada pagina usam apenas "Carregando..." com `animate-pulse`. Para um app premium, deveria ter o logo da marca e uma animacao mais sofisticada (spinner com glow neon).
 
-```text
-ListPicker
-  └── Sheet (auto-drawer no mobile)
-       ├── SheetHeader com titulo
-       └── Lista scrollavel
-            ├── Item "Nenhum" (opcional)
-            └── Items mapeados com:
-                 ├── Check icon (se selecionado)
-                 ├── Label
-                 └── hover: bg-secondary
-```
+**Arquivo:** `src/App.tsx` (linhas 42-48) + criar componente reutilizavel
 
-### Select Radix - Branching Mobile
+---
 
-O `SelectContent` detecta `useIsMobile()`:
-- **Mobile**: renderiza como Sheet/Drawer com lista de items em vez de popover flutuante
-- **Desktop**: mantem popover Radix atual
+## 4. Arquivo `Dashboard.tsx` antigo nao utilizado
 
-Isso usa o `SheetMobileContext` ja existente e garante que qualquer `<Select>` do app (Agenda, Receitas, Configuracoes, WhatsApp, etc.) automaticamente use bottom-sheet no mobile.
+O arquivo `src/pages/Dashboard.tsx` e uma versao antiga do estoque que nao e referenciado em nenhum lugar (o App.tsx usa `DashboardNew`). E codigo morto que pode ser removido.
+
+**Arquivo:** `src/pages/Dashboard.tsx` (remover)
+
+---
+
+## 5. Mobile header semi-transparente
+
+O header mobile no `AppLayout.tsx` usa `bg-card/90`, o que pode causar o mesmo efeito de bleed-through corrigido no `page-header-bar`. Deve ser `bg-card` para consistencia.
+
+**Arquivo:** `src/components/layout/AppLayout.tsx` (linha 101)
+
+---
+
+## 6. Badge de "Acoes Pendentes" no Dashboard com numero quebrado
+
+O badge de despesas pendentes exibe `23531` (valor monetario formatado como inteiro via `Math.round`). Deveria ser formatado como moeda (R$ 235,31) para fazer sentido contextual.
+
+**Arquivo:** `src/components/dashboard/AdminDashboard.tsx` (linha 224)
+
+---
+
+## 7. Finance Bottom Nav - tab ativa sem glow consistente
+
+A barra inferior do Financeiro usa um indicador fino (`w-5 h-0.5`) sem o glow neon padrao que o resto do app utiliza. Pode ser refinado para maior consistencia.
+
+**Arquivo:** `src/components/finance/FinanceBottomNav.tsx`
+
+---
+
+## 8. Chat header sem `page-header-bar`
+
+A pagina de Chat usa um header customizado simples ("Mensagens") sem seguir o padrao `page-header-bar` com icone + titulo + subtitulo usado em todas as outras paginas.
+
+**Arquivo:** `src/pages/Chat.tsx` (linhas 133-171)
+
+---
+
+## Resumo de Mudancas
+
+| # | Arquivo | Tipo | Descricao |
+|---|---------|------|-----------|
+| 1 | `src/pages/NotFound.tsx` | Refatorar | Redesign completo com estetica dark, texto PT-BR |
+| 2 | `src/pages/Settings.tsx` | Corrigir | Adicionar `page-header-content` nos headers |
+| 3 | `src/App.tsx` + novo componente | Melhorar | PageLoader com logo e spinner neon |
+| 4 | `src/pages/Dashboard.tsx` | Remover | Codigo morto nao utilizado |
+| 5 | `src/components/layout/AppLayout.tsx` | Corrigir | Header mobile `bg-card/90` para `bg-card` |
+| 6 | `src/components/dashboard/AdminDashboard.tsx` | Corrigir | Formatar despesas como moeda |
+| 7 | `src/components/finance/FinanceBottomNav.tsx` | Refinar | Indicador ativo com glow neon |
+| 8 | `src/pages/Chat.tsx` | Padronizar | Header com `page-header-bar` |
+
+Todas as mudancas seguem a regra de nao adicionar funcionalidades novas -- apenas consolidacao, correcao e padronizacao visual.
+
