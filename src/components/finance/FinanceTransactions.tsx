@@ -68,6 +68,7 @@ interface FinanceTransactionsProps {
   onReorderTransactions?: (dateStr: string, orderedIds: string[]) => Promise<void>;
   categories: FinanceCategory[];
   accounts: FinanceAccount[];
+  initialFilters?: Partial<TransactionFiltersState>;
 }
 
 export function FinanceTransactions({
@@ -80,14 +81,24 @@ export function FinanceTransactions({
   onDeleteTransaction,
   onReorderTransactions,
   categories,
-  accounts
+  accounts,
+  initialFilters
 }: FinanceTransactionsProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<TransactionFiltersState>({
     status: 'all',
+    type: 'all',
     categoryId: null,
-    accountId: null
+    accountId: null,
+    ...initialFilters
   });
+
+  // Apply initialFilters when they change from parent
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(prev => ({ ...prev, ...initialFilters }));
+    }
+  }, [initialFilters]);
   const todayRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
 
@@ -110,6 +121,8 @@ export function FinanceTransactions({
       const filtered = transactions.filter(t => {
         if (filters.status === 'paid' && !t.is_paid) return false;
         if (filters.status === 'pending' && t.is_paid) return false;
+        if (filters.type === 'income' && t.type !== 'income') return false;
+        if (filters.type === 'expense' && t.type !== 'expense') return false;
         if (filters.categoryId && t.category_id !== filters.categoryId) return false;
         if (filters.accountId && t.account_id !== filters.accountId) return false;
         return true;
@@ -128,7 +141,7 @@ export function FinanceTransactions({
   }, [filteredTransactionsByDate]);
 
   const hasTransactions = sortedDates.length > 0;
-  const hasActiveFilters = filters.status !== 'all' || filters.categoryId || filters.accountId;
+  const hasActiveFilters = filters.status !== 'all' || filters.type !== 'all' || filters.categoryId || filters.accountId;
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
