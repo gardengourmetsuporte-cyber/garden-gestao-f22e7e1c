@@ -107,7 +107,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="bg-card backdrop-blur-xl border-b border-border/20">
           <div className="flex items-center justify-between h-14 px-3">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="p-2.5 rounded-xl hover:bg-secondary active:scale-95 transition-all touch-manipulation"
@@ -115,13 +115,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               >
                 <Menu className="w-[22px] h-[22px] text-muted-foreground" />
               </button>
-              <button
-                onClick={() => navigate('/')}
-                className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20 active:scale-95 transition-transform"
-              >
-                <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
-              </button>
             </div>
+
+            {/* Centered Garden Logo */}
+            <button
+              onClick={() => navigate('/')}
+              className="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20 active:scale-95 transition-transform"
+              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.15)' }}
+            >
+              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+            </button>
 
             <div className="flex items-center gap-1">
               <span className={cn(
