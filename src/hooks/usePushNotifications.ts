@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+
+const SUBSCRIBED_KEY = 'push-subscribed';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -15,12 +17,10 @@ function urlBase64ToUint8Array(base64String: string) {
 
 /** Get SW registration with a timeout to avoid infinite waits */
 async function getRegistration(timeoutMs = 5000): Promise<ServiceWorkerRegistration | null> {
-  // If there's already an active registration, return immediately
   const regs = await navigator.serviceWorker.getRegistrations();
   const active = regs.find(r => r.active);
   if (active) return active;
 
-  // Otherwise wait for ready with a timeout
   return Promise.race([
     navigator.serviceWorker.ready,
     new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
@@ -29,35 +29,41 @@ async function getRegistration(timeoutMs = 5000): Promise<ServiceWorkerRegistrat
 
 export function usePushNotifications() {
   const { user } = useAuth();
-  const [isSupported, setIsSupported] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [isSupported] = useState(
+    () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+  );
+  // Fast-path: if permission is granted and we cached subscription, assume subscribed
+  const [isSubscribed, setIsSubscribed] = useState(
+    () => isSupported && Notification.permission === 'granted' && localStorage.getItem(SUBSCRIBED_KEY) === 'true'
+  );
+  const [permission, setPermission] = useState<NotificationPermission>(
+    () => isSupported ? Notification.permission : 'default'
+  );
   const [isLoading, setIsLoading] = useState(false);
-  const checkedRef = useRef(false);
 
+  // Background verification (non-blocking, won't cause prompt to flash)
   useEffect(() => {
-    const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
-    setIsSupported(supported);
-    if (supported) {
-      setPermission(Notification.permission);
-      // Non-blocking check — fire and forget with short timeout
-      if (!checkedRef.current) {
-        checkedRef.current = true;
-        getRegistration(3000).then(reg => {
-          if (reg) {
-            (reg as any).pushManager.getSubscription().then((sub: any) => setIsSubscribed(!!sub)).catch(() => {});
-          }
-        }).catch(() => {});
-      }
+    if (!isSupported || !user) return;
+    // Only verify if we think we're subscribed — to catch stale cache
+    if (isSubscribed) {
+      getRegistration(2000).then(reg => {
+        if (reg) {
+          (reg as any).pushManager.getSubscription().then((sub: any) => {
+            if (!sub) {
+              localStorage.removeItem(SUBSCRIBED_KEY);
+              setIsSubscribed(false);
+            }
+          }).catch(() => {});
+        }
+      }).catch(() => {});
     }
-  }, []);
+  }, [isSupported, user, isSubscribed]);
 
   const subscribe = useCallback(async () => {
     if (!user || !isSupported) return false;
     setIsLoading(true);
 
     try {
-      // Request permission first (instant UI)
       const perm = await Notification.requestPermission();
       setPermission(perm);
       if (perm !== 'granted') {
@@ -65,7 +71,6 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Fetch VAPID key and wait for SW in parallel
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const [vapidRes, registration] = await Promise.all([
         fetch(`${supabaseUrl}/functions/v1/push-notifier?action=vapid-key`, {
@@ -99,6 +104,7 @@ export function usePushNotifications() {
 
       if (!saveRes.ok) throw new Error('Failed to save subscription');
 
+      localStorage.setItem(SUBSCRIBED_KEY, 'true');
       setIsSubscribed(true);
       setIsLoading(false);
       return true;
@@ -132,6 +138,7 @@ export function usePushNotifications() {
           }
         );
       }
+      localStorage.removeItem(SUBSCRIBED_KEY);
       setIsSubscribed(false);
     } catch (err) {
       console.error('Push unsubscribe failed:', err);
