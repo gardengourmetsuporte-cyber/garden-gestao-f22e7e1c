@@ -128,11 +128,11 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
   }, []);
 
   return (
-    <div className="relative isolate overflow-hidden rounded-xl">
+    <div className="relative isolate rounded-xl">
       {/* Swipe action buttons - behind */}
       <div
         className={cn(
-          'absolute inset-y-0 right-0 flex z-0 transition-opacity',
+          'absolute inset-y-0 right-0 flex z-0 transition-opacity overflow-hidden rounded-xl',
           swipeOffset === 0 ? 'pointer-events-none opacity-0' : 'opacity-100'
         )}
         style={{ width: `${MAX_SWIPE}px` }}
