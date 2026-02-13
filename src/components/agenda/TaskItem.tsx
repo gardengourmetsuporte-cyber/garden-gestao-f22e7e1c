@@ -60,7 +60,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const editSubRef = useRef<HTMLInputElement>(null);
 
   const SWIPE_THRESHOLD = -70;
-  const MAX_SWIPE = -160;
+  const MAX_SWIPE = -240;
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -123,6 +123,12 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
     <div className="relative overflow-hidden rounded-2xl" {...dragHandleProps}>
       {/* Swipe background actions */}
       <div className="absolute inset-y-0 right-0 flex items-stretch z-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); closeSwipe(); setExpanded(true); setAddingSubtask(true); setTimeout(() => subtaskInputRef.current?.focus(), 100); }}
+          className="w-20 flex items-center justify-center bg-primary text-primary-foreground text-xs font-semibold"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
         <button
           onClick={(e) => { e.stopPropagation(); closeSwipe(); onClick?.(); }}
           className="w-20 flex items-center justify-center bg-muted-foreground/60 text-white text-xs font-semibold"
@@ -203,15 +209,8 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           </div>
         </div>
 
-        {/* Category badge below */}
-        {task.category && (
-          <div className="px-4 pb-2 -mt-2">
-            <span className="flex items-center gap-1 w-fit">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: task.category.color }} />
-              <span className="text-xs text-muted-foreground">{task.category.name}</span>
-            </span>
-          </div>
-        )}
+
+
 
         {/* Expanded subtasks */}
         {expanded && (
