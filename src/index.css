@@ -225,7 +225,7 @@
   }
 
   .page-header-bar {
-    @apply bg-card/80 backdrop-blur-2xl sticky top-0 z-40;
+    @apply bg-card backdrop-blur-2xl sticky top-0 z-40;
     border-bottom: 1px solid hsl(var(--border) / 0.3);
     box-shadow: 0 1px 0 hsl(var(--neon-cyan) / 0.08), 0 4px 16px hsl(222 50% 3% / 0.4);
   }
