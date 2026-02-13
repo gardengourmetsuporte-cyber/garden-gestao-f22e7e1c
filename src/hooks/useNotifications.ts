@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -13,31 +14,30 @@ export interface AppNotification {
   created_at: string;
 }
 
+async function fetchNotificationsData(userId: string): Promise<AppNotification[]> {
+  const { data } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  return (data as unknown as AppNotification[]) || [];
+}
+
 export function useNotifications() {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchNotifications = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(50);
+  const queryKey = ['notifications', user?.id];
 
-    if (data) {
-      setNotifications(data as unknown as AppNotification[]);
-    }
-    setIsLoading(false);
-  }, [user]);
+  const { data: notifications = [], isLoading } = useQuery({
+    queryKey,
+    queryFn: () => fetchNotificationsData(user!.id),
+    enabled: !!user,
+  });
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  // Realtime subscription
+  // Realtime subscription - update cache directly
   useEffect(() => {
     if (!user) return;
 
@@ -45,57 +45,56 @@ export function useNotifications() {
       .channel('notifications-realtime')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-        },
+        { event: '*', schema: 'public', table: 'notifications' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
             const newNotif = payload.new as unknown as AppNotification;
             if (newNotif.user_id === user.id) {
-              setNotifications(prev => [newNotif, ...prev]);
-              // Play notification sound
+              queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
+                old ? [newNotif, ...old] : [newNotif]
+              );
               playNotificationSound();
             }
           } else if (payload.eventType === 'UPDATE') {
-            setNotifications(prev =>
-              prev.map(n => n.id === (payload.new as any).id ? { ...n, ...(payload.new as any) } : n)
+            queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
+              old?.map(n => n.id === (payload.new as any).id ? { ...n, ...(payload.new as any) } : n) ?? []
             );
           } else if (payload.eventType === 'DELETE') {
-            setNotifications(prev => prev.filter(n => n.id !== (payload.old as any).id));
+            queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
+              old?.filter(n => n.id !== (payload.old as any).id) ?? []
+            );
           }
         }
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
+    return () => { supabase.removeChannel(channel); };
+  }, [user, queryClient]);
 
   const markAsRead = useCallback(async (notificationId: string) => {
+    // Optimistic update
+    queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
+      old?.map(n => n.id === notificationId ? { ...n, read: true } : n) ?? []
+    );
     await supabase
       .from('notifications')
       .update({ read: true } as any)
       .eq('id', notificationId);
-
-    setNotifications(prev =>
-      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-    );
-  }, []);
+  }, [queryClient]);
 
   const markAllAsRead = useCallback(async () => {
     const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
     if (unreadIds.length === 0) return;
 
+    // Optimistic update
+    queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
+      old?.map(n => ({ ...n, read: true })) ?? []
+    );
     await supabase
       .from('notifications')
       .update({ read: true } as any)
       .in('id', unreadIds);
-
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  }, [notifications]);
+  }, [notifications, queryClient]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const unreadNotifications = notifications.filter(n => !n.read);
@@ -107,7 +106,7 @@ export function useNotifications() {
     isLoading,
     markAsRead,
     markAllAsRead,
-    refetch: fetchNotifications,
+    refetch: () => queryClient.invalidateQueries({ queryKey }),
   };
 }
 
@@ -115,7 +114,6 @@ function playNotificationSound() {
   try {
     const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     
-    // First tone
     const osc1 = audioCtx.createOscillator();
     const gain1 = audioCtx.createGain();
     osc1.connect(gain1);
@@ -127,7 +125,6 @@ function playNotificationSound() {
     osc1.start(audioCtx.currentTime);
     osc1.stop(audioCtx.currentTime + 0.15);
 
-    // Second tone (higher)
     const osc2 = audioCtx.createOscillator();
     const gain2 = audioCtx.createGain();
     osc2.connect(gain2);
