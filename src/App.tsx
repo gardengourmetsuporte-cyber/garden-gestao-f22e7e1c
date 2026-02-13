@@ -29,6 +29,7 @@ const TabletAdmin = lazy(() => import("./pages/TabletAdmin"));
 const WhatsApp = lazy(() => import("./pages/WhatsApp"));
 const MenuAdmin = lazy(() => import("./pages/MenuAdmin"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Orders = lazy(() => import("./pages/Orders"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +92,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Inventory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
             </ProtectedRoute>
           }
         />

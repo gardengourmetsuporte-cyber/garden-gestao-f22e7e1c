@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
+
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
-import { useOrders } from '@/hooks/useOrders';
-import { useSupplierInvoices } from '@/hooks/useSupplierInvoices';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatsCard } from '@/components/inventory/StatsCard';
 import { ItemCard } from '@/components/inventory/ItemCardNew';
@@ -14,13 +12,13 @@ import { SearchBar } from '@/components/inventory/SearchBar';
 import { QuickMovementSheetNew } from '@/components/inventory/QuickMovementSheetNew';
 import { ItemFormSheetNew } from '@/components/inventory/ItemFormSheetNew';
 import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
-import { OrdersTab } from '@/components/inventory/OrdersTab';
+
 import { AppLayout } from '@/components/layout/AppLayout';
 import { InventoryItem } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type View = 'items' | 'history' | 'orders';
+type View = 'items' | 'history';
 
 export default function InventoryPage() {
   const location = useLocation();
@@ -41,8 +39,6 @@ export default function InventoryPage() {
 
   const { categories } = useCategories();
   const { suppliers } = useSuppliers();
-  const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
-  const { addInvoice } = useSupplierInvoices();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('items');
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -54,10 +50,7 @@ export default function InventoryPage() {
 
   // Handle navigation state from Dashboard
   useEffect(() => {
-    const state = location.state as { activeTab?: string; stockFilter?: string } | null;
-    if (state?.activeTab === 'orders' && isAdmin) {
-      setView('orders');
-    }
+    const state = location.state as { stockFilter?: string } | null;
     if (state?.stockFilter === 'critical') {
       setStockFilter('zero');
       setView('items');
@@ -163,76 +156,6 @@ export default function InventoryPage() {
     }
   };
 
-  const handleCreateOrder = async (supplierId: string, orderItems: { item_id: string; quantity: number }[]) => {
-    try {
-      await createOrder(supplierId, orderItems);
-    } catch (error) {
-      toast.error('Erro ao criar pedido');
-    }
-  };
-
-  const handleSendOrder = async (orderId: string) => {
-    try {
-      const order = orders.find(o => o.id === orderId);
-      if (order?.status === 'draft') {
-        await updateOrderStatus(orderId, 'sent');
-      }
-    } catch (error) {
-      toast.error('Erro ao atualizar pedido');
-    }
-  };
-
-  const handleReceiveOrder = async (orderId: string, receivedItems: { itemId: string; quantity: number }[]) => {
-    try {
-      // Register stock entries for each received item
-      for (const item of receivedItems) {
-        await registerMovement(item.itemId, 'entrada', item.quantity, `Recebimento de pedido`);
-      }
-      // Update order status to received
-      await updateOrderStatus(orderId, 'received');
-    } catch (error) {
-      toast.error('Erro ao receber pedido');
-      throw error;
-    }
-  };
-
-  const handleDeleteOrder = async (orderId: string) => {
-    try {
-      await deleteOrder(orderId);
-    } catch (error) {
-      toast.error('Erro ao excluir pedido');
-    }
-  };
-
-  const handleRegisterInvoice = async (data: {
-    orderId: string;
-    supplierId: string;
-    amount: number;
-    dueDate: string;
-    description: string;
-    invoiceNumber?: string;
-  }): Promise<string> => {
-    // Add invoice and get the ID back
-    const invoiceId = await addInvoice({
-      supplier_id: data.supplierId,
-      amount: data.amount,
-      due_date: data.dueDate,
-      description: data.description,
-      invoice_number: data.invoiceNumber,
-    });
-    
-    // Link invoice to order
-    if (invoiceId) {
-      await supabase
-        .from('orders')
-        .update({ supplier_invoice_id: invoiceId })
-        .eq('id', data.orderId);
-      // Refetch orders to update UI
-      await refetchOrders();
-    }
-    
-    return invoiceId || '';
-  };
 
   if (isLoading) {
     return (
@@ -263,8 +186,6 @@ export default function InventoryPage() {
     return orderA - orderB;
   });
 
-  // Count items needing orders
-  const itemsNeedingOrder = items.filter(i => i.current_stock <= i.min_stock).length;
 
   return (
     <AppLayout>
@@ -367,33 +288,14 @@ export default function InventoryPage() {
               <History className="w-4 h-4" />
               Histórico
             </button>
-            {isAdmin && (
-              <button
-                onClick={() => { setView('orders'); setStockFilter(null); }}
-                className={cn(
-                  "tab-command-item relative",
-                  view === 'orders' ? 'tab-command-active' : 'tab-command-inactive'
-                )}
-              >
-                <ShoppingCart className="w-4 h-4" />
-                Pedidos
-                {itemsNeedingOrder > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
-                    {itemsNeedingOrder}
-                  </span>
-                )}
-              </button>
-            )}
           </div>
 
           {/* Search */}
-          {view !== 'orders' && (
-            <SearchBar
-              value={search}
-              onChange={setSearch}
-              placeholder={view === 'items' ? 'Buscar itens...' : 'Buscar movimentações...'}
-            />
-          )}
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder={view === 'items' ? 'Buscar itens...' : 'Buscar movimentações...'}
+          />
 
           {/* Content */}
           {view === 'items' ? (
@@ -457,17 +359,6 @@ export default function InventoryPage() {
                 })
               )}
             </div>
-          ) : view === 'orders' ? (
-            <OrdersTab
-              items={items}
-              suppliers={suppliers}
-              orders={orders}
-              onCreateOrder={handleCreateOrder}
-              onSendOrder={handleSendOrder}
-              onDeleteOrder={handleDeleteOrder}
-              onReceiveOrder={handleReceiveOrder}
-              onRegisterInvoice={handleRegisterInvoice}
-            />
           ) : (
             <MovementHistoryNew
               movements={movements.filter(m => {
