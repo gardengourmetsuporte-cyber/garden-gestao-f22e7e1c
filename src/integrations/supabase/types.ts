@@ -1238,6 +1238,243 @@ export type Database = {
           },
         ]
       }
+      menu_categories: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_categories_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_groups: {
+        Row: {
+          availability: Json
+          category_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          schedule: Json | null
+          sort_order: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          availability?: Json
+          category_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          schedule?: Json | null
+          sort_order?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          availability?: Json
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          schedule?: Json | null
+          sort_order?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_groups_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_groups_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_option_groups: {
+        Row: {
+          allow_repeat: boolean
+          availability: Json
+          created_at: string
+          id: string
+          is_active: boolean
+          max_selections: number
+          min_selections: number
+          sort_order: number
+          title: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          allow_repeat?: boolean
+          availability?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_selections?: number
+          min_selections?: number
+          sort_order?: number
+          title: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          allow_repeat?: boolean
+          availability?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_selections?: number
+          min_selections?: number
+          sort_order?: number
+          title?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_option_groups_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_options: {
+        Row: {
+          availability: Json
+          codigo_pdv: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          option_group_id: string
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          availability?: Json
+          codigo_pdv?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          option_group_id: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          availability?: Json
+          codigo_pdv?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          option_group_id?: string
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_options_option_group_id_fkey"
+            columns: ["option_group_id"]
+            isOneToOne: false
+            referencedRelation: "menu_option_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_product_option_groups: {
+        Row: {
+          id: string
+          option_group_id: string
+          product_id: string
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          option_group_id: string
+          product_id: string
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          option_group_id?: string
+          product_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_product_option_groups_option_group_id_fkey"
+            columns: ["option_group_id"]
+            isOneToOne: false
+            referencedRelation: "menu_option_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_product_option_groups_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "tablet_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -2113,48 +2350,76 @@ export type Database = {
       }
       tablet_products: {
         Row: {
+          availability: Json
           category: string
           codigo_pdv: string | null
           created_at: string
+          custom_prices: Json | null
           description: string | null
+          group_id: string | null
           id: string
           image_url: string | null
+          is_18_plus: boolean
           is_active: boolean
+          is_highlighted: boolean
           name: string
           price: number
+          price_type: string
+          schedule: Json | null
           sort_order: number
           unit_id: string
           updated_at: string
         }
         Insert: {
+          availability?: Json
           category?: string
           codigo_pdv?: string | null
           created_at?: string
+          custom_prices?: Json | null
           description?: string | null
+          group_id?: string | null
           id?: string
           image_url?: string | null
+          is_18_plus?: boolean
           is_active?: boolean
+          is_highlighted?: boolean
           name: string
           price?: number
+          price_type?: string
+          schedule?: Json | null
           sort_order?: number
           unit_id: string
           updated_at?: string
         }
         Update: {
+          availability?: Json
           category?: string
           codigo_pdv?: string | null
           created_at?: string
+          custom_prices?: Json | null
           description?: string | null
+          group_id?: string | null
           id?: string
           image_url?: string | null
+          is_18_plus?: boolean
           is_active?: boolean
+          is_highlighted?: boolean
           name?: string
           price?: number
+          price_type?: string
+          schedule?: Json | null
           sort_order?: number
           unit_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tablet_products_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "menu_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tablet_products_unit_id_fkey"
             columns: ["unit_id"]
