@@ -1,125 +1,85 @@
 
-# Sistema de Urgencia Temporal com Notificacoes Automaticas
+# Configuracoes de Alertas Temporais por Modulo
 
-## Visao Geral
+## O que sera feito
 
-Implementar um sistema inteligente que escala a urgencia visual (cores) e dispara notificacoes push automaticamente conforme o horario do dia avanca, criando pressao positiva para completar tarefas operacionais dentro do prazo.
+Criar uma nova tela em Configuracoes chamada "Alertas e Sinalizacao" onde o administrador pode, para cada modulo:
 
-## Regras de Escalacao por Modulo
+1. **Ativar/desativar** a sinalizacao temporal (switch on/off)
+2. **Editar os horarios** de cada gatilho (warning e critical)
 
-### Financeiro (`/finance`)
-| Horario | Nivel | Cor | Notificacao |
-|---------|-------|-----|-------------|
-| Inicio do dia | `attention` (laranja) | Amber/Laranja | Nao |
-| >= 16:00 | `warning` (laranja pulsante) | Amber pulsante | Sim - "Contas do dia ainda em aberto" |
-| >= 18:00 | `critical` (vermelho) | Vermelho + pulse | Sim - "Urgente: tempo acabando para pagamentos" |
+Os modulos configuraveis serao:
+- Financeiro (horario de aviso e critico)
+- Checklist de Abertura (horario de aviso e critico)
+- Checklist de Fechamento (horario de aviso e critico)
+- Fechamento de Caixa (horario critico)
 
-### Checklist Abertura (`/checklists`)
-| Horario | Nivel | Cor | Notificacao |
-|---------|-------|-----|-------------|
-| Inicio do dia | `attention` (laranja) | Amber | Nao |
-| >= 12:00 | `warning` | Amber pulsante | Sim - "Checklist de abertura incompleto" |
-| >= 14:00 | `critical` (vermelho) | Vermelho + pulse | Sim - "Checklist atrasado!" |
+## Como vai funcionar
 
-### Checklist Fechamento (`/checklists`)
-| Horario | Nivel | Cor | Notificacao |
-|---------|-------|-----|-------------|
-| A partir das 14:00 | `attention` | Amber | Nao |
-| >= 18:30 | `warning` | Amber pulsante | Sim |
-| >= 21:00 | `critical` | Vermelho | Sim |
+Cada modulo tera um card com:
+- Nome e icone do modulo
+- Switch para ativar/desativar a sinalizacao
+- Campos de horario editaveis (formato HH:MM) para os niveis "Aviso" (laranja) e "Critico" (vermelho)
+- Os valores padrao serao os atuais ja implementados
 
-### Fechamento de Caixa (`/cash-closing`)
-| Horario | Nivel | Cor | Notificacao |
-|---------|-------|-----|-------------|
-| Pendente | `attention` | Amber | Nao |
-| >= 22:00 | `critical` | Vermelho | Sim |
-
-## Icone de Relogio nas Tarefas da Agenda
-
-O icone de relogio (`CalendarDays`) ao lado da data/hora da tarefa mudara de cor conforme a proximidade do vencimento:
-- **Verde**: faltam mais de 2 horas
-- **Laranja**: faltam menos de 2 horas
-- **Vermelho pulsante**: vencida ou faltam menos de 30 minutos
-
----
+As configuracoes serao salvas no banco de dados por unidade, permitindo que cada filial tenha seus proprios horarios.
 
 ## Detalhes Tecnicos
 
-### 1. Hook `useTimeBasedUrgency` (novo arquivo)
-
-Cria um hook reativo que recalcula a cada 60 segundos usando `setInterval`. Retorna o nivel de urgencia para cada modulo com base no horario atual.
+### 1. Nova tabela no banco: `time_alert_settings`
 
 ```text
-src/hooks/useTimeBasedUrgency.ts
-- useState para hora atual
-- setInterval de 60s para atualizar
-- Funcao pura que recebe hora e retorna StatusLevel por modulo
-- Exporta funcao getTaskUrgencyColor(dueDate, dueTime) para tarefas
+Colunas:
+- id (uuid, PK)
+- user_id (uuid, NOT NULL) -- dono da config
+- unit_id (uuid, NULL) -- por unidade
+- module_key (text, NOT NULL) -- 'finance', 'checklist_abertura', 'checklist_fechamento', 'cash_closing'
+- enabled (boolean, DEFAULT true)
+- warning_hour (numeric, NULL) -- ex: 16.0, 18.5
+- critical_hour (numeric, NULL) -- ex: 18.0, 21.0
+- created_at, updated_at (timestamps)
+- UNIQUE(user_id, unit_id, module_key)
+
+RLS: users manage own settings (auth.uid() = user_id)
 ```
 
-### 2. Modificar `useModuleStatus.ts`
+### 2. Novo componente: `TimeAlertSettings`
 
-Integrar o resultado do `useTimeBasedUrgency` para escalar o nivel dos modulos. A logica sera: se ha pendencias E o horario exige escalacao, o nivel sobe de `attention` para `warning` ou `critical`.
+Arquivo: `src/components/settings/TimeAlertSettings.tsx`
 
-Adicionar nivel `warning` ao tipo `StatusLevel`:
-```typescript
-export type StatusLevel = 'ok' | 'attention' | 'warning' | 'critical';
-```
+Interface com 4 cards (um por modulo), cada um contendo:
+- Switch de ativacao
+- Input de horario para nivel "Aviso" (onde aplicavel)
+- Input de horario para nivel "Critico"
+- Salva automaticamente ao alterar (sem botao "Salvar")
 
-Incluir a hora atual na queryKey para forcar recalculo quando o intervalo muda:
-```typescript
-queryKey: ['module-status', userId, unitId, urgencyBucket],
-```
+### 3. Novo hook: `useTimeAlertSettings`
 
-### 3. Modificar `AppLayout.tsx`
+Arquivo: `src/hooks/useTimeAlertSettings.ts`
 
-Adicionar estilo visual para o novo nivel `warning` (laranja pulsante) no indicador de status da sidebar, diferenciando de `attention` (laranja estatico) e `critical` (vermelho pulsante).
+- Busca as configuracoes da tabela `time_alert_settings` para o usuario e unidade ativos
+- Se nao existir registro, usa os valores padrao hardcoded
+- Expoe funcao `updateSetting(moduleKey, field, value)` com upsert
+- Exporta os horarios efetivos para consumo por `useTimeBasedUrgency` e `useTimeAlerts`
 
-### 4. Modificar `TaskItem.tsx`
+### 4. Modificar hooks existentes
 
-O icone `CalendarDays` ao lado da data recebera cor dinamica:
-- Comparar `due_date` + `due_time` com a hora atual
-- Verde se faltam >2h, laranja se <2h, vermelho se <30min ou vencida
+**`useTimeBasedUrgency.ts`**: Em vez de horarios hardcoded, receber as configuracoes do `useTimeAlertSettings` e usar os horarios personalizados. Se um modulo estiver desativado, retornar urgency `ok` sempre.
 
-### 5. Sistema de Notificacoes Push Temporais (frontend)
+**`useTimeAlerts.ts`**: Filtrar os triggers com base nas configuracoes -- se o modulo estiver desativado, pular o disparo de notificacao. Usar os horarios personalizados em vez dos hardcoded.
 
-Criar um hook `useTimeAlerts` que roda no `AppLayout`:
-- Verifica a cada 5 minutos se atingiu um horario-gatilho
-- Usa `localStorage` para controlar notificacoes ja disparadas naquele dia (evitar repeticao)
-- Insere registros na tabela `notifications` quando um gatilho e ativado
-- As notificacoes push ja sao disparadas automaticamente pelo trigger existente `send_push_on_notification`
+### 5. Registrar na pagina de Configuracoes
 
-Chave de controle no localStorage:
-```text
-time_alerts_fired_{YYYY-MM-DD} = ["finance_16", "checklist_ab_12", ...]
-```
+Adicionar o item "Alertas e Sinalizacao" na secao "Sistema" do menu de configuracoes (`Settings.tsx`), com o icone `Bell` e variante `red`. Visivel apenas para administradores.
 
-### 6. Arquivos a Criar
-- `src/hooks/useTimeBasedUrgency.ts` - Hook de urgencia temporal
-- `src/hooks/useTimeAlerts.ts` - Disparador de notificacoes baseadas em horario
+### Arquivos a criar
+- `src/components/settings/TimeAlertSettings.tsx`
+- `src/hooks/useTimeAlertSettings.ts`
 
-### 7. Arquivos a Modificar
-- `src/hooks/useModuleStatus.ts` - Integrar escalacao temporal
-- `src/components/layout/AppLayout.tsx` - Visual do nivel `warning`
-- `src/components/agenda/TaskItem.tsx` - Cor dinamica do relogio
-- `src/index.css` - Classe de animacao para warning pulsante
+### Arquivos a modificar
+- `src/pages/Settings.tsx` -- adicionar item no menu
+- `src/hooks/useTimeBasedUrgency.ts` -- consumir configuracoes dinamicas
+- `src/hooks/useTimeAlerts.ts` -- consumir configuracoes dinamicas
 
-### Fluxo de Dados
-
-```text
-setInterval(60s) --> useTimeBasedUrgency --> urgencyBucket (hora arredondada)
-                                              |
-                                              v
-                                    useModuleStatus (recalcula status)
-                                              |
-                                              v
-                                    AppLayout sidebar (cor do indicador)
-
-setInterval(5min) --> useTimeAlerts --> verifica gatilhos
-                                          |
-                                          v
-                                    Insere notification no DB
-                                          |
-                                          v
-                                    Trigger send_push_on_notification (push automatico)
-```
+### Migracao SQL
+- Criar tabela `time_alert_settings` com RLS
