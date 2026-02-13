@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, MessageCircle, Building2, ChevronDown } from 'lucide-react';
+import { Bell, MessageCircle, Building2 } from 'lucide-react';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,35 +35,43 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="bg-card border-b border-border/20">
           <div className="flex items-center justify-between h-12 px-3">
-            {/* Logo + Unit */}
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => navigate('/')}
-                className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 border border-border/20 active:scale-95 transition-transform"
-              >
-                <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
-              </button>
+            {/* Left: Role badge */}
+            <div className="flex items-center">
+              <span className={cn(
+                "px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase",
+                isAdmin
+                  ? "bg-primary/15 text-primary border border-primary/20"
+                  : "bg-secondary text-muted-foreground border border-border/20"
+              )}>
+                {isAdmin ? 'Admin' : 'Staff'}
+              </span>
+            </div>
 
-              {/* Unit selector inline */}
+            {/* Right actions */}
+            <div className="flex items-center gap-0.5">
+              {/* Unit selector icon */}
               {units.length > 0 && (
                 <div className="relative">
                   <button
                     onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all"
+                    className={cn(
+                      "relative p-2 rounded-lg hover:bg-secondary transition-all",
+                      unitDropdownOpen && "bg-secondary"
+                    )}
                   >
-                    <span className="truncate max-w-[100px]">
-                      {activeUnit?.name || 'Unidade'}
-                    </span>
-                    <ChevronDown className={cn(
-                      "w-3 h-3 transition-transform duration-200",
-                      unitDropdownOpen && "rotate-180"
-                    )} />
+                    <Building2 className="w-5 h-5 text-muted-foreground" />
+                    {activeUnit && (
+                      <span
+                        className="absolute bottom-1.5 right-1.5 w-2 h-2 rounded-full border border-card"
+                        style={{ background: getThemeColor(activeUnit.slug) }}
+                      />
+                    )}
                   </button>
                   {unitDropdownOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setUnitDropdownOpen(false)} />
                       <div
-                        className="absolute top-full left-0 mt-1 z-50 rounded-xl overflow-hidden py-1 min-w-[180px]"
+                        className="absolute top-full right-0 mt-1 z-50 rounded-xl overflow-hidden py-1 min-w-[180px]"
                         style={{
                           background: 'hsl(var(--card))',
                           border: '1px solid hsl(var(--border) / 0.4)',
@@ -96,18 +104,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   )}
                 </div>
               )}
-            </div>
-
-            {/* Right actions */}
-            <div className="flex items-center gap-0.5">
-              <span className={cn(
-                "px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase",
-                isAdmin
-                  ? "bg-primary/15 text-primary border border-primary/20"
-                  : "bg-secondary text-muted-foreground border border-border/20"
-              )}>
-                {isAdmin ? 'Admin' : 'Staff'}
-              </span>
               <button
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"

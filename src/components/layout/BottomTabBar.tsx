@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, DollarSign, ClipboardCheck, User, MoreHorizontal } from 'lucide-react';
+import { DollarSign, ClipboardCheck, User, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -8,18 +8,18 @@ interface BottomTabBarProps {
 }
 
 const tabs = [
-  { icon: LayoutDashboard, label: 'Home', href: '/' },
+  { icon: null, label: 'Home', href: '/', isLogo: true },
   { icon: DollarSign, label: 'Financeiro', href: '/finance', adminOnly: true },
   { icon: ClipboardCheck, label: 'Checklists', href: '/checklists' },
   { icon: User, label: 'Perfil', href: '/profile/me' },
-];
+] as const;
 
 export function BottomTabBar({ onMorePress }: BottomTabBarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
 
-  const visibleTabs = tabs.filter(t => !t.adminOnly || isAdmin);
+  const visibleTabs = tabs.filter(t => !('adminOnly' in t && t.adminOnly) || isAdmin);
 
   return (
     <nav
@@ -49,7 +49,22 @@ export function BottomTabBar({ onMorePress }: BottomTabBarProps) {
                 style={{ minWidth: 44, minHeight: 44 }}
               >
                 <div className="relative">
-                  <tab.icon className={cn("w-[22px] h-[22px]", isActive && "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]")} />
+                  {'isLogo' in tab && tab.isLogo ? (
+                    <div className={cn(
+                      "w-[26px] h-[26px] rounded-md overflow-hidden border border-border/30",
+                      isActive && "ring-1 ring-primary/50 shadow-[0_0_8px_hsl(var(--primary)/0.4)]"
+                    )}>
+                      <img
+                        alt="Home"
+                        className="w-full h-full object-contain"
+                        src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      {tab.icon && <tab.icon className={cn("w-[22px] h-[22px]", isActive && "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]")} />}
+                    </>
+                  )}
                   {isActive && (
                     <div
                       className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
