@@ -167,9 +167,9 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
       {/* Main content - slides left to reveal actions */}
       <div
         className={cn(
-          'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y overflow-hidden',
+          'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
           !is_paid && 'text-muted-foreground',
-          isNew && 'border-[hsl(var(--neon-cyan)/0.6)]',
+          isNew && 'border-[hsl(var(--neon-cyan)/0.6)] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.3),0_0_4px_hsl(var(--neon-cyan)/0.2)]',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
         style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
@@ -177,10 +177,6 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Neon accent bar for new transactions */}
-        {isNew && (
-          <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl bg-[hsl(var(--neon-cyan))] shadow-[0_0_10px_hsl(var(--neon-cyan)/0.7),0_0_4px_hsl(var(--neon-cyan)/0.5)]" />
-        )}
         {/* Quick pay toggle */}
         <button
           onClick={handleTogglePaid}
