@@ -36,15 +36,22 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between h-11 px-3">
-          {/* Left: Role badge */}
-          <span className={cn(
-            "px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase",
-            isAdmin
-              ? "bg-primary/15 text-primary border border-primary/20"
-              : "bg-secondary text-muted-foreground border border-border/20"
-          )}>
-            {isAdmin ? 'Admin' : 'Staff'}
-          </span>
+          {/* Left: Logo + Unit name */}
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 active:scale-95 transition-transform"
+          >
+            <div className="w-7 h-7 rounded-lg overflow-hidden ring-1 ring-border/30">
+              <img
+                alt="Home"
+                className="w-full h-full object-cover"
+                src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
+              />
+            </div>
+            <span className="text-sm font-semibold text-foreground truncate max-w-[120px]">
+              {activeUnit?.name ?? 'Garden'}
+            </span>
+          </button>
 
           {/* Right: action icons */}
           <div className="flex items-center gap-0.5">
