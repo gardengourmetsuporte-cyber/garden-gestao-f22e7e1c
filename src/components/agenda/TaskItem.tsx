@@ -180,7 +180,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
               )}>
                 {task.title}
               </p>
-              {(hasSubtasks || !task.is_completed) && (
+              {hasSubtasks && (
                 <ChevronRight className={cn(
                   'w-4 h-4 text-muted-foreground transition-transform shrink-0',
                   expanded && 'rotate-90'
