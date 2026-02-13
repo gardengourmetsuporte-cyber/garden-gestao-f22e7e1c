@@ -202,42 +202,48 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     }
   });
 
+  const isBackSwiping = backSwipeX !== null && backSwipeX > 0;
+  const swipeThreshold = typeof window !== 'undefined' ? window.innerWidth * 0.3 : 120;
+  const isPastThreshold = isBackSwiping && backSwipeX > swipeThreshold;
+
   return (
     <div className="min-h-screen bg-background">
-      {/* ======= Back Swipe Indicator ======= */}
-      {backSwipeX !== null && backSwipeX > 0 && (
-        <div className="lg:hidden fixed inset-0 z-[60] pointer-events-none">
-          {/* Dark overlay that fades in */}
+      {/* ======= Back Swipe Overlay (behind the page) ======= */}
+      {isBackSwiping && (
+        <div className="lg:hidden fixed inset-0 z-[55] pointer-events-none bg-background" />
+      )}
+
+      {/* ======= Swipeable Page Wrapper ======= */}
+      <div
+        className="relative z-[56]"
+        style={isBackSwiping ? {
+          transform: `translateX(${backSwipeX}px)`,
+          transition: 'none',
+          boxShadow: '-8px 0 30px hsl(0 0% 0% / 0.4)',
+        } : undefined}
+      >
+      {/* ======= Back Swipe Arrow Indicator (on the edge of the sliding page) ======= */}
+      {isBackSwiping && (
+        <div
+          className="lg:hidden fixed top-1/2 -translate-y-1/2 z-[70] flex items-center justify-center pointer-events-none"
+          style={{
+            left: -20,
+            opacity: Math.min(backSwipeX / 60, 1),
+          }}
+        >
           <div
-            className="absolute inset-0 bg-black/40"
-            style={{ opacity: Math.min(backSwipeX / (window.innerWidth * 0.4), 0.6) }}
-          />
-          {/* Arrow indicator */}
-          <div
-            className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
+            className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{
-              left: Math.min(backSwipeX - 40, 60),
-              opacity: Math.min(backSwipeX / 80, 1),
-              transition: 'none',
+              background: isPastThreshold ? 'hsl(var(--neon-cyan) / 0.3)' : 'hsl(var(--card) / 0.8)',
+              border: `1px solid ${isPastThreshold ? 'hsl(var(--neon-cyan) / 0.6)' : 'hsl(var(--border) / 0.5)'}`,
+              boxShadow: isPastThreshold ? '0 0 20px hsl(var(--neon-cyan) / 0.4)' : '0 4px 12px hsl(0 0% 0% / 0.3)',
             }}
           >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{
-                background: backSwipeX > window.innerWidth * 0.3
-                  ? 'hsl(var(--neon-cyan) / 0.3)'
-                  : 'hsl(var(--card) / 0.8)',
-                border: `1px solid ${backSwipeX > window.innerWidth * 0.3 ? 'hsl(var(--neon-cyan) / 0.6)' : 'hsl(var(--border) / 0.5)'}`,
-                boxShadow: backSwipeX > window.innerWidth * 0.3
-                  ? '0 0 20px hsl(var(--neon-cyan) / 0.4)'
-                  : '0 4px 12px hsl(0 0% 0% / 0.3)',
-              }}
-            >
-              <ChevronRight className="w-5 h-5 rotate-180" style={{ color: backSwipeX > window.innerWidth * 0.3 ? 'hsl(var(--neon-cyan))' : 'hsl(var(--muted-foreground))' }} />
-            </div>
+            <ChevronRight className="w-5 h-5 rotate-180" style={{ color: isPastThreshold ? 'hsl(var(--neon-cyan))' : 'hsl(var(--muted-foreground))' }} />
           </div>
         </div>
       )}
+
       {/* ======= Mobile Header ======= */}
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card"
@@ -291,10 +297,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </header>
 
+      </div>{/* End swipeable wrapper - before sidebar */}
+
       {/* ======= Sidebar Overlay ======= */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in"
+          className="lg:hidden fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm animate-fade-in"
           style={sidebarDragX !== null ? { opacity: Math.max(0, 1 - sidebarDragX / Math.min(window.innerWidth * 0.85, 360)) } : undefined}
           onClick={() => setSidebarOpen(false)}
         />
@@ -306,7 +314,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         onTouchMove={sidebarTouchMove}
         onTouchEnd={sidebarTouchEnd}
         className={cn(
-          "fixed top-0 right-0 z-50 h-full w-[85vw] max-w-[360px] flex flex-col",
+          "fixed top-0 right-0 z-[75] h-full w-[85vw] max-w-[360px] flex flex-col",
           "bg-background/95 backdrop-blur-2xl",
           "lg:translate-x-0 lg:right-auto lg:left-0",
           sidebarOpen ? "" : "translate-x-full lg:translate-x-0",
@@ -578,6 +586,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </aside>
 
+      {/* ======= Swipeable wrapper for FAB + Main ======= */}
+      <div
+        className="relative z-[56]"
+        style={isBackSwiping ? {
+          transform: `translateX(${backSwipeX}px)`,
+          transition: 'none',
+        } : undefined}
+      >
       {/* ======= Floating Menu FAB ======= */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -618,6 +634,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         {children}
       </main>
+      </div>{/* End swipeable FAB+Main wrapper */}
 
       {/* Unit transition overlay */}
       {isTransitioning && (
