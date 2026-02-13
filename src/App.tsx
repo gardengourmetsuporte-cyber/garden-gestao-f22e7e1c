@@ -25,6 +25,7 @@ const TabletSelect = lazy(() => import("./pages/TabletSelect"));
 const TabletMenu = lazy(() => import("./pages/TabletMenu"));
 const TabletConfirm = lazy(() => import("./pages/TabletConfirm"));
 const TabletAdmin = lazy(() => import("./pages/TabletAdmin"));
+const WhatsApp = lazy(() => import("./pages/WhatsApp"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -162,6 +163,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <TabletAdmin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/whatsapp"
+          element={
+            <ProtectedRoute>
+              <WhatsApp />
             </ProtectedRoute>
           }
         />
