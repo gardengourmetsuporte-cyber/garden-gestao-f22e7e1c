@@ -168,7 +168,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           <button 
             className="flex-1 min-w-0 text-left"
             onClick={() => {
-              if (hasSubtasks || !task.is_completed) {
+              if (hasSubtasks) {
                 setExpanded(!expanded);
               }
             }}
