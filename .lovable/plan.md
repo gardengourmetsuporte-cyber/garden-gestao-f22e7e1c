@@ -1,91 +1,79 @@
 
 
-# Plano de Otimizacao de Performance
+# Plano: Performance + Persistencia de Tela ao Minimizar
 
-## Problema Identificado
+## O que esta acontecendo
 
-O app esta lento porque o Dashboard carrega **8 hooks simultaneamente**, cada um fazendo queries independentes ao banco. Alem disso, o `useChatUnreadCount` faz **N+2 queries** (uma por conversa), e a maioria dos hooks usa `useState/useEffect` puro sem cache, refazendo todas as queries toda vez que voce navega entre paginas.
+Quando voce minimiza o app e volta, todos os componentes que usam `useState` + `useEffect` perdem seus dados e refazem todas as queries do zero. Isso acontece porque esses hooks nao tem cache -- os dados vivem apenas na memoria do componente, e quando o celular suspende/retoma o app, React pode re-montar os componentes, disparando tudo de novo.
 
-### Fluxo atual de carregamento:
+Hooks que ja usam React Query (como `useDashboardStats`) NAO tem esse problema, porque os dados ficam em um cache global que sobrevive entre navegacoes e re-montagens.
 
-```text
-Auth (2 queries sequenciais)
-  -> Unit (2 queries sequenciais)
-    -> Dashboard monta e dispara simultaneamente:
-       - useLeaderboard (2+ queries)
-       - useInventoryDB (1 query pesada com joins)
-       - useOrders (1 query pesada com joins)
-       - useRewards (2 queries)
-       - useUsers (2 queries)
-       - useCashClosing (1 query)
-       - useFinance (3 queries + init defaults)
-       - useRecipes (2 queries)
-    -> AppLayout dispara:
-       - useNotifications (1 query + realtime)
-       - useChatUnreadCount (N+2 queries!)
-```
+## Solucao
 
-**Total: ~20+ queries ao banco so para abrir o Dashboard**
+Migrar os 7 hooks restantes para React Query. Com isso:
+- Os dados ficam no cache global por 2 minutos
+- Ao minimizar e voltar, a tela aparece instantaneamente com os dados do cache
+- O refetch acontece silenciosamente em background, sem tela de loading
+- Comportamento identico a apps profissionais
 
 ---
 
-## Solucao Proposta
+## Etapas de Implementacao
 
-### 1. Migrar hooks do Dashboard para React Query (cache inteligente)
+### 1. `useNotifications` -- Migrar para React Query + Realtime
 
-Converter os hooks principais (`useInventoryDB`, `useOrders`, `useRewards`, `useUsers`, `useCashClosing`, `useLeaderboard`) para usar `useQuery` do TanStack React Query (que ja esta instalado mas subutilizado). Isso adiciona:
+Substituir `useState/useEffect` por `useQuery` para o fetch inicial. Manter o canal realtime, mas ao receber eventos, usar `queryClient.setQueryData` para atualizar o cache diretamente (sem re-fetch). As funcoes `markAsRead` e `markAllAsRead` atualizam o cache local de forma otimista.
 
-- **Cache automatico**: dados ficam em memoria ao navegar entre paginas
-- **staleTime**: evita refetch desnecessario por 2-5 minutos
-- **Background refetch**: atualiza silenciosamente quando voce volta a pagina
+### 2. `usePoints` -- Migrar para React Query
 
-### 2. Criar hook leve `useDashboardStats` 
+Substituir por `useQuery` simples. Os pontos mudam raramente, entao o cache de 2 minutos e perfeito.
 
-Em vez de carregar TODOS os dados de cada modulo (todos os itens de estoque, todos os pedidos, etc), criar um hook dedicado que busca apenas as **contagens** necessarias para o Dashboard com queries otimizadas:
+### 3. `useChatUnreadCount` -- Migrar para React Query + Realtime
 
-```text
-- COUNT de itens com estoque critico
-- COUNT de pedidos pendentes
-- COUNT de resgates pendentes
-- COUNT de fechamentos pendentes
-- Stats financeiros do mes (ja existente)
-```
+Substituir por `useQuery` para a contagem. O canal realtime invalida o cache (`queryClient.invalidateQueries`) ao receber novas mensagens, disparando um refetch silencioso em background.
 
-### 3. Corrigir o N+1 do `useChatUnreadCount`
+### 4. `useLeaderboard` -- Migrar para React Query
 
-Substituir o loop que faz uma query por conversa por uma unica query agregada que conta todas as mensagens nao lidas de uma vez.
+Separar `leaderboard` e `sectorPoints` em duas queries `useQuery` independentes. Dados do leaderboard mudam pouco, cache de 2 minutos elimina todas as re-buscas ao navegar.
 
-### 4. Adicionar skeleton loading ao Dashboard
+### 5. `useRewards` -- Migrar para React Query
 
-Substituir o "Carregando..." generico por skeletons nos cards, dando feedback visual imediato enquanto os dados carregam.
+Separar em 3 queries: `products`, `redemptions` e `allRedemptions` (admin). Mutations (`createProduct`, `redeemProduct`, etc) usam `useMutation` com invalidacao automatica do cache.
 
-### 5. Otimizar QueryClient
+### 6. `useInventoryDB` -- Migrar para React Query
 
-Configurar `staleTime` e `gcTime` globais no QueryClient para que dados recentes nao sejam rebuscados imediatamente.
+Separar `items` e `movements` em 2 queries `useQuery`. Mutations (`addItem`, `registerMovement`, etc) invalidam o cache apos sucesso. Funcoes derivadas (`getLowStockItems`, etc) usam `useMemo` sobre os dados do cache.
+
+### 7. `useOrders` -- Migrar para React Query
+
+`orders` vira `useQuery`. Mutations (`createOrder`, `updateOrderStatus`, etc) invalidam o cache apos sucesso.
 
 ---
 
-## Detalhes Tecnicos
-
-### Arquivos que serao modificados:
+## Arquivos modificados
 
 | Arquivo | Mudanca |
 |---|---|
-| `src/App.tsx` | Configurar QueryClient com staleTime global |
-| `src/hooks/useChatUnreadCount.ts` | Reescrever para query unica |
-| `src/hooks/useDashboardStats.ts` | **Novo** - hook leve para contagens |
-| `src/hooks/useInventoryDB.ts` | Migrar para useQuery |
-| `src/hooks/useOrders.ts` | Migrar para useQuery |
-| `src/hooks/useRewards.ts` | Migrar para useQuery |
-| `src/hooks/useUsers.ts` | Migrar para useQuery |
-| `src/hooks/useCashClosing.ts` | Migrar para useQuery |
-| `src/hooks/useLeaderboard.ts` | Migrar para useQuery |
-| `src/components/dashboard/AdminDashboard.tsx` | Usar `useDashboardStats` + skeletons |
+| `src/hooks/useNotifications.ts` | useQuery + realtime com setQueryData |
+| `src/hooks/usePoints.ts` | useQuery |
+| `src/hooks/useChatUnreadCount.ts` | useQuery + realtime com invalidation |
+| `src/hooks/useLeaderboard.ts` | 2x useQuery |
+| `src/hooks/useRewards.ts` | 3x useQuery + useMutation |
+| `src/hooks/useInventoryDB.ts` | 2x useQuery + useMutation |
+| `src/hooks/useOrders.ts` | useQuery + useMutation |
 
-### Resultado esperado:
+## O que NAO muda
 
-- **Primeira carga**: ~8 queries (em vez de 20+)
-- **Navegacao entre paginas**: instantanea (dados em cache)
-- **Retorno ao Dashboard**: sem recarregamento por 2 min
-- **Chat unread**: 1 query em vez de N+2
+- Nenhuma alteracao visual
+- Nenhuma mudanca no banco de dados
+- A interface das funcoes exportadas dos hooks permanece compativel
+- Componentes que consomem esses hooks continuam funcionando sem alteracao
+
+## Resultado esperado
+
+| Cenario | Antes | Depois |
+|---|---|---|
+| Minimizar e voltar ao app | Tela de loading + re-fetch total | Tela aparece instantanea do cache |
+| Navegar Dashboard -> Estoque -> Dashboard | ~20+ queries | 0 queries (dados em cache) |
+| Sidebar (pontos + notificacoes + chat) | Re-fetch a cada pagina | Cache por 2 min |
 
