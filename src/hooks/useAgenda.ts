@@ -205,6 +205,25 @@ export function useAgenda() {
     },
   });
 
+  // Update category mutation
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({ id, name, color }: { id: string; name: string; color: string }) => {
+      const { error } = await supabase
+        .from('task_categories' as any)
+        .update({ name, color } as any)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
+      toast({ title: 'Categoria atualizada!' });
+    },
+    onError: () => {
+      toast({ title: 'Erro ao atualizar categoria', variant: 'destructive' });
+    },
+  });
+
   // Delete category mutation
   const deleteCategoryMutation = useMutation({
     mutationFn: async (categoryId: string) => {
@@ -250,6 +269,7 @@ export function useAgenda() {
     toggleTask: toggleTaskMutation.mutate,
     deleteTask: deleteTaskMutation.mutate,
     addCategory: addCategoryMutation.mutate,
+    updateCategory: updateCategoryMutation.mutate,
     deleteCategory: deleteCategoryMutation.mutate,
     reorderTasks: reorderTasksMutation.mutate,
     reorderCategories: reorderCategoriesMutation.mutate,

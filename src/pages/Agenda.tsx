@@ -1,28 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ListChecks, Plus, CheckCircle2, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { ListChecks, Plus, Calendar, MoreHorizontal, CheckCircle2, Folder, Trash2, Pencil, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgenda } from '@/hooks/useAgenda';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
-
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
-
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import type { ManagerTask } from '@/types/agenda';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import type { ManagerTask, TaskCategory } from '@/types/agenda';
+
+const CATEGORY_COLORS = [
+  '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e',
+  '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280',
+];
 
 export default function Agenda() {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [pendingOpen, setPendingOpen] = useState(true);
-  const [completedOpen, setCompletedOpen] = useState(false);
   const [viewMode, setViewMode] = useState('list');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [showCompleted, setShowCompleted] = useState(false);
+  const [categorySheetOpen, setCategorySheetOpen] = useState(false);
 
   const {
     tasks,
@@ -33,6 +39,7 @@ export default function Agenda() {
     toggleTask,
     deleteTask,
     addCategory,
+    updateCategory,
     deleteCategory,
     reorderTasks,
     reorderCategories,
@@ -82,17 +89,9 @@ export default function Agenda() {
     setExpandedCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
 
-  const handleReorderPendingTasks = (reorderedTasks: ManagerTask[]) => {
-    const updates = reorderedTasks.map((task, index) => ({
-      id: task.id,
-      sort_order: index
-    }));
-    reorderTasks(updates);
-  };
-
   if (!isAdmin) return null;
 
-  const renderTaskItem = (task: ManagerTask, sortable?: { isDragging: boolean; dragHandleProps: Record<string, unknown> }) => (
+  const renderTaskItem = (task: ManagerTask) => (
     <TaskItem
       key={task.id}
       task={task}
@@ -102,99 +101,65 @@ export default function Agenda() {
       onInlineUpdate={handleInlineUpdate}
       onAddSubtask={handleAddSubtask}
       onUpdateSubtask={handleUpdateSubtask}
-      isDragging={sortable?.isDragging}
-      dragHandleProps={sortable?.dragHandleProps}
     />
   );
 
   const ListContent = () => (
-    <div className="space-y-3">
-      {/* Pending section */}
-      <Collapsible open={pendingOpen} onOpenChange={setPendingOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 card-command-info">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <ListChecks className="w-4 h-4 text-primary" />
-            </div>
-            <span className="font-semibold">Pendentes</span>
-            <span className="text-sm font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-              {pendingTasks.length}
-            </span>
-          </div>
-          {pendingOpen ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-3">
-          {isLoading ? (
-            <p className="text-center text-muted-foreground py-8">Carregando...</p>
-          ) : pendingTasks.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state-title">Nenhum lembrete pendente</p>
-              <Button variant="link" className="mt-1 text-primary" onClick={() => setTaskSheetOpen(true)}>
-                Criar novo
-              </Button>
-            </div>
-          ) : (
-            <>
-              {/* Category sections */}
-              {tasksByCategory.map(({ category, tasks: catTasks }) => {
-                const isExpanded = expandedCategories[category.id] !== false; // default open
-                return (
-                  <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
-                    <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl bg-card border border-border hover:border-primary/20 transition-all">
-                      <div className="flex items-center gap-3">
-                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
-                        <span className="font-semibold text-sm">{category.name}</span>
-                        <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                          {catTasks.length}
-                        </span>
-                      </div>
-                      {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-2 space-y-2 pl-2">
-                      {catTasks.map(task => renderTaskItem(task))}
-                    </CollapsibleContent>
-                  </Collapsible>
-                );
-              })}
+    <div className="space-y-2">
+      {isLoading ? (
+        <p className="text-center text-muted-foreground py-8">Carregando...</p>
+      ) : pendingTasks.length === 0 && !showCompleted ? (
+        <div className="empty-state">
+          <p className="empty-state-title">Nenhum lembrete pendente</p>
+          <Button variant="link" className="mt-1 text-primary" onClick={() => setTaskSheetOpen(true)}>
+            Criar novo
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Category sections */}
+          {tasksByCategory.map(({ category, tasks: catTasks }) => {
+            const isExpanded = expandedCategories[category.id] !== false;
+            return (
+              <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
+                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl bg-card border border-border hover:border-primary/20 transition-all">
+                  <div className="flex items-center gap-3">
+                    <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
+                    <span className="font-semibold text-sm">{category.name}</span>
+                    <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                      {catTasks.length}
+                    </span>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2 space-y-2 pl-2">
+                  {catTasks.map(task => renderTaskItem(task))}
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          })}
 
-              {/* Uncategorized tasks */}
-              {uncategorizedTasks.length > 0 && (
-                <div className="space-y-2">
-                  {tasksByCategory.length > 0 && (
-                    <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
-                  )}
-                  {uncategorizedTasks.map(task => renderTaskItem(task))}
-                </div>
+          {/* Uncategorized tasks */}
+          {uncategorizedTasks.length > 0 && (
+            <div className="space-y-2">
+              {tasksByCategory.length > 0 && (
+                <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
               )}
-            </>
+              {uncategorizedTasks.map(task => renderTaskItem(task))}
+            </div>
           )}
-        </CollapsibleContent>
-      </Collapsible>
 
-      {/* Completed Tasks */}
-      <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 card-command-success">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-success/10">
-              <CheckCircle2 className="w-4 h-4 text-success" />
+          {/* Completed tasks (togglable) */}
+          {showCompleted && completedTasks.length > 0 && (
+            <div className="space-y-2 mt-4">
+              <div className="flex items-center gap-2 px-1">
+                <CheckCircle2 className="w-4 h-4 text-success" />
+                <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
+              </div>
+              {completedTasks.map(task => renderTaskItem(task))}
             </div>
-            <span className="font-semibold">Concluídos</span>
-            <span className="text-sm font-medium px-2 py-0.5 rounded-full bg-success/10 text-success">
-              {completedTasks.length}
-            </span>
-          </div>
-          {completedOpen ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-2">
-          {completedTasks.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state-title">Nenhum lembrete concluído</p>
-            </div>
-          ) : (
-            completedTasks.map(task => renderTaskItem(task))
           )}
-        </CollapsibleContent>
-      </Collapsible>
+        </>
+      )}
     </div>
   );
 
@@ -223,13 +188,33 @@ export default function Agenda() {
                 </p>
               </div>
             </div>
-            <Button 
-              size="icon" 
-              className="rounded-xl w-11 h-11 shadow-lg shadow-primary/20"
-              onClick={() => setTaskSheetOpen(true)}
-            >
-              <Plus className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                size="icon" 
+                className="rounded-xl w-11 h-11 shadow-lg shadow-primary/20"
+                onClick={() => setTaskSheetOpen(true)}
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" className="rounded-xl w-11 h-11">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => setShowCompleted(!showCompleted)}>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    {showCompleted ? 'Ocultar concluídos' : 'Ver concluídos'}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setCategorySheetOpen(true)}>
+                    <Folder className="w-4 h-4 mr-2" />
+                    Gerenciar categorias
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 
@@ -266,6 +251,160 @@ export default function Agenda() {
         categories={categories}
         onAddCategory={addCategory}
       />
+
+      {/* Category Management Sheet */}
+      <CategoryManagerSheet
+        open={categorySheetOpen}
+        onOpenChange={setCategorySheetOpen}
+        categories={categories}
+        onAdd={addCategory}
+        onUpdate={updateCategory}
+        onDelete={deleteCategory}
+      />
     </AppLayout>
+  );
+}
+
+// ─── Category Manager Sheet ─────────────────────────────────────
+
+interface CategoryManagerSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  categories: TaskCategory[];
+  onAdd: (cat: { name: string; color: string }) => void;
+  onUpdate: (cat: { id: string; name: string; color: string }) => void;
+  onDelete: (id: string) => void;
+}
+
+function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate, onDelete }: CategoryManagerSheetProps) {
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState(CATEGORY_COLORS[4]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editColor, setEditColor] = useState('');
+
+  const handleAdd = () => {
+    if (!newName.trim()) return;
+    onAdd({ name: newName.trim(), color: newColor });
+    setNewName('');
+  };
+
+  const startEdit = (cat: TaskCategory) => {
+    setEditingId(cat.id);
+    setEditName(cat.name);
+    setEditColor(cat.color);
+  };
+
+  const saveEdit = () => {
+    if (!editingId || !editName.trim()) return;
+    onUpdate({ id: editingId, name: editName.trim(), color: editColor });
+    setEditingId(null);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl overflow-y-auto">
+        <SheetHeader className="text-left pb-2">
+          <SheetTitle>Categorias</SheetTitle>
+          <SheetDescription>Crie, edite ou exclua categorias dos seus lembretes</SheetDescription>
+        </SheetHeader>
+
+        <div className="space-y-4 mt-4 pb-4">
+          {/* Add new */}
+          <div className="bg-secondary/50 rounded-2xl p-4 border border-border space-y-3">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Nova categoria"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="flex-1 h-10"
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              />
+              <Button size="sm" onClick={handleAdd} disabled={!newName.trim()} className="h-10 px-4 rounded-xl">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex gap-1.5 flex-wrap">
+              {CATEGORY_COLORS.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  className={cn(
+                    "w-6 h-6 rounded-full transition-all",
+                    newColor === color && "ring-2 ring-offset-2 ring-foreground"
+                  )}
+                  style={{ backgroundColor: color }}
+                  onClick={() => setNewColor(color)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* List */}
+          {categories.length === 0 ? (
+            <p className="text-center text-muted-foreground text-sm py-6">Nenhuma categoria criada</p>
+          ) : (
+            <div className="space-y-2">
+              {categories.map((cat) => (
+                <div key={cat.id} className="bg-card rounded-2xl border border-border p-4">
+                  {editingId === cat.id ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="flex-1 h-10"
+                          autoFocus
+                          onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                        />
+                        <Button size="sm" onClick={saveEdit} className="h-10 rounded-xl">Salvar</Button>
+                        <Button size="icon" variant="ghost" className="h-10 w-10" onClick={() => setEditingId(null)}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {CATEGORY_COLORS.map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            className={cn(
+                              "w-6 h-6 rounded-full transition-all",
+                              editColor === color && "ring-2 ring-offset-2 ring-foreground"
+                            )}
+                            style={{ backgroundColor: color }}
+                            onClick={() => setEditColor(color)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="w-4 h-4 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
+                        <span className="font-medium text-sm">{cat.name}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => startEdit(cat)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => onDelete(cat.id)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
