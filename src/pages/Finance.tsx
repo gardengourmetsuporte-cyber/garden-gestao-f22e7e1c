@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
 import { FinanceHome } from '@/components/finance/FinanceHome';
@@ -11,7 +11,8 @@ import { useFinance } from '@/hooks/useFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useEmployees } from '@/hooks/useEmployees';
-import { FinanceTab, TransactionType, FinanceTransaction, TransactionFormData } from '@/types/finance';
+import { FinanceTab, TransactionType, FinanceTransaction, TransactionFormData, FinanceAccount } from '@/types/finance';
+import { TransactionFiltersState } from '@/components/finance/TransactionFilters';
 import { Loader2 } from 'lucide-react';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
 
@@ -22,6 +23,23 @@ export default function Finance() {
   const [transactionType, setTransactionType] = useState<TransactionType>('expense');
   const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
   const [accountManagementOpen, setAccountManagementOpen] = useState(false);
+  const [transactionInitialFilters, setTransactionInitialFilters] = useState<Partial<TransactionFiltersState>>({});
+
+  const handleFinanceNavigate = useCallback((tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => {
+    if (filter) {
+      const newFilters: Partial<TransactionFiltersState> = {};
+      if (filter.type) newFilters.type = filter.type;
+      if (filter.status) newFilters.status = filter.status;
+      setTransactionInitialFilters(newFilters);
+    } else {
+      setTransactionInitialFilters({});
+    }
+    setActiveTab(tab);
+  }, []);
+
+  const handleAccountCardClick = useCallback((account: FinanceAccount) => {
+    setAccountManagementOpen(true);
+  }, []);
 
   const {
     accounts,
@@ -115,6 +133,8 @@ export default function Finance() {
             accounts={accounts}
             totalBalance={totalBalance}
             monthStats={monthStats}
+            onNavigate={handleFinanceNavigate}
+            onAccountClick={handleAccountCardClick}
           />
         )}
 
@@ -129,8 +149,9 @@ export default function Finance() {
             onDeleteTransaction={deleteTransaction}
             onReorderTransactions={reorderTransactions}
              categories={categories}
-             accounts={accounts}
-          />
+              accounts={accounts}
+              initialFilters={transactionInitialFilters}
+           />
         )}
 
 

@@ -1,7 +1,7 @@
-import { ArrowUpCircle, ArrowDownCircle, AlertCircle } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, AlertCircle, ChevronRight } from 'lucide-react';
 import { MonthSelector } from './MonthSelector';
 import { AccountCard } from './AccountCard';
-import { FinanceAccount, MonthlyStats } from '@/types/finance';
+import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
 import { cn } from '@/lib/utils';
 
 interface FinanceHomeProps {
@@ -10,6 +10,8 @@ interface FinanceHomeProps {
   accounts: FinanceAccount[];
   totalBalance: number;
   monthStats: MonthlyStats;
+  onNavigate?: (tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => void;
+  onAccountClick?: (account: FinanceAccount) => void;
 }
 
 export function FinanceHome({
@@ -18,6 +20,8 @@ export function FinanceHome({
   accounts,
   totalBalance,
   monthStats,
+  onNavigate,
+  onAccountClick,
 }: FinanceHomeProps) {
   const formatCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -28,19 +32,28 @@ export function FinanceHome({
       <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
 
       {/* Total Balance Card - Command Center style */}
-      <div className="card-command animate-neon-border p-6 animate-slide-up stagger-1">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Saldo em contas</p>
+      <button
+        onClick={() => onNavigate?.('more')}
+        className="card-command animate-neon-border p-6 animate-slide-up stagger-1 w-full text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+      >
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Saldo em contas</p>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </div>
         <p className={cn(
           "text-4xl font-extrabold mt-2 tracking-tight",
           totalBalance >= 0 ? "text-[hsl(var(--neon-cyan))]" : "text-destructive"
         )}>
           {formatCurrency(totalBalance)}
         </p>
-      </div>
+      </button>
 
       {/* Income/Expense Summary - asymmetric command cards */}
       <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-2">
-        <div className="card-command-success p-4">
+        <button
+          onClick={() => onNavigate?.('transactions', { type: 'income' })}
+          className="card-command-success p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        >
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-xl bg-success/15 flex items-center justify-center">
               <ArrowUpCircle className="w-5 h-5 text-success" />
@@ -50,8 +63,11 @@ export function FinanceHome({
           <p className="text-xl font-bold text-success">
             {formatCurrency(monthStats.totalIncome)}
           </p>
-        </div>
-        <div className="card-command-danger p-4">
+        </button>
+        <button
+          onClick={() => onNavigate?.('transactions', { type: 'expense' })}
+          className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        >
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-xl bg-destructive/15 flex items-center justify-center">
               <ArrowDownCircle className="w-5 h-5 text-destructive" />
@@ -61,17 +77,23 @@ export function FinanceHome({
           <p className="text-xl font-bold text-destructive">
             {formatCurrency(monthStats.totalExpense)}
           </p>
-        </div>
+        </button>
       </div>
 
       {/* Pending Alerts */}
       {(monthStats.pendingExpenses > 0 || monthStats.pendingIncome > 0) && (
-        <div className="card-command-warning p-4 space-y-2 animate-slide-up stagger-3">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-warning/15 flex items-center justify-center">
-              <AlertCircle className="w-4 h-4 text-warning" />
+        <button
+          onClick={() => onNavigate?.('transactions', { status: 'pending' })}
+          className="card-command-warning p-4 space-y-2 animate-slide-up stagger-3 w-full text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-warning/15 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4 text-warning" />
+              </div>
+              <span className="font-semibold text-sm text-warning">Pendências</span>
             </div>
-            <span className="font-semibold text-sm text-warning">Pendências</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </div>
           {monthStats.pendingExpenses > 0 && (
             <p className="text-sm text-muted-foreground pl-9">
@@ -83,7 +105,7 @@ export function FinanceHome({
               Receitas a receber: <span className="font-semibold text-success">{formatCurrency(monthStats.pendingIncome)}</span>
             </p>
           )}
-        </div>
+        </button>
       )}
 
       {/* Accounts List */}
@@ -93,7 +115,7 @@ export function FinanceHome({
         </div>
         <div className="space-y-2">
           {accounts.map(account => (
-            <AccountCard key={account.id} account={account} />
+            <AccountCard key={account.id} account={account} onClick={() => onAccountClick?.(account)} />
           ))}
           {accounts.length === 0 && (
             <p className="text-center text-muted-foreground py-8 text-sm">

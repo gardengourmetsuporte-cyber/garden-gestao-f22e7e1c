@@ -9,11 +9,12 @@
  import { X, Flag, Landmark, Tag } from 'lucide-react';
  import { cn } from '@/lib/utils';
  
- export interface TransactionFiltersState {
-   status: 'all' | 'paid' | 'pending';
-   categoryId: string | null;
-   accountId: string | null;
- }
+export interface TransactionFiltersState {
+  status: 'all' | 'paid' | 'pending';
+  type: 'all' | 'income' | 'expense';
+  categoryId: string | null;
+  accountId: string | null;
+}
  
  interface TransactionFiltersProps {
    open: boolean;
@@ -40,11 +41,12 @@
    };
  
    const handleReset = () => {
-     const defaultFilters: TransactionFiltersState = {
-       status: 'all',
-       categoryId: null,
-       accountId: null
-     };
+      const defaultFilters: TransactionFiltersState = {
+        status: 'all',
+        type: 'all',
+        categoryId: null,
+        accountId: null
+      };
      setLocalFilters(defaultFilters);
      onFiltersChange(defaultFilters);
      onOpenChange(false);

@@ -1,4 +1,4 @@
-import { Wallet, Landmark, CreditCard } from 'lucide-react';
+import { Wallet, Landmark, CreditCard, ChevronRight } from 'lucide-react';
 import { FinanceAccount } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
@@ -49,8 +49,8 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all w-full text-left",
-        onClick && "hover:bg-secondary/50 cursor-pointer"
+        "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all duration-200 w-full text-left",
+        onClick && "hover:bg-secondary/50 hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
       )}
     >
       <BankAvatar account={account} />
@@ -64,6 +64,7 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
       )}>
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
       </p>
+      {onClick && <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
     </button>
   );
 }
