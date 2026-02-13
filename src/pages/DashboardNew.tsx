@@ -1,10 +1,9 @@
 import { AppLayout } from '@/components/layout/AppLayout';
-import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
-import { EmployeeDashboard } from '@/components/dashboard/EmployeeDashboard';
+import { WidgetGrid } from '@/components/dashboard/WidgetGrid';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function DashboardPage() {
-  const { isAdmin, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -18,9 +17,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen pb-24">
-          {isAdmin ? <AdminDashboard /> : <EmployeeDashboard />}
-      </div>
+      <WidgetGrid />
     </AppLayout>
   );
 }
