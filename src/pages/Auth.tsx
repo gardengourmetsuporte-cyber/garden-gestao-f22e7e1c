@@ -119,14 +119,14 @@ export default function Auth() {
         <div className="w-full max-w-sm space-y-8 animate-slide-up">
           {/* Logo */}
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-24 h-24 rounded-full overflow-hidden p-2 relative"
+            <div className="w-28 h-28 rounded-full overflow-hidden relative"
               style={{
-                background: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--neon-cyan) / 0.3)',
+                background: 'white',
+                border: '2px solid hsl(var(--neon-cyan) / 0.3)',
                 boxShadow: '0 0 30px hsl(var(--neon-cyan) / 0.15), 0 8px 32px hsl(222 47% 3% / 0.4)',
               }}
             >
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg" />
+              <img alt="Logo" className="w-full h-full object-cover" src="/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg" />
             </div>
             <div className="text-center">
               <h1 className="text-2xl font-bold text-foreground">Sistema de Gestão</h1>
