@@ -57,29 +57,61 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
   const [sidebarDragX, setSidebarDragX] = useState<number | null>(null);
+  const [backSwipeX, setBackSwipeX] = useState<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const isDraggingSidebarRef = useRef(false);
+  const backSwipeRef = useRef<{ x: number; y: number; active: boolean } | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Edge swipe to open sidebar (from right edge)
+  // Edge swipe to open sidebar (from right edge) + left edge swipe to go back
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       if (sidebarOpen) return;
       const touch = e.touches[0];
+      // Right edge → sidebar
       if (touch.clientX > window.innerWidth - 20) {
         touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
       }
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      if (sidebarOpen || !touchStartRef.current) return;
-      const touch = e.touches[0];
-      const dx = touchStartRef.current.x - touch.clientX;
-      const dy = Math.abs(touch.clientY - touchStartRef.current.y);
-      if (dx > 30 && dy < 50) {
-        setSidebarOpen(true);
-        touchStartRef.current = null;
+      // Left edge → back navigation (only if not on dashboard)
+      if (touch.clientX < 24 && location.pathname !== '/') {
+        backSwipeRef.current = { x: touch.clientX, y: touch.clientY, active: false };
       }
     };
-    const handleTouchEnd = () => { if (!sidebarOpen) touchStartRef.current = null; };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (sidebarOpen) return;
+      const touch = e.touches[0];
+      // Sidebar open gesture
+      if (touchStartRef.current) {
+        const dx = touchStartRef.current.x - touch.clientX;
+        const dy = Math.abs(touch.clientY - touchStartRef.current.y);
+        if (dx > 30 && dy < 50) {
+          setSidebarOpen(true);
+          touchStartRef.current = null;
+        }
+      }
+      // Back swipe gesture
+      if (backSwipeRef.current) {
+        const dx = touch.clientX - backSwipeRef.current.x;
+        const dy = Math.abs(touch.clientY - backSwipeRef.current.y);
+        if (!backSwipeRef.current.active && dx > 10 && dy < 40) {
+          backSwipeRef.current.active = true;
+        }
+        if (backSwipeRef.current.active) {
+          setBackSwipeX(Math.max(0, Math.min(dx, window.innerWidth)));
+        }
+      }
+    };
+    const handleTouchEnd = () => {
+      if (!sidebarOpen) touchStartRef.current = null;
+      if (backSwipeRef.current?.active && backSwipeX !== null) {
+        if (backSwipeX > window.innerWidth * 0.3) {
+          navigate(-1);
+        }
+        setBackSwipeX(null);
+      }
+      backSwipeRef.current = null;
+    };
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
@@ -88,7 +120,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [sidebarOpen]);
+  }, [sidebarOpen, location.pathname, backSwipeX, navigate]);
 
   // Sidebar drag-to-close handlers
   const sidebarTouchStart = (e: React.TouchEvent) => {
@@ -128,8 +160,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const rank = getRank(earnedPoints);
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
-  const location = useLocation();
-  const navigate = useNavigate();
   const navRef = useRef<HTMLElement>(null);
 
   // Pages with bottom navigation bars that conflict with the FAB
@@ -169,6 +199,40 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ======= Back Swipe Indicator ======= */}
+      {backSwipeX !== null && backSwipeX > 0 && (
+        <div className="lg:hidden fixed inset-0 z-[60] pointer-events-none">
+          {/* Dark overlay that fades in */}
+          <div
+            className="absolute inset-0 bg-black/40"
+            style={{ opacity: Math.min(backSwipeX / (window.innerWidth * 0.4), 0.6) }}
+          />
+          {/* Arrow indicator */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
+            style={{
+              left: Math.min(backSwipeX - 40, 60),
+              opacity: Math.min(backSwipeX / 80, 1),
+              transition: 'none',
+            }}
+          >
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{
+                background: backSwipeX > window.innerWidth * 0.3
+                  ? 'hsl(var(--neon-cyan) / 0.3)'
+                  : 'hsl(var(--card) / 0.8)',
+                border: `1px solid ${backSwipeX > window.innerWidth * 0.3 ? 'hsl(var(--neon-cyan) / 0.6)' : 'hsl(var(--border) / 0.5)'}`,
+                boxShadow: backSwipeX > window.innerWidth * 0.3
+                  ? '0 0 20px hsl(var(--neon-cyan) / 0.4)'
+                  : '0 4px 12px hsl(0 0% 0% / 0.3)',
+              }}
+            >
+              <ChevronRight className="w-5 h-5 rotate-180" style={{ color: backSwipeX > window.innerWidth * 0.3 ? 'hsl(var(--neon-cyan))' : 'hsl(var(--muted-foreground))' }} />
+            </div>
+          </div>
+        </div>
+      )}
       {/* ======= Mobile Header ======= */}
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card"
