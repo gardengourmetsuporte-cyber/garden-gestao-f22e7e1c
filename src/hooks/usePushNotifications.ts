@@ -41,23 +41,23 @@ export function usePushNotifications() {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  // Background verification (non-blocking, won't cause prompt to flash)
+  // Background verification on mount only (non-blocking, won't cause prompt to flash)
   useEffect(() => {
     if (!isSupported || !user) return;
-    // Only verify if we think we're subscribed — to catch stale cache
-    if (isSubscribed) {
-      getRegistration(2000).then(reg => {
-        if (reg) {
-          (reg as any).pushManager.getSubscription().then((sub: any) => {
-            if (!sub) {
-              localStorage.removeItem(SUBSCRIBED_KEY);
-              setIsSubscribed(false);
-            }
-          }).catch(() => {});
-        }
-      }).catch(() => {});
-    }
-  }, [isSupported, user, isSubscribed]);
+    const cached = localStorage.getItem(SUBSCRIBED_KEY) === 'true';
+    if (!cached) return;
+    getRegistration(2000).then(reg => {
+      if (reg) {
+        (reg as any).pushManager.getSubscription().then((sub: any) => {
+          if (!sub) {
+            localStorage.removeItem(SUBSCRIBED_KEY);
+            setIsSubscribed(false);
+          }
+        }).catch(() => {});
+      }
+    }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSupported, user]);
 
   const subscribe = useCallback(async () => {
     if (!user || !isSupported) return false;
