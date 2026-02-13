@@ -106,7 +106,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       if (!sidebarOpen) touchStartRef.current = null;
       if (backSwipeRef.current?.active && backSwipeX !== null) {
         if (backSwipeX > window.innerWidth * 0.3) {
-          navigate(-1);
+          // Dispatch custom event so modules (e.g. Finance) can handle internal back navigation
+          const event = new CustomEvent('app-back-swipe', { cancelable: true });
+          const prevented = !window.dispatchEvent(event);
+          if (!prevented) {
+            navigate('/');
+          }
         }
         setBackSwipeX(null);
       }

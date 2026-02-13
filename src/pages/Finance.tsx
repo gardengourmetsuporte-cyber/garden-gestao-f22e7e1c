@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
 import { FinanceHome } from '@/components/finance/FinanceHome';
@@ -19,6 +19,18 @@ import { RecurringEditMode } from '@/components/finance/TransactionSheet';
 export default function Finance() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+
+  // Listen for back-swipe: if on a sub-tab, go to home tab instead of leaving the module
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (activeTab !== 'home') {
+        e.preventDefault();
+        setActiveTab('home');
+      }
+    };
+    window.addEventListener('app-back-swipe', handler);
+    return () => window.removeEventListener('app-back-swipe', handler);
+  }, [activeTab]);
   const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<TransactionType>('expense');
   const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
