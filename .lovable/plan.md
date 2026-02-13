@@ -1,289 +1,119 @@
 
-
-# Modulo: Cardapio Completo (Estilo Goomer)
+# Sistema de Estado de Conclusao por Modulo
 
 ## Visao Geral
 
-Criar um modulo completo de gestao de cardapio inspirado no Goomer, substituindo o cadastro simples atual de `tablet_products` por uma estrutura hierarquica com categorias, subcategorias (grupos), produtos com imagens/descricoes ricas, e opcionais/complementos vinculaveis aos produtos. A estrutura do tablet para o cliente sera atualizada automaticamente.
+Criar um sistema de indicadores visuais na barra lateral que mostra automaticamente o estado de cada modulo (Concluido, Atencao, Critico) baseado em regras de negocios internas. Nenhum banco de dados novo e necessario -- toda a logica e derivada dos dados ja existentes.
 
 ---
 
-## Analise das Telas do Goomer (referencia)
+## Arquitetura
 
-Com base nas capturas de tela enviadas, o sistema precisa de:
-
-1. **Categorias principais** no menu lateral (Lanches, Acompanhamentos, Sobremesas, Bebidas, etc.) com icones e cores
-2. **Grupos/subcategorias** dentro de cada categoria (Prato executivo, Economicos, Classicos, etc.) com badges "Delivery/retirada" e "Mesa", contagem de itens, e horario de disponibilidade
-3. **Produtos** dentro de cada grupo com: imagem, nome, descricao, preco (unico ou personalizado), codigo PDV, contagem de opcionais vinculados, destaque, reordenamento via drag
-4. **Opcionais** (complementos) como entidade separada: Grupos de opcionais com titulo-pergunta ("Acompanha salada?", "Adicional de Molhos", "Base", "Bebida"), cada um com:
-   - Disponibilidade (Tablet / Delivery)
-   - Minimo e maximo de selecoes
-   - Opcao "Repetir opcao"
-   - Lista de opcoes com nome, preco adicional, codigo PDV, disponibilidade
-   - Vinculacao a multiplos produtos/categorias
-5. **Abas do cardapio**: Cardapio Principal, Rodizio, Vinhos, Opcionais, Traducoes
+O sistema **nao precisa de tabelas novas**. Os estados sao calculados em tempo real a partir dos dados ja existentes no banco via um hook centralizado (`useModuleStatus`), que reutiliza e estende o `useDashboardStats` existente.
 
 ---
 
-## Etapa 1: Banco de Dados (4 novas tabelas + alteracao em 1)
+## Regras de Status por Modulo
 
-### 1.1 Alteracao na tabela `tablet_products`
-Adicionar colunas:
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| group_id | uuid (FK, nullable) | Grupo/subcategoria ao qual pertence |
-| is_highlighted | boolean (default false) | Produto em destaque |
-| is_18_plus | boolean (default false) | Produto para maiores de 18 |
-| availability | jsonb (default '{"tablet":true,"delivery":true}') | Disponibilidade por canal |
-| schedule | jsonb (nullable) | Horario de disponibilidade (ex: {"days":["qui","sab"],"start":"10:00","end":"15:30"}) |
-| price_type | text (default 'fixed') | 'fixed' ou 'custom' |
-| custom_prices | jsonb (nullable) | Array de precos personalizados [{label, code, price}] |
+| Modulo | Critico (vermelho) | Atencao (amarelo) | Concluido (verde) |
+|---|---|---|---|
+| **Financeiro** | Transacoes vencidas nao pagas (data < hoje) | Transacoes do dia nao pagas | Tudo conciliado no mes |
+| **Estoque** | Itens com estoque zerado | Itens abaixo do minimo | Todos os itens acima do minimo |
+| **Checklists** | -- | Checklist do turno atual incompleto | Checklist do turno completo |
+| **Fechamento** | -- | Fechamentos pendentes de validacao (admin) | Todos validados |
+| **Funcionarios** | -- | Pagamentos do mes em aberto | Todos pagos |
+| **Recompensas** | -- | Resgates pendentes de aprovacao (admin) | Todos processados |
 
-### 1.2 Nova tabela: `menu_categories`
-Categorias principais do cardapio (Lanches, Bebidas, etc.)
-
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| id | uuid | PK |
-| unit_id | uuid | FK para units |
-| name | text | Nome da categoria |
-| icon | text | Nome do icone (Lucide) |
-| color | text | Cor hex |
-| sort_order | integer | Ordem |
-| is_active | boolean | Ativa/desativa |
-| created_at, updated_at | timestamptz | Timestamps |
-
-### 1.3 Nova tabela: `menu_groups`
-Subcategorias/grupos dentro de uma categoria (Economicos, Classicos, etc.)
-
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| id | uuid | PK |
-| unit_id | uuid | FK para units |
-| category_id | uuid | FK para menu_categories |
-| name | text | Nome do grupo |
-| description | text (nullable) | Descricao |
-| availability | jsonb | {"tablet":true,"delivery":true} |
-| schedule | jsonb (nullable) | Horario de disponibilidade |
-| sort_order | integer | Ordem |
-| is_active | boolean | Ativo/desativo |
-| created_at, updated_at | timestamptz | Timestamps |
-
-### 1.4 Nova tabela: `menu_option_groups`
-Grupos de opcionais/complementos ("Acompanha salada?", "Adicional de Molhos")
-
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| id | uuid | PK |
-| unit_id | uuid | FK para units |
-| title | text | Titulo/pergunta (ex: "Acompanha salada?") |
-| min_selections | integer (default 0) | Minimo de selecoes |
-| max_selections | integer (default 1) | Maximo de selecoes |
-| allow_repeat | boolean (default false) | Permitir repetir opcao |
-| availability | jsonb | {"tablet":true,"delivery":true} |
-| sort_order | integer | Ordem |
-| is_active | boolean | Ativo |
-| created_at, updated_at | timestamptz | Timestamps |
-
-### 1.5 Nova tabela: `menu_options`
-Opcoes individuais dentro de um grupo de opcionais
-
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| id | uuid | PK |
-| option_group_id | uuid | FK para menu_option_groups |
-| name | text | Nome da opcao (ex: "Com salada") |
-| price | numeric (default 0) | Preco adicional |
-| codigo_pdv | text (nullable) | Codigo PDV |
-| availability | jsonb | {"tablet":true,"delivery":true} |
-| image_url | text (nullable) | Imagem opcional |
-| sort_order | integer | Ordem |
-| is_active | boolean | Ativo |
-| created_at, updated_at | timestamptz | Timestamps |
-
-### 1.6 Nova tabela: `menu_product_option_groups`
-Tabela de vinculacao N:N entre produtos e grupos de opcionais
-
-| Coluna | Tipo | Descricao |
-|---|---|---|
-| id | uuid | PK |
-| product_id | uuid | FK para tablet_products |
-| option_group_id | uuid | FK para menu_option_groups |
-| sort_order | integer | Ordem do opcional neste produto |
-
-### Politicas RLS
-- Todas as tabelas: leitura publica (para o cardapio do tablet funcionar sem login), escrita restrita a admins
-- A tabela de vinculacao segue o mesmo padrao
-
-### Realtime
-- Habilitar realtime em `menu_categories`, `menu_groups`, `menu_option_groups` para atualizacoes em tempo real no admin
+Modulos sem regras definidas (Dashboard, Agenda, Chat, Receitas, Cardapio, WhatsApp, Configuracoes) nao exibem indicador.
 
 ---
 
-## Etapa 2: Interface Administrativa - Pagina de Cardapio
+## Implementacao Tecnica
 
-### 2.1 Nova rota `/cardapio` (protegida, admin only)
-- Adicionada ao menu lateral no grupo "Operacao", substituindo ou complementando o "Pedidos Tablet"
-- A aba "Produtos" do TabletAdmin atual sera migrada para este novo modulo
+### 1. Novo hook: `useModuleStatus`
 
-### 2.2 Layout principal (estilo Goomer - 2 paineis)
+Hook centralizado que calcula o estado de cada modulo usando uma unica query paralela (estendendo o padrao do `useDashboardStats`).
 
+Retorna um mapa:
 ```text
-+---------------------------+--------------------------------------+
-| Categorias (sidebar)      |  Conteudo do grupo selecionado       |
-|                           |                                      |
-| [+] Nova Categoria        |  Nome do Grupo                       |
-|                           |  Horario | Badges | N itens          |
-| > Lanches           v     |  [+ Novo Produto] [Editar] [Excluir] |
-|   - Prato executivo       |                                      |
-|   - Economicos            |  Card Produto 1                      |
-|   - Classicos             |  Card Produto 2                      |
-| > Acompanhamentos   v     |  Card Produto 3                      |
-| > Sobremesas        v     |  ...                                 |
-| > Bebidas           v     |                                      |
-+---------------------------+--------------------------------------+
+{
+  '/finance':     { level: 'critical', count: 3, tooltip: '3 despesas vencidas' },
+  '/inventory':   { level: 'attention', count: 2, tooltip: '2 itens abaixo do minimo' },
+  '/checklists':  { level: 'ok', count: 0, tooltip: 'Checklists em dia' },
+  '/cash-closing': { level: 'attention', count: 1, tooltip: '1 fechamento pendente' },
+  ...
+}
 ```
 
-### 2.3 Painel esquerdo - Arvore de categorias
-- Lista de categorias com icone e cor
-- Expansivel: ao clicar mostra os grupos da categoria
-- Cada grupo mostra badges de disponibilidade ("Delivery/retirada", "Mesa") e contagem de itens
-- Drag para reordenar categorias e grupos
-- Menu de contexto (tres pontos) em cada item: Editar, Excluir
-- Botao "+ Nova Categoria" no topo
+Niveis: `'ok'` | `'attention'` | `'critical'` | `null` (sem indicador)
 
-### 2.4 Painel direito - Conteudo do grupo
-Ao selecionar um grupo no painel esquerdo:
-- Header com nome do grupo, horario de disponibilidade, badges, contagem de itens
-- Toolbar: [+ Novo Produto] [Editar Grupo] [Duplicar] [Excluir]
-- Lista de produtos com:
-  - Handle de drag para reordenar
-  - Imagem thumbnail (ou placeholder)
-  - Nome e descricao (truncada)
-  - Preco e codigo PDV
-  - Badges de disponibilidade
-  - Contagem de opcionais vinculados (ex: "2 opcionais")
-  - Badge "Destaque" se aplicavel
-  - Acoes: Editar, Filtrar opcionais, Visualizar, Duplicar, Excluir
+Usa React Query com `staleTime: 2min` (mesmo padrao global) e queryKey vinculada ao `activeUnitId` para isolamento multi-tenant.
 
-### 2.5 Sheet de Produto (editar/criar)
-Modal lateral (bottom sheet no mobile) com:
-- Campo: Nome
-- Campo: Descricao (textarea)
-- Campo: Grupo (select com grupos disponiveis)
-- Toggle: Produto para maiores de 18
-- Secao Horario: "Sempre aberto" ou botao "Definir Horario" (abre sub-formulario com dias e horas)
-- Secao Preco:
-  - Radio: Unico / Personalizado
-  - Se unico: campo com codigo PDV + preco
-  - Se personalizado: lista dinamica de variacoes [{label, codigo, preco}]
-- Upload de imagem do produto
-- Toggle: Ativo/Inativo
-- Botoes: Fechar | Salvar Alteracoes
+### 2. Consultas do hook
 
-### 2.6 Abas superiores
-Seguindo o Goomer:
-- **Cardapio Principal** - gestao completa de categorias/grupos/produtos
-- **Opcionais** - gestao de grupos de opcionais e vinculacao a produtos
+O hook executa em paralelo (Promise.all):
 
-### 2.7 Aba Opcionais
-- Lista de todos os grupos de opcionais
-- Cada card mostra:
-  - Titulo do grupo ("Acompanha salada?")
-  - Badges de disponibilidade
-  - Lista de opcoes com nome, preco e codigo PDV
-  - Badge "Em N produtos" ou "Aplicar em produto"
-  - Botoes: Editar, Menu de contexto
-- Botao "Criar Novo" no topo
-- Ao clicar "Aplicar em produto" ou "Em N produtos": abre dialog para vincular/desvincular o grupo de opcionais a categorias e produtos especificos (arvore com checkboxes, como na captura IMG_2836)
+- **Financeiro**: Conta transacoes nao pagas do mes atual, separando vencidas (data < hoje) das do dia
+- **Estoque**: Conta itens com `current_stock = 0` (critico) e `current_stock <= min_stock` (atencao)
+- **Checklists**: Conta itens do turno atual (abertura/fechamento baseado no horario) nao completados hoje
+- **Fechamento**: Conta fechamentos com `status = 'pending'`
+- **Funcionarios**: Conta pagamentos do mes com `is_paid = false`
+- **Recompensas**: Conta resgates com `status = 'pending'`
 
-### 2.8 Sheet de Grupo de Opcionais (editar/criar)
-- Campo: Titulo/pergunta
-- Toggles: Disponivel nos Tablets / Disponivel no Delivery
-- Campo: Minimo de selecoes
-- Campo: Maximo de selecoes
-- Toggle: Repetir opcao
-- Secao Opcoes (lista dinamica):
-  - Para cada opcao: toggles Tablet/Delivery, nome, preco (select: Gratuito/valor), botao excluir
-  - Botao "+ Nova Opcao"
-- Botoes: Fechar | Salvar
+### 3. Modificacao no `AppLayout.tsx`
 
----
+Na renderizacao de cada item do menu lateral, adicionar um indicador visual condicional:
 
-## Etapa 3: Atualizacao do Cardapio do Tablet (cliente)
+- **Dot colorido** ao lado direito do label do modulo (substituindo o chevron quando ha pendencia)
+- **Cores**:
+  - Critico: vermelho com glow sutil (`hsl(var(--neon-red))`)
+  - Atencao: amarelo/amber com glow sutil (`hsl(var(--neon-amber))`)
+  - Concluido: verde com glow sutil (`hsl(var(--neon-green))`) -- exibido apenas brevemente ou por opcao
+- **Badge numerico** mostrando a contagem de pendencias (mesmo estilo dos badges de notificacao existentes)
+- **Tooltip nativo** (atributo `title`) com a explicacao do estado
 
-### Modificar `TabletMenu.tsx` e `useTabletOrder.ts`
-- Buscar produtos com a nova estrutura hierarquica (categorias > grupos > produtos)
-- Renderizar categorias como secoes principais com grupos como subsecoes
-- Ao adicionar ao carrinho, se o produto tem opcionais vinculados, abrir sheet de selecao de opcionais antes de confirmar
-- Armazenar opcoes selecionadas no carrinho junto com o item
-- Incluir opcionais no total do pedido e nos dados enviados ao PDV
+O indicador aparece como um pequeno dot (6x6px) com animacao `pulse` suave no caso critico, e um badge de contagem discreto.
 
----
+### 4. Estilo visual
 
-## Etapa 4: Hooks
+Seguindo a estetica "Dark Command Center" existente:
 
-### Novos hooks:
-- `useMenuCategories` -- CRUD de categorias com React Query
-- `useMenuGroups` -- CRUD de grupos com React Query
-- `useMenuOptionGroups` -- CRUD de grupos de opcionais com React Query
-- `useMenuOptions` -- CRUD de opcoes individuais
-- `useMenuProductOptions` -- Vinculacao produtos <> opcionais
-
-### Modificacao no hook existente:
-- `useTabletAdmin` -- atualizar `saveProduct` para incluir novos campos (group_id, availability, schedule, price_type, etc.)
-
----
-
-## Etapa 5: Integracao com WhatsApp
-
-A IA do WhatsApp ja consulta `tablet_products`. Com a nova estrutura, sera atualizado para:
-- Incluir categorias e grupos na descricao do cardapio enviada a IA
-- Incluir opcionais disponiveis para cada produto
-- A IA podera perguntar sobre opcionais ao montar pedidos
+- Dot de status: circulo de 6px com `box-shadow` de glow na cor correspondente
+- Badge de contagem: mesmo estilo dos badges existentes de notificacao/chat (compacto, 16x16px, font 8px)
+- Animacao de pulso sutil apenas para estado critico (reutiliza `animate-pulse` existente)
+- Sem elementos infantis, gamificacao ou icones extras -- apenas indicadores minimalistas
 
 ---
 
 ## Arquivos que serao criados/modificados
 
-### Novos arquivos:
 | Arquivo | Descricao |
 |---|---|
-| `src/pages/MenuAdmin.tsx` | Pagina principal do modulo de cardapio |
-| `src/components/menu/MenuCategoryTree.tsx` | Painel lateral com arvore de categorias/grupos |
-| `src/components/menu/MenuGroupContent.tsx` | Painel direito com produtos do grupo |
-| `src/components/menu/ProductSheet.tsx` | Sheet de criar/editar produto |
-| `src/components/menu/OptionGroupSheet.tsx` | Sheet de criar/editar grupo de opcionais |
-| `src/components/menu/OptionGroupList.tsx` | Aba de opcionais |
-| `src/components/menu/LinkOptionsDialog.tsx` | Dialog para vincular opcionais a produtos |
-| `src/components/menu/ProductCard.tsx` | Card de produto na listagem |
-| `src/hooks/useMenuAdmin.ts` | Hooks para todas as novas tabelas |
+| `src/hooks/useModuleStatus.ts` | **Novo** - Hook centralizado com logica de status |
+| `src/components/layout/AppLayout.tsx` | Adicionar indicadores visuais nos itens do menu |
 
-### Arquivos modificados:
-| Arquivo | Mudanca |
-|---|---|
-| `src/App.tsx` | Adicionar rota `/cardapio` |
-| `src/components/layout/AppLayout.tsx` | Adicionar item no menu lateral |
-| `src/pages/TabletMenu.tsx` | Atualizar para usar nova estrutura hierarquica |
-| `src/hooks/useTabletOrder.ts` | Incluir logica de opcionais no carrinho |
-| `supabase/functions/whatsapp-webhook/index.ts` | Incluir categorias e opcionais no contexto da IA |
+Nenhuma migracao de banco de dados e necessaria.
 
 ---
 
-## Resumo da Hierarquia de Dados
+## Secao Tecnica
+
+### Estrutura do hook
 
 ```text
-menu_categories (Lanches, Bebidas, Sobremesas...)
-  └── menu_groups (Economicos, Classicos, Hot Dog...)
-        └── tablet_products (Classic, Original, Standard...)
-              └── menu_product_option_groups (vinculacao N:N)
-                    └── menu_option_groups ("Acompanha salada?", "Molhos"...)
-                          └── menu_options (Com salada, Sem salada, Barbecue...)
+useModuleStatus()
+  ├── Inputs: user.id, activeUnitId, isAdmin
+  ├── Query: Promise.all(6 consultas Supabase)
+  ├── Processamento: regras de negocio por modulo
+  └── Output: Record<string, { level, count, tooltip } | null>
 ```
 
----
+### Logica de prioridade
 
-## Nota sobre Migracao
+Quando um modulo tem tanto itens criticos quanto de atencao, o nivel exibido e o mais grave (critico > atencao > ok). A contagem reflete o total de pendencias (soma de ambos).
 
-Os produtos ja cadastrados em `tablet_products` que nao tem `group_id` continuarao funcionando normalmente. A interface permitira associa-los a grupos/categorias gradualmente. A categoria atual (campo `category` texto) sera mantida como fallback para retrocompatibilidade.
+### Performance
 
+- Reutiliza o padrao de cache do `useDashboardStats` (staleTime 2min)
+- Consultas usam `count: 'exact', head: true` sempre que possivel para minimizar transferencia de dados
+- Executado apenas para admins (funcionarios nao veem todos os modulos)
