@@ -172,21 +172,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="bg-card backdrop-blur-xl border-b border-border/20">
           <div className="flex items-center justify-between h-14 px-3">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="relative p-2.5 rounded-xl hover:bg-secondary active:scale-95 transition-all touch-manipulation"
-                style={{ minWidth: 44, minHeight: 44 }}
-              >
-                <Menu className="w-[22px] h-[22px] text-muted-foreground" />
-                {activeUnit && (
-                  <span
-                    className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full border-2 border-card"
-                    style={{ background: getThemeColor(activeUnit.slug), boxShadow: `0 0 6px ${getThemeColor(activeUnit.slug)}80` }}
-                  />
-                )}
-              </button>
-            </div>
+            <div className="w-10" /> {/* Spacer for removed menu button */}
 
             {/* Centered Garden Logo */}
             <button
@@ -518,6 +504,37 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           </button>
         </div>
       </aside>
+
+      {/* ======= Floating Menu FAB ======= */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className={cn(
+          "lg:hidden fixed z-[60] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
+          sidebarOpen ? "rotate-180 scale-90" : "hover:scale-105"
+        )}
+        style={{
+          bottom: 'calc(env(safe-area-inset-bottom) + 24px)',
+          right: '20px',
+          background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
+          boxShadow: '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
+        }}
+      >
+        {sidebarOpen ? (
+          <X className="w-6 h-6 text-primary-foreground" />
+        ) : (
+          <Menu className="w-6 h-6 text-primary-foreground" />
+        )}
+        {!sidebarOpen && activeUnit && (
+          <span
+            className="absolute top-1 right-1 w-3 h-3 rounded-full border-2"
+            style={{
+              borderColor: 'hsl(var(--primary))',
+              background: getThemeColor(activeUnit.slug),
+              boxShadow: `0 0 8px ${getThemeColor(activeUnit.slug)}80`,
+            }}
+          />
+        )}
+      </button>
 
       {/* ======= Main Content ======= */}
       <main
