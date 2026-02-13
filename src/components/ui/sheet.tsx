@@ -2,32 +2,102 @@ import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 import * as React from "react";
+import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-const Sheet = SheetPrimitive.Root;
+// ── Context to share mobile state across compound components ──
+const SheetMobileContext = React.createContext(false);
 
-const SheetTrigger = SheetPrimitive.Trigger;
+// ── Root ──
+interface SheetProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+  modal?: boolean;
+}
 
-const SheetClose = SheetPrimitive.Close;
+const Sheet = ({ children, ...props }: SheetProps) => {
+  const isMobile = useIsMobile();
 
-const SheetPortal = SheetPrimitive.Portal;
+  if (isMobile) {
+    return (
+      <SheetMobileContext.Provider value={true}>
+        <DrawerPrimitive.Root shouldScaleBackground {...props}>
+          {children}
+        </DrawerPrimitive.Root>
+      </SheetMobileContext.Provider>
+    );
+  }
 
+  return (
+    <SheetMobileContext.Provider value={false}>
+      <SheetPrimitive.Root {...props}>{children}</SheetPrimitive.Root>
+    </SheetMobileContext.Provider>
+  );
+};
+
+// ── Trigger ──
+const SheetTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
+>((props, ref) => {
+  const isMobile = React.useContext(SheetMobileContext);
+  if (isMobile) return <DrawerPrimitive.Trigger ref={ref} {...props} />;
+  return <SheetPrimitive.Trigger ref={ref} {...props} />;
+});
+SheetTrigger.displayName = "SheetTrigger";
+
+// ── Close ──
+const SheetClose = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Close>
+>((props, ref) => {
+  const isMobile = React.useContext(SheetMobileContext);
+  if (isMobile) return <DrawerPrimitive.Close ref={ref} {...props} />;
+  return <SheetPrimitive.Close ref={ref} {...props} />;
+});
+SheetClose.displayName = "SheetClose";
+
+// ── Portal ──
+const SheetPortal = (props: React.ComponentPropsWithoutRef<typeof SheetPrimitive.Portal>) => {
+  const isMobile = React.useContext(SheetMobileContext);
+  if (isMobile) return <DrawerPrimitive.Portal {...props} />;
+  return <SheetPrimitive.Portal {...props} />;
+};
+
+// ── Overlay ──
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Overlay
-    className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className,
-    )}
-    {...props}
-    ref={ref}
-  />
-));
-SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
+>(({ className, ...props }, ref) => {
+  const isMobile = React.useContext(SheetMobileContext);
 
+  if (isMobile) {
+    return (
+      <DrawerPrimitive.Overlay
+        ref={ref}
+        className={cn("fixed inset-0 z-50 bg-black/80", className)}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <SheetPrimitive.Overlay
+      className={cn(
+        "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        className,
+      )}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+SheetOverlay.displayName = "SheetOverlay";
+
+// ── Content variants (desktop only) ──
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
   {
@@ -52,46 +122,101 @@ interface SheetContentProps
     VariantProps<typeof sheetVariants> {}
 
 const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
-  ({ side = "right", className, children, ...props }, ref) => (
-    <SheetPortal>
-      <SheetOverlay />
-      <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-        {children}
-        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-secondary hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </SheetPrimitive.Close>
-      </SheetPrimitive.Content>
-    </SheetPortal>
-  ),
-);
-SheetContent.displayName = SheetPrimitive.Content.displayName;
+  ({ side = "right", className, children, ...props }, ref) => {
+    const isMobile = React.useContext(SheetMobileContext);
 
-const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
+    if (isMobile) {
+      return (
+        <DrawerPrimitive.Portal>
+          <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <DrawerPrimitive.Content
+            ref={ref as React.Ref<HTMLDivElement>}
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[96vh] flex-col rounded-t-[10px] border bg-background",
+              className,
+            )}
+            {...(props as any)}
+          >
+            <div className="mx-auto mt-4 h-2 w-[100px] shrink-0 rounded-full bg-muted" />
+            <div className="flex-1 overflow-y-auto p-6">{children}</div>
+          </DrawerPrimitive.Content>
+        </DrawerPrimitive.Portal>
+      );
+    }
+
+    return (
+      <SheetPortal>
+        <SheetOverlay />
+        <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
+          {children}
+          <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-secondary hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </SheetPrimitive.Close>
+        </SheetPrimitive.Content>
+      </SheetPortal>
+    );
+  },
 );
+SheetContent.displayName = "SheetContent";
+
+// ── Header ──
+const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+  const isMobile = React.useContext(SheetMobileContext);
+  if (isMobile) {
+    return <div className={cn("grid gap-1.5 text-center sm:text-left", className)} {...props} />;
+  }
+  return <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />;
+};
 SheetHeader.displayName = "SheetHeader";
 
+// ── Footer ──
 const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
 );
 SheetFooter.displayName = "SheetFooter";
 
+// ── Title ──
 const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title ref={ref} className={cn("text-lg font-semibold text-foreground", className)} {...props} />
-));
-SheetTitle.displayName = SheetPrimitive.Title.displayName;
+>(({ className, ...props }, ref) => {
+  const isMobile = React.useContext(SheetMobileContext);
 
+  if (isMobile) {
+    return (
+      <DrawerPrimitive.Title
+        ref={ref}
+        className={cn("text-lg font-semibold text-foreground", className)}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <SheetPrimitive.Title ref={ref} className={cn("text-lg font-semibold text-foreground", className)} {...props} />
+  );
+});
+SheetTitle.displayName = "SheetTitle";
+
+// ── Description ──
 const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Description ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
-));
-SheetDescription.displayName = SheetPrimitive.Description.displayName;
+>(({ className, ...props }, ref) => {
+  const isMobile = React.useContext(SheetMobileContext);
+
+  if (isMobile) {
+    return (
+      <DrawerPrimitive.Description ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+    );
+  }
+
+  return (
+    <SheetPrimitive.Description ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+  );
+});
+SheetDescription.displayName = "SheetDescription";
 
 export {
   Sheet,
