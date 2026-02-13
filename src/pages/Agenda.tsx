@@ -39,6 +39,7 @@ function SortableTaskItem({ id, children }: { id: string; children: React.ReactN
   );
 }
 
+export default function Agenda() {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
