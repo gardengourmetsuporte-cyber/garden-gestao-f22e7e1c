@@ -28,6 +28,7 @@ const TabletConfirm = lazy(() => import("./pages/TabletConfirm"));
 const TabletAdmin = lazy(() => import("./pages/TabletAdmin"));
 const WhatsApp = lazy(() => import("./pages/WhatsApp"));
 const MenuAdmin = lazy(() => import("./pages/MenuAdmin"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -175,6 +176,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <WhatsApp />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/:userId"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
