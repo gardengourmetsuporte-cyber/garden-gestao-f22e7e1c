@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -24,200 +24,143 @@ export interface RewardRedemption {
   created_at: string;
   updated_at: string;
   product?: RewardProduct;
-  profile?: {
-    full_name: string;
-  };
+  profile?: { full_name: string };
+}
+
+async function fetchProducts(): Promise<RewardProduct[]> {
+  const { data, error } = await supabase
+    .from('reward_products')
+    .select('*')
+    .order('points_cost', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function fetchUserRedemptions(userId: string): Promise<RewardRedemption[]> {
+  const { data, error } = await supabase
+    .from('reward_redemptions')
+    .select('*, product:reward_products(*)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+async function fetchAllRedemptionsData(): Promise<RewardRedemption[]> {
+  const { data, error } = await supabase
+    .from('reward_redemptions')
+    .select('*, product:reward_products(*)')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+
+  const userIds = [...new Set(data?.map(r => r.user_id) || [])];
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('user_id, full_name')
+    .in('user_id', userIds);
+
+  return (data || []).map(r => ({
+    ...r,
+    profile: profiles?.find(p => p.user_id === r.user_id),
+  }));
 }
 
 export function useRewards() {
   const { user, isAdmin } = useAuth();
-  const [products, setProducts] = useState<RewardProduct[]>([]);
-  const [redemptions, setRedemptions] = useState<RewardRedemption[]>([]);
-  const [allRedemptions, setAllRedemptions] = useState<RewardRedemption[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchProducts();
-    if (user) {
-      fetchRedemptions();
-      if (isAdmin) {
-        fetchAllRedemptions();
-      }
-    }
-  }, [user, isAdmin]);
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['reward-products'],
+    queryFn: fetchProducts,
+  });
 
-  async function fetchProducts() {
-    try {
-      const { data, error } = await supabase
-        .from('reward_products')
-        .select('*')
-        .order('points_cost', { ascending: true });
+  const { data: redemptions = [] } = useQuery({
+    queryKey: ['reward-redemptions', user?.id],
+    queryFn: () => fetchUserRedemptions(user!.id),
+    enabled: !!user,
+  });
 
+  const { data: allRedemptions = [] } = useQuery({
+    queryKey: ['reward-all-redemptions'],
+    queryFn: fetchAllRedemptionsData,
+    enabled: !!user && isAdmin,
+  });
+
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['reward-products'] });
+    queryClient.invalidateQueries({ queryKey: ['reward-redemptions'] });
+    queryClient.invalidateQueries({ queryKey: ['reward-all-redemptions'] });
+  };
+
+  const createProductMut = useMutation({
+    mutationFn: async (product: Omit<RewardProduct, 'id' | 'created_at' | 'updated_at'>) => {
+      const { error } = await supabase.from('reward_products').insert(product);
       if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    },
+    onSuccess: invalidateAll,
+  });
 
-  async function fetchRedemptions() {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('reward_redemptions')
-        .select(`
-          *,
-          product:reward_products(*)
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
+  const updateProductMut = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<RewardProduct> }) => {
+      const { error } = await supabase.from('reward_products').update(updates).eq('id', id);
       if (error) throw error;
-      setRedemptions(data || []);
-    } catch (error) {
-      console.error('Error fetching redemptions:', error);
-    }
-  }
+    },
+    onSuccess: invalidateAll,
+  });
 
-  async function fetchAllRedemptions() {
-    try {
-      const { data, error } = await supabase
-        .from('reward_redemptions')
-        .select(`
-          *,
-          product:reward_products(*)
-        `)
-        .order('created_at', { ascending: false });
-
+  const deleteProductMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('reward_products').delete().eq('id', id);
       if (error) throw error;
-      
-      // Fetch user profiles separately
-      const userIds = [...new Set(data?.map(r => r.user_id) || [])];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', userIds);
+    },
+    onSuccess: invalidateAll,
+  });
 
-      const redemptionsWithProfiles = (data || []).map(r => ({
-        ...r,
-        profile: profiles?.find(p => p.user_id === r.user_id),
-      }));
-
-      setAllRedemptions(redemptionsWithProfiles);
-    } catch (error) {
-      console.error('Error fetching all redemptions:', error);
-    }
-  }
-
-  async function createProduct(product: Omit<RewardProduct, 'id' | 'created_at' | 'updated_at'>) {
-    try {
-      const { error } = await supabase
-        .from('reward_products')
-        .insert(product);
-
+  const redeemProductMut = useMutation({
+    mutationFn: async ({ productId, pointsCost }: { productId: string; pointsCost: number }) => {
+      if (!user) throw new Error('Usuário não autenticado');
+      const { error } = await supabase.from('reward_redemptions').insert({
+        user_id: user.id,
+        product_id: productId,
+        points_spent: pointsCost,
+        status: 'pending',
+      });
       if (error) throw error;
-      await fetchProducts();
-    } catch (error) {
-      throw new Error('Erro ao criar produto');
-    }
-  }
+    },
+    onSuccess: invalidateAll,
+  });
 
-  async function updateProduct(id: string, updates: Partial<RewardProduct>) {
-    try {
-      const { error } = await supabase
-        .from('reward_products')
-        .update(updates)
-        .eq('id', id);
-
+  const updateRedemptionStatusMut = useMutation({
+    mutationFn: async ({ id, status, notes }: { id: string; status: RewardRedemption['status']; notes?: string }) => {
+      const { error } = await supabase.from('reward_redemptions').update({ status, notes }).eq('id', id);
       if (error) throw error;
-      await fetchProducts();
-    } catch (error) {
-      throw new Error('Erro ao atualizar produto');
-    }
-  }
+    },
+    onSuccess: invalidateAll,
+  });
 
-  async function deleteProduct(id: string) {
-    try {
-      const { error } = await supabase
-        .from('reward_products')
-        .delete()
-        .eq('id', id);
-
+  const deleteRedemptionMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('reward_redemptions').delete().eq('id', id);
       if (error) throw error;
-      await fetchProducts();
-    } catch (error) {
-      throw new Error('Erro ao excluir produto');
-    }
-  }
-
-  async function redeemProduct(productId: string, pointsCost: number) {
-    if (!user) throw new Error('Usuário não autenticado');
-
-    try {
-      const { error } = await supabase
-        .from('reward_redemptions')
-        .insert({
-          user_id: user.id,
-          product_id: productId,
-          points_spent: pointsCost,
-          status: 'pending',
-        });
-
-      if (error) throw error;
-      await fetchRedemptions();
-    } catch (error) {
-      throw new Error('Erro ao resgatar produto');
-    }
-  }
-
-  async function updateRedemptionStatus(id: string, status: RewardRedemption['status'], notes?: string) {
-    try {
-      const { error } = await supabase
-        .from('reward_redemptions')
-        .update({ status, notes })
-        .eq('id', id);
-
-      if (error) throw error;
-      await fetchAllRedemptions();
-      await fetchRedemptions();
-    } catch (error) {
-      throw new Error('Erro ao atualizar status');
-    }
-  }
-
-  async function deleteRedemption(id: string) {
-    try {
-      const { error } = await supabase
-        .from('reward_redemptions')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      await fetchAllRedemptions();
-      await fetchRedemptions();
-    } catch (error) {
-      throw new Error('Erro ao excluir resgate');
-    }
-  }
+    },
+    onSuccess: invalidateAll,
+  });
 
   return {
     products,
     redemptions,
     allRedemptions,
-    isLoading,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    redeemProduct,
-    updateRedemptionStatus,
-    deleteRedemption,
-    refetch: () => {
-      fetchProducts();
-      fetchRedemptions();
-      if (isAdmin) fetchAllRedemptions();
-    },
+    isLoading: isLoadingProducts,
+    createProduct: (product: Omit<RewardProduct, 'id' | 'created_at' | 'updated_at'>) =>
+      createProductMut.mutateAsync(product),
+    updateProduct: (id: string, updates: Partial<RewardProduct>) =>
+      updateProductMut.mutateAsync({ id, updates }),
+    deleteProduct: (id: string) => deleteProductMut.mutateAsync(id),
+    redeemProduct: (productId: string, pointsCost: number) =>
+      redeemProductMut.mutateAsync({ productId, pointsCost }),
+    updateRedemptionStatus: (id: string, status: RewardRedemption['status'], notes?: string) =>
+      updateRedemptionStatusMut.mutateAsync({ id, status, notes }),
+    deleteRedemption: (id: string) => deleteRedemptionMut.mutateAsync(id),
+    refetch: invalidateAll,
   };
 }
