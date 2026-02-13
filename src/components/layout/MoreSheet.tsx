@@ -7,7 +7,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
-import { cn } from '@/lib/utils';
 
 interface MoreSheetProps {
   open: boolean;
@@ -58,11 +57,11 @@ export function MoreSheet({ open, onOpenChange }: MoreSheetProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <DrawerHeader className="pb-2">
-          <DrawerTitle className="text-base">Módulos</DrawerTitle>
+        <DrawerHeader className="pb-1 pt-2">
+          <DrawerTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Módulos</DrawerTitle>
         </DrawerHeader>
         <div className="px-4 pb-6">
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {visibleModules.map((mod) => {
               const status = moduleStatuses[mod.href];
               const chatBadge = mod.href === '/chat' && chatUnreadCount > 0;
@@ -76,17 +75,17 @@ export function MoreSheet({ open, onOpenChange }: MoreSheetProps) {
                   className="flex flex-col items-center gap-1.5 py-3 rounded-2xl hover:bg-secondary/40 active:scale-95 transition-all relative"
                 >
                   <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                    className="w-11 h-11 rounded-[14px] flex items-center justify-center"
                     style={{
-                      background: `${mod.color}15`,
-                      border: `1px solid ${mod.color}25`,
+                      background: `${mod.color}12`,
+                      border: `1px solid ${mod.color}20`,
                     }}
                   >
-                    <mod.icon className="w-5 h-5" style={{ color: mod.color }} />
+                    <mod.icon className="w-[20px] h-[20px]" style={{ color: mod.color }} strokeWidth={1.8} />
                   </div>
                   {hasBadge && (
                     <span
-                      className="absolute top-2 right-2 w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center"
+                      className="absolute top-1.5 right-1 min-w-[16px] h-4 px-0.5 rounded-full text-[8px] font-bold flex items-center justify-center"
                       style={{
                         background: status?.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
                         color: status?.level === 'critical' ? 'hsl(0 0% 100%)' : 'hsl(0 0% 0%)',
@@ -95,19 +94,19 @@ export function MoreSheet({ open, onOpenChange }: MoreSheetProps) {
                       {badgeCount > 9 ? '9+' : badgeCount}
                     </span>
                   )}
-                  <span className="text-[11px] font-medium text-foreground">{mod.label}</span>
+                  <span className="text-[11px] font-medium text-foreground/80 leading-tight">{mod.label}</span>
                 </button>
               );
             })}
           </div>
 
           {/* Sign out */}
-          <div className="mt-4 pt-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
+          <div className="mt-4 pt-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.2)' }}>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98]"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4" strokeWidth={1.8} />
               <span className="font-medium">Sair</span>
             </button>
           </div>

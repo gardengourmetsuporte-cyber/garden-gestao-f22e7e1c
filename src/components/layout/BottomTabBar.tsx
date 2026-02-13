@@ -8,7 +8,7 @@ interface BottomTabBarProps {
 }
 
 const tabs = [
-  { icon: null, label: 'Home', href: '/', isLogo: true },
+  { icon: null, label: '', href: '/', isLogo: true },
   { icon: DollarSign, label: 'Financeiro', href: '/finance', adminOnly: true },
   { icon: ClipboardCheck, label: 'Checklists', href: '/checklists' },
   { icon: User, label: 'Perfil', href: '/profile/me' },
@@ -27,12 +27,13 @@ export function BottomTabBar({ onMorePress }: BottomTabBarProps) {
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div
-        className="bg-card/95 backdrop-blur-xl border-t border-border/20"
+        className="bg-card/95 backdrop-blur-xl"
         style={{
-          boxShadow: '0 -4px 30px hsl(222 50% 3% / 0.5)',
+          borderTop: '1px solid hsl(var(--border) / 0.15)',
+          boxShadow: '0 -2px 20px hsl(222 50% 3% / 0.4)',
         }}
       >
-        <div className="flex items-center justify-around h-14 px-2">
+        <div className="flex items-center justify-around h-[56px] px-1">
           {visibleTabs.map((tab) => {
             const isActive = tab.href === '/'
               ? location.pathname === '/'
@@ -43,44 +44,52 @@ export function BottomTabBar({ onMorePress }: BottomTabBarProps) {
                 key={tab.href}
                 onClick={() => navigate(tab.href)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-xl transition-all active:scale-90",
+                  "flex flex-col items-center justify-center flex-1 py-1.5 rounded-xl transition-all duration-200 active:scale-90",
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}
-                style={{ minWidth: 44, minHeight: 44 }}
+                style={{ minWidth: 48, minHeight: 48 }}
               >
-                <div className="relative">
-                  {'isLogo' in tab && tab.isLogo ? (
-                    <div className={cn(
-                      "w-[26px] h-[26px] rounded-md overflow-hidden border border-border/30",
-                      isActive && "ring-1 ring-primary/50 shadow-[0_0_8px_hsl(var(--primary)/0.4)]"
-                    )}>
-                      <img
-                        alt="Home"
-                        className="w-full h-full object-contain"
-                        src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      {tab.icon && <tab.icon className={cn("w-[22px] h-[22px]", isActive && "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]")} />}
-                    </>
-                  )}
-                  {isActive && (
-                    <div
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                      style={{
-                        background: 'hsl(var(--primary))',
-                        boxShadow: '0 0 6px hsl(var(--primary) / 0.6)',
-                      }}
+                {'isLogo' in tab && tab.isLogo ? (
+                  <div className={cn(
+                    "w-8 h-8 rounded-[10px] overflow-hidden transition-all duration-200",
+                    isActive
+                      ? "ring-[1.5px] ring-primary/60 shadow-[0_0_12px_hsl(var(--primary)/0.35)]"
+                      : "ring-1 ring-border/30 opacity-70"
+                  )}>
+                    <img
+                      alt="Home"
+                      className="w-full h-full object-cover"
+                      src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
                     />
-                  )}
-                </div>
-                <span className={cn(
-                  "text-[10px] font-medium",
-                  isActive ? "text-primary" : "text-muted-foreground/70"
-                )}>
-                  {tab.label}
-                </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-0.5">
+                    {tab.icon && (
+                      <tab.icon
+                        className={cn(
+                          "w-[21px] h-[21px] transition-all duration-200",
+                          isActive && "drop-shadow-[0_0_6px_hsl(var(--primary)/0.5)]"
+                        )}
+                        strokeWidth={isActive ? 2.2 : 1.8}
+                      />
+                    )}
+                    <span className={cn(
+                      "text-[10px] font-medium leading-none transition-colors duration-200",
+                      isActive ? "text-primary" : "text-muted-foreground/60"
+                    )}>
+                      {tab.label}
+                    </span>
+                  </div>
+                )}
+                {isActive && (
+                  <div
+                    className="w-1 h-1 rounded-full mt-0.5"
+                    style={{
+                      background: 'hsl(var(--primary))',
+                      boxShadow: '0 0 6px hsl(var(--primary) / 0.6)',
+                    }}
+                  />
+                )}
               </button>
             );
           })}
@@ -88,11 +97,13 @@ export function BottomTabBar({ onMorePress }: BottomTabBarProps) {
           {/* More tab */}
           <button
             onClick={onMorePress}
-            className="flex flex-col items-center justify-center gap-0.5 flex-1 py-1 rounded-xl transition-all active:scale-90 text-muted-foreground"
-            style={{ minWidth: 44, minHeight: 44 }}
+            className="flex flex-col items-center justify-center flex-1 py-1.5 rounded-xl transition-all duration-200 active:scale-90 text-muted-foreground"
+            style={{ minWidth: 48, minHeight: 48 }}
           >
-            <MoreHorizontal className="w-[22px] h-[22px]" />
-            <span className="text-[10px] font-medium text-muted-foreground/70">Mais</span>
+            <div className="flex flex-col items-center gap-0.5">
+              <MoreHorizontal className="w-[21px] h-[21px]" strokeWidth={1.8} />
+              <span className="text-[10px] font-medium leading-none text-muted-foreground/60">Mais</span>
+            </div>
           </button>
         </div>
       </div>
