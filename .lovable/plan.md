@@ -1,87 +1,109 @@
 
+# Perfil Publico, Titulos de Ranking e Molduras de Avatar
 
-# Auditoria Completa e Melhorias de Profissionalismo
+## Visao Geral
 
-Apos revisar todos os modulos, componentes e paginas do sistema, identifiquei os seguintes pontos de melhoria para elevar o nivel de profissionalismo e consistencia visual.
-
----
-
-## 1. Pagina 404 (NotFound) fora do padrao
-
-A pagina 404 usa `bg-muted`, texto em ingles ("Oops! Page not found"), e nao segue o design system dark. Precisa ser refeita com a estetica Command Center, texto em portugues e um visual premium.
-
-**Arquivo:** `src/pages/NotFound.tsx`
+Criar um sistema de perfil publico para cada funcionario com conquistas, titulos baseados em ranking (inspirado no League of Legends) e molduras decorativas ao redor do avatar que refletem o nivel do usuario.
 
 ---
 
-## 2. Settings - Header sem `page-header-content` wrapper
+## 1. Sistema de Titulos e Molduras por Ranking
 
-Na pagina de Configuracoes, o header principal e o header de sub-secao usam `page-header-bar` mas nao envolvem o conteudo em `page-header-content`, causando padding inconsistente comparado com outras paginas.
+Definir faixas de pontos que geram titulos e molduras, similar ao sistema de elos do LoL:
 
-**Arquivo:** `src/pages/Settings.tsx` (linhas 51-58 e 81-93)
+```text
+Pontos Ganhos    Titulo           Cor da Moldura
+0-9              Iniciante        Cinza (border simples)
+10-24            Aprendiz         Verde (neon verde)
+25-49            Dedicado         Azul (neon cyan)
+50-99            Veterano         Roxo (neon purple)
+100-199          Mestre           Dourado (neon amber)
+200-499          Lenda            Vermelho (neon red)
+500+             Mitico           Gradiente animado (rainbow)
+```
 
----
-
-## 3. PageLoader generico demais
-
-O `PageLoader` global (App.tsx) e os loading states individuais de cada pagina usam apenas "Carregando..." com `animate-pulse`. Para um app premium, deveria ter o logo da marca e uma animacao mais sofisticada (spinner com glow neon).
-
-**Arquivo:** `src/App.tsx` (linhas 42-48) + criar componente reutilizavel
-
----
-
-## 4. Arquivo `Dashboard.tsx` antigo nao utilizado
-
-O arquivo `src/pages/Dashboard.tsx` e uma versao antiga do estoque que nao e referenciado em nenhum lugar (o App.tsx usa `DashboardNew`). E codigo morto que pode ser removido.
-
-**Arquivo:** `src/pages/Dashboard.tsx` (remover)
+**Arquivo novo:** `src/lib/ranks.ts` -- funcoes puras que recebem `earned_points` e retornam titulo, cor, nivel e estilo da moldura.
 
 ---
 
-## 5. Mobile header semi-transparente
+## 2. Componente de Avatar com Moldura (`RankedAvatar`)
 
-O header mobile no `AppLayout.tsx` usa `bg-card/90`, o que pode causar o mesmo efeito de bleed-through corrigido no `page-header-bar`. Deve ser `bg-card` para consistencia.
+Um componente reutilizavel que envolve o avatar do usuario com uma borda decorativa baseada no ranking. Os niveis mais altos terao:
+- Borda mais grossa com glow neon
+- Animacao sutil de brilho rotativo para niveis altos (Lenda, Mitico)
+- Badge com o titulo abaixo ou ao lado do avatar
 
-**Arquivo:** `src/components/layout/AppLayout.tsx` (linha 101)
+**Arquivo novo:** `src/components/profile/RankedAvatar.tsx`
 
----
-
-## 6. Badge de "Acoes Pendentes" no Dashboard com numero quebrado
-
-O badge de despesas pendentes exibe `23531` (valor monetario formatado como inteiro via `Math.round`). Deveria ser formatado como moeda (R$ 235,31) para fazer sentido contextual.
-
-**Arquivo:** `src/components/dashboard/AdminDashboard.tsx` (linha 224)
-
----
-
-## 7. Finance Bottom Nav - tab ativa sem glow consistente
-
-A barra inferior do Financeiro usa um indicador fino (`w-5 h-0.5`) sem o glow neon padrao que o resto do app utiliza. Pode ser refinado para maior consistencia.
-
-**Arquivo:** `src/components/finance/FinanceBottomNav.tsx`
+Sera usado em:
+- Sidebar (substituir o avatar atual)
+- Leaderboard (substituir o avatar simples)
+- Pagina de Perfil Publico (versao grande)
 
 ---
 
-## 8. Chat header sem `page-header-bar`
+## 3. Pagina de Perfil Publico
 
-A pagina de Chat usa um header customizado simples ("Mensagens") sem seguir o padrao `page-header-bar` com icone + titulo + subtitulo usado em todas as outras paginas.
+Nova rota `/profile/:userId` acessivel por qualquer usuario logado, mostrando:
 
-**Arquivo:** `src/pages/Chat.tsx` (linhas 133-171)
+- **Header**: Avatar grande com moldura de ranking + Nome + Titulo + Cargo
+- **Card de Pontos**: Pontos ganhos, gastos, saldo (similar ao UserPointsCard)
+- **Conquistas**: Lista de marcos atingidos (ex: "Primeira tarefa", "50 pontos", "100 tarefas")
+- **Historico de Ranking**: Posicao atual no leaderboard
+
+**Arquivos novos:**
+- `src/pages/Profile.tsx` -- pagina principal
+- `src/components/profile/AchievementList.tsx` -- lista de conquistas
+- `src/components/profile/ProfileHeader.tsx` -- header com avatar grande + moldura
+
+**Rota nova em `App.tsx`:** `/profile/:userId`
 
 ---
 
-## Resumo de Mudancas
+## 4. Sistema de Conquistas
 
-| # | Arquivo | Tipo | Descricao |
-|---|---------|------|-----------|
-| 1 | `src/pages/NotFound.tsx` | Refatorar | Redesign completo com estetica dark, texto PT-BR |
-| 2 | `src/pages/Settings.tsx` | Corrigir | Adicionar `page-header-content` nos headers |
-| 3 | `src/App.tsx` + novo componente | Melhorar | PageLoader com logo e spinner neon |
-| 4 | `src/pages/Dashboard.tsx` | Remover | Codigo morto nao utilizado |
-| 5 | `src/components/layout/AppLayout.tsx` | Corrigir | Header mobile `bg-card/90` para `bg-card` |
-| 6 | `src/components/dashboard/AdminDashboard.tsx` | Corrigir | Formatar despesas como moeda |
-| 7 | `src/components/finance/FinanceBottomNav.tsx` | Refinar | Indicador ativo com glow neon |
-| 8 | `src/pages/Chat.tsx` | Padronizar | Header com `page-header-bar` |
+Conquistas calculadas no frontend baseadas nos dados existentes (sem tabela nova no banco):
 
-Todas as mudancas seguem a regra de nao adicionar funcionalidades novas -- apenas consolidacao, correcao e padronizacao visual.
+- "Primeiro Passo" -- Completou primeira tarefa
+- "Fiel Escudeiro" -- 10 tarefas completadas
+- "Incansavel" -- 50 tarefas completadas
+- "Centuriao" -- 100 tarefas completadas
+- "Colecionador" -- Resgatou primeira recompensa
+- Conquistas por faixas de pontos (alinhadas com os titulos)
 
+**Arquivo novo:** `src/lib/achievements.ts` -- logica pura para calcular conquistas
+
+---
+
+## 5. Integracao nos Componentes Existentes
+
+- **Sidebar (`AppLayout.tsx`)**: Trocar avatar simples pelo `RankedAvatar`, adicionar titulo abaixo do nome. Clicar no card do usuario navega para `/profile/me`.
+- **Leaderboard (`Leaderboard.tsx`)**: Usar `RankedAvatar` com moldura menor, mostrar titulo ao lado do nome.
+- **Dashboard cards**: Links para perfis dos usuarios no ranking.
+
+---
+
+## 6. Hook de Dados do Perfil
+
+**Arquivo novo:** `src/hooks/useProfile.ts`
+
+Hook que busca dados de um usuario especifico (pontos, completions, redemptions) para montar a pagina de perfil. Reutiliza as funcoes de `src/lib/points.ts`.
+
+---
+
+## Resumo de Arquivos
+
+| Arquivo | Acao | Descricao |
+|---------|------|-----------|
+| `src/lib/ranks.ts` | Criar | Logica de titulos, niveis e cores por pontos |
+| `src/lib/achievements.ts` | Criar | Logica de conquistas baseada em dados existentes |
+| `src/components/profile/RankedAvatar.tsx` | Criar | Avatar com moldura decorativa de ranking |
+| `src/components/profile/ProfileHeader.tsx` | Criar | Header do perfil publico |
+| `src/components/profile/AchievementList.tsx` | Criar | Lista de conquistas |
+| `src/pages/Profile.tsx` | Criar | Pagina de perfil publico |
+| `src/hooks/useProfile.ts` | Criar | Hook para dados do perfil |
+| `src/App.tsx` | Editar | Adicionar rota `/profile/:userId` |
+| `src/components/layout/AppLayout.tsx` | Editar | Usar RankedAvatar + titulo + link para perfil |
+| `src/components/dashboard/Leaderboard.tsx` | Editar | Usar RankedAvatar + titulo no ranking |
+
+Nenhuma alteracao no banco de dados e necessaria -- tudo e calculado a partir das tabelas existentes (`checklist_completions`, `reward_redemptions`, `profiles`).
