@@ -1,9 +1,9 @@
 import { UserPointsCard } from '@/components/dashboard/UserPointsCard';
 
-interface PointsWidgetProps {
-  size: 'medium' | 'large';
-}
-
-export function PointsWidget({ size }: PointsWidgetProps) {
-  return <UserPointsCard />;
+export function PointsWidget() {
+  return (
+    <div className="h-full overflow-hidden">
+      <UserPointsCard />
+    </div>
+  );
 }

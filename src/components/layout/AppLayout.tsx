@@ -430,10 +430,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
                               <span className="flex-1">{item.label}</span>
 
-                              {/* Widget add hint */}
-                              {canAddWidget && (
-                                <span className="text-[9px] text-primary/40 font-medium">segurar</span>
-                              )}
+
 
                               {/* Module status indicators */}
                               {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 ? (

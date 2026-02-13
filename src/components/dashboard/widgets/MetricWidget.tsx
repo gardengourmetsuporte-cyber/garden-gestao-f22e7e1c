@@ -16,7 +16,7 @@ const metricConfig: Record<string, {
   metric_balance: {
     title: 'Saldo do Mês',
     icon: Wallet,
-    variant: '', // dynamic
+    variant: '',
     getSubtitle: (v) => v >= 0 ? 'positivo' : 'negativo',
     getRoute: () => '/finance',
   },
@@ -45,10 +45,9 @@ const metricConfig: Record<string, {
 
 interface MetricWidgetProps {
   type: WidgetType;
-  size: 'small' | 'medium';
 }
 
-export function MetricWidget({ type, size }: MetricWidgetProps) {
+export function MetricWidget({ type }: MetricWidgetProps) {
   const navigate = useNavigate();
   const { stats, isLoading } = useDashboardStats();
 
@@ -81,14 +80,14 @@ export function MetricWidget({ type, size }: MetricWidgetProps) {
   };
 
   return (
-    <div onClick={handleClick} className={cn('stat-command group cursor-pointer', variant)}>
+    <div onClick={handleClick} className={cn('stat-command group cursor-pointer h-full flex flex-col justify-between', variant)}>
       <div className="flex items-start justify-between">
         <div className="w-10 h-10 rounded-xl bg-card/80 backdrop-blur-sm flex items-center justify-center border border-border/30">
           <Icon className="w-5 h-5 text-foreground" />
         </div>
         <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
       </div>
-      <div className="mt-3">
+      <div className="mt-auto">
         {isLoading ? (
           <>
             <Skeleton className="h-7 w-20 mb-1" />
@@ -96,7 +95,7 @@ export function MetricWidget({ type, size }: MetricWidgetProps) {
           </>
         ) : (
           <>
-            <p className={cn('font-bold tracking-tight text-foreground', size === 'medium' ? 'text-3xl' : 'text-2xl')}>{displayValue}</p>
+            <p className="font-bold tracking-tight text-foreground text-2xl">{displayValue}</p>
             <p className="text-muted-foreground text-xs font-medium mt-0.5">{config.title}</p>
             <p className="text-muted-foreground/60 text-[10px] mt-0.5">{config.getSubtitle(rawValue)}</p>
           </>
