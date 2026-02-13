@@ -58,8 +58,8 @@ export default function RewardsPage() {
         {/* Header */}
         <div className="page-header-bar">
           <div className="page-header-content flex items-center gap-3">
-            <div className="page-header-icon bg-warning/10">
-              <Gift className="w-5 h-5 text-warning" />
+            <div className="icon-glow icon-glow-md icon-glow-warning">
+              <Gift className="w-5 h-5" />
             </div>
             <div>
               <h1 className="page-title">Loja de Recompensas</h1>
@@ -73,8 +73,8 @@ export default function RewardsPage() {
           <div className="card-command-warning p-6">
             <p className="text-sm text-muted-foreground mb-1">Seu saldo</p>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center">
-                <Star className="w-6 h-6 text-warning fill-warning" />
+              <div className="icon-glow icon-glow-lg icon-glow-warning">
+                <Star className="w-6 h-6 fill-warning" />
               </div>
               <span className="text-4xl font-bold text-foreground">{balance}</span>
               <span className="text-lg text-muted-foreground">pontos</span>

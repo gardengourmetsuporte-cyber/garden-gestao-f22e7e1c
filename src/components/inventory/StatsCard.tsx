@@ -10,10 +10,10 @@ interface StatsCardProps {
 }
 
 const variantMap = {
-  default: { stat: 'stat-command-cyan', iconBg: 'bg-primary/10 text-primary' },
-  success: { stat: 'stat-command-green', iconBg: 'bg-success/10 text-success' },
-  warning: { stat: 'stat-command-amber', iconBg: 'bg-warning/10 text-warning' },
-  destructive: { stat: 'stat-command-red', iconBg: 'bg-destructive/10 text-destructive' },
+  default: { stat: 'stat-command-cyan', iconCls: 'icon-glow icon-glow-md icon-glow-primary' },
+  success: { stat: 'stat-command-green', iconCls: 'icon-glow icon-glow-md icon-glow-success' },
+  warning: { stat: 'stat-command-amber', iconCls: 'icon-glow icon-glow-md icon-glow-warning' },
+  destructive: { stat: 'stat-command-red', iconCls: 'icon-glow icon-glow-md icon-glow-destructive' },
 };
 
 export function StatsCard({ title, value, icon: Icon, variant = 'default', onClick }: StatsCardProps) {
@@ -29,7 +29,7 @@ export function StatsCard({ title, value, icon: Icon, variant = 'default', onCli
           <p className="stat-label">{title}</p>
           <p className="stat-value mt-1">{value}</p>
         </div>
-        <div className={cn("stat-icon", styles.iconBg)}>
+        <div className={cn("stat-icon", styles.iconCls)}>
           <Icon className="w-5 h-5" />
         </div>
       </div>

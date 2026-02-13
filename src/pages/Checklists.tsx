@@ -152,8 +152,8 @@ export default function ChecklistsPage() {
           <div className="page-header-content">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="page-header-icon bg-success/10">
-                  <ClipboardCheck className="w-5 h-5 text-success" />
+                 <div className="icon-glow icon-glow-md icon-glow-success">
+                   <ClipboardCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <h1 className="page-title">Checklists</h1>

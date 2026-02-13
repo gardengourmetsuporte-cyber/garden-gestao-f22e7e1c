@@ -34,8 +34,8 @@ function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, inde
       )}
     >
       <div className="flex items-start justify-between">
-        <div className="w-10 h-10 rounded-xl bg-card/80 backdrop-blur-sm flex items-center justify-center border border-border/30">
-          <Icon className="w-5 h-5 text-foreground" />
+        <div className="icon-glow icon-glow-md icon-glow-muted">
+          <Icon className="w-5 h-5" />
         </div>
         <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
       </div>

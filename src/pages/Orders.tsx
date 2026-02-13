@@ -156,8 +156,8 @@ export default function OrdersPage() {
           <div className="page-header-content">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="page-header-icon bg-primary/10">
-                  <ShoppingCart className="w-5 h-5 text-primary" />
+                <div className="icon-glow icon-glow-md icon-glow-primary">
+                  <ShoppingCart className="w-5 h-5" />
                 </div>
                 <div>
                   <h1 className="page-title">Pedidos</h1>

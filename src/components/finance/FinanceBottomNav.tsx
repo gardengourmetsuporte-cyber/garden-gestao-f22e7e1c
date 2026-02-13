@@ -102,7 +102,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <tab.icon className="w-6 h-6" />
+              <tab.icon className="w-6 h-6" style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
                 <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />
@@ -140,7 +140,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <tab.icon className="w-6 h-6" />
+              <tab.icon className="w-6 h-6" style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
                 <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />

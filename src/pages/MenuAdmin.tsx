@@ -83,8 +83,8 @@ export default function MenuAdmin() {
       {/* Header */}
       <div className="page-header-bar">
         <div className="page-header-content flex items-center gap-3">
-          <div className="page-header-icon bg-primary/15">
-            <BookOpen className="w-5 h-5 text-primary" />
+          <div className="icon-glow icon-glow-md icon-glow-primary">
+            <BookOpen className="w-5 h-5" />
           </div>
           <div className="flex-1">
             <h1 className="page-title">Cardápio</h1>

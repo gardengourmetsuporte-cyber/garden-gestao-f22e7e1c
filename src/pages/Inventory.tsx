@@ -195,8 +195,8 @@ export default function InventoryPage() {
           <div className="page-header-content">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="page-header-icon bg-primary/10">
-                  <Package className="w-5 h-5 text-primary" />
+                 <div className="icon-glow icon-glow-md icon-glow-primary">
+                   <Package className="w-5 h-5" />
                 </div>
                 <div>
                   <h1 className="page-title">Controle de Estoque</h1>
