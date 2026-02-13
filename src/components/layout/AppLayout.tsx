@@ -127,14 +127,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </button>
 
             <div className="flex items-center gap-1">
-              <span className={cn(
-                "px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase",
-                isAdmin
-                  ? "bg-primary/15 text-primary border border-primary/20"
-                  : "bg-secondary text-muted-foreground border border-border/20"
-              )}>
-                {isAdmin ? 'Admin' : 'Staff'}
-              </span>
               <button
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"
