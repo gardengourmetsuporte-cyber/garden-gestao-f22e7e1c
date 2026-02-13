@@ -871,6 +871,50 @@ export type Database = {
           },
         ]
       }
+      finance_snapshots: {
+        Row: {
+          accounts_data: Json
+          created_at: string
+          id: string
+          month: string
+          name: string
+          total_balance: number
+          transactions_data: Json
+          unit_id: string | null
+          user_id: string
+        }
+        Insert: {
+          accounts_data?: Json
+          created_at?: string
+          id?: string
+          month: string
+          name?: string
+          total_balance?: number
+          transactions_data?: Json
+          unit_id?: string | null
+          user_id: string
+        }
+        Update: {
+          accounts_data?: Json
+          created_at?: string
+          id?: string
+          month?: string
+          name?: string
+          total_balance?: number
+          transactions_data?: Json
+          unit_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_snapshots_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       finance_tags: {
         Row: {
           color: string

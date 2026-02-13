@@ -1,32 +1,44 @@
 import { useState } from 'react';
-import { Wallet, Tag, ChevronRight } from 'lucide-react';
+import { Wallet, Tag, Archive, ChevronRight } from 'lucide-react';
 import { AccountManagement } from './AccountManagement';
 import { CategoryManagement } from './CategoryManagement';
-import { FinanceAccount, FinanceCategory } from '@/types/finance';
+import { FinanceBackupSheet } from './FinanceBackupSheet';
+import { FinanceAccount, FinanceCategory, FinanceTransaction } from '@/types/finance';
+import { useFinanceBackup } from '@/hooks/useFinanceBackup';
 
 interface FinanceMoreProps {
   accounts: FinanceAccount[];
   categories: FinanceCategory[];
+  transactions: FinanceTransaction[];
+  selectedMonth: Date;
   onAddAccount: (data: Omit<FinanceAccount, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
   onUpdateAccount: (id: string, data: Partial<FinanceAccount>) => Promise<void>;
   onDeleteAccount: (id: string) => Promise<void>;
   onRefreshCategories: () => Promise<void>;
+  onRefreshAll: () => Promise<void>;
 }
 
 export function FinanceMore({ 
   accounts, 
   categories, 
+  transactions,
+  selectedMonth,
   onAddAccount, 
   onUpdateAccount, 
   onDeleteAccount,
-  onRefreshCategories 
+  onRefreshCategories,
+  onRefreshAll,
 }: FinanceMoreProps) {
   const [accountsOpen, setAccountsOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
+
+  const backup = useFinanceBackup(accounts, transactions, selectedMonth, onRefreshAll);
 
   const menuItems = [
     { icon: Wallet, label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
     { icon: Tag, label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
+    { icon: Archive, label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
   ];
 
   return (
@@ -67,6 +79,20 @@ export function FinanceMore({
         onOpenChange={setCategoriesOpen}
         categories={categories}
         onRefresh={onRefreshCategories}
+      />
+
+      <FinanceBackupSheet
+        open={backupOpen}
+        onOpenChange={setBackupOpen}
+        snapshots={backup.snapshots}
+        isLoading={backup.isLoading}
+        isCreating={backup.isCreating}
+        isRestoring={backup.isRestoring}
+        onFetch={backup.fetchSnapshots}
+        onCreate={backup.createSnapshot}
+        onCompare={backup.compareSnapshot}
+        onRestore={backup.restoreSnapshot}
+        onDelete={backup.deleteSnapshot}
       />
     </>
   );

@@ -174,10 +174,13 @@ export default function Finance() {
           <FinanceMore
             accounts={accounts}
             categories={categories}
+            transactions={transactions}
+            selectedMonth={selectedMonth}
             onAddAccount={addAccount}
             onUpdateAccount={updateAccount}
             onDeleteAccount={deleteAccount}
             onRefreshCategories={handleRefreshCategories}
+            onRefreshAll={handleRefreshAll}
           />
         )}
       </div>
