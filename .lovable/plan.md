@@ -1,63 +1,71 @@
 
-# Cards Clicaveis no Modulo Financeiro e Sistema Inteiro
+# Backup e Restauracao do Financeiro
 
 ## Visao Geral
 
-Tornar todos os cards informativos do sistema clicaveis, com navegacao contextual e feedback visual (hover/active states). O foco principal e o modulo financeiro (tela Home), mas a logica sera replicada em outros modulos.
+Criar um sistema de snapshots (pontos de restauracao) para o modulo financeiro. Voce podera criar um backup a qualquer momento e, se algo der errado, restaurar os saldos e transacoes para aquele ponto exato.
 
 ---
 
-## 1. Finance Home - Cards Clicaveis
+## Como Funciona
 
-Cada card na tela principal do financeiro tera uma acao ao ser clicado:
-
-| Card | Acao ao Clicar |
-|------|----------------|
-| **Saldo em Contas** | Abre aba "Mais" (gestao de contas) |
-| **Receitas** | Navega para aba "Transacoes" com filtro de receitas |
-| **Despesas** | Navega para aba "Transacoes" com filtro de despesas |
-| **Pendencias** | Navega para aba "Transacoes" com filtro de pendentes |
-| **Conta individual** | Abre sheet de edicao da conta (AccountManagement) |
-
-**Arquivo editado:** `src/components/finance/FinanceHome.tsx`
-- Adicionar props `onTabChange`, `onAccountClick` e callbacks de filtro
-- Envolver cada card em botao/div clicavel com `cursor-pointer`, `hover:scale-[1.01]`, `active:scale-[0.98]`
-
-**Arquivo editado:** `src/pages/Finance.tsx`
-- Passar as novas props para `FinanceHome`
-- Implementar logica de navegacao entre abas com filtros pre-aplicados
+1. **Criar Backup**: Botao na aba "Mais" do financeiro. Ao clicar, o sistema salva uma foto completa das suas contas (nomes, saldos) e transacoes do mes atual.
+2. **Ver Backups**: Lista com data/hora de cada backup criado, mostrando o saldo total naquele momento.
+3. **Comparar**: Ao abrir um backup, voce ve lado a lado o saldo de cada conta no backup vs. o saldo atual, destacando diferencas.
+4. **Restaurar**: Botao para reverter tudo ao estado do backup -- apaga transacoes novas e recria as que existiam, restaurando saldos.
 
 ---
 
-## 2. Feedback Visual nos Cards
+## Estrutura no Banco de Dados
 
-Adicionar micro-interacoes consistentes em todos os cards clicaveis:
-- `cursor-pointer` para indicar clicabilidade
-- `hover:scale-[1.01]` e `active:scale-[0.98]` para feedback tatil
-- `transition-all duration-200` para suavidade
-- Seta discreta (ChevronRight ou ArrowUpRight) nos cards de conta
+Uma nova tabela `finance_snapshots` para armazenar os backups:
 
----
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid | Identificador unico |
+| user_id | uuid | Dono do backup |
+| unit_id | uuid | Unidade |
+| name | text | Nome descritivo (ex: "Antes do ajuste de janeiro") |
+| accounts_data | jsonb | Foto das contas (id, nome, saldo) |
+| transactions_data | jsonb | Foto de todas as transacoes do periodo |
+| total_balance | numeric | Saldo total no momento do backup |
+| month | date | Mes de referencia |
+| created_at | timestamp | Data/hora da criacao |
 
-## 3. Replicar em Outros Modulos
-
-### Dashboard (AdminDashboard / EmployeeDashboard)
-- Ja possui cards clicaveis -- sem alteracoes necessarias
-
-### Inventario (StatsCard)
-- Ja possui `onClick` -- apenas garantir feedback visual consistente
-
-### Perfil (Profile)
-- Cards de pontos e conquistas podem navegar para leaderboard/recompensas
+Politica RLS: cada usuario so acessa seus proprios backups.
 
 ---
 
-## 4. Resumo Tecnico de Alteracoes
+## Alteracoes no Sistema
 
-| Arquivo | Acao | Descricao |
-|---------|------|-----------|
-| `src/components/finance/FinanceHome.tsx` | Editar | Adicionar onClick nos cards de saldo, receitas, despesas, pendencias e contas |
-| `src/pages/Finance.tsx` | Editar | Passar callbacks de navegacao para FinanceHome |
-| `src/components/finance/AccountCard.tsx` | Editar | Adicionar visual feedback (hover/active states) |
+### Arquivos Novos
 
-A maior parte do sistema ja possui cards clicaveis (Dashboard, Inventario). O foco principal e o modulo financeiro que ainda nao tem interatividade nos cards informativos.
+| Arquivo | Descricao |
+|---------|-----------|
+| `src/hooks/useFinanceBackup.ts` | Hook com funcoes de criar, listar, comparar e restaurar backups |
+| `src/components/finance/FinanceBackupSheet.tsx` | Sheet com lista de backups, botao de criar, e opcoes de comparar/restaurar |
+
+### Arquivos Editados
+
+| Arquivo | Descricao |
+|---------|-----------|
+| `src/components/finance/FinanceMore.tsx` | Adicionar item "Backups" no menu |
+| `src/pages/Finance.tsx` | Passar props necessarias para o FinanceMore |
+
+---
+
+## Fluxo do Usuario
+
+1. Vai em **Financeiro > Mais > Backups**
+2. Clica em **"Criar Backup Agora"** -- escolhe um nome opcional
+3. Backup aparece na lista com data, saldo total e numero de transacoes
+4. Para comparar: clica no backup e ve as diferencas de saldo por conta
+5. Para restaurar: botao com confirmacao dupla ("Tem certeza? Isso vai substituir os dados atuais")
+
+---
+
+## Seguranca
+
+- Confirmacao dupla antes de restaurar (dialog de alerta)
+- Limite de 10 backups por usuario (os mais antigos sao excluidos automaticamente)
+- A restauracao cria um backup automatico do estado atual antes de reverter (seguranca extra)
