@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
@@ -88,6 +88,8 @@ export function FinanceTransactions({
     categoryId: null,
     accountId: null
   });
+  const todayRef = useRef<HTMLDivElement>(null);
+  const hasScrolledRef = useRef(false);
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
@@ -127,6 +129,24 @@ export function FinanceTransactions({
 
   const hasTransactions = sortedDates.length > 0;
   const hasActiveFilters = filters.status !== 'all' || filters.categoryId || filters.accountId;
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+  // Reset scroll tracking when month changes
+  useEffect(() => {
+    hasScrolledRef.current = false;
+  }, [selectedMonth]);
+
+  // Auto-scroll to today's date on mount
+  useEffect(() => {
+    if (hasScrolledRef.current) return;
+    if (todayRef.current) {
+      hasScrolledRef.current = true;
+      setTimeout(() => {
+        todayRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }, 100);
+    }
+  }, [sortedDates]);
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -206,7 +226,7 @@ export function FinanceTransactions({
                 }, 0);
 
                 return (
-                  <div key={dateStr}>
+                  <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
                     {/* Date Header */}
                     <div className="flex items-center justify-between py-2 px-1">
                       <span className="text-sm font-medium text-muted-foreground capitalize">
