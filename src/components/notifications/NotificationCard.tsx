@@ -50,10 +50,15 @@ export function NotificationCard() {
   const { unreadNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [expanded, setExpanded] = useState(true);
 
-  if (unreadCount === 0) return null;
+  if (unreadCount === 0) return (
+    <div className="p-6 text-center">
+      <Bell className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+      <p className="text-sm text-muted-foreground">Sem notificações</p>
+    </div>
+  );
 
   return (
-    <div className="animate-slide-up">
+    <div>
       <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
         {/* Header */}
         <button
