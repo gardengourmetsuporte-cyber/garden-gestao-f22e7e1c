@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ListChecks, Plus, CheckCircle2, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { SortableList, DragHandle } from '@/components/ui/sortable-list';
+import { cn } from '@/lib/utils';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +11,7 @@ import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { CategoryChips } from '@/components/agenda/CategoryChips';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { ManagerTask } from '@/types/agenda';
 
@@ -207,21 +208,22 @@ export default function Agenda() {
         </div>
 
         <div className="px-4 py-4 space-y-4">
-          <ToggleGroup
-            type="single"
-            value={viewMode}
-            onValueChange={(v) => v && setViewMode(v)}
-            className="w-full bg-muted/50 rounded-xl p-1"
-          >
-            <ToggleGroupItem value="list" className="flex-1 rounded-lg text-sm gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm">
+          <div className="tab-command">
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn("tab-command-item", viewMode === 'list' ? "tab-command-active" : "tab-command-inactive")}
+            >
               <ListChecks className="w-4 h-4" />
               Lista
-            </ToggleGroupItem>
-            <ToggleGroupItem value="calendar" className="flex-1 rounded-lg text-sm gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm">
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={cn("tab-command-item", viewMode === 'calendar' ? "tab-command-active" : "tab-command-inactive")}
+            >
               <Calendar className="w-4 h-4" />
               Calendário
-            </ToggleGroupItem>
-          </ToggleGroup>
+            </button>
+          </div>
 
           {viewMode === 'list' ? <ListContent /> : <CalendarContent />}
         </div>

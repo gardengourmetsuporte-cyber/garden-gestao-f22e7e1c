@@ -582,6 +582,24 @@
     animation: unitFlash 500ms ease-out forwards;
   }
 
+  @keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .animate-float {
+    animation: floatLogo 3s ease-in-out infinite;
+  }
+
+  @keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-page-enter {
+    animation: pageFadeIn 0.3s ease-out both;
+  }
+
   /* Stagger animation delays */
   .stagger-1 { animation-delay: 0ms; }
   .stagger-2 { animation-delay: 60ms; }

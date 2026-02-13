@@ -4,13 +4,13 @@ import {
   Settings, AlertCircle, Receipt, Wallet, ChefHat, CalendarDays
 } from 'lucide-react';
 import { Leaderboard } from './Leaderboard';
-import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { useCountUp, useCountUpCurrency } from '@/hooks/useCountUp';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface MetricCardProps {
   title: string;
@@ -28,7 +28,7 @@ function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, inde
     <div
       onClick={onClick}
       className={cn(
-        "stat-command group cursor-pointer animate-slide-up p-4",
+        "stat-command group cursor-pointer animate-slide-up p-5",
         variant,
         `stagger-${index + 1}`
       )}
@@ -53,34 +53,6 @@ function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, inde
           </>
         )}
       </div>
-    </div>
-  );
-}
-
-interface QuickAccessCardProps {
-  title: string;
-  subtitle: string;
-  icon: React.ElementType;
-  onClick: () => void;
-  iconBg: string;
-  iconColor: string;
-  index: number;
-}
-
-function QuickAccessCard({ title, subtitle, icon: Icon, onClick, iconBg, iconColor, index }: QuickAccessCardProps) {
-  return (
-    <div
-      onClick={onClick}
-      className={cn(
-        "card-command-info p-4 flex flex-col items-center text-center animate-slide-up cursor-pointer hover:scale-[1.02] active:scale-[0.97] transition-all",
-        `stagger-${index + 1}`
-      )}
-    >
-      <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-2", iconBg)}>
-        <Icon className={cn("w-6 h-6", iconColor)} />
-      </div>
-      <p className="font-semibold text-sm text-foreground">{title}</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</p>
     </div>
   );
 }
@@ -125,6 +97,28 @@ function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
   );
 }
 
+interface PillButtonProps {
+  label: string;
+  icon: React.ElementType;
+  onClick: () => void;
+  badge?: string;
+}
+
+function PillButton({ label, icon: Icon, onClick, badge }: PillButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-card/80 border border-border/30 whitespace-nowrap active:scale-95 transition-all hover:border-primary/30 shrink-0"
+    >
+      <Icon className="w-4 h-4 text-primary" />
+      <span className="text-xs font-medium text-foreground">{label}</span>
+      {badge && (
+        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">{badge}</span>
+      )}
+    </button>
+  );
+}
+
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -149,18 +143,17 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
-      {/* Welcome Header */}
+      {/* Welcome Header - Compact */}
       <div className="animate-slide-up stagger-1">
-        <div className="card-command p-5">
-          <h2 className="text-xl font-bold text-foreground">
-            Olá, {profile?.full_name?.split(' ')[0] || 'Admin'}! 👋
-          </h2>
-          <p className="text-muted-foreground text-xs mt-1 capitalize">{currentDate}</p>
+        <div className="card-command p-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">
+              Olá, {profile?.full_name?.split(' ')[0] || 'Admin'}! 👋
+            </h2>
+            <p className="text-muted-foreground text-xs capitalize">{currentDate}</p>
+          </div>
         </div>
       </div>
-
-      {/* Notifications */}
-      <NotificationCard />
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-2 gap-3">
@@ -227,19 +220,21 @@ export function AdminDashboard() {
         </div>
       )}
 
-      {/* Quick Access Cards */}
-      <div>
+      {/* Quick Access - Horizontal Scrollable Pills (iFood style) */}
+      <div className="animate-slide-up stagger-5">
         <h3 className="section-label mb-2">Acesso Rápido</h3>
-        <div className="grid grid-cols-3 gap-2.5">
-          <QuickAccessCard title="Financeiro" subtitle="Receitas e despesas" icon={Wallet} iconBg="bg-success/10" iconColor="text-success" onClick={() => navigate('/finance')} index={0} />
-          <QuickAccessCard title="Fichas" subtitle={`${stats.recipesCount} receitas`} icon={ChefHat} iconBg="bg-purple-500/10" iconColor="text-purple-500" onClick={() => navigate('/recipes')} index={1} />
-          <QuickAccessCard title="Agenda" subtitle="Tarefas" icon={CalendarDays} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/agenda')} index={2} />
-          <QuickAccessCard title="Estoque" subtitle={`${stats.itemsCount} itens`} icon={Package} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/inventory')} index={3} />
-          <QuickAccessCard title="Checklists" subtitle="Tarefas diárias" icon={ClipboardCheck} iconBg="bg-success/10" iconColor="text-success" onClick={() => navigate('/checklists')} index={4} />
-          <QuickAccessCard title="Fechamento" subtitle={stats.pendingClosings > 0 ? `${stats.pendingClosings} pendentes` : 'Caixas'} icon={Receipt} iconBg="bg-primary/10" iconColor="text-primary" onClick={() => navigate('/cash-closing')} index={5} />
-          <QuickAccessCard title="Recompensas" subtitle={stats.pendingRedemptions > 0 ? `${stats.pendingRedemptions} pendentes` : 'Prêmios'} icon={Gift} iconBg="bg-warning/10" iconColor="text-warning" onClick={() => navigate('/rewards')} index={6} />
-          <QuickAccessCard title="Config." subtitle={`${stats.usersCount} usuários`} icon={Settings} iconBg="bg-secondary" iconColor="text-secondary-foreground" onClick={() => navigate('/settings')} index={7} />
-        </div>
+        <ScrollArea className="w-full">
+          <div className="flex gap-2 pb-2">
+            <PillButton label="Financeiro" icon={Wallet} onClick={() => navigate('/finance')} />
+            <PillButton label="Agenda" icon={CalendarDays} onClick={() => navigate('/agenda')} />
+            <PillButton label="Estoque" icon={Package} onClick={() => navigate('/inventory')} badge={stats.criticalItems > 0 ? `${stats.criticalItems}` : undefined} />
+            <PillButton label="Checklists" icon={ClipboardCheck} onClick={() => navigate('/checklists')} />
+            <PillButton label="Fechamento" icon={Receipt} onClick={() => navigate('/cash-closing')} badge={stats.pendingClosings > 0 ? `${stats.pendingClosings}` : undefined} />
+            <PillButton label="Recompensas" icon={Gift} onClick={() => navigate('/rewards')} badge={stats.pendingRedemptions > 0 ? `${stats.pendingRedemptions}` : undefined} />
+            <PillButton label="Config." icon={Settings} onClick={() => navigate('/settings')} />
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
       {/* Leaderboard */}

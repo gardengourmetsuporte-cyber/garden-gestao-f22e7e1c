@@ -1,6 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator, ChevronRight, Building2 } from 'lucide-react';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
@@ -14,20 +13,25 @@ import { UnitManagement } from '@/components/settings/UnitManagement';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-const adminMenuItems = [
-  { value: 'profile', icon: User, label: 'Perfil', variant: 'cyan' as const },
-  { value: 'categories', icon: Tag, label: 'Categorias', variant: 'amber' as const },
-  { value: 'suppliers', icon: Truck, label: 'Fornecedores', variant: 'green' as const },
-  { value: 'checklists', icon: ClipboardCheck, label: 'Checklists', variant: 'purple' as const },
-  { value: 'users', icon: Users, label: 'Usuários', variant: 'cyan' as const },
-  { value: 'rewards', icon: Gift, label: 'Loja de Recompensas', variant: 'amber' as const },
-  { value: 'payments', icon: Wallet, label: 'Métodos de Pagamento', variant: 'green' as const },
-  { value: 'costs', icon: Calculator, label: 'Custos de Receitas', variant: 'red' as const },
-];
+interface MenuItem {
+  value: string;
+  icon: React.ElementType;
+  label: string;
+  description: string;
+  variant: string;
+  section: string;
+}
 
-const superAdminMenuItems = [
-  ...adminMenuItems,
-  { value: 'units', icon: Building2, label: 'Unidades', variant: 'purple' as const },
+const allMenuItems: MenuItem[] = [
+  { value: 'profile', icon: User, label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
+  { value: 'users', icon: Users, label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
+  { value: 'categories', icon: Tag, label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
+  { value: 'suppliers', icon: Truck, label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'green', section: 'Operação' },
+  { value: 'checklists', icon: ClipboardCheck, label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'purple', section: 'Operação' },
+  { value: 'payments', icon: Wallet, label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'green', section: 'Operação' },
+  { value: 'costs', icon: Calculator, label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'red', section: 'Operação' },
+  { value: 'rewards', icon: Gift, label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'amber', section: 'Sistema' },
+  { value: 'units', icon: Building2, label: 'Unidades', description: 'Gerenciar filiais e lojas', variant: 'purple', section: 'Sistema' },
 ];
 
 const variantBorderColors: Record<string, string> = {
@@ -42,9 +46,27 @@ export default function SettingsPage() {
   const { isAdmin, isSuperAdmin } = useAuth();
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const menuItems = isSuperAdmin ? superAdminMenuItems : isAdmin ? adminMenuItems : [adminMenuItems[0]];
+  const menuItems = allMenuItems.filter(item => {
+    if (item.value === 'units') return isSuperAdmin;
+    if (item.value === 'profile') return true;
+    return isAdmin;
+  });
+
+  // Group by section
+  const sections: { label: string; items: MenuItem[] }[] = [];
+  const seenSections = new Set<string>();
+  menuItems.forEach(item => {
+    if (!seenSections.has(item.section)) {
+      seenSections.add(item.section);
+      sections.push({
+        label: item.section,
+        items: menuItems.filter(i => i.section === item.section),
+      });
+    }
+  });
 
   if (activeSection) {
+    const activeItem = menuItems.find(i => i.value === activeSection);
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
@@ -53,7 +75,7 @@ export default function SettingsPage() {
               <button onClick={() => setActiveSection(null)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <ChevronRight className="w-5 h-5 rotate-180" />
               </button>
-              <h1 className="text-lg font-bold">{menuItems.find(i => i.value === activeSection)?.label}</h1>
+              <h1 className="text-lg font-bold">{activeItem?.label}</h1>
             </div>
           </header>
 
@@ -92,30 +114,40 @@ export default function SettingsPage() {
           </div>
         </header>
 
-        <div className="px-4 py-6 lg:px-6 space-y-2">
-          {menuItems.map((item, index) => {
-            const borderColor = variantBorderColors[item.variant];
-            return (
-              <button
-                key={item.value}
-                onClick={() => setActiveSection(item.value)}
-                className={cn(
-                  "list-command w-full flex items-center gap-3 p-4 text-left",
-                  `animate-slide-up stagger-${index + 1}`
-                )}
-                style={{ borderLeftColor: borderColor }}
-              >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: `${borderColor}15` }}
-                >
-                  <item.icon className="w-5 h-5" style={{ color: borderColor }} />
-                </div>
-                <span className="flex-1 font-medium text-sm">{item.label}</span>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </button>
-            );
-          })}
+        <div className="px-4 py-6 lg:px-6 space-y-6">
+          {sections.map((section) => (
+            <div key={section.label}>
+              <h3 className="section-label mb-2 px-1">{section.label}</h3>
+              <div className="space-y-2">
+                {section.items.map((item, index) => {
+                  const borderColor = variantBorderColors[item.variant];
+                  return (
+                    <button
+                      key={item.value}
+                      onClick={() => setActiveSection(item.value)}
+                      className={cn(
+                        "list-command w-full flex items-center gap-3 p-4 text-left",
+                        `animate-slide-up stagger-${index + 1}`
+                      )}
+                      style={{ borderLeftColor: borderColor }}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${borderColor}15` }}
+                      >
+                        <item.icon className="w-5 h-5" style={{ color: borderColor }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="font-medium text-sm block">{item.label}</span>
+                        <span className="text-[11px] text-muted-foreground">{item.description}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </AppLayout>
