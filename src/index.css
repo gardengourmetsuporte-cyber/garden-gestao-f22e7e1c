@@ -600,6 +600,11 @@
     animation: pageFadeIn 0.3s ease-out both;
   }
 
+  @keyframes neonPulse {
+    0%, 100% { box-shadow: 0 0 8px hsl(var(--neon-cyan) / 0.35), inset 0 0 6px hsl(var(--neon-cyan) / 0.04); }
+    50% { box-shadow: 0 0 18px hsl(var(--neon-cyan) / 0.55), inset 0 0 10px hsl(var(--neon-cyan) / 0.08); }
+  }
+
   /* Stagger animation delays */
   .stagger-1 { animation-delay: 0ms; }
   .stagger-2 { animation-delay: 60ms; }
