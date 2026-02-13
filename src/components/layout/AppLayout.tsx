@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useRef } from 'react';
+import { ReactNode, useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
@@ -336,6 +336,32 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   const widgetType = ROUTE_TO_WIDGET[item.href];
                   const widgetAlreadyAdded = widgetType ? widgets.some(w => w.type === widgetType) : true;
 
+                  const canAddWidget = widgetType && !widgetAlreadyAdded;
+                  let longPressTimer: ReturnType<typeof setTimeout> | null = null;
+                  let didLongPress = false;
+
+                  const handleTouchStart = () => {
+                    if (!canAddWidget) return;
+                    didLongPress = false;
+                    longPressTimer = setTimeout(() => {
+                      didLongPress = true;
+                      addWidget(widgetType!);
+                      toast.success(`"${item.label}" adicionado ao Dashboard`);
+                      setSidebarOpen(false);
+                      navigate('/');
+                    }, 500);
+                  };
+
+                  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
+                    if (longPressTimer) {
+                      clearTimeout(longPressTimer);
+                      longPressTimer = null;
+                    }
+                    if (didLongPress) {
+                      e.preventDefault();
+                    }
+                  };
+
                   return (
                     <div key={item.href} className="flex items-center gap-1">
                       <TooltipProvider>
@@ -344,12 +370,22 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             <Link
                               to={item.href}
                               data-active={isActive}
-                              onClick={() => setSidebarOpen(false)}
+                              onClick={(e) => {
+                                if (didLongPress) { e.preventDefault(); return; }
+                                setSidebarOpen(false);
+                              }}
+                              onTouchStart={handleTouchStart}
+                              onTouchEnd={handleTouchEnd}
+                              onTouchCancel={() => { if (longPressTimer) clearTimeout(longPressTimer); }}
+                              onMouseDown={handleTouchStart}
+                              onMouseUp={handleTouchEnd}
+                              onMouseLeave={() => { if (longPressTimer) clearTimeout(longPressTimer); }}
                               className={cn(
                                 "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
                                 isActive
                                   ? "text-foreground"
-                                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]",
+                                canAddWidget && "cursor-grab"
                               )}
                               style={isActive ? {
                                 background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
@@ -394,6 +430,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
                               <span className="flex-1">{item.label}</span>
 
+                              {/* Widget add hint */}
+                              {canAddWidget && (
+                                <span className="text-[9px] text-primary/40 font-medium">segurar</span>
+                              )}
+
                               {/* Module status indicators */}
                               {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 ? (
                                 <div className="flex items-center gap-1.5">
@@ -437,21 +478,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )}
                         </Tooltip>
                       </TooltipProvider>
-
-                      {/* Add to dashboard button */}
-                      {widgetType && !widgetAlreadyAdded && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addWidget(widgetType);
-                            toast.success(`Widget "${item.label}" adicionado ao dashboard`);
-                          }}
-                          className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 active:scale-90 transition-all"
-                          title={`Adicionar ${item.label} ao Dashboard`}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      )}
                     </div>
                   );
                 })}
