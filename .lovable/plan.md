@@ -1,40 +1,25 @@
 
-
-# Gesto de Puxar para Fechar (Swipe-to-Dismiss) em Todo o App
+# Corrigir elemento visual passando por trás da barra de cabeçalho
 
 ## Problema
-Atualmente todas as telas de edicao/formularios usam o componente `Sheet` (Radix Dialog) que so fecha pelo botao X. No mobile isso e pouco dinamico.
+O cabeçalho de página (`page-header-bar`) usa fundo semi-transparente (`bg-card/80`), permitindo que conteúdo da página apareça por trás quando o usuário rola. Isso causa o efeito indesejado do logotipo/conteúdo passando por trás da barra.
 
-## Solucao
+## Solução
+Tornar o fundo do `page-header-bar` totalmente opaco para que nenhum conteúdo passe por trás dele ao rolar.
 
-Modificar o componente `Sheet` (`src/components/ui/sheet.tsx`) para que, **no mobile**, ele use internamente o **Vaul Drawer** (ja instalado no projeto) que tem gesto nativo de puxar para baixo para fechar. No desktop, mantem o comportamento atual.
+## Mudança
 
-Isso aplica a mudanca automaticamente nos **31 arquivos** que usam Sheet sem precisar alterar nenhum deles.
+| Arquivo | Descrição |
+|---|---|
+| `src/index.css` | Alterar `bg-card/80` para `bg-card` no `.page-header-bar`, mantendo o backdrop-blur como fallback |
 
-## Como funciona
+A classe `.page-header-bar` (linha 228) será atualizada de:
+```text
+bg-card/80 backdrop-blur-2xl
+```
+Para:
+```text
+bg-card backdrop-blur-2xl
+```
 
-- O componente `Sheet` detecta se e mobile via `useIsMobile()`
-- **Mobile**: renderiza um `Drawer` do Vaul com handle visual (barra de arrasto) e gesto de swipe-down
-- **Desktop**: renderiza o Sheet original (Radix Dialog) como antes
-- A API externa (props `open`, `onOpenChange`, `side`, `children`) permanece identica
-
-## Detalhes Tecnicos
-
-### Arquivo modificado: `src/components/ui/sheet.tsx`
-
-- Importar `useIsMobile` e os componentes do Vaul Drawer
-- O componente `Sheet` (root) faz o branching: mobile = Drawer, desktop = Radix Dialog
-- O componente `SheetContent` no mobile renderiza `DrawerContent` com a barra de arrasto (handle) no topo e `max-height` respeitando as classes existentes
-- `SheetHeader`, `SheetTitle`, `SheetDescription` fazem o mesmo branching para usar os equivalentes do Drawer
-- O botao X e removido no mobile (o gesto de puxar substitui), mantido no desktop
-
-### Comportamento no mobile
-- Tela sobe de baixo (como ja faz)
-- Barra de arrasto cinza no topo (100px x 4px, arredondada)
-- Puxar para baixo fecha com animacao fluida
-- Tocar no overlay (fundo escuro) tambem fecha
-- Scroll interno do conteudo funciona normalmente sem conflito com o gesto
-
-### Sem mudancas em outros arquivos
-Como o componente Sheet e o ponto central, todos os 31 arquivos que usam `<Sheet>` e `<SheetContent side="bottom">` herdam o comportamento automaticamente.
-
+Isso resolve o problema em todas as páginas que usam esse cabeçalho (Checklists, Inventário, etc.) de uma só vez.
