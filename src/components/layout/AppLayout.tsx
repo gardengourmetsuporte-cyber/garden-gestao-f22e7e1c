@@ -60,19 +60,19 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const isDraggingSidebarRef = useRef(false);
 
-  // Edge swipe to open sidebar
+  // Edge swipe to open sidebar (from right edge)
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       if (sidebarOpen) return;
       const touch = e.touches[0];
-      if (touch.clientX < 20) {
+      if (touch.clientX > window.innerWidth - 20) {
         touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
       }
     };
     const handleTouchMove = (e: TouchEvent) => {
       if (sidebarOpen || !touchStartRef.current) return;
       const touch = e.touches[0];
-      const dx = touch.clientX - touchStartRef.current.x;
+      const dx = touchStartRef.current.x - touch.clientX;
       const dy = Math.abs(touch.clientY - touchStartRef.current.y);
       if (dx > 30 && dy < 50) {
         setSidebarOpen(true);
@@ -102,17 +102,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     const touch = e.touches[0];
     const dx = touch.clientX - touchStartRef.current.x;
     const dy = Math.abs(touch.clientY - touchStartRef.current.y);
-    if (!isDraggingSidebarRef.current && dx < -10 && dy < 30) {
+    if (!isDraggingSidebarRef.current && dx > 10 && dy < 30) {
       isDraggingSidebarRef.current = true;
     }
     if (isDraggingSidebarRef.current) {
-      setSidebarDragX(Math.min(0, dx));
+      setSidebarDragX(Math.max(0, dx));
     }
   };
   const sidebarTouchEnd = () => {
     if (isDraggingSidebarRef.current && sidebarDragX !== null) {
       const sidebarWidth = Math.min(window.innerWidth * 0.85, 360);
-      if (Math.abs(sidebarDragX) > sidebarWidth * 0.3) {
+      if (sidebarDragX > sidebarWidth * 0.3) {
         setSidebarOpen(false);
       }
     }
@@ -222,7 +222,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       {sidebarOpen && (
         <div
           className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in"
-          style={sidebarDragX !== null ? { opacity: Math.max(0, 1 + sidebarDragX / Math.min(window.innerWidth * 0.85, 360)) } : undefined}
+          style={sidebarDragX !== null ? { opacity: Math.max(0, 1 - sidebarDragX / Math.min(window.innerWidth * 0.85, 360)) } : undefined}
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -233,16 +233,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         onTouchMove={sidebarTouchMove}
         onTouchEnd={sidebarTouchEnd}
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[85vw] max-w-[360px] flex flex-col",
+          "fixed top-0 right-0 z-50 h-full w-[85vw] max-w-[360px] flex flex-col",
           "bg-background/95 backdrop-blur-2xl",
-          "lg:translate-x-0",
-          sidebarOpen ? "" : "-translate-x-full",
+          "lg:translate-x-0 lg:right-auto lg:left-0",
+          sidebarOpen ? "" : "translate-x-full lg:translate-x-0",
           sidebarDragX === null && "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
         )}
         style={{
           paddingTop: 'env(safe-area-inset-top)',
-          borderRight: '1px solid hsl(var(--neon-cyan) / 0.1)',
-          boxShadow: sidebarOpen ? '4px 0 40px hsl(222 50% 3% / 0.7), 0 0 60px hsl(var(--neon-cyan) / 0.05)' : 'none',
+          borderLeft: '1px solid hsl(var(--neon-cyan) / 0.1)',
+          boxShadow: sidebarOpen ? '-4px 0 40px hsl(222 50% 3% / 0.7), 0 0 60px hsl(var(--neon-cyan) / 0.05)' : 'none',
           ...(sidebarOpen && sidebarDragX !== null ? { transform: `translateX(${sidebarDragX}px)` } : {})
         }}
       >
@@ -406,7 +406,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             {/* Active indicator bar */}
                             {isActive && (
                               <div
-                                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
+                                className="absolute right-0 lg:right-auto lg:left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-l-full lg:rounded-l-none lg:rounded-r-full"
                                 style={{
                                   background: 'hsl(var(--neon-cyan))',
                                   boxShadow: '0 0 8px hsl(var(--neon-cyan) / 0.5)'
