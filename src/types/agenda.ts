@@ -26,6 +26,8 @@ export interface ManagerTask {
   completed_at: string | null;
   category_id?: string | null;
   category?: TaskCategory | null;
+  parent_id?: string | null;
+  subtasks?: ManagerTask[];
   created_at: string;
   updated_at: string;
   // Deprecated fields kept for backward compatibility

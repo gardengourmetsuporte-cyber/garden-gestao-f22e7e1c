@@ -1237,6 +1237,7 @@ export type Database = {
           is_completed: boolean
           is_system_generated: boolean
           notes: string | null
+          parent_id: string | null
           period: Database["public"]["Enums"]["day_period"]
           priority: Database["public"]["Enums"]["task_priority"]
           sort_order: number | null
@@ -1258,6 +1259,7 @@ export type Database = {
           is_completed?: boolean
           is_system_generated?: boolean
           notes?: string | null
+          parent_id?: string | null
           period?: Database["public"]["Enums"]["day_period"]
           priority?: Database["public"]["Enums"]["task_priority"]
           sort_order?: number | null
@@ -1279,6 +1281,7 @@ export type Database = {
           is_completed?: boolean
           is_system_generated?: boolean
           notes?: string | null
+          parent_id?: string | null
           period?: Database["public"]["Enums"]["day_period"]
           priority?: Database["public"]["Enums"]["task_priority"]
           sort_order?: number | null
@@ -1295,6 +1298,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "task_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manager_tasks_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "manager_tasks"
             referencedColumns: ["id"]
           },
           {

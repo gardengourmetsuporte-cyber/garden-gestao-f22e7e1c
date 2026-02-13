@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,7 +35,7 @@ export function useAgenda() {
   });
 
   // Fetch all tasks for user (not filtered by date)
-  const { data: tasks = [], isLoading: tasksLoading } = useQuery({
+  const { data: allTasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['manager-tasks', user?.id, activeUnitId],
     queryFn: async () => {
       if (!user?.id || !activeUnitId) return [];
@@ -53,9 +53,24 @@ export function useAgenda() {
     enabled: !!user?.id && !!activeUnitId,
   });
 
+  // Build hierarchical tasks: group subtasks under parents
+  const tasks = useMemo(() => {
+    const parentTasks = allTasks.filter(t => !t.parent_id);
+    const childMap = new Map<string, ManagerTask[]>();
+    allTasks.filter(t => t.parent_id).forEach(t => {
+      const children = childMap.get(t.parent_id!) || [];
+      children.push(t);
+      childMap.set(t.parent_id!, children);
+    });
+    return parentTasks.map(t => ({
+      ...t,
+      subtasks: childMap.get(t.id) || [],
+    }));
+  }, [allTasks]);
+
   // Add task mutation
   const addTaskMutation = useMutation({
-    mutationFn: async (task: { title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string }) => {
+    mutationFn: async (task: { title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string; parent_id?: string }) => {
       if (!user?.id || !activeUnitId) throw new Error('User not authenticated');
       const { error } = await supabase
         .from('manager_tasks')
@@ -68,7 +83,8 @@ export function useAgenda() {
           due_time: task.due_time || null,
           priority: 'medium',
           category_id: task.category_id || null,
-        });
+          parent_id: task.parent_id || null,
+        } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -107,7 +123,7 @@ export function useAgenda() {
   // Toggle task completion mutation
   const toggleTaskMutation = useMutation({
     mutationFn: async (taskId: string) => {
-      const task = tasks.find(t => t.id === taskId);
+      const task = allTasks.find(t => t.id === taskId);
       if (!task) throw new Error('Task not found');
       
       const { error } = await supabase

@@ -56,6 +56,10 @@ export default function Agenda() {
     updateTask({ id, title, notes: notes || undefined });
   };
 
+  const handleAddSubtask = (parentId: string, title: string) => {
+    addTask({ title, parent_id: parentId });
+  };
+
   const handleCloseSheet = (open: boolean) => {
     setTaskSheetOpen(open);
     if (!open) setEditingTask(null);
@@ -127,6 +131,7 @@ export default function Agenda() {
                   onDelete={deleteTask}
                   onClick={() => handleEditTask(task)}
                   onInlineUpdate={handleInlineUpdate}
+                  onAddSubtask={handleAddSubtask}
                   isDragging={isDragging}
                   dragHandleProps={dragHandleProps}
                 />
@@ -164,6 +169,7 @@ export default function Agenda() {
                 onDelete={deleteTask}
                 onClick={() => handleEditTask(task)}
                 onInlineUpdate={handleInlineUpdate}
+                onAddSubtask={handleAddSubtask}
               />
             ))
           )}

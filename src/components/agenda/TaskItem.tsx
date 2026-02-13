@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CalendarDays, Info, Trash2 } from 'lucide-react';
+import { CalendarDays, Info, Trash2, ChevronRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
 
@@ -12,6 +12,7 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onClick?: () => void;
   onInlineUpdate?: (id: string, title: string, notes: string) => void;
+  onAddSubtask?: (parentId: string, title: string) => void;
   isDragging?: boolean;
   dragHandleProps?: Record<string, unknown>;
 }
@@ -30,9 +31,15 @@ function isOverdue(dateStr: string | null): boolean {
   return isPast(parseISO(dateStr)) && !isToday(parseISO(dateStr));
 }
 
-export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, isDragging, dragHandleProps }: TaskItemProps) {
+export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, onAddSubtask, isDragging, dragHandleProps }: TaskItemProps) {
   const dueLabel = formatDueDate(task.due_date || null, task.due_time || null);
   const overdue = !task.is_completed && isOverdue(task.due_date || null);
+  const subtasks = task.subtasks || [];
+  const hasSubtasks = subtasks.length > 0;
+  const completedSubtasks = subtasks.filter(s => s.is_completed).length;
+
+  // Expand state
+  const [expanded, setExpanded] = useState(false);
 
   // Swipe state
   const [swipeX, setSwipeX] = useState(0);
@@ -41,17 +48,15 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
   const touchStartY = useRef(0);
   const isHorizontalSwipe = useRef<boolean | null>(null);
 
-  // Inline editing state
-  const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(task.title);
-  const [editNotes, setEditNotes] = useState(task.notes || '');
-  const titleRef = useRef<HTMLTextAreaElement>(null);
+  // Inline add subtask
+  const [addingSubtask, setAddingSubtask] = useState(false);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+  const subtaskInputRef = useRef<HTMLInputElement>(null);
 
   const SWIPE_THRESHOLD = -70;
   const MAX_SWIPE = -160;
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isEditing) return;
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     isHorizontalSwipe.current = null;
@@ -59,7 +64,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isSwiping || isEditing) return;
+    if (!isSwiping) return;
     const dx = e.touches[0].clientX - touchStartX.current;
     const dy = e.touches[0].clientY - touchStartY.current;
 
@@ -88,36 +93,23 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
 
   const closeSwipe = () => setSwipeX(0);
 
-  const handleTitleClick = () => {
-    if (isDragging || task.is_completed) return;
-    setEditTitle(task.title);
-    setEditNotes(task.notes || '');
-    setIsEditing(true);
-    setTimeout(() => titleRef.current?.focus(), 50);
+  const handleAddSubtask = () => {
+    const title = newSubtaskTitle.trim();
+    if (!title || !onAddSubtask) return;
+    onAddSubtask(task.id, title);
+    setNewSubtaskTitle('');
+    // Keep input focused for rapid entry
+    subtaskInputRef.current?.focus();
   };
 
-  const handleFinishEditing = () => {
-    setIsEditing(false);
-    const newTitle = editTitle.trim();
-    if (!newTitle) {
-      setEditTitle(task.title);
-      setEditNotes(task.notes || '');
-      return;
-    }
-    if (newTitle !== task.title || editNotes.trim() !== (task.notes || '').trim()) {
-      onInlineUpdate?.(task.id, newTitle, editNotes.trim());
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleSubtaskKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      handleFinishEditing();
+      handleAddSubtask();
     }
     if (e.key === 'Escape') {
-      setIsEditing(false);
-      setEditTitle(task.title);
-      setEditNotes(task.notes || '');
+      setAddingSubtask(false);
+      setNewSubtaskTitle('');
     }
   };
 
@@ -142,7 +134,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
       {/* Main content - slides */}
       <div
         className={cn(
-          'relative z-10 flex items-start gap-3 p-4 transition-transform bg-card border border-border shadow-sm',
+          'relative z-10 bg-card border border-border shadow-sm',
           task.is_completed && 'opacity-60 bg-muted',
           isDragging && 'shadow-lg ring-2 ring-primary/50',
           !isSwiping && 'transition-transform duration-200',
@@ -152,54 +144,47 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <Checkbox
-          checked={task.is_completed}
-          onCheckedChange={() => onToggle(task.id)}
-          onClick={(e) => e.stopPropagation()}
-          className="w-6 h-6 rounded-full border-2 mt-0.5 shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
-        />
+        {/* Parent task row */}
+        <div className="flex items-start gap-3 p-4">
+          <Checkbox
+            checked={task.is_completed}
+            onCheckedChange={() => onToggle(task.id)}
+            onClick={(e) => e.stopPropagation()}
+            className="w-6 h-6 rounded-full border-2 mt-0.5 shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
+          />
 
-        <div className="flex-1 min-w-0">
-          {isEditing ? (
-            <div className="space-y-1" onBlur={handleFinishEditing}>
-              <textarea
-                ref={titleRef}
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                rows={1}
-                className="w-full bg-transparent font-semibold text-foreground resize-none outline-none border-b border-primary/40 pb-1 text-base"
-                style={{ minHeight: '1.5em' }}
-              />
-              <textarea
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Notas..."
-                rows={2}
-                className="w-full bg-transparent text-sm text-muted-foreground resize-none outline-none placeholder:text-muted-foreground/50"
-                style={{ minHeight: '2em' }}
-              />
-            </div>
-          ) : (
-            <button onClick={handleTitleClick} className="w-full text-left">
+          <button 
+            className="flex-1 min-w-0 text-left"
+            onClick={() => {
+              if (hasSubtasks || !task.is_completed) {
+                setExpanded(!expanded);
+              }
+            }}
+          >
+            <div className="flex items-center gap-2">
               <p className={cn(
-                'font-medium text-foreground',
+                'font-medium text-foreground flex-1',
                 task.is_completed && 'line-through text-muted-foreground'
               )}>
                 {task.title}
               </p>
-
-              {/* Notes displayed below title */}
-              {task.notes && (
-                <p className="text-sm text-muted-foreground mt-0.5 whitespace-pre-line">
-                  {task.notes}
-                </p>
+              {(hasSubtasks || !task.is_completed) && (
+                <ChevronRight className={cn(
+                  'w-4 h-4 text-muted-foreground transition-transform shrink-0',
+                  expanded && 'rotate-90'
+                )} />
               )}
-            </button>
-          )}
+            </div>
 
-          <div className="flex items-center gap-2 flex-wrap mt-1">
+            {/* Subtask counter badge */}
+            {hasSubtasks && !expanded && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {completedSubtasks}/{subtasks.length} subtarefa{subtasks.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </button>
+
+          <div className="flex items-center gap-2 flex-wrap mt-1 shrink-0">
             {dueLabel && (
               <span className={cn(
                 'text-xs flex items-center gap-1',
@@ -209,14 +194,81 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
                 {dueLabel}
               </span>
             )}
-            {task.category && (
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: task.category.color }} />
-                <span className="text-xs text-muted-foreground">{task.category.name}</span>
-              </span>
-            )}
           </div>
         </div>
+
+        {/* Category badge below */}
+        {task.category && (
+          <div className="px-4 pb-2 -mt-2">
+            <span className="flex items-center gap-1 w-fit">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: task.category.color }} />
+              <span className="text-xs text-muted-foreground">{task.category.name}</span>
+            </span>
+          </div>
+        )}
+
+        {/* Expanded subtasks */}
+        {expanded && (
+          <div className="border-t border-border bg-secondary/30">
+            {subtasks.map(sub => (
+              <div key={sub.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 last:border-b-0">
+                <div className="w-6" /> {/* Indent spacer */}
+                <Checkbox
+                  checked={sub.is_completed}
+                  onCheckedChange={() => onToggle(sub.id)}
+                  className="w-5 h-5 rounded-full border-2 shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
+                />
+                <span className={cn(
+                  'text-sm flex-1',
+                  sub.is_completed && 'line-through text-muted-foreground'
+                )}>
+                  {sub.title}
+                </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onDelete(sub.id); }}
+                  className="p-1 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+
+            {/* Add subtask input */}
+            {addingSubtask ? (
+              <div className="flex items-center gap-3 px-4 py-2.5">
+                <div className="w-6" />
+                <div className="w-5 flex items-center justify-center">
+                  <Plus className="w-4 h-4 text-primary" />
+                </div>
+                <input
+                  ref={subtaskInputRef}
+                  value={newSubtaskTitle}
+                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                  onKeyDown={handleSubtaskKeyDown}
+                  onBlur={() => {
+                    if (!newSubtaskTitle.trim()) setAddingSubtask(false);
+                    else handleAddSubtask();
+                  }}
+                  placeholder="Nova subtarefa..."
+                  className="flex-1 text-sm bg-transparent outline-none placeholder:text-muted-foreground/50"
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setAddingSubtask(true);
+                  setTimeout(() => subtaskInputRef.current?.focus(), 50);
+                }}
+                className="flex items-center gap-3 px-4 py-2.5 w-full text-left text-primary hover:bg-primary/5 transition-colors"
+              >
+                <div className="w-6" />
+                <Plus className="w-4 h-4" />
+                <span className="text-sm font-medium">Adicionar subtarefa</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
