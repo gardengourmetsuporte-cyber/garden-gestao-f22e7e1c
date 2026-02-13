@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { differenceInHours } from 'date-fns';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
@@ -92,6 +93,30 @@ export function FinanceTransactions({
     accountId: null,
     ...initialFilters
   });
+
+  // Track "seen" new transactions — persisted in sessionStorage
+  const SEEN_KEY = 'finance_seen_txns';
+  const [seenIds, setSeenIds] = useState<Set<string>>(() => {
+    try {
+      const stored = sessionStorage.getItem(SEEN_KEY);
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+
+  const markSeen = useCallback((id: string) => {
+    setSeenIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      sessionStorage.setItem(SEEN_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  }, []);
+
+  const isNewTransaction = useCallback((t: FinanceTransaction) => {
+    if (seenIds.has(t.id)) return false;
+    const hoursAgo = differenceInHours(new Date(), new Date(t.created_at));
+    return hoursAgo < 24;
+  }, [seenIds]);
 
   // Apply initialFilters when they change from parent
   useEffect(() => {
@@ -264,7 +289,11 @@ export function FinanceTransactions({
                               )}
                               <TransactionItem
                                 transaction={transaction}
-                                onClick={() => onTransactionClick(transaction)}
+                                isNew={isNewTransaction(transaction)}
+                                onClick={() => {
+                                  markSeen(transaction.id);
+                                  onTransactionClick(transaction);
+                                }}
                                 onTogglePaid={onTogglePaid}
                                 onDelete={onDeleteTransaction}
                               />

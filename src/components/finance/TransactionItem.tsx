@@ -6,6 +6,7 @@ import { useState, useRef, useCallback } from 'react';
 
 interface TransactionItemProps {
   transaction: FinanceTransaction;
+  isNew?: boolean;
   onClick?: () => void;
   onTogglePaid?: (id: string, isPaid: boolean) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
@@ -14,7 +15,7 @@ interface TransactionItemProps {
 const MAX_SWIPE = 140;
 const DEADZONE = 8;
 
-export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }: TransactionItemProps) {
+export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onDelete }: TransactionItemProps) {
   const { type, amount, description, category, account, is_paid } = transaction;
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -132,7 +133,10 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete }
   }, []);
 
   return (
-    <div className="relative isolate overflow-hidden rounded-xl">
+    <div className={cn(
+      "relative isolate overflow-hidden rounded-xl",
+      isNew && "ring-1 ring-[hsl(var(--neon-cyan))] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.4),inset_0_0_8px_hsl(var(--neon-cyan)/0.05)] animate-[neonPulse_2s_ease-in-out_infinite]"
+    )}>
       {/* Swipe action buttons - behind */}
       <div
         className={cn(
