@@ -100,7 +100,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* ======= Mobile Header ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="bg-card backdrop-blur-xl border-b border-border/20">
