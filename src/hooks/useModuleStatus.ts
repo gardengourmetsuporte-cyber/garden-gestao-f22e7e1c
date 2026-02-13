@@ -3,8 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { useTimeBasedUrgency, type UrgencyLevel } from '@/hooks/useTimeBasedUrgency';
 
-export type StatusLevel = 'ok' | 'attention' | 'critical';
+export type StatusLevel = 'ok' | 'attention' | 'warning' | 'critical';
 
 export interface ModuleStatus {
   level: StatusLevel;
@@ -214,11 +215,28 @@ async function fetchModuleStatuses(
   return result;
 }
 
+function escalateLevel(base: StatusLevel, urgency: UrgencyLevel): StatusLevel {
+  if (base === 'ok') return 'ok';
+  // Map urgency to minimum level
+  const urgencyToLevel: Record<UrgencyLevel, StatusLevel> = {
+    ok: 'attention',
+    attention: 'attention',
+    warning: 'warning',
+    critical: 'critical',
+  };
+  const urgencyLevel = urgencyToLevel[urgency];
+  const order: StatusLevel[] = ['ok', 'attention', 'warning', 'critical'];
+  const baseIdx = order.indexOf(base);
+  const urgIdx = order.indexOf(urgencyLevel);
+  return order[Math.max(baseIdx, urgIdx)];
+}
+
 export function useModuleStatus() {
   const { user, isAdmin } = useAuth();
   const { activeUnitId } = useUnit();
+  const { moduleUrgency, urgencyBucket } = useTimeBasedUrgency();
 
-  const { data: statuses } = useQuery({
+  const { data: rawStatuses } = useQuery({
     queryKey: ['module-status', user?.id, activeUnitId],
     queryFn: () => fetchModuleStatuses(user!.id, activeUnitId!, isAdmin),
     enabled: !!user && !!activeUnitId,
@@ -226,5 +244,33 @@ export function useModuleStatus() {
     refetchInterval: 5 * 60 * 1000,
   });
 
-  return statuses || {};
+  const statuses = rawStatuses || {};
+
+  // Apply temporal escalation
+  const result: ModuleStatusMap = { ...statuses };
+
+  if (result['/finance'] && result['/finance'].level !== 'ok') {
+    result['/finance'] = {
+      ...result['/finance'],
+      level: escalateLevel(result['/finance'].level, moduleUrgency.finance),
+    };
+  }
+
+  if (result['/checklists'] && result['/checklists'].level !== 'ok') {
+    const hour = new Date().getHours();
+    const checklistUrgency = hour < 14 ? moduleUrgency.checklistAbertura : moduleUrgency.checklistFechamento;
+    result['/checklists'] = {
+      ...result['/checklists'],
+      level: escalateLevel(result['/checklists'].level, checklistUrgency),
+    };
+  }
+
+  if (result['/cash-closing'] && result['/cash-closing'].level !== 'ok') {
+    result['/cash-closing'] = {
+      ...result['/cash-closing'],
+      level: escalateLevel(result['/cash-closing'].level, moduleUrgency.cashClosing),
+    };
+  }
+
+  return result;
 }

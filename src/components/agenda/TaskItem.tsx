@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { CalendarDays, Info, Trash2, ChevronRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
+import { getTaskUrgencyColor } from '@/hooks/useTimeBasedUrgency';
 
 interface TaskItemProps {
   task: ManagerTask;
@@ -35,6 +36,9 @@ function isOverdue(dateStr: string | null): boolean {
 export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, onAddSubtask, onUpdateSubtask, isDragging, dragHandleProps }: TaskItemProps) {
   const dueLabel = formatDueDate(task.due_date || null, task.due_time || null);
   const overdue = !task.is_completed && isOverdue(task.due_date || null);
+  const clockUrgency = !task.is_completed
+    ? getTaskUrgencyColor(task.due_date || null, task.due_time || null)
+    : { colorClass: 'text-muted-foreground', pulse: false };
   const subtasks = task.subtasks || [];
   const hasSubtasks = subtasks.length > 0;
   const completedSubtasks = subtasks.filter(s => s.is_completed).length;
@@ -202,7 +206,11 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                 'text-xs flex items-center gap-1',
                 overdue ? 'text-destructive' : 'text-muted-foreground'
               )}>
-                <CalendarDays className="w-3 h-3" />
+                <CalendarDays className={cn(
+                  'w-3 h-3',
+                  clockUrgency.colorClass,
+                  clockUrgency.pulse && 'animate-pulse'
+                )} />
                 {dueLabel}
               </span>
             )}

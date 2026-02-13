@@ -17,6 +17,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
 import { useModuleStatus, type StatusLevel } from '@/hooks/useModuleStatus';
+import { useTimeAlerts } from '@/hooks/useTimeAlerts';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
@@ -133,6 +134,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const rank = getRank(earnedPoints);
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
+  useTimeAlerts();
   const navRef = useRef<HTMLElement>(null);
 
   // Pages with bottom navigation bars that conflict with the FAB
@@ -489,18 +491,22 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                 <span
                                   className={cn(
                                     "w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center shrink-0",
-                                    moduleStatus.level === 'critical' && "animate-pulse"
+                                    (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
                                   )}
                                   style={{
                                     background: moduleStatus.level === 'critical'
                                       ? 'hsl(var(--neon-red))'
-                                      : 'hsl(var(--neon-amber))',
+                                      : moduleStatus.level === 'warning'
+                                        ? 'hsl(var(--neon-amber))'
+                                        : 'hsl(var(--neon-amber))',
                                     color: moduleStatus.level === 'critical'
                                       ? 'hsl(0 0% 100%)'
                                       : 'hsl(0 0% 0%)',
                                     boxShadow: moduleStatus.level === 'critical'
                                       ? '0 0 8px hsl(var(--neon-red) / 0.5)'
-                                      : '0 0 8px hsl(var(--neon-amber) / 0.4)',
+                                      : moduleStatus.level === 'warning'
+                                        ? '0 0 10px hsl(var(--neon-amber) / 0.6)'
+                                        : '0 0 8px hsl(var(--neon-amber) / 0.4)',
                                   }}
                                 >
                                   {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
