@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
-  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown, MessageCircle, Monitor, MessageSquare, BookOpen
+  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown, MessageCircle, Monitor, MessageSquare, BookOpen, Plus
 } from 'lucide-react';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
@@ -19,6 +19,19 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/comp
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
+import { useDashboardLayout } from '@/hooks/useDashboardLayout';
+import { WidgetType } from '@/types/dashboard';
+import { toast } from 'sonner';
+
+// Mapping from sidebar routes to widget types
+const ROUTE_TO_WIDGET: Record<string, WidgetType> = {
+  '/finance': 'metric_balance',
+  '/inventory': 'metric_critical',
+  '/recipes': 'metric_recipes',
+  '/rewards': 'points',
+  '/checklists': 'quick_access',
+  '/': 'welcome',
+};
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -61,6 +74,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const rank = getRank(earnedPoints);
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
+  const { widgets, addWidget } = useDashboardLayout();
   const navigate = useNavigate();
   const navRef = useRef<HTMLElement>(null);
 
@@ -319,107 +333,126 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                   const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
                   const moduleStatus = moduleStatuses[item.href];
+                  const widgetType = ROUTE_TO_WIDGET[item.href];
+                  const widgetAlreadyAdded = widgetType ? widgets.some(w => w.type === widgetType) : true;
 
                   return (
-                    <TooltipProvider key={item.href}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Link
-                            to={item.href}
-                            data-active={isActive}
-                            onClick={() => setSidebarOpen(false)}
-                            className={cn(
-                              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
-                              isActive
-                                ? "text-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
-                            )}
-                            style={isActive ? {
-                              background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
-                              border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-                              boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
-                            } : undefined}
-                          >
-                            {/* Active indicator bar */}
-                            {isActive && (
-                              <div
-                                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
-                                style={{
-                                  background: 'hsl(var(--neon-cyan))',
-                                  boxShadow: '0 0 8px hsl(var(--neon-cyan) / 0.5)'
-                                }}
-                              />
-                            )}
-
-                            {/* Icon container */}
-                            <div
+                    <div key={item.href} className="flex items-center gap-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link
+                              to={item.href}
+                              data-active={isActive}
+                              onClick={() => setSidebarOpen(false)}
                               className={cn(
-                                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200",
-                                isActive ? "" : "group-hover:bg-secondary/60"
+                                "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
+                                isActive
+                                  ? "text-foreground"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
                               )}
                               style={isActive ? {
-                                background: 'hsl(var(--primary) / 0.15)',
-                                boxShadow: '0 0 8px hsl(var(--primary) / 0.1)'
+                                background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
+                                border: '1px solid hsl(var(--neon-cyan) / 0.2)',
+                                boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
                               } : undefined}
                             >
-                              <div className="relative">
-                                <item.icon className={cn(
-                                  "w-[18px] h-[18px]",
-                                  isActive ? "text-primary" : ""
-                                )} />
-                                {showBadge && (
-                                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
-                                    {badgeCount > 9 ? '9+' : badgeCount}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <span className="flex-1">{item.label}</span>
-
-                            {/* Module status indicators */}
-                            {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 ? (
-                              <div className="flex items-center gap-1.5">
-                                <span
-                                  className={cn(
-                                    "w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center shrink-0",
-                                    moduleStatus.level === 'critical' && "animate-pulse"
-                                  )}
+                              {/* Active indicator bar */}
+                              {isActive && (
+                                <div
+                                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
                                   style={{
-                                    background: moduleStatus.level === 'critical'
-                                      ? 'hsl(var(--neon-red))'
-                                      : 'hsl(var(--neon-amber))',
-                                    color: moduleStatus.level === 'critical'
-                                      ? 'hsl(0 0% 100%)'
-                                      : 'hsl(0 0% 0%)',
-                                    boxShadow: moduleStatus.level === 'critical'
-                                      ? '0 0 8px hsl(var(--neon-red) / 0.5)'
-                                      : '0 0 8px hsl(var(--neon-amber) / 0.4)',
+                                    background: 'hsl(var(--neon-cyan))',
+                                    boxShadow: '0 0 8px hsl(var(--neon-cyan) / 0.5)'
                                   }}
-                                >
-                                  {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
-                                </span>
-                              </div>
-                            ) : moduleStatus && moduleStatus.level === 'ok' ? (
+                                />
+                              )}
+
+                              {/* Icon container */}
                               <div
-                                className="w-1.5 h-1.5 rounded-full shrink-0"
-                                style={{
-                                  background: 'hsl(var(--neon-green))',
-                                  boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
-                                }}
-                              />
-                            ) : isActive ? (
-                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
-                            ) : null}
-                          </Link>
-                        </TooltipTrigger>
-                        {moduleStatus && (
-                          <TooltipContent side="right" className="text-xs">
-                            {moduleStatus.tooltip}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </TooltipProvider>
+                                className={cn(
+                                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200",
+                                  isActive ? "" : "group-hover:bg-secondary/60"
+                                )}
+                                style={isActive ? {
+                                  background: 'hsl(var(--primary) / 0.15)',
+                                  boxShadow: '0 0 8px hsl(var(--primary) / 0.1)'
+                                } : undefined}
+                              >
+                                <div className="relative">
+                                  <item.icon className={cn(
+                                    "w-[18px] h-[18px]",
+                                    isActive ? "text-primary" : ""
+                                  )} />
+                                  {showBadge && (
+                                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
+                                      {badgeCount > 9 ? '9+' : badgeCount}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <span className="flex-1">{item.label}</span>
+
+                              {/* Module status indicators */}
+                              {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 ? (
+                                <div className="flex items-center gap-1.5">
+                                  <span
+                                    className={cn(
+                                      "w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center shrink-0",
+                                      moduleStatus.level === 'critical' && "animate-pulse"
+                                    )}
+                                    style={{
+                                      background: moduleStatus.level === 'critical'
+                                        ? 'hsl(var(--neon-red))'
+                                        : 'hsl(var(--neon-amber))',
+                                      color: moduleStatus.level === 'critical'
+                                        ? 'hsl(0 0% 100%)'
+                                        : 'hsl(0 0% 0%)',
+                                      boxShadow: moduleStatus.level === 'critical'
+                                        ? '0 0 8px hsl(var(--neon-red) / 0.5)'
+                                        : '0 0 8px hsl(var(--neon-amber) / 0.4)',
+                                    }}
+                                  >
+                                    {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
+                                  </span>
+                                </div>
+                              ) : moduleStatus && moduleStatus.level === 'ok' ? (
+                                <div
+                                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                                  style={{
+                                    background: 'hsl(var(--neon-green))',
+                                    boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
+                                  }}
+                                />
+                              ) : isActive ? (
+                                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
+                              ) : null}
+                            </Link>
+                          </TooltipTrigger>
+                          {moduleStatus && (
+                            <TooltipContent side="right" className="text-xs">
+                              {moduleStatus.tooltip}
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      {/* Add to dashboard button */}
+                      {widgetType && !widgetAlreadyAdded && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addWidget(widgetType);
+                            toast.success(`Widget "${item.label}" adicionado ao dashboard`);
+                          }}
+                          className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 active:scale-90 transition-all"
+                          title={`Adicionar ${item.label} ao Dashboard`}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   );
                 })}
               </div>
