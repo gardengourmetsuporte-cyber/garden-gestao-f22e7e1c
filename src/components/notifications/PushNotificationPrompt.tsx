@@ -11,25 +11,22 @@ export function PushNotificationPrompt() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Show prompt after a short delay if user is logged in and not subscribed
-    if (!user || !isSupported || isSubscribed || permission === 'denied' || dismissed) {
+    // Don't show if: no user, not supported, already subscribed, permission denied/granted, or dismissed
+    if (!user || !isSupported || isSubscribed || isLoading || permission === 'denied' || permission === 'granted' || dismissed) {
       setShow(false);
       return;
     }
 
-    // Check if user already dismissed recently
+    // Check if user already dismissed recently (24h cooldown)
     const lastDismissed = localStorage.getItem('push-prompt-dismissed');
     if (lastDismissed) {
-      const dismissedAt = new Date(lastDismissed);
-      const hoursSince = (Date.now() - dismissedAt.getTime()) / (1000 * 60 * 60);
-      if (hoursSince < 24) {
-        return;
-      }
+      const hoursSince = (Date.now() - new Date(lastDismissed).getTime()) / (1000 * 60 * 60);
+      if (hoursSince < 24) return;
     }
 
-    const timer = setTimeout(() => setShow(true), 3000);
-    return () => clearTimeout(timer);
-  }, [user, isSupported, isSubscribed, permission, dismissed]);
+    // Show immediately (no artificial delay)
+    setShow(true);
+  }, [user, isSupported, isSubscribed, isLoading, permission, dismissed]);
 
   if (!show) return null;
 
