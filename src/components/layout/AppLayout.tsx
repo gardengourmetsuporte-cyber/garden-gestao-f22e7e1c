@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useRef, useCallback } from 'react';
+import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
@@ -340,33 +340,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   const widgetAlreadyAdded = widgetType ? widgets.some(w => w.type === widgetType) : true;
 
                   const canAddWidget = widgetType && !widgetAlreadyAdded;
-                  let longPressTimer: ReturnType<typeof setTimeout> | null = null;
-                  let didLongPress = false;
 
-                  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-                    if (!canAddWidget) return;
-                    didLongPress = false;
-                    longPressTimer = setTimeout(() => {
-                      didLongPress = true;
+                  const handleAddWidget = (e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (canAddWidget) {
                       addWidget(widgetType!);
                       toast.success(`"${item.label}" adicionado ao Dashboard`);
                       setSidebarOpen(false);
                       navigate('/');
-                    }, 600);
-                  };
-
-                  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
-                    if (longPressTimer) {
-                      clearTimeout(longPressTimer);
-                      longPressTimer = null;
                     }
-                    if (didLongPress) {
-                      e.preventDefault();
-                    }
-                  };
-
-                  const handleContextMenu = (e: React.MouseEvent) => {
-                    if (canAddWidget) e.preventDefault();
                   };
 
                   return (
@@ -377,31 +360,18 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             <Link
                               to={item.href}
                               data-active={isActive}
-                              onClick={(e) => {
-                                if (didLongPress) { e.preventDefault(); return; }
-                                setSidebarOpen(false);
-                              }}
-                              onTouchStart={handleTouchStart}
-                              onTouchEnd={handleTouchEnd}
-                              onTouchCancel={() => { if (longPressTimer) clearTimeout(longPressTimer); }}
-                              onMouseDown={handleTouchStart}
-                              onMouseUp={handleTouchEnd}
-                              onMouseLeave={() => { if (longPressTimer) clearTimeout(longPressTimer); }}
-                              onContextMenu={handleContextMenu}
+                              onClick={() => setSidebarOpen(false)}
                               className={cn(
-                                "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group select-none",
+                                "flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
                                 isActive
                                   ? "text-foreground"
                                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
                               )}
-                              style={{
-                                ...(isActive ? {
-                                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
-                                  border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-                                  boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
-                                } : {}),
-                                WebkitTouchCallout: 'none',
-                              } as React.CSSProperties}
+                              style={isActive ? {
+                                background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
+                                border: '1px solid hsl(var(--neon-cyan) / 0.2)',
+                                boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
+                              } : undefined}
                             >
                               {/* Active indicator bar */}
                               {isActive && (
@@ -485,6 +455,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )}
                         </Tooltip>
                       </TooltipProvider>
+                      {/* Add to dashboard button */}
+                      {canAddWidget && (
+                        <button
+                          onClick={handleAddWidget}
+                          className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-primary bg-primary/10 hover:bg-primary/20 active:scale-90 transition-all"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   );
                 })}
