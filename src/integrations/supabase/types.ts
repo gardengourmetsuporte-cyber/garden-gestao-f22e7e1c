@@ -2124,6 +2124,176 @@ export type Database = {
           },
         ]
       }
+      smart_receiving_items: {
+        Row: {
+          confidence: number | null
+          confirmed_quantity: number | null
+          confirmed_unit_price: number | null
+          created_at: string
+          id: string
+          inventory_item_id: string | null
+          is_confirmed: boolean | null
+          is_new_item: boolean | null
+          matched_name: string | null
+          raw_description: string
+          raw_quantity: number
+          raw_total: number | null
+          raw_unit_price: number | null
+          raw_unit_type: string | null
+          receiving_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          confirmed_quantity?: number | null
+          confirmed_unit_price?: number | null
+          created_at?: string
+          id?: string
+          inventory_item_id?: string | null
+          is_confirmed?: boolean | null
+          is_new_item?: boolean | null
+          matched_name?: string | null
+          raw_description: string
+          raw_quantity?: number
+          raw_total?: number | null
+          raw_unit_price?: number | null
+          raw_unit_type?: string | null
+          receiving_id: string
+        }
+        Update: {
+          confidence?: number | null
+          confirmed_quantity?: number | null
+          confirmed_unit_price?: number | null
+          created_at?: string
+          id?: string
+          inventory_item_id?: string | null
+          is_confirmed?: boolean | null
+          is_new_item?: boolean | null
+          matched_name?: string | null
+          raw_description?: string
+          raw_quantity?: number
+          raw_total?: number | null
+          raw_unit_price?: number | null
+          raw_unit_type?: string | null
+          receiving_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_receiving_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_receiving_items_receiving_id_fkey"
+            columns: ["receiving_id"]
+            isOneToOne: false
+            referencedRelation: "smart_receivings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      smart_receivings: {
+        Row: {
+          ai_raw_response: Json | null
+          boleto_amount: number | null
+          boleto_barcode: string | null
+          boleto_due_date: string | null
+          boleto_image_url: string | null
+          confirmed_at: string | null
+          created_at: string
+          finance_transaction_id: string | null
+          id: string
+          invoice_date: string | null
+          invoice_image_url: string | null
+          invoice_number: string | null
+          order_id: string | null
+          status: string
+          supplier_id: string | null
+          supplier_invoice_id: string | null
+          supplier_name: string | null
+          total_amount: number | null
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_raw_response?: Json | null
+          boleto_amount?: number | null
+          boleto_barcode?: string | null
+          boleto_due_date?: string | null
+          boleto_image_url?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          finance_transaction_id?: string | null
+          id?: string
+          invoice_date?: string | null
+          invoice_image_url?: string | null
+          invoice_number?: string | null
+          order_id?: string | null
+          status?: string
+          supplier_id?: string | null
+          supplier_invoice_id?: string | null
+          supplier_name?: string | null
+          total_amount?: number | null
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_raw_response?: Json | null
+          boleto_amount?: number | null
+          boleto_barcode?: string | null
+          boleto_due_date?: string | null
+          boleto_image_url?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          finance_transaction_id?: string | null
+          id?: string
+          invoice_date?: string | null
+          invoice_image_url?: string | null
+          invoice_number?: string | null
+          order_id?: string | null
+          status?: string
+          supplier_id?: string | null
+          supplier_invoice_id?: string | null
+          supplier_name?: string | null
+          total_amount?: number | null
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_receivings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_receivings_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_receivings_supplier_invoice_id_fkey"
+            columns: ["supplier_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_receivings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stock_movements: {
         Row: {
           created_at: string

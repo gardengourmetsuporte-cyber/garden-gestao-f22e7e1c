@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText } from 'lucide-react';
+import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles } from 'lucide-react';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { cn } from '@/lib/utils';
 import { ReceiveOrderSheet } from './ReceiveOrderSheet';
 import { RegisterInvoiceAfterReceive } from './RegisterInvoiceAfterReceive';
+import { SmartReceivingSheet } from './SmartReceivingSheet';
 
 interface OrdersTabProps {
   items: InventoryItem[];
@@ -44,6 +45,8 @@ export function OrdersTab({
   const [orderToReceive, setOrderToReceive] = useState<Order | null>(null);
   const [invoiceSheetOpen, setInvoiceSheetOpen] = useState(false);
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
+  const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
+  const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
 
   // Get items that need to be ordered (below minimum stock)
   const lowStockItems = useMemo(() => {
@@ -375,6 +378,21 @@ export function OrdersTab({
             setOrderForInvoice(orderToReceive);
             setInvoiceSheetOpen(true);
           }
+        }}
+        onSmartReceive={() => {
+          setSmartReceivingOrder(orderToReceive);
+          setSmartReceivingOpen(true);
+        }}
+      />
+
+      {/* Smart Receiving Sheet */}
+      <SmartReceivingSheet
+        open={smartReceivingOpen}
+        onOpenChange={setSmartReceivingOpen}
+        order={smartReceivingOrder}
+        inventoryItems={items}
+        onComplete={() => {
+          setSmartReceivingOpen(false);
         }}
       />
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Check, AlertTriangle } from 'lucide-react';
+import { Package, Check, AlertTriangle, Sparkles } from 'lucide-react';
 import { Order, OrderItem } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,7 @@ interface ReceiveOrderSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirmReceive: (orderId: string, items: { itemId: string; quantity: number }[]) => Promise<void>;
+  onSmartReceive?: () => void;
 }
 
 export function ReceiveOrderSheet({
@@ -29,6 +30,7 @@ export function ReceiveOrderSheet({
   open,
   onOpenChange,
   onConfirmReceive,
+  onSmartReceive,
 }: ReceiveOrderSheetProps) {
   const [receivedItems, setReceivedItems] = useState<ReceivedItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,6 +124,21 @@ export function ReceiveOrderSheet({
           <p className="text-sm text-muted-foreground">
             Confira os itens recebidos. Ajuste as quantidades se algo veio diferente do pedido.
           </p>
+
+          {/* Smart Receiving Button */}
+          {onSmartReceive && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                onOpenChange(false);
+                onSmartReceive();
+              }}
+              className="w-full h-12 gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary"
+            >
+              <Sparkles className="w-5 h-5" />
+              Escanear Nota Fiscal com IA
+            </Button>
+          )}
 
           {receivedItems.map(item => (
             <div
