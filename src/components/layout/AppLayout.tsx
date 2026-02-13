@@ -39,7 +39,7 @@ const navItems: NavItem[] = [
   { icon: Users, label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: Gift, label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: MessageCircle, label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: Monitor, label: 'Pedidos Tablet', href: '/tablet-admin', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: Monitor, label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'producao', groupLabel: 'Em Produção' },
   { icon: BookOpen, label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
   { icon: MessageSquare, label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
   { icon: Settings, label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
