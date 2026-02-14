@@ -76,12 +76,12 @@ export function ListPicker({
 
   return (
     <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) resetState(); }}>
-      <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl">
+       <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader className="pb-3 border-b border-border/20">
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
 
-        <div className="pt-3 flex flex-col h-[calc(70vh-80px)]">
+        <div className="pt-3 flex flex-col h-[calc(70vh-80px)]" data-vaul-no-drag>
           {/* Search + Create button row */}
           <div className="flex gap-2 mb-3">
             <div className="relative flex-1">
@@ -110,6 +110,7 @@ export function ListPicker({
           {showCreateInput && onCreateNew && (
             <div className="flex gap-2 mb-3">
               <Input
+                data-vaul-no-drag
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder={createPlaceholder}
