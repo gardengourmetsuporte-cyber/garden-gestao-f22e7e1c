@@ -2,6 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceTransaction } from '@/types/finance';
 import { cn } from '@/lib/utils';
+import { ICON_MAP } from '@/lib/iconMap';
 import { useState, useRef, useCallback } from 'react';
 
 interface TransactionItemProps {
@@ -57,8 +58,16 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
   };
 
   const getCategoryIcon = () => {
-    if (!category?.icon) return null;
-    return <AppIcon name={category.icon} size={14} style={{ color: category.color }} />;
+    if (!category?.icon) {
+      // Colored dot fallback
+      return <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: category?.color || 'hsl(var(--muted-foreground))' }} />;
+    }
+    // Check if icon is mapped; if not, show colored dot
+    const isMapped = !!ICON_MAP[category.icon];
+    if (!isMapped) {
+      return <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: category.color }} />;
+    }
+    return <AppIcon name={category.icon} size={14} style={{ color: category.color }} className="flex-shrink-0" />;
   };
 
   const formatAmount = () => {
