@@ -1,4 +1,4 @@
-import { ArrowUpCircle, ArrowDownCircle, AlertCircle, ChevronRight } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { MonthSelector } from './MonthSelector';
 import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
@@ -38,7 +38,7 @@ export function FinanceHome({
       >
         <div className="flex items-center justify-between">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Saldo em contas</p>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
         </div>
         <p className={cn(
           "text-4xl font-extrabold mt-2 tracking-tight",
@@ -56,7 +56,7 @@ export function FinanceHome({
         >
           <div className="flex items-center gap-2 mb-2">
             <div className="icon-glow icon-glow-sm icon-glow-success">
-              <ArrowUpCircle className="w-5 h-5" />
+              <AppIcon name="ArrowUpCircle" size={20} />
             </div>
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
@@ -70,7 +70,7 @@ export function FinanceHome({
         >
           <div className="flex items-center gap-2 mb-2">
             <div className="icon-glow icon-glow-sm icon-glow-destructive">
-              <ArrowDownCircle className="w-5 h-5" />
+              <AppIcon name="ArrowDownCircle" size={20} />
             </div>
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
@@ -89,11 +89,11 @@ export function FinanceHome({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="icon-glow icon-glow-sm icon-glow-warning" style={{ width: '1.75rem', height: '1.75rem' }}>
-                <AlertCircle className="w-4 h-4" />
+                <AppIcon name="AlertCircle" size={16} />
               </div>
               <span className="font-semibold text-sm text-warning">Pendências</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
           </div>
           {monthStats.pendingExpenses > 0 && (
             <p className="text-sm text-muted-foreground pl-9">

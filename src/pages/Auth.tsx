@@ -1,7 +1,7 @@
 // Auth page v2
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Sparkles } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -201,7 +201,7 @@ export default function Auth() {
             {/* Title with icon */}
             <div className="text-center space-y-1.5">
               <div className="flex items-center justify-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
+                <AppIcon name="Sparkles" size={20} className="text-primary" />
                 <h2 className="text-xl font-bold text-foreground">
                   {isResetPassword ? 'Recuperar Senha' : isLogin ? 'Bem-vindo' : 'Criar Conta'}
                 </h2>
@@ -228,7 +228,7 @@ export default function Auth() {
                         focusedField === 'resetEmail' ? "text-primary" : "text-muted-foreground/60"
                       )}
                     >
-                      <Mail className="w-5 h-5" />
+                      <AppIcon name="Mail" size={20} />
                     </div>
                     <Input
                       id="resetEmail"
@@ -261,7 +261,7 @@ export default function Auth() {
                       Aguarde...
                     </span>
                   ) : (
-                    <>Enviar link<ArrowRight className="w-5 h-5 ml-2" /></>
+                    <>Enviar link<AppIcon name="ArrowRight" size={20} className="ml-2" /></>
                   )}
                 </Button>
               </form>
@@ -279,7 +279,7 @@ export default function Auth() {
                           focusedField === 'fullName' ? "text-primary" : "text-muted-foreground/60"
                         )}
                       >
-                        <User className="w-5 h-5" />
+                        <AppIcon name="User" size={20} />
                       </div>
                       <Input
                         id="fullName"
@@ -309,7 +309,7 @@ export default function Auth() {
                         focusedField === 'email' ? "text-primary" : "text-muted-foreground/60"
                       )}
                     >
-                      <Mail className="w-5 h-5" />
+                      <AppIcon name="Mail" size={20} />
                     </div>
                     <Input
                       id="email"
@@ -349,7 +349,7 @@ export default function Auth() {
                         focusedField === 'password' ? "text-primary" : "text-muted-foreground/60"
                       )}
                     >
-                      <Lock className="w-5 h-5" />
+                      <AppIcon name="Lock" size={20} />
                     </div>
                     <Input
                       id="password"
@@ -366,7 +366,7 @@ export default function Auth() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? <AppIcon name="EyeOff" size={20} /> : <AppIcon name="Eye" size={20} />}
                     </button>
                   </div>
                   {errors.password && (
@@ -392,7 +392,7 @@ export default function Auth() {
                     ) : (
                       <>
                         {isLogin ? 'Entrar' : 'Cadastrar'}
-                        <ArrowRight className="w-5 h-5 ml-2" />
+                        <AppIcon name="ArrowRight" size={20} className="ml-2" />
                       </>
                     )}
                   </Button>

@@ -1,5 +1,5 @@
 import { MonthSelector } from './MonthSelector';
-import { Target } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface FinancePlanningProps {
   selectedMonth: Date;
@@ -17,7 +17,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange }: FinancePlannin
       {/* Coming Soon */}
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-          <Target className="w-8 h-8 text-primary" />
+          <AppIcon name="Target" size={32} className="text-primary" />
         </div>
         <h2 className="text-xl font-semibold mb-2">Planejamento Financeiro</h2>
         <p className="text-muted-foreground max-w-sm">

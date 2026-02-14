@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageSquare, Settings, ShoppingBag, Brain, BookOpen } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ConversationList } from '@/components/whatsapp/ConversationList';
 import { ConversationChat } from '@/components/whatsapp/ConversationChat';
@@ -12,11 +12,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 const tabs = [
-  { key: 'conversations', label: 'Conversas', icon: MessageSquare },
-  { key: 'orders', label: 'Pedidos', icon: ShoppingBag },
-  { key: 'knowledge', label: 'Base', icon: BookOpen },
-  { key: 'logs', label: 'Logs IA', icon: Brain },
-  { key: 'settings', label: 'Config', icon: Settings },
+  { key: 'conversations', label: 'Conversas', icon: 'MessageSquare' },
+  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag' },
+  { key: 'knowledge', label: 'Base', icon: 'BookOpen' },
+  { key: 'logs', label: 'Logs IA', icon: 'Brain' },
+  { key: 'settings', label: 'Config', icon: 'Settings' },
 ];
 
 export default function WhatsAppPage() {
@@ -45,7 +45,7 @@ export default function WhatsAppPage() {
           <div className="page-header-content">
             <div className="flex items-center gap-3">
               <div className="icon-glow icon-glow-md icon-glow-success">
-                <MessageSquare className="w-5 h-5" />
+                <AppIcon name="MessageSquare" size={20} />
               </div>
               <div>
                 <h1 className="page-title">WhatsApp</h1>
@@ -65,7 +65,7 @@ export default function WhatsAppPage() {
                     activeTab === tab.key ? 'tab-command-active' : 'tab-command-inactive'
                   )}
                 >
-                  <tab.icon className="w-3.5 h-3.5" />
+                  <AppIcon name={tab.icon} size={14} />
                   <span className="hidden sm:inline">{tab.label}</span>
                 </button>
               ))}

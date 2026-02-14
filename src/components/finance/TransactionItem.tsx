@@ -1,4 +1,5 @@
-import { ArrowUpCircle, ArrowDownCircle, ArrowLeftRight, CreditCard, Check, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceTransaction } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { getLucideIcon } from '@/lib/icons';
@@ -30,18 +31,24 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
   const getTypeIcon = () => {
     switch (type) {
       case 'income':
-        return <ArrowUpCircle className="w-5 h-5 text-success" />;
+        return <AppIcon name="ArrowUpCircle" size={20} className="text-success" />;
       case 'expense':
-        return <ArrowDownCircle className="w-5 h-5 text-destructive" />;
+        return <AppIcon name="ArrowDownCircle" size={20} className="text-destructive" />;
       case 'transfer':
-        return <ArrowLeftRight className="w-5 h-5 text-primary" />;
+        return <AppIcon name="ArrowLeftRight" size={20} className="text-primary" />;
       case 'credit_card':
-        return <CreditCard className="w-5 h-5 text-primary" />;
+        return <AppIcon name="CreditCard" size={20} className="text-primary" />;
     }
   };
 
   const getCategoryIcon = () => {
     if (!category?.icon) return null;
+    // Try Material icon from ICON_MAP first, fallback to Lucide
+    const { ICON_MAP } = require('@/lib/iconMap');
+    const materialName = ICON_MAP[category.icon];
+    if (materialName) {
+      return <AppIcon name={category.icon} size={16} style={{ color: category.color }} />;
+    }
     const IconComponent = getLucideIcon(category.icon);
     if (!IconComponent) return null;
     return <IconComponent className="w-4 h-4" style={{ color: category.color }} />;
@@ -194,7 +201,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
           {isToggling ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : is_paid ? (
-            <Check className="w-4 h-4" />
+            <AppIcon name="Check" size={16} />
           ) : null}
         </button>
 

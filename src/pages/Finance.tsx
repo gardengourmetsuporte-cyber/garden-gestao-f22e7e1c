@@ -14,6 +14,7 @@ import { useEmployees } from '@/hooks/useEmployees';
 import { FinanceTab, TransactionType, FinanceTransaction, TransactionFormData, FinanceAccount } from '@/types/finance';
 import { TransactionFiltersState } from '@/components/finance/TransactionFilters';
 import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
 
 export default function Finance() {

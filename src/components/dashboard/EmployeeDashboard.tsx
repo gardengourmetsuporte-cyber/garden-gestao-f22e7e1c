@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ClipboardCheck, Gift, Package, ArrowRight, Receipt } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { UserPointsCard } from './UserPointsCard';
 import { Leaderboard } from './Leaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
@@ -54,7 +54,7 @@ export function EmployeeDashboard() {
                 <span className="text-xs font-semibold" style={{ color: currentRank.color }}>
                   {currentRank.title}
                 </span>
-                <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                <AppIcon name="ArrowRight" size={12} className="text-muted-foreground" />
                 <span className="text-xs font-semibold text-foreground">
                   {nextRank.title}
                 </span>
@@ -74,9 +74,9 @@ export function EmployeeDashboard() {
       {/* Quick Actions */}
       <div className="grid grid-cols-3 gap-2.5">
         {[
-          { to: '/checklists', icon: ClipboardCheck, label: 'Checklists', sub: 'Ganhe pontos', bg: 'bg-success/10', color: 'text-success', borderClass: 'card-command-success', idx: 4 },
-          { to: '/cash-closing', icon: Receipt, label: 'Caixa', sub: 'Fechamento', bg: 'bg-primary/10', color: 'text-primary', borderClass: 'card-command-info', idx: 5 },
-          { to: '/rewards', icon: Gift, label: 'Recompensas', sub: 'Troque', bg: 'bg-warning/10', color: 'text-warning', borderClass: 'card-command-warning', idx: 6, badge: pendingRedemptions },
+          { to: '/checklists', icon: 'ClipboardCheck', label: 'Checklists', sub: 'Ganhe pontos', bg: 'bg-success/10', color: 'text-success', borderClass: 'card-command-success', idx: 4 },
+          { to: '/cash-closing', icon: 'Receipt', label: 'Caixa', sub: 'Fechamento', bg: 'bg-primary/10', color: 'text-primary', borderClass: 'card-command-info', idx: 5 },
+          { to: '/rewards', icon: 'Gift', label: 'Recompensas', sub: 'Troque', bg: 'bg-warning/10', color: 'text-warning', borderClass: 'card-command-warning', idx: 6, badge: pendingRedemptions },
         ].map(item => (
           <Link key={item.to} to={item.to}>
             <div className={cn(
@@ -85,7 +85,7 @@ export function EmployeeDashboard() {
               `stagger-${item.idx}`
             )}>
               <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-2", item.bg)}>
-                <item.icon className={cn("w-5 h-5", item.color)} />
+                <AppIcon name={item.icon} size={20} className={item.color} />
               </div>
               <p className="font-semibold text-xs text-foreground">{item.label}</p>
               <p className="text-[10px] text-muted-foreground">{item.sub}</p>
@@ -113,14 +113,14 @@ export function EmployeeDashboard() {
         <div className="card-command-info p-3.5 flex items-center justify-between animate-slide-up stagger-8 cursor-pointer hover:scale-[1.01] active:scale-[0.98] transition-all">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
-              <Package className="w-4 h-4 text-muted-foreground" />
+              <AppIcon name="Package" size={16} className="text-muted-foreground" />
             </div>
             <div>
               <p className="font-medium text-sm text-foreground">Estoque</p>
               <p className="text-[10px] text-muted-foreground">Ver itens e movimentações</p>
             </div>
           </div>
-          <ArrowRight className="w-4 h-4 text-muted-foreground" />
+          <AppIcon name="ArrowRight" size={16} className="text-muted-foreground" />
         </div>
       </Link>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Home, FileText, Plus, PieChart, MoreHorizontal, ArrowUpCircle, ArrowDownCircle, ArrowLeftRight, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { FinanceTab, TransactionType } from '@/types/finance';
 
@@ -9,11 +10,11 @@ interface FinanceBottomNavProps {
   onAddTransaction: (type: TransactionType) => void;
 }
 
-const tabs: { id: FinanceTab; icon: typeof Home; label: string }[] = [
-  { id: 'home', icon: Home, label: 'Principal' },
-  { id: 'transactions', icon: FileText, label: 'Transações' },
-  { id: 'charts', icon: PieChart, label: 'Gráficos' },
-  { id: 'more', icon: MoreHorizontal, label: 'Mais' },
+const tabs: { id: FinanceTab; icon: string; label: string }[] = [
+  { id: 'home', icon: 'Home', label: 'Principal' },
+  { id: 'transactions', icon: 'FileText', label: 'Transações' },
+  { id: 'charts', icon: 'PieChart', label: 'Gráficos' },
+  { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 
 export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: FinanceBottomNavProps) {
@@ -48,7 +49,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-emerald-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
               style={{ boxShadow: '0 0 16px rgba(16, 185, 129, 0.3)' }}
             >
-              <ArrowUpCircle className="w-7 h-7 text-emerald-400" />
+              <AppIcon name="ArrowUpCircle" size={28} className="text-emerald-400" />
             </div>
             <span className="text-[11px] font-semibold text-emerald-400">Receita</span>
           </button>
@@ -63,7 +64,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-red-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
               style={{ boxShadow: '0 0 16px rgba(239, 68, 68, 0.3)' }}
             >
-              <ArrowDownCircle className="w-7 h-7 text-red-400" />
+              <AppIcon name="ArrowDownCircle" size={28} className="text-red-400" />
             </div>
             <span className="text-[11px] font-semibold text-red-400">Despesa</span>
           </button>
@@ -78,7 +79,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-cyan-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
               style={{ boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)' }}
             >
-              <ArrowLeftRight className="w-7 h-7 text-cyan-400" />
+              <AppIcon name="ArrowLeftRight" size={28} className="text-cyan-400" />
             </div>
             <span className="text-[11px] font-semibold text-cyan-400">Transf.</span>
           </button>
@@ -102,7 +103,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <tab.icon className="w-6 h-6" style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
+              <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
                 <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />
@@ -124,7 +125,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               {/* Inner background */}
               <div className="absolute inset-[2px] rounded-full bg-card" />
               {/* Icon */}
-              <Plus className="w-8 h-8 text-[hsl(var(--neon-cyan))] relative z-10" />
+              <AppIcon name="Plus" size={32} className="text-[hsl(var(--neon-cyan))] relative z-10" />
             </button>
           </div>
 
@@ -140,7 +141,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <tab.icon className="w-6 h-6" style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
+              <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
                 <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />

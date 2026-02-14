@@ -8,7 +8,7 @@ import { MyPayslips } from '@/components/employees/MyPayslips';
 import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
 import { SwipeableTabs } from '@/components/ui/swipeable-tabs';
-import { Users, Calendar } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export default function Employees() {
   const { isAdmin } = useAuth();
@@ -21,7 +21,7 @@ export default function Employees() {
         <div className="page-header-bar">
           <div className="page-header-content flex items-center gap-3">
             <div className="icon-glow icon-glow-md icon-glow-primary">
-              <Users className="w-5 h-5" />
+              <AppIcon name="Users" size={20} />
             </div>
             <div>
               <h1 className="page-title">
@@ -49,13 +49,13 @@ export default function Employees() {
                   {
                     key: 'employees',
                     label: 'Funcionários',
-                    icon: <Users className="w-4 h-4" />,
+                    icon: <AppIcon name="Users" size={16} />,
                     content: <EmployeeList onSelectEmployee={setSelectedEmployee} />,
                   },
                   {
                     key: 'schedules',
                     label: 'Folgas',
-                    icon: <Calendar className="w-4 h-4" />,
+                    icon: <AppIcon name="Calendar" size={16} />,
                     content: <ScheduleManagement />,
                   },
                 ]}
@@ -67,13 +67,13 @@ export default function Employees() {
                 {
                   key: 'payslips',
                   label: 'Holerites',
-                  icon: <Users className="w-4 h-4" />,
+                  icon: <AppIcon name="Users" size={16} />,
                   content: <MyPayslips />,
                 },
                 {
                   key: 'schedules',
                   label: 'Folgas',
-                  icon: <Calendar className="w-4 h-4" />,
+                  icon: <AppIcon name="Calendar" size={16} />,
                   content: <EmployeeScheduleRequest />,
                 },
               ]}
