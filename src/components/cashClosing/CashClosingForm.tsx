@@ -187,7 +187,12 @@ export function CashClosingForm({ onSuccess }: Props) {
 
       if (success) {
         onSuccess();
+      } else {
+        toast.error('Não foi possível salvar o fechamento. Seus dados estão preservados, tente novamente.');
       }
+    } catch (err) {
+      console.error('Cash closing submit error:', err);
+      toast.error('Erro inesperado ao enviar. Seus dados estão preservados, tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
