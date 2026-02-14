@@ -391,14 +391,14 @@ export function TransactionSheet({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl overflow-y-auto">
+        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl overflow-hidden flex flex-col">
           <SheetHeader className="pb-4">
             <SheetTitle>
               {editingTransaction ? 'Editar Transação' : 'Nova Transação'}
             </SheetTitle>
           </SheetHeader>
 
-          <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto space-y-6 pb-4">
             {/* Type selector */}
             <Tabs value={type} onValueChange={(v) => {
               setType(v as TransactionType);
@@ -701,21 +701,23 @@ export function TransactionSheet({
                 </div>
               </div>
 
-            {/* Actions */}
-            <div className="flex flex-col gap-3 pt-4 pb-8">
-              {/* Save and Continue - only for new transactions */}
-              {!editingTransaction && (
-                <Button
-                  variant="ghost"
-                  onClick={handleSaveAndContinue}
-                  disabled={isLoading || !amount || parseFloat(amount) <= 0 || !description.trim()}
-                  className="text-primary"
-                >
-                  Salvar e continuar
-                </Button>
-              )}
-              
-              <div className="flex gap-3">
+          </div>
+
+          {/* Sticky bottom actions */}
+          <div className="shrink-0 border-t border-border/50 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] bg-background">
+            {/* Save and Continue - only for new transactions */}
+            {!editingTransaction && (
+              <Button
+                variant="ghost"
+                onClick={handleSaveAndContinue}
+                disabled={isLoading || !amount || parseFloat(amount) <= 0 || !description.trim()}
+                className="text-primary w-full mb-2"
+              >
+                Salvar e continuar
+              </Button>
+            )}
+            
+            <div className="flex gap-3">
               {editingTransaction && onDelete && (
                 <Button 
                   variant="destructive" 
@@ -733,7 +735,6 @@ export function TransactionSheet({
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
               </Button>
-              </div>
             </div>
           </div>
         </SheetContent>
