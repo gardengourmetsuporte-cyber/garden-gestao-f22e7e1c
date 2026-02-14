@@ -24,10 +24,11 @@ interface CategoryManagementProps {
 }
 
 const ICONS = [
-  'ShoppingCart', 'Utensils', 'Car', 'Home', 'Heart', 'Briefcase', 
+  'ShoppingCart', 'ShoppingBasket', 'Utensils', 'Car', 'Home', 'Heart', 'Briefcase', 
   'GraduationCap', 'Plane', 'Gift', 'Music', 'Film', 'Gamepad2',
   'Shirt', 'Dumbbell', 'Pill', 'Scissors', 'Wrench', 'Zap',
-  'Droplets', 'Flame', 'Phone', 'Wifi', 'CreditCard', 'Wallet'
+  'Droplets', 'Flame', 'Phone', 'Wifi', 'CreditCard', 'Wallet',
+  'Store', 'Building2', 'Truck', 'Receipt', 'Landmark', 'Users', 'TrendingUp', 'FileText'
 ];
 
 const COLORS = [

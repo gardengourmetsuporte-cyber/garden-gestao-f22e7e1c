@@ -61,6 +61,7 @@ export const ICON_MAP: Record<string, string> = {
   Coins: 'toll',
   ShoppingCart: 'shopping_cart',
   ShoppingBag: 'shopping_bag',
+  ShoppingBasket: 'shopping_basket',
 
   // People & Communication
   User: 'person',
@@ -150,6 +151,7 @@ export const ICON_MAP: Record<string, string> = {
   Repeat: 'repeat',
 
   // Building & Places
+  Briefcase: 'work',
   Building: 'business',
   Store: 'storefront',
   Hospital: 'local_hospital',
@@ -186,6 +188,8 @@ export const ICON_MAP: Record<string, string> = {
 
   // Tech
   Smartphone: 'smartphone',
+  Shirt: 'checkroom',
+  Flame: 'local_fire_department',
   Laptop: 'laptop',
   Tv: 'tv',
   Headphones: 'headphones',
