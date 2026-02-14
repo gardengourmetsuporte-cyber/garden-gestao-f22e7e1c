@@ -1,96 +1,137 @@
 
-# Refatoracao Completa: Nivel App Unicornio
 
-## Diagnostico Atual
+# Modulo de Marketing: Planejamento e Publicacao de Conteudo
 
-Apos analise detalhada de todos os hooks e paginas, identifiquei **5 problemas criticos** que comprometem a confiabilidade e a experiencia profissional do sistema:
+## Visao Geral
 
-### Problemas Encontrados
+Criar um modulo completo de Marketing para planejar, organizar e publicar conteudos no **Instagram** e **WhatsApp Status**, com foco em rapidez de execucao e organizacao visual por calendario.
 
-1. **Hooks sem cache (React Query)**: `useFinance`, `useChecklists`, `useCashClosing` e `useChat` usam `useState/useEffect` puro -- ao trocar de pagina e voltar, os dados sao recarregados do zero, causando telas de loading repetitivas e perda de fluidez.
+## Estrutura do Modulo
 
-2. **Queries N+1 no Fechamento de Caixa**: Para cada fechamento, o sistema faz uma query individual para buscar o perfil do usuario e outra para o validador. Com 30 fechamentos, sao 60+ queries extras.
+### 1. Tabela `marketing_posts` (banco de dados)
 
-3. **Queries N+1 no Chat**: Cada conversa dispara 3 queries paralelas (participantes, ultima mensagem, unread count). Com 15 conversas, sao 45+ queries.
+Armazena todos os posts planejados com os seguintes campos:
+- `id`, `unit_id`, `user_id` (multi-tenant padrao)
+- `title` - titulo interno do post
+- `caption` - legenda/texto do post
+- `media_urls` - array de URLs das imagens/videos (bucket de storage)
+- `channels` - array de canais alvo (`['instagram', 'whatsapp_status']`)
+- `status` - enum: `draft` (rascunho), `scheduled` (agendado), `published` (publicado), `failed` (erro)
+- `scheduled_at` - data/hora do agendamento (opcional, para organizacao)
+- `published_at` - data/hora da publicacao efetiva
+- `tags` - array de tags para organizacao (ex: "promocao", "cardapio", "novidade")
+- `notes` - anotacoes internas
+- `sort_order`, `created_at`, `updated_at`
 
-4. **Queries N+1 nos Checklists**: O `fetchCompletions` faz uma query de perfil para CADA completion individual ao inves de buscar todos os perfis de uma vez.
+### 2. Storage Bucket `marketing-media`
 
-5. **Import duplicado no useCashClosing**: O arquivo importa `supabase` duas vezes (como `supabase` e `sb`), um indicativo de codigo acumulado sem revisao.
+Bucket publico para armazenar imagens e videos dos posts, com RLS restrita a admins para upload e leitura publica para exibicao.
 
----
+### 3. Pagina `/marketing` (nova)
 
-## Plano de Refatoracao
+Interface com tres visoes alternadas por tabs:
 
-### Fase 1: Migrar useFinance para React Query
+**Aba Calendario:**
+- Visualizacao mensal com marcadores nos dias que tem posts agendados
+- Clicar no dia exibe os posts daquele dia
+- Indicador de cor por status (rascunho = cinza, agendado = azul, publicado = verde)
 
-O hook mais critico do sistema. Atualmente tem ~470 linhas com gerenciamento manual de estado.
+**Aba Feed (lista):**
+- Lista vertical com preview dos posts (imagem + titulo + legenda truncada)
+- Filtro por status (Todos, Rascunhos, Agendados, Publicados)
+- Filtro por canal (Instagram, WhatsApp)
+- Cada card mostra: thumbnail, titulo, legenda, canais alvo, data, status
 
-**Mudancas:**
-- Substituir `useState` + `useEffect` por `useQuery` para accounts, categories e transactions
-- Substituir funcoes CRUD manuais por `useMutation` com invalidacao automatica de cache
-- Manter a logica de `initializeDefaults` como funcao auxiliar chamada uma unica vez
-- Manter a logica de `reorderTransactions` com optimistic update via `queryClient.setQueryData`
-- Resultado: transicoes instantaneas entre abas do modulo financeiro
+**Aba Ideias (rascunhos rapidos):**
+- Campo rapido para anotar ideias de conteudo sem preencher tudo
+- Converte para post completo com um toque
 
-### Fase 2: Migrar useChecklists para React Query
+### 4. Sheet de Criacao/Edicao de Post
 
-**Mudancas:**
-- `sectors` via `useQuery` com queryKey `['checklist-sectors', activeUnitId]`
-- `completions` via `useQuery` parametrizado por `date` e `type`
-- Eliminar o loop N+1 de profiles em `fetchCompletions` -- buscar todos os user_ids unicos e fazer uma unica query de profiles
-- Todas as operacoes CRUD (addSector, addItem, toggleCompletion, etc.) via `useMutation`
-- Manter as funcoes de reorder com optimistic update
+Bottom-sheet (padrao do app) com:
+- Upload de imagens (multiplas, com preview e reordenacao)
+- Campo de legenda com contador de caracteres
+- Seletor de canais (Instagram, WhatsApp Status) com checkboxes visuais
+- Date picker para agendar
+- Campo de tags
+- Campo de notas internas
+- Botao "Salvar Rascunho" e "Publicar Agora"
 
-### Fase 3: Migrar useCashClosing para React Query
+### 5. Publicacao Rapida
 
-**Mudancas:**
-- Remover import duplicado (`sb`)
-- `closings` via `useQuery` com queryKey `['cash-closings', activeUnitId]`
-- Eliminar N+1 de profiles: buscar todos os `user_id` e `validated_by` unicos em uma unica query
-- `createClosing`, `approveClosing`, `markDivergent` via `useMutation`
-- Manter a logica complexa de `integrateWithFinancial` como funcao auxiliar dentro da mutation de aprovacao
+**Instagram:**
+- Como a API do Instagram (Meta Graph API) requer uma conta Business com token de acesso, a publicacao sera feita via **deep link** que abre o app do Instagram com a imagem pronta para postar
+- O sistema copia automaticamente a legenda para a area de transferencia ao clicar "Publicar"
+- Apos o usuario confirmar, marca o post como publicado no sistema
 
-### Fase 4: Migrar useChat para React Query
+**WhatsApp Status:**
+- Utiliza **deep link** do WhatsApp para compartilhar a imagem como Status
+- A legenda e copiada automaticamente para a area de transferencia
+- Apos o usuario confirmar, marca o post como publicado
 
-**Mudancas:**
-- `conversations` via `useQuery` com queryKey `['chat-conversations', activeUnitId]`
-- Otimizar fetchConversations: buscar todos os profiles de participantes em uma unica query ao inves de por conversa
-- `messages` via `useQuery` parametrizado por `activeConversationId`
-- `sendMessage` e `createConversation` via `useMutation`
-- Manter subscricoes realtime como `useEffect` separado que invalida o cache
+Essa abordagem de deep links elimina a necessidade de APIs complexas e tokens, oferecendo a experiencia mais rapida possivel: **1 toque para abrir o app + colar legenda + publicar**.
 
-### Fase 5: Limpeza e Padronizacao Global
+### 6. Hook `useMarketing`
 
-**Mudancas:**
-- Remover `useInventory.ts` (localStorage) se nao esta sendo usado (o sistema ja usa `useInventoryDB.ts` com React Query)
-- Padronizar tratamento de erros: todas as mutations devem ter `onError` com toast
-- Garantir que todos os hooks usem `staleTime` consistente (2 min global ja configurado no QueryClient)
+Hook com React Query seguindo o padrao ja refatorado:
+- `useQuery` para listagem de posts com cache
+- `useMutation` para criar, editar, excluir e marcar como publicado
+- Filtros por mes, status e canal
+
+### 7. Navegacao
+
+- Adicionar item "Marketing" no menu lateral do `AppLayout` com icone `Megaphone`
+- Rota protegida, somente admins
+- Grupo "Gestao"
 
 ---
 
 ## Detalhes Tecnicos
 
-### Padrao de Migracao (aplicado em cada hook)
+### Tabela SQL
 
 ```text
-ANTES (useState/useEffect):
-  useState -> fetch em useEffect -> setData manual -> refetch manual apos CRUD
-
-DEPOIS (React Query):
-  useQuery (cache automatico) -> useMutation (CRUD) -> invalidateQueries (refetch automatico)
+marketing_posts (
+  id uuid PK default gen_random_uuid(),
+  unit_id uuid references units(id),
+  user_id uuid not null,
+  title text not null,
+  caption text default '',
+  media_urls text[] default '{}',
+  channels text[] default '{}',
+  status text default 'draft' check in ('draft','scheduled','published','failed'),
+  scheduled_at timestamptz,
+  published_at timestamptz,
+  tags text[] default '{}',
+  notes text,
+  sort_order int default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+)
 ```
 
-### O que NAO muda
+RLS: admins podem tudo; funcionarios nao tem acesso (adminOnly).
 
-- Toda a logica de negocios permanece identica (calculos financeiros, integracao caixa-financeiro, permissoes, etc.)
-- Nenhuma tabela ou RLS sera alterada
-- Nenhum componente de UI sera modificado visualmente
-- As interfaces/tipos exportados pelos hooks permanecem compativeis
-- As paginas que consomem os hooks nao precisam de alteracao (mesmos retornos)
+### Deep Links usados
 
-### Beneficios Esperados
+- Instagram: `instagram://library?AssetPath=<encoded_uri>` (fallback: abrir galeria e copiar legenda)
+- WhatsApp: `whatsapp://send?text=<caption>` com intent de Status
 
-- Navegacao entre modulos sem telas de loading (dados em cache)
-- App volta instantaneamente ao minimizar e reabrir (cache persistido em memoria)
-- Reducao de ~70% nas queries ao banco de dados (eliminacao de N+1)
-- Codigo mais previsivel e testavel com padroes uniformes
+### Arquivos a criar
+
+1. `src/types/marketing.ts` - tipos TypeScript
+2. `src/hooks/useMarketing.ts` - hook React Query
+3. `src/pages/Marketing.tsx` - pagina principal
+4. `src/components/marketing/MarketingCalendar.tsx` - visao calendario
+5. `src/components/marketing/MarketingFeed.tsx` - visao lista/feed
+6. `src/components/marketing/MarketingIdeas.tsx` - rascunhos rapidos
+7. `src/components/marketing/PostSheet.tsx` - sheet de criacao/edicao
+8. `src/components/marketing/PostCard.tsx` - card de preview do post
+9. `src/components/marketing/PublishActions.tsx` - logica de deep links e publicacao rapida
+10. Migracao SQL para tabela + bucket + RLS
+
+### Arquivos a editar
+
+1. `src/App.tsx` - adicionar rota `/marketing`
+2. `src/components/layout/AppLayout.tsx` - adicionar item no menu
+
