@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useRef } from 'react';
+import { ReactNode, useState, useEffect, useRef, useCallback } from 'react';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -78,6 +78,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const isClosingDrawerRef = useRef(false);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -246,30 +247,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       )}
 
-      {/* Touch-blocking layer behind FAB when drawer is open */}
-      {sidebarOpen && (
-        <div
-          className="lg:hidden fixed z-[9998]"
-          style={{
-            bottom: 0,
-            right: 0,
-            width: '100px',
-            height: '160px',
-            pointerEvents: 'auto',
-          }}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); }}
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
-        />
-      )}
-
       <button
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
           if (sidebarOpen) {
+            isClosingDrawerRef.current = true;
             setSidebarOpen(false);
             setFabOpen(false);
+            setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
           } else {
             setFabOpen(prev => !prev);
           }
@@ -313,7 +299,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       </main>
 
       {/* ======= Bottom Sheet Menu (Drawer) ======= */}
-      <Drawer open={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <Drawer open={sidebarOpen} onOpenChange={(open) => {
+        if (!open) {
+          isClosingDrawerRef.current = true;
+          setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
+        }
+        setSidebarOpen(open);
+      }}>
         <DrawerContent className="border-t-0 max-h-[92vh] rounded-t-3xl overflow-hidden" style={{
           background: 'hsl(var(--background))',
         }}>
@@ -415,7 +407,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         key={item.href}
                         to={item.href}
                         data-active={isActive}
-                        onClick={() => setSidebarOpen(false)}
+                        onClick={(e) => {
+                          if (isClosingDrawerRef.current) {
+                            e.preventDefault();
+                            return;
+                          }
+                          setSidebarOpen(false);
+                        }}
                         className={cn(
                           "flex flex-col items-center gap-1.5 py-2 text-center transition-all duration-200 relative active:scale-[0.92] rounded-xl",
                           "animate-fade-in",
