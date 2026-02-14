@@ -107,6 +107,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const moduleStatuses = useModuleStatus();
   useTimeAlerts();
   const [notifOpen, setNotifOpen] = useState(false);
+  const handleNotifOpenChange = useCallback((open: boolean) => {
+    setNotifOpen(prev => prev === open ? prev : open);
+  }, []);
   const navRef = useRef<HTMLElement>(null);
 
   const hasBottomNav = location.pathname === '/finance';
@@ -175,7 +178,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </span>
                 )}
               </button>
-              <Popover open={notifOpen} onOpenChange={setNotifOpen}>
+              <Popover open={notifOpen} onOpenChange={handleNotifOpenChange}>
                 <PopoverTrigger asChild>
                   <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />

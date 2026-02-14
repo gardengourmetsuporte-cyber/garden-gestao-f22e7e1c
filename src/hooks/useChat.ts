@@ -86,36 +86,44 @@ async function fetchConversationsData(userId: string, unitId: string): Promise<C
   const myParticipants = (allParticipants || []).filter(p => p.user_id === userId);
   const myParticipantMap = new Map(myParticipants.map(p => [p.conversation_id, p]));
 
-  // For unread counts, we need to count messages after last_read_at for each conversation
-  // Do this in a batch: get counts for each conversation
-  const enriched: ChatConversation[] = [];
+  // Batch unread count: find the earliest last_read_at, fetch all unread messages in one query
+  const unreadCountMap = new Map<string, number>();
+  const convsWithLastRead = convData
+    .map(c => ({ id: c.id, lastRead: myParticipantMap.get(c.id)?.last_read_at }))
+    .filter(c => c.lastRead);
 
-  for (const conv of convData) {
+  if (convsWithLastRead.length > 0) {
+    const earliestRead = convsWithLastRead.reduce((min, c) => c.lastRead! < min ? c.lastRead! : min, convsWithLastRead[0].lastRead!);
+    const { data: unreadMessages } = await supabase
+      .from('chat_messages')
+      .select('conversation_id, created_at')
+      .in('conversation_id', convsWithLastRead.map(c => c.id))
+      .gt('created_at', earliestRead)
+      .neq('sender_id', userId);
+
+    (unreadMessages || []).forEach(m => {
+      const convLastRead = myParticipantMap.get(m.conversation_id)?.last_read_at;
+      if (convLastRead && m.created_at > convLastRead) {
+        unreadCountMap.set(m.conversation_id, (unreadCountMap.get(m.conversation_id) || 0) + 1);
+      }
+    });
+  }
+
+  const enriched: ChatConversation[] = convData.map(conv => {
     const convParticipants = (allParticipants || []).filter(p => p.conversation_id === conv.id);
     const participantsWithProfile = convParticipants.map(p => ({
       ...p,
       profile: profileMap.get(p.user_id) || { full_name: 'Usuário', avatar_url: null },
     }));
 
-    let unread_count = 0;
-    const myP = myParticipantMap.get(conv.id);
-    if (myP?.last_read_at) {
-      const { count } = await supabase
-        .from('chat_messages').select('*', { count: 'exact', head: true })
-        .eq('conversation_id', conv.id)
-        .gt('created_at', myP.last_read_at)
-        .neq('sender_id', userId);
-      unread_count = count || 0;
-    }
-
-    enriched.push({
+    return {
       ...conv,
       type: conv.type as ChatConversation['type'],
       participants: participantsWithProfile,
       last_message: lastMessageMap.get(conv.id) || null,
-      unread_count,
-    });
-  }
+      unread_count: unreadCountMap.get(conv.id) || 0,
+    };
+  });
 
   enriched.sort((a, b) => {
     const aTime = a.last_message?.created_at || a.created_at;

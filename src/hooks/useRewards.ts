@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export interface RewardProduct {
   id: string;
@@ -27,30 +28,36 @@ export interface RewardRedemption {
   profile?: { full_name: string };
 }
 
-async function fetchProducts(): Promise<RewardProduct[]> {
-  const { data, error } = await supabase
+async function fetchProducts(unitId: string | null): Promise<RewardProduct[]> {
+  let query = supabase
     .from('reward_products')
     .select('*')
     .order('points_cost', { ascending: true });
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-async function fetchUserRedemptions(userId: string): Promise<RewardRedemption[]> {
-  const { data, error } = await supabase
+async function fetchUserRedemptions(userId: string, unitId: string | null): Promise<RewardRedemption[]> {
+  let query = supabase
     .from('reward_redemptions')
     .select('*, product:reward_products(*)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-async function fetchAllRedemptionsData(): Promise<RewardRedemption[]> {
-  const { data, error } = await supabase
+async function fetchAllRedemptionsData(unitId: string | null): Promise<RewardRedemption[]> {
+  let query = supabase
     .from('reward_redemptions')
     .select('*, product:reward_products(*)')
     .order('created_at', { ascending: false });
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data, error } = await query;
   if (error) throw error;
 
   const userIds = [...new Set(data?.map(r => r.user_id) || [])];
@@ -68,21 +75,22 @@ async function fetchAllRedemptionsData(): Promise<RewardRedemption[]> {
 export function useRewards() {
   const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
+  const { activeUnitId } = useUnit();
 
   const { data: products = [], isLoading: isLoadingProducts } = useQuery({
-    queryKey: ['reward-products'],
-    queryFn: fetchProducts,
+    queryKey: ['reward-products', activeUnitId],
+    queryFn: () => fetchProducts(activeUnitId),
   });
 
   const { data: redemptions = [] } = useQuery({
-    queryKey: ['reward-redemptions', user?.id],
-    queryFn: () => fetchUserRedemptions(user!.id),
+    queryKey: ['reward-redemptions', user?.id, activeUnitId],
+    queryFn: () => fetchUserRedemptions(user!.id, activeUnitId),
     enabled: !!user,
   });
 
   const { data: allRedemptions = [] } = useQuery({
-    queryKey: ['reward-all-redemptions'],
-    queryFn: fetchAllRedemptionsData,
+    queryKey: ['reward-all-redemptions', activeUnitId],
+    queryFn: () => fetchAllRedemptionsData(activeUnitId),
     enabled: !!user && isAdmin,
   });
 

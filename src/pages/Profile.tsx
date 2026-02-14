@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { AchievementList } from '@/components/profile/AchievementList';
 import { useProfile } from '@/hooks/useProfile';
+import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatPoints } from '@/lib/points';
 import { PageLoader } from '@/components/PageLoader';
@@ -12,9 +13,10 @@ export default function Profile() {
   const { userId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { leaderboard } = useLeaderboard();
 
   const resolvedUserId = userId === 'me' ? user?.id : userId;
-  const { profile, isLoading } = useProfile(resolvedUserId);
+  const { profile, isLoading } = useProfile(resolvedUserId, leaderboard);
 
   if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
   if (!profile) return <AppLayout><div className="p-6 text-center text-muted-foreground">Perfil não encontrado</div></AppLayout>;

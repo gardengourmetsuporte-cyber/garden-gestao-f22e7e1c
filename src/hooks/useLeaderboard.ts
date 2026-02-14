@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateEarnedPoints, calculateSpentPoints } from '@/lib/points';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export interface LeaderboardEntry {
   user_id: string;
@@ -21,11 +23,11 @@ export interface SectorPointsSummary {
   total_tasks: number;
 }
 
-async function fetchLeaderboardData(): Promise<LeaderboardEntry[]> {
+async function fetchLeaderboardData(unitId: string): Promise<LeaderboardEntry[]> {
   const [{ data: profiles }, { data: completions }, { data: redemptions }] = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url'),
-    supabase.from('checklist_completions').select('completed_by, points_awarded, awarded_points'),
-    supabase.from('reward_redemptions').select('user_id, points_spent, status'),
+    supabase.from('checklist_completions').select('completed_by, points_awarded, awarded_points').eq('unit_id', unitId),
+    supabase.from('reward_redemptions').select('user_id, points_spent, status').eq('unit_id', unitId),
   ]);
 
   const userCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
@@ -63,12 +65,12 @@ async function fetchLeaderboardData(): Promise<LeaderboardEntry[]> {
   return entries;
 }
 
-async function fetchSectorPointsData(): Promise<SectorPointsSummary[]> {
+async function fetchSectorPointsData(unitId: string): Promise<SectorPointsSummary[]> {
   const [{ data: sectors }, { data: subcategories }, { data: items }, { data: completions }] = await Promise.all([
-    supabase.from('checklist_sectors').select('id, name, color').order('sort_order'),
-    supabase.from('checklist_subcategories').select('id, sector_id'),
-    supabase.from('checklist_items').select('id, subcategory_id, is_active'),
-    supabase.from('checklist_completions').select('item_id'),
+    supabase.from('checklist_sectors').select('id, name, color').eq('unit_id', unitId).order('sort_order'),
+    supabase.from('checklist_subcategories').select('id, sector_id').eq('unit_id', unitId),
+    supabase.from('checklist_items').select('id, subcategory_id, is_active').eq('unit_id', unitId),
+    supabase.from('checklist_completions').select('item_id').eq('unit_id', unitId),
   ]);
 
   const subcatToSectorMap = new Map<string, string>();
@@ -107,15 +109,19 @@ async function fetchSectorPointsData(): Promise<SectorPointsSummary[]> {
 
 export function useLeaderboard() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const { activeUnitId } = useUnit();
 
   const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useQuery({
-    queryKey: ['leaderboard'],
-    queryFn: fetchLeaderboardData,
+    queryKey: ['leaderboard', activeUnitId],
+    queryFn: () => fetchLeaderboardData(activeUnitId!),
+    enabled: !!user && !!activeUnitId,
   });
 
   const { data: sectorPoints = [], isLoading: isLoadingSectors } = useQuery({
-    queryKey: ['sector-points'],
-    queryFn: fetchSectorPointsData,
+    queryKey: ['sector-points', activeUnitId],
+    queryFn: () => fetchSectorPointsData(activeUnitId!),
+    enabled: !!user && !!activeUnitId,
   });
 
   const isLoading = isLoadingLeaderboard || isLoadingSectors;
