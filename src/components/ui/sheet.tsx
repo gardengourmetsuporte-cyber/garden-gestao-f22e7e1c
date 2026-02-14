@@ -24,7 +24,7 @@ const Sheet = ({ children, ...props }: SheetProps) => {
   if (isMobile) {
     return (
       <SheetMobileContext.Provider value={true}>
-        <DrawerPrimitive.Root shouldScaleBackground {...props}>
+        <DrawerPrimitive.Root {...props}>
           {children}
         </DrawerPrimitive.Root>
       </SheetMobileContext.Provider>
