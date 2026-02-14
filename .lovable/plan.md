@@ -1,85 +1,96 @@
 
-# Configuracoes de Alertas Temporais por Modulo
+# Refatoracao Completa: Nivel App Unicornio
 
-## O que sera feito
+## Diagnostico Atual
 
-Criar uma nova tela em Configuracoes chamada "Alertas e Sinalizacao" onde o administrador pode, para cada modulo:
+Apos analise detalhada de todos os hooks e paginas, identifiquei **5 problemas criticos** que comprometem a confiabilidade e a experiencia profissional do sistema:
 
-1. **Ativar/desativar** a sinalizacao temporal (switch on/off)
-2. **Editar os horarios** de cada gatilho (warning e critical)
+### Problemas Encontrados
 
-Os modulos configuraveis serao:
-- Financeiro (horario de aviso e critico)
-- Checklist de Abertura (horario de aviso e critico)
-- Checklist de Fechamento (horario de aviso e critico)
-- Fechamento de Caixa (horario critico)
+1. **Hooks sem cache (React Query)**: `useFinance`, `useChecklists`, `useCashClosing` e `useChat` usam `useState/useEffect` puro -- ao trocar de pagina e voltar, os dados sao recarregados do zero, causando telas de loading repetitivas e perda de fluidez.
 
-## Como vai funcionar
+2. **Queries N+1 no Fechamento de Caixa**: Para cada fechamento, o sistema faz uma query individual para buscar o perfil do usuario e outra para o validador. Com 30 fechamentos, sao 60+ queries extras.
 
-Cada modulo tera um card com:
-- Nome e icone do modulo
-- Switch para ativar/desativar a sinalizacao
-- Campos de horario editaveis (formato HH:MM) para os niveis "Aviso" (laranja) e "Critico" (vermelho)
-- Os valores padrao serao os atuais ja implementados
+3. **Queries N+1 no Chat**: Cada conversa dispara 3 queries paralelas (participantes, ultima mensagem, unread count). Com 15 conversas, sao 45+ queries.
 
-As configuracoes serao salvas no banco de dados por unidade, permitindo que cada filial tenha seus proprios horarios.
+4. **Queries N+1 nos Checklists**: O `fetchCompletions` faz uma query de perfil para CADA completion individual ao inves de buscar todos os perfis de uma vez.
+
+5. **Import duplicado no useCashClosing**: O arquivo importa `supabase` duas vezes (como `supabase` e `sb`), um indicativo de codigo acumulado sem revisao.
+
+---
+
+## Plano de Refatoracao
+
+### Fase 1: Migrar useFinance para React Query
+
+O hook mais critico do sistema. Atualmente tem ~470 linhas com gerenciamento manual de estado.
+
+**Mudancas:**
+- Substituir `useState` + `useEffect` por `useQuery` para accounts, categories e transactions
+- Substituir funcoes CRUD manuais por `useMutation` com invalidacao automatica de cache
+- Manter a logica de `initializeDefaults` como funcao auxiliar chamada uma unica vez
+- Manter a logica de `reorderTransactions` com optimistic update via `queryClient.setQueryData`
+- Resultado: transicoes instantaneas entre abas do modulo financeiro
+
+### Fase 2: Migrar useChecklists para React Query
+
+**Mudancas:**
+- `sectors` via `useQuery` com queryKey `['checklist-sectors', activeUnitId]`
+- `completions` via `useQuery` parametrizado por `date` e `type`
+- Eliminar o loop N+1 de profiles em `fetchCompletions` -- buscar todos os user_ids unicos e fazer uma unica query de profiles
+- Todas as operacoes CRUD (addSector, addItem, toggleCompletion, etc.) via `useMutation`
+- Manter as funcoes de reorder com optimistic update
+
+### Fase 3: Migrar useCashClosing para React Query
+
+**Mudancas:**
+- Remover import duplicado (`sb`)
+- `closings` via `useQuery` com queryKey `['cash-closings', activeUnitId]`
+- Eliminar N+1 de profiles: buscar todos os `user_id` e `validated_by` unicos em uma unica query
+- `createClosing`, `approveClosing`, `markDivergent` via `useMutation`
+- Manter a logica complexa de `integrateWithFinancial` como funcao auxiliar dentro da mutation de aprovacao
+
+### Fase 4: Migrar useChat para React Query
+
+**Mudancas:**
+- `conversations` via `useQuery` com queryKey `['chat-conversations', activeUnitId]`
+- Otimizar fetchConversations: buscar todos os profiles de participantes em uma unica query ao inves de por conversa
+- `messages` via `useQuery` parametrizado por `activeConversationId`
+- `sendMessage` e `createConversation` via `useMutation`
+- Manter subscricoes realtime como `useEffect` separado que invalida o cache
+
+### Fase 5: Limpeza e Padronizacao Global
+
+**Mudancas:**
+- Remover `useInventory.ts` (localStorage) se nao esta sendo usado (o sistema ja usa `useInventoryDB.ts` com React Query)
+- Padronizar tratamento de erros: todas as mutations devem ter `onError` com toast
+- Garantir que todos os hooks usem `staleTime` consistente (2 min global ja configurado no QueryClient)
+
+---
 
 ## Detalhes Tecnicos
 
-### 1. Nova tabela no banco: `time_alert_settings`
+### Padrao de Migracao (aplicado em cada hook)
 
 ```text
-Colunas:
-- id (uuid, PK)
-- user_id (uuid, NOT NULL) -- dono da config
-- unit_id (uuid, NULL) -- por unidade
-- module_key (text, NOT NULL) -- 'finance', 'checklist_abertura', 'checklist_fechamento', 'cash_closing'
-- enabled (boolean, DEFAULT true)
-- warning_hour (numeric, NULL) -- ex: 16.0, 18.5
-- critical_hour (numeric, NULL) -- ex: 18.0, 21.0
-- created_at, updated_at (timestamps)
-- UNIQUE(user_id, unit_id, module_key)
+ANTES (useState/useEffect):
+  useState -> fetch em useEffect -> setData manual -> refetch manual apos CRUD
 
-RLS: users manage own settings (auth.uid() = user_id)
+DEPOIS (React Query):
+  useQuery (cache automatico) -> useMutation (CRUD) -> invalidateQueries (refetch automatico)
 ```
 
-### 2. Novo componente: `TimeAlertSettings`
+### O que NAO muda
 
-Arquivo: `src/components/settings/TimeAlertSettings.tsx`
+- Toda a logica de negocios permanece identica (calculos financeiros, integracao caixa-financeiro, permissoes, etc.)
+- Nenhuma tabela ou RLS sera alterada
+- Nenhum componente de UI sera modificado visualmente
+- As interfaces/tipos exportados pelos hooks permanecem compativeis
+- As paginas que consomem os hooks nao precisam de alteracao (mesmos retornos)
 
-Interface com 4 cards (um por modulo), cada um contendo:
-- Switch de ativacao
-- Input de horario para nivel "Aviso" (onde aplicavel)
-- Input de horario para nivel "Critico"
-- Salva automaticamente ao alterar (sem botao "Salvar")
+### Beneficios Esperados
 
-### 3. Novo hook: `useTimeAlertSettings`
-
-Arquivo: `src/hooks/useTimeAlertSettings.ts`
-
-- Busca as configuracoes da tabela `time_alert_settings` para o usuario e unidade ativos
-- Se nao existir registro, usa os valores padrao hardcoded
-- Expoe funcao `updateSetting(moduleKey, field, value)` com upsert
-- Exporta os horarios efetivos para consumo por `useTimeBasedUrgency` e `useTimeAlerts`
-
-### 4. Modificar hooks existentes
-
-**`useTimeBasedUrgency.ts`**: Em vez de horarios hardcoded, receber as configuracoes do `useTimeAlertSettings` e usar os horarios personalizados. Se um modulo estiver desativado, retornar urgency `ok` sempre.
-
-**`useTimeAlerts.ts`**: Filtrar os triggers com base nas configuracoes -- se o modulo estiver desativado, pular o disparo de notificacao. Usar os horarios personalizados em vez dos hardcoded.
-
-### 5. Registrar na pagina de Configuracoes
-
-Adicionar o item "Alertas e Sinalizacao" na secao "Sistema" do menu de configuracoes (`Settings.tsx`), com o icone `Bell` e variante `red`. Visivel apenas para administradores.
-
-### Arquivos a criar
-- `src/components/settings/TimeAlertSettings.tsx`
-- `src/hooks/useTimeAlertSettings.ts`
-
-### Arquivos a modificar
-- `src/pages/Settings.tsx` -- adicionar item no menu
-- `src/hooks/useTimeBasedUrgency.ts` -- consumir configuracoes dinamicas
-- `src/hooks/useTimeAlerts.ts` -- consumir configuracoes dinamicas
-
-### Migracao SQL
-- Criar tabela `time_alert_settings` com RLS
+- Navegacao entre modulos sem telas de loading (dados em cache)
+- App volta instantaneamente ao minimizar e reabrir (cache persistido em memoria)
+- Reducao de ~70% nas queries ao banco de dados (eliminacao de N+1)
+- Codigo mais previsivel e testavel com padroes uniformes
