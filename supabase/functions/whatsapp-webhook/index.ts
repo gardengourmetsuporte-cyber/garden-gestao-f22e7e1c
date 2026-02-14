@@ -181,11 +181,13 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
+    console.log("[WEBHOOK] Received payload:", JSON.stringify(body).substring(0, 500));
 
     // Determine provider from query param or body
     const url = new URL(req.url);
     const providerParam = url.searchParams.get("provider") || "evolution";
     const channelIdParam = url.searchParams.get("channel_id");
+    console.log("[WEBHOOK] Provider:", providerParam, "Channel ID:", channelIdParam);
 
     // Find channel
     let channel: any = null;
@@ -212,15 +214,21 @@ serve(async (req) => {
     }
 
     if (!channel) {
+      console.log("[WEBHOOK] No active channel found for provider:", providerParam);
       return new Response(JSON.stringify({ ok: false, error: "No active channel" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    console.log("[WEBHOOK] Channel found:", channel.id, "Provider:", channel.provider, "API URL:", channel.api_url);
+
     // Parse incoming message
     const incoming = parseIncoming(channel.provider, body);
+    console.log("[WEBHOOK] Parsed message:", incoming ? JSON.stringify(incoming).substring(0, 300) : "null (skipped)");
+    
     if (!incoming || !incoming.phone || !incoming.content) {
+      console.log("[WEBHOOK] Skipping - no valid message parsed from event");
       return new Response(JSON.stringify({ ok: true, skipped: true }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
