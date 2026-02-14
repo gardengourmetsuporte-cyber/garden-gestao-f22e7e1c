@@ -106,6 +106,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
   useTimeAlerts();
+  const [notifOpen, setNotifOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const hasBottomNav = location.pathname === '/finance';
@@ -174,7 +175,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </span>
                 )}
               </button>
-              <Popover>
+              <Popover open={notifOpen} onOpenChange={setNotifOpen}>
                 <PopoverTrigger asChild>
                   <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
