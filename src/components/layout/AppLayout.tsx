@@ -168,7 +168,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="bg-card backdrop-blur-xl border-b border-border/20">
           <div className="flex items-center justify-between h-14 px-3">
-            <div className="w-10" />
+            <div className="w-10">
+              <PointsDisplay isPulsing={isPulsing} showLabel={false} className="scale-75 origin-left" />
+            </div>
 
             <button
               onClick={() => navigate('/')}
