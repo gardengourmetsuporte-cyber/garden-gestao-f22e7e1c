@@ -129,4 +129,81 @@ export const ICON_MAP: Record<string, string> = {
   Target: 'track_changes',
   Grip: 'drag_indicator',
   GripVertical: 'drag_indicator',
+
+  // Transport & Vehicles
+  Car: 'directions_car',
+  Truck: 'local_shipping',
+  Bus: 'directions_bus',
+  Fuel: 'local_gas_station',
+  Plane: 'flight',
+
+  // Finance categories (common)
+  Banknote: 'payments',
+  BadgeDollarSign: 'paid',
+  PiggyBank: 'savings',
+  HandCoins: 'toll',
+  CircleDollarSign: 'monetization_on',
+  BarChart3: 'bar_chart',
+  BarChart: 'bar_chart',
+  LineChart: 'show_chart',
+  Activity: 'monitoring',
+  Repeat: 'repeat',
+
+  // Building & Places
+  Building: 'business',
+  Store: 'storefront',
+  Hospital: 'local_hospital',
+  GraduationCap: 'school',
+  
+  // Home & Living
+  House: 'home',
+  Sofa: 'weekend',
+  Droplets: 'water_drop',
+  Zap: 'bolt',
+  Wifi: 'wifi',
+  Wrench: 'build',
+  Hammer: 'handyman',
+  Paintbrush: 'brush',
+  Scissors: 'content_cut',
+
+  // Health & Body
+  Heart: 'favorite',
+  HeartPulse: 'monitor_heart',
+  Pill: 'medication',
+  Stethoscope: 'stethoscope',
+  Dumbbell: 'fitness_center',
+
+  // Entertainment
+  Music: 'music_note',
+  Film: 'movie',
+  Gamepad2: 'sports_esports',
+  Ticket: 'confirmation_number',
+  Coffee: 'coffee',
+  Wine: 'wine_bar',
+  Beer: 'sports_bar',
+  Pizza: 'local_pizza',
+  Apple: 'nutrition',
+
+  // Tech
+  Smartphone: 'smartphone',
+  Laptop: 'laptop',
+  Tv: 'tv',
+  Headphones: 'headphones',
+  Printer: 'print',
+
+  // Nature
+  TreePine: 'park',
+  Flower2: 'local_florist',
+  Dog: 'pets',
+  Cat: 'pets',
+  Leaf: 'eco',
+
+  // Documents
+  FileCheck: 'task',
+  FilePlus: 'note_add',
+  Files: 'file_copy',
+  Paperclip: 'attach_file',
+  Bookmark: 'bookmark',
+  Tag: 'label',
+  Tags: 'sell',
 };
