@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   ChecklistSector, 
@@ -9,7 +9,7 @@ import {
 } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // ---- Fetch helpers ----
 
@@ -76,7 +76,12 @@ export function useChecklists() {
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
 
+  // Track the current date/type for completions
+  const [currentDate, setCurrentDate] = useState<string>('');
+  const [currentType, setCurrentType] = useState<ChecklistType>('abertura');
+
   const sectorsKey = ['checklist-sectors', activeUnitId];
+  const completionsKey = ['checklist-completions', currentDate, currentType];
 
   const { data: sectors = [], isLoading } = useQuery({
     queryKey: sectorsKey,
@@ -84,25 +89,21 @@ export function useChecklists() {
     enabled: !!user && !!activeUnitId,
   });
 
-  // Completions are fetched on-demand via fetchCompletions, stored in a separate query
-  const completionsKeyPrefix = ['checklist-completions'];
+  // Completions fetched via a dedicated useQuery tied to current date/type
+  const { data: completions = [] } = useQuery({
+    queryKey: completionsKey,
+    queryFn: () => fetchCompletionsData(currentDate, currentType),
+    enabled: !!user && !!currentDate && !!currentType,
+    staleTime: 0, // Always refetch when invalidated
+  });
 
-  const getCompletionsKey = useCallback((date: string, type: ChecklistType) => 
-    [...completionsKeyPrefix, date, type], []);
-
-  // We keep a "current" completions state via the last fetched query
-  // The page component calls fetchCompletions(date, type) which triggers a query
+  // Called by the page to set which date/type to load completions for
   const fetchCompletions = useCallback(async (date: string, type: ChecklistType) => {
-    const data = await queryClient.fetchQuery({
-      queryKey: getCompletionsKey(date, type),
-      queryFn: () => fetchCompletionsData(date, type),
-    });
-    return data;
-  }, [queryClient, getCompletionsKey]);
-
-  // Get current completions from cache (the last fetched ones)
-  const completions = queryClient.getQueriesData<ChecklistCompletion[]>({ queryKey: completionsKeyPrefix })
-    .flatMap(([, data]) => data || []);
+    setCurrentDate(date);
+    setCurrentType(type);
+    // Also ensure the query is fresh
+    await queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, type] });
+  }, [queryClient]);
 
   const invalidateSectors = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: sectorsKey });
@@ -309,13 +310,12 @@ export function useChecklists() {
           item_id: itemId, checklist_type: checklistType,
           completed_by: targetUserId, date,
           awarded_points: points > 0, points_awarded: points,
-        }, { onConflict: 'item_id,completed_by,date,checklist_type' })
-        .select().single();
+        }, { onConflict: 'item_id,completed_by,date,checklist_type' });
       if (error) throw error;
     }
 
-    // Invalidate completions + points queries
-    queryClient.invalidateQueries({ queryKey: [...completionsKeyPrefix, date, checklistType] });
+    // Invalidate completions for the current date/type + gamification caches
+    queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, checklistType] });
     queryClient.invalidateQueries({ queryKey: ['points'] });
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
