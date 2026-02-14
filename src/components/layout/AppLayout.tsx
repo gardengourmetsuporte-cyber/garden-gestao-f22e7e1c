@@ -310,72 +310,57 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Bottom Sheet Menu (Drawer) ======= */}
       <Drawer open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <DrawerContent className="bg-background/95 backdrop-blur-2xl border-t border-border/30 max-h-[88vh] rounded-t-3xl">
-          {/* Handle bar */}
-          <div className="flex justify-center pt-2 pb-1">
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        <DrawerContent className="border-t max-h-[90vh] rounded-t-3xl" style={{
+          background: 'hsl(var(--background))',
+          borderColor: 'hsl(var(--border) / 0.2)',
+        }}>
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 rounded-full" style={{ background: 'hsl(var(--muted-foreground) / 0.25)' }} />
           </div>
 
-          {/* Compact header row: logo + unit + avatar */}
-          <div className="flex items-center gap-2.5 px-4 py-2 shrink-0">
-            {/* Logo */}
-            <div
-              className="w-8 h-8 rounded-lg overflow-hidden border border-primary/30 shrink-0"
-              style={{ boxShadow: '0 0 10px hsl(var(--primary) / 0.15)' }}
-            >
+          {/* Header: Logo + Unit + Profile */}
+          <div className="flex items-center gap-3 px-5 pb-3">
+            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0" style={{
+              border: '1px solid hsl(var(--primary) / 0.2)',
+              boxShadow: '0 0 12px hsl(var(--primary) / 0.1)',
+            }}>
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
             </div>
 
-            {/* Unit selector - inline */}
             {units.length > 0 ? (
               <div className="flex-1 min-w-0 relative">
                 <button
                   onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all w-full"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all w-full"
                   style={{
-                    background: 'hsl(var(--secondary) / 0.6)',
+                    background: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border) / 0.3)',
                   }}
                 >
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))' }}
-                  />
-                  <span className="flex-1 text-left truncate text-foreground text-xs">
-                    {activeUnit?.name || 'Unidade'}
-                  </span>
-                  <AppIcon name="ChevronDown" size={12} className={cn(
-                    "text-muted-foreground transition-transform duration-200",
-                    unitDropdownOpen && "rotate-180"
-                  )} />
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{
+                    background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
+                    boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : undefined,
+                  }} />
+                  <span className="flex-1 text-left truncate text-foreground">{activeUnit?.name || 'Unidade'}</span>
+                  <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200", unitDropdownOpen && "rotate-180")} />
                 </button>
                 {unitDropdownOpen && (
-                  <div
-                    className="absolute top-full left-0 right-0 mt-1 z-50 rounded-xl overflow-hidden py-1"
-                    style={{
-                      background: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border) / 0.4)',
-                      boxShadow: '0 8px 32px hsl(222 50% 3% / 0.6)',
-                    }}
-                  >
+                  <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1" style={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border) / 0.4)',
+                    boxShadow: 'var(--shadow-elevated)',
+                  }}>
                     {units.map(unit => (
                       <button
                         key={unit.id}
-                        onClick={() => {
-                          setActiveUnitId(unit.id);
-                          setUnitDropdownOpen(false);
-                        }}
+                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
                         className={cn(
-                          "w-full flex items-center gap-2 px-3 py-2 text-xs transition-all",
-                          unit.id === activeUnit?.id
-                            ? "text-primary bg-primary/10"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                          "w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all",
+                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                         )}
                       >
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{ background: getThemeColor(unit.slug) }}
-                        />
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
                         <span className="truncate">{unit.name}</span>
                       </button>
                     ))}
@@ -388,28 +373,24 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </div>
             )}
 
-            {/* User avatar - compact */}
-            <button
-              onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
-              className="shrink-0 active:scale-90 transition-transform"
-            >
-              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={34} />
+            <button onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }} className="shrink-0 active:scale-90 transition-transform">
+              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={36} />
             </button>
           </div>
 
-          <div className="mx-4 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
-
-          {/* Navigation Grid - Colorful 3D Icons */}
-          <nav ref={navRef} className="flex-1 overflow-y-auto px-4 pt-3 pb-6 space-y-4">
-            {groupedNav.map((group) => (
-              <div key={group.label}>
-                <div className="mb-2 px-1">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground/50">
+          {/* Navigation */}
+          <nav ref={navRef} className="flex-1 overflow-y-auto px-5 pb-8">
+            {groupedNav.map((group, gi) => (
+              <div key={group.label} className={cn(gi > 0 && "mt-5")}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-px flex-1" style={{ background: 'hsl(var(--border) / 0.15)' }} />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-1" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
                     {group.label}
                   </span>
+                  <div className="h-px flex-1" style={{ background: 'hsl(var(--border) / 0.15)' }} />
                 </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {group.items.map((item) => {
+                <div className="grid grid-cols-4 gap-x-2 gap-y-4">
+                  {group.items.map((item, idx) => {
                     const isActive = location.pathname === item.href;
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
@@ -423,28 +404,28 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         data-active={isActive}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl text-center transition-all duration-200 relative active:scale-[0.90]",
-                          isActive
-                            ? "text-foreground"
-                            : "text-muted-foreground"
+                          "flex flex-col items-center gap-2 py-1 text-center transition-all duration-200 relative active:scale-[0.88]",
+                          "animate-fade-in",
                         )}
+                        style={{ animationDelay: `${(gi * 4 + idx) * 30}ms` }}
                       >
                         <div className="relative">
-                          {/* Outer ring glow on active */}
+                          {/* Glow behind active icon */}
                           {isActive && (
-                            <div
-                              className="absolute -inset-1 rounded-[18px] pointer-events-none animate-pulse"
-                              style={{
-                                background: `radial-gradient(circle, ${theme.ring} 0%, transparent 70%)`,
-                              }}
-                            />
+                            <div className="absolute inset-0 rounded-[18px] pointer-events-none" style={{
+                              background: `radial-gradient(circle, ${theme.ring} 0%, transparent 70%)`,
+                              transform: 'scale(1.6)',
+                              filter: 'blur(6px)',
+                            }} />
                           )}
                           <div
-                            className="relative w-[52px] h-[52px] rounded-[16px] flex items-center justify-center transition-all duration-200 overflow-hidden"
+                            className="relative w-[54px] h-[54px] rounded-[16px] flex items-center justify-center overflow-hidden transition-transform duration-200"
                             style={{
                               background: theme.gradient,
-                              boxShadow: isActive ? theme.shadow : theme.shadow.replace(/0\.5/g, '0.3').replace(/0\.3\)/g, '0.15)'),
-                              transform: isActive ? 'scale(1.08) translateY(-2px)' : undefined,
+                              boxShadow: isActive
+                                ? theme.shadow
+                                : `0 4px 12px rgba(0,0,0,0.25), inset 0 -2px 4px rgba(0,0,0,0.12)`,
+                              transform: isActive ? 'scale(1.1) translateY(-2px)' : undefined,
                             }}
                           >
                             <AppIcon
@@ -452,61 +433,60 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               size={24}
                               style={{
                                 color: theme.iconColor,
-                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))',
+                                filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
                               }}
                             />
-                            {/* Top-left glass highlight */}
-                            <div
-                              className="absolute top-0 left-0 w-full h-1/2 pointer-events-none rounded-t-[16px]"
-                              style={{
-                                background: 'linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)',
-                              }}
-                            />
-                            {/* Bottom edge darkening for depth */}
-                            <div
-                              className="absolute bottom-0 left-0 w-full h-1/3 pointer-events-none rounded-b-[16px]"
-                              style={{
-                                background: 'linear-gradient(0deg, rgba(0,0,0,0.15) 0%, transparent 100%)',
-                              }}
-                            />
-                            {/* Corner specular highlight */}
-                            <div
-                              className="absolute top-[3px] left-[3px] w-[14px] h-[14px] rounded-full pointer-events-none"
-                              style={{
-                                background: 'radial-gradient(circle, rgba(255,255,255,0.45) 0%, transparent 70%)',
-                              }}
-                            />
+                            {/* Glass highlight top half */}
+                            <div className="absolute top-0 left-0 w-full h-[55%] pointer-events-none rounded-t-[16px]" style={{
+                              background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 70%, transparent 100%)',
+                            }} />
+                            {/* Bottom depth */}
+                            <div className="absolute bottom-0 left-0 w-full h-[30%] pointer-events-none rounded-b-[16px]" style={{
+                              background: 'linear-gradient(0deg, rgba(0,0,0,0.12) 0%, transparent 100%)',
+                            }} />
+                            {/* Corner specular */}
+                            <div className="absolute top-[4px] left-[4px] w-3 h-3 rounded-full pointer-events-none" style={{
+                              background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
+                            }} />
                           </div>
+
+                          {/* Badges */}
                           {showBadge && (
-                            <span className="absolute -top-1 -right-1 w-4.5 h-4.5 min-w-[18px] rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse border-2 border-background">
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse border-2" style={{
+                              background: 'hsl(var(--destructive))',
+                              color: 'hsl(var(--destructive-foreground))',
+                              borderColor: 'hsl(var(--background))',
+                            }}>
                               {badgeCount > 9 ? '9+' : badgeCount}
                             </span>
                           )}
                           {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
                             <span
                               className={cn(
-                                "absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[8px] font-bold flex items-center justify-center border-2 border-background",
+                                "absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full text-[8px] font-bold flex items-center justify-center border-2",
                                 (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
                               )}
                               style={{
                                 background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
                                 color: moduleStatus.level === 'critical' ? '#fff' : '#000',
+                                borderColor: 'hsl(var(--background))',
                               }}
                             >
                               {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
                             </span>
                           )}
                           {moduleStatus && moduleStatus.level === 'ok' && (
-                            <div
-                              className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-background"
-                              style={{
-                                background: 'hsl(var(--neon-green))',
-                                boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
-                              }}
-                            />
+                            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{
+                              background: 'hsl(var(--neon-green))',
+                              boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
+                              border: '1.5px solid hsl(var(--background))',
+                            }} />
                           )}
                         </div>
-                        <span className="text-[10px] font-medium leading-tight max-w-full truncate">{item.label}</span>
+                        <span className={cn(
+                          "text-[10px] font-medium leading-tight max-w-full truncate transition-colors",
+                          isActive ? "text-foreground" : "text-muted-foreground"
+                        )}>{item.label}</span>
                       </Link>
                     );
                   })}
@@ -515,14 +495,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             ))}
 
             {/* Logout */}
-            <div className="pt-1">
-              <div className="h-px bg-gradient-to-r from-transparent via-border/30 to-transparent mb-2" />
+            <div className="mt-6 pt-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.15)' }}>
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98]"
+                className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.97]"
+                style={{ color: 'hsl(var(--muted-foreground))' }}
               >
                 <AppIcon name="LogOut" size={16} />
-                <span className="font-medium">Sair</span>
+                <span className="font-medium">Sair da conta</span>
               </button>
             </div>
           </nav>
