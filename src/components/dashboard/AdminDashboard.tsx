@@ -105,32 +105,67 @@ export function AdminDashboard() {
         </button>
 
 
-        {/* AGENDA WIDGET - full width */}
+        {/* AGENDA WIDGET - Premium redesign */}
         <button
           onClick={() => navigate('/agenda')}
-          className="card-command col-span-2 p-4 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+          className="card-command col-span-2 p-0 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.005] active:scale-[0.98] overflow-hidden relative"
         >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <AppIcon name="CalendarDays" size={18} className="text-primary" />
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Agenda de hoje</span>
+          <div className="absolute -top-10 right-0 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: 'hsl(var(--primary))' }} />
+          <div className="p-4 pb-3">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)', border: '1px solid hsl(var(--primary) / 0.25)' }}>
+                  <AppIcon name="CalendarDays" size={18} className="text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm font-bold text-foreground">Agenda</span>
+                  <span className="text-[10px] text-muted-foreground block">Tarefas de hoje</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {!tasksLoading && pendingTasks.length > 0 && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'hsl(var(--primary) / 0.15)', color: 'hsl(var(--primary))' }}>
+                    {pendingTasks.length} pendente{pendingTasks.length > 1 ? 's' : ''}
+                  </span>
+                )}
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+              </div>
             </div>
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
           </div>
           {tasksLoading ? (
-            <div className="space-y-2">
-              {[1,2,3].map(i => <Skeleton key={i} className="h-8 w-full" />)}
+            <div className="space-y-1 px-4 pb-4">
+              {[1,2,3].map(i => <Skeleton key={i} className="h-11 w-full rounded-xl" />)}
             </div>
           ) : pendingTasks.length > 0 ? (
-            <div className="space-y-2">
-              {pendingTasks.map(task => {
+            <div className="px-3 pb-3 space-y-1">
+              {pendingTasks.map((task, idx) => {
                 const isOverdue = task.due_date && isPast(new Date(task.due_date + 'T23:59:59')) && !isToday(new Date(task.due_date));
                 return (
-                  <div key={task.id} className="flex items-center gap-3">
-                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0", isOverdue ? "bg-destructive" : "bg-primary")} />
-                    <span className="text-sm text-foreground truncate flex-1">{task.title}</span>
+                  <div
+                    key={task.id}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors",
+                      isOverdue ? "bg-destructive/8" : "bg-secondary/40"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
+                      isOverdue ? "bg-destructive/15" : "bg-primary/10"
+                    )}>
+                      <AppIcon
+                        name={isOverdue ? "AlertTriangle" : "Check"}
+                        size={14}
+                        className={isOverdue ? "text-destructive" : "text-primary"}
+                      />
+                    </div>
+                    <span className={cn("text-sm text-foreground truncate flex-1", isOverdue && "text-destructive/90")}>{task.title}</span>
                     {task.due_date && (
-                      <span className={cn("text-[10px] font-medium flex-shrink-0", isOverdue ? "text-destructive" : "text-muted-foreground")}>
+                      <span className={cn(
+                        "text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0",
+                        isOverdue
+                          ? "bg-destructive/15 text-destructive"
+                          : "bg-muted/50 text-muted-foreground"
+                      )}>
                         {isToday(new Date(task.due_date)) ? 'Hoje' : isTomorrow(new Date(task.due_date)) ? 'Amanhã' : format(new Date(task.due_date), 'dd/MM')}
                       </span>
                     )}
@@ -139,9 +174,11 @@ export function AdminDashboard() {
               })}
             </div>
           ) : (
-            <div className="text-center py-3">
-              <AppIcon name="Check" size={24} className="text-success mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente</p>
+            <div className="text-center px-4 pb-5">
+              <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ background: 'hsl(142 60% 45% / 0.12)' }}>
+                <AppIcon name="Check" size={20} style={{ color: 'hsl(142 60% 50%)' }} />
+              </div>
+              <p className="text-xs text-muted-foreground">Tudo em dia! 🎉</p>
             </div>
           )}
         </button>
