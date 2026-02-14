@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect, useRef } from 'react';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
@@ -14,9 +14,9 @@ import { PushNotificationPrompt } from '@/components/notifications/PushNotificat
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
-import { useModuleStatus, type StatusLevel } from '@/hooks/useModuleStatus';
+import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { useTimeAlerts } from '@/hooks/useTimeAlerts';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
@@ -57,14 +57,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
-  const [sidebarDragX, setSidebarDragX] = useState<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const isDraggingSidebarRef = useRef(false);
+  
   
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Edge swipe to open sidebar (from right edge)
+  // Edge swipe to open menu (from right edge)
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       if (sidebarOpen) return;
@@ -96,36 +95,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     };
   }, [sidebarOpen]);
 
-  // Sidebar drag-to-close handlers
-  const sidebarTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
-    isDraggingSidebarRef.current = false;
-    setSidebarDragX(null);
-  };
-  const sidebarTouchMove = (e: React.TouchEvent) => {
-    if (!touchStartRef.current) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - touchStartRef.current.x;
-    const dy = Math.abs(touch.clientY - touchStartRef.current.y);
-    if (!isDraggingSidebarRef.current && dx > 10 && dy < 30) {
-      isDraggingSidebarRef.current = true;
-    }
-    if (isDraggingSidebarRef.current) {
-      setSidebarDragX(Math.max(0, dx));
-    }
-  };
-  const sidebarTouchEnd = () => {
-    if (isDraggingSidebarRef.current && sidebarDragX !== null) {
-      const sidebarWidth = Math.min(window.innerWidth * 0.85, 360);
-      if (sidebarDragX > sidebarWidth * 0.3) {
-        setSidebarOpen(false);
-      }
-    }
-    setSidebarDragX(null);
-    isDraggingSidebarRef.current = false;
-    touchStartRef.current = null;
-  };
   const { profile, isAdmin, signOut } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
@@ -312,298 +281,244 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
-        className={cn("min-h-screen lg:pt-0 lg:pl-[360px] animate-page-enter", "transition-all duration-300")}
+        className={cn("min-h-screen animate-page-enter", "transition-all duration-300")}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.75rem)' }}
       >
         {children}
       </main>
 
-      {/* ======= Sidebar Overlay ======= */}
-      {sidebarOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm animate-fade-in"
-          style={sidebarDragX !== null ? { opacity: Math.max(0, 1 - sidebarDragX / Math.min(window.innerWidth * 0.85, 360)) } : undefined}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* ======= Bottom Sheet Menu (Drawer) ======= */}
+      <Drawer open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <DrawerContent className="bg-background/95 backdrop-blur-2xl border-t border-border/30 max-h-[85vh] rounded-t-3xl">
+          {/* Handle bar */}
+          <div className="flex justify-center pt-2 pb-1">
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
 
-      {/* ======= Sidebar ======= */}
-      <aside
-        onTouchStart={sidebarTouchStart}
-        onTouchMove={sidebarTouchMove}
-        onTouchEnd={sidebarTouchEnd}
-        className={cn(
-          "fixed top-0 right-0 z-[75] h-full w-[85vw] max-w-[360px] flex flex-col",
-          "bg-background/95 backdrop-blur-2xl",
-          "lg:translate-x-0 lg:right-auto lg:left-0",
-          sidebarOpen ? "" : "translate-x-full lg:translate-x-0",
-          sidebarDragX === null && "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-        )}
-        style={{
-          paddingTop: 'env(safe-area-inset-top)',
-          borderLeft: '1px solid hsl(var(--neon-cyan) / 0.1)',
-          boxShadow: sidebarOpen ? '-4px 0 40px hsl(222 50% 3% / 0.7), 0 0 60px hsl(var(--neon-cyan) / 0.05)' : 'none',
-          ...(sidebarOpen && sidebarDragX !== null ? { transform: `translateX(${sidebarDragX}px)` } : {})
-        }}
-      >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between h-14 px-4 shrink-0">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-xl overflow-hidden border border-primary/30"
-              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.2)' }}
-            >
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
-            </div>
-            <div>
-              <h1 className="font-bold text-sm text-foreground tracking-tight">Garden</h1>
-              <p className="text-[9px] text-muted-foreground uppercase tracking-[0.2em]">Command Center</p>
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-2 shrink-0">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-xl overflow-hidden border border-primary/30"
+                style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.2)' }}
+              >
+                <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
+              </div>
+              <div>
+                <h1 className="font-bold text-sm text-foreground tracking-tight">Garden</h1>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-[0.2em]">Command Center</p>
+              </div>
             </div>
           </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-xl hover:bg-secondary active:scale-95 transition-all"
-          >
-            <AppIcon name="X" size={16} className="text-muted-foreground" />
-          </button>
-        </div>
 
-        <div className="mx-4 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
+          <div className="mx-5 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
 
-        {units.length > 0 && (
-          <div className="px-4 pt-3 shrink-0">
-            <div className="relative">
-              <button
-                onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--neon-cyan) / 0.04))',
-                  border: '1px solid hsl(var(--neon-cyan) / 0.15)',
-                }}
-              >
-                <AppIcon name="Building2" size={16} className="text-primary shrink-0" />
-                <span className="flex-1 text-left truncate text-foreground">
-                  {activeUnit?.name || 'Selecionar Unidade'}
-                </span>
-                <AppIcon name="ChevronDown" size={14} className={cn(
-                  "text-muted-foreground transition-transform duration-200",
-                  unitDropdownOpen && "rotate-180"
-                )} />
-              </button>
-              {unitDropdownOpen && (
-                <div
-                  className="absolute top-full left-0 right-0 mt-1 z-50 rounded-xl overflow-hidden py-1"
+          {units.length > 0 && (
+            <div className="px-5 pt-3 shrink-0">
+              <div className="relative">
+                <button
+                  onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
                   style={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border) / 0.4)',
-                    boxShadow: '0 8px 32px hsl(222 50% 3% / 0.6)',
+                    background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--neon-cyan) / 0.04))',
+                    border: '1px solid hsl(var(--neon-cyan) / 0.15)',
                   }}
                 >
-                  {units.map(unit => (
-                    <button
-                      key={unit.id}
-                      onClick={() => {
-                        setActiveUnitId(unit.id);
-                        setUnitDropdownOpen(false);
-                      }}
-                      className={cn(
-                        "w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-all",
-                        unit.id === activeUnit?.id
-                          ? "text-primary bg-primary/10"
-                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                      )}
-                    >
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{ background: getThemeColor(unit.slug) }}
-                      />
-                      <span className="truncate">{unit.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* User Card */}
-        <div className="p-4 shrink-0">
-          <div
-            className="rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all"
-            onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
-            style={{
-              background: 'linear-gradient(135deg, hsl(var(--card)) 0%, hsl(222 45% 10%) 100%)',
-              border: '1px solid hsl(var(--neon-cyan) / 0.15)',
-              boxShadow: '0 0 20px hsl(var(--neon-cyan) / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.03)'
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={42} />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-foreground truncate">
-                  {profile?.full_name || 'Usuário'}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span
-                    className="text-[9px] font-bold uppercase tracking-wider"
-                    style={{ color: rank.color }}
+                  <AppIcon name="Building2" size={16} className="text-primary shrink-0" />
+                  <span className="flex-1 text-left truncate text-foreground">
+                    {activeUnit?.name || 'Selecionar Unidade'}
+                  </span>
+                  <AppIcon name="ChevronDown" size={14} className={cn(
+                    "text-muted-foreground transition-transform duration-200",
+                    unitDropdownOpen && "rotate-180"
+                  )} />
+                </button>
+                {unitDropdownOpen && (
+                  <div
+                    className="absolute top-full left-0 right-0 mt-1 z-50 rounded-xl overflow-hidden py-1"
+                    style={{
+                      background: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border) / 0.4)',
+                      boxShadow: '0 8px 32px hsl(222 50% 3% / 0.6)',
+                    }}
                   >
-                    {rank.title}
-                  </span>
-                  <span className="text-[8px] text-muted-foreground">•</span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {isAdmin ? 'Admin' : 'Staff'}
-                  </span>
+                    {units.map(unit => (
+                      <button
+                        key={unit.id}
+                        onClick={() => {
+                          setActiveUnitId(unit.id);
+                          setUnitDropdownOpen(false);
+                        }}
+                        className={cn(
+                          "w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-all",
+                          unit.id === activeUnit?.id
+                            ? "text-primary bg-primary/10"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}
+                      >
+                        <span
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          style={{ background: getThemeColor(unit.slug) }}
+                        />
+                        <span className="truncate">{unit.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* User Card */}
+          <div className="px-5 py-3 shrink-0">
+            <div
+              className="rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all"
+              onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--card)) 0%, hsl(222 45% 10%) 100%)',
+                border: '1px solid hsl(var(--neon-cyan) / 0.15)',
+                boxShadow: '0 0 20px hsl(var(--neon-cyan) / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.03)'
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={42} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-foreground truncate">
+                    {profile?.full_name || 'Usuário'}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span
+                      className="text-[9px] font-bold uppercase tracking-wider"
+                      style={{ color: rank.color }}
+                    >
+                      {rank.title}
+                    </span>
+                    <span className="text-[8px] text-muted-foreground">•</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {isAdmin ? 'Admin' : 'Staff'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="mt-3 pt-2.5" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
-              <PointsDisplay isPulsing={isPulsing} />
+              <div className="mt-3 pt-2.5" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
+                <PointsDisplay isPulsing={isPulsing} />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Navigation */}
-        <nav ref={navRef} className="flex-1 overflow-y-auto px-3 pb-3 space-y-5">
-          {groupedNav.map((group) => (
-            <div key={group.label}>
-              <div className="px-3 mb-1.5">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/60">
-                  {group.label}
-                </span>
-              </div>
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
-                  const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
-                  const moduleStatus = moduleStatuses[item.href];
+          {/* Navigation Grid */}
+          <nav ref={navRef} className="flex-1 overflow-y-auto px-5 pb-6 space-y-5">
+            {groupedNav.map((group) => (
+              <div key={group.label}>
+                <div className="mb-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/60">
+                    {group.label}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {group.items.map((item) => {
+                    const isActive = location.pathname === item.href;
+                    const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
+                    const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
+                    const moduleStatus = moduleStatuses[item.href];
 
-                  return (
-                    <TooltipProvider key={item.href}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Link
-                            to={item.href}
-                            data-active={isActive}
-                            onClick={() => setSidebarOpen(false)}
+                    return (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        data-active={isActive}
+                        onClick={() => setSidebarOpen(false)}
+                        className={cn(
+                          "flex flex-col items-center gap-1.5 p-3 rounded-xl text-center transition-all duration-200 relative active:scale-[0.95]",
+                          isActive
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}
+                        style={isActive ? {
+                          background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
+                          border: '1px solid hsl(var(--neon-cyan) / 0.2)',
+                          boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
+                        } : {
+                          border: '1px solid transparent',
+                        }}
+                      >
+                        <div className="relative">
+                          <div
                             className={cn(
-                              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group",
-                              isActive
-                                ? "text-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 active:scale-[0.98]"
+                              "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200",
                             )}
                             style={isActive ? {
-                              background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
-                              border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-                              boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
-                            } : undefined}
+                              background: 'hsl(var(--primary) / 0.15)',
+                              border: '1px solid hsl(var(--primary) / 0.2)',
+                              boxShadow: '0 0 10px hsl(var(--primary) / 0.15)'
+                            } : {
+                              background: 'hsl(var(--secondary) / 0.5)',
+                            }}
                           >
-                            {isActive && (
-                              <div
-                                className="absolute right-0 lg:right-auto lg:left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-l-full lg:rounded-l-none lg:rounded-r-full"
-                                style={{
-                                  background: 'hsl(var(--neon-cyan))',
-                                  boxShadow: '0 0 8px hsl(var(--neon-cyan) / 0.5)'
-                                }}
-                              />
-                            )}
-
-                            <div
+                            <AppIcon
+                              name={item.icon}
+                              size={20}
+                              className={cn(isActive ? "text-primary" : "")}
+                              style={isActive ? { filter: 'drop-shadow(0 0 5px hsl(217 91% 60% / 0.6))' } : undefined}
+                            />
+                          </div>
+                          {showBadge && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
+                              {badgeCount > 9 ? '9+' : badgeCount}
+                            </span>
+                          )}
+                          {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
+                            <span
                               className={cn(
-                                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200",
-                                isActive ? "" : "group-hover:bg-secondary/60"
+                                "absolute -top-1 -right-1 w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center",
+                                (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
                               )}
-                              style={isActive ? {
-                                background: 'hsl(var(--primary) / 0.15)',
-                                border: '1px solid hsl(var(--primary) / 0.2)',
-                                boxShadow: '0 0 10px hsl(var(--primary) / 0.15)'
-                              } : undefined}
+                              style={{
+                                background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
+                                color: moduleStatus.level === 'critical' ? 'hsl(0 0% 100%)' : 'hsl(0 0% 0%)',
+                                boxShadow: moduleStatus.level === 'critical'
+                                  ? '0 0 8px hsl(var(--neon-red) / 0.5)'
+                                  : '0 0 8px hsl(var(--neon-amber) / 0.5)',
+                              }}
                             >
-                              <div className="relative">
-                                <AppIcon
-                                  name={item.icon}
-                                  size={18}
-                                  className={cn(isActive ? "text-primary" : "")}
-                                  style={isActive ? { filter: 'drop-shadow(0 0 5px hsl(217 91% 60% / 0.6))' } : undefined}
-                                />
-                                {showBadge && (
-                                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
-                                    {badgeCount > 9 ? '9+' : badgeCount}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <span className="flex-1">{item.label}</span>
-
-                            {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 ? (
-                              <div className="flex items-center gap-1.5">
-                                <span
-                                  className={cn(
-                                    "w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center shrink-0",
-                                    (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
-                                  )}
-                                  style={{
-                                    background: moduleStatus.level === 'critical'
-                                      ? 'hsl(var(--neon-red))'
-                                      : moduleStatus.level === 'warning'
-                                        ? 'hsl(var(--neon-amber))'
-                                        : 'hsl(var(--neon-amber))',
-                                    color: moduleStatus.level === 'critical'
-                                      ? 'hsl(0 0% 100%)'
-                                      : 'hsl(0 0% 0%)',
-                                    boxShadow: moduleStatus.level === 'critical'
-                                      ? '0 0 8px hsl(var(--neon-red) / 0.5)'
-                                      : moduleStatus.level === 'warning'
-                                        ? '0 0 10px hsl(var(--neon-amber) / 0.6)'
-                                        : '0 0 8px hsl(var(--neon-amber) / 0.4)',
-                                  }}
-                                >
-                                  {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
-                                </span>
-                              </div>
-                            ) : moduleStatus && moduleStatus.level === 'ok' ? (
-                              <div
-                                className="w-1.5 h-1.5 rounded-full shrink-0"
-                                style={{
-                                  background: 'hsl(var(--neon-green))',
-                                  boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
-                                }}
-                              />
-                            ) : isActive ? (
-                              <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
-                            ) : null}
-                          </Link>
-                        </TooltipTrigger>
-                        {moduleStatus && (
-                          <TooltipContent side="right" className="text-xs">
-                            {moduleStatus.tooltip}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </TooltipProvider>
-                  );
-                })}
+                              {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
+                            </span>
+                          )}
+                          {moduleStatus && moduleStatus.level === 'ok' && (
+                            <div
+                              className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
+                              style={{
+                                background: 'hsl(var(--neon-green))',
+                                boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
+                              }}
+                            />
+                          )}
+                        </div>
+                        <span className="text-[11px] font-medium leading-tight">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
-        </nav>
+            ))}
 
-        {/* Logout */}
-        <div className="shrink-0 p-3">
-          <div className="mx-1 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent mb-3" />
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98] group"
-          >
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-destructive/10 transition-colors">
-              <AppIcon name="LogOut" size={18} />
+            {/* Logout */}
+            <div className="pt-2">
+              <div className="h-px bg-gradient-to-r from-transparent via-border/30 to-transparent mb-3" />
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98] group"
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-destructive/10 transition-colors">
+                  <AppIcon name="LogOut" size={18} />
+                </div>
+                <span className="font-medium">Sair</span>
+              </button>
             </div>
-            <span className="font-medium">Sair</span>
-          </button>
-        </div>
-      </aside>
+          </nav>
+        </DrawerContent>
+      </Drawer>
+
 
       {/* Unit transition overlay */}
       {isTransitioning && (
