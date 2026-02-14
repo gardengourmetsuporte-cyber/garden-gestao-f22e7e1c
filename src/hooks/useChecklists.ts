@@ -73,7 +73,7 @@ async function fetchCompletionsData(date: string, type: ChecklistType) {
 
 export function useChecklists() {
   const { user } = useAuth();
-  const { activeUnitId } = useUnit();
+  const { activeUnitId, isLoading: unitLoading } = useUnit();
   const queryClient = useQueryClient();
 
   // Track the current date/type for completions
@@ -83,7 +83,7 @@ export function useChecklists() {
   const sectorsKey = ['checklist-sectors', activeUnitId];
   const completionsKey = ['checklist-completions', currentDate, currentType];
 
-  const { data: sectors = [], isLoading } = useQuery({
+  const { data: sectors = [], isLoading: sectorsLoading } = useQuery({
     queryKey: sectorsKey,
     queryFn: () => fetchSectorsData(activeUnitId),
     enabled: !!user && !!activeUnitId,
@@ -96,6 +96,9 @@ export function useChecklists() {
     enabled: !!user && !!currentDate && !!currentType,
     staleTime: 0, // Always refetch when invalidated
   });
+
+  // Show loading while unit context resolves OR sectors are actually loading
+  const isLoading = unitLoading || sectorsLoading || (!activeUnitId && !!user);
 
   // Called by the page to set which date/type to load completions for
   const fetchCompletions = useCallback(async (date: string, type: ChecklistType) => {
