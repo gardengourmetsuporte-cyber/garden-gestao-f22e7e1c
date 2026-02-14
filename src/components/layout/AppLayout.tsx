@@ -34,6 +34,26 @@ interface NavItem {
   groupLabel: string;
 }
 
+// Module icon theme: gradient + shadow for 3D effect
+const MODULE_THEMES: Record<string, { gradient: string; shadow: string; iconColor: string }> = {
+  '/':             { gradient: 'linear-gradient(135deg, #6366f1, #818cf8)', shadow: '0 4px 14px rgba(99,102,241,0.45)', iconColor: '#fff' },
+  '/agenda':       { gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)', shadow: '0 4px 14px rgba(245,158,11,0.45)', iconColor: '#fff' },
+  '/finance':      { gradient: 'linear-gradient(135deg, #10b981, #34d399)', shadow: '0 4px 14px rgba(16,185,129,0.45)', iconColor: '#fff' },
+  '/inventory':    { gradient: 'linear-gradient(135deg, #f97316, #fb923c)', shadow: '0 4px 14px rgba(249,115,22,0.45)', iconColor: '#fff' },
+  '/orders':       { gradient: 'linear-gradient(135deg, #3b82f6, #60a5fa)', shadow: '0 4px 14px rgba(59,130,246,0.45)', iconColor: '#fff' },
+  '/checklists':   { gradient: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', shadow: '0 4px 14px rgba(139,92,246,0.45)', iconColor: '#fff' },
+  '/cash-closing': { gradient: 'linear-gradient(135deg, #ec4899, #f472b6)', shadow: '0 4px 14px rgba(236,72,153,0.45)', iconColor: '#fff' },
+  '/recipes':      { gradient: 'linear-gradient(135deg, #ef4444, #f87171)', shadow: '0 4px 14px rgba(239,68,68,0.45)', iconColor: '#fff' },
+  '/employees':    { gradient: 'linear-gradient(135deg, #06b6d4, #22d3ee)', shadow: '0 4px 14px rgba(6,182,212,0.45)', iconColor: '#fff' },
+  '/rewards':      { gradient: 'linear-gradient(135deg, #eab308, #facc15)', shadow: '0 4px 14px rgba(234,179,8,0.45)', iconColor: '#fff' },
+  '/chat':         { gradient: 'linear-gradient(135deg, #14b8a6, #2dd4bf)', shadow: '0 4px 14px rgba(20,184,166,0.45)', iconColor: '#fff' },
+  '/tablet-admin': { gradient: 'linear-gradient(135deg, #64748b, #94a3b8)', shadow: '0 4px 14px rgba(100,116,139,0.45)', iconColor: '#fff' },
+  '/cardapio':     { gradient: 'linear-gradient(135deg, #d946ef, #e879f9)', shadow: '0 4px 14px rgba(217,70,239,0.45)', iconColor: '#fff' },
+  '/whatsapp':     { gradient: 'linear-gradient(135deg, #22c55e, #4ade80)', shadow: '0 4px 14px rgba(34,197,94,0.45)', iconColor: '#fff' },
+  '/marketing':    { gradient: 'linear-gradient(135deg, #f43f5e, #fb7185)', shadow: '0 4px 14px rgba(244,63,94,0.45)', iconColor: '#fff' },
+  '/settings':     { gradient: 'linear-gradient(135deg, #475569, #64748b)', shadow: '0 4px 14px rgba(71,85,105,0.45)', iconColor: '#fff' },
+};
+
 const navItems: NavItem[] = [
   { icon: 'LayoutDashboard', label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
@@ -289,46 +309,41 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Bottom Sheet Menu (Drawer) ======= */}
       <Drawer open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <DrawerContent className="bg-background/95 backdrop-blur-2xl border-t border-border/30 max-h-[85vh] rounded-t-3xl">
+        <DrawerContent className="bg-background/95 backdrop-blur-2xl border-t border-border/30 max-h-[88vh] rounded-t-3xl">
           {/* Handle bar */}
           <div className="flex justify-center pt-2 pb-1">
             <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
 
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 py-2 shrink-0">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-xl overflow-hidden border border-primary/30"
-                style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.2)' }}
-              >
-                <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
-              </div>
-              <div>
-                <h1 className="font-bold text-sm text-foreground tracking-tight">Garden</h1>
-                <p className="text-[9px] text-muted-foreground uppercase tracking-[0.2em]">Command Center</p>
-              </div>
+          {/* Compact header row: logo + unit + avatar */}
+          <div className="flex items-center gap-2.5 px-4 py-2 shrink-0">
+            {/* Logo */}
+            <div
+              className="w-8 h-8 rounded-lg overflow-hidden border border-primary/30 shrink-0"
+              style={{ boxShadow: '0 0 10px hsl(var(--primary) / 0.15)' }}
+            >
+              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
             </div>
-          </div>
 
-          <div className="mx-5 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
-
-          {units.length > 0 && (
-            <div className="px-5 pt-3 shrink-0">
-              <div className="relative">
+            {/* Unit selector - inline */}
+            {units.length > 0 ? (
+              <div className="flex-1 min-w-0 relative">
                 <button
                   onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all w-full"
                   style={{
-                    background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--neon-cyan) / 0.04))',
-                    border: '1px solid hsl(var(--neon-cyan) / 0.15)',
+                    background: 'hsl(var(--secondary) / 0.6)',
+                    border: '1px solid hsl(var(--border) / 0.3)',
                   }}
                 >
-                  <AppIcon name="Building2" size={16} className="text-primary shrink-0" />
-                  <span className="flex-1 text-left truncate text-foreground">
-                    {activeUnit?.name || 'Selecionar Unidade'}
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))' }}
+                  />
+                  <span className="flex-1 text-left truncate text-foreground text-xs">
+                    {activeUnit?.name || 'Unidade'}
                   </span>
-                  <AppIcon name="ChevronDown" size={14} className={cn(
+                  <AppIcon name="ChevronDown" size={12} className={cn(
                     "text-muted-foreground transition-transform duration-200",
                     unitDropdownOpen && "rotate-180"
                   )} />
@@ -350,14 +365,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           setUnitDropdownOpen(false);
                         }}
                         className={cn(
-                          "w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-all",
+                          "w-full flex items-center gap-2 px-3 py-2 text-xs transition-all",
                           unit.id === activeUnit?.id
                             ? "text-primary bg-primary/10"
                             : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                         )}
                       >
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          className="w-2 h-2 rounded-full shrink-0"
                           style={{ background: getThemeColor(unit.slug) }}
                         />
                         <span className="truncate">{unit.name}</span>
@@ -366,61 +381,39 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="flex-1">
+                <h1 className="font-bold text-sm text-foreground">Garden</h1>
+              </div>
+            )}
 
-          {/* User Card */}
-          <div className="px-5 py-3 shrink-0">
-            <div
-              className="rounded-xl p-3 cursor-pointer active:scale-[0.98] transition-all"
+            {/* User avatar - compact */}
+            <button
               onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
-              style={{
-                background: 'linear-gradient(135deg, hsl(var(--card)) 0%, hsl(222 45% 10%) 100%)',
-                border: '1px solid hsl(var(--neon-cyan) / 0.15)',
-                boxShadow: '0 0 20px hsl(var(--neon-cyan) / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.03)'
-              }}
+              className="shrink-0 active:scale-90 transition-transform"
             >
-              <div className="flex items-center gap-3">
-                <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={42} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground truncate">
-                    {profile?.full_name || 'Usuário'}
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span
-                      className="text-[9px] font-bold uppercase tracking-wider"
-                      style={{ color: rank.color }}
-                    >
-                      {rank.title}
-                    </span>
-                    <span className="text-[8px] text-muted-foreground">•</span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {isAdmin ? 'Admin' : 'Staff'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 pt-2.5" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
-                <PointsDisplay isPulsing={isPulsing} />
-              </div>
-            </div>
+              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={34} />
+            </button>
           </div>
 
-          {/* Navigation Grid */}
-          <nav ref={navRef} className="flex-1 overflow-y-auto px-5 pb-6 space-y-5">
+          <div className="mx-4 h-px bg-gradient-to-r from-transparent via-border/30 to-transparent" />
+
+          {/* Navigation Grid - Colorful 3D Icons */}
+          <nav ref={navRef} className="flex-1 overflow-y-auto px-4 pt-3 pb-6 space-y-4">
             {groupedNav.map((group) => (
               <div key={group.label}>
-                <div className="mb-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/60">
+                <div className="mb-2 px-1">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground/50">
                     {group.label}
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {group.items.map((item) => {
                     const isActive = location.pathname === item.href;
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
                     const moduleStatus = moduleStatuses[item.href];
+                    const theme = MODULE_THEMES[item.href] || MODULE_THEMES['/'];
 
                     return (
                       <Link
@@ -429,56 +422,50 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         data-active={isActive}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex flex-col items-center gap-1.5 p-3 rounded-xl text-center transition-all duration-200 relative active:scale-[0.95]",
+                          "flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl text-center transition-all duration-200 relative active:scale-[0.92]",
                           isActive
-                            ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                            ? "text-foreground bg-secondary/60"
+                            : "text-muted-foreground"
                         )}
-                        style={isActive ? {
-                          background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--neon-cyan) / 0.06))',
-                          border: '1px solid hsl(var(--neon-cyan) / 0.2)',
-                          boxShadow: '0 0 12px hsl(var(--neon-cyan) / 0.08)'
-                        } : {
-                          border: '1px solid transparent',
-                        }}
                       >
                         <div className="relative">
                           <div
-                            className={cn(
-                              "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200",
-                            )}
-                            style={isActive ? {
-                              background: 'hsl(var(--primary) / 0.15)',
-                              border: '1px solid hsl(var(--primary) / 0.2)',
-                              boxShadow: '0 0 10px hsl(var(--primary) / 0.15)'
-                            } : {
-                              background: 'hsl(var(--secondary) / 0.5)',
+                            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200"
+                            style={{
+                              background: theme.gradient,
+                              boxShadow: isActive ? theme.shadow : theme.shadow.replace('0.45', '0.25'),
+                              transform: isActive ? 'scale(1.05)' : undefined,
                             }}
                           >
                             <AppIcon
                               name={item.icon}
-                              size={20}
-                              className={cn(isActive ? "text-primary" : "")}
-                              style={isActive ? { filter: 'drop-shadow(0 0 5px hsl(217 91% 60% / 0.6))' } : undefined}
+                              size={22}
+                              style={{ color: theme.iconColor, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
                             />
                           </div>
+                          {/* Shine/gloss overlay for 3D effect */}
+                          <div
+                            className="absolute inset-0 rounded-2xl pointer-events-none"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 40%, transparent 60%)',
+                              width: '3rem',
+                              height: '3rem',
+                            }}
+                          />
                           {showBadge && (
-                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
+                            <span className="absolute -top-1 -right-1 w-4.5 h-4.5 min-w-[18px] rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse border-2 border-background">
                               {badgeCount > 9 ? '9+' : badgeCount}
                             </span>
                           )}
                           {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
                             <span
                               className={cn(
-                                "absolute -top-1 -right-1 w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center",
+                                "absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[8px] font-bold flex items-center justify-center border-2 border-background",
                                 (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
                               )}
                               style={{
                                 background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
-                                color: moduleStatus.level === 'critical' ? 'hsl(0 0% 100%)' : 'hsl(0 0% 0%)',
-                                boxShadow: moduleStatus.level === 'critical'
-                                  ? '0 0 8px hsl(var(--neon-red) / 0.5)'
-                                  : '0 0 8px hsl(var(--neon-amber) / 0.5)',
+                                color: moduleStatus.level === 'critical' ? '#fff' : '#000',
                               }}
                             >
                               {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
@@ -486,7 +473,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )}
                           {moduleStatus && moduleStatus.level === 'ok' && (
                             <div
-                              className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
+                              className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-background"
                               style={{
                                 background: 'hsl(var(--neon-green))',
                                 boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
@@ -494,7 +481,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             />
                           )}
                         </div>
-                        <span className="text-[11px] font-medium leading-tight">{item.label}</span>
+                        <span className="text-[10px] font-medium leading-tight max-w-full truncate">{item.label}</span>
                       </Link>
                     );
                   })}
@@ -503,15 +490,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             ))}
 
             {/* Logout */}
-            <div className="pt-2">
-              <div className="h-px bg-gradient-to-r from-transparent via-border/30 to-transparent mb-3" />
+            <div className="pt-1">
+              <div className="h-px bg-gradient-to-r from-transparent via-border/30 to-transparent mb-2" />
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98] group"
+                className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98]"
               >
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-destructive/10 transition-colors">
-                  <AppIcon name="LogOut" size={18} />
-                </div>
+                <AppIcon name="LogOut" size={16} />
                 <span className="font-medium">Sair</span>
               </button>
             </div>
