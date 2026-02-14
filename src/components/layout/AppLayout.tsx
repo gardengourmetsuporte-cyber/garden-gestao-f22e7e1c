@@ -34,25 +34,7 @@ interface NavItem {
   groupLabel: string;
 }
 
-// Clean, flat icon colors — one accent per module
-const MODULE_COLORS: Record<string, string> = {
-  '/':             'hsl(var(--primary))',
-  '/agenda':       'hsl(var(--neon-amber))',
-  '/finance':      'hsl(var(--neon-green))',
-  '/inventory':    'hsl(38 92% 55%)',
-  '/orders':       'hsl(var(--primary))',
-  '/checklists':   'hsl(var(--neon-purple))',
-  '/cash-closing': 'hsl(328 85% 58%)',
-  '/recipes':      'hsl(var(--neon-red))',
-  '/employees':    'hsl(var(--neon-cyan))',
-  '/rewards':      'hsl(45 96% 56%)',
-  '/chat':         'hsl(168 76% 42%)',
-  '/tablet-admin': 'hsl(215 20% 50%)',
-  '/cardapio':     'hsl(292 80% 58%)',
-  '/whatsapp':     'hsl(142 71% 45%)',
-  '/marketing':    'hsl(350 85% 55%)',
-  '/settings':     'hsl(215 20% 55%)',
-};
+// Monochrome — no per-module colors
 
 const navItems: NavItem[] = [
   { icon: 'LayoutDashboard', label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
@@ -334,22 +316,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   setFabOpen(false);
                   navigate('/');
                 }}
-                className="w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-all"
-                style={{
-                  background: 'hsl(var(--secondary))',
-                  border: '1px solid hsl(var(--border) / 0.3)',
-                }}
+                className="w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-all bg-secondary border border-border/30"
               >
                 <AppIcon name="X" size={18} className="text-foreground" />
               </button>
             </div>
           </div>
 
-          {/* Profile Card */}
-          <div className="mx-4 mb-4 p-4 rounded-2xl" style={{
-            background: 'hsl(var(--card))',
-            border: '1px solid hsl(var(--border) / 0.3)',
-          }}>
+          {/* Profile Card — Refined */}
+          <div className="mx-4 mb-5 p-4 rounded-2xl bg-card border border-border/20">
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }} 
@@ -375,15 +350,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
             {/* Unit selector inline */}
             {units.length > 0 && (
-              <div className="mt-3 pt-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.2)' }}>
+              <div className="mt-3 pt-3 border-t border-border/15">
                 <div className="relative">
                   <button
                     onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium transition-all"
-                    style={{
-                      background: 'hsl(var(--secondary) / 0.6)',
-                      border: '1px solid hsl(var(--border) / 0.2)',
-                    }}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium transition-all bg-secondary/60 border border-border/20"
                   >
                     <span className="w-2 h-2 rounded-full shrink-0" style={{
                       background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
@@ -393,9 +364,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200", unitDropdownOpen && "rotate-180")} />
                   </button>
                   {unitDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1" style={{
-                      background: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border) / 0.4)',
+                    <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1 bg-card border border-border/40" style={{
                       boxShadow: 'var(--shadow-elevated)',
                     }}>
                       {units.map(unit => (
@@ -418,7 +387,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             )}
           </div>
 
-          {/* Navigation Grid */}
+          {/* Navigation Grid — Monochrome Modern */}
           <nav ref={navRef} className="flex-1 overflow-y-auto px-4 pb-8">
             {groupedNav.map((group, gi) => (
               <div key={group.label} className={cn(gi > 0 && "mt-5")}>
@@ -431,7 +400,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
                     const moduleStatus = moduleStatuses[item.href];
-                    const accentColor = MODULE_COLORS[item.href] || 'hsl(var(--primary))';
 
                     return (
                       <Link
@@ -452,28 +420,20 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         style={{ animationDelay: `${(gi * 4 + idx) * 25}ms` }}
                       >
                         <div className="relative">
-                          {/* Icon container — clean rounded square */}
+                          {/* Icon container — monochrome filled style */}
                           <div
                             className={cn(
                               "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200",
+                              isActive
+                                ? "bg-primary shadow-lg shadow-primary/25"
+                                : "bg-secondary/80 border border-border/30"
                             )}
-                            style={{
-                              background: isActive
-                                ? accentColor
-                                : 'hsl(var(--secondary))',
-                              boxShadow: isActive
-                                ? `0 4px 16px ${accentColor.replace(')', ' / 0.35)')}, 0 0 24px ${accentColor.replace(')', ' / 0.15)')}`
-                                : 'none',
-                              border: isActive
-                                ? 'none'
-                                : '1px solid hsl(var(--border) / 0.3)',
-                            }}
                           >
                             <AppIcon
                               name={item.icon}
                               size={22}
+                              className={isActive ? "text-primary-foreground" : "text-muted-foreground"}
                               style={{
-                                color: isActive ? '#fff' : accentColor,
                                 filter: isActive ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
@@ -481,9 +441,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
                           {/* Badges */}
                           {showBadge && (
-                            <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse" style={{
-                              background: 'hsl(var(--destructive))',
-                              color: 'hsl(var(--destructive-foreground))',
+                            <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse bg-destructive text-destructive-foreground" style={{
                               border: '2px solid hsl(var(--background))',
                             }}>
                               {badgeCount > 9 ? '9+' : badgeCount}
@@ -524,7 +482,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             ))}
 
             {/* Logout */}
-            <div className="mt-6 pt-4" style={{ borderTop: '1px solid hsl(var(--border) / 0.15)' }}>
+            <div className="mt-6 pt-4 border-t border-border/15">
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.97] text-muted-foreground hover:text-foreground hover:bg-secondary/40"
