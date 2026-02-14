@@ -1,16 +1,29 @@
 import { useState } from 'react';
 import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { AppRole } from '@/types/database';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Shield, User, Loader2 } from 'lucide-react';
+import { Users, Shield, User, Loader2, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+
+const ROLES: { value: AppRole; label: string; icon: React.ElementType }[] = [
+  { value: 'super_admin', label: 'Super Admin', icon: Shield },
+  { value: 'admin', label: 'Admin', icon: Shield },
+  { value: 'funcionario', label: 'Funcionário', icon: User },
+];
 
 export function UserManagement() {
   const { users, isLoading, updateUserRole } = useUsers();
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
+  const [roleDialogUser, setRoleDialogUser] = useState<UserWithRole | null>(null);
 
   const handleRoleChange = async (userId: string, newRole: AppRole) => {
+    setRoleDialogUser(null);
     setUpdatingUser(userId);
     try {
       await updateUserRole(userId, newRole);
@@ -20,6 +33,8 @@ export function UserManagement() {
       setUpdatingUser(null);
     }
   };
+
+  const getRoleLabel = (role: AppRole) => ROLES.find(r => r.value === role)?.label || role;
 
   if (isLoading) {
     return (
@@ -48,7 +63,7 @@ export function UserManagement() {
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                {user.role === 'admin' ? (
+                {user.role === 'admin' || user.role === 'super_admin' ? (
                   <Shield className="w-5 h-5 text-primary" />
                 ) : (
                   <User className="w-5 h-5 text-muted-foreground" />
@@ -65,34 +80,13 @@ export function UserManagement() {
               {updatingUser === user.user_id ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Select
-                  value={user.role}
-                  onValueChange={(value: AppRole) => handleRoleChange(user.user_id, value)}
+                <button
+                  onClick={() => setRoleDialogUser(user)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-border text-sm font-medium hover:bg-secondary transition-colors"
                 >
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="super_admin">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4" />
-                        Super Admin
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="admin">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4" />
-                        Admin
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="funcionario">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        Funcionário
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                  {getRoleLabel(user.role)}
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                </button>
               )}
             </div>
           </div>
@@ -103,6 +97,35 @@ export function UserManagement() {
           </p>
         )}
       </div>
+
+      <Dialog open={!!roleDialogUser} onOpenChange={(open) => !open && setRoleDialogUser(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Alterar função de {roleDialogUser?.full_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 pt-2">
+            {ROLES.map((role) => {
+              const Icon = role.icon;
+              const isActive = roleDialogUser?.role === role.value;
+              return (
+                <button
+                  key={role.value}
+                  onClick={() => roleDialogUser && handleRoleChange(roleDialogUser.user_id, role.value)}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors",
+                    isActive
+                      ? "bg-primary/10 border border-primary/30 text-primary"
+                      : "bg-secondary/50 hover:bg-secondary border border-transparent"
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium text-sm">{role.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
