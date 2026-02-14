@@ -306,9 +306,43 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <DrawerContent className="border-t-0 max-h-[92vh] rounded-t-3xl overflow-hidden" style={{
           background: 'hsl(var(--background))',
         }}>
-          {/* Handle + Close button */}
+          {/* Header: Unit Selector + Handle + Close */}
           <div className="flex items-center justify-between px-4 pt-3 pb-1">
-            <div className="flex-1" />
+            {/* Unit selector compact */}
+            <div className="flex-1 relative">
+              {units.length > 0 && (
+                <button
+                  onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all bg-secondary/60 border border-border/20 max-w-[140px]"
+                >
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{
+                    background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
+                    boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : undefined,
+                  }} />
+                  <span className="truncate text-foreground">{activeUnit?.name || 'Unidade'}</span>
+                  <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200 shrink-0", unitDropdownOpen && "rotate-180")} />
+                </button>
+              )}
+              {unitDropdownOpen && units.length > 0 && (
+                <div className="absolute top-full left-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1 bg-card border border-border/40 min-w-[180px]" style={{
+                  boxShadow: 'var(--shadow-elevated)',
+                }}>
+                  {units.map(unit => (
+                    <button
+                      key={unit.id}
+                      onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all",
+                        unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      )}
+                    >
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
+                      <span className="truncate">{unit.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
             <div className="flex-1 flex justify-end">
               <button
@@ -324,69 +358,22 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </div>
 
-          {/* Profile Card — Refined */}
-          <div className="mx-4 mb-5 p-4 rounded-2xl bg-card border border-border/20">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }} 
-                className="shrink-0 active:scale-90 transition-transform"
-              >
-                <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} />
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">
-                  {profile?.full_name || 'Usuário'}
-                </p>
-                <p className="text-[11px] font-medium mt-0.5" style={{ color: rank.color }}>
-                  {rank.title} · {earnedPoints} pts
-                </p>
-              </div>
-              <button
-                onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
-                className="p-2 rounded-xl transition-colors hover:bg-secondary/60"
-              >
-                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
-              </button>
+          {/* Mini Profile Row */}
+          <button
+            onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
+            className="flex items-center gap-3 w-full px-4 py-2 border-b border-border/10 active:bg-secondary/40 transition-colors"
+          >
+            <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={32} />
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {profile?.full_name || 'Usuário'}
+              </p>
+              <p className="text-[10px] font-medium" style={{ color: rank.color }}>
+                {rank.title} · {earnedPoints} pts
+              </p>
             </div>
-
-            {/* Unit selector inline */}
-            {units.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-border/15">
-                <div className="relative">
-                  <button
-                    onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium transition-all bg-secondary/60 border border-border/20"
-                  >
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{
-                      background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
-                      boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : undefined,
-                    }} />
-                    <span className="flex-1 text-left truncate text-foreground">{activeUnit?.name || 'Unidade'}</span>
-                    <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200", unitDropdownOpen && "rotate-180")} />
-                  </button>
-                  {unitDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1 bg-card border border-border/40" style={{
-                      boxShadow: 'var(--shadow-elevated)',
-                    }}>
-                      {units.map(unit => (
-                        <button
-                          key={unit.id}
-                          onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                          className={cn(
-                            "w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all",
-                            unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                          )}
-                        >
-                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
-                          <span className="truncate">{unit.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+          </button>
 
           {/* Navigation Grid — Monochrome Modern */}
           <nav ref={navRef} className="flex-1 overflow-y-auto px-4 pb-8">
