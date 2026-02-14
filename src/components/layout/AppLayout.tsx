@@ -247,13 +247,18 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       )}
 
       <button
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
           if (sidebarOpen) {
             setSidebarOpen(false);
             setFabOpen(false);
           } else {
             setFabOpen(prev => !prev);
           }
+        }}
+        onTouchEnd={(e) => {
+          e.stopPropagation();
         }}
         className={cn(
           "lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
