@@ -1316,6 +1316,68 @@ export type Database = {
           },
         ]
       }
+      marketing_posts: {
+        Row: {
+          caption: string | null
+          channels: string[] | null
+          created_at: string
+          id: string
+          media_urls: string[] | null
+          notes: string | null
+          published_at: string | null
+          scheduled_at: string | null
+          sort_order: number | null
+          status: string
+          tags: string[] | null
+          title: string
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          channels?: string[] | null
+          created_at?: string
+          id?: string
+          media_urls?: string[] | null
+          notes?: string | null
+          published_at?: string | null
+          scheduled_at?: string | null
+          sort_order?: number | null
+          status?: string
+          tags?: string[] | null
+          title: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          channels?: string[] | null
+          created_at?: string
+          id?: string
+          media_urls?: string[] | null
+          notes?: string | null
+          published_at?: string | null
+          scheduled_at?: string | null
+          sort_order?: number | null
+          status?: string
+          tags?: string[] | null
+          title?: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_posts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_categories: {
         Row: {
           color: string
