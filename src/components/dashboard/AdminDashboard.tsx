@@ -104,37 +104,72 @@ export function AdminDashboard() {
           </div>
         </button>
 
-        {/* POINTS WIDGET - half width */}
+
+        {/* AGENDA WIDGET - full width */}
         <button
-          onClick={() => navigate('/profile')}
-          className="card-command-warning p-4 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+          onClick={() => navigate('/agenda')}
+          className="card-command col-span-2 p-4 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
         >
-          <div className="flex items-center gap-2 mb-2">
-            <AppIcon name="Star" size={18} className="text-warning" />
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Seus pontos</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <AppIcon name="CalendarDays" size={18} className="text-primary" />
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Agenda de hoje</span>
+            </div>
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
           </div>
-          {pointsLoading ? (
-            <Skeleton className="h-8 w-16" />
+          {tasksLoading ? (
+            <div className="space-y-2">
+              {[1,2,3].map(i => <Skeleton key={i} className="h-8 w-full" />)}
+            </div>
+          ) : pendingTasks.length > 0 ? (
+            <div className="space-y-2">
+              {pendingTasks.map(task => {
+                const isOverdue = task.due_date && isPast(new Date(task.due_date + 'T23:59:59')) && !isToday(new Date(task.due_date));
+                return (
+                  <div key={task.id} className="flex items-center gap-3">
+                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0", isOverdue ? "bg-destructive" : "bg-primary")} />
+                    <span className="text-sm text-foreground truncate flex-1">{task.title}</span>
+                    {task.due_date && (
+                      <span className={cn("text-[10px] font-medium flex-shrink-0", isOverdue ? "text-destructive" : "text-muted-foreground")}>
+                        {isToday(new Date(task.due_date)) ? 'Hoje' : isTomorrow(new Date(task.due_date)) ? 'Amanhã' : format(new Date(task.due_date), 'dd/MM')}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           ) : (
-            <>
-              <p className="text-2xl font-bold text-foreground">{animatedPoints}</p>
-              <div className="mt-2">
-                <Progress value={progress} className="h-1 bg-secondary [&>div]:bg-warning" />
-                <p className="text-[9px] text-muted-foreground mt-1">{earnedPoints}/{nextMilestone} próxima conquista</p>
-              </div>
-            </>
+            <div className="text-center py-3">
+              <AppIcon name="Check" size={24} className="text-success mx-auto mb-1" />
+              <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente</p>
+            </div>
           )}
         </button>
 
-        {/* RANKING WIDGET - FULL WIDTH, premium podium */}
-        <div className="col-span-2 animate-slide-up stagger-4">
+        {/* ALERTS */}
+        {(stats.pendingRedemptions > 0) && (
+          <div className="card-command-info col-span-2 p-4 animate-slide-up stagger-4">
+            <div className="flex items-center gap-2 mb-2">
+              <AppIcon name="Bell" size={16} className="text-primary" />
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
+            </div>
+            <button
+              onClick={() => navigate('/rewards')}
+              className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors"
+            >
+              <span className="text-xs text-foreground">Resgates aguardando</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
+            </button>
+          </div>
+        )}
+
+        {/* RANKING WIDGET - FULL WIDTH, LAST */}
+        <div className="col-span-2 animate-slide-up stagger-5">
           <button
             onClick={() => navigate('/profile')}
             className="card-command w-full p-5 text-left transition-all duration-200 hover:scale-[1.005] active:scale-[0.99] overflow-hidden relative"
           >
-            {/* Decorative glow */}
             <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full opacity-15 blur-3xl pointer-events-none" style={{ background: 'hsl(var(--neon-amber))' }} />
-
             <div className="flex items-center justify-between mb-5 relative">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--neon-amber) / 0.15)', border: '1px solid hsl(var(--neon-amber) / 0.25)' }}>
@@ -147,31 +182,24 @@ export function AdminDashboard() {
               </div>
               <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
             </div>
-
             {leaderboardLoading ? (
               <div className="space-y-3">
                 {[1,2,3].map(i => <Skeleton key={i} className="h-10 w-full" />)}
               </div>
             ) : top3.length > 0 ? (
               <>
-                {/* Podium - visual */}
                 <div className="flex items-end justify-center gap-4 mb-5 pt-2">
-                  {/* 2nd place */}
                   {top3[1] && (
                     <div className="flex flex-col items-center gap-1.5">
                       <div className="relative">
                         <RankedAvatar avatarUrl={top3[1].avatar_url} earnedPoints={top3[1].earned_points} size={44} />
                         <span className="absolute -bottom-1 -right-1 text-base">🥈</span>
                       </div>
-                      <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[1].user_id === user?.id && "text-primary")}>
-                        {top3[1].full_name?.split(' ')[0]}
-                      </span>
+                      <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[1].user_id === user?.id && "text-primary")}>{top3[1].full_name?.split(' ')[0]}</span>
                       <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[1].earned_points} pts</span>
                       <div className="w-[68px] h-14 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(215 20% 60% / 0.25), transparent)', border: '1px solid hsl(215 20% 60% / 0.3)', borderBottom: 'none' }} />
                     </div>
                   )}
-
-                  {/* 1st place - tallest */}
                   {top3[0] && (
                     <div className="flex flex-col items-center gap-1.5 -mt-2">
                       <div className="relative">
@@ -179,32 +207,24 @@ export function AdminDashboard() {
                         <RankedAvatar avatarUrl={top3[0].avatar_url} earnedPoints={top3[0].earned_points} size={60} />
                         <span className="absolute -bottom-1 -right-1 text-lg">🥇</span>
                       </div>
-                      <span className={cn("text-xs font-bold truncate max-w-[80px] text-center", top3[0].user_id === user?.id ? "text-primary" : "text-foreground")}>
-                        {top3[0].full_name?.split(' ')[0]}
-                      </span>
+                      <span className={cn("text-xs font-bold truncate max-w-[80px] text-center", top3[0].user_id === user?.id ? "text-primary" : "text-foreground")}>{top3[0].full_name?.split(' ')[0]}</span>
                       <span className="text-[11px] font-extrabold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[0].earned_points} pts</span>
                       <div className="w-[72px] h-20 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(var(--neon-amber) / 0.25), transparent)', border: '1px solid hsl(var(--neon-amber) / 0.35)', borderBottom: 'none' }} />
                     </div>
                   )}
-
-                  {/* 3rd place */}
                   {top3[2] && (
                     <div className="flex flex-col items-center gap-1.5">
                       <div className="relative">
                         <RankedAvatar avatarUrl={top3[2].avatar_url} earnedPoints={top3[2].earned_points} size={44} />
                         <span className="absolute -bottom-1 -right-1 text-base">🥉</span>
                       </div>
-                      <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[2].user_id === user?.id && "text-primary")}>
-                        {top3[2].full_name?.split(' ')[0]}
-                      </span>
+                      <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[2].user_id === user?.id && "text-primary")}>{top3[2].full_name?.split(' ')[0]}</span>
                       <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[2].earned_points} pts</span>
                       <div className="w-[68px] h-10 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(30 60% 40% / 0.25), transparent)', border: '1px solid hsl(30 60% 40% / 0.3)', borderBottom: 'none' }} />
                     </div>
                   )}
                 </div>
-
-                {/* Remaining users */}
-                {(leaderboard || []).slice(3, 6).map((entry, idx) => (
+                {(leaderboard || []).slice(3).map((entry) => (
                   <div key={entry.user_id} className={cn(
                     "flex items-center gap-3 py-2.5 px-3 rounded-xl mb-1.5",
                     entry.user_id === user?.id ? "bg-primary/10 ring-1 ring-primary/20" : "bg-secondary/40"
@@ -221,19 +241,6 @@ export function AdminDashboard() {
                     </div>
                   </div>
                 ))}
-
-                {/* Your position if not in top 6 */}
-                {userRank && userRank.rank > 6 && (
-                  <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-primary/10 ring-1 ring-primary/20 mt-1">
-                    <span className="text-xs font-bold text-primary w-5 text-center">{userRank.rank}º</span>
-                    <RankedAvatar avatarUrl={userRank.avatar_url} earnedPoints={userRank.earned_points} size={28} />
-                    <span className="text-xs font-medium text-primary truncate flex-1">Você</span>
-                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>
-                      <AppIcon name="Star" size={12} style={{ color: 'hsl(var(--neon-amber))' }} />
-                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{userRank.earned_points}</span>
-                    </div>
-                  </div>
-                )}
               </>
             ) : (
               <div className="text-center py-6">
@@ -243,75 +250,6 @@ export function AdminDashboard() {
             )}
           </button>
         </div>
-
-        {/* AGENDA WIDGET - full width */}
-        <button
-          onClick={() => navigate('/agenda')}
-          className="card-command col-span-2 p-4 text-left animate-slide-up stagger-4 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <AppIcon name="CalendarDays" size={18} className="text-primary" />
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Agenda de hoje</span>
-            </div>
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
-          </div>
-
-          {tasksLoading ? (
-            <div className="space-y-2">
-              {[1,2,3].map(i => <Skeleton key={i} className="h-8 w-full" />)}
-            </div>
-          ) : pendingTasks.length > 0 ? (
-            <div className="space-y-2">
-              {pendingTasks.map(task => {
-                const isOverdue = task.due_date && isPast(new Date(task.due_date + 'T23:59:59')) && !isToday(new Date(task.due_date));
-                return (
-                  <div key={task.id} className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full flex-shrink-0",
-                      isOverdue ? "bg-destructive" : "bg-primary"
-                    )} />
-                    <span className="text-sm text-foreground truncate flex-1">{task.title}</span>
-                    {task.due_date && (
-                      <span className={cn(
-                        "text-[10px] font-medium flex-shrink-0",
-                        isOverdue ? "text-destructive" : "text-muted-foreground"
-                      )}>
-                        {isToday(new Date(task.due_date)) ? 'Hoje' : 
-                         isTomorrow(new Date(task.due_date)) ? 'Amanhã' :
-                         format(new Date(task.due_date), 'dd/MM')}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-3">
-              <AppIcon name="Check" size={24} className="text-success mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente</p>
-            </div>
-          )}
-        </button>
-
-        {/* ALERTS - full width, only if alerts exist */}
-        {(stats.pendingRedemptions > 0) && (
-          <div className="card-command-info col-span-2 p-4 animate-slide-up stagger-5">
-            <div className="flex items-center gap-2 mb-2">
-              <AppIcon name="Bell" size={16} className="text-primary" />
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
-            </div>
-            {stats.pendingRedemptions > 0 && (
-              <button
-                onClick={() => navigate('/rewards')}
-                className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors"
-              >
-                <span className="text-xs text-foreground">Resgates aguardando</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
