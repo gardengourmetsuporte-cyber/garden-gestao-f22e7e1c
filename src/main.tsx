@@ -10,6 +10,8 @@ if ("ontouchstart" in window) {
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
       // Skip if inside a Vaul drawer — Vaul handles its own positioning
       if (target.closest("[vaul-drawer]")) return;
+      // Skip if inside a Radix dialog overlay (nested sheets)
+      if (target.closest("[data-radix-popper-content-wrapper]")) return;
 
       setTimeout(() => {
         const scrollable = target.closest('[role="dialog"] .overflow-y-auto, .flex-1.overflow-y-auto');
@@ -18,9 +20,8 @@ if ("ontouchstart" in window) {
           const containerRect = scrollable.getBoundingClientRect();
           const offset = targetRect.top - containerRect.top - containerRect.height / 3;
           scrollable.scrollTop += offset;
-        } else {
-          target.scrollIntoView({ behavior: "smooth", block: "center" });
         }
+        // Don't fallback to scrollIntoView — it causes the page jump bug
       }, 350);
     }
   });
