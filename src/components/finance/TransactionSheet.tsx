@@ -167,51 +167,30 @@ export function TransactionSheet({
         setShowRecurringConfig(false);
         draftRestoredRef.current = false;
       } else {
-        // Check for saved draft (only restore once per mount cycle)
-        const draft = loadDraft();
-        const isRecentDraft = draft && (Date.now() - draft.timestamp < 10 * 60 * 1000); // 10 min max
-        
-        if (isRecentDraft && !draftRestoredRef.current) {
-          draftRestoredRef.current = true;
-          setType(draft.type || defaultType);
-          setAmount(draft.amount || '');
-          setDescription(draft.description || '');
-          setCategoryId(draft.categoryId || null);
-          setAccountId(draft.accountId || null);
-          setToAccountId(draft.toAccountId || null);
-          setDate(draft.date ? new Date(draft.date) : new Date());
-          setIsPaid(draft.isPaid ?? true);
-          setIsFixed(draft.isFixed ?? false);
-          setIsRecurring(draft.isRecurring ?? false);
-          setRecurringInterval(draft.recurringInterval || 'monthly');
-          setRecurringCount(draft.recurringCount || '2');
-          setNotes(draft.notes || '');
-          setSupplierId(draft.supplierId || null);
-          setEmployeeId(draft.employeeId || null);
-          setShowRecurringConfig(false);
-        } else if (!isRecentDraft) {
-          draftRestoredRef.current = false;
-          clearDraft();
-          setType(defaultType);
-          setAmount('');
-          setDescription('');
-          setCategoryId(null);
-          const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
-          setAccountId(nonCreditCards[0]?.id || accounts[0]?.id || null);
-          setToAccountId(null);
-          setDate(new Date());
-          setIsPaid(true);
-          setIsFixed(false);
-          setIsRecurring(false);
-          setRecurringInterval('monthly');
-          setRecurringCount('2');
-          setNotes('');
-          setSupplierId(null);
-          setEmployeeId(null);
-          setShowRecurringConfig(false);
-        }
+        // New transaction — always start with a clean form
+        // Draft restoration is disabled to avoid stale data between consecutive creates
+        clearDraft();
+        draftRestoredRef.current = false;
+        setType(defaultType);
+        setAmount('');
+        setDescription('');
+        setCategoryId(null);
+        const nonCreditCards = accounts.filter(a => a.type !== 'credit_card');
+        setAccountId(nonCreditCards[0]?.id || accounts[0]?.id || null);
+        setToAccountId(null);
+        setDate(new Date());
+        setIsPaid(true);
+        setIsFixed(false);
+        setIsRecurring(false);
+        setRecurringInterval('monthly');
+        setRecurringCount('2');
+        setNotes('');
+        setSupplierId(null);
+        setEmployeeId(null);
+        setShowRecurringConfig(false);
       }
     } else {
+      // Sheet closed — reset draft flag so next open starts fresh
       draftRestoredRef.current = false;
     }
   }, [open, defaultType, accounts, editingTransaction]);
