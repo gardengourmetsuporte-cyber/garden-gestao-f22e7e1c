@@ -190,7 +190,7 @@ export default function InventoryPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
         {/* Header */}
         <header className="page-header-bar">
           <div className="page-header-content">
@@ -218,7 +218,7 @@ export default function InventoryPage() {
 
         <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Stats - Clickable */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatsCard
               title="Total de Itens"
               value={items.length}
