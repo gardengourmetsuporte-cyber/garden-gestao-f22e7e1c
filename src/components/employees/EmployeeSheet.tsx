@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useEmployees } from '@/hooks/useEmployees';
+import { useUnit } from '@/contexts/UnitContext';
 import { Employee } from '@/types/employee';
 import { UserWithRole } from '@/hooks/useUsers';
 import {
@@ -44,6 +45,7 @@ interface FormData {
 
 export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: EmployeeSheetProps) {
   const { addEmployee, updateEmployee } = useEmployees();
+  const { activeUnitId } = useUnit();
   
   const { register, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<FormData>({
     defaultValues: {
@@ -111,6 +113,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
         is_active: data.is_active,
         notes: data.notes || null,
         user_id: data.user_id || null,
+        unit_id: activeUnitId || null,
       };
 
       if (employee) {
