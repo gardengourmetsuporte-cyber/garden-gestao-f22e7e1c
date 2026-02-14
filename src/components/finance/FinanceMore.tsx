@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Wallet, Tag, Archive, ChevronRight } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { AccountManagement } from './AccountManagement';
 import { CategoryManagement } from './CategoryManagement';
 import { FinanceBackupSheet } from './FinanceBackupSheet';
@@ -36,9 +36,9 @@ export function FinanceMore({
   const backup = useFinanceBackup(accounts, transactions, selectedMonth, onRefreshAll);
 
   const menuItems = [
-    { icon: Wallet, label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
-    { icon: Tag, label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
-    { icon: Archive, label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
+    { icon: 'Wallet', label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
+    { icon: 'Hash', label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
+    { icon: 'Archive', label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
   ];
 
   return (
@@ -57,10 +57,10 @@ export function FinanceMore({
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
               style={{ backgroundColor: `${item.color}15` }}
             >
-              <item.icon className="w-5 h-5" style={{ color: item.color }} />
+              <AppIcon name={item.icon} size={20} style={{ color: item.color }} />
             </div>
             <span className="flex-1 font-medium">{item.label}</span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
           </button>
         ))}
       </div>

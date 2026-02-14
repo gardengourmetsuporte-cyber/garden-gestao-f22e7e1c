@@ -5,7 +5,7 @@ import {
   LineChart, Line, CartesianGrid, Area, AreaChart
 } from 'recharts';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { MonthSelector } from './MonthSelector';
 import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { EntityStats } from '@/hooks/useFinanceStats';
@@ -173,7 +173,7 @@ export function FinanceCharts({
       {(drillDownCategory || entityView) && (
         <div className="px-4 flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={handleBack} className="gap-1">
-            <ChevronLeft className="w-4 h-4" />
+            <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
           <span className="text-sm font-medium text-muted-foreground">
