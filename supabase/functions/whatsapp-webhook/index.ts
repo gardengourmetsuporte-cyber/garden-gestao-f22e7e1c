@@ -79,6 +79,15 @@ function parseIncoming(provider: string, body: any): IncomingMessage | null {
   }
 }
 
+function isLocalUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.hostname === "localhost" || u.hostname === "127.0.0.1" || u.hostname === "0.0.0.0";
+  } catch {
+    return false;
+  }
+}
+
 async function sendMessage(
   provider: string,
   apiUrl: string,
@@ -86,6 +95,12 @@ async function sendMessage(
   text: string,
   apiKey: string
 ): Promise<boolean> {
+  // Skip sending if API URL is localhost (unreachable from cloud)
+  if (isLocalUrl(apiUrl)) {
+    console.warn("[SEND] Skipping send — api_url is localhost (unreachable from cloud). Message saved in DB. Update api_url to a public URL to enable sending.");
+    return false;
+  }
+
   try {
     let url = "";
     let headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -108,7 +123,6 @@ async function sendMessage(
         break;
 
       case "twilio":
-        // Twilio uses basic auth
         url = apiUrl;
         const [sid, token] = apiKey.split(":");
         headers["Authorization"] = `Basic ${btoa(`${sid}:${token}`)}`;
@@ -136,29 +150,33 @@ async function sendMessage(
         body = { phone, message: text };
     }
 
+    console.log("[SEND] Sending to:", url);
     const resp = await fetch(url, {
       method: "POST",
       headers,
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
+    console.log("[SEND] Response status:", resp.status);
     return resp.ok;
   } catch (e) {
-    console.error("sendMessage error:", e);
+    console.error("[SEND] Error:", e);
     return false;
   }
 }
 
-// ============ Business Hours Check ============
+// ============ Business Hours Check (BRT = UTC-3) ============
 
 function isWithinBusinessHours(hours: any): boolean {
-  if (!hours) return true;
+  if (!hours) return true; // null = 24/7
   const now = new Date();
+  // Convert to BRT (UTC-3)
+  const brt = new Date(now.getTime() - 3 * 60 * 60 * 1000);
   const days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-  const dayKey = days[now.getUTCDay()]; // Note: UTC, adjust if needed
+  const dayKey = days[brt.getUTCDay()];
   const dayConfig = hours[dayKey];
   if (!dayConfig || !dayConfig.open || !dayConfig.close) return false;
 
-  const currentMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const currentMinutes = brt.getUTCHours() * 60 + brt.getUTCMinutes();
   const [openH, openM] = dayConfig.open.split(":").map(Number);
   const [closeH, closeM] = dayConfig.close.split(":").map(Number);
   const openMinutes = openH * 60 + openM;
