@@ -314,8 +314,11 @@ export function useChecklists() {
       if (error) throw error;
     }
 
-    // Invalidate the specific completions query
+    // Invalidate completions + points queries
     queryClient.invalidateQueries({ queryKey: [...completionsKeyPrefix, date, checklistType] });
+    queryClient.invalidateQueries({ queryKey: ['points'] });
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
   }, [completions, user?.id, queryClient]);
 
   const isItemCompleted = useCallback((itemId: string) => {
