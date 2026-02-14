@@ -55,6 +55,7 @@ export function useOrders() {
           supplier_id: supplierId,
           created_by: user?.id,
           status: 'draft' as OrderStatus,
+          unit_id: activeUnitId,
         })
         .select('*, supplier:suppliers(*)')
         .single();
@@ -66,6 +67,7 @@ export function useOrders() {
         item_id: item.item_id,
         quantity: item.quantity,
         notes: item.notes,
+        unit_id: activeUnitId,
       }));
 
       const { data: itemsData, error: itemsError } = await supabase
