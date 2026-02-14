@@ -1,4 +1,4 @@
-import { Star, TrendingUp, Gift } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Progress } from '@/components/ui/progress';
 import { usePoints } from '@/hooks/usePoints';
 import { useCountUp } from '@/hooks/useCountUp';
@@ -35,13 +35,13 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
           <div>
             <p className="text-muted-foreground text-xs">Seu saldo atual</p>
             <div className="flex items-center gap-2 mt-1">
-              <Star className="w-7 h-7 text-warning fill-warning" />
+              <AppIcon name="Star" size={28} className="text-warning" />
               <span className="text-3xl font-bold tracking-tight text-foreground">{animatedBalance}</span>
               <span className="text-sm text-muted-foreground">pts</span>
             </div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center border border-warning/20">
-            <Gift className="w-6 h-6 text-warning" />
+            <AppIcon name="Gift" size={24} className="text-warning" />
           </div>
         </div>
 
@@ -61,14 +61,14 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
       <div className="grid grid-cols-2 divide-x divide-border/30 border-t border-border/30">
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-success mb-0.5">
-            <TrendingUp className="w-3.5 h-3.5" />
+            <AppIcon name="TrendingUp" size={14} />
             <span className="text-xl font-bold">{animatedEarned}</span>
           </div>
           <p className="text-[10px] text-muted-foreground">Pontos ganhos</p>
         </div>
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-primary mb-0.5">
-            <Gift className="w-3.5 h-3.5" />
+            <AppIcon name="Gift" size={14} />
             <span className="text-xl font-bold">{animatedSpent}</span>
           </div>
           <p className="text-[10px] text-muted-foreground">Pontos usados</p>
