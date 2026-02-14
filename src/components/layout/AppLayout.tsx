@@ -258,8 +258,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <AppIcon name="Menu" size={20} className="text-foreground" />
           </button>
 
-          {/* Home button - only when not on home */}
-          {location.pathname !== '/' && (
+          {/* Home button */}
+          {(
             <button
               onClick={() => { setFabOpen(false); navigate('/'); }}
               className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
