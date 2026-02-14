@@ -1,41 +1,44 @@
 
-# FAB Expansivel - Botao Unico com Sub-Acoes
+# Reorganizar o Card de Perfil do Menu de Modulos
 
-## Conceito
-Substituir os dois botoes flutuantes (Home + Menu) por um unico FAB que, ao ser clicado, expande um mini-menu radial/vertical com opcoes de acao rapida: **Home**, **Menu Lateral** e potencialmente outros atalhos.
+## Problema
+O card com foto do usuario, nome, rank e seletor de unidade ocupa muito espaco vertical no Drawer de modulos, empurrando os icones de navegacao para baixo.
 
-## Como vai funcionar
-1. **Estado fechado**: Um unico botao flutuante com icone de "grid" ou "apps" (estilo launcher)
-2. **Ao clicar**: O botao rotaciona para "X" e aparecem 2-3 botoes menores acima dele com animacao escalonada (fan-out vertical)
-3. **Opcoes exibidas**:
-   - **Home** (icone casa) - navega para o dashboard
-   - **Menu** (icone menu) - abre o sidebar lateral
-4. **Ao clicar em qualquer opcao ou no "X"**: os botoes recolhem com animacao reversa
+## Solucao
 
-## Visual
-- FAB principal mantem o gradiente neon atual (primary -> cyan)
-- Sub-botoes menores (w-11 h-11) com fundo semi-transparente e backdrop-blur
-- Animacao de entrada: cada botao sobe com delay escalonado (0ms, 80ms, 160ms) + fade-in + scale
-- Quando expandido, um overlay sutil escurece o fundo
+Remover o card grande (linhas 327-389 do AppLayout.tsx) e redistribuir as informacoes:
+
+### 1. Seletor de Unidade -- mover para o cabecalho do Drawer
+- Colocar o seletor de unidade compacto na mesma linha do handle/botao fechar (linha 310-325)
+- Layout: `[Seletor de Unidade] --- [handle] --- [X]`
+- O seletor sera um botao pequeno com o dot colorido + nome da unidade + chevron
+
+### 2. Mini perfil -- linha compacta abaixo do handle
+- Substituir o card grande por uma linha compacta (1 linha, ~40px de altura):
+  - Avatar pequeno (32px) + nome + rank em texto + seta para perfil
+  - Tudo inline, sem card/borda, apenas uma faixa sutil
+
+### 3. Resultado
+- Economia de ~80px de espaco vertical no Drawer
+- Informacoes de perfil e unidade continuam acessiveis
+- Mais modulos visiveis sem scroll
 
 ## Detalhes Tecnicos
 
-### Alteracoes em `src/components/layout/AppLayout.tsx`:
-1. **Remover** o bloco "Floating Home FAB" (linhas 230-246)
-2. **Substituir** o bloco "Floating Menu FAB" (linhas 248-279) por um componente FAB expansivel:
-   - Novo estado `fabOpen` (boolean) para controlar expansao
-   - Ao clicar no FAB principal: alterna `fabOpen`
-   - Renderizar sub-botoes condicionalmente com classes de animacao CSS
-   - Sub-botao "Home": chama `navigate('/')` e fecha o FAB
-   - Sub-botao "Menu": chama `setSidebarOpen(true)` e fecha o FAB
-   - O botao Home so aparece quando `location.pathname !== '/'`
-3. **Overlay**: quando `fabOpen === true`, renderizar div com `bg-black/40` e `backdrop-blur-sm` que fecha o FAB ao clicar
+**Arquivo:** `src/components/layout/AppLayout.tsx`
 
-### Animacoes CSS em `src/index.css`:
-- Classe `.fab-action-enter` com keyframe de translate-y + opacity + scale para a entrada dos sub-botoes
-- Delays escalonados via `animation-delay` inline
+**Alteracoes:**
 
-### Posicionamento dos sub-botoes (de baixo para cima):
-- FAB principal: posicao atual (bottom dinâmico conforme hasBottomNav)
-- Botao 1 (Menu): 64px acima do FAB
-- Botao 2 (Home): 120px acima do FAB (so aparece fora da home)
+1. **Remover** o bloco "Profile Card" (linhas 327-389) -- o card com avatar grande, nome, rank, e o seletor de unidade embutido
+
+2. **Atualizar o cabecalho do Drawer** (linhas 310-325) para incluir o seletor de unidade inline:
+   - Lado esquerdo: botao do seletor de unidade (dot colorido + nome truncado + chevron)
+   - Centro: handle bar
+   - Lado direito: botao fechar (X)
+
+3. **Adicionar mini perfil** logo abaixo do cabecalho:
+   - Uma linha compacta com `RankedAvatar` (32px), nome truncado, rank/pontos, e botao de navegacao ao perfil
+   - Padding reduzido (px-4 py-2)
+   - Sem card background, apenas uma borda inferior sutil (`border-b border-border/10`)
+
+4. **Manter** o dropdown de unidades com a mesma logica de abertura/fechamento e posicionamento absoluto, agora ancorado no cabecalho
