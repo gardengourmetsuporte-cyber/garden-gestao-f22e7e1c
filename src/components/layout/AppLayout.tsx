@@ -227,6 +227,24 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </header>
 
+      {/* ======= Floating Home FAB ======= */}
+      {!sidebarOpen && location.pathname !== '/dashboard' && (
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="lg:hidden fixed z-[60] w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90 hover:scale-105"
+          style={{
+            bottom: hasBottomNav
+              ? 'calc(env(safe-area-inset-bottom) + 148px)'
+              : 'calc(env(safe-area-inset-bottom) + 88px)',
+            right: '22px',
+            background: 'linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--primary)))',
+            boxShadow: '0 4px 20px hsl(var(--neon-cyan) / 0.35), 0 0 30px hsl(var(--primary) / 0.12)',
+          }}
+        >
+          <AppIcon name="Home" size={20} className="text-primary-foreground" />
+        </button>
+      )}
+
       {/* ======= Floating Menu FAB ======= */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
