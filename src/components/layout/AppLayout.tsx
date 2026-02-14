@@ -252,11 +252,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           e.stopPropagation();
           e.preventDefault();
           if (sidebarOpen) {
-            isClosingDrawerRef.current = true;
-            setSidebarOpen(false);
-            setFabOpen(false);
-            navigate('/');
-            setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
+            // handled by close button inside drawer
+            return;
           } else if (fabOpen) {
             setFabOpen(false);
           } else {
@@ -267,11 +264,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           e.stopPropagation();
           e.preventDefault();
           if (sidebarOpen) {
-            isClosingDrawerRef.current = true;
-            setSidebarOpen(false);
-            setFabOpen(false);
-            navigate('/');
-            setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
+            return;
           } else if (fabOpen) {
             setFabOpen(false);
           } else {
@@ -280,7 +273,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         }}
         className={cn(
           "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300 active:scale-95",
-          (fabOpen || sidebarOpen) ? "w-16 h-16" : "w-14 h-14 hover:scale-105"
+          sidebarOpen ? "pointer-events-none opacity-0" : "",
+          fabOpen ? "w-16 h-16" : "w-14 h-14 hover:scale-105"
         )}
         style={{
           bottom: hasBottomNav
@@ -291,7 +285,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           boxShadow: '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
         }}
       >
-        {(fabOpen || sidebarOpen) ? (
+        {fabOpen ? (
           <AppIcon name="X" size={24} className="text-primary-foreground" />
         ) : (
           <AppIcon name="Grip" size={24} className="text-primary-foreground" />
@@ -327,9 +321,26 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <DrawerContent className="border-t-0 max-h-[92vh] rounded-t-3xl overflow-hidden" style={{
           background: 'hsl(var(--background))',
         }}>
-          {/* Handle */}
-          <div className="flex justify-center pt-3 pb-1">
+          {/* Handle + Close button */}
+          <div className="flex items-center justify-between px-4 pt-3 pb-1">
+            <div className="flex-1" />
             <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
+            <div className="flex-1 flex justify-end">
+              <button
+                onClick={() => {
+                  setSidebarOpen(false);
+                  setFabOpen(false);
+                  navigate('/');
+                }}
+                className="w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-all"
+                style={{
+                  background: 'hsl(var(--secondary))',
+                  border: '1px solid hsl(var(--border) / 0.3)',
+                }}
+              >
+                <AppIcon name="X" size={18} className="text-foreground" />
+              </button>
+            </div>
           </div>
 
           {/* Profile Card */}
