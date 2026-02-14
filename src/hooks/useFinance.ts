@@ -299,21 +299,27 @@ export function useFinance(selectedMonth: Date) {
       ['finance-transactions', userId, activeUnitId, monthKey],
       (old) => {
         if (!old) return old;
-        const updated = [...old];
-        orderedIds.forEach((id, index) => {
-          const txn = updated.find(t => t.id === id);
-          if (txn) txn.sort_order = index;
+        return old.map(t => {
+          const newOrder = orderedIds.indexOf(t.id);
+          if (newOrder !== -1) {
+            return { ...t, sort_order: newOrder };
+          }
+          return t;
         });
-        return updated;
       }
     );
 
-    await Promise.all(
-      orderedIds.map((id, index) =>
-        supabase.from('finance_transactions').update({ sort_order: index }).eq('id', id)
-      )
-    );
-  }, [queryClient, userId, activeUnitId, monthKey]);
+    try {
+      await Promise.all(
+        orderedIds.map((id, index) =>
+          supabase.from('finance_transactions').update({ sort_order: index }).eq('id', id)
+        )
+      );
+    } catch {
+      toast.error('Erro ao salvar ordem');
+      invalidateTransactionsAndAccounts();
+    }
+  }, [queryClient, userId, activeUnitId, monthKey, invalidateTransactionsAndAccounts]);
 
   const updateTransactionDate = useCallback(async (id: string, newDate: string) => {
     queryClient.setQueryData<FinanceTransaction[]>(
@@ -345,7 +351,11 @@ export function useFinance(selectedMonth: Date) {
       if (!grouped[t.date]) grouped[t.date] = [];
       grouped[t.date].push(t);
     });
-    Object.values(grouped).forEach(txns => txns.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)));
+    Object.values(grouped).forEach(txns => txns.sort((a, b) => {
+      const diff = (a.sort_order ?? 0) - (b.sort_order ?? 0);
+      if (diff !== 0) return diff;
+      return a.created_at.localeCompare(b.created_at);
+    }));
     return grouped;
   }, [transactions]);
 

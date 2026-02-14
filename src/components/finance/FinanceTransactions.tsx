@@ -28,7 +28,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 // Sortable transaction wrapper (reordering within same day only)
-function SortableTransaction({ id, children }: { id: string; children: React.ReactNode }) {
+function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
   const {
     attributes,
     listeners,
@@ -53,7 +53,7 @@ function SortableTransaction({ id, children }: { id: string; children: React.Rea
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
+      {children(isDragging)}
     </div>
   );
 }
@@ -280,24 +280,27 @@ export function FinanceTransactions({
                       <div className="space-y-2">
                         {transactions.map(transaction => (
                           <SortableTransaction key={transaction.id} id={transaction.id}>
-                            <div
-                              className="relative"
-                              onPointerDown={() => markSeen(transaction.id)}
-                            >
-                              {transaction.is_recurring && transaction.installment_group_id && (
-                                <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
-                                  <Repeat className="w-2.5 h-2.5 mr-0.5" />
-                                  {transaction.installment_number}/{transaction.total_installments}
-                                </Badge>
-                              )}
-                              <TransactionItem
-                                transaction={transaction}
-                                isNew={isNewTransaction(transaction)}
-                                onClick={() => onTransactionClick(transaction)}
-                                onTogglePaid={onTogglePaid}
-                                onDelete={onDeleteTransaction}
-                              />
-                            </div>
+                            {(isDragging) => (
+                              <div
+                                className="relative"
+                                onPointerDown={() => markSeen(transaction.id)}
+                              >
+                                {transaction.is_recurring && transaction.installment_group_id && (
+                                  <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                                    <Repeat className="w-2.5 h-2.5 mr-0.5" />
+                                    {transaction.installment_number}/{transaction.total_installments}
+                                  </Badge>
+                                )}
+                                <TransactionItem
+                                  transaction={transaction}
+                                  isNew={isNewTransaction(transaction)}
+                                  onClick={() => onTransactionClick(transaction)}
+                                  onTogglePaid={onTogglePaid}
+                                  onDelete={onDeleteTransaction}
+                                  disableSwipe={isDragging}
+                                />
+                              </div>
+                            )}
                           </SortableTransaction>
                         ))}
                       </div>
