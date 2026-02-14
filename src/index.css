@@ -680,3 +680,21 @@ textarea:focus,
 select:focus {
   box-shadow: 0 0 0 2px hsl(217 91% 60% / 0.15);
 }
+
+/* Mobile keyboard: scroll focused input into view */
+@supports (interactive-widget: resizes-content) {
+  /* Modern browsers handle it via viewport meta */
+}
+
+input:focus,
+textarea:focus {
+  scroll-margin-bottom: 120px;
+}
+
+/* Ensure sheets/drawers scroll the focused field into view on iOS */
+[vaul-drawer] input:focus,
+[vaul-drawer] textarea:focus,
+[role="dialog"] input:focus,
+[role="dialog"] textarea:focus {
+  scroll-margin-bottom: 160px;
+}
