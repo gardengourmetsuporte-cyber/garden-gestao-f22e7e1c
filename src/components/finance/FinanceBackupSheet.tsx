@@ -3,7 +3,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Archive, Plus, RotateCcw, Trash2, ChevronDown, ChevronUp, ArrowLeftRight, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceSnapshot, AccountComparison } from '@/hooks/useFinanceBackup';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -73,13 +74,12 @@ export function FinanceBackupSheet({
         <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <Archive className="w-5 h-5 text-primary" />
+              <AppIcon name="Archive" size={20} className="text-primary" />
               Backups Financeiros
             </SheetTitle>
           </SheetHeader>
 
           <div className="mt-4 space-y-4 overflow-y-auto max-h-[calc(85vh-120px)] pb-8">
-            {/* Create new backup */}
             <div className="flex gap-2">
               <Input
                 placeholder="Nome do backup (opcional)"
@@ -88,7 +88,7 @@ export function FinanceBackupSheet({
                 className="flex-1"
               />
               <Button onClick={handleCreate} disabled={isCreating} size="sm">
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppIcon name="Plus" size={16} />}
                 <span className="ml-1 hidden sm:inline">Criar</span>
               </Button>
             </div>
@@ -99,7 +99,7 @@ export function FinanceBackupSheet({
               </div>
             ) : snapshots.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <Archive className="w-10 h-10 mx-auto mb-2 opacity-40" />
+                <AppIcon name="Archive" size={40} className="mx-auto mb-2 opacity-40" />
                 <p className="text-sm">Nenhum backup ainda</p>
                 <p className="text-xs mt-1">Crie um backup para proteger seus dados</p>
               </div>
@@ -128,17 +128,13 @@ export function FinanceBackupSheet({
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold">{formatCurrency(snapshot.total_balance)}</p>
                         </div>
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
-                        )}
+                        <AppIcon name={isExpanded ? 'ChevronUp' : 'ChevronDown'} size={16} className="text-muted-foreground shrink-0" />
                       </button>
 
                       {isExpanded && comparison && (
                         <div className="border-t px-3 py-3 space-y-3 bg-muted/30">
                           <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground mb-2">
-                            <ArrowLeftRight className="w-3 h-3" />
+                            <AppIcon name="ArrowLeftRight" size={12} />
                             Comparação com estado atual
                           </div>
 
@@ -170,7 +166,7 @@ export function FinanceBackupSheet({
                               onClick={() => setRestoreTarget(snapshot)}
                               disabled={isRestoring}
                             >
-                              {isRestoring ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <RotateCcw className="w-4 h-4 mr-1" />}
+                              {isRestoring ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <AppIcon name="RefreshCw" size={16} className="mr-1" />}
                               Restaurar
                             </Button>
                             <Button
@@ -178,7 +174,7 @@ export function FinanceBackupSheet({
                               size="sm"
                               onClick={() => setDeleteTarget(snapshot.id)}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <AppIcon name="Trash2" size={16} />
                             </Button>
                           </div>
                         </div>
@@ -192,7 +188,6 @@ export function FinanceBackupSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Restore confirmation */}
       <AlertDialog open={!!restoreTarget} onOpenChange={open => !open && setRestoreTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -223,7 +218,6 @@ export function FinanceBackupSheet({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

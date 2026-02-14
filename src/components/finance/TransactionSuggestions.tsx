@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { FinanceTransaction, FinanceCategory, FinanceAccount } from '@/types/finance';
-import { History, Tag } from 'lucide-react';
-import { getLucideIcon } from '@/lib/icons';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
 interface TransactionSuggestion {
@@ -33,19 +32,15 @@ export function TransactionSuggestions({
     const seen = new Set<string>();
     const results: TransactionSuggestion[] = [];
 
-    // Get flat list of all categories (including subcategories)
     const allCategories = categories.flatMap(c => [c, ...(c.subcategories || [])]);
 
-    // Search through past transactions
     const matchingTransactions = transactions
       .filter(t => {
-        // Clean description (remove installment suffix like "(1/12)")
         const cleanDesc = t.description.replace(/\s*\(\d+\/\d+\)$/, '').toLowerCase();
         return cleanDesc.includes(term);
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    // Add unique suggestions from history
     for (const tx of matchingTransactions) {
       const cleanDesc = tx.description.replace(/\s*\(\d+\/\d+\)$/, '').trim();
       const key = `${cleanDesc.toLowerCase()}-${tx.category_id || ''}-${tx.account_id || ''}`;
@@ -76,60 +71,53 @@ export function TransactionSuggestions({
 
   return (
     <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden">
-      {suggestions.map((suggestion, index) => {
-        const CategoryIcon = suggestion.category?.icon 
-          ? getLucideIcon(suggestion.category.icon) 
-          : null;
-
-        return (
-          <button
-            key={index}
-            type="button"
-            className={cn(
-              "w-full flex items-center gap-3 px-3 py-3 hover:bg-accent text-left transition-colors",
-              index < suggestions.length - 1 && "border-b"
-            )}
-            onClick={() => onSelect(suggestion)}
+      {suggestions.map((suggestion, index) => (
+        <button
+          key={index}
+          type="button"
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-3 hover:bg-accent text-left transition-colors",
+            index < suggestions.length - 1 && "border-b"
+          )}
+          onClick={() => onSelect(suggestion)}
+        >
+          {/* Icon */}
+          <div 
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            style={{ 
+              backgroundColor: suggestion.category?.color 
+                ? `${suggestion.category.color}20` 
+                : 'hsl(var(--muted))' 
+            }}
           >
-            {/* Icon */}
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-              style={{ 
-                backgroundColor: suggestion.category?.color 
-                  ? `${suggestion.category.color}20` 
-                  : 'hsl(var(--muted))' 
-              }}
-            >
-              {suggestion.isFromHistory ? (
-                CategoryIcon ? (
-                  <CategoryIcon 
-                    className="w-5 h-5" 
-                    style={{ color: suggestion.category?.color }} 
-                  />
-                ) : (
-                  <History className="w-5 h-5 text-muted-foreground" />
-                )
-              ) : (
-                <Tag className="w-5 h-5 text-muted-foreground" />
-              )}
-            </div>
+            {suggestion.isFromHistory && suggestion.category?.icon ? (
+              <AppIcon 
+                name={suggestion.category.icon} 
+                size={20} 
+                style={{ color: suggestion.category?.color }} 
+              />
+            ) : suggestion.isFromHistory ? (
+              <AppIcon name="History" size={20} className="text-muted-foreground" />
+            ) : (
+              <AppIcon name="Hash" size={20} className="text-muted-foreground" />
+            )}
+          </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm truncate">
-                {highlightMatch(suggestion.description, searchTerm)}
-              </div>
-              {(suggestion.category || suggestion.account) && (
-                <div className="text-xs text-muted-foreground truncate">
-                  {suggestion.category?.name}
-                  {suggestion.category && suggestion.account && ' | '}
-                  {suggestion.account?.name}
-                </div>
-              )}
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-sm truncate">
+              {highlightMatch(suggestion.description, searchTerm)}
             </div>
-          </button>
-        );
-      })}
+            {(suggestion.category || suggestion.account) && (
+              <div className="text-xs text-muted-foreground truncate">
+                {suggestion.category?.name}
+                {suggestion.category && suggestion.account && ' | '}
+                {suggestion.account?.name}
+              </div>
+            )}
+          </div>
+        </button>
+      ))}
     </div>
   );
 }

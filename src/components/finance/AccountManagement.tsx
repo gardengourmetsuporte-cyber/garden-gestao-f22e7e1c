@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FinanceAccount, AccountType } from '@/types/finance';
-import { Plus, Pencil, Trash2, Wallet, Building2, CreditCard, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
 
@@ -17,10 +18,10 @@ interface AccountManagementProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-const ACCOUNT_TYPES: { value: AccountType; label: string; icon: typeof Wallet }[] = [
-  { value: 'wallet', label: 'Carteira', icon: Wallet },
-  { value: 'bank', label: 'Banco', icon: Building2 },
-  { value: 'credit_card', label: 'Cartão de Crédito', icon: CreditCard },
+const ACCOUNT_TYPES: { value: AccountType; label: string; icon: string }[] = [
+  { value: 'wallet', label: 'Carteira', icon: 'Wallet' },
+  { value: 'bank', label: 'Banco', icon: 'Landmark' },
+  { value: 'credit_card', label: 'Cartão de Crédito', icon: 'CreditCard' },
 ];
 
 const COLORS = [
@@ -40,7 +41,6 @@ export function AccountManagement({
   const [editingAccount, setEditingAccount] = useState<FinanceAccount | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Form state
   const [name, setName] = useState('');
   const [type, setType] = useState<AccountType>('wallet');
   const [balance, setBalance] = useState('');
@@ -109,20 +109,15 @@ export function AccountManagement({
         </div>
       );
     }
-    const Icon = getAccountIcon(account.type);
+    const iconName = ACCOUNT_TYPES.find(t => t.value === account.type)?.icon || 'Wallet';
     return (
       <div
         className="w-10 h-10 rounded-full flex items-center justify-center"
         style={{ backgroundColor: account.color + '20' }}
       >
-        <Icon className="w-5 h-5" style={{ color: account.color }} />
+        <AppIcon name={iconName} size={20} style={{ color: account.color }} />
       </div>
     );
-  };
-
-  const getAccountIcon = (accountType: string) => {
-    const typeInfo = ACCOUNT_TYPES.find(t => t.value === accountType);
-    return typeInfo?.icon || Wallet;
   };
 
   return (
@@ -136,49 +131,41 @@ export function AccountManagement({
 
         {!isEditing ? (
           <div className="space-y-4">
-            {/* List of accounts */}
             <div className="space-y-2">
-              {accounts.map(account => {
-                return (
-                  <div
-                    key={account.id}
-                    className="flex items-center gap-3 p-4 bg-card border rounded-xl"
-                  >
-                    {getBankAvatar(account)}
-                    <div className="flex-1">
-                      <p className="font-medium">{account.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(account)}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleDelete(account.id)}
-                      disabled={isLoading}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+              {accounts.map(account => (
+                <div
+                  key={account.id}
+                  className="flex items-center gap-3 p-4 bg-card border rounded-xl"
+                >
+                  {getBankAvatar(account)}
+                  <div className="flex-1">
+                    <p className="font-medium">{account.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
+                    </p>
                   </div>
-                );
-              })}
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(account)}>
+                    <AppIcon name="Pencil" size={16} />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => handleDelete(account.id)}
+                    disabled={isLoading}
+                  >
+                    <AppIcon name="Trash2" size={16} className="text-destructive" />
+                  </Button>
+                </div>
+              ))}
             </div>
 
-            {/* Add button */}
-            <Button 
-              className="w-full h-12" 
-              onClick={() => setIsEditing(true)}
-            >
-              <Plus className="w-5 h-5 mr-2" />
+            <Button className="w-full h-12" onClick={() => setIsEditing(true)}>
+              <AppIcon name="Plus" size={20} className="mr-2" />
               Nova Conta
             </Button>
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Name */}
             <div className="space-y-2">
               <Label>Nome da conta</Label>
               <Input
@@ -189,7 +176,6 @@ export function AccountManagement({
               />
             </div>
 
-            {/* Type */}
             <div className="space-y-2">
               <Label>Tipo</Label>
               <div className="grid grid-cols-3 gap-2">
@@ -200,14 +186,13 @@ export function AccountManagement({
                     className="h-16 flex-col gap-1"
                     onClick={() => setType(t.value)}
                   >
-                    <t.icon className="w-5 h-5" />
+                    <AppIcon name={t.icon} size={20} />
                     <span className="text-xs">{t.label}</span>
                   </Button>
                 ))}
               </div>
             </div>
 
-            {/* Balance */}
             <div className="space-y-2">
               <Label>Saldo inicial</Label>
               <div className="relative">
@@ -223,7 +208,6 @@ export function AccountManagement({
               </div>
             </div>
 
-            {/* Color */}
             <div className="space-y-2">
               <Label>Cor</Label>
               <div className="flex flex-wrap gap-2">
@@ -241,7 +225,6 @@ export function AccountManagement({
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3 pt-4">
               <Button variant="outline" className="flex-1 h-12" onClick={resetForm}>
                 Cancelar

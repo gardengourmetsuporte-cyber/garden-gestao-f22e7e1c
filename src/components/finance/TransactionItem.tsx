@@ -2,7 +2,6 @@ import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceTransaction } from '@/types/finance';
 import { cn } from '@/lib/utils';
-import { getLucideIcon } from '@/lib/icons';
 import { useState, useRef, useCallback } from 'react';
 
 interface TransactionItemProps {
@@ -31,19 +30,35 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
   const getTypeIcon = () => {
     switch (type) {
       case 'income':
-        return <AppIcon name="ArrowUpCircle" size={20} className="text-success" />;
+        return (
+          <div className="w-8 h-8 rounded-full bg-success/15 flex items-center justify-center">
+            <AppIcon name="ArrowUpCircle" size={18} className="text-success" />
+          </div>
+        );
       case 'expense':
-        return <AppIcon name="ArrowDownCircle" size={20} className="text-destructive" />;
+        return (
+          <div className="w-8 h-8 rounded-full bg-destructive/15 flex items-center justify-center">
+            <AppIcon name="ArrowDownCircle" size={18} className="text-destructive" />
+          </div>
+        );
       case 'transfer':
-        return <AppIcon name="ArrowLeftRight" size={20} className="text-primary" />;
+        return (
+          <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+            <AppIcon name="ArrowLeftRight" size={18} className="text-primary" />
+          </div>
+        );
       case 'credit_card':
-        return <AppIcon name="CreditCard" size={20} className="text-primary" />;
+        return (
+          <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+            <AppIcon name="CreditCard" size={18} className="text-primary" />
+          </div>
+        );
     }
   };
 
   const getCategoryIcon = () => {
     if (!category?.icon) return null;
-    return <AppIcon name={category.icon} size={16} style={{ color: category.color }} />;
+    return <AppIcon name={category.icon} size={14} style={{ color: category.color }} />;
   };
 
   const formatAmount = () => {
@@ -169,7 +184,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
       <div
         className={cn(
           'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
-          !is_paid && 'text-muted-foreground',
+          !is_paid && 'opacity-70',
           isNew && 'border-[hsl(var(--neon-cyan)/0.6)] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.3),0_0_4px_hsl(var(--neon-cyan)/0.2)]',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
@@ -204,14 +219,15 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
 
           {/* Details */}
           <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">{description}</p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <p className="font-medium truncate text-sm">{description}</p>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
               {getCategoryIcon()}
-              <span className="truncate">{category?.name || 'Sem categoria'}</span>
+              <span className="truncate max-w-[100px]">{category?.name || 'Sem categoria'}</span>
               {account && (
                 <>
-                  <span>•</span>
-                  <span className="truncate">{account.name}</span>
+                  <span className="text-muted-foreground/50">•</span>
+                  <AppIcon name="Landmark" size={12} className="text-muted-foreground/60 flex-shrink-0" />
+                  <span className="truncate max-w-[80px]">{account.name}</span>
                 </>
               )}
             </div>
@@ -220,7 +236,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
           {/* Amount */}
           <p
             className={cn(
-              'font-semibold tabular-nums flex-shrink-0',
+              'font-bold tabular-nums flex-shrink-0 text-sm',
               type === 'income'
                 ? 'text-success'
                 : type === 'transfer'

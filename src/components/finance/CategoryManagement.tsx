@@ -7,9 +7,9 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FinanceCategory } from '@/types/finance';
-import { Plus, Pencil, Trash2, Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
-import { getLucideIcon } from '@/lib/icons';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -51,12 +51,10 @@ export function CategoryManagement({
   const [parentCategory, setParentCategory] = useState<FinanceCategory | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Form state
   const [name, setName] = useState('');
   const [icon, setIcon] = useState(ICONS[0]);
   const [color, setColor] = useState(COLORS[0]);
 
-  // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<FinanceCategory | null>(null);
   const [deleteAction, setDeleteAction] = useState<DeleteAction>('remove_category');
@@ -65,7 +63,6 @@ export function CategoryManagement({
 
   const filteredCategories = categories.filter(c => c.type === activeType && !c.parent_id);
 
-  // Get all categories for transfer (excluding the one being deleted and its children)
   const getTransferOptions = () => {
     if (!categoryToDelete) return [];
     const allCats = categories.flatMap(c => [c, ...(c.subcategories || [])]);
@@ -146,7 +143,6 @@ export function CategoryManagement({
     setIsLoading(true);
     setCategoryToDelete(category);
     
-    // Count transactions using this category or its children
     const childIds = (category.subcategories || []).map(s => s.id);
     const allIds = [category.id, ...childIds];
     
@@ -178,7 +174,6 @@ export function CategoryManagement({
       
       if (transactionCount > 0) {
         if (deleteAction === 'remove_category') {
-          // Set category_id to null for all affected transactions
           const { error } = await supabase
             .from('finance_transactions')
             .update({ category_id: null })
@@ -190,17 +185,14 @@ export function CategoryManagement({
             setIsLoading(false);
             return;
           }
-          // Transfer transactions to target category
           const { error } = await supabase
             .from('finance_transactions')
             .update({ category_id: transferTargetId })
             .in('category_id', allIds);
           if (error) throw error;
         }
-        // force_delete: just proceed to delete the category
       }
       
-      // Delete children first (subcategories)
       if (childIds.length > 0) {
         const { error: delChildrenErr } = await supabase
           .from('finance_categories')
@@ -209,7 +201,6 @@ export function CategoryManagement({
         if (delChildrenErr) throw delChildrenErr;
       }
       
-      // Delete the category itself
       const { error } = await supabase
         .from('finance_categories')
         .delete()
@@ -226,8 +217,6 @@ export function CategoryManagement({
     setIsLoading(false);
   };
 
-  const IconComponent = getLucideIcon(icon);
-
   return (
     <>
       <Sheet open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
@@ -236,7 +225,7 @@ export function CategoryManagement({
             <SheetTitle className="flex items-center gap-2">
               {isEditing && (
                 <Button variant="ghost" size="icon" onClick={resetForm}>
-                  <ArrowLeft className="w-5 h-5" />
+                  <AppIcon name="ArrowLeft" size={20} />
                 </Button>
               )}
               {isEditing 
@@ -247,7 +236,6 @@ export function CategoryManagement({
 
           {!isEditing ? (
             <div className="space-y-4">
-              {/* Type tabs */}
               <Tabs value={activeType} onValueChange={(v) => setActiveType(v as 'expense' | 'income')}>
                 <TabsList className="grid grid-cols-2 w-full">
                   <TabsTrigger value="expense">Despesas</TabsTrigger>
@@ -255,7 +243,6 @@ export function CategoryManagement({
                 </TabsList>
               </Tabs>
 
-              {/* List of categories with DnD */}
               <SortableList
                 items={filteredCategories}
                 getItemId={(cat) => cat.id}
@@ -271,7 +258,6 @@ export function CategoryManagement({
                 }}
                 className="space-y-2"
                 renderItem={(category, { isDragging, dragHandleProps }) => {
-                  const CatIcon = getLucideIcon(category.icon);
                   return (
                     <div key={category.id}>
                       <div className={cn(
@@ -283,7 +269,7 @@ export function CategoryManagement({
                           className="w-10 h-10 rounded-full flex items-center justify-center"
                           style={{ backgroundColor: category.color + '20' }}
                         >
-                          {CatIcon && <CatIcon className="w-5 h-5" style={{ color: category.color }} />}
+                          <AppIcon name={category.icon} size={20} style={{ color: category.color }} />
                         </div>
                         <div className="flex-1">
                           <p className="font-medium">{category.name}</p>
@@ -292,10 +278,10 @@ export function CategoryManagement({
                           </p>
                         </div>
                         <Button variant="ghost" size="sm" onClick={() => handleAddSubcategory(category)}>
-                          <Plus className="w-4 h-4" />
+                          <AppIcon name="Plus" size={16} />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(category)}>
-                          <Pencil className="w-4 h-4" />
+                          <AppIcon name="Pencil" size={16} />
                         </Button>
                         <Button 
                           variant="ghost" 
@@ -303,37 +289,33 @@ export function CategoryManagement({
                           onClick={() => openDeleteDialog(category)}
                           disabled={isLoading}
                         >
-                          <Trash2 className="w-4 h-4 text-destructive" />
+                          <AppIcon name="Trash2" size={16} className="text-destructive" />
                         </Button>
                       </div>
                       
-                      {/* Subcategories */}
                       {category.subcategories && category.subcategories.length > 0 && (
                         <div className="ml-6 mt-1 space-y-1">
-                          {category.subcategories.map(sub => {
-                            const SubIcon = getLucideIcon(sub.icon);
-                            return (
-                              <div 
-                                key={sub.id}
-                                className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg"
+                          {category.subcategories.map(sub => (
+                            <div 
+                              key={sub.id}
+                              className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg"
+                            >
+                              <AppIcon name={sub.icon} size={16} style={{ color: sub.color }} />
+                              <span className="flex-1 text-sm">{sub.name}</span>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(sub)}>
+                                <AppIcon name="Pencil" size={12} />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => openDeleteDialog(sub)}
+                                disabled={isLoading}
                               >
-                                {SubIcon && <SubIcon className="w-4 h-4" style={{ color: sub.color }} />}
-                                <span className="flex-1 text-sm">{sub.name}</span>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(sub)}>
-                                  <Pencil className="w-3 h-3" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-8 w-8"
-                                  onClick={() => openDeleteDialog(sub)}
-                                  disabled={isLoading}
-                                >
-                                  <Trash2 className="w-3 h-3 text-destructive" />
-                                </Button>
-                              </div>
-                            );
-                          })}
+                                <AppIcon name="Trash2" size={12} className="text-destructive" />
+                              </Button>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -341,18 +323,13 @@ export function CategoryManagement({
                 }}
               />
 
-              {/* Add button */}
-              <Button 
-                className="w-full h-12" 
-                onClick={() => setIsEditing(true)}
-              >
-                <Plus className="w-5 h-5 mr-2" />
+              <Button className="w-full h-12" onClick={() => setIsEditing(true)}>
+                <AppIcon name="Plus" size={20} className="mr-2" />
                 Nova Categoria
               </Button>
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Name */}
               <div className="space-y-2">
                 <Label>Nome</Label>
                 <Input
@@ -363,29 +340,24 @@ export function CategoryManagement({
                 />
               </div>
 
-              {/* Icon */}
               <div className="space-y-2">
                 <Label>Ícone</Label>
                 <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-secondary/30 rounded-lg">
-                  {ICONS.map(i => {
-                    const Icon = getLucideIcon(i);
-                    return (
-                      <button
-                        key={i}
-                        className={cn(
-                          "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
-                          icon === i ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary"
-                        )}
-                        onClick={() => setIcon(i)}
-                      >
-                        {Icon && <Icon className="w-5 h-5" />}
-                      </button>
-                    );
-                  })}
+                  {ICONS.map(i => (
+                    <button
+                      key={i}
+                      className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+                        icon === i ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary"
+                      )}
+                      onClick={() => setIcon(i)}
+                    >
+                      <AppIcon name={i} size={20} />
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Color */}
               <div className="space-y-2">
                 <Label>Cor</Label>
                 <div className="flex flex-wrap gap-2">
@@ -403,7 +375,6 @@ export function CategoryManagement({
                 </div>
               </div>
 
-              {/* Preview */}
               <div className="p-4 bg-secondary/30 rounded-lg">
                 <Label className="text-xs text-muted-foreground mb-2 block">Prévia</Label>
                 <div className="flex items-center gap-3">
@@ -411,13 +382,12 @@ export function CategoryManagement({
                     className="w-12 h-12 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: color + '20' }}
                   >
-                    {IconComponent && <IconComponent className="w-6 h-6" style={{ color }} />}
+                    <AppIcon name={icon} size={24} style={{ color }} />
                   </div>
                   <span className="font-medium">{name || 'Nome da categoria'}</span>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex gap-3 pt-4">
                 <Button variant="outline" className="flex-1 h-12" onClick={resetForm}>
                   Cancelar
@@ -435,7 +405,6 @@ export function CategoryManagement({
         </SheetContent>
       </Sheet>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -455,35 +424,48 @@ export function CategoryManagement({
           {transactionCount > 0 && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Ação</Label>
-                <Select value={deleteAction} onValueChange={(v) => setDeleteAction(v as DeleteAction)}>
+                {(['remove_category', 'transfer', 'force_delete'] as DeleteAction[]).map(action => (
+                  <label key={action} className={cn(
+                    "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
+                    deleteAction === action ? "border-primary bg-primary/5" : "border-border hover:bg-secondary/50"
+                  )}>
+                    <input
+                      type="radio"
+                      name="deleteAction"
+                      value={action}
+                      checked={deleteAction === action}
+                      onChange={() => setDeleteAction(action)}
+                      className="mt-1"
+                    />
+                    <div>
+                      <p className="font-medium text-sm">
+                        {action === 'remove_category' && 'Remover categoria dos lançamentos'}
+                        {action === 'transfer' && 'Transferir para outra categoria'}
+                        {action === 'force_delete' && 'Excluir tudo (categoria + lançamentos)'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {action === 'remove_category' && 'Os lançamentos ficam sem categoria'}
+                        {action === 'transfer' && 'Mover os lançamentos para outra categoria'}
+                        {action === 'force_delete' && 'Remove a categoria e apaga os lançamentos vinculados'}
+                      </p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {deleteAction === 'transfer' && (
+                <Select value={transferTargetId} onValueChange={setTransferTargetId}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecionar categoria destino" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="remove_category">Deixar lançamentos sem categoria</SelectItem>
-                    <SelectItem value="transfer">Transferir para outra categoria</SelectItem>
-                    <SelectItem value="force_delete">Excluir mesmo assim (sem alteração)</SelectItem>
+                    {getTransferOptions().map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-              </div>
-              
-              {deleteAction === 'transfer' && (
-                <div className="space-y-2">
-                  <Label>Transferir para</Label>
-                  <Select value={transferTargetId} onValueChange={setTransferTargetId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecionar categoria..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getTransferOptions().map(cat => (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               )}
             </div>
           )}
@@ -497,7 +479,8 @@ export function CategoryManagement({
               onClick={executeDelete}
               disabled={isLoading || (deleteAction === 'transfer' && !transferTargetId)}
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Excluir'}
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+              Excluir
             </Button>
           </DialogFooter>
         </DialogContent>

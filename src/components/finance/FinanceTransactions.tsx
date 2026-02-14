@@ -5,7 +5,8 @@ import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
 import { TransactionItem } from './TransactionItem';
 import { FinanceTransaction, MonthlyStats } from '@/types/finance';
-import { FileText, Filter, Repeat } from 'lucide-react';
+import { Loader2, Repeat } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TransactionFilters, TransactionFiltersState } from './TransactionFilters';
@@ -228,7 +229,7 @@ export function FinanceTransactions({
             onClick={() => setShowFilters(true)}
             className="gap-1"
           >
-            <Filter className="w-4 h-4" />
+            <AppIcon name="Filter" size={16} />
             {hasActiveFilters && <span className="text-xs">•</span>}
           </Button>
         </div>
@@ -312,7 +313,7 @@ export function FinanceTransactions({
           </DndContext>
         ) : (
           <div className="empty-state">
-            <FileText className="w-12 h-12 mb-4 opacity-50" />
+            <AppIcon name="FileText" size={48} className="mb-4 opacity-50" />
             <p className="text-lg font-medium">Nenhuma transação</p>
             <p className="text-sm">Toque em + para adicionar</p>
           </div>
