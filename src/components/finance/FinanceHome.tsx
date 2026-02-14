@@ -26,41 +26,84 @@ export function FinanceHome({
   const formatCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
+  const profit = monthStats.totalIncome - monthStats.totalExpense;
+  const profitPercent = monthStats.totalIncome > 0 
+    ? ((profit / monthStats.totalIncome) * 100).toFixed(0) 
+    : '0';
+
   return (
-    <div className="p-4 space-y-5">
+    <div className="p-4 space-y-4">
       {/* Month Selector */}
       <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
 
-      {/* Total Balance Card - Command Center style */}
+      {/* === HERO BALANCE CARD === */}
       <button
         onClick={() => onNavigate?.('more')}
-        className="card-command animate-neon-border p-6 animate-slide-up stagger-1 w-full text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        className="finance-hero-card w-full text-left animate-slide-up stagger-1"
       >
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Saldo em contas</p>
-          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+        <div className="finance-hero-inner p-5 pb-4">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+              Saldo em contas
+            </span>
+            <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+          </div>
+
+          {/* Balance */}
+          <p className={cn(
+            "text-[2rem] font-extrabold tracking-tight leading-tight",
+            totalBalance >= 0 ? "text-white" : "text-red-300"
+          )}>
+            {formatCurrency(totalBalance)}
+          </p>
+
+          {/* Sub-stats row */}
+          <div className="flex gap-2 mt-3">
+            <div className="finance-hero-chip finance-hero-chip--success">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Lucro líquido</span>
+              <div className="flex items-center gap-1.5">
+                <span className={cn(
+                  "text-sm font-bold",
+                  profit >= 0 ? "text-emerald-300" : "text-red-300"
+                )}>
+                  {formatCurrency(Math.abs(profit))}
+                </span>
+                <span className={cn(
+                  "text-[10px] font-bold px-1 py-0.5 rounded",
+                  profit >= 0 
+                    ? "text-emerald-300 bg-emerald-400/15" 
+                    : "text-red-300 bg-red-400/15"
+                )}>
+                  {profit >= 0 ? '+' : '-'}{Math.abs(Number(profitPercent))}%
+                </span>
+              </div>
+            </div>
+            <div className="finance-hero-chip finance-hero-chip--neutral">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-bold text-red-300">
+                  {formatCurrency(monthStats.totalExpense)}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className={cn(
-          "text-4xl font-extrabold mt-2 tracking-tight",
-          totalBalance >= 0 ? "text-[hsl(var(--neon-cyan))]" : "text-destructive"
-        )}>
-          {formatCurrency(totalBalance)}
-        </p>
       </button>
 
-      {/* Income/Expense Summary - asymmetric command cards */}
+      {/* Income/Expense Summary */}
       <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-2">
         <button
           onClick={() => onNavigate?.('transactions', { type: 'income' })}
           className="card-command-success p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="icon-glow icon-glow-sm icon-glow-success">
-              <AppIcon name="ArrowUpCircle" size={20} />
+            <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
+              <AppIcon name="ArrowUpCircle" size={18} className="text-success" />
             </div>
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Receitas</span>
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
-          <p className="text-xl font-bold text-success">
+          <p className="text-lg font-bold text-success">
             {formatCurrency(monthStats.totalIncome)}
           </p>
         </button>
@@ -69,12 +112,12 @@ export function FinanceHome({
           className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="icon-glow icon-glow-sm icon-glow-destructive">
-              <AppIcon name="ArrowDownCircle" size={20} />
+            <div className="w-7 h-7 rounded-full bg-destructive/20 flex items-center justify-center">
+              <AppIcon name="ArrowDownCircle" size={18} className="text-destructive" />
             </div>
-            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Despesas</span>
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
-          <p className="text-xl font-bold text-destructive">
+          <p className="text-lg font-bold text-destructive">
             {formatCurrency(monthStats.totalExpense)}
           </p>
         </button>
@@ -88,22 +131,24 @@ export function FinanceHome({
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="icon-glow icon-glow-sm icon-glow-warning" style={{ width: '1.75rem', height: '1.75rem' }}>
-                <AppIcon name="AlertCircle" size={16} />
+              <div className="w-7 h-7 rounded-full bg-warning/20 flex items-center justify-center">
+                <AppIcon name="AlertCircle" size={16} className="text-warning" />
               </div>
               <span className="font-semibold text-sm text-warning">Pendências</span>
             </div>
             <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
           </div>
           {monthStats.pendingExpenses > 0 && (
-            <p className="text-sm text-muted-foreground pl-9">
-              Despesas a pagar: <span className="font-semibold text-destructive">{formatCurrency(monthStats.pendingExpenses)}</span>
-            </p>
+            <div className="flex items-center justify-between pl-9 text-sm">
+              <span className="text-muted-foreground">Despesas a pagar</span>
+              <span className="font-semibold text-destructive">{formatCurrency(monthStats.pendingExpenses)}</span>
+            </div>
           )}
           {monthStats.pendingIncome > 0 && (
-            <p className="text-sm text-muted-foreground pl-9">
-              Receitas a receber: <span className="font-semibold text-success">{formatCurrency(monthStats.pendingIncome)}</span>
-            </p>
+            <div className="flex items-center justify-between pl-9 text-sm">
+              <span className="text-muted-foreground">Receitas a receber</span>
+              <span className="font-semibold text-success">{formatCurrency(monthStats.pendingIncome)}</span>
+            </div>
           )}
         </button>
       )}
