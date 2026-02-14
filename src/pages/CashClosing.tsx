@@ -23,7 +23,7 @@ export default function CashClosing() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-36">
         {/* Header */}
         <div className="page-header-bar">
           <div className="page-header-content flex items-center gap-3">

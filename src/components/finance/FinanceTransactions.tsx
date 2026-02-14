@@ -284,7 +284,6 @@ export function FinanceTransactions({
                             {(isDragging) => (
                               <div
                                 className="relative"
-                                onPointerDown={() => markSeen(transaction.id)}
                               >
                                 {transaction.is_recurring && transaction.installment_group_id && (
                                   <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
@@ -295,7 +294,13 @@ export function FinanceTransactions({
                                 <TransactionItem
                                   transaction={transaction}
                                   isNew={isNewTransaction(transaction)}
-                                  onClick={() => onTransactionClick(transaction)}
+                                  onClick={() => {
+                                    if (isNewTransaction(transaction)) {
+                                      markSeen(transaction.id);
+                                      return;
+                                    }
+                                    onTransactionClick(transaction);
+                                  }}
                                   onTogglePaid={onTogglePaid}
                                   onDelete={onDeleteTransaction}
                                   disableSwipe={isDragging}
