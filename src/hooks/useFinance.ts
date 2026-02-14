@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -148,6 +148,7 @@ export function useFinance(selectedMonth: Date) {
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
   const userId = user?.id;
+  const defaultsInitializedRef = useRef(false);
 
   const monthKey = format(selectedMonth, 'yyyy-MM');
 
@@ -164,13 +165,17 @@ export function useFinance(selectedMonth: Date) {
     enabled: !!userId,
   });
 
+  // Initialize defaults once per session
+  useEffect(() => {
+    if (userId && !defaultsInitializedRef.current) {
+      defaultsInitializedRef.current = true;
+      initializeDefaults(userId);
+    }
+  }, [userId]);
+
   const { data: transactions = [], isLoading: loadingTransactions } = useQuery({
     queryKey: ['finance-transactions', userId, activeUnitId, monthKey],
-    queryFn: async () => {
-      // Initialize defaults on first ever load (idempotent check inside)
-      await initializeDefaults(userId!);
-      return fetchTransactionsData(userId!, activeUnitId, selectedMonth);
-    },
+    queryFn: () => fetchTransactionsData(userId!, activeUnitId, selectedMonth),
     enabled: !!userId,
   });
 

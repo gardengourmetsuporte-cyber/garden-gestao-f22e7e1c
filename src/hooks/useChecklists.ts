@@ -41,12 +41,14 @@ async function fetchSectorsData(unitId: string | null) {
   })) as ChecklistSector[];
 }
 
-async function fetchCompletionsData(date: string, type: ChecklistType) {
-  const { data: completionsData, error } = await supabase
+async function fetchCompletionsData(date: string, type: ChecklistType, unitId: string | null) {
+  let query = supabase
     .from('checklist_completions')
     .select('*')
     .eq('date', date)
     .eq('checklist_type', type);
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data: completionsData, error } = await query;
 
   if (error) throw error;
 
@@ -81,7 +83,7 @@ export function useChecklists() {
   const [currentType, setCurrentType] = useState<ChecklistType>('abertura');
 
   const sectorsKey = ['checklist-sectors', activeUnitId];
-  const completionsKey = ['checklist-completions', currentDate, currentType];
+  const completionsKey = ['checklist-completions', currentDate, currentType, activeUnitId];
 
   const { data: sectors = [], isLoading: sectorsLoading } = useQuery({
     queryKey: sectorsKey,
@@ -92,8 +94,8 @@ export function useChecklists() {
   // Completions fetched via a dedicated useQuery tied to current date/type
   const { data: completions = [] } = useQuery({
     queryKey: completionsKey,
-    queryFn: () => fetchCompletionsData(currentDate, currentType),
-    enabled: !!user && !!currentDate && !!currentType,
+    queryFn: () => fetchCompletionsData(currentDate, currentType, activeUnitId),
+    enabled: !!user && !!currentDate && !!currentType && !!activeUnitId,
     staleTime: 0, // Always refetch when invalidated
   });
 
@@ -105,7 +107,7 @@ export function useChecklists() {
     setCurrentDate(date);
     setCurrentType(type);
     // Also ensure the query is fresh
-    await queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, type] });
+    await queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, type, activeUnitId] });
   }, [queryClient]);
 
   const invalidateSectors = useCallback(() => {
@@ -318,7 +320,7 @@ export function useChecklists() {
     }
 
     // Invalidate completions for the current date/type + gamification caches
-    queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, checklistType] });
+    queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, checklistType, activeUnitId] });
     queryClient.invalidateQueries({ queryKey: ['points'] });
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     queryClient.invalidateQueries({ queryKey: ['leaderboard'] });

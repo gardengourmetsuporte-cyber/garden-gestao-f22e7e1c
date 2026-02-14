@@ -114,6 +114,7 @@ export function useEmployees() {
 export function useEmployeePayments(employeeId?: string) {
   const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
+  const { activeUnitId } = useUnit();
 
   // Fetch payments
   const { data: payments = [], isLoading } = useQuery({
@@ -131,6 +132,9 @@ export function useEmployeePayments(employeeId?: string) {
       
       if (employeeId) {
         query = query.eq('employee_id', employeeId);
+      }
+      if (activeUnitId) {
+        query = query.eq('unit_id', activeUnitId);
       }
       
       const { data, error } = await query;
