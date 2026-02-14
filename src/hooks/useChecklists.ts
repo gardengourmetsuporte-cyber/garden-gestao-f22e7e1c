@@ -81,7 +81,7 @@ export function useChecklists() {
   const { data: sectors = [], isLoading } = useQuery({
     queryKey: sectorsKey,
     queryFn: () => fetchSectorsData(activeUnitId),
-    enabled: !!user,
+    enabled: !!user && !!activeUnitId,
   });
 
   // Completions are fetched on-demand via fetchCompletions, stored in a separate query
