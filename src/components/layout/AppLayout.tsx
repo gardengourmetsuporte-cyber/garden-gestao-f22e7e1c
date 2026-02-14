@@ -34,24 +34,24 @@ interface NavItem {
   groupLabel: string;
 }
 
-// Module icon theme: gradient + shadow for 3D effect
-const MODULE_THEMES: Record<string, { gradient: string; shadow: string; iconColor: string }> = {
-  '/':             { gradient: 'linear-gradient(135deg, #6366f1, #818cf8)', shadow: '0 4px 14px rgba(99,102,241,0.45)', iconColor: '#fff' },
-  '/agenda':       { gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)', shadow: '0 4px 14px rgba(245,158,11,0.45)', iconColor: '#fff' },
-  '/finance':      { gradient: 'linear-gradient(135deg, #10b981, #34d399)', shadow: '0 4px 14px rgba(16,185,129,0.45)', iconColor: '#fff' },
-  '/inventory':    { gradient: 'linear-gradient(135deg, #f97316, #fb923c)', shadow: '0 4px 14px rgba(249,115,22,0.45)', iconColor: '#fff' },
-  '/orders':       { gradient: 'linear-gradient(135deg, #3b82f6, #60a5fa)', shadow: '0 4px 14px rgba(59,130,246,0.45)', iconColor: '#fff' },
-  '/checklists':   { gradient: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', shadow: '0 4px 14px rgba(139,92,246,0.45)', iconColor: '#fff' },
-  '/cash-closing': { gradient: 'linear-gradient(135deg, #ec4899, #f472b6)', shadow: '0 4px 14px rgba(236,72,153,0.45)', iconColor: '#fff' },
-  '/recipes':      { gradient: 'linear-gradient(135deg, #ef4444, #f87171)', shadow: '0 4px 14px rgba(239,68,68,0.45)', iconColor: '#fff' },
-  '/employees':    { gradient: 'linear-gradient(135deg, #06b6d4, #22d3ee)', shadow: '0 4px 14px rgba(6,182,212,0.45)', iconColor: '#fff' },
-  '/rewards':      { gradient: 'linear-gradient(135deg, #eab308, #facc15)', shadow: '0 4px 14px rgba(234,179,8,0.45)', iconColor: '#fff' },
-  '/chat':         { gradient: 'linear-gradient(135deg, #14b8a6, #2dd4bf)', shadow: '0 4px 14px rgba(20,184,166,0.45)', iconColor: '#fff' },
-  '/tablet-admin': { gradient: 'linear-gradient(135deg, #64748b, #94a3b8)', shadow: '0 4px 14px rgba(100,116,139,0.45)', iconColor: '#fff' },
-  '/cardapio':     { gradient: 'linear-gradient(135deg, #d946ef, #e879f9)', shadow: '0 4px 14px rgba(217,70,239,0.45)', iconColor: '#fff' },
-  '/whatsapp':     { gradient: 'linear-gradient(135deg, #22c55e, #4ade80)', shadow: '0 4px 14px rgba(34,197,94,0.45)', iconColor: '#fff' },
-  '/marketing':    { gradient: 'linear-gradient(135deg, #f43f5e, #fb7185)', shadow: '0 4px 14px rgba(244,63,94,0.45)', iconColor: '#fff' },
-  '/settings':     { gradient: 'linear-gradient(135deg, #475569, #64748b)', shadow: '0 4px 14px rgba(71,85,105,0.45)', iconColor: '#fff' },
+// Module icon theme: rich 3D gradients with depth & glow
+const MODULE_THEMES: Record<string, { gradient: string; shadow: string; iconColor: string; ring: string }> = {
+  '/':             { gradient: 'linear-gradient(145deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%)', shadow: '0 6px 20px rgba(99,102,241,0.5), 0 2px 6px rgba(79,70,229,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(129,140,248,0.4)' },
+  '/agenda':       { gradient: 'linear-gradient(145deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%)', shadow: '0 6px 20px rgba(245,158,11,0.5), 0 2px 6px rgba(217,119,6,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(252,211,77,0.4)' },
+  '/finance':      { gradient: 'linear-gradient(145deg, #6ee7b7 0%, #10b981 50%, #059669 100%)', shadow: '0 6px 20px rgba(16,185,129,0.5), 0 2px 6px rgba(5,150,105,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(110,231,183,0.4)' },
+  '/inventory':    { gradient: 'linear-gradient(145deg, #fdba74 0%, #f97316 50%, #ea580c 100%)', shadow: '0 6px 20px rgba(249,115,22,0.5), 0 2px 6px rgba(234,88,12,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(253,186,116,0.4)' },
+  '/orders':       { gradient: 'linear-gradient(145deg, #93c5fd 0%, #3b82f6 50%, #2563eb 100%)', shadow: '0 6px 20px rgba(59,130,246,0.5), 0 2px 6px rgba(37,99,235,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(147,197,253,0.4)' },
+  '/checklists':   { gradient: 'linear-gradient(145deg, #c4b5fd 0%, #8b5cf6 50%, #7c3aed 100%)', shadow: '0 6px 20px rgba(139,92,246,0.5), 0 2px 6px rgba(124,58,237,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(196,181,253,0.4)' },
+  '/cash-closing': { gradient: 'linear-gradient(145deg, #f9a8d4 0%, #ec4899 50%, #db2777 100%)', shadow: '0 6px 20px rgba(236,72,153,0.5), 0 2px 6px rgba(219,39,119,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(249,168,212,0.4)' },
+  '/recipes':      { gradient: 'linear-gradient(145deg, #fca5a5 0%, #ef4444 50%, #dc2626 100%)', shadow: '0 6px 20px rgba(239,68,68,0.5), 0 2px 6px rgba(220,38,38,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(252,165,165,0.4)' },
+  '/employees':    { gradient: 'linear-gradient(145deg, #67e8f9 0%, #06b6d4 50%, #0891b2 100%)', shadow: '0 6px 20px rgba(6,182,212,0.5), 0 2px 6px rgba(8,145,178,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(103,232,249,0.4)' },
+  '/rewards':      { gradient: 'linear-gradient(145deg, #fde68a 0%, #eab308 50%, #ca8a04 100%)', shadow: '0 6px 20px rgba(234,179,8,0.5), 0 2px 6px rgba(202,138,4,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(253,230,138,0.4)' },
+  '/chat':         { gradient: 'linear-gradient(145deg, #5eead4 0%, #14b8a6 50%, #0d9488 100%)', shadow: '0 6px 20px rgba(20,184,166,0.5), 0 2px 6px rgba(13,148,136,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(94,234,212,0.4)' },
+  '/tablet-admin': { gradient: 'linear-gradient(145deg, #cbd5e1 0%, #64748b 50%, #475569 100%)', shadow: '0 6px 20px rgba(100,116,139,0.5), 0 2px 6px rgba(71,85,105,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(203,213,225,0.4)' },
+  '/cardapio':     { gradient: 'linear-gradient(145deg, #f0abfc 0%, #d946ef 50%, #c026d3 100%)', shadow: '0 6px 20px rgba(217,70,239,0.5), 0 2px 6px rgba(192,38,211,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(240,171,252,0.4)' },
+  '/whatsapp':     { gradient: 'linear-gradient(145deg, #86efac 0%, #22c55e 50%, #16a34a 100%)', shadow: '0 6px 20px rgba(34,197,94,0.5), 0 2px 6px rgba(22,163,74,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(134,239,172,0.4)' },
+  '/marketing':    { gradient: 'linear-gradient(145deg, #fda4af 0%, #f43f5e 50%, #e11d48 100%)', shadow: '0 6px 20px rgba(244,63,94,0.5), 0 2px 6px rgba(225,29,72,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(253,164,175,0.4)' },
+  '/settings':     { gradient: 'linear-gradient(145deg, #94a3b8 0%, #64748b 50%, #475569 100%)', shadow: '0 6px 20px rgba(71,85,105,0.45), 0 2px 6px rgba(51,65,85,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(148,163,184,0.4)' },
 };
 
 const navItems: NavItem[] = [
@@ -422,36 +422,60 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         data-active={isActive}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl text-center transition-all duration-200 relative active:scale-[0.92]",
+                          "flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl text-center transition-all duration-200 relative active:scale-[0.90]",
                           isActive
-                            ? "text-foreground bg-secondary/60"
+                            ? "text-foreground"
                             : "text-muted-foreground"
                         )}
                       >
                         <div className="relative">
+                          {/* Outer ring glow on active */}
+                          {isActive && (
+                            <div
+                              className="absolute -inset-1 rounded-[18px] pointer-events-none animate-pulse"
+                              style={{
+                                background: `radial-gradient(circle, ${theme.ring} 0%, transparent 70%)`,
+                              }}
+                            />
+                          )}
                           <div
-                            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200"
+                            className="relative w-[52px] h-[52px] rounded-[16px] flex items-center justify-center transition-all duration-200 overflow-hidden"
                             style={{
                               background: theme.gradient,
-                              boxShadow: isActive ? theme.shadow : theme.shadow.replace('0.45', '0.25'),
-                              transform: isActive ? 'scale(1.05)' : undefined,
+                              boxShadow: isActive ? theme.shadow : theme.shadow.replace(/0\.5/g, '0.3').replace(/0\.3\)/g, '0.15)'),
+                              transform: isActive ? 'scale(1.08) translateY(-2px)' : undefined,
                             }}
                           >
                             <AppIcon
                               name={item.icon}
-                              size={22}
-                              style={{ color: theme.iconColor, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                              size={24}
+                              style={{
+                                color: theme.iconColor,
+                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))',
+                              }}
+                            />
+                            {/* Top-left glass highlight */}
+                            <div
+                              className="absolute top-0 left-0 w-full h-1/2 pointer-events-none rounded-t-[16px]"
+                              style={{
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)',
+                              }}
+                            />
+                            {/* Bottom edge darkening for depth */}
+                            <div
+                              className="absolute bottom-0 left-0 w-full h-1/3 pointer-events-none rounded-b-[16px]"
+                              style={{
+                                background: 'linear-gradient(0deg, rgba(0,0,0,0.15) 0%, transparent 100%)',
+                              }}
+                            />
+                            {/* Corner specular highlight */}
+                            <div
+                              className="absolute top-[3px] left-[3px] w-[14px] h-[14px] rounded-full pointer-events-none"
+                              style={{
+                                background: 'radial-gradient(circle, rgba(255,255,255,0.45) 0%, transparent 70%)',
+                              }}
                             />
                           </div>
-                          {/* Shine/gloss overlay for 3D effect */}
-                          <div
-                            className="absolute inset-0 rounded-2xl pointer-events-none"
-                            style={{
-                              background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 40%, transparent 60%)',
-                              width: '3rem',
-                              height: '3rem',
-                            }}
-                          />
                           {showBadge && (
                             <span className="absolute -top-1 -right-1 w-4.5 h-4.5 min-w-[18px] rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse border-2 border-background">
                               {badgeCount > 9 ? '9+' : badgeCount}
