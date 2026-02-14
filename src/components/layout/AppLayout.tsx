@@ -246,12 +246,25 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       )}
 
+      {/* Touch-blocking layer behind FAB when drawer is open */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed z-[9998]"
+          style={{
+            bottom: 0,
+            right: 0,
+            width: '100px',
+            height: '160px',
+            pointerEvents: 'auto',
+          }}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); }}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
+        />
+      )}
+
       <button
-        onPointerDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onPointerUp={(e) => {
+        onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
           if (sidebarOpen) {
@@ -260,17 +273,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           } else {
             setFabOpen(prev => !prev);
           }
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onTouchStart={(e) => {
-          e.stopPropagation();
-        }}
-        onTouchEnd={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
         }}
         className={cn(
           "lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
