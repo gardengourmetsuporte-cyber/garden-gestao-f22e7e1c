@@ -247,7 +247,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       )}
 
       <button
-        onClick={(e) => {
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onPointerUp={(e) => {
           e.stopPropagation();
           e.preventDefault();
           if (sidebarOpen) {
@@ -257,8 +261,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             setFabOpen(prev => !prev);
           }
         }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+        }}
         onTouchEnd={(e) => {
           e.stopPropagation();
+          e.preventDefault();
         }}
         className={cn(
           "lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
