@@ -50,7 +50,8 @@ export default function Finance() {
   }, []);
 
   const handleAccountCardClick = useCallback((account: FinanceAccount) => {
-    setAccountManagementOpen(true);
+    setTransactionInitialFilters({ accountId: account.id });
+    setActiveTab('transactions');
   }, []);
 
   const {
