@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Receipt, CheckCircle2, Send } from 'lucide-react';
+import { Plus, Receipt, CheckCircle2, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -63,15 +63,22 @@ export default function CashClosing() {
         </div>
 
         {/* FAB */}
-        <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Sheet open={isFormOpen} onOpenChange={(open) => {
+          // Prevent accidental close — only allow programmatic close via onSuccess
+          if (!open) return;
+          setIsFormOpen(open);
+        }}>
           <SheetTrigger asChild>
             <button className="fab">
               <Plus className="w-7 h-7" />
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
-            <SheetHeader>
+          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+            <SheetHeader className="flex flex-row items-center justify-between">
               <SheetTitle>Novo Fechamento de Caixa</SheetTitle>
+              <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="text-muted-foreground">
+                Fechar
+              </Button>
             </SheetHeader>
             <div className="overflow-y-auto h-[calc(90vh-80px)] pt-4">
               <CashClosingForm 

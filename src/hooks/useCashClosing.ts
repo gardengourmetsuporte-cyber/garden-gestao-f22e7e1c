@@ -103,8 +103,14 @@ export function useCashClosing() {
         throw error;
       }
     },
-    onSuccess: () => invalidate(),
-    onError: (err: Error) => toast.error(err.message || 'Erro ao enviar fechamento'),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Fechamento de caixa enviado com sucesso! ✅');
+    },
+    onError: (err: Error) => {
+      console.error('Cash closing error:', err);
+      toast.error(err.message || 'Erro ao enviar fechamento. Tente novamente.');
+    },
   });
 
   const createClosing = async (formData: CashClosingFormData) => {
