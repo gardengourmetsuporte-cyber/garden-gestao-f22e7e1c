@@ -5,20 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  CreditCard, 
-  ChevronRight, 
-  Calendar, 
-  Check, 
-  AlertCircle,
-  Plus,
-  Loader2,
-  ArrowLeft
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { format, isBefore, isAfter, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { getLucideIcon } from '@/lib/icons';
+import { AppIcon } from '@/components/ui/app-icon';
 import { TransactionSheet } from './TransactionSheet';
 
 interface CreditCardTabProps {
@@ -76,15 +67,15 @@ export function CreditCardTab({
     const dueDate = new Date(invoice.due_date);
     
     if (invoice.is_paid) {
-      return { label: 'Paga', variant: 'default' as const, icon: Check };
+      return { label: 'Paga', variant: 'default' as const, icon: 'Check' };
     }
     if (isBefore(dueDate, today)) {
-      return { label: 'Vencida', variant: 'destructive' as const, icon: AlertCircle };
+      return { label: 'Vencida', variant: 'destructive' as const, icon: 'AlertCircle' };
     }
     if (isBefore(dueDate, addDays(today, 7))) {
-      return { label: 'Vence em breve', variant: 'secondary' as const, icon: Calendar };
+      return { label: 'Vence em breve', variant: 'secondary' as const, icon: 'Calendar' };
     }
-    return { label: 'Aberta', variant: 'outline' as const, icon: Calendar };
+    return { label: 'Aberta', variant: 'outline' as const, icon: 'Calendar' };
   };
 
   // Group invoices by credit card account
@@ -102,7 +93,7 @@ export function CreditCardTab({
       {creditCardAccounts.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="pt-6 text-center">
-            <CreditCard className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <AppIcon name="CreditCard" size={48} className="mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground mb-4">
               Você ainda não tem cartões cadastrados
             </p>
@@ -121,7 +112,7 @@ export function CreditCardTab({
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: account.color + '20' }}
                 >
-                  <CreditCard className="w-5 h-5" style={{ color: account.color }} />
+                  <AppIcon name="CreditCard" size={20} style={{ color: account.color }} />
                 </div>
                 <div className="flex-1">
                   <h2 className="font-semibold">{account.name}</h2>
@@ -140,7 +131,7 @@ export function CreditCardTab({
                     setShowAddTransaction(true);
                   }}
                 >
-                  <Plus className="w-4 h-4 mr-1" />
+                  <AppIcon name="Plus" size={16} className="mr-1" />
                   Lançar
                 </Button>
               </div>
@@ -156,7 +147,6 @@ export function CreditCardTab({
                 <div className="space-y-2">
                   {accountInvoices.map(invoice => {
                     const status = getInvoiceStatus(invoice);
-                    const StatusIcon = status.icon;
                     
                     return (
                       <Card 
@@ -181,11 +171,11 @@ export function CreditCardTab({
                               R$ {Number(invoice.total_amount).toFixed(2)}
                             </p>
                             <Badge variant={status.variant} className="text-xs">
-                              <StatusIcon className="w-3 h-3 mr-1" />
+                              <AppIcon name={status.icon} size={12} className="mr-1" />
                               {status.label}
                             </Badge>
                           </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />
                         </CardContent>
                       </Card>
                     );
@@ -203,7 +193,7 @@ export function CreditCardTab({
           <SheetHeader className="pb-4">
             <SheetTitle className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={() => setSelectedInvoice(null)}>
-                <ArrowLeft className="w-5 h-5" />
+                <AppIcon name="ArrowLeft" size={20} />
               </Button>
               Fatura {selectedInvoice && format(new Date(selectedInvoice.due_date), 'MMMM/yyyy', { locale: ptBR })}
             </SheetTitle>
@@ -229,8 +219,8 @@ export function CreditCardTab({
                       Vencimento: {format(new Date(selectedInvoice.due_date), 'dd/MM/yyyy')}
                     </p>
                     {selectedInvoice.is_paid && selectedInvoice.paid_at && (
-                      <Badge className="mt-2 bg-success text-success-foreground">
-                        <Check className="w-3 h-3 mr-1" />
+                       <Badge className="mt-2 bg-success text-success-foreground">
+                        <AppIcon name="Check" size={12} className="mr-1" />
                         Paga em {format(new Date(selectedInvoice.paid_at), 'dd/MM')}
                       </Badge>
                     )}
@@ -245,14 +235,14 @@ export function CreditCardTab({
                     className="flex-1" 
                     onClick={() => setShowPaySheet(true)}
                   >
-                    <Check className="w-4 h-4 mr-2" />
+                     <AppIcon name="Check" size={16} className="mr-2" />
                     Pagar Fatura
                   </Button>
                   <Button 
                     variant="outline"
                     onClick={() => setShowAddTransaction(true)}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <AppIcon name="Plus" size={16} className="mr-2" />
                     Adicionar
                   </Button>
                 </div>
@@ -273,7 +263,6 @@ export function CreditCardTab({
                 ) : (
                   <div className="space-y-2">
                     {invoiceTransactions.map(tx => {
-                      const CatIcon = tx.category?.icon ? getLucideIcon(tx.category.icon) : null;
                       const isInstallment = tx.total_installments && tx.total_installments > 1;
                       
                       return (
@@ -281,12 +270,12 @@ export function CreditCardTab({
                           key={tx.id}
                           className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg"
                         >
-                          {CatIcon && (
+                          {tx.category?.icon && (
                             <div 
                               className="w-10 h-10 rounded-full flex items-center justify-center"
                               style={{ backgroundColor: (tx.category?.color || '#6366f1') + '20' }}
                             >
-                              <CatIcon className="w-5 h-5" style={{ color: tx.category?.color }} />
+                              <AppIcon name={tx.category.icon} size={20} style={{ color: tx.category?.color }} />
                             </div>
                           )}
                           <div className="flex-1">
@@ -348,7 +337,7 @@ export function CreditCardTab({
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  <Check className="w-4 h-4 mr-2" />
+                  <AppIcon name="Check" size={16} className="mr-2" />
                   Confirmar Pagamento de R$ {selectedInvoice?.total_amount?.toFixed(2)}
                 </>
               )}
