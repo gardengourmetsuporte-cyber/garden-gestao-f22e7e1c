@@ -18,8 +18,10 @@ const nameSchema = z.string().min(2, 'Nome deve ter no mínimo 2 caracteres');
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const [isNewPassword, setIsNewPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,11 +30,23 @@ export default function Auth() {
   const { user, signIn, signUp, isLoading } = useAuth();
   const navigate = useNavigate();
 
+  // Listen for PASSWORD_RECOVERY event
   useEffect(() => {
-    if (user && !isLoading) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsNewPassword(true);
+        setIsResetPassword(false);
+        setIsLogin(true);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user && !isLoading && !isNewPassword) {
       navigate('/', { replace: true });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, isNewPassword]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -45,6 +59,30 @@ export default function Auth() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleSetNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: Record<string, string> = {};
+    try { passwordSchema.parse(password); } catch (err: any) { newErrors.password = err.errors[0].message; }
+    if (password !== confirmPassword) { newErrors.confirmPassword = 'As senhas não coincidem'; }
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success('Senha alterada com sucesso!');
+      setIsNewPassword(false);
+      setPassword('');
+      setConfirmPassword('');
+      navigate('/', { replace: true });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
@@ -54,7 +92,7 @@ export default function Auth() {
     setIsSubmitting(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/auth`,
       });
       if (error) {
         toast.error(error.message);
@@ -203,11 +241,13 @@ export default function Auth() {
               <div className="flex items-center justify-center gap-2">
                 <AppIcon name="Sparkles" size={20} className="text-primary" />
                 <h2 className="text-xl font-bold text-foreground">
-                  {isResetPassword ? 'Recuperar Senha' : isLogin ? 'Bem-vindo' : 'Criar Conta'}
+                  {isNewPassword ? 'Nova Senha' : isResetPassword ? 'Recuperar Senha' : isLogin ? 'Bem-vindo' : 'Criar Conta'}
                 </h2>
               </div>
               <p className="text-sm text-muted-foreground">
-                {isResetPassword
+                {isNewPassword
+                  ? 'Defina sua nova senha'
+                  : isResetPassword
                   ? 'Informe seu email para recuperação'
                   : isLogin
                   ? 'Acesse sua conta para continuar'
@@ -215,7 +255,75 @@ export default function Auth() {
               </p>
             </div>
 
-            {isResetPassword ? (
+            {isNewPassword ? (
+              <form onSubmit={handleSetNewPassword} className="space-y-4">
+                <div className="space-y-2 animate-fade-in">
+                  <Label htmlFor="newPassword" className="text-sm text-muted-foreground font-medium">
+                    Nova Senha
+                  </Label>
+                  <div className="relative">
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'newPassword' ? "text-primary" : "text-muted-foreground/60")}>
+                      <AppIcon name="Lock" size={20} />
+                    </div>
+                    <Input
+                      id="newPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      onFocus={() => setFocusedField('newPassword')}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="••••••••"
+                      className={cn(inputClasses('password'), "pr-11")}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors">
+                      {showPassword ? <AppIcon name="EyeOff" size={20} /> : <AppIcon name="Eye" size={20} />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-xs text-destructive animate-fade-in">{errors.password}</p>}
+                </div>
+
+                <div className="space-y-2 animate-fade-in">
+                  <Label htmlFor="confirmPassword" className="text-sm text-muted-foreground font-medium">
+                    Confirmar Senha
+                  </Label>
+                  <div className="relative">
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'confirmPassword' ? "text-primary" : "text-muted-foreground/60")}>
+                      <AppIcon name="Lock" size={20} />
+                    </div>
+                    <Input
+                      id="confirmPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      onFocus={() => setFocusedField('confirmPassword')}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="••••••••"
+                      className={inputClasses('confirmPassword')}
+                    />
+                  </div>
+                  {errors.confirmPassword && <p className="text-xs text-destructive animate-fade-in">{errors.confirmPassword}</p>}
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98]"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan) / 0.8))',
+                    boxShadow: '0 4px 24px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--neon-cyan) / 0.1)',
+                  }}
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Aguarde...
+                    </span>
+                  ) : (
+                    <>Salvar nova senha<AppIcon name="Check" size={20} className="ml-2" /></>
+                  )}
+                </Button>
+              </form>
+            ) : isResetPassword ? (
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2 animate-fade-in">
                   <Label htmlFor="resetEmail" className="text-sm text-muted-foreground font-medium">
