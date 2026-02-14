@@ -56,6 +56,7 @@ const navItems: NavItem[] = [
 function AppLayoutContent({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
   const [sidebarDragX, setSidebarDragX] = useState<number | null>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const isDraggingSidebarRef = useRef(false);
@@ -227,30 +228,61 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </header>
 
-      {/* ======= Floating Home FAB ======= */}
-      {!sidebarOpen && location.pathname !== '/dashboard' && (
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="lg:hidden fixed z-[60] w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90 hover:scale-105"
-          style={{
-            bottom: hasBottomNav
-              ? 'calc(env(safe-area-inset-bottom) + 148px)'
-              : 'calc(env(safe-area-inset-bottom) + 88px)',
-            right: '22px',
-            background: 'linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--primary)))',
-            boxShadow: '0 4px 20px hsl(var(--neon-cyan) / 0.35), 0 0 30px hsl(var(--primary) / 0.12)',
-          }}
-        >
-          <AppIcon name="Home" size={20} className="text-primary-foreground" />
-        </button>
+      {/* ======= Expandable FAB ======= */}
+      {/* Overlay when FAB is open */}
+      {fabOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm animate-fade-in"
+          onClick={() => setFabOpen(false)}
+        />
       )}
 
-      {/* ======= Floating Menu FAB ======= */}
+      {/* FAB sub-actions */}
+      {fabOpen && !sidebarOpen && (
+        <div
+          className="lg:hidden fixed z-[60] flex flex-col-reverse items-center gap-3"
+          style={{
+            bottom: hasBottomNav
+              ? 'calc(env(safe-area-inset-bottom) + 100px)'
+              : 'calc(env(safe-area-inset-bottom) + 40px)',
+            right: '23px',
+            paddingBottom: '64px',
+          }}
+        >
+          {/* Menu button */}
+          <button
+            onClick={() => { setFabOpen(false); setSidebarOpen(true); }}
+            className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
+            style={{ animationDelay: '0ms', boxShadow: '0 4px 16px hsl(222 50% 3% / 0.5)' }}
+          >
+            <AppIcon name="Menu" size={20} className="text-foreground" />
+          </button>
+
+          {/* Home button - only when not on home */}
+          {location.pathname !== '/' && (
+            <button
+              onClick={() => { setFabOpen(false); navigate('/'); }}
+              className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
+              style={{ animationDelay: '80ms', boxShadow: '0 4px 16px hsl(222 50% 3% / 0.5)' }}
+            >
+              <AppIcon name="Home" size={20} className="text-foreground" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Main FAB button */}
       <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
+        onClick={() => {
+          if (sidebarOpen) {
+            setSidebarOpen(false);
+          } else {
+            setFabOpen(prev => !prev);
+          }
+        }}
         className={cn(
           "lg:hidden fixed z-[60] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
-          sidebarOpen ? "rotate-180 scale-90" : "hover:scale-105"
+          (fabOpen || sidebarOpen) ? "rotate-180 scale-90" : "hover:scale-105"
         )}
         style={{
           bottom: hasBottomNav
@@ -261,12 +293,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           boxShadow: '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
         }}
       >
-        {sidebarOpen ? (
+        {(fabOpen || sidebarOpen) ? (
           <AppIcon name="X" size={24} className="text-primary-foreground" />
         ) : (
-          <AppIcon name="Menu" size={24} className="text-primary-foreground" />
+          <AppIcon name="Grip" size={24} className="text-primary-foreground" />
         )}
-        {!sidebarOpen && activeUnit && (
+        {!fabOpen && !sidebarOpen && activeUnit && (
           <span
             className="absolute top-1 right-1 w-3 h-3 rounded-full border-2"
             style={{
