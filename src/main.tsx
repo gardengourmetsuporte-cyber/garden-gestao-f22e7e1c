@@ -9,8 +9,19 @@ if ("ontouchstart" in window) {
     const target = e.target as HTMLElement;
     if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
       setTimeout(() => {
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 300);
+        // Find the nearest scrollable container (drawer/dialog/sheet)
+        const scrollable = target.closest('[vaul-drawer] .overflow-y-auto, [role="dialog"] .overflow-y-auto, [vaul-drawer] > div:last-child, .flex-1.overflow-y-auto');
+        if (scrollable) {
+          // Scroll within the container, not the whole page
+          const targetRect = target.getBoundingClientRect();
+          const containerRect = scrollable.getBoundingClientRect();
+          const offset = targetRect.top - containerRect.top - containerRect.height / 3;
+          scrollable.scrollTop += offset;
+        } else {
+          // Fallback for non-drawer inputs
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 350);
     }
   });
 }
