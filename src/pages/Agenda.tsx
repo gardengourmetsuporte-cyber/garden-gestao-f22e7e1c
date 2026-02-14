@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ListChecks, Plus, Calendar, MoreHorizontal, CheckCircle2, Folder, Trash2, Pencil, X } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -195,7 +195,7 @@ export default function Agenda() {
           {showCompleted && completedTasks.length > 0 && (
             <div className="space-y-2 mt-4">
               <div className="flex items-center gap-2 px-1">
-                <CheckCircle2 className="w-4 h-4 text-success" />
+                <AppIcon name="CheckCircle2" size={16} className="text-success" />
                 <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
               </div>
               {completedTasks.map(task => renderTaskItem(task))}
@@ -222,7 +222,7 @@ export default function Agenda() {
           <div className="page-header-content flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="icon-glow icon-glow-md icon-glow-primary">
-                <ListChecks className="w-5 h-5" />
+                <AppIcon name="ListChecks" size={20} />
               </div>
               <div>
                 <h1 className="page-title">Agenda</h1>
@@ -237,22 +237,22 @@ export default function Agenda() {
                 className="rounded-xl w-11 h-11 shadow-lg shadow-primary/20"
                 onClick={() => setTaskSheetOpen(true)}
               >
-                <Plus className="w-5 h-5" />
+                <AppIcon name="Plus" size={20} />
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="ghost" className="rounded-xl w-11 h-11">
-                    <MoreHorizontal className="w-5 h-5" />
+                    <AppIcon name="MoreHorizontal" size={20} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem onClick={() => setShowCompleted(!showCompleted)}>
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    <AppIcon name="CheckCircle2" size={16} className="mr-2" />
                     {showCompleted ? 'Ocultar concluídos' : 'Ver concluídos'}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setCategorySheetOpen(true)}>
-                    <Folder className="w-4 h-4 mr-2" />
+                    <AppIcon name="Folder" size={16} className="mr-2" />
                     Gerenciar categorias
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -267,14 +267,14 @@ export default function Agenda() {
               onClick={() => setViewMode('list')}
               className={cn("tab-command-item", viewMode === 'list' ? "tab-command-active" : "tab-command-inactive")}
             >
-              <ListChecks className="w-4 h-4" />
+              <AppIcon name="ListChecks" size={16} />
               Lista
             </button>
             <button
               onClick={() => setViewMode('calendar')}
               className={cn("tab-command-item", viewMode === 'calendar' ? "tab-command-active" : "tab-command-inactive")}
             >
-              <Calendar className="w-4 h-4" />
+              <AppIcon name="Calendar" size={16} />
               Calendário
             </button>
           </div>
@@ -364,7 +364,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                 onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               />
               <Button size="sm" onClick={handleAdd} disabled={!newName.trim()} className="h-10 px-4 rounded-xl">
-                <Plus className="w-4 h-4" />
+                <AppIcon name="Plus" size={16} />
               </Button>
             </div>
             <div className="flex gap-1.5 flex-wrap">
@@ -402,7 +402,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                         />
                         <Button size="sm" onClick={saveEdit} className="h-10 rounded-xl">Salvar</Button>
                         <Button size="icon" variant="ghost" className="h-10 w-10" onClick={() => setEditingId(null)}>
-                          <X className="w-4 h-4" />
+                          <AppIcon name="X" size={16} />
                         </Button>
                       </div>
                       <div className="flex gap-1.5 flex-wrap">
@@ -431,13 +431,13 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                           onClick={() => startEdit(cat)}
                           className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
                         >
-                          <Pencil className="w-4 h-4" />
+                          <AppIcon name="Pencil" size={16} />
                         </button>
                         <button
                           onClick={() => onDelete(cat.id)}
                           className="p-2 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <AppIcon name="Trash2" size={16} />
                         </button>
                       </div>
                     </div>

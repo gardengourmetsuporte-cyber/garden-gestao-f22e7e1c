@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Receipt, CheckCircle2, Send, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -27,7 +28,7 @@ export default function CashClosing() {
         <div className="page-header-bar">
           <div className="page-header-content flex items-center gap-3">
             <div className="icon-glow icon-glow-md icon-glow-primary">
-              <Receipt className="w-5 h-5" />
+              <AppIcon name="Receipt" size={20} />
             </div>
             <div>
               <h1 className="page-title">Fechamento de Caixa</h1>
@@ -70,7 +71,7 @@ export default function CashClosing() {
         }}>
           <SheetTrigger asChild>
             <button className="fab">
-              <Plus className="w-7 h-7" />
+              <AppIcon name="Plus" size={28} />
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
@@ -109,7 +110,7 @@ function EmployeeClosingView({
     const statusConfig = {
       pending: {
         cardClass: 'card-command-warning',
-        icon: Send,
+        icon: () => <AppIcon name="Send" size={32} />,
         iconBg: 'bg-warning/10',
         iconColor: 'text-warning',
         title: 'Fechamento Enviado',
@@ -118,7 +119,7 @@ function EmployeeClosingView({
       },
       approved: {
         cardClass: 'card-command-success',
-        icon: CheckCircle2,
+        icon: () => <AppIcon name="CheckCircle2" size={32} />,
         iconBg: 'bg-success/10',
         iconColor: 'text-success',
         title: 'Fechamento Aprovado',
@@ -127,7 +128,7 @@ function EmployeeClosingView({
       },
       divergent: {
         cardClass: 'card-command-danger',
-        icon: Receipt,
+        icon: () => <AppIcon name="Receipt" size={32} />,
         iconBg: 'bg-destructive/10',
         iconColor: 'text-destructive',
         title: 'Fechamento com Divergência',
@@ -159,7 +160,7 @@ function EmployeeClosingView({
   return (
     <div className="card-command-info p-6 text-center">
       <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-        <Receipt className="w-8 h-8 text-primary" />
+        <AppIcon name="Receipt" size={32} className="text-primary" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">Fechamento de Hoje</h3>
       <p className="text-muted-foreground text-sm capitalize mb-4">{formattedDate}</p>
@@ -167,7 +168,7 @@ function EmployeeClosingView({
         Você ainda não enviou o fechamento de caixa de hoje.
       </p>
       <Button onClick={onOpenForm} className="w-full">
-        <Plus className="w-4 h-4 mr-2" />
+        <AppIcon name="Plus" size={16} className="mr-2" />
         Iniciar Fechamento
       </Button>
     </div>

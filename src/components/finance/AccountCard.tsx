@@ -1,7 +1,8 @@
-import { Wallet, Landmark, CreditCard, ChevronRight } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceAccount } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
+import { ICON_MAP } from '@/lib/iconMap';
 
 interface AccountCardProps {
   account: FinanceAccount;
@@ -25,19 +26,15 @@ function BankAvatar({ account }: { account: FinanceAccount }) {
     );
   }
 
-  // Fallback: use icon field
-  const iconMap: Record<string, typeof Wallet> = {
-    Wallet, Landmark, CreditCard,
-    Building2: Landmark,
-  };
-  const Icon = iconMap[account.icon] || Wallet;
+  // Fallback: use icon field mapped to AppIcon
+  const iconName = account.icon || 'Wallet';
 
   return (
     <div
       className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
       style={{ backgroundColor: account.color + '20' }}
     >
-      <Icon className="w-5 h-5" style={{ color: account.color }} />
+      <AppIcon name={iconName} size={20} style={{ color: account.color }} />
     </div>
   );
 }
@@ -64,7 +61,7 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
       )}>
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
       </p>
-      {onClick && <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
+      {onClick && <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />}
     </button>
   );
 }

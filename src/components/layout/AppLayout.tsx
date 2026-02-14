@@ -1,9 +1,7 @@
 import { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard, Package, ClipboardCheck, Settings, LogOut, Menu, X,
-  User, Shield, Gift, CalendarDays, DollarSign, Receipt, ChefHat, Users, Bell, ChevronRight, Building2, ChevronDown, MessageCircle, Monitor, MessageSquare, BookOpen, ShoppingCart, Megaphone
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
@@ -28,7 +26,7 @@ interface AppLayoutProps {
 }
 
 interface NavItem {
-  icon: typeof Package;
+  icon: string; // Material icon name via AppIcon
   label: string;
   href: string;
   adminOnly?: boolean;
@@ -37,22 +35,22 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
-  { icon: CalendarDays, label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
-  { icon: DollarSign, label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: Package, label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: ShoppingCart, label: 'Pedidos', href: '/orders', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: ClipboardCheck, label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
-  { icon: Receipt, label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
-  { icon: ChefHat, label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: Users, label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: Gift, label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: MessageCircle, label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: Monitor, label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'producao', groupLabel: 'Em Produção' },
-  { icon: BookOpen, label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: MessageSquare, label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: Megaphone, label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: Settings, label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
+  { icon: 'LayoutDashboard', label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
+  { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
+  { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'Users', label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'Gift', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'MessageCircle', label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'producao', groupLabel: 'Em Produção' },
+  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'Settings', label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
 ];
 
 function AppLayoutContent({ children }: AppLayoutProps) {
@@ -199,7 +197,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"
               >
-                <MessageCircle className="w-[22px] h-[22px] text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
+                <AppIcon name="MessageCircle" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                 {chatUnreadCount > 0 && (
                   <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
                     {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
@@ -211,7 +209,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <button
                     className="relative p-2 rounded-lg hover:bg-secondary transition-all"
                   >
-                    <Bell className="w-[22px] h-[22px] text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
+                    <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -246,9 +244,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         }}
       >
         {sidebarOpen ? (
-          <X className="w-6 h-6 text-primary-foreground" />
+          <AppIcon name="X" size={24} className="text-primary-foreground" />
         ) : (
-          <Menu className="w-6 h-6 text-primary-foreground" />
+          <AppIcon name="Menu" size={24} className="text-primary-foreground" />
         )}
         {!sidebarOpen && activeUnit && (
           <span
@@ -279,7 +277,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         />
       )}
 
-      {/* ======= Sidebar (OUTSIDE swipeable wrapper) ======= */}
+      {/* ======= Sidebar ======= */}
       <aside
         onTouchStart={sidebarTouchStart}
         onTouchMove={sidebarTouchMove}
@@ -316,7 +314,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-2 rounded-xl hover:bg-secondary active:scale-95 transition-all"
           >
-            <X className="w-4 h-4 text-muted-foreground" />
+            <AppIcon name="X" size={16} className="text-muted-foreground" />
           </button>
         </div>
 
@@ -333,12 +331,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   border: '1px solid hsl(var(--neon-cyan) / 0.15)',
                 }}
               >
-                <Building2 className="w-4 h-4 text-primary shrink-0" />
+                <AppIcon name="Building2" size={16} className="text-primary shrink-0" />
                 <span className="flex-1 text-left truncate text-foreground">
                   {activeUnit?.name || 'Selecionar Unidade'}
                 </span>
-                <ChevronDown className={cn(
-                  "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+                <AppIcon name="ChevronDown" size={14} className={cn(
+                  "text-muted-foreground transition-transform duration-200",
                   unitDropdownOpen && "rotate-180"
                 )} />
               </button>
@@ -473,10 +471,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               } : undefined}
                             >
                               <div className="relative">
-                                <item.icon className={cn(
-                                  "w-[18px] h-[18px]",
-                                  isActive ? "text-primary" : ""
-                                )} style={isActive ? { filter: 'drop-shadow(0 0 5px hsl(217 91% 60% / 0.6))' } : undefined} />
+                                <AppIcon
+                                  name={item.icon}
+                                  size={18}
+                                  className={cn(isActive ? "text-primary" : "")}
+                                  style={isActive ? { filter: 'drop-shadow(0 0 5px hsl(217 91% 60% / 0.6))' } : undefined}
+                                />
                                 {showBadge && (
                                   <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">
                                     {badgeCount > 9 ? '9+' : badgeCount}
@@ -522,7 +522,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                 }}
                               />
                             ) : isActive ? (
-                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
+                              <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
                             ) : null}
                           </Link>
                         </TooltipTrigger>
@@ -548,7 +548,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all active:scale-[0.98] group"
           >
             <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-destructive/10 transition-colors">
-              <LogOut className="w-[18px] h-[18px]" />
+              <AppIcon name="LogOut" size={18} />
             </div>
             <span className="font-medium">Sair</span>
           </button>

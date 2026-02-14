@@ -16,11 +16,11 @@
 
 @layer base {
   :root {
-    /* Dark Command Center palette */
-    --background: 222 50% 5%;
+    /* Dark Command Center palette — refined */
+    --background: 222 70% 4%;
     --foreground: 210 40% 96%;
 
-    --card: 222 45% 8%;
+    --card: 222 45% 9%;
     --card-foreground: 210 40% 96%;
 
     --popover: 222 45% 9%;
@@ -47,7 +47,7 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 222 20% 14%;
+    --border: 215 28% 17%;
     --input: 222 30% 11%;
     --ring: 217 91% 60%;
 
@@ -243,7 +243,8 @@
     border: 1px solid hsl(var(--primary) / 0.15);
   }
 
-  .page-header-icon svg {
+  .page-header-icon svg,
+  .page-header-icon .material-icons-round {
     filter: drop-shadow(0 0 6px currentColor);
   }
 
@@ -253,7 +254,8 @@
     border-color: hsl(0 0% 100% / 0.08);
   }
 
-  .stat-icon svg {
+  .stat-icon svg,
+  .stat-icon .material-icons-round {
     filter: drop-shadow(0 0 5px currentColor);
   }
 
@@ -272,13 +274,16 @@
     border: 1px solid hsl(0 0% 100% / 0.06);
   }
 
-  .icon-glow svg {
+  .icon-glow svg,
+  .icon-glow .material-icons-round {
     filter: drop-shadow(0 0 6px currentColor);
     transition: filter 0.2s ease;
   }
 
   .icon-glow:hover svg,
-  .icon-glow:active svg {
+  .icon-glow:active svg,
+  .icon-glow:hover .material-icons-round,
+  .icon-glow:active .material-icons-round {
     filter: drop-shadow(0 0 10px currentColor);
   }
 

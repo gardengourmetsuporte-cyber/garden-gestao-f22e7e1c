@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Package, AlertTriangle, PackageX, ArrowRightLeft, Plus, History, ClipboardList, ChevronDown, ChevronUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useInventoryDB } from '@/hooks/useInventoryDB';
 import { useCategories } from '@/hooks/useCategories';
@@ -196,7 +197,7 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                  <div className="icon-glow icon-glow-md icon-glow-primary">
-                   <Package className="w-5 h-5" />
+                   <AppIcon name="Package" size={20} />
                 </div>
                 <div>
                   <h1 className="page-title">Controle de Estoque</h1>
@@ -208,7 +209,7 @@ export default function InventoryPage() {
                   onClick={handleAddItem}
                   className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg shadow-primary/30"
                 >
-                  <Plus className="w-6 h-6" />
+                  <AppIcon name="Plus" size={24} />
                 </button>
               )}
             </div>
@@ -275,7 +276,7 @@ export default function InventoryPage() {
                 view === 'items' ? 'tab-command-active' : 'tab-command-inactive'
               )}
             >
-              <ClipboardList className="w-4 h-4" />
+              <AppIcon name="ClipboardList" size={16} />
               Itens
             </button>
             <button
@@ -285,7 +286,7 @@ export default function InventoryPage() {
                 view === 'history' ? 'tab-command-active' : 'tab-command-inactive'
               )}
             >
-              <History className="w-4 h-4" />
+              <AppIcon name="History" size={16} />
               Histórico
             </button>
           </div>
@@ -304,7 +305,7 @@ export default function InventoryPage() {
                 <div className="text-center py-12 text-muted-foreground">
                   {items.length === 0 ? (
                     <>
-                      <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <AppIcon name="Package" size={48} className="mx-auto mb-3 opacity-50" />
                       <p className="font-medium">Nenhum item cadastrado</p>
                       <p className="text-sm mt-1">Toque no + para adicionar</p>
                     </>

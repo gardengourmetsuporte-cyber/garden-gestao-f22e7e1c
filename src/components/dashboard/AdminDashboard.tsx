@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { 
-  Package, ClipboardCheck, Gift, AlertTriangle, ArrowUpRight, ShoppingCart,
-  Settings, AlertCircle, Receipt, Wallet, ChefHat, CalendarDays
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Leaderboard } from './Leaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
@@ -15,7 +13,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 interface MetricCardProps {
   title: string;
   value: string;
-  icon: React.ElementType;
+  icon: string;
   onClick: () => void;
   variant: string;
   subtitle?: string;
@@ -23,7 +21,7 @@ interface MetricCardProps {
   isLoading?: boolean;
 }
 
-function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, index, isLoading }: MetricCardProps) {
+function MetricCard({ title, value, icon, onClick, variant, subtitle, index, isLoading }: MetricCardProps) {
   return (
     <div
       onClick={onClick}
@@ -35,9 +33,9 @@ function MetricCard({ title, value, icon: Icon, onClick, variant, subtitle, inde
     >
       <div className="flex items-start justify-between">
         <div className="icon-glow icon-glow-md icon-glow-muted">
-          <Icon className="w-5 h-5" />
+          <AppIcon name={icon} size={20} />
         </div>
-        <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
+        <AppIcon name="ArrowUpRight" size={16} className="text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
       </div>
       <div className="mt-3">
         {isLoading ? (
@@ -86,12 +84,12 @@ function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
       )}
     >
       <div className="flex items-center gap-2.5">
-        <AlertCircle className={cn("w-4 h-4", severity === 'error' ? 'text-destructive' : severity === 'warning' ? 'text-warning' : 'text-primary')} />
+        <AppIcon name="AlertCircle" size={16} className={cn(severity === 'error' ? 'text-destructive' : severity === 'warning' ? 'text-warning' : 'text-primary')} />
         <span className="text-xs text-foreground">{message}</span>
       </div>
       <div className="flex items-center gap-1.5">
         <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", severityStyles[severity])}>{count}</span>
-        <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        <AppIcon name="ArrowUpRight" size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>
   );
@@ -99,18 +97,18 @@ function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
 
 interface PillButtonProps {
   label: string;
-  icon: React.ElementType;
+  icon: string;
   onClick: () => void;
   badge?: string;
 }
 
-function PillButton({ label, icon: Icon, onClick, badge }: PillButtonProps) {
+function PillButton({ label, icon, onClick, badge }: PillButtonProps) {
   return (
     <button
       onClick={onClick}
       className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-card/80 border border-border/30 whitespace-nowrap active:scale-95 transition-all hover:border-primary/30 shrink-0"
     >
-      <Icon className="w-4 h-4 text-primary" />
+      <AppIcon name={icon} size={16} className="text-primary" />
       <span className="text-xs font-medium text-foreground">{label}</span>
       {badge && (
         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">{badge}</span>
@@ -160,7 +158,7 @@ export function AdminDashboard() {
         <MetricCard
           title="Saldo do Mês"
           value={formatCurrency(animatedBalance)}
-          icon={Wallet}
+          icon="Wallet"
           variant={stats.monthBalance >= 0 ? "stat-command-green" : "stat-command-red"}
           onClick={() => navigate('/finance')}
           subtitle={stats.monthBalance >= 0 ? 'positivo' : 'negativo'}
@@ -170,7 +168,7 @@ export function AdminDashboard() {
         <MetricCard
           title="Pedidos Pendentes"
           value={String(animatedOrders)}
-          icon={ShoppingCart}
+          icon="ShoppingCart"
           variant="stat-command-amber"
           onClick={() => navigate('/inventory', { state: { activeTab: 'orders' } })}
           subtitle={stats.pendingOrders > 0 ? 'aguardando' : 'nenhum'}
@@ -180,7 +178,7 @@ export function AdminDashboard() {
         <MetricCard
           title="Fichas Técnicas"
           value={String(animatedRecipes)}
-          icon={ChefHat}
+          icon="ChefHat"
           variant="stat-command-purple"
           onClick={() => navigate('/recipes')}
           subtitle="cadastradas"
@@ -190,7 +188,7 @@ export function AdminDashboard() {
         <MetricCard
           title="Estoque Crítico"
           value={String(animatedCritical)}
-          icon={AlertTriangle}
+          icon="AlertTriangle"
           variant="stat-command-red"
           onClick={() => navigate('/inventory', { state: { stockFilter: 'critical' } })}
           subtitle={stats.criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
@@ -203,7 +201,7 @@ export function AdminDashboard() {
       {hasAlerts && (
         <div className="card-command-warning p-4 animate-slide-up stagger-5">
           <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-warning" />
+            <AppIcon name="AlertTriangle" size={16} className="text-warning" />
             <h3 className="font-semibold text-sm text-foreground">Ações Pendentes</h3>
           </div>
           <div className="space-y-1">
@@ -225,13 +223,13 @@ export function AdminDashboard() {
         <h3 className="section-label mb-2">Acesso Rápido</h3>
         <ScrollArea className="w-full">
           <div className="flex gap-2 pb-2">
-            <PillButton label="Financeiro" icon={Wallet} onClick={() => navigate('/finance')} />
-            <PillButton label="Agenda" icon={CalendarDays} onClick={() => navigate('/agenda')} />
-            <PillButton label="Estoque" icon={Package} onClick={() => navigate('/inventory')} badge={stats.criticalItems > 0 ? `${stats.criticalItems}` : undefined} />
-            <PillButton label="Checklists" icon={ClipboardCheck} onClick={() => navigate('/checklists')} />
-            <PillButton label="Fechamento" icon={Receipt} onClick={() => navigate('/cash-closing')} badge={stats.pendingClosings > 0 ? `${stats.pendingClosings}` : undefined} />
-            <PillButton label="Recompensas" icon={Gift} onClick={() => navigate('/rewards')} badge={stats.pendingRedemptions > 0 ? `${stats.pendingRedemptions}` : undefined} />
-            <PillButton label="Config." icon={Settings} onClick={() => navigate('/settings')} />
+            <PillButton label="Financeiro" icon="Wallet" onClick={() => navigate('/finance')} />
+            <PillButton label="Agenda" icon="CalendarDays" onClick={() => navigate('/agenda')} />
+            <PillButton label="Estoque" icon="Package" onClick={() => navigate('/inventory')} badge={stats.criticalItems > 0 ? `${stats.criticalItems}` : undefined} />
+            <PillButton label="Checklists" icon="ClipboardCheck" onClick={() => navigate('/checklists')} />
+            <PillButton label="Fechamento" icon="Receipt" onClick={() => navigate('/cash-closing')} badge={stats.pendingClosings > 0 ? `${stats.pendingClosings}` : undefined} />
+            <PillButton label="Recompensas" icon="Gift" onClick={() => navigate('/rewards')} badge={stats.pendingRedemptions > 0 ? `${stats.pendingRedemptions}` : undefined} />
+            <PillButton label="Config." icon="Settings" onClick={() => navigate('/settings')} />
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>

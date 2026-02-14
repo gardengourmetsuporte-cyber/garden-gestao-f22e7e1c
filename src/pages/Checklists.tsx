@@ -7,7 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
-import { ClipboardCheck, Settings, Sun, Moon, CalendarIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
+import { CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -153,7 +154,7 @@ export default function ChecklistsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                  <div className="icon-glow icon-glow-md icon-glow-success">
-                   <ClipboardCheck className="w-5 h-5" />
+                   <AppIcon name="ClipboardCheck" size={20} />
                 </div>
                 <div>
                   <h1 className="page-title">Checklists</h1>
@@ -170,7 +171,7 @@ export default function ChecklistsPage() {
                       : "bg-secondary text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Settings className="w-5 h-5" />
+                  <AppIcon name="Settings" size={20} />
                 </button>
               )}
             </div>
@@ -213,8 +214,8 @@ export default function ChecklistsPage() {
                   )}
                   style={checklistType === 'abertura' ? { borderColor: 'hsl(38 92% 50% / 0.4)', boxShadow: '0 0 12px hsl(38 92% 50% / 0.15)' } : undefined}
                 >
-                  <Sun className="w-5 h-5" />
-                  <span className="font-bold text-sm">Abertura</span>
+                  <AppIcon name="Sun" size={20} />
+                   <span className="font-bold text-sm">Abertura</span>
                 </button>
 
                 <button
@@ -225,8 +226,8 @@ export default function ChecklistsPage() {
                   )}
                   style={checklistType === 'fechamento' ? { borderColor: 'hsl(262 80% 65% / 0.4)', boxShadow: '0 0 12px hsl(262 80% 65% / 0.15)' } : undefined}
                 >
-                  <Moon className="w-5 h-5" />
-                  <span className="font-bold text-sm">Fechamento</span>
+                  <AppIcon name="Moon" size={20} />
+                   <span className="font-bold text-sm">Fechamento</span>
                 </button>
               </div>
 
@@ -248,7 +249,7 @@ export default function ChecklistsPage() {
               {/* Settings Header */}
               <div className="card-command p-4">
                 <div className="flex items-center gap-3">
-                  <ClipboardCheck className="w-5 h-5 text-primary" />
+                  <AppIcon name="ClipboardCheck" size={20} className="text-primary" />
                   <div>
                     <h2 className="font-semibold text-foreground">Configurar Checklists</h2>
                     <p className="text-sm text-muted-foreground">
@@ -268,8 +269,8 @@ export default function ChecklistsPage() {
                   )}
                   style={settingsType === 'abertura' ? { borderColor: 'hsl(38 92% 50% / 0.4)', boxShadow: '0 0 12px hsl(38 92% 50% / 0.15)' } : undefined}
                 >
-                  <Sun className="w-5 h-5" />
-                  <span className="font-semibold">Abertura</span>
+                  <AppIcon name="Sun" size={20} />
+                   <span className="font-semibold">Abertura</span>
                 </button>
                 <button
                   onClick={() => setSettingsType('fechamento')}
@@ -279,8 +280,8 @@ export default function ChecklistsPage() {
                   )}
                   style={settingsType === 'fechamento' ? { borderColor: 'hsl(262 80% 65% / 0.4)', boxShadow: '0 0 12px hsl(262 80% 65% / 0.15)' } : undefined}
                 >
-                  <Moon className="w-5 h-5" />
-                  <span className="font-semibold">Fechamento</span>
+                  <AppIcon name="Moon" size={20} />
+                   <span className="font-semibold">Fechamento</span>
                 </button>
               </div>
 

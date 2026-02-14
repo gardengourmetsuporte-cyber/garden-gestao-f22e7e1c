@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, ArrowLeft, Plus, Users, Megaphone, Camera } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { format, isToday, isYesterday } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -138,7 +138,7 @@ export default function Chat() {
           <div className="page-header-content flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-secondary/80 flex items-center justify-center">
-                <Users className="w-5 h-5 text-muted-foreground" />
+                <AppIcon name="Users" size={20} className="text-muted-foreground" />
               </div>
               <div>
                 <h1 className="text-lg font-bold">Mensagens</h1>
@@ -154,7 +154,7 @@ export default function Chat() {
                 className="w-9 h-9 rounded-xl"
                 title="Novo grupo"
               >
-                <Users className="w-5 h-5" />
+                <AppIcon name="Users" size={20} />
               </Button>
               <Button
                 size="icon"
@@ -163,7 +163,7 @@ export default function Chat() {
                 className="w-9 h-9 rounded-xl"
                 title="Novo canal"
               >
-                <Megaphone className="w-5 h-5" />
+                <AppIcon name="Megaphone" size={20} />
               </Button>
             </div>
           )}
@@ -171,7 +171,7 @@ export default function Chat() {
         </header>
         <div className="px-4 pt-3 pb-2">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+          <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -226,9 +226,9 @@ export default function Chat() {
                         }}
                       >
                         {conv.type === 'announcement' ? (
-                          <Megaphone className="w-6 h-6 text-amber-400" />
+                          <AppIcon name="Megaphone" size={24} className="text-amber-400" />
                         ) : (
-                          <Users className="w-6 h-6 text-primary" />
+                          <AppIcon name="Users" size={24} className="text-primary" />
                         )}
                       </div>
                     )}
@@ -293,7 +293,7 @@ export default function Chat() {
         {/* Empty state */}
         {filteredConversations.length === 0 && filteredNewContacts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground/40">
-            <Camera className="w-16 h-16 mb-3 opacity-30" />
+            <AppIcon name="Camera" size={64} className="mb-3 opacity-30" />
             <p className="text-sm font-medium">{search ? 'Nenhum resultado' : 'Nenhuma conversa ainda'}</p>
           </div>
         )}
@@ -356,7 +356,7 @@ export default function Chat() {
             </div>
 
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+              <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
               <Input
                 value={groupSearch}
                 onChange={e => setGroupSearch(e.target.value)}
