@@ -70,7 +70,10 @@ export default function CashClosing() {
           setIsFormOpen(open);
         }}>
           <SheetTrigger asChild>
-            <button className="fab">
+73:             <button 
+              className="fab"
+              style={{ bottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}
+            >
               <AppIcon name="Plus" size={28} />
             </button>
           </SheetTrigger>
