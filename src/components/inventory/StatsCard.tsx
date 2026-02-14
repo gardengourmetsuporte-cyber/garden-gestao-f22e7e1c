@@ -1,10 +1,10 @@
-import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface StatsCardProps {
   title: string;
   value: number | string;
-  icon: LucideIcon;
+  icon: string;
   variant?: 'default' | 'success' | 'warning' | 'destructive';
   onClick?: () => void;
 }
@@ -16,7 +16,7 @@ const variantMap = {
   destructive: { stat: 'stat-command-red', iconCls: 'icon-glow icon-glow-md icon-glow-destructive' },
 };
 
-export function StatsCard({ title, value, icon: Icon, variant = 'default', onClick }: StatsCardProps) {
+export function StatsCard({ title, value, icon, variant = 'default', onClick }: StatsCardProps) {
   const styles = variantMap[variant];
 
   return (
@@ -30,7 +30,7 @@ export function StatsCard({ title, value, icon: Icon, variant = 'default', onCli
           <p className="stat-value mt-1">{value}</p>
         </div>
         <div className={cn("stat-icon", styles.iconCls)}>
-          <Icon className="w-5 h-5" />
+          <AppIcon name={icon} size={20} />
         </div>
       </div>
     </button>
