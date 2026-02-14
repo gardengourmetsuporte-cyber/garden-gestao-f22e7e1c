@@ -26,7 +26,7 @@ interface AppLayoutProps {
 }
 
 interface NavItem {
-  icon: string; // Material icon name via AppIcon
+  icon: string;
   label: string;
   href: string;
   adminOnly?: boolean;
@@ -34,24 +34,24 @@ interface NavItem {
   groupLabel: string;
 }
 
-// Module icon theme: rich 3D gradients with depth & glow
-const MODULE_THEMES: Record<string, { gradient: string; shadow: string; iconColor: string; ring: string }> = {
-  '/':             { gradient: 'linear-gradient(145deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%)', shadow: '0 6px 20px rgba(99,102,241,0.5), 0 2px 6px rgba(79,70,229,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(129,140,248,0.4)' },
-  '/agenda':       { gradient: 'linear-gradient(145deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%)', shadow: '0 6px 20px rgba(245,158,11,0.5), 0 2px 6px rgba(217,119,6,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(252,211,77,0.4)' },
-  '/finance':      { gradient: 'linear-gradient(145deg, #6ee7b7 0%, #10b981 50%, #059669 100%)', shadow: '0 6px 20px rgba(16,185,129,0.5), 0 2px 6px rgba(5,150,105,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(110,231,183,0.4)' },
-  '/inventory':    { gradient: 'linear-gradient(145deg, #fdba74 0%, #f97316 50%, #ea580c 100%)', shadow: '0 6px 20px rgba(249,115,22,0.5), 0 2px 6px rgba(234,88,12,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(253,186,116,0.4)' },
-  '/orders':       { gradient: 'linear-gradient(145deg, #93c5fd 0%, #3b82f6 50%, #2563eb 100%)', shadow: '0 6px 20px rgba(59,130,246,0.5), 0 2px 6px rgba(37,99,235,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(147,197,253,0.4)' },
-  '/checklists':   { gradient: 'linear-gradient(145deg, #c4b5fd 0%, #8b5cf6 50%, #7c3aed 100%)', shadow: '0 6px 20px rgba(139,92,246,0.5), 0 2px 6px rgba(124,58,237,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(196,181,253,0.4)' },
-  '/cash-closing': { gradient: 'linear-gradient(145deg, #f9a8d4 0%, #ec4899 50%, #db2777 100%)', shadow: '0 6px 20px rgba(236,72,153,0.5), 0 2px 6px rgba(219,39,119,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(249,168,212,0.4)' },
-  '/recipes':      { gradient: 'linear-gradient(145deg, #fca5a5 0%, #ef4444 50%, #dc2626 100%)', shadow: '0 6px 20px rgba(239,68,68,0.5), 0 2px 6px rgba(220,38,38,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(252,165,165,0.4)' },
-  '/employees':    { gradient: 'linear-gradient(145deg, #67e8f9 0%, #06b6d4 50%, #0891b2 100%)', shadow: '0 6px 20px rgba(6,182,212,0.5), 0 2px 6px rgba(8,145,178,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(103,232,249,0.4)' },
-  '/rewards':      { gradient: 'linear-gradient(145deg, #fde68a 0%, #eab308 50%, #ca8a04 100%)', shadow: '0 6px 20px rgba(234,179,8,0.5), 0 2px 6px rgba(202,138,4,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(253,230,138,0.4)' },
-  '/chat':         { gradient: 'linear-gradient(145deg, #5eead4 0%, #14b8a6 50%, #0d9488 100%)', shadow: '0 6px 20px rgba(20,184,166,0.5), 0 2px 6px rgba(13,148,136,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(94,234,212,0.4)' },
-  '/tablet-admin': { gradient: 'linear-gradient(145deg, #cbd5e1 0%, #64748b 50%, #475569 100%)', shadow: '0 6px 20px rgba(100,116,139,0.5), 0 2px 6px rgba(71,85,105,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(203,213,225,0.4)' },
-  '/cardapio':     { gradient: 'linear-gradient(145deg, #f0abfc 0%, #d946ef 50%, #c026d3 100%)', shadow: '0 6px 20px rgba(217,70,239,0.5), 0 2px 6px rgba(192,38,211,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(240,171,252,0.4)' },
-  '/whatsapp':     { gradient: 'linear-gradient(145deg, #86efac 0%, #22c55e 50%, #16a34a 100%)', shadow: '0 6px 20px rgba(34,197,94,0.5), 0 2px 6px rgba(22,163,74,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(134,239,172,0.4)' },
-  '/marketing':    { gradient: 'linear-gradient(145deg, #fda4af 0%, #f43f5e 50%, #e11d48 100%)', shadow: '0 6px 20px rgba(244,63,94,0.5), 0 2px 6px rgba(225,29,72,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(253,164,175,0.4)' },
-  '/settings':     { gradient: 'linear-gradient(145deg, #94a3b8 0%, #64748b 50%, #475569 100%)', shadow: '0 6px 20px rgba(71,85,105,0.45), 0 2px 6px rgba(51,65,85,0.3), inset 0 -2px 4px rgba(0,0,0,0.15)', iconColor: '#fff', ring: 'rgba(148,163,184,0.4)' },
+// Clean, flat icon colors — one accent per module
+const MODULE_COLORS: Record<string, string> = {
+  '/':             'hsl(var(--primary))',
+  '/agenda':       'hsl(var(--neon-amber))',
+  '/finance':      'hsl(var(--neon-green))',
+  '/inventory':    'hsl(38 92% 55%)',
+  '/orders':       'hsl(var(--primary))',
+  '/checklists':   'hsl(var(--neon-purple))',
+  '/cash-closing': 'hsl(328 85% 58%)',
+  '/recipes':      'hsl(var(--neon-red))',
+  '/employees':    'hsl(var(--neon-cyan))',
+  '/rewards':      'hsl(45 96% 56%)',
+  '/chat':         'hsl(168 76% 42%)',
+  '/tablet-admin': 'hsl(215 20% 50%)',
+  '/cardapio':     'hsl(292 80% 58%)',
+  '/whatsapp':     'hsl(142 71% 45%)',
+  '/marketing':    'hsl(350 85% 55%)',
+  '/settings':     'hsl(215 20% 55%)',
 };
 
 const navItems: NavItem[] = [
@@ -78,7 +78,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -126,10 +125,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   useTimeAlerts();
   const navRef = useRef<HTMLElement>(null);
 
-  // Pages with bottom navigation bars that conflict with the FAB
   const hasBottomNav = location.pathname === '/finance';
 
-  // Scroll sidebar nav to active item when opened
   useEffect(() => {
     if (sidebarOpen && navRef.current) {
       const activeLink = navRef.current.querySelector('[data-active="true"]');
@@ -148,7 +145,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
 
-  // Group nav items by group
   const groupedNav: { label: string; items: typeof filteredNavItems }[] = [];
   const seenGroups = new Set<string>();
   filteredNavItems.forEach(item => {
@@ -163,7 +159,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      
 
       {/* ======= Mobile Header ======= */}
       <header
@@ -196,9 +191,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button
-                    className="relative p-2 rounded-lg hover:bg-secondary transition-all"
-                  >
+                  <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
@@ -218,7 +211,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       </header>
 
       {/* ======= Expandable FAB ======= */}
-      {/* Overlay when FAB is open */}
       {fabOpen && (
         <div
           className="lg:hidden fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm animate-fade-in"
@@ -226,7 +218,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         />
       )}
 
-      {/* FAB sub-actions */}
       {fabOpen && !sidebarOpen && (
         <div
           className="lg:hidden fixed z-[60] flex flex-col-reverse items-center gap-3"
@@ -238,7 +229,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             paddingBottom: '64px',
           }}
         >
-          {/* Menu button */}
           <button
             onClick={() => { setFabOpen(false); setSidebarOpen(true); }}
             className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
@@ -246,21 +236,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           >
             <AppIcon name="Menu" size={20} className="text-foreground" />
           </button>
-
-          {/* Home button */}
-          {(
-            <button
-              onClick={() => { setFabOpen(false); navigate('/'); }}
-              className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
-              style={{ animationDelay: '80ms', boxShadow: '0 4px 16px hsl(222 50% 3% / 0.5)' }}
-            >
-              <AppIcon name="Home" size={20} className="text-foreground" />
-            </button>
-          )}
+          <button
+            onClick={() => { setFabOpen(false); navigate('/'); }}
+            className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
+            style={{ animationDelay: '80ms', boxShadow: '0 4px 16px hsl(222 50% 3% / 0.5)' }}
+          >
+            <AppIcon name="Home" size={20} className="text-foreground" />
+          </button>
         </div>
       )}
 
-      {/* Main FAB button */}
       <button
         onClick={() => {
           if (sidebarOpen) {
@@ -310,92 +295,101 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Bottom Sheet Menu (Drawer) ======= */}
       <Drawer open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <DrawerContent className="border-t max-h-[90vh] rounded-t-3xl" style={{
+        <DrawerContent className="border-t-0 max-h-[92vh] rounded-t-3xl overflow-hidden" style={{
           background: 'hsl(var(--background))',
-          borderColor: 'hsl(var(--border) / 0.2)',
         }}>
           {/* Handle */}
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 rounded-full" style={{ background: 'hsl(var(--muted-foreground) / 0.25)' }} />
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
           </div>
 
-          {/* Header: Logo + Unit + Profile */}
-          <div className="flex items-center gap-3 px-5 pb-3">
-            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0" style={{
-              border: '1px solid hsl(var(--primary) / 0.2)',
-              boxShadow: '0 0 12px hsl(var(--primary) / 0.1)',
-            }}>
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg" />
+          {/* Profile Card */}
+          <div className="mx-4 mb-4 p-4 rounded-2xl" style={{
+            background: 'hsl(var(--card))',
+            border: '1px solid hsl(var(--border) / 0.3)',
+          }}>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }} 
+                className="shrink-0 active:scale-90 transition-transform"
+              >
+                <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} />
+              </button>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">
+                  {profile?.full_name || 'Usuário'}
+                </p>
+                <p className="text-[11px] font-medium mt-0.5" style={{ color: rank.color }}>
+                  {rank.title} · {earnedPoints} pts
+                </p>
+              </div>
+              <button
+                onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
+                className="p-2 rounded-xl transition-colors hover:bg-secondary/60"
+              >
+                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+              </button>
             </div>
 
-            {units.length > 0 ? (
-              <div className="flex-1 min-w-0 relative">
-                <button
-                  onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all w-full"
-                  style={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border) / 0.3)',
-                  }}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{
-                    background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
-                    boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : undefined,
-                  }} />
-                  <span className="flex-1 text-left truncate text-foreground">{activeUnit?.name || 'Unidade'}</span>
-                  <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200", unitDropdownOpen && "rotate-180")} />
-                </button>
-                {unitDropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1" style={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border) / 0.4)',
-                    boxShadow: 'var(--shadow-elevated)',
-                  }}>
-                    {units.map(unit => (
-                      <button
-                        key={unit.id}
-                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                        className={cn(
-                          "w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all",
-                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                        )}
-                      >
-                        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
-                        <span className="truncate">{unit.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex-1">
-                <h1 className="font-bold text-sm text-foreground">Garden</h1>
+            {/* Unit selector inline */}
+            {units.length > 0 && (
+              <div className="mt-3 pt-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.2)' }}>
+                <div className="relative">
+                  <button
+                    onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium transition-all"
+                    style={{
+                      background: 'hsl(var(--secondary) / 0.6)',
+                      border: '1px solid hsl(var(--border) / 0.2)',
+                    }}
+                  >
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{
+                      background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
+                      boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : undefined,
+                    }} />
+                    <span className="flex-1 text-left truncate text-foreground">{activeUnit?.name || 'Unidade'}</span>
+                    <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200", unitDropdownOpen && "rotate-180")} />
+                  </button>
+                  {unitDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1" style={{
+                      background: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border) / 0.4)',
+                      boxShadow: 'var(--shadow-elevated)',
+                    }}>
+                      {units.map(unit => (
+                        <button
+                          key={unit.id}
+                          onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                          className={cn(
+                            "w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all",
+                            unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                          )}
+                        >
+                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
+                          <span className="truncate">{unit.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-
-            <button onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }} className="shrink-0 active:scale-90 transition-transform">
-              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={36} />
-            </button>
           </div>
 
-          {/* Navigation */}
-          <nav ref={navRef} className="flex-1 overflow-y-auto px-5 pb-8">
+          {/* Navigation Grid */}
+          <nav ref={navRef} className="flex-1 overflow-y-auto px-4 pb-8">
             {groupedNav.map((group, gi) => (
               <div key={group.label} className={cn(gi > 0 && "mt-5")}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-px flex-1" style={{ background: 'hsl(var(--border) / 0.15)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-1" style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>
-                    {group.label}
-                  </span>
-                  <div className="h-px flex-1" style={{ background: 'hsl(var(--border) / 0.15)' }} />
-                </div>
-                <div className="grid grid-cols-4 gap-x-2 gap-y-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40 px-1 mb-2.5 block">
+                  {group.label}
+                </span>
+                <div className="grid grid-cols-4 gap-3">
                   {group.items.map((item, idx) => {
                     const isActive = location.pathname === item.href;
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
                     const moduleStatus = moduleStatuses[item.href];
-                    const theme = MODULE_THEMES[item.href] || MODULE_THEMES['/'];
+                    const accentColor = MODULE_COLORS[item.href] || 'hsl(var(--primary))';
 
                     return (
                       <Link
@@ -404,58 +398,45 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         data-active={isActive}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          "flex flex-col items-center gap-2 py-1 text-center transition-all duration-200 relative active:scale-[0.88]",
+                          "flex flex-col items-center gap-1.5 py-2 text-center transition-all duration-200 relative active:scale-[0.92] rounded-xl",
                           "animate-fade-in",
                         )}
-                        style={{ animationDelay: `${(gi * 4 + idx) * 30}ms` }}
+                        style={{ animationDelay: `${(gi * 4 + idx) * 25}ms` }}
                       >
                         <div className="relative">
-                          {/* Glow behind active icon */}
-                          {isActive && (
-                            <div className="absolute inset-0 rounded-[18px] pointer-events-none" style={{
-                              background: `radial-gradient(circle, ${theme.ring} 0%, transparent 70%)`,
-                              transform: 'scale(1.6)',
-                              filter: 'blur(6px)',
-                            }} />
-                          )}
+                          {/* Icon container — clean rounded square */}
                           <div
-                            className="relative w-[54px] h-[54px] rounded-[16px] flex items-center justify-center overflow-hidden transition-transform duration-200"
+                            className={cn(
+                              "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200",
+                            )}
                             style={{
-                              background: theme.gradient,
+                              background: isActive
+                                ? accentColor
+                                : 'hsl(var(--secondary))',
                               boxShadow: isActive
-                                ? theme.shadow
-                                : `0 4px 12px rgba(0,0,0,0.25), inset 0 -2px 4px rgba(0,0,0,0.12)`,
-                              transform: isActive ? 'scale(1.1) translateY(-2px)' : undefined,
+                                ? `0 4px 16px ${accentColor.replace(')', ' / 0.35)')}, 0 0 24px ${accentColor.replace(')', ' / 0.15)')}`
+                                : 'none',
+                              border: isActive
+                                ? 'none'
+                                : '1px solid hsl(var(--border) / 0.3)',
                             }}
                           >
                             <AppIcon
                               name={item.icon}
-                              size={24}
+                              size={22}
                               style={{
-                                color: theme.iconColor,
-                                filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
+                                color: isActive ? '#fff' : accentColor,
+                                filter: isActive ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
-                            {/* Glass highlight top half */}
-                            <div className="absolute top-0 left-0 w-full h-[55%] pointer-events-none rounded-t-[16px]" style={{
-                              background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 70%, transparent 100%)',
-                            }} />
-                            {/* Bottom depth */}
-                            <div className="absolute bottom-0 left-0 w-full h-[30%] pointer-events-none rounded-b-[16px]" style={{
-                              background: 'linear-gradient(0deg, rgba(0,0,0,0.12) 0%, transparent 100%)',
-                            }} />
-                            {/* Corner specular */}
-                            <div className="absolute top-[4px] left-[4px] w-3 h-3 rounded-full pointer-events-none" style={{
-                              background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
-                            }} />
                           </div>
 
                           {/* Badges */}
                           {showBadge && (
-                            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse border-2" style={{
+                            <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse" style={{
                               background: 'hsl(var(--destructive))',
                               color: 'hsl(var(--destructive-foreground))',
-                              borderColor: 'hsl(var(--background))',
+                              border: '2px solid hsl(var(--background))',
                             }}>
                               {badgeCount > 9 ? '9+' : badgeCount}
                             </span>
@@ -463,13 +444,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
                             <span
                               className={cn(
-                                "absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full text-[8px] font-bold flex items-center justify-center border-2",
+                                "absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center",
                                 (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
                               )}
                               style={{
                                 background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
                                 color: moduleStatus.level === 'critical' ? '#fff' : '#000',
-                                borderColor: 'hsl(var(--background))',
+                                border: '2px solid hsl(var(--background))',
                               }}
                             >
                               {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
@@ -495,11 +476,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             ))}
 
             {/* Logout */}
-            <div className="mt-6 pt-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.15)' }}>
+            <div className="mt-6 pt-4" style={{ borderTop: '1px solid hsl(var(--border) / 0.15)' }}>
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.97]"
-                style={{ color: 'hsl(var(--muted-foreground))' }}
+                className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.97] text-muted-foreground hover:text-foreground hover:bg-secondary/40"
               >
                 <AppIcon name="LogOut" size={16} />
                 <span className="font-medium">Sair da conta</span>
@@ -508,7 +488,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           </nav>
         </DrawerContent>
       </Drawer>
-
 
       {/* Unit transition overlay */}
       {isTransitioning && (
