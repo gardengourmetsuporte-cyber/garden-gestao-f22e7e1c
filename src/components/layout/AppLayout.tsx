@@ -256,7 +256,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           }
         }}
         className={cn(
-          "lg:hidden fixed z-[70] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
+          "lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
           (fabOpen || sidebarOpen) ? "rotate-180 scale-90" : "hover:scale-105"
         )}
         style={{
