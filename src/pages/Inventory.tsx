@@ -222,28 +222,28 @@ export default function InventoryPage() {
             <StatsCard
               title="Total de Itens"
               value={items.length}
-              icon={Package}
+              icon="Package"
               variant="default"
               onClick={() => handleStockFilterClick('all')}
             />
             <StatsCard
               title="Estoque Baixo"
               value={lowStockItems.length}
-              icon={AlertTriangle}
+              icon="AlertTriangle"
               variant={lowStockItems.length > 0 ? 'warning' : 'default'}
               onClick={() => handleStockFilterClick('low')}
             />
             <StatsCard
               title="Zerados"
               value={outOfStockItems.length}
-              icon={PackageX}
+              icon="PackageX"
               variant={outOfStockItems.length > 0 ? 'destructive' : 'default'}
               onClick={() => handleStockFilterClick('zero')}
             />
             <StatsCard
               title="Movimentações (7d)"
               value={recentMovements.length}
-              icon={ArrowRightLeft}
+              icon="ArrowRightLeft"
               variant="success"
               onClick={() => { setView('history'); setStockFilter(null); }}
             />

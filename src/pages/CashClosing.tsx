@@ -143,7 +143,7 @@ function EmployeeClosingView({
     return (
       <div className={`${config.cardClass} p-6 text-center`}>
         <div className={`w-16 h-16 mx-auto rounded-full ${config.iconBg} flex items-center justify-center mb-4`}>
-          <Icon className={`w-8 h-8 ${config.iconColor}`} />
+          <Icon />
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">{config.title}</h3>
         <p className="text-muted-foreground text-sm capitalize mb-1">{formattedDate}</p>
