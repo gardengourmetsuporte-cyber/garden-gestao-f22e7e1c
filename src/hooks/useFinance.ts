@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   FinanceAccount, 
   FinanceCategory, 
@@ -16,440 +17,339 @@ import { toast } from 'sonner';
 
 export type RecurringEditMode = 'single' | 'pending' | 'all';
 
+// ---- Fetch helpers ----
+
+async function fetchAccountsData(userId: string, unitId: string | null) {
+  let query = supabase
+    .from('finance_accounts')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .order('created_at');
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data } = await query;
+  return (data || []) as FinanceAccount[];
+}
+
+async function fetchCategoriesData(userId: string, unitId: string | null) {
+  let query = supabase
+    .from('finance_categories')
+    .select('*')
+    .eq('user_id', userId)
+    .order('sort_order');
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data } = await query;
+
+  const all = (data || []) as FinanceCategory[];
+  const parents = all.filter(c => !c.parent_id);
+  return parents.map(parent => ({
+    ...parent,
+    subcategories: all.filter(c => c.parent_id === parent.id)
+  }));
+}
+
+async function fetchTransactionsData(userId: string, unitId: string | null, month: Date) {
+  const startDate = format(startOfMonth(month), 'yyyy-MM-dd');
+  const endDate = format(endOfMonth(month), 'yyyy-MM-dd');
+
+  let query = supabase
+    .from('finance_transactions')
+    .select(`
+      *,
+      category:finance_categories(*),
+      account:finance_accounts!finance_transactions_account_id_fkey(*),
+      to_account:finance_accounts!finance_transactions_to_account_id_fkey(*),
+      supplier:suppliers!finance_transactions_supplier_id_fkey(id, name),
+      employee:employees!finance_transactions_employee_id_fkey(id, full_name)
+    `)
+    .eq('user_id', userId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  if (unitId) query = query.eq('unit_id', unitId);
+  const { data } = await query;
+  return (data || []) as FinanceTransaction[];
+}
+
+async function initializeDefaults(userId: string) {
+  const { data: existingAccounts } = await supabase
+    .from('finance_accounts')
+    .select('id')
+    .eq('user_id', userId)
+    .limit(1);
+
+  if (!existingAccounts || existingAccounts.length === 0) {
+    await supabase.from('finance_accounts').insert({
+      user_id: userId,
+      name: 'Carteira',
+      type: 'wallet',
+      balance: 0,
+      color: '#3b82f6',
+      icon: 'Wallet'
+    });
+  }
+
+  const { data: existingCategories } = await supabase
+    .from('finance_categories')
+    .select('id')
+    .eq('user_id', userId)
+    .limit(1);
+
+  if (!existingCategories || existingCategories.length === 0) {
+    for (let i = 0; i < DEFAULT_EXPENSE_CATEGORIES.length; i++) {
+      const cat = DEFAULT_EXPENSE_CATEGORIES[i];
+      const { data: parentData } = await supabase
+        .from('finance_categories')
+        .insert({
+          user_id: userId, name: cat.name, type: 'expense',
+          icon: cat.icon, color: cat.color, is_system: true, sort_order: i
+        })
+        .select().single();
+
+      if (parentData && cat.subcategories.length > 0) {
+        const subs = cat.subcategories.map((name, j) => ({
+          user_id: userId, name, type: 'expense',
+          icon: cat.icon, color: cat.color,
+          parent_id: parentData.id, is_system: true, sort_order: j
+        }));
+        await supabase.from('finance_categories').insert(subs);
+      }
+    }
+
+    for (let i = 0; i < DEFAULT_INCOME_CATEGORIES.length; i++) {
+      const cat = DEFAULT_INCOME_CATEGORIES[i];
+      const { data: parentData } = await supabase
+        .from('finance_categories')
+        .insert({
+          user_id: userId, name: cat.name, type: 'income',
+          icon: cat.icon, color: cat.color, is_system: true, sort_order: i
+        })
+        .select().single();
+
+      if (parentData && cat.subcategories.length > 0) {
+        const subs = cat.subcategories.map((name, j) => ({
+          user_id: userId, name, type: 'income',
+          icon: cat.icon, color: cat.color,
+          parent_id: parentData.id, is_system: true, sort_order: j
+        }));
+        await supabase.from('finance_categories').insert(subs);
+      }
+    }
+  }
+}
+
+// ---- Hook ----
+
 export function useFinance(selectedMonth: Date) {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
-  const [accounts, setAccounts] = useState<FinanceAccount[]>([]);
-  const [categories, setCategories] = useState<FinanceCategory[]>([]);
-  const [transactions, setTransactions] = useState<FinanceTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
+  const queryClient = useQueryClient();
+  const userId = user?.id;
 
-  // Fetch accounts
-  const fetchAccounts = useCallback(async () => {
-    if (!user) return;
-    let query = supabase
-      .from('finance_accounts')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .order('created_at');
-    if (activeUnitId) query = query.eq('unit_id', activeUnitId);
-    const { data } = await query;
-    setAccounts((data || []) as FinanceAccount[]);
-  }, [user, activeUnitId]);
+  const monthKey = format(selectedMonth, 'yyyy-MM');
 
-  // Fetch categories with hierarchy
-  const fetchCategories = useCallback(async () => {
-    if (!user) return;
-    let query = supabase
-      .from('finance_categories')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('sort_order');
-    if (activeUnitId) query = query.eq('unit_id', activeUnitId);
-    const { data } = await query;
-    
-    const all = (data || []) as FinanceCategory[];
-    const parents = all.filter(c => !c.parent_id);
-    const withSubs = parents.map(parent => ({
-      ...parent,
-      subcategories: all.filter(c => c.parent_id === parent.id)
-    }));
-    setCategories(withSubs);
-  }, [user, activeUnitId]);
+  // -- Queries --
+  const { data: accounts = [], isLoading: loadingAccounts } = useQuery({
+    queryKey: ['finance-accounts', userId, activeUnitId],
+    queryFn: () => fetchAccountsData(userId!, activeUnitId),
+    enabled: !!userId,
+  });
 
-  // Fetch transactions for selected month
-  const fetchTransactions = useCallback(async () => {
-    if (!user) return;
-    const startDate = format(startOfMonth(selectedMonth), 'yyyy-MM-dd');
-    const endDate = format(endOfMonth(selectedMonth), 'yyyy-MM-dd');
-    
-    let query = supabase
-      .from('finance_transactions')
-      .select(`
-        *,
-        category:finance_categories(*),
-        account:finance_accounts!finance_transactions_account_id_fkey(*),
-        to_account:finance_accounts!finance_transactions_to_account_id_fkey(*),
-        supplier:suppliers!finance_transactions_supplier_id_fkey(id, name),
-        employee:employees!finance_transactions_employee_id_fkey(id, full_name)
-      `)
-      .eq('user_id', user.id)
-      .gte('date', startDate)
-      .lte('date', endDate)
-      .order('date', { ascending: false })
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
-    
-    if (activeUnitId) query = query.eq('unit_id', activeUnitId);
-    const { data } = await query;
-    
-    setTransactions((data || []) as FinanceTransaction[]);
-  }, [user, selectedMonth, activeUnitId]);
+  const { data: categories = [], isLoading: loadingCategories } = useQuery({
+    queryKey: ['finance-categories', userId, activeUnitId],
+    queryFn: () => fetchCategoriesData(userId!, activeUnitId),
+    enabled: !!userId,
+  });
 
-  // Initialize default data if empty
-  const initializeDefaults = useCallback(async () => {
-    if (!user) return;
-    
-    // Check if user has accounts
-    const { data: existingAccounts } = await supabase
-      .from('finance_accounts')
-      .select('id')
-      .eq('user_id', user.id)
-      .limit(1);
-    
-    if (!existingAccounts || existingAccounts.length === 0) {
-      // Create default account
-      await supabase.from('finance_accounts').insert({
-        user_id: user.id,
-        name: 'Carteira',
-        type: 'wallet',
-        balance: 0,
-        color: '#3b82f6',
-        icon: 'Wallet'
+  const { data: transactions = [], isLoading: loadingTransactions } = useQuery({
+    queryKey: ['finance-transactions', userId, activeUnitId, monthKey],
+    queryFn: async () => {
+      // Initialize defaults on first ever load (idempotent check inside)
+      await initializeDefaults(userId!);
+      return fetchTransactionsData(userId!, activeUnitId, selectedMonth);
+    },
+    enabled: !!userId,
+  });
+
+  const isLoading = loadingAccounts || loadingCategories || loadingTransactions;
+
+  const invalidateAll = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['finance-accounts', userId, activeUnitId] });
+    queryClient.invalidateQueries({ queryKey: ['finance-categories', userId, activeUnitId] });
+    queryClient.invalidateQueries({ queryKey: ['finance-transactions', userId, activeUnitId, monthKey] });
+  }, [queryClient, userId, activeUnitId, monthKey]);
+
+  const invalidateTransactionsAndAccounts = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['finance-accounts', userId, activeUnitId] });
+    queryClient.invalidateQueries({ queryKey: ['finance-transactions', userId, activeUnitId, monthKey] });
+  }, [queryClient, userId, activeUnitId, monthKey]);
+
+  // -- Mutations --
+  const addTransactionMut = useMutation({
+    mutationFn: async (data: TransactionFormData) => {
+      const { error } = await supabase.from('finance_transactions').insert({
+        ...data,
+        user_id: userId!,
+        unit_id: activeUnitId,
       });
-    }
-    
-    // Check if user has categories
-    const { data: existingCategories } = await supabase
-      .from('finance_categories')
-      .select('id')
-      .eq('user_id', user.id)
-      .limit(1);
-    
-    if (!existingCategories || existingCategories.length === 0) {
-      // Create default expense categories
-      for (let i = 0; i < DEFAULT_EXPENSE_CATEGORIES.length; i++) {
-        const cat = DEFAULT_EXPENSE_CATEGORIES[i];
-        const { data: parentData } = await supabase
-          .from('finance_categories')
-          .insert({
-            user_id: user.id,
-            name: cat.name,
-            type: 'expense',
-            icon: cat.icon,
-            color: cat.color,
-            is_system: true,
-            sort_order: i
-          })
-          .select()
-          .single();
-        
-        if (parentData && cat.subcategories.length > 0) {
-          const subs = cat.subcategories.map((name, j) => ({
-            user_id: user.id,
-            name,
-            type: 'expense',
-            icon: cat.icon,
-            color: cat.color,
-            parent_id: parentData.id,
-            is_system: true,
-            sort_order: j
-          }));
-          await supabase.from('finance_categories').insert(subs);
-        }
-      }
-      
-      // Create default income categories
-      for (let i = 0; i < DEFAULT_INCOME_CATEGORIES.length; i++) {
-        const cat = DEFAULT_INCOME_CATEGORIES[i];
-        const { data: parentData } = await supabase
-          .from('finance_categories')
-          .insert({
-            user_id: user.id,
-            name: cat.name,
-            type: 'income',
-            icon: cat.icon,
-            color: cat.color,
-            is_system: true,
-            sort_order: i
-          })
-          .select()
-          .single();
-        
-        if (parentData && cat.subcategories.length > 0) {
-          const subs = cat.subcategories.map((name, j) => ({
-            user_id: user.id,
-            name,
-            type: 'income',
-            icon: cat.icon,
-            color: cat.color,
-            parent_id: parentData.id,
-            is_system: true,
-            sort_order: j
-          }));
-          await supabase.from('finance_categories').insert(subs);
-        }
-      }
-    }
-  }, [user]);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidateTransactionsAndAccounts(),
+    onError: () => toast.error('Erro ao salvar transação'),
+  });
 
-  // Initial load - only initialize defaults once per unit
-  useEffect(() => {
-    async function load() {
-      if (!user || !activeUnitId) return;
-      setIsLoading(true);
-      if (!initialized) {
-        setInitialized(true);
-        await initializeDefaults();
-      }
-      await Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]);
-      setIsLoading(false);
-    }
-    load();
-  }, [user, activeUnitId]);
+  const updateTransactionMut = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<TransactionFormData> }) => {
+      const { error } = await supabase.from('finance_transactions').update(data).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidateTransactionsAndAccounts(),
+    onError: () => toast.error('Erro ao atualizar transação'),
+  });
 
-  // Refetch transactions when month changes (only after initial load)
-  useEffect(() => {
-    if (initialized && user) {
-      fetchTransactions();
-    }
-  }, [selectedMonth]);
+  const deleteTransactionMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('finance_transactions').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidateTransactionsAndAccounts(),
+    onError: () => toast.error('Erro ao excluir transação'),
+  });
 
-  // CRUD Operations
-  const addTransaction = async (data: TransactionFormData) => {
-    if (!user) return;
-    const { error } = await supabase.from('finance_transactions').insert({
-      ...data,
-      user_id: user.id,
-      unit_id: activeUnitId,
-    });
-    if (error) {
-      toast.error('Erro ao salvar transação');
-      return;
-    }
-    // Silent success - no toast
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
-  };
+  const togglePaidMut = useMutation({
+    mutationFn: async ({ id, isPaid }: { id: string; isPaid: boolean }) => {
+      const { error } = await supabase.from('finance_transactions').update({ is_paid: isPaid }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => invalidateTransactionsAndAccounts(),
+    onError: () => toast.error('Erro ao atualizar transação'),
+  });
 
-  const updateTransaction = async (id: string, data: Partial<TransactionFormData>) => {
-    const { error } = await supabase
-      .from('finance_transactions')
-      .update(data)
-      .eq('id', id);
-    if (error) {
-      toast.error('Erro ao atualizar transação');
-      return;
-    }
-    // Silent success - no toast
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
-  };
+  const addAccountMut = useMutation({
+    mutationFn: async (data: Omit<FinanceAccount, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+      const { error } = await supabase.from('finance_accounts').insert({
+        ...data, user_id: userId!, unit_id: activeUnitId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['finance-accounts', userId, activeUnitId] }),
+    onError: () => toast.error('Erro ao criar conta'),
+  });
 
-  const updateRecurringTransaction = async (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => {
-    // First get the transaction to find its group
+  const updateAccountMut = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<FinanceAccount> }) => {
+      const { error } = await supabase.from('finance_accounts').update(data).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['finance-accounts', userId, activeUnitId] }),
+    onError: () => toast.error('Erro ao atualizar conta'),
+  });
+
+  const deleteAccountMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('finance_accounts').update({ is_active: false }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['finance-accounts', userId, activeUnitId] }),
+    onError: () => toast.error('Erro ao excluir conta'),
+  });
+
+  // -- Recurring transaction update --
+  const updateRecurringTransaction = useCallback(async (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => {
     const { data: transaction } = await supabase
-      .from('finance_transactions')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
+      .from('finance_transactions').select('*').eq('id', id).single();
+
     if (!transaction) {
       toast.error('Transação não encontrada');
       return;
     }
-    
+
     const groupId = transaction.installment_group_id;
-    
+    const cleanDesc = data.description ? data.description.replace(/\s*\(\d+\/\d+\)$/, '') : undefined;
+    const sharedUpdate = {
+      amount: data.amount, description: cleanDesc,
+      category_id: data.category_id, account_id: data.account_id,
+      is_fixed: data.is_fixed, notes: data.notes
+    };
+
+    let error;
     if (mode === 'single' || !groupId) {
-      // Update only this transaction
-      const { error } = await supabase
-        .from('finance_transactions')
-        .update(data)
-        .eq('id', id);
-      if (error) {
-        toast.error('Erro ao atualizar transação');
-        return;
-      }
-      // Silent success
+      ({ error } = await supabase.from('finance_transactions').update(data).eq('id', id));
     } else if (mode === 'pending') {
-      // Update all pending (is_paid = false) transactions in the group
-      const { error } = await supabase
-        .from('finance_transactions')
-        .update({
-          amount: data.amount,
-          description: data.description ? data.description.replace(/\s*\(\d+\/\d+\)$/, '') : undefined,
-          category_id: data.category_id,
-          account_id: data.account_id,
-          is_fixed: data.is_fixed,
-          notes: data.notes
-        })
-        .eq('installment_group_id', groupId)
-        .eq('is_paid', false);
-      if (error) {
-        toast.error('Erro ao atualizar transações pendentes');
-        return;
-      }
-      // Silent success
-    } else if (mode === 'all') {
-      // Update all transactions in the group
-      const { error } = await supabase
-        .from('finance_transactions')
-        .update({
-          amount: data.amount,
-          description: data.description ? data.description.replace(/\s*\(\d+\/\d+\)$/, '') : undefined,
-          category_id: data.category_id,
-          account_id: data.account_id,
-          is_fixed: data.is_fixed,
-          notes: data.notes
-        })
-        .eq('installment_group_id', groupId);
-      if (error) {
-        toast.error('Erro ao atualizar todas as transações');
-        return;
-      }
-      // Silent success
+      ({ error } = await supabase.from('finance_transactions').update(sharedUpdate)
+        .eq('installment_group_id', groupId).eq('is_paid', false));
+    } else {
+      ({ error } = await supabase.from('finance_transactions').update(sharedUpdate)
+        .eq('installment_group_id', groupId));
     }
-    
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
-  };
 
-  const deleteTransaction = async (id: string) => {
-    const { error } = await supabase
-      .from('finance_transactions')
-      .delete()
-      .eq('id', id);
-    if (error) {
-      toast.error('Erro ao excluir transação');
-      return;
-    }
-    // Silent success
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
-  };
-
-  const toggleTransactionPaid = async (id: string, isPaid: boolean) => {
-    const { error } = await supabase
-      .from('finance_transactions')
-      .update({ is_paid: isPaid })
-      .eq('id', id);
     if (error) {
       toast.error('Erro ao atualizar transação');
       return;
     }
-    await Promise.all([fetchTransactions(), fetchAccounts()]);
-  };
-  const addAccount = async (data: Omit<FinanceAccount, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    if (!user) return;
-    const { error } = await supabase.from('finance_accounts').insert({
-      ...data,
-      user_id: user.id,
-      unit_id: activeUnitId,
-    });
-    if (error) {
-      toast.error('Erro ao criar conta');
-      return;
-    }
-    await fetchAccounts();
-  };
+    invalidateTransactionsAndAccounts();
+  }, [invalidateTransactionsAndAccounts]);
 
-  const updateAccount = async (id: string, data: Partial<FinanceAccount>) => {
-    const { error } = await supabase
-      .from('finance_accounts')
-      .update(data)
-      .eq('id', id);
-    if (error) {
-      toast.error('Erro ao atualizar conta');
-      return;
-    }
-    await fetchAccounts();
-  };
+  // -- Reorder (optimistic) --
+  const reorderTransactions = useCallback(async (dateStr: string, orderedIds: string[]) => {
+    queryClient.setQueryData<FinanceTransaction[]>(
+      ['finance-transactions', userId, activeUnitId, monthKey],
+      (old) => {
+        if (!old) return old;
+        const updated = [...old];
+        orderedIds.forEach((id, index) => {
+          const txn = updated.find(t => t.id === id);
+          if (txn) txn.sort_order = index;
+        });
+        return updated;
+      }
+    );
 
-  const deleteAccount = async (id: string) => {
-    const { error } = await supabase
-      .from('finance_accounts')
-      .update({ is_active: false })
-      .eq('id', id);
-    if (error) {
-      toast.error('Erro ao excluir conta');
-      return;
-    }
-    await fetchAccounts();
-  };
+    await Promise.all(
+      orderedIds.map((id, index) =>
+        supabase.from('finance_transactions').update({ sort_order: index }).eq('id', id)
+      )
+    );
+  }, [queryClient, userId, activeUnitId, monthKey]);
 
-  // Computed stats
+  const updateTransactionDate = useCallback(async (id: string, newDate: string) => {
+    queryClient.setQueryData<FinanceTransaction[]>(
+      ['finance-transactions', userId, activeUnitId, monthKey],
+      (old) => old?.map(t => t.id === id ? { ...t, date: newDate } : t)
+    );
+
+    const { error } = await supabase.from('finance_transactions').update({ date: newDate }).eq('id', id);
+    if (error) {
+      toast.error('Erro ao mover transação');
+      invalidateTransactionsAndAccounts();
+    }
+  }, [queryClient, userId, activeUnitId, monthKey, invalidateTransactionsAndAccounts]);
+
+  // -- Computed stats --
   const monthStats: MonthlyStats = useMemo(() => {
-    const income = transactions
-      .filter(t => t.type === 'income' && t.is_paid)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-    
-    const expense = transactions
-      .filter(t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-    
-    const pendingExpenses = transactions
-      .filter(t => (t.type === 'expense' || t.type === 'credit_card') && !t.is_paid)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-    
-    const pendingIncome = transactions
-      .filter(t => t.type === 'income' && !t.is_paid)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-    
-    return {
-      totalIncome: income,
-      totalExpense: expense,
-      balance: income - expense,
-      pendingExpenses,
-      pendingIncome
-    };
+    const income = transactions.filter(t => t.type === 'income' && t.is_paid).reduce((s, t) => s + Number(t.amount), 0);
+    const expense = transactions.filter(t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid).reduce((s, t) => s + Number(t.amount), 0);
+    const pendingExpenses = transactions.filter(t => (t.type === 'expense' || t.type === 'credit_card') && !t.is_paid).reduce((s, t) => s + Number(t.amount), 0);
+    const pendingIncome = transactions.filter(t => t.type === 'income' && !t.is_paid).reduce((s, t) => s + Number(t.amount), 0);
+    return { totalIncome: income, totalExpense: expense, balance: income - expense, pendingExpenses, pendingIncome };
   }, [transactions]);
 
-  // Total balance across all accounts
-  const totalBalance = useMemo(() => {
-    return accounts.reduce((sum, acc) => sum + Number(acc.balance), 0);
-  }, [accounts]);
+  const totalBalance = useMemo(() => accounts.reduce((s, a) => s + Number(a.balance), 0), [accounts]);
 
-  // Transactions grouped by date (sorted by sort_order within each date)
   const transactionsByDate = useMemo(() => {
     const grouped: Record<string, FinanceTransaction[]> = {};
     transactions.forEach(t => {
       if (!grouped[t.date]) grouped[t.date] = [];
       grouped[t.date].push(t);
     });
-    // Sort within each date by sort_order
-    Object.values(grouped).forEach(txns => {
-      txns.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-    });
+    Object.values(grouped).forEach(txns => txns.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)));
     return grouped;
   }, [transactions]);
 
-  const reorderTransactions = useCallback(async (dateStr: string, orderedIds: string[]) => {
-    // Optimistic update
-    setTransactions(prev => {
-      const updated = [...prev];
-      orderedIds.forEach((id, index) => {
-        const txn = updated.find(t => t.id === id);
-        if (txn) txn.sort_order = index;
-      });
-      return updated;
-    });
-
-    // Persist to DB
-    await Promise.all(
-      orderedIds.map((id, index) =>
-        supabase.from('finance_transactions').update({ sort_order: index }).eq('id', id)
-      )
-    );
-  }, []);
-
-  const updateTransactionDate = useCallback(async (id: string, newDate: string) => {
-    // Optimistic update - move the transaction to the new date locally
-    setTransactions(prev => {
-      return prev.map(t => t.id === id ? { ...t, date: newDate } : t);
-    });
-
-    // Persist to DB
-    const { error } = await supabase
-      .from('finance_transactions')
-      .update({ date: newDate })
-      .eq('id', id);
-
-    if (error) {
-      toast.error('Erro ao mover transação');
-      // Revert on error
-      await fetchTransactions();
-    }
-  }, [fetchTransactions]);
-
+  // -- Public API (same shape as before) --
   return {
     accounts,
     categories,
@@ -458,16 +358,16 @@ export function useFinance(selectedMonth: Date) {
     monthStats,
     totalBalance,
     isLoading,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    toggleTransactionPaid,
-    addAccount,
-    updateAccount,
-    deleteAccount,
+    addTransaction: (data: TransactionFormData) => addTransactionMut.mutateAsync(data),
+    updateTransaction: (id: string, data: Partial<TransactionFormData>) => updateTransactionMut.mutateAsync({ id, data }),
+    deleteTransaction: (id: string) => deleteTransactionMut.mutateAsync(id),
+    toggleTransactionPaid: (id: string, isPaid: boolean) => togglePaidMut.mutateAsync({ id, isPaid }),
+    addAccount: (data: Omit<FinanceAccount, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => addAccountMut.mutateAsync(data),
+    updateAccount: (id: string, data: Partial<FinanceAccount>) => updateAccountMut.mutateAsync({ id, data }),
+    deleteAccount: (id: string) => deleteAccountMut.mutateAsync(id),
     updateRecurringTransaction,
     reorderTransactions,
     updateTransactionDate,
-    refetch: () => Promise.all([fetchAccounts(), fetchCategories(), fetchTransactions()]),
+    refetch: invalidateAll,
   };
 }

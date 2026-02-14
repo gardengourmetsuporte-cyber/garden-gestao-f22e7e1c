@@ -1,11 +1,11 @@
- import { useState, useEffect, useCallback } from 'react';
- import { supabase } from '@/integrations/supabase/client';
- import { useAuth } from '@/contexts/AuthContext';
- import { useUnit } from '@/contexts/UnitContext';
- import { CashClosing, CashClosingFormData, CashClosingStatus } from '@/types/cashClosing';
- import { format } from 'date-fns';
- import { toast } from 'sonner';
-import { supabase as sb } from '@/integrations/supabase/client';
+import { useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
+import { CashClosing, CashClosingFormData } from '@/types/cashClosing';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface PaymentSetting {
   method_key: string;
@@ -15,600 +15,393 @@ interface PaymentSetting {
   fee_percentage: number;
   create_transaction: boolean;
 }
- 
- export function useCashClosing() {
-   const { user, isAdmin } = useAuth();
-   const { activeUnitId } = useUnit();
-   const [closings, setClosings] = useState<CashClosing[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
- 
-    const fetchClosings = useCallback(async () => {
-      if (!user || !activeUnitId) return;
-      setIsLoading(true);
-  
-      try {
-        // Use type assertion since types.ts doesn't have this table yet
-        const { data, error } = await supabase
-          .from('cash_closings' as any)
-          .select('*')
-          .eq('unit_id', activeUnitId)
-          .order('date', { ascending: false })
-          .order('created_at', { ascending: false });
- 
-       if (error) throw error;
- 
-       // Fetch profiles for each closing
-       const closingsWithProfiles = await Promise.all(
-         (data || []).map(async (closing: any) => {
-           const { data: profile } = await supabase
-             .from('profiles')
-             .select('full_name, avatar_url')
-             .eq('user_id', closing.user_id)
-             .single();
- 
-           let validatorProfile = null;
-           if (closing.validated_by) {
-             const { data: vp } = await supabase
-               .from('profiles')
-               .select('full_name')
-               .eq('user_id', closing.validated_by)
-               .single();
-             validatorProfile = vp;
-           }
- 
-           return {
-             ...closing,
-             profile,
-             validator_profile: validatorProfile,
-           } as CashClosing;
-         })
-       );
- 
-       setClosings(closingsWithProfiles);
-     } catch (error) {
-       console.error('Error fetching closings:', error);
-     } finally {
-       setIsLoading(false);
-     }
-    }, [user, activeUnitId]);
-  
-    useEffect(() => {
-      fetchClosings();
-    }, [fetchClosings]);
- 
-   const uploadReceipt = async (file: File): Promise<string | null> => {
-     if (!user) return null;
- 
-     const fileExt = file.name.split('.').pop();
-     const fileName = `${user.id}/${Date.now()}.${fileExt}`;
- 
-     const { error } = await supabase.storage
-       .from('cash-receipts')
-       .upload(fileName, file);
- 
-     if (error) {
-       toast.error('Erro ao enviar comprovante');
-       return null;
-     }
- 
-     const { data: { publicUrl } } = supabase.storage
-       .from('cash-receipts')
-       .getPublicUrl(fileName);
- 
-     return publicUrl;
-   };
- 
-    const createClosing = async (formData: CashClosingFormData) => {
-      if (!user || !activeUnitId) return false;
-  
-      try {
-        const { error } = await supabase
-          .from('cash_closings' as any)
-          .insert({
-           date: formData.date,
-           unit_name: formData.unit_name,
-           unit_id: activeUnitId,
-        initial_cash: formData.initial_cash,
-           cash_amount: formData.cash_amount,
-           debit_amount: formData.debit_amount,
-           credit_amount: formData.credit_amount,
-           pix_amount: formData.pix_amount,
-            meal_voucher_amount: formData.meal_voucher_amount || 0,
-           delivery_amount: formData.delivery_amount,
-           cash_difference: formData.cash_difference,
-           receipt_url: formData.receipt_url || '',
-           notes: formData.notes,
-           expenses: formData.expenses || [],
-            user_id: user.id,
-          } as any);
- 
-       if (error) {
-         if (error.code === '23505') {
-           toast.error('Já existe um fechamento para esta data e unidade');
-         } else {
-           toast.error('Erro ao enviar fechamento');
-         }
-         return false;
-       }
- 
-      await fetchClosings();
-       return true;
-     } catch {
-       toast.error('Erro ao enviar fechamento');
-       return false;
-     }
-   };
- 
-   const approveClosing = async (closingId: string) => {
-     if (!user || !isAdmin) return false;
- 
-     try {
-       // First, update the closing status
-       const { error: updateError } = await supabase
-         .from('cash_closings' as any)
-         .update({
-           status: 'approved',
-           validated_by: user.id,
-           validated_at: new Date().toISOString(),
-         } as any)
-         .eq('id', closingId);
- 
-       if (updateError) throw updateError;
- 
-       // Get the closing data to create financial transactions
-       const closing = closings.find(c => c.id === closingId);
-       if (closing && !closing.financial_integrated) {
-         await integrateWithFinancial(closing);
-       }
- 
-      await fetchClosings();
-       return true;
-     } catch {
-       toast.error('Erro ao aprovar fechamento');
-       return false;
-     }
-   };
- 
-   const markDivergent = async (closingId: string, notes: string) => {
-     if (!user || !isAdmin) return false;
- 
-     try {
-       const { error } = await supabase
-         .from('cash_closings' as any)
-         .update({
-           status: 'divergent',
-           validated_by: user.id,
-           validated_at: new Date().toISOString(),
-           validation_notes: notes,
-         } as any)
-         .eq('id', closingId);
- 
-       if (error) throw error;
- 
-      await fetchClosings();
-       return true;
-     } catch {
-       toast.error('Erro ao marcar divergência');
-       return false;
-     }
-   };
- 
-    const integrateWithFinancial = async (closing: CashClosing) => {
-      if (!user || !activeUnitId) return;
 
-     try {
-        // Fetch user's payment method settings
-        const { data: paymentSettings } = await sb
-          .from('payment_method_settings' as any)
-          .select('*')
-          .eq('user_id', user.id);
+// ---- Fetch helper (eliminates N+1) ----
 
-        const getPaymentSetting = (methodKey: string): PaymentSetting | null => {
-          const setting = (paymentSettings as unknown as PaymentSetting[] || []).find(s => s.method_key === methodKey);
-          return setting || null;
-        };
+async function fetchClosingsData(userId: string, unitId: string, isAdmin: boolean) {
+  const { data, error } = await supabase
+    .from('cash_closings' as any)
+    .select('*')
+    .eq('unit_id', unitId)
+    .order('date', { ascending: false })
+    .order('created_at', { ascending: false });
 
-       // Get user's income categories for each payment method
-        const categoryQuery = supabase
-          .from('finance_categories')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('type', 'income');
-        if (activeUnitId) categoryQuery.eq('unit_id', activeUnitId);
-        const { data: categories } = await categoryQuery;
- 
-        // Get accounts - Carteira for cash, Itaú for others
-        const { data: accounts } = await supabase
-          .from('finance_accounts')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_active', true);
-  
-        // Find specific accounts - busca flexível por nome
-        const carteiraAccount = accounts?.find(a => 
-          a.name.toLowerCase().includes('carteira') || a.type === 'wallet'
-        );
-        const itauAccount = accounts?.find(a => 
-          a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau')
-        );
-        const carteiraAccountId = carteiraAccount?.id || accounts?.[0]?.id || null;
-        const bankAccountId = itauAccount?.id || accounts?.[0]?.id || null;
+  if (error) throw error;
 
-        // Find main categories
-        const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
-        const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
+  const closings = (data || []) as any[];
 
-        // Find specific subcategories for each payment method - busca por nome exato
-        const dinheiroSubcat = categories?.find(c => c.name.toLowerCase() === 'dinheiro');
-        const debitoSubcat = categories?.find(c => c.name.toLowerCase() === 'cartão débito' || c.name.toLowerCase() === 'débito');
-        const creditoSubcat = categories?.find(c => c.name.toLowerCase() === 'cartão crédito' || c.name.toLowerCase() === 'crédito');
-        const pixSubcat = categories?.find(c => c.name.toLowerCase() === 'pix');
-        const voucherSubcat = categories?.find(c => c.name.toLowerCase() === 'vale alimentação' || c.name.toLowerCase() === 'vale refeição');
-        const ifoodSubcat = categories?.find(c => c.name.toLowerCase() === 'ifood' || c.name.toLowerCase() === 'delivery');
- 
-       const transactions = [];
+  // Batch profile fetch — single query for all unique user IDs
+  const allUserIds = new Set<string>();
+  closings.forEach(c => {
+    allUserIds.add(c.user_id);
+    if (c.validated_by) allUserIds.add(c.validated_by);
+  });
 
-        // Helper: format date label from 'yyyy-MM-dd' without timezone issues
-        const formatDateLabel = (dateStr: string): string => {
-          const [, month, day] = dateStr.split('-');
-          return `${day}/${month}`;
-        };
+  const profileMap = new Map<string, { full_name: string; avatar_url: string | null }>();
+  if (allUserIds.size > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('user_id, full_name, avatar_url')
+      .in('user_id', [...allUserIds]);
+    (profiles || []).forEach(p => profileMap.set(p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }));
+  }
 
-         // Helper functions for date calculations (use T12:00 to avoid UTC midnight boundary)
-        const addBusinessDays = (dateStr: string, days: number): string => {
-           if (days === 0) return dateStr;
-          const date = new Date(dateStr + 'T12:00:00');
-          let added = 0;
-          while (added < days) {
-            date.setDate(date.getDate() + 1);
-            const dayOfWeek = date.getDay();
-            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-              added++;
-            }
-          }
-          return format(date, 'yyyy-MM-dd');
-        };
-  
-         const getNextDayOfWeek = (dateStr: string, targetDay: number): string => {
-           const date = new Date(dateStr + 'T12:00:00');
-           const currentDay = date.getDay();
-           const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7;
-           date.setDate(date.getDate() + daysUntilTarget);
-           return format(date, 'yyyy-MM-dd');
-         };
+  return closings.map(c => ({
+    ...c,
+    profile: profileMap.get(c.user_id) || null,
+    validator_profile: c.validated_by ? profileMap.get(c.validated_by) || null : null,
+  })) as CashClosing[];
+}
 
-        const calculateSettlementDate = (baseDate: string, setting: PaymentSetting | null): { date: string; isPaid: boolean } => {
-          if (!setting) return { date: baseDate, isPaid: true };
+// ---- Hook ----
 
-          switch (setting.settlement_type) {
-            case 'immediate':
-              return { date: baseDate, isPaid: true };
-            case 'business_days':
-              return { date: addBusinessDays(baseDate, setting.settlement_days), isPaid: false };
-            case 'weekly_day':
-              return { date: getNextDayOfWeek(baseDate, setting.settlement_day_of_week ?? 3), isPaid: false };
-            default:
-              return { date: baseDate, isPaid: true };
-          }
-        };
+export function useCashClosing() {
+  const { user, isAdmin } = useAuth();
+  const { activeUnitId } = useUnit();
+  const queryClient = useQueryClient();
 
-        const applyFee = (amount: number, setting: PaymentSetting | null): number => {
-          if (!setting || setting.fee_percentage === 0) return amount;
-          return amount * (1 - setting.fee_percentage / 100);
-        };
+  const queryKey = ['cash-closings', activeUnitId];
 
-       // Create income transactions for each payment method
-       if (closing.cash_amount > 0 && (getPaymentSetting('cash_amount')?.create_transaction !== false)) {
-          const cashSetting = getPaymentSetting('cash_amount');
-          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, cashSetting);
-          const netAmount = applyFee(closing.cash_amount, cashSetting);
+  const { data: closings = [], isLoading } = useQuery({
+    queryKey,
+    queryFn: () => fetchClosingsData(user!.id, activeUnitId!, isAdmin),
+    enabled: !!user && !!activeUnitId,
+  });
 
-           transactions.push({
-             user_id: user.id,
-             unit_id: activeUnitId,
-             type: 'income',
-              amount: netAmount,
-             description: `Dinheiro (${formatDateLabel(closing.date)})`,
-             category_id: dinheiroSubcat?.id || balcaoCategory?.id || null,
-             account_id: carteiraAccountId, // Dinheiro vai para Carteira
-              date: settlementDate,
-              is_paid: isPaid,
-              notes: `Fechamento de caixa${cashSetting?.fee_percentage ? ` (taxa: ${cashSetting.fee_percentage}%)` : ''}`,
-           });
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
+
+  const uploadReceipt = async (file: File): Promise<string | null> => {
+    if (!user) return null;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    const { error } = await supabase.storage.from('cash-receipts').upload(fileName, file);
+    if (error) {
+      toast.error('Erro ao enviar comprovante');
+      return null;
+    }
+    const { data: { publicUrl } } = supabase.storage.from('cash-receipts').getPublicUrl(fileName);
+    return publicUrl;
+  };
+
+  const createClosingMut = useMutation({
+    mutationFn: async (formData: CashClosingFormData) => {
+      const { error } = await supabase
+        .from('cash_closings' as any)
+        .insert({
+          date: formData.date, unit_name: formData.unit_name, unit_id: activeUnitId,
+          initial_cash: formData.initial_cash, cash_amount: formData.cash_amount,
+          debit_amount: formData.debit_amount, credit_amount: formData.credit_amount,
+          pix_amount: formData.pix_amount, meal_voucher_amount: formData.meal_voucher_amount || 0,
+          delivery_amount: formData.delivery_amount, cash_difference: formData.cash_difference,
+          receipt_url: formData.receipt_url || '', notes: formData.notes,
+          expenses: formData.expenses || [], user_id: user!.id,
+        } as any);
+      if (error) {
+        if (error.code === '23505') throw new Error('Já existe um fechamento para esta data e unidade');
+        throw error;
+      }
+    },
+    onSuccess: () => invalidate(),
+    onError: (err: Error) => toast.error(err.message || 'Erro ao enviar fechamento'),
+  });
+
+  const createClosing = async (formData: CashClosingFormData) => {
+    try {
+      await createClosingMut.mutateAsync(formData);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const approveClosing = async (closingId: string) => {
+    if (!user || !isAdmin) return false;
+    try {
+      const { error: updateError } = await supabase
+        .from('cash_closings' as any)
+        .update({ status: 'approved', validated_by: user.id, validated_at: new Date().toISOString() } as any)
+        .eq('id', closingId);
+      if (updateError) throw updateError;
+
+      const closing = closings.find(c => c.id === closingId);
+      if (closing && !closing.financial_integrated) {
+        await integrateWithFinancial(closing);
+      }
+      invalidate();
+      return true;
+    } catch {
+      toast.error('Erro ao aprovar fechamento');
+      return false;
+    }
+  };
+
+  const markDivergent = async (closingId: string, notes: string) => {
+    if (!user || !isAdmin) return false;
+    try {
+      const { error } = await supabase
+        .from('cash_closings' as any)
+        .update({ status: 'divergent', validated_by: user.id, validated_at: new Date().toISOString(), validation_notes: notes } as any)
+        .eq('id', closingId);
+      if (error) throw error;
+      invalidate();
+      return true;
+    } catch {
+      toast.error('Erro ao marcar divergência');
+      return false;
+    }
+  };
+
+  const deleteClosing = async (closingId: string) => {
+    if (!user || !isAdmin) return false;
+    try {
+      const { error } = await supabase.from('cash_closings' as any).delete().eq('id', closingId);
+      if (error) throw error;
+      invalidate();
+      return true;
+    } catch {
+      toast.error('Erro ao excluir fechamento');
+      return false;
+    }
+  };
+
+  const checkChecklistCompleted = async (date: string): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      const query = supabase.from('checklist_items').select('id')
+        .eq('checklist_type', 'fechamento').eq('is_active', true).is('deleted_at', null);
+      if (activeUnitId) query.eq('unit_id', activeUnitId);
+      const { data: items } = await query;
+      if (!items || items.length === 0) return true;
+
+      const { data: completions } = await supabase
+        .from('checklist_completions').select('item_id')
+        .eq('date', date).eq('checklist_type', 'fechamento').eq('completed_by', user.id);
+
+      const completedIds = new Set(completions?.map(c => c.item_id) || []);
+      return items.every(item => completedIds.has(item.id));
+    } catch {
+      return true;
+    }
+  };
+
+  // ---- Financial integration (unchanged logic) ----
+  const integrateWithFinancial = async (closing: CashClosing) => {
+    if (!user || !activeUnitId) return;
+
+    try {
+      const { data: paymentSettings } = await supabase
+        .from('payment_method_settings' as any).select('*').eq('user_id', user.id);
+
+      const getPaymentSetting = (methodKey: string): PaymentSetting | null => {
+        const setting = (paymentSettings as unknown as PaymentSetting[] || []).find(s => s.method_key === methodKey);
+        return setting || null;
+      };
+
+      const categoryQuery = supabase
+        .from('finance_categories').select('*').eq('user_id', user.id).eq('type', 'income');
+      if (activeUnitId) categoryQuery.eq('unit_id', activeUnitId);
+      const { data: categories } = await categoryQuery;
+
+      const { data: accounts } = await supabase
+        .from('finance_accounts').select('*').eq('user_id', user.id).eq('is_active', true);
+
+      const carteiraAccount = accounts?.find(a => a.name.toLowerCase().includes('carteira') || a.type === 'wallet');
+      const itauAccount = accounts?.find(a => a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau'));
+      const carteiraAccountId = carteiraAccount?.id || accounts?.[0]?.id || null;
+      const bankAccountId = itauAccount?.id || accounts?.[0]?.id || null;
+
+      const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
+      const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
+
+      const dinheiroSubcat = categories?.find(c => c.name.toLowerCase() === 'dinheiro');
+      const debitoSubcat = categories?.find(c => c.name.toLowerCase() === 'cartão débito' || c.name.toLowerCase() === 'débito');
+      const creditoSubcat = categories?.find(c => c.name.toLowerCase() === 'cartão crédito' || c.name.toLowerCase() === 'crédito');
+      const pixSubcat = categories?.find(c => c.name.toLowerCase() === 'pix');
+      const voucherSubcat = categories?.find(c => c.name.toLowerCase() === 'vale alimentação' || c.name.toLowerCase() === 'vale refeição');
+      const ifoodSubcat = categories?.find(c => c.name.toLowerCase() === 'ifood' || c.name.toLowerCase() === 'delivery');
+
+      const transactions: any[] = [];
+
+      const formatDateLabel = (dateStr: string): string => {
+        const [, month, day] = dateStr.split('-');
+        return `${day}/${month}`;
+      };
+
+      const addBusinessDays = (dateStr: string, days: number): string => {
+        if (days === 0) return dateStr;
+        const date = new Date(dateStr + 'T12:00:00');
+        let added = 0;
+        while (added < days) {
+          date.setDate(date.getDate() + 1);
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek !== 0 && dayOfWeek !== 6) added++;
         }
+        return format(date, 'yyyy-MM-dd');
+      };
 
-       if (closing.debit_amount > 0 && (getPaymentSetting('debit_amount')?.create_transaction !== false)) {
-          const debitSetting = getPaymentSetting('debit_amount');
-          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, debitSetting);
-          const feeAmount = debitSetting?.fee_percentage ? closing.debit_amount * (debitSetting.fee_percentage / 100) : 0;
+      const getNextDayOfWeek = (dateStr: string, targetDay: number): string => {
+        const date = new Date(dateStr + 'T12:00:00');
+        const currentDay = date.getDay();
+        const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7;
+        date.setDate(date.getDate() + daysUntilTarget);
+        return format(date, 'yyyy-MM-dd');
+      };
 
-           // Lançamento de entrada com valor bruto
-            transactions.push({
-              user_id: user.id,
-              unit_id: activeUnitId,
-              type: 'income',
-              amount: closing.debit_amount,
-              description: `Débito (${formatDateLabel(closing.date)})`,
-              category_id: debitoSubcat?.id || balcaoCategory?.id || null,
-              account_id: bankAccountId,
-              date: settlementDate,
-              is_paid: isPaid,
-              notes: 'Fechamento de caixa',
-            });
+      const calculateSettlementDate = (baseDate: string, setting: PaymentSetting | null): { date: string; isPaid: boolean } => {
+        if (!setting) return { date: baseDate, isPaid: true };
+        switch (setting.settlement_type) {
+          case 'immediate': return { date: baseDate, isPaid: true };
+          case 'business_days': return { date: addBusinessDays(baseDate, setting.settlement_days), isPaid: false };
+          case 'weekly_day': return { date: getNextDayOfWeek(baseDate, setting.settlement_day_of_week ?? 3), isPaid: false };
+          default: return { date: baseDate, isPaid: true };
+        }
+      };
 
-          // Lançamento de saída da taxa (se houver)
+      const applyFee = (amount: number, setting: PaymentSetting | null): number => {
+        if (!setting || setting.fee_percentage === 0) return amount;
+        return amount * (1 - setting.fee_percentage / 100);
+      };
+
+      // Helper to get expense fee category
+      const getFeeCategoryId = async (parentName: string, subName: string) => {
+        const { data: expCategories } = await supabase
+          .from('finance_categories').select('*').eq('user_id', user.id).eq('type', 'expense');
+        const parent = expCategories?.find(c => c.name === parentName && !c.parent_id);
+        const sub = expCategories?.find(c => c.name === subName && c.parent_id === parent?.id);
+        return { parentId: parent?.id || null, subId: sub?.id || null };
+      };
+
+      const addIncomeTx = (amount: number, desc: string, catId: string | null, accId: string | null, setting: PaymentSetting | null) => {
+        const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, setting);
+        transactions.push({
+          user_id: user.id, unit_id: activeUnitId, type: 'income',
+          amount, description: desc, category_id: catId, account_id: accId,
+          date: settlementDate, is_paid: isPaid,
+          notes: `Fechamento de caixa${setting?.fee_percentage ? ` (taxa: ${setting.fee_percentage}%)` : ''}`,
+        });
+      };
+
+      const addFeeTx = async (grossAmount: number, feePercent: number, desc: string, accId: string | null, setting: PaymentSetting | null) => {
+        const feeAmount = grossAmount * (feePercent / 100);
+        if (feeAmount <= 0) return;
+        const { parentId, subId } = await getFeeCategoryId('Taxas Operacionais', 'Maquininha');
+        const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, setting);
+        transactions.push({
+          user_id: user.id, unit_id: activeUnitId, type: 'expense',
+          amount: feeAmount, description: desc, category_id: subId || parentId,
+          account_id: accId, date: settlementDate, is_paid: isPaid,
+          notes: `Taxa automática sobre R$ ${grossAmount.toFixed(2)}`,
+        });
+      };
+
+      // Cash
+      if (closing.cash_amount > 0 && getPaymentSetting('cash_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('cash_amount');
+        addIncomeTx(applyFee(closing.cash_amount, s), `Dinheiro (${formatDateLabel(closing.date)})`, dinheiroSubcat?.id || balcaoCategory?.id || null, carteiraAccountId, s);
+      }
+
+      // Debit
+      if (closing.debit_amount > 0 && getPaymentSetting('debit_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('debit_amount');
+        const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
+        transactions.push({
+          user_id: user.id, unit_id: activeUnitId, type: 'income',
+          amount: closing.debit_amount, description: `Débito (${formatDateLabel(closing.date)})`,
+          category_id: debitoSubcat?.id || balcaoCategory?.id || null, account_id: bankAccountId,
+          date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
+        });
+        if (s?.fee_percentage) await addFeeTx(closing.debit_amount, s.fee_percentage, `Taxa Débito - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`, bankAccountId, s);
+      }
+
+      // Credit
+      if (closing.credit_amount > 0 && getPaymentSetting('credit_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('credit_amount');
+        const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
+        transactions.push({
+          user_id: user.id, unit_id: activeUnitId, type: 'income',
+          amount: closing.credit_amount, description: `Crédito (${formatDateLabel(closing.date)})`,
+          category_id: creditoSubcat?.id || balcaoCategory?.id || null, account_id: bankAccountId,
+          date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
+        });
+        if (s?.fee_percentage) await addFeeTx(closing.credit_amount, s.fee_percentage, `Taxa Crédito - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`, bankAccountId, s);
+      }
+
+      // Pix
+      if (closing.pix_amount > 0 && getPaymentSetting('pix_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('pix_amount');
+        addIncomeTx(applyFee(closing.pix_amount, s), `Pix (${formatDateLabel(closing.date)})`, pixSubcat?.id || balcaoCategory?.id || null, bankAccountId, s);
+      }
+
+      // Meal voucher
+      if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0 && getPaymentSetting('meal_voucher_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('meal_voucher_amount');
+        addIncomeTx(applyFee(closing.meal_voucher_amount, s), `Vale Alimentação (${formatDateLabel(closing.date)})`, voucherSubcat?.id || balcaoCategory?.id || null, bankAccountId, s);
+      }
+
+      // Delivery
+      if (closing.delivery_amount > 0 && getPaymentSetting('delivery_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('delivery_amount');
+        const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
+        transactions.push({
+          user_id: user.id, unit_id: activeUnitId, type: 'income',
+          amount: closing.delivery_amount, description: `Delivery (${formatDateLabel(closing.date)})`,
+          category_id: ifoodSubcat?.id || deliveryCategory?.id || null, account_id: bankAccountId,
+          date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
+        });
+        if (s?.fee_percentage) {
+          const { parentId, subId } = await getFeeCategoryId('Taxas Operacionais', 'iFood');
+          const deliveryFeeSubcat = subId || (await getFeeCategoryId('Taxas Operacionais', 'Delivery')).subId;
+          const feeAmount = closing.delivery_amount * (s.fee_percentage / 100);
           if (feeAmount > 0) {
-            // Get fee category (Taxas Operacionais > Maquininha)
-            const { data: expCategories } = await supabase
-              .from('finance_categories')
-              .select('*')
-              .eq('user_id', user.id)
-              .eq('type', 'expense');
-            
-            const taxasCategory = expCategories?.find(c => c.name === 'Taxas Operacionais' && !c.parent_id);
-            const maquininhaSubcat = expCategories?.find(c => c.name === 'Maquininha' && c.parent_id === taxasCategory?.id);
-
             transactions.push({
-              user_id: user.id,
-              unit_id: activeUnitId,
-              type: 'expense',
-              amount: feeAmount,
-              description: `Taxa Débito - ${debitSetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
-              category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
-              account_id: bankAccountId,
-              date: settlementDate,
-              is_paid: isPaid,
-              notes: `Taxa automática sobre R$ ${closing.debit_amount.toFixed(2)}`,
-            });
-          }
-        }
- 
-       if (closing.credit_amount > 0 && (getPaymentSetting('credit_amount')?.create_transaction !== false)) {
-          const creditSetting = getPaymentSetting('credit_amount');
-          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, creditSetting);
-          const feeAmount = creditSetting?.fee_percentage ? closing.credit_amount * (creditSetting.fee_percentage / 100) : 0;
-
-           // Lançamento de entrada com valor bruto
-            transactions.push({
-              user_id: user.id,
-              unit_id: activeUnitId,
-              type: 'income',
-              amount: closing.credit_amount,
-              description: `Crédito (${formatDateLabel(closing.date)})`,
-              category_id: creditoSubcat?.id || balcaoCategory?.id || null,
-              account_id: bankAccountId,
-              date: settlementDate,
-              is_paid: isPaid,
-              notes: 'Fechamento de caixa',
-            });
-
-          // Lançamento de saída da taxa (se houver)
-          if (feeAmount > 0) {
-            // Get fee category (Taxas Operacionais > Maquininha)
-            const { data: expCategories } = await supabase
-              .from('finance_categories')
-              .select('*')
-              .eq('user_id', user.id)
-              .eq('type', 'expense');
-            
-            const taxasCategory = expCategories?.find(c => c.name === 'Taxas Operacionais' && !c.parent_id);
-            const maquininhaSubcat = expCategories?.find(c => c.name === 'Maquininha' && c.parent_id === taxasCategory?.id);
-
-             transactions.push({
-               user_id: user.id,
-               unit_id: activeUnitId,
-               type: 'expense',
-               amount: feeAmount,
-               description: `Taxa Crédito - ${creditSetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
-               category_id: maquininhaSubcat?.id || taxasCategory?.id || null,
-               account_id: bankAccountId,
-               date: settlementDate,
-               is_paid: isPaid,
-               notes: `Taxa automática sobre R$ ${closing.credit_amount.toFixed(2)}`,
-             });
-          }
-        }
- 
-       if (closing.pix_amount > 0 && (getPaymentSetting('pix_amount')?.create_transaction !== false)) {
-          const pixSetting = getPaymentSetting('pix_amount');
-          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, pixSetting);
-          const netAmount = applyFee(closing.pix_amount, pixSetting);
-
-           transactions.push({
-             user_id: user.id,
-             unit_id: activeUnitId,
-             type: 'income',
-              amount: netAmount,
-             description: `Pix (${formatDateLabel(closing.date)})`,
-             category_id: pixSubcat?.id || balcaoCategory?.id || null,
-             account_id: bankAccountId,
-              date: settlementDate,
-              is_paid: isPaid,
-              notes: `Fechamento de caixa${pixSetting?.fee_percentage ? ` (taxa: ${pixSetting.fee_percentage}%)` : ''}`,
-           });
-        }
-
-        if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0 && (getPaymentSetting('meal_voucher_amount')?.create_transaction !== false)) {
-           const voucherSetting = getPaymentSetting('meal_voucher_amount');
-           const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, voucherSetting);
-           const netAmount = applyFee(closing.meal_voucher_amount, voucherSetting);
-
-            transactions.push({
-              user_id: user.id,
-              unit_id: activeUnitId,
-              type: 'income',
-               amount: netAmount,
-              description: `Vale Alimentação (${formatDateLabel(closing.date)})`,
-              category_id: voucherSubcat?.id || balcaoCategory?.id || null,
-              account_id: bankAccountId,
-               date: settlementDate,
-               is_paid: isPaid,
-               notes: `Fechamento de caixa${voucherSetting?.fee_percentage ? ` (taxa: ${voucherSetting.fee_percentage}%)` : ''}`,
-            });
-         }
-
-        if (closing.delivery_amount > 0 && (getPaymentSetting('delivery_amount')?.create_transaction !== false)) {
-          const deliverySetting = getPaymentSetting('delivery_amount');
-          const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, deliverySetting);
-          const feeAmount = deliverySetting?.fee_percentage ? closing.delivery_amount * (deliverySetting.fee_percentage / 100) : 0;
-
-           // Lançamento de entrada com valor bruto
-            transactions.push({
-              user_id: user.id,
-              unit_id: activeUnitId,
-              type: 'income',
-              amount: closing.delivery_amount,
-              description: `Delivery (${formatDateLabel(closing.date)})`,
-              category_id: ifoodSubcat?.id || deliveryCategory?.id || null,
-              account_id: bankAccountId,
-              date: settlementDate,
-              is_paid: isPaid,
-              notes: 'Fechamento de caixa',
-            });
-
-          // Lançamento de saída da taxa (se houver)
-          if (feeAmount > 0) {
-            const { data: expCategories } = await supabase
-              .from('finance_categories')
-              .select('*')
-              .eq('user_id', user.id)
-              .eq('type', 'expense');
-            
-            const taxasCategory = expCategories?.find(c => c.name === 'Taxas Operacionais' && !c.parent_id);
-            const deliveryFeeSubcat = expCategories?.find(c => (c.name === 'iFood' || c.name === 'Delivery') && c.parent_id === taxasCategory?.id);
-
-            transactions.push({
-              user_id: user.id,
-              unit_id: activeUnitId,
-              type: 'expense',
-              amount: feeAmount,
-              description: `Taxa Delivery - ${deliverySetting?.fee_percentage}% (${formatDateLabel(closing.date)})`,
-              category_id: deliveryFeeSubcat?.id || taxasCategory?.id || null,
-              account_id: bankAccountId,
-              date: settlementDate,
-              is_paid: isPaid,
+              user_id: user.id, unit_id: activeUnitId, type: 'expense',
+              amount: feeAmount, description: `Taxa Delivery - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`,
+              category_id: deliveryFeeSubcat || parentId, account_id: bankAccountId,
+              date: settlementDate, is_paid: isPaid,
               notes: `Taxa automática sobre R$ ${closing.delivery_amount.toFixed(2)}`,
             });
           }
-         }
+        }
+      }
 
-       // Create expense transactions from cash closing expenses
-       if (closing.expenses && Array.isArray(closing.expenses)) {
-         // Get expense categories
-         const { data: expenseCategories } = await supabase
-           .from('finance_categories')
-           .select('*')
-           .eq('user_id', user.id)
-           .eq('type', 'expense');
-         
-         for (const expense of closing.expenses as any[]) {
-           if (expense.amount && expense.amount > 0) {
-               transactions.push({
-                 user_id: user.id,
-                 unit_id: activeUnitId,
-                 type: 'expense',
-                 amount: expense.amount,
-                 description: expense.description || 'Gasto do dia',
-                 category_id: null,
-                 account_id: carteiraAccountId, // Gastos do dia saem da Carteira
-                 date: closing.date,
-                 is_paid: true,
-                 notes: 'Lançamento automático do fechamento de caixa',
-               });
-            }
-         }
-       }
- 
-        if (transactions.length > 0) {
-          const { error: insertError } = await supabase.from('finance_transactions').insert(transactions);
-          if (insertError) {
-            console.error('Error inserting financial transactions:', insertError);
-            toast.error('Erro ao criar lançamentos financeiros');
-            return;
+      // Expenses from closing
+      if (closing.expenses && Array.isArray(closing.expenses)) {
+        for (const expense of closing.expenses as any[]) {
+          if (expense.amount && expense.amount > 0) {
+            transactions.push({
+              user_id: user.id, unit_id: activeUnitId, type: 'expense',
+              amount: expense.amount, description: expense.description || 'Gasto do dia',
+              category_id: null, account_id: carteiraAccountId,
+              date: closing.date, is_paid: true,
+              notes: 'Lançamento automático do fechamento de caixa',
+            });
           }
         }
-  
-        // Mark as integrated only after successful insert
-        await supabase
-          .from('cash_closings' as any)
-          .update({ financial_integrated: true } as any)
-          .eq('id', closing.id);
-
-        toast.success(`${transactions.length} lançamentos financeiros criados`);
-  
-      } catch (error) {
-        console.error('Error integrating with financial:', error);
-        toast.error('Erro ao integrar com financeiro');
       }
-   };
- 
-   const deleteClosing = async (closingId: string) => {
-     if (!user || !isAdmin) return false;
- 
-     try {
-       const { error } = await supabase
-         .from('cash_closings' as any)
-         .delete()
-         .eq('id', closingId);
- 
-       if (error) throw error;
- 
-      await fetchClosings();
-       return true;
-     } catch {
-       toast.error('Erro ao excluir fechamento');
-       return false;
-     }
-   };
- 
-    const checkChecklistCompleted = async (date: string): Promise<boolean> => {
-     if (!user) return false;
- 
-     try {
-        // Check if there are any checklist items for 'fechamento' type
-        const query = supabase
-          .from('checklist_items')
-          .select('id')
-          .eq('checklist_type', 'fechamento')
-          .eq('is_active', true)
-          .is('deleted_at', null);
-        
-        if (activeUnitId) query.eq('unit_id', activeUnitId);
-        
-        const { data: items } = await query;
- 
-       if (!items || items.length === 0) {
-         // No checklist items configured, allow closing
-         return true;
-       }
- 
-       // Check completions for today
-        const { data: completions } = await supabase
-         .from('checklist_completions')
-         .select('item_id')
-         .eq('date', date)
-          .eq('checklist_type', 'fechamento')
-          // checklist completions are user-scoped in the app
-          .eq('completed_by', user.id);
- 
-       const completedIds = new Set(completions?.map(c => c.item_id) || []);
-       const allCompleted = items.every(item => completedIds.has(item.id));
- 
-       return allCompleted;
-     } catch {
-       return true; // Allow on error
-     }
-   };
- 
-   return {
-     closings,
-     isLoading,
-     uploadReceipt,
-     createClosing,
-     approveClosing,
-     markDivergent,
-     deleteClosing,
-     checkChecklistCompleted,
-     refetch: fetchClosings,
-   };
- }
+
+      if (transactions.length > 0) {
+        const { error: insertError } = await supabase.from('finance_transactions').insert(transactions);
+        if (insertError) {
+          console.error('Error inserting financial transactions:', insertError);
+          toast.error('Erro ao criar lançamentos financeiros');
+          return;
+        }
+      }
+
+      await supabase.from('cash_closings' as any).update({ financial_integrated: true } as any).eq('id', closing.id);
+      toast.success(`${transactions.length} lançamentos financeiros criados`);
+    } catch (error) {
+      console.error('Error integrating with financial:', error);
+      toast.error('Erro ao integrar com financeiro');
+    }
+  };
+
+  return {
+    closings, isLoading, uploadReceipt,
+    createClosing, approveClosing, markDivergent,
+    deleteClosing, checkChecklistCompleted,
+    refetch: invalidate,
+  };
+}

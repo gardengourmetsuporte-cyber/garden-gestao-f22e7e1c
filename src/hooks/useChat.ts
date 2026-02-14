@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface ChatConversation {
   id: string;
@@ -37,175 +37,154 @@ export interface ChatMessage {
   sender_profile?: { full_name: string; avatar_url: string | null };
 }
 
+// ---- Fetch helpers ----
+
+async function fetchConversationsData(userId: string, unitId: string): Promise<ChatConversation[]> {
+  const { data: participantData } = await supabase
+    .from('chat_participants').select('conversation_id').eq('user_id', userId);
+
+  if (!participantData || participantData.length === 0) return [];
+
+  const convIds = participantData.map(p => p.conversation_id);
+
+  const { data: convData } = await supabase
+    .from('chat_conversations').select('*')
+    .in('id', convIds).eq('unit_id', unitId)
+    .order('updated_at', { ascending: false });
+
+  if (!convData || convData.length === 0) return [];
+
+  // Batch: get all participants for all conversations at once
+  const { data: allParticipants } = await supabase
+    .from('chat_participants').select('*').in('conversation_id', convData.map(c => c.id));
+
+  // Batch: get all unique user_ids and fetch profiles once
+  const allUserIds = [...new Set((allParticipants || []).map(p => p.user_id))];
+  const profileMap = new Map<string, { full_name: string; avatar_url: string | null }>();
+  if (allUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles').select('user_id, full_name, avatar_url').in('user_id', allUserIds);
+    (profiles || []).forEach(p => profileMap.set(p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }));
+  }
+
+  // Batch: get last message for each conversation (we'll do one query per conv but could optimize further)
+  // For now, fetch latest messages in bulk
+  const { data: allRecentMessages } = await supabase
+    .from('chat_messages').select('*')
+    .in('conversation_id', convData.map(c => c.id))
+    .order('created_at', { ascending: false });
+
+  // Group messages by conversation and pick the latest
+  const lastMessageMap = new Map<string, any>();
+  (allRecentMessages || []).forEach(m => {
+    if (!lastMessageMap.has(m.conversation_id)) {
+      lastMessageMap.set(m.conversation_id, m);
+    }
+  });
+
+  // Get my participant records for unread count
+  const myParticipants = (allParticipants || []).filter(p => p.user_id === userId);
+  const myParticipantMap = new Map(myParticipants.map(p => [p.conversation_id, p]));
+
+  // For unread counts, we need to count messages after last_read_at for each conversation
+  // Do this in a batch: get counts for each conversation
+  const enriched: ChatConversation[] = [];
+
+  for (const conv of convData) {
+    const convParticipants = (allParticipants || []).filter(p => p.conversation_id === conv.id);
+    const participantsWithProfile = convParticipants.map(p => ({
+      ...p,
+      profile: profileMap.get(p.user_id) || { full_name: 'Usuário', avatar_url: null },
+    }));
+
+    let unread_count = 0;
+    const myP = myParticipantMap.get(conv.id);
+    if (myP?.last_read_at) {
+      const { count } = await supabase
+        .from('chat_messages').select('*', { count: 'exact', head: true })
+        .eq('conversation_id', conv.id)
+        .gt('created_at', myP.last_read_at)
+        .neq('sender_id', userId);
+      unread_count = count || 0;
+    }
+
+    enriched.push({
+      ...conv,
+      type: conv.type as ChatConversation['type'],
+      participants: participantsWithProfile,
+      last_message: lastMessageMap.get(conv.id) || null,
+      unread_count,
+    });
+  }
+
+  enriched.sort((a, b) => {
+    const aTime = a.last_message?.created_at || a.created_at;
+    const bTime = b.last_message?.created_at || b.created_at;
+    return new Date(bTime).getTime() - new Date(aTime).getTime();
+  });
+
+  return enriched;
+}
+
+async function fetchMessagesData(conversationId: string, userId: string): Promise<ChatMessage[]> {
+  const { data } = await supabase
+    .from('chat_messages').select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true }).limit(200);
+
+  if (!data) return [];
+
+  const senderIds = [...new Set(data.map(m => m.sender_id))];
+  const { data: profiles } = await supabase
+    .from('profiles').select('user_id, full_name, avatar_url').in('user_id', senderIds);
+  const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+  // Mark as read
+  await supabase
+    .from('chat_participants')
+    .update({ last_read_at: new Date().toISOString() })
+    .eq('conversation_id', conversationId).eq('user_id', userId);
+
+  return data.map(m => ({
+    ...m,
+    sender_profile: profileMap.get(m.sender_id) || { full_name: 'Usuário', avatar_url: null },
+  }));
+}
+
+// ---- Hook ----
+
 export function useChat() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
-  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const queryClient = useQueryClient();
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoadingConversations, setIsLoadingConversations] = useState(true);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const messagesChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-  // Fetch conversations
-  const fetchConversations = useCallback(async () => {
-    if (!user || !activeUnitId) {
-      setConversations([]);
-      setIsLoadingConversations(false);
-      return;
-    }
+  const conversationsKey = ['chat-conversations', activeUnitId];
+  const messagesKey = ['chat-messages', activeConversationId];
 
-    try {
-      // Get conversations user participates in for this unit
-      const { data: participantData } = await supabase
-        .from('chat_participants')
-        .select('conversation_id')
-        .eq('user_id', user.id);
+  const { data: conversations = [], isLoading: isLoadingConversations } = useQuery({
+    queryKey: conversationsKey,
+    queryFn: () => fetchConversationsData(user!.id, activeUnitId!),
+    enabled: !!user && !!activeUnitId,
+  });
 
-      if (!participantData || participantData.length === 0) {
-        setConversations([]);
-        setIsLoadingConversations(false);
-        return;
-      }
+  const { data: messages = [], isLoading: isLoadingMessages } = useQuery({
+    queryKey: messagesKey,
+    queryFn: () => fetchMessagesData(activeConversationId!, user!.id),
+    enabled: !!user && !!activeConversationId,
+    staleTime: 0, // Always fresh when opening a conversation
+  });
 
-      const convIds = participantData.map(p => p.conversation_id);
+  const totalUnreadCount = conversations.reduce((sum, c) => sum + (c.unread_count || 0), 0);
 
-      const { data: convData } = await supabase
-        .from('chat_conversations')
-        .select('*')
-        .in('id', convIds)
-        .eq('unit_id', activeUnitId)
-        .order('updated_at', { ascending: false });
+  const fetchConversations = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: conversationsKey });
+  }, [queryClient, conversationsKey]);
 
-      if (!convData) {
-        setConversations([]);
-        setIsLoadingConversations(false);
-        return;
-      }
-
-      // For each conversation, get participants and last message
-      const enriched = await Promise.all(
-        convData.map(async (conv) => {
-          const [participantsRes, messagesRes, myParticipant] = await Promise.all([
-            supabase
-              .from('chat_participants')
-              .select('*')
-              .eq('conversation_id', conv.id),
-            supabase
-              .from('chat_messages')
-              .select('*')
-              .eq('conversation_id', conv.id)
-              .order('created_at', { ascending: false })
-              .limit(1),
-            supabase
-              .from('chat_participants')
-              .select('last_read_at')
-              .eq('conversation_id', conv.id)
-              .eq('user_id', user.id)
-              .maybeSingle(),
-          ]);
-
-          // Fetch participant profiles
-          const participantUserIds = (participantsRes.data || []).map(p => p.user_id);
-          const { data: pProfiles } = participantUserIds.length > 0
-            ? await supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', participantUserIds)
-            : { data: [] };
-          const profileMap = new Map((pProfiles || []).map(p => [p.user_id, p]));
-
-          const participantsWithProfile = (participantsRes.data || []).map(p => ({
-            ...p,
-            profile: profileMap.get(p.user_id) || { full_name: 'Usuário', avatar_url: null },
-          }));
-
-          // Count unread
-          let unread_count = 0;
-          if (myParticipant.data?.last_read_at) {
-            const { count } = await supabase
-              .from('chat_messages')
-              .select('*', { count: 'exact', head: true })
-              .eq('conversation_id', conv.id)
-              .gt('created_at', myParticipant.data.last_read_at)
-              .neq('sender_id', user.id);
-            unread_count = count || 0;
-          }
-
-          return {
-            ...conv,
-            type: conv.type as ChatConversation['type'],
-            participants: participantsWithProfile,
-            last_message: messagesRes.data?.[0] || null,
-            unread_count,
-          } as ChatConversation;
-        })
-      );
-
-      // Sort by last message time
-      enriched.sort((a, b) => {
-        const aTime = a.last_message?.created_at || a.created_at;
-        const bTime = b.last_message?.created_at || b.created_at;
-        return new Date(bTime).getTime() - new Date(aTime).getTime();
-      });
-
-      setConversations(enriched);
-      setTotalUnreadCount(enriched.reduce((sum, c) => sum + (c.unread_count || 0), 0));
-    } catch {
-      // silent
-    } finally {
-      setIsLoadingConversations(false);
-    }
-  }, [user, activeUnitId]);
-
-  // Fetch messages for active conversation
-  const fetchMessages = useCallback(async () => {
-    if (!activeConversationId || !user) {
-      setMessages([]);
-      return;
-    }
-
-    setIsLoadingMessages(true);
-    try {
-      const { data } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('conversation_id', activeConversationId)
-        .order('created_at', { ascending: true })
-        .limit(200);
-
-      if (!data) {
-        setMessages([]);
-        setIsLoadingMessages(false);
-        return;
-      }
-
-      // Get unique sender ids and fetch profiles
-      const senderIds = [...new Set(data.map(m => m.sender_id))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, avatar_url')
-        .in('user_id', senderIds);
-
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
-
-      setMessages(
-        data.map(m => ({
-          ...m,
-          sender_profile: profileMap.get(m.sender_id) || { full_name: 'Usuário', avatar_url: null },
-        }))
-      );
-
-      // Mark as read
-      await supabase
-        .from('chat_participants')
-        .update({ last_read_at: new Date().toISOString() })
-        .eq('conversation_id', activeConversationId)
-        .eq('user_id', user.id);
-    } catch {
-      // silent
-    } finally {
-      setIsLoadingMessages(false);
-    }
-  }, [activeConversationId, user]);
+  const fetchMessages = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: messagesKey });
+  }, [queryClient, messagesKey]);
 
   // Send message
   const sendMessage = useCallback(async (content: string) => {
@@ -217,7 +196,6 @@ export function useChat() {
       content: content.trim(),
     });
 
-    // Update conversation updated_at
     await supabase
       .from('chat_conversations')
       .update({ updated_at: new Date().toISOString() })
@@ -228,45 +206,29 @@ export function useChat() {
   const createDirectConversation = useCallback(async (otherUserId: string) => {
     if (!user || !activeUnitId) return null;
 
-    // Check if DM already exists between these two users in this unit
     const { data: myConvs } = await supabase
-      .from('chat_participants')
-      .select('conversation_id')
-      .eq('user_id', user.id);
+      .from('chat_participants').select('conversation_id').eq('user_id', user.id);
 
     if (myConvs) {
       for (const mc of myConvs) {
         const { data: conv } = await supabase
-          .from('chat_conversations')
-          .select('*')
-          .eq('id', mc.conversation_id)
-          .eq('type', 'direct')
-          .eq('unit_id', activeUnitId)
-          .maybeSingle();
+          .from('chat_conversations').select('*')
+          .eq('id', mc.conversation_id).eq('type', 'direct')
+          .eq('unit_id', activeUnitId).maybeSingle();
 
         if (conv) {
           const { data: otherP } = await supabase
-            .from('chat_participants')
-            .select('user_id')
-            .eq('conversation_id', conv.id)
-            .eq('user_id', otherUserId)
-            .maybeSingle();
-
+            .from('chat_participants').select('user_id')
+            .eq('conversation_id', conv.id).eq('user_id', otherUserId).maybeSingle();
           if (otherP) return conv.id;
         }
       }
     }
 
-    // Create new DM
     const { data: newConv } = await supabase
       .from('chat_conversations')
-      .insert({
-        unit_id: activeUnitId,
-        type: 'direct',
-        created_by: user.id,
-      })
-      .select()
-      .single();
+      .insert({ unit_id: activeUnitId, type: 'direct', created_by: user.id })
+      .select().single();
 
     if (!newConv) return null;
 
@@ -275,7 +237,7 @@ export function useChat() {
       { conversation_id: newConv.id, user_id: otherUserId, role: 'member' },
     ]);
 
-    await fetchConversations();
+    fetchConversations();
     return newConv.id;
   }, [user, activeUnitId, fetchConversations]);
 
@@ -285,46 +247,24 @@ export function useChat() {
 
     const { data: newConv } = await supabase
       .from('chat_conversations')
-      .insert({
-        unit_id: activeUnitId,
-        type,
-        name,
-        created_by: user.id,
-      })
-      .select()
-      .single();
+      .insert({ unit_id: activeUnitId, type, name, created_by: user.id })
+      .select().single();
 
     if (!newConv) return null;
 
     const participants = [
       { conversation_id: newConv.id, user_id: user.id, role: 'admin' },
-      ...memberIds.map(id => ({
-        conversation_id: newConv.id,
-        user_id: id,
-        role: 'member' as const,
-      })),
+      ...memberIds.map(id => ({ conversation_id: newConv.id, user_id: id, role: 'member' as const })),
     ];
 
     await supabase.from('chat_participants').insert(participants);
-    await fetchConversations();
+    fetchConversations();
     return newConv.id;
   }, [user, activeUnitId, fetchConversations]);
 
   // Toggle pin
   const togglePin = useCallback(async (messageId: string, isPinned: boolean) => {
-    await supabase
-      .from('chat_messages')
-      .update({ is_pinned: !isPinned })
-      .eq('id', messageId);
-    await fetchMessages();
-  }, [fetchMessages]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchConversations();
-  }, [fetchConversations]);
-
-  useEffect(() => {
+    await supabase.from('chat_messages').update({ is_pinned: !isPinned }).eq('id', messageId);
     fetchMessages();
   }, [fetchMessages]);
 
@@ -339,29 +279,20 @@ export function useChat() {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'chat_messages',
+          event: 'INSERT', schema: 'public', table: 'chat_messages',
           filter: `conversation_id=eq.${activeConversationId}`,
         },
         async (payload) => {
           const newMsg = payload.new as ChatMessage;
-          // Fetch sender profile
           const { data: profile } = await supabase
-            .from('profiles')
-            .select('user_id, full_name, avatar_url')
-            .eq('user_id', newMsg.sender_id)
-            .maybeSingle();
+            .from('profiles').select('user_id, full_name, avatar_url')
+            .eq('user_id', newMsg.sender_id).maybeSingle();
 
-          setMessages(prev => [
-            ...prev,
-            {
-              ...newMsg,
-              sender_profile: profile || { full_name: 'Usuário', avatar_url: null },
-            },
+          queryClient.setQueryData<ChatMessage[]>(messagesKey, (old) => [
+            ...(old || []),
+            { ...newMsg, sender_profile: profile || { full_name: 'Usuário', avatar_url: null } },
           ]);
 
-          // Mark as read if from someone else
           if (newMsg.sender_id !== user?.id) {
             await supabase
               .from('chat_participants')
@@ -374,11 +305,8 @@ export function useChat() {
       .subscribe();
 
     messagesChannelRef.current = channel;
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [activeConversationId, user?.id]);
+    return () => { channel.unsubscribe(); };
+  }, [activeConversationId, user?.id, queryClient, messagesKey]);
 
   // Realtime for conversation list updates
   useEffect(() => {
@@ -389,9 +317,7 @@ export function useChat() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'chat_messages' },
-        () => {
-          fetchConversations();
-        }
+        () => fetchConversations()
       )
       .subscribe();
 
@@ -399,18 +325,9 @@ export function useChat() {
   }, [user, fetchConversations]);
 
   return {
-    conversations,
-    activeConversationId,
-    setActiveConversationId,
-    messages,
-    isLoadingConversations,
-    isLoadingMessages,
-    totalUnreadCount,
-    sendMessage,
-    createDirectConversation,
-    createGroupConversation,
-    togglePin,
-    fetchConversations,
-    fetchMessages,
+    conversations, activeConversationId, setActiveConversationId,
+    messages, isLoadingConversations, isLoadingMessages, totalUnreadCount,
+    sendMessage, createDirectConversation, createGroupConversation,
+    togglePin, fetchConversations, fetchMessages,
   };
 }
