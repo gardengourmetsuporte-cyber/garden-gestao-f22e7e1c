@@ -95,11 +95,11 @@ export function FinanceTransactions({
     ...initialFilters
   });
 
-  // Track "seen" new transactions — persisted in sessionStorage
+  // Track "seen" new transactions — persisted in localStorage
   const SEEN_KEY = 'finance_seen_txns';
   const [seenIds, setSeenIds] = useState<Set<string>>(() => {
     try {
-      const stored = sessionStorage.getItem(SEEN_KEY);
+      const stored = localStorage.getItem(SEEN_KEY);
       return stored ? new Set(JSON.parse(stored)) : new Set();
     } catch { return new Set(); }
   });
@@ -108,7 +108,7 @@ export function FinanceTransactions({
     setSeenIds(prev => {
       const next = new Set(prev);
       next.add(id);
-      sessionStorage.setItem(SEEN_KEY, JSON.stringify([...next]));
+      localStorage.setItem(SEEN_KEY, JSON.stringify([...next]));
       return next;
     });
   }, []);
