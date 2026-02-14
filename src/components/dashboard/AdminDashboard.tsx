@@ -202,9 +202,8 @@ export function AdminDashboard() {
 
         {/* RANKING WIDGET - FULL WIDTH, LAST */}
         <div className="col-span-2 animate-slide-up stagger-5">
-          <button
-            onClick={() => navigate('/profile')}
-            className="card-command w-full p-5 text-left transition-all duration-200 hover:scale-[1.005] active:scale-[0.99] overflow-hidden relative"
+          <div
+            className="card-command w-full p-5 text-left overflow-hidden relative"
           >
             <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full opacity-15 blur-3xl pointer-events-none" style={{ background: 'hsl(var(--neon-amber))' }} />
             <div className="flex items-center justify-between mb-5 relative">
@@ -217,7 +216,6 @@ export function AdminDashboard() {
                   <span className="text-[10px] text-muted-foreground block">Placar de pontos</span>
                 </div>
               </div>
-              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
             </div>
             {leaderboardLoading ? (
               <div className="space-y-3">
@@ -227,7 +225,7 @@ export function AdminDashboard() {
               <>
                 <div className="flex items-end justify-center gap-4 mb-5 pt-2">
                   {top3[1] && (
-                    <div className="flex flex-col items-center gap-1.5">
+                    <button onClick={() => navigate(`/profile/${top3[1].user_id}`)} className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform">
                       <div className="relative">
                         <RankedAvatar avatarUrl={top3[1].avatar_url} earnedPoints={top3[1].earned_points} size={44} />
                         <span className="absolute -bottom-1 -right-1 text-base">🥈</span>
@@ -235,10 +233,10 @@ export function AdminDashboard() {
                       <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[1].user_id === user?.id && "text-primary")}>{top3[1].full_name?.split(' ')[0]}</span>
                       <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[1].earned_points} pts</span>
                       <div className="w-[68px] h-14 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(215 20% 60% / 0.25), transparent)', border: '1px solid hsl(215 20% 60% / 0.3)', borderBottom: 'none' }} />
-                    </div>
+                    </button>
                   )}
                   {top3[0] && (
-                    <div className="flex flex-col items-center gap-1.5 -mt-2">
+                    <button onClick={() => navigate(`/profile/${top3[0].user_id}`)} className="flex flex-col items-center gap-1.5 -mt-2 active:scale-95 transition-transform">
                       <div className="relative">
                         <div className="absolute inset-0 rounded-full blur-md opacity-40" style={{ background: 'hsl(var(--neon-amber))' }} />
                         <RankedAvatar avatarUrl={top3[0].avatar_url} earnedPoints={top3[0].earned_points} size={60} />
@@ -247,10 +245,10 @@ export function AdminDashboard() {
                       <span className={cn("text-xs font-bold truncate max-w-[80px] text-center", top3[0].user_id === user?.id ? "text-primary" : "text-foreground")}>{top3[0].full_name?.split(' ')[0]}</span>
                       <span className="text-[11px] font-extrabold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[0].earned_points} pts</span>
                       <div className="w-[72px] h-20 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(var(--neon-amber) / 0.25), transparent)', border: '1px solid hsl(var(--neon-amber) / 0.35)', borderBottom: 'none' }} />
-                    </div>
+                    </button>
                   )}
                   {top3[2] && (
-                    <div className="flex flex-col items-center gap-1.5">
+                    <button onClick={() => navigate(`/profile/${top3[2].user_id}`)} className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform">
                       <div className="relative">
                         <RankedAvatar avatarUrl={top3[2].avatar_url} earnedPoints={top3[2].earned_points} size={44} />
                         <span className="absolute -bottom-1 -right-1 text-base">🥉</span>
@@ -258,14 +256,18 @@ export function AdminDashboard() {
                       <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[2].user_id === user?.id && "text-primary")}>{top3[2].full_name?.split(' ')[0]}</span>
                       <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[2].earned_points} pts</span>
                       <div className="w-[68px] h-10 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(30 60% 40% / 0.25), transparent)', border: '1px solid hsl(30 60% 40% / 0.3)', borderBottom: 'none' }} />
-                    </div>
+                    </button>
                   )}
                 </div>
                 {(leaderboard || []).slice(3).map((entry) => (
-                  <div key={entry.user_id} className={cn(
-                    "flex items-center gap-3 py-2.5 px-3 rounded-xl mb-1.5",
-                    entry.user_id === user?.id ? "bg-primary/10 ring-1 ring-primary/20" : "bg-secondary/40"
-                  )}>
+                  <button
+                    key={entry.user_id}
+                    onClick={() => navigate(`/profile/${entry.user_id}`)}
+                    className={cn(
+                      "flex items-center gap-3 py-2.5 px-3 rounded-xl mb-1.5 w-full text-left active:scale-[0.98] transition-transform",
+                      entry.user_id === user?.id ? "bg-primary/10 ring-1 ring-primary/20" : "bg-secondary/40"
+                    )}
+                  >
                     <span className="text-xs font-bold text-muted-foreground w-5 text-center">{entry.rank}º</span>
                     <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_points} size={28} />
                     <span className={cn("text-xs font-medium truncate flex-1", entry.user_id === user?.id && "text-primary")}>
@@ -276,7 +278,7 @@ export function AdminDashboard() {
                       <AppIcon name="Star" size={12} style={{ color: 'hsl(var(--neon-amber))' }} />
                       <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{entry.earned_points}</span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </>
             ) : (
@@ -285,7 +287,7 @@ export function AdminDashboard() {
                 <p className="text-xs text-muted-foreground">Sem dados de ranking</p>
               </div>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </div>
