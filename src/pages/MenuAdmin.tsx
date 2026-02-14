@@ -7,7 +7,7 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
-import { BookOpen } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export default function MenuAdmin() {
   const {
@@ -53,8 +53,6 @@ export default function MenuAdmin() {
   };
 
   const openLinkOptionsForProduct = (productId: string) => {
-    // Find or pick option group — for now open the options tab link dialog
-    // This is a simplified approach: switch to options tab
     setActiveTab('options');
   };
 
@@ -78,19 +76,40 @@ export default function MenuAdmin() {
     setLinkDialogOpen(true);
   };
 
+  // Stats
+  const totalProducts = products.length;
+  const totalCategories = categories.length;
+  const totalOptions = optionGroups.length;
+  const activeProducts = products.filter(p => p.is_active).length;
+
   return (
     <AppLayout>
       {/* Header */}
       <div className="page-header-bar">
         <div className="page-header-content flex items-center gap-3">
-          <div className="icon-glow icon-glow-md icon-glow-primary">
-            <BookOpen className="w-5 h-5" />
+          <div className="icon-glow icon-glow-md icon-glow-purple">
+            <AppIcon name="BookOpen" size={20} />
           </div>
-          <div className="flex-1">
-            <h1 className="page-title">Cardápio</h1>
-            <p className="page-subtitle">Gerencie categorias, produtos e opcionais</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base font-bold text-foreground">Cardápio</h1>
+            <p className="text-[11px] text-muted-foreground">Categorias, produtos e opcionais</p>
           </div>
         </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="px-4 pt-4 grid grid-cols-4 gap-2">
+        {[
+          { label: 'Categorias', value: totalCategories, color: 'hsl(var(--neon-purple))' },
+          { label: 'Produtos', value: totalProducts, color: 'hsl(var(--primary))' },
+          { label: 'Ativos', value: activeProducts, color: 'hsl(var(--neon-green))' },
+          { label: 'Opcionais', value: totalOptions, color: 'hsl(var(--neon-amber))' },
+        ].map(s => (
+          <div key={s.label} className="card-base p-3 text-center">
+            <p className="text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
+            <p className="text-[10px] text-muted-foreground font-medium">{s.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Tabs */}
@@ -100,49 +119,45 @@ export default function MenuAdmin() {
             className={`tab-command-item ${activeTab === 'menu' ? 'tab-command-item-active' : 'tab-command-inactive'}`}
             onClick={() => setActiveTab('menu')}
           >
-            Cardápio
+            <AppIcon name="BookOpen" size={16} />
+            <span>Cardápio</span>
           </button>
           <button
             className={`tab-command-item ${activeTab === 'options' ? 'tab-command-item-active' : 'tab-command-inactive'}`}
             onClick={() => setActiveTab('options')}
           >
-            Opcionais
+            <AppIcon name="Settings" size={16} />
+            <span>Opcionais</span>
           </button>
         </div>
       </div>
 
       <div className="p-4">
         {activeTab === 'menu' ? (
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Left: Category Tree */}
-            <div className="lg:w-[300px] shrink-0">
-              <div className="card-base p-3">
-                <MenuCategoryTree
-                  categories={categories}
-                  groups={groups}
-                  selectedGroupId={selectedGroupId}
-                  onSelectGroup={setSelectedGroupId}
-                  onSaveCategory={saveCategory}
-                  onDeleteCategory={deleteCategory}
-                  onSaveGroup={saveGroup}
-                  onDeleteGroup={deleteGroup}
-                  getProductCount={(gid) => getProductsByGroup(gid).length}
-                />
-              </div>
-            </div>
+          <div className="space-y-4">
+            {/* Category Tree */}
+            <MenuCategoryTree
+              categories={categories}
+              groups={groups}
+              selectedGroupId={selectedGroupId}
+              onSelectGroup={setSelectedGroupId}
+              onSaveCategory={saveCategory}
+              onDeleteCategory={deleteCategory}
+              onSaveGroup={saveGroup}
+              onDeleteGroup={deleteGroup}
+              getProductCount={(gid) => getProductsByGroup(gid).length}
+            />
 
-            {/* Right: Group Content */}
-            <div className="flex-1">
-              <MenuGroupContent
-                group={selectedGroup}
-                products={groupProducts}
-                getOptionCount={(pid) => getLinkedOptionGroupIds(pid).length}
-                onNewProduct={openNewProduct}
-                onEditProduct={openEditProduct}
-                onDeleteProduct={deleteProduct}
-                onLinkOptions={openLinkOptionsForProduct}
-              />
-            </div>
+            {/* Group Content */}
+            <MenuGroupContent
+              group={selectedGroup}
+              products={groupProducts}
+              getOptionCount={(pid) => getLinkedOptionGroupIds(pid).length}
+              onNewProduct={openNewProduct}
+              onEditProduct={openEditProduct}
+              onDeleteProduct={deleteProduct}
+              onLinkOptions={openLinkOptionsForProduct}
+            />
           </div>
         ) : (
           <OptionGroupList

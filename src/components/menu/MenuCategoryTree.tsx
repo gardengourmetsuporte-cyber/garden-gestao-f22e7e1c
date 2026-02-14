@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Plus, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { getLucideIcon } from '@/lib/icons';
+import { AppIcon } from '@/components/ui/app-icon';
 import type { MenuCategory, MenuGroup } from '@/hooks/useMenuAdmin';
 
 interface Props {
@@ -74,52 +73,94 @@ export function MenuCategoryTree({
     setGrpDialog(false);
   };
 
+  if (categories.length === 0) {
+    return (
+      <div className="card-base p-5">
+        <div className="empty-state py-6">
+          <div className="icon-glow icon-glow-lg icon-glow-muted mx-auto mb-3">
+            <AppIcon name="BookOpen" size={24} />
+          </div>
+          <p className="empty-state-title">Nenhuma categoria</p>
+          <p className="empty-state-text mb-4">Comece criando sua primeira categoria de cardápio</p>
+          <Button size="sm" onClick={openNewCategory}>
+            <AppIcon name="Plus" size={16} className="mr-1.5" /> Nova Categoria
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-2">
-      <Button onClick={openNewCategory} size="sm" className="w-full mb-3">
-        <Plus className="w-4 h-4 mr-1" /> Nova Categoria
-      </Button>
+    <div className="space-y-3">
+      {/* Add category button */}
+      <button
+        onClick={openNewCategory}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97]"
+        style={{
+          background: 'hsl(var(--primary) / 0.08)',
+          border: '1px dashed hsl(var(--primary) / 0.3)',
+        }}
+      >
+        <AppIcon name="Plus" size={16} /> Nova Categoria
+      </button>
 
       {categories.map(cat => {
         const expanded = expandedCats.has(cat.id);
         const catGroups = groups.filter(g => g.category_id === cat.id);
-        const IconComp = getLucideIcon(cat.icon || 'UtensilsCrossed');
 
         return (
-          <div key={cat.id}>
+          <div key={cat.id} className="card-base overflow-hidden">
+            {/* Category header */}
             <div className="flex items-center gap-1">
               <button
                 onClick={() => toggleCat(cat.id)}
-                className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-secondary/50"
-                style={{ borderLeft: `3px solid ${cat.color}` }}
+                className="flex-1 flex items-center gap-2.5 px-3.5 py-3 text-sm font-semibold transition-all"
               >
-                {expanded ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
-                {IconComp && <IconComp className="w-4 h-4" style={{ color: cat.color }} />}
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  style={{
+                    background: `${cat.color}20`,
+                    border: `1px solid ${cat.color}40`,
+                  }}
+                >
+                  <span className="text-base" style={{ color: cat.color }}>
+                    {cat.icon === 'UtensilsCrossed' ? '🍴' : cat.icon === 'Coffee' ? '☕' : cat.icon === 'Wine' ? '🍷' : cat.icon === 'Dessert' ? '🍰' : '📋'}
+                  </span>
+                </div>
                 <span className="flex-1 text-left text-foreground">{cat.name}</span>
-                <span className="text-[10px] text-muted-foreground">{catGroups.length}</span>
+                <span className="text-[10px] text-muted-foreground mr-1">{catGroups.length} grupos</span>
+                <AppIcon
+                  name="ChevronDown"
+                  size={14}
+                  className={cn(
+                    "text-muted-foreground transition-transform duration-200",
+                    !expanded && "-rotate-90"
+                  )}
+                />
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1.5 rounded-lg hover:bg-secondary/60">
-                    <MoreVertical className="w-3.5 h-3.5 text-muted-foreground" />
+                  <button className="p-2 rounded-lg hover:bg-secondary/60 mr-1">
+                    <AppIcon name="MoreVertical" size={14} className="text-muted-foreground" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => openNewGroup(cat.id)}>
-                    <Plus className="w-3.5 h-3.5 mr-2" /> Novo Grupo
+                    <AppIcon name="Plus" size={14} className="mr-2" /> Novo Grupo
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => openEditCategory(cat)}>
-                    <Pencil className="w-3.5 h-3.5 mr-2" /> Editar
+                    <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onDeleteCategory(cat.id)} className="text-destructive">
-                    <Trash2 className="w-3.5 h-3.5 mr-2" /> Excluir
+                    <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
 
             {expanded && (
-              <div className="ml-6 mt-1 space-y-0.5">
+              <div className="px-3 pb-3 space-y-1">
+                <div className="h-px bg-border/30 mb-2" />
                 {catGroups.map(grp => {
                   const count = getProductCount(grp.id);
                   const isSelected = selectedGroupId === grp.id;
@@ -129,31 +170,48 @@ export function MenuCategoryTree({
                       <button
                         onClick={() => onSelectGroup(grp.id)}
                         className={cn(
-                          "flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
+                          "flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 active:scale-[0.98]",
                           isSelected
-                            ? "bg-primary/10 text-foreground border border-primary/20"
+                            ? "text-foreground"
                             : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
                         )}
+                        style={isSelected ? {
+                          background: 'hsl(var(--primary) / 0.1)',
+                          border: '1px solid hsl(var(--primary) / 0.25)',
+                          boxShadow: '0 0 12px hsl(var(--primary) / 0.08)',
+                        } : { border: '1px solid transparent' }}
                       >
-                        <span className="flex-1 text-left truncate">{grp.name}</span>
-                        <div className="flex items-center gap-1">
-                          {avail?.tablet && <Badge variant="secondary" className="text-[8px] px-1 py-0">Mesa</Badge>}
-                          {avail?.delivery && <Badge variant="secondary" className="text-[8px] px-1 py-0">Delivery</Badge>}
-                          <span className="text-[10px] text-muted-foreground">{count}</span>
+                        <div
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ background: isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)' }}
+                        />
+                        <span className="flex-1 text-left truncate font-medium">{grp.name}</span>
+                        <div className="flex items-center gap-1.5">
+                          {avail?.tablet && (
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
+                              background: 'hsl(var(--neon-cyan) / 0.1)', color: 'hsl(var(--neon-cyan))',
+                            }}>Mesa</span>
+                          )}
+                          {avail?.delivery && (
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
+                              background: 'hsl(var(--neon-green) / 0.1)', color: 'hsl(var(--neon-green))',
+                            }}>Delivery</span>
+                          )}
+                          <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
                         </div>
                       </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded hover:bg-secondary/60">
-                            <MoreVertical className="w-3 h-3 text-muted-foreground" />
+                          <button className="p-1.5 rounded-lg hover:bg-secondary/60">
+                            <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => openEditGroup(grp)}>
-                            <Pencil className="w-3.5 h-3.5 mr-2" /> Editar
+                            <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
-                            <Trash2 className="w-3.5 h-3.5 mr-2" /> Excluir
+                            <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -162,9 +220,9 @@ export function MenuCategoryTree({
                 })}
                 <button
                   onClick={() => openNewGroup(cat.id)}
-                  className="flex items-center gap-2 px-3 py-1.5 text-xs text-primary hover:bg-primary/5 rounded-lg transition-all w-full"
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-primary hover:bg-primary/5 rounded-xl transition-all w-full active:scale-[0.98]"
                 >
-                  <Plus className="w-3 h-3" /> Adicionar grupo
+                  <AppIcon name="Plus" size={12} /> Adicionar grupo
                 </button>
               </div>
             )}
