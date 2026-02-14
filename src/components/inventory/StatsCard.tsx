@@ -9,30 +9,48 @@ interface StatsCardProps {
   onClick?: () => void;
 }
 
-const variantMap = {
-  default: { stat: 'stat-command-cyan', iconCls: 'icon-glow icon-glow-md icon-glow-primary' },
-  success: { stat: 'stat-command-green', iconCls: 'icon-glow icon-glow-md icon-glow-success' },
-  warning: { stat: 'stat-command-amber', iconCls: 'icon-glow icon-glow-md icon-glow-warning' },
-  destructive: { stat: 'stat-command-red', iconCls: 'icon-glow icon-glow-md icon-glow-destructive' },
+const variantStyles = {
+  default: {
+    iconBg: 'bg-primary/10',
+    iconColor: 'text-primary',
+    border: 'border-primary/20',
+  },
+  success: {
+    iconBg: 'bg-success/10',
+    iconColor: 'text-success',
+    border: 'border-success/20',
+  },
+  warning: {
+    iconBg: 'bg-warning/10',
+    iconColor: 'text-warning',
+    border: 'border-warning/20',
+  },
+  destructive: {
+    iconBg: 'bg-destructive/10',
+    iconColor: 'text-destructive',
+    border: 'border-destructive/20',
+  },
 };
 
 export function StatsCard({ title, value, icon, variant = 'default', onClick }: StatsCardProps) {
-  const styles = variantMap[variant];
+  const styles = variantStyles[variant];
 
   return (
     <button
       onClick={onClick}
-      className={cn("stat-command w-full text-left", styles.stat)}
+      className={cn(
+        "w-full text-left p-3 rounded-xl bg-card/60 backdrop-blur-sm border transition-all duration-200",
+        "hover:bg-card/90 active:scale-[0.97]",
+        styles.border
+      )}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="stat-label">{title}</p>
-          <p className="stat-value mt-1">{value}</p>
-        </div>
-        <div className={cn("stat-icon", styles.iconCls)}>
-          <AppIcon name={icon} size={20} />
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-medium text-muted-foreground leading-tight">{title}</p>
+        <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", styles.iconBg)}>
+          <AppIcon name={icon} size={16} className={styles.iconColor} />
         </div>
       </div>
+      <p className="text-2xl font-bold text-foreground">{value}</p>
     </button>
   );
 }

@@ -1,6 +1,7 @@
-import { Package, ChevronRight, Edit2 } from 'lucide-react';
+import { ChevronRight, Edit2 } from 'lucide-react';
 import { InventoryItem } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface ItemCardProps {
   item: InventoryItem;
@@ -29,75 +30,61 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
   const categoryColor = item.category?.color || '#6b7280';
 
   return (
-    <div 
-      className="list-command w-full animate-slide-up"
-      style={{ borderLeftColor: categoryColor }}
+    <div
+      className="bg-card/60 backdrop-blur-sm rounded-xl p-3 transition-all duration-200 cursor-pointer hover:bg-card/90 active:scale-[0.98] border border-border/30"
+      style={{ borderLeftWidth: 3, borderLeftColor: categoryColor }}
     >
       <div className="flex items-center gap-3">
-        {/* Category Color Indicator */}
-        <div 
-          className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+        {/* Icon */}
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
           style={{ backgroundColor: `${categoryColor}15` }}
         >
-          <Package 
-            className="w-6 h-6"
-            style={{ color: categoryColor }}
-          />
+          <AppIcon name="Package" size={18} style={{ color: categoryColor }} />
         </div>
 
-        {/* Item Info */}
-        <button
-          onClick={onClick}
-          className="flex-1 min-w-0 text-left"
-        >
-          <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
-          <p 
-            className="text-sm font-medium truncate"
-            style={{ color: categoryColor }}
-          >
+        {/* Info */}
+        <button onClick={onClick} className="flex-1 min-w-0 text-left">
+          <h3 className="font-semibold text-sm text-foreground truncate">{item.name}</h3>
+          <p className="text-xs truncate" style={{ color: categoryColor }}>
             {item.category?.name || 'Sem categoria'}
           </p>
         </button>
 
-        {/* Stock Info */}
-        <div className="text-right shrink-0">
-          <p className={cn(
-            "text-lg font-bold",
-            status === 'ok' && "text-foreground",
-            status === 'low' && "text-warning",
-            status === 'out' && "text-destructive"
-          )}>
-            {item.current_stock.toFixed(item.unit_type === 'unidade' ? 0 : 2)}
-            <span className="text-sm font-normal text-muted-foreground ml-1">{unitLabel}</span>
-          </p>
-          <span className={cn(
-            "badge-status",
-            status === 'ok' && "badge-success",
-            status === 'low' && "badge-warning",
-            status === 'out' && "badge-error"
-          )}>
-            {status === 'ok' && 'OK'}
-            {status === 'low' && 'Baixo'}
-            {status === 'out' && 'Zerado'}
-          </span>
+        {/* Stock */}
+        <div className="text-right shrink-0 flex items-center gap-2">
+          <div>
+            <p className={cn(
+              "text-base font-bold leading-tight",
+              status === 'ok' && "text-foreground",
+              status === 'low' && "text-warning",
+              status === 'out' && "text-destructive"
+            )}>
+              {item.current_stock.toFixed(item.unit_type === 'unidade' ? 0 : 2)}
+              <span className="text-xs font-normal text-muted-foreground ml-0.5">{unitLabel}</span>
+            </p>
+            <span className={cn(
+              "text-[10px] font-semibold px-1.5 py-0.5 rounded-full inline-block mt-0.5",
+              status === 'ok' && "bg-success/15 text-success",
+              status === 'low' && "bg-warning/15 text-warning",
+              status === 'out' && "bg-destructive/15 text-destructive"
+            )}>
+              {status === 'ok' ? 'OK' : status === 'low' ? 'Baixo' : 'Zerado'}
+            </span>
+          </div>
+
+          {/* Edit */}
+          {onEdit && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
         </div>
-
-        {/* Edit Button */}
-        {onEdit && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
-        )}
-
-        <button onClick={onClick} className="shrink-0">
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </button>
       </div>
     </div>
   );
