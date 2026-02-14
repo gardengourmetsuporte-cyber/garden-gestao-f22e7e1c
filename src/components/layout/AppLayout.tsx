@@ -248,6 +248,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       )}
 
       <button
+        onTouchEnd={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (sidebarOpen) {
+            isClosingDrawerRef.current = true;
+            setSidebarOpen(false);
+            setFabOpen(false);
+            navigate('/');
+            setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
+          } else if (fabOpen) {
+            setFabOpen(false);
+          } else {
+            setFabOpen(true);
+          }
+        }}
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -255,9 +270,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             isClosingDrawerRef.current = true;
             setSidebarOpen(false);
             setFabOpen(false);
+            navigate('/');
             setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
+          } else if (fabOpen) {
+            setFabOpen(false);
           } else {
-            setFabOpen(prev => !prev);
+            setFabOpen(true);
           }
         }}
         className={cn(
