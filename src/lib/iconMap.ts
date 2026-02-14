@@ -54,6 +54,7 @@ export const ICON_MAP: Record<string, string> = {
   ArrowUpCircle: 'arrow_upward',
   ArrowDownCircle: 'arrow_downward',
   ArrowLeftRight: 'swap_horiz',
+  ArrowRightLeft: 'swap_horiz',
   TrendingUp: 'trending_up',
   TrendingDown: 'trending_down',
   PieChart: 'pie_chart',
