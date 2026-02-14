@@ -280,7 +280,10 @@ export function FinanceTransactions({
                       <div className="space-y-2">
                         {transactions.map(transaction => (
                           <SortableTransaction key={transaction.id} id={transaction.id}>
-                            <div className="relative">
+                            <div
+                              className="relative"
+                              onPointerDown={() => markSeen(transaction.id)}
+                            >
                               {transaction.is_recurring && transaction.installment_group_id && (
                                 <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
                                   <Repeat className="w-2.5 h-2.5 mr-0.5" />
@@ -290,10 +293,7 @@ export function FinanceTransactions({
                               <TransactionItem
                                 transaction={transaction}
                                 isNew={isNewTransaction(transaction)}
-                                onClick={() => {
-                                  markSeen(transaction.id);
-                                  onTransactionClick(transaction);
-                                }}
+                                onClick={() => onTransactionClick(transaction)}
                                 onTogglePaid={onTogglePaid}
                                 onDelete={onDeleteTransaction}
                               />
