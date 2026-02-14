@@ -1,247 +1,243 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Leaderboard } from './Leaderboard';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAgenda } from '@/hooks/useAgenda';
+import { usePoints } from '@/hooks/usePoints';
 import { cn } from '@/lib/utils';
 import { useCountUp, useCountUpCurrency } from '@/hooks/useCountUp';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-
-interface MetricCardProps {
-  title: string;
-  value: string;
-  icon: string;
-  onClick: () => void;
-  variant: string;
-  subtitle?: string;
-  index: number;
-  isLoading?: boolean;
-}
-
-function MetricCard({ title, value, icon, onClick, variant, subtitle, index, isLoading }: MetricCardProps) {
-  return (
-    <div
-      onClick={onClick}
-      className={cn(
-        "stat-command group cursor-pointer animate-slide-up p-5",
-        variant,
-        `stagger-${index + 1}`
-      )}
-    >
-      <div className="flex items-start justify-between">
-        <div className="icon-glow icon-glow-md icon-glow-muted">
-          <AppIcon name={icon} size={20} />
-        </div>
-        <AppIcon name="ArrowUpRight" size={16} className="text-muted-foreground opacity-50 group-active:opacity-100 transition-opacity" />
-      </div>
-      <div className="mt-3">
-        {isLoading ? (
-          <>
-            <Skeleton className="h-7 w-20 mb-1" />
-            <Skeleton className="h-3 w-16" />
-          </>
-        ) : (
-          <>
-            <p className="text-2xl font-bold tracking-tight text-foreground">{value}</p>
-            <p className="text-muted-foreground text-xs font-medium mt-0.5">{title}</p>
-            {subtitle && <p className="text-muted-foreground/60 text-[10px] mt-0.5">{subtitle}</p>}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-interface AlertItemProps {
-  message: string;
-  count: number | string;
-  severity: 'error' | 'warning' | 'info';
-  onClick: () => void;
-}
-
-function AlertItem({ message, count, severity, onClick }: AlertItemProps) {
-  const severityStyles = {
-    error: 'text-destructive bg-destructive/10',
-    warning: 'text-warning bg-warning/10',
-    info: 'text-primary bg-primary/10',
-  };
-
-  const borderColor = {
-    error: 'border-l-destructive/50',
-    warning: 'border-l-warning/50',
-    info: 'border-l-primary/50',
-  };
-
-  return (
-    <div 
-      onClick={onClick}
-      className={cn(
-        "flex items-center justify-between py-2 px-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors active:scale-[0.98] group border-l-2",
-        borderColor[severity]
-      )}
-    >
-      <div className="flex items-center gap-2.5">
-        <AppIcon name="AlertCircle" size={16} className={cn(severity === 'error' ? 'text-destructive' : severity === 'warning' ? 'text-warning' : 'text-primary')} />
-        <span className="text-xs text-foreground">{message}</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", severityStyles[severity])}>{count}</span>
-        <AppIcon name="ArrowUpRight" size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-      </div>
-    </div>
-  );
-}
-
-interface PillButtonProps {
-  label: string;
-  icon: string;
-  onClick: () => void;
-  badge?: string;
-}
-
-function PillButton({ label, icon, onClick, badge }: PillButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-card/80 border border-border/30 whitespace-nowrap active:scale-95 transition-all hover:border-primary/30 shrink-0"
-    >
-      <AppIcon name={icon} size={16} className="text-primary" />
-      <span className="text-xs font-medium text-foreground">{label}</span>
-      {badge && (
-        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">{badge}</span>
-      )}
-    </button>
-  );
-}
+import { Progress } from '@/components/ui/progress';
+import { RankedAvatar } from '@/components/profile/RankedAvatar';
+import { getRank } from '@/lib/ranks';
+import { format, isToday, isTomorrow, isPast } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
+  const { tasks: agendaTasks, isLoading: tasksLoading } = useAgenda();
+  const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
 
   const animatedBalance = useCountUpCurrency(stats.monthBalance);
-  const animatedCritical = useCountUp(stats.criticalItems);
-  const animatedOrders = useCountUp(stats.pendingOrders);
-  const animatedRecipes = useCountUp(stats.recipesCount);
+  const animatedPoints = useCountUp(balance);
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-  const currentDate = new Date().toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bom dia';
+    if (h < 18) return 'Boa tarde';
+    return 'Boa noite';
+  })();
 
-  const hasAlerts = stats.pendingRedemptions > 0 || stats.pendingClosings > 0 || stats.pendingExpenses > 0;
+  const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
+
+  // Agenda: today's pending tasks
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const pendingTasks = (agendaTasks || [])
+    .filter(t => !t.is_completed && (!t.due_date || t.due_date <= todayStr || t.date === todayStr))
+    .slice(0, 5);
+
+  // Leaderboard top 3
+  const top3 = (leaderboard || []).slice(0, 3);
+  const userRank = (leaderboard || []).find(e => e.user_id === user?.id);
+
+  const nextMilestone = Math.ceil((earnedPoints + 1) / 50) * 50;
+  const progress = earnedPoints > 0 ? ((earnedPoints % 50) / 50) * 100 : 0;
 
   return (
-    <div className="space-y-5 p-4 lg:p-6">
-      {/* Welcome Header - Compact */}
+    <div className="space-y-4 p-4 lg:p-6">
+      {/* Welcome - minimal */}
       <div className="animate-slide-up stagger-1">
-        <div className="card-command p-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-foreground">
-              Olá, {profile?.full_name?.split(' ')[0] || 'Admin'}! 👋
-            </h2>
-            <p className="text-muted-foreground text-xs capitalize">{currentDate}</p>
-          </div>
-        </div>
+        <h2 className="text-xl font-bold text-foreground">
+          {greeting}, {firstName} 👋
+        </h2>
+        <p className="text-muted-foreground text-xs capitalize mt-0.5">
+          {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
+        </p>
       </div>
 
-      {/* Metric Cards Grid */}
+      {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
-        <MetricCard
-          title="Saldo do Mês"
-          value={formatCurrency(animatedBalance)}
-          icon="Wallet"
-          variant={stats.monthBalance >= 0 ? "stat-command-green" : "stat-command-red"}
+
+        {/* FINANCE WIDGET - large (full width) */}
+        <button
           onClick={() => navigate('/finance')}
-          subtitle={stats.monthBalance >= 0 ? 'positivo' : 'negativo'}
-          index={0}
-          isLoading={statsLoading}
-        />
-        <MetricCard
-          title="Pedidos Pendentes"
-          value={String(animatedOrders)}
-          icon="ShoppingCart"
-          variant="stat-command-amber"
-          onClick={() => navigate('/inventory', { state: { activeTab: 'orders' } })}
-          subtitle={stats.pendingOrders > 0 ? 'aguardando' : 'nenhum'}
-          index={1}
-          isLoading={statsLoading}
-        />
-        <MetricCard
-          title="Fichas Técnicas"
-          value={String(animatedRecipes)}
-          icon="ChefHat"
-          variant="stat-command-purple"
-          onClick={() => navigate('/recipes')}
-          subtitle="cadastradas"
-          index={2}
-          isLoading={statsLoading}
-        />
-        <MetricCard
-          title="Estoque Crítico"
-          value={String(animatedCritical)}
-          icon="AlertTriangle"
-          variant="stat-command-red"
-          onClick={() => navigate('/inventory', { state: { stockFilter: 'critical' } })}
-          subtitle={stats.criticalItems > 0 ? 'itens em alerta' : 'tudo ok'}
-          index={3}
-          isLoading={statsLoading}
-        />
-      </div>
+          className="finance-hero-card col-span-2 text-left animate-slide-up stagger-2"
+        >
+          <div className="finance-hero-inner p-5 pb-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+                Saldo do mês
+              </span>
+              <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+            </div>
+            <p className={cn(
+              "text-[2rem] font-extrabold tracking-tight leading-tight",
+              stats.monthBalance >= 0 ? "text-white" : "text-red-300"
+            )}>
+              {statsLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(animatedBalance)}
+            </p>
+            <div className="flex gap-2 mt-3">
+              <div className="finance-hero-chip finance-hero-chip--success">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
+                <span className={cn(
+                  "text-sm font-bold",
+                  stats.pendingExpenses > 0 ? "text-red-300" : "text-emerald-300"
+                )}>
+                  {statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}
+                </span>
+              </div>
+              {stats.pendingClosings > 0 && (
+                <div className="finance-hero-chip finance-hero-chip--neutral">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Fechamentos</span>
+                  <span className="text-sm font-bold text-amber-300">{stats.pendingClosings}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </button>
 
-      {/* Alerts Section */}
-      {hasAlerts && (
-        <div className="card-command-warning p-4 animate-slide-up stagger-5">
+        {/* POINTS WIDGET - half width */}
+        <button
+          onClick={() => navigate('/profile')}
+          className="card-command-warning p-4 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <AppIcon name="Star" size={18} className="text-warning" />
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Seus pontos</span>
+          </div>
+          {pointsLoading ? (
+            <Skeleton className="h-8 w-16" />
+          ) : (
+            <>
+              <p className="text-2xl font-bold text-foreground">{animatedPoints}</p>
+              <div className="mt-2">
+                <Progress value={progress} className="h-1 bg-secondary [&>div]:bg-warning" />
+                <p className="text-[9px] text-muted-foreground mt-1">{earnedPoints}/{nextMilestone} próxima conquista</p>
+              </div>
+            </>
+          )}
+        </button>
+
+        {/* RANKING WIDGET - half width */}
+        <button
+          onClick={() => navigate('/profile')}
+          className="card-command p-4 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        >
           <div className="flex items-center gap-2 mb-3">
-            <AppIcon name="AlertTriangle" size={16} className="text-warning" />
-            <h3 className="font-semibold text-sm text-foreground">Ações Pendentes</h3>
+            <AppIcon name="Trophy" size={18} className="text-warning" />
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Ranking</span>
           </div>
-          <div className="space-y-1">
+          {leaderboardLoading ? (
+            <div className="space-y-2">
+              {[1,2,3].map(i => <Skeleton key={i} className="h-5 w-full" />)}
+            </div>
+          ) : top3.length > 0 ? (
+            <div className="space-y-2">
+              {top3.map((entry, idx) => (
+                <div key={entry.user_id} className="flex items-center gap-2">
+                  <span className="text-xs w-4 text-center">
+                    {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}
+                  </span>
+                  <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_points} size={20} />
+                  <span className={cn(
+                    "text-[11px] font-medium truncate flex-1",
+                    entry.user_id === user?.id && "text-primary"
+                  )}>
+                    {entry.full_name?.split(' ')[0]}
+                  </span>
+                  <span className="text-[10px] font-bold text-warning">{entry.earned_points}</span>
+                </div>
+              ))}
+              {userRank && userRank.rank > 3 && (
+                <div className="flex items-center gap-2 pt-1 border-t border-border/30">
+                  <span className="text-[10px] w-4 text-center text-muted-foreground font-bold">{userRank.rank}º</span>
+                  <RankedAvatar avatarUrl={userRank.avatar_url} earnedPoints={userRank.earned_points} size={20} />
+                  <span className="text-[11px] font-medium text-primary truncate flex-1">Você</span>
+                  <span className="text-[10px] font-bold text-warning">{userRank.earned_points}</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Sem dados</p>
+          )}
+        </button>
+
+        {/* AGENDA WIDGET - full width */}
+        <button
+          onClick={() => navigate('/agenda')}
+          className="card-command col-span-2 p-4 text-left animate-slide-up stagger-4 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <AppIcon name="CalendarDays" size={18} className="text-primary" />
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Agenda de hoje</span>
+            </div>
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+          </div>
+
+          {tasksLoading ? (
+            <div className="space-y-2">
+              {[1,2,3].map(i => <Skeleton key={i} className="h-8 w-full" />)}
+            </div>
+          ) : pendingTasks.length > 0 ? (
+            <div className="space-y-2">
+              {pendingTasks.map(task => {
+                const isOverdue = task.due_date && isPast(new Date(task.due_date + 'T23:59:59')) && !isToday(new Date(task.due_date));
+                return (
+                  <div key={task.id} className="flex items-center gap-3">
+                    <div className={cn(
+                      "w-2 h-2 rounded-full flex-shrink-0",
+                      isOverdue ? "bg-destructive" : "bg-primary"
+                    )} />
+                    <span className="text-sm text-foreground truncate flex-1">{task.title}</span>
+                    {task.due_date && (
+                      <span className={cn(
+                        "text-[10px] font-medium flex-shrink-0",
+                        isOverdue ? "text-destructive" : "text-muted-foreground"
+                      )}>
+                        {isToday(new Date(task.due_date)) ? 'Hoje' : 
+                         isTomorrow(new Date(task.due_date)) ? 'Amanhã' :
+                         format(new Date(task.due_date), 'dd/MM')}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-3">
+              <AppIcon name="Check" size={24} className="text-success mx-auto mb-1" />
+              <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente</p>
+            </div>
+          )}
+        </button>
+
+        {/* ALERTS - full width, only if alerts exist */}
+        {(stats.pendingRedemptions > 0) && (
+          <div className="card-command-info col-span-2 p-4 animate-slide-up stagger-5">
+            <div className="flex items-center gap-2 mb-2">
+              <AppIcon name="Bell" size={16} className="text-primary" />
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
+            </div>
             {stats.pendingRedemptions > 0 && (
-              <AlertItem message="Resgates aguardando" count={stats.pendingRedemptions} severity="info" onClick={() => navigate('/rewards')} />
-            )}
-            {stats.pendingClosings > 0 && (
-              <AlertItem message="Fechamentos pendentes" count={stats.pendingClosings} severity="warning" onClick={() => navigate('/cash-closing')} />
-            )}
-            {stats.pendingExpenses > 0 && (
-              <AlertItem message="Despesas a pagar" count={formatCurrency(stats.pendingExpenses)} severity="info" onClick={() => navigate('/finance')} />
+              <button
+                onClick={() => navigate('/rewards')}
+                className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors"
+              >
+                <span className="text-xs text-foreground">Resgates aguardando</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
+              </button>
             )}
           </div>
-        </div>
-      )}
-
-      {/* Quick Access - Horizontal Scrollable Pills (iFood style) */}
-      <div className="animate-slide-up stagger-5">
-        <h3 className="section-label mb-2">Acesso Rápido</h3>
-        <ScrollArea className="w-full">
-          <div className="flex gap-2 pb-2">
-            <PillButton label="Financeiro" icon="Wallet" onClick={() => navigate('/finance')} />
-            <PillButton label="Agenda" icon="CalendarDays" onClick={() => navigate('/agenda')} />
-            <PillButton label="Estoque" icon="Package" onClick={() => navigate('/inventory')} badge={stats.criticalItems > 0 ? `${stats.criticalItems}` : undefined} />
-            <PillButton label="Checklists" icon="ClipboardCheck" onClick={() => navigate('/checklists')} />
-            <PillButton label="Fechamento" icon="Receipt" onClick={() => navigate('/cash-closing')} badge={stats.pendingClosings > 0 ? `${stats.pendingClosings}` : undefined} />
-            <PillButton label="Recompensas" icon="Gift" onClick={() => navigate('/rewards')} badge={stats.pendingRedemptions > 0 ? `${stats.pendingRedemptions}` : undefined} />
-            <PillButton label="Config." icon="Settings" onClick={() => navigate('/settings')} />
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
-
-      {/* Leaderboard */}
-      <div className="animate-slide-up stagger-6">
-        <Leaderboard 
-          entries={leaderboard} 
-          currentUserId={user?.id}
-          isLoading={leaderboardLoading}
-        />
+        )}
       </div>
     </div>
   );
