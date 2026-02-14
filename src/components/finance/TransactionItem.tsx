@@ -43,15 +43,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
 
   const getCategoryIcon = () => {
     if (!category?.icon) return null;
-    // Try Material icon from ICON_MAP first, fallback to Lucide
-    const { ICON_MAP } = require('@/lib/iconMap');
-    const materialName = ICON_MAP[category.icon];
-    if (materialName) {
-      return <AppIcon name={category.icon} size={16} style={{ color: category.color }} />;
-    }
-    const IconComponent = getLucideIcon(category.icon);
-    if (!IconComponent) return null;
-    return <IconComponent className="w-4 h-4" style={{ color: category.color }} />;
+    return <AppIcon name={category.icon} size={16} style={{ color: category.color }} />;
   };
 
   const formatAmount = () => {
