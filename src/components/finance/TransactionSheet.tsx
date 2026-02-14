@@ -23,9 +23,9 @@ import {
 } from '@/types/finance';
 import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, ChevronDown, ChevronUp, Loader2, Trash2, Repeat } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getLucideIcon } from '@/lib/icons';
+import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 
 export type RecurringEditMode = 'single' | 'pending' | 'all';
@@ -389,7 +389,7 @@ export function TransactionSheet({
   const selectedCategory = categories.flatMap(c => [c, ...(c.subcategories || [])]).find(c => c.id === categoryId);
   const selectedAccount = accounts.find(a => a.id === accountId);
 
-  const CategoryIcon = selectedCategory?.icon ? getLucideIcon(selectedCategory.icon) : null;
+  const categoryIconName = selectedCategory?.icon || null;
 
   const getDateLabel = () => {
     if (isToday(date)) return 'Hoje';
@@ -525,7 +525,7 @@ export function TransactionSheet({
                 <Popover open={showCalendar} onOpenChange={setShowCalendar}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm">
-                      <CalendarIcon className="w-4 h-4 mr-1" />
+                      <AppIcon name="Calendar" size={16} className="mr-1" />
                       {!isToday(date) && !isYesterday(date) ? getDateLabel() : 'Outros'}
                     </Button>
                   </PopoverTrigger>
@@ -554,12 +554,12 @@ export function TransactionSheet({
                   onClick={() => setShowCategoryPicker(true)}
                 >
                   <div className="flex items-center gap-2">
-                    {CategoryIcon && (
-                      <CategoryIcon className="w-4 h-4" style={{ color: selectedCategory?.color }} />
+                    {categoryIconName && (
+                      <AppIcon name={categoryIconName} size={16} style={{ color: selectedCategory?.color }} />
                     )}
                     <span>{selectedCategory?.name || 'Selecionar categoria'}</span>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                   <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
                 </Button>
               </div>
             )}
@@ -573,7 +573,7 @@ export function TransactionSheet({
                 onClick={() => setShowAccountPicker(true)}
               >
                 <span>{availableAccounts.find(a => a.id === accountId)?.name || `Selecionar ${type === 'credit_card' ? 'cartão' : 'conta'}`}</span>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
               </Button>
             </div>
 
@@ -587,7 +587,7 @@ export function TransactionSheet({
                   onClick={() => setShowToAccountPicker(true)}
                 >
                   <span>{accounts.find(a => a.id === toAccountId)?.name || 'Selecionar conta'}</span>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
                 </Button>
               </div>
             )}
@@ -603,19 +603,19 @@ export function TransactionSheet({
                     onClick={() => setShowSupplierPicker(true)}
                   >
                     <span>{suppliers.find(s => s.id === supplierId)?.name || 'Nenhum'}</span>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                  </Button>
-                </div>
+                     <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
+                   </Button>
+                 </div>
 
-                <div className="space-y-2">
-                  <Label>Funcionário</Label>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between h-12"
-                    onClick={() => setShowEmployeePicker(true)}
-                  >
-                    <span>{employees.find(e => e.id === employeeId)?.full_name || 'Nenhum'}</span>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                 <div className="space-y-2">
+                   <Label>Funcionário</Label>
+                   <Button
+                     variant="outline"
+                     className="w-full justify-between h-12"
+                     onClick={() => setShowEmployeePicker(true)}
+                   >
+                     <span>{employees.find(e => e.id === employeeId)?.full_name || 'Nenhum'}</span>
+                     <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
                   </Button>
                 </div>
               </>
@@ -627,7 +627,7 @@ export function TransactionSheet({
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Repeat className="w-4 h-4 text-muted-foreground" />
+                       <AppIcon name="Repeat" size={16} className="text-muted-foreground" />
                         <Label>Repetir</Label>
                       </div>
                       <Switch checked={isRecurring} onCheckedChange={(checked) => {
@@ -644,7 +644,7 @@ export function TransactionSheet({
                       {/* Quantity selector with increment/decrement */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Repeat className="w-4 h-4 text-muted-foreground" />
+                         <AppIcon name="Repeat" size={16} className="text-muted-foreground" />
                           <span className="text-sm">Quantidade</span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -655,7 +655,7 @@ export function TransactionSheet({
                             className="h-8 w-8"
                             onClick={() => setRecurringCount(String(Math.max(2, parseInt(recurringCount) - 1)))}
                           >
-                            <ChevronDown className="w-4 h-4" />
+                            <AppIcon name="ChevronDown" size={16} />
                           </Button>
                           <span className="text-lg font-semibold w-8 text-center">{recurringCount}</span>
                           <Button
@@ -665,7 +665,7 @@ export function TransactionSheet({
                             className="h-8 w-8"
                             onClick={() => setRecurringCount(String(Math.min(60, parseInt(recurringCount) + 1)))}
                           >
-                            <ChevronUp className="w-4 h-4" />
+                            <AppIcon name="ChevronUp" size={16} />
                           </Button>
                         </div>
                       </div>
@@ -673,8 +673,8 @@ export function TransactionSheet({
                       {/* Period selector */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Repeat className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm">Período</span>
+                         <AppIcon name="Repeat" size={16} className="text-muted-foreground" />
+                           <span className="text-sm">Período</span>
                         </div>
                         <Select value={recurringInterval} onValueChange={setRecurringInterval}>
                           <SelectTrigger className="w-32">
@@ -744,7 +744,7 @@ export function TransactionSheet({
                   disabled={isLoading}
                   className="w-14"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <AppIcon name="Trash2" size={20} />
                 </Button>
               )}
               <Button
