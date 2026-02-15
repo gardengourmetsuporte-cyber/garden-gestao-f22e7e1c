@@ -1,5 +1,4 @@
 import { ReactNode, useState, useEffect, useRef, useCallback } from 'react';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -18,7 +17,6 @@ import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { getModuleKeyFromRoute } from '@/lib/modules';
 import { useTimeAlerts } from '@/hooks/useTimeAlerts';
-
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
@@ -36,68 +34,30 @@ interface NavItem {
   groupLabel: string;
 }
 
-// Monochrome — no per-module colors
-
 const navItems: NavItem[] = [
-  { icon: 'LayoutDashboard', label: 'Dashboard', href: '/', group: 'principal', groupLabel: 'Principal' },
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Users', label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'MessageCircle', label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'producao', groupLabel: 'Em Produção' },
-  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'producao', groupLabel: 'Produção' },
   { icon: 'Settings', label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
 ];
 
 function AppLayoutContent({ children }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [launcherOpen, setLauncherOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
-  const [fabOpen, setFabOpen] = useState(false);
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const isClosingDrawerRef = useRef(false);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Edge swipe to open menu (from right edge)
-  useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      if (sidebarOpen) return;
-      const touch = e.touches[0];
-      if (touch.clientX > window.innerWidth - 20) {
-        touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
-      }
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      if (sidebarOpen || !touchStartRef.current) return;
-      const touch = e.touches[0];
-      const dx = touchStartRef.current.x - touch.clientX;
-      const dy = Math.abs(touch.clientY - touchStartRef.current.y);
-      if (dx > 30 && dy < 50) {
-        setSidebarOpen(true);
-        touchStartRef.current = null;
-      }
-    };
-    const handleTouchEnd = () => {
-      if (!sidebarOpen) touchStartRef.current = null;
-    };
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [sidebarOpen]);
 
   const { profile, isAdmin, signOut } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
@@ -112,20 +72,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const handleNotifOpenChange = useCallback((open: boolean) => {
     setNotifOpen(prev => prev === open ? prev : open);
   }, []);
-  const navRef = useRef<HTMLElement>(null);
 
   const hasBottomNav = location.pathname === '/finance' || location.pathname === '/chat';
-
-  useEffect(() => {
-    if (sidebarOpen && navRef.current) {
-      const activeLink = navRef.current.querySelector('[data-active="true"]');
-      if (activeLink) {
-        setTimeout(() => {
-          activeLink.scrollIntoView({ block: 'center', behavior: 'instant' });
-        }, 50);
-      }
-    }
-  }, [sidebarOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -151,6 +99,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       });
     }
   });
+
+  // Close launcher on route change
+  useEffect(() => {
+    setLauncherOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -207,194 +160,126 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </header>
 
-      {/* ======= Expandable FAB ======= */}
-      {fabOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm animate-fade-in"
-          onClick={() => setFabOpen(false)}
-        />
-      )}
-
-      {fabOpen && !sidebarOpen && (
-        <div
-          className="lg:hidden fixed z-[60] flex flex-col-reverse items-center gap-3"
-          style={{
-            bottom: hasBottomNav
-              ? 'calc(env(safe-area-inset-bottom) + 100px)'
-              : 'calc(env(safe-area-inset-bottom) + 40px)',
-            right: '23px',
-            paddingBottom: '64px',
-          }}
-        >
-          <button
-            onClick={() => { setFabOpen(false); setSidebarOpen(true); }}
-            className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
-            style={{ animationDelay: '0ms', boxShadow: '0 4px 16px hsl(222 50% 3% / 0.5)' }}
-          >
-            <AppIcon name="Menu" size={20} className="text-foreground" />
-          </button>
-          <button
-            onClick={() => { setFabOpen(false); navigate('/'); }}
-            className="fab-action-enter w-11 h-11 rounded-full flex items-center justify-center bg-card/90 backdrop-blur-md border border-border/50 active:scale-90 transition-transform"
-            style={{ animationDelay: '80ms', boxShadow: '0 4px 16px hsl(222 50% 3% / 0.5)' }}
-          >
-            <AppIcon name="Home" size={20} className="text-foreground" />
-          </button>
-        </div>
-      )}
-
+      {/* ======= FAB (Launcher Trigger) ======= */}
       <button
-        onTouchEnd={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (sidebarOpen) {
-            // handled by close button inside drawer
-            return;
-          } else if (fabOpen) {
-            setFabOpen(false);
-          } else {
-            setFabOpen(true);
-          }
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (sidebarOpen) {
-            return;
-          } else if (fabOpen) {
-            setFabOpen(false);
-          } else {
-            setFabOpen(true);
-          }
-        }}
+        onClick={() => setLauncherOpen(!launcherOpen)}
         className={cn(
-          "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300 active:scale-95",
-          sidebarOpen ? "pointer-events-none opacity-0" : "",
-          fabOpen ? "w-16 h-16" : "w-14 h-14 hover:scale-105"
+          "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
+          launcherOpen ? "w-14 h-14 rotate-0" : "w-14 h-14 hover:scale-105"
         )}
         style={{
           bottom: hasBottomNav
             ? 'calc(env(safe-area-inset-bottom) + 84px)'
             : 'calc(env(safe-area-inset-bottom) + 24px)',
           right: '20px',
-          background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
-          boxShadow: '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
+          background: launcherOpen
+            ? 'hsl(var(--destructive))'
+            : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
+          boxShadow: launcherOpen
+            ? '0 4px 24px hsl(var(--destructive) / 0.4)'
+            : '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
         }}
       >
-        {fabOpen ? (
-          <AppIcon name="X" size={24} className="text-primary-foreground" />
+        {launcherOpen ? (
+          <AppIcon name="X" size={24} className="text-destructive-foreground" />
         ) : (
-          <AppIcon name="Grip" size={24} className="text-primary-foreground" />
-        )}
-        {!fabOpen && !sidebarOpen && activeUnit && (
-          <span
-            className="absolute top-1 right-1 w-3 h-3 rounded-full border-2"
-            style={{
-              borderColor: 'hsl(var(--primary))',
-              background: getThemeColor(activeUnit.slug),
-              boxShadow: `0 0 8px ${getThemeColor(activeUnit.slug)}80`,
-            }}
-          />
+          <>
+            <AppIcon name="Grip" size={24} className="text-primary-foreground" />
+            {activeUnit && (
+              <span
+                className="absolute top-1 right-1 w-3 h-3 rounded-full border-2"
+                style={{
+                  borderColor: 'hsl(var(--primary))',
+                  background: getThemeColor(activeUnit.slug),
+                  boxShadow: `0 0 8px ${getThemeColor(activeUnit.slug)}80`,
+                }}
+              />
+            )}
+          </>
         )}
       </button>
 
-      {/* ======= Main Content ======= */}
-      <main
-        className={cn("min-h-screen animate-page-enter", "transition-all duration-300")}
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.75rem)' }}
-      >
-        {children}
-      </main>
-
-      {/* ======= Bottom Sheet Menu (Drawer) ======= */}
-      <Drawer open={sidebarOpen} onOpenChange={(open) => {
-        if (!open) {
-          isClosingDrawerRef.current = true;
-          setTimeout(() => { isClosingDrawerRef.current = false; }, 400);
-        }
-        setSidebarOpen(open);
-      }}>
-        <DrawerContent className="border-t-0 max-h-[92vh] rounded-t-3xl overflow-hidden" style={{
-          background: 'hsl(var(--background))',
-        }}>
-          {/* Header: Unit Selector + Handle + Close */}
-          <div className="flex items-center justify-between px-4 pt-3 pb-1">
-            {/* Unit selector compact */}
-            <div className="flex-1 relative">
-              {units.length > 0 && (
-                <button
-                  onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all bg-secondary/60 border border-border/20 max-w-[140px]"
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{
-                    background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
-                    boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : undefined,
-                  }} />
-                  <span className="truncate text-foreground">{activeUnit?.name || 'Unidade'}</span>
-                  <AppIcon name="ChevronDown" size={12} className={cn("text-muted-foreground transition-transform duration-200 shrink-0", unitDropdownOpen && "rotate-180")} />
-                </button>
-              )}
-              {unitDropdownOpen && units.length > 0 && (
-                <div className="absolute top-full left-0 mt-1.5 z-50 rounded-xl overflow-hidden py-1 bg-card border border-border/40 min-w-[180px]" style={{
-                  boxShadow: 'var(--shadow-elevated)',
-                }}>
-                  {units.map(unit => (
-                    <button
-                      key={unit.id}
-                      onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                      className={cn(
-                        "w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all",
-                        unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                      )}
-                    >
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
-                      <span className="truncate">{unit.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
-            <div className="flex-1 flex justify-end">
+      {/* ======= App Launcher Overlay ======= */}
+      {launcherOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-[9998] flex flex-col launcher-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setLauncherOpen(false);
+          }}
+        >
+          {/* Scrollable content */}
+          <div
+            className="flex-1 overflow-y-auto px-5 launcher-content"
+            style={{
+              paddingTop: 'calc(env(safe-area-inset-top) + 80px)',
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)',
+            }}
+          >
+            {/* Home Button */}
+            <div className="flex justify-center mb-6 launcher-item" style={{ animationDelay: '0ms' }}>
               <button
-                onClick={() => {
-                  setSidebarOpen(false);
-                  setFabOpen(false);
-                  navigate('/');
-                }}
-                className="w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-all bg-secondary border border-border/30"
+                onClick={() => { navigate('/'); setLauncherOpen(false); }}
+                className="flex flex-col items-center gap-2 active:scale-90 transition-transform"
               >
-                <AppIcon name="X" size={18} className="text-foreground" />
+                <div
+                  className="w-16 h-16 rounded-[20px] flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
+                    boxShadow: '0 4px 20px hsl(var(--primary) / 0.4), 0 0 30px hsl(var(--neon-cyan) / 0.15)',
+                  }}
+                >
+                  <AppIcon name="Home" size={28} className="text-primary-foreground" />
+                </div>
+                <span className="text-xs font-semibold text-foreground">Home</span>
               </button>
             </div>
-          </div>
 
-          {/* Mini Profile Row */}
-          <button
-            onClick={() => { navigate('/profile/me'); setSidebarOpen(false); }}
-            className="flex items-center gap-3 w-full px-4 py-2 border-b border-border/10 active:bg-secondary/40 transition-colors"
-          >
-            <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={32} />
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-semibold text-foreground truncate">
-                {profile?.full_name || 'Usuário'}
-              </p>
-              <p className="text-[10px] font-medium" style={{ color: rank.color }}>
-                {rank.title} · {earnedPoints} pts
-              </p>
-            </div>
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-          </button>
+            {/* Unit Selector */}
+            {units.length > 1 && (
+              <div className="flex justify-center mb-6 launcher-item" style={{ animationDelay: '40ms' }}>
+                <div className="relative">
+                  <button
+                    onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 active:scale-95 transition-transform"
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{
+                      background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
+                      boxShadow: activeUnit ? `0 0 8px ${getThemeColor(activeUnit.slug)}80` : undefined,
+                    }} />
+                    <span className="text-sm font-medium text-foreground">{activeUnit?.name || 'Unidade'}</span>
+                    <AppIcon name="ChevronDown" size={14} className={cn("text-muted-foreground transition-transform", unitDropdownOpen && "rotate-180")} />
+                  </button>
+                  {unitDropdownOpen && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 rounded-2xl overflow-hidden py-1 bg-card/95 backdrop-blur-xl border border-border/40 min-w-[200px]" style={{
+                      boxShadow: 'var(--shadow-elevated)',
+                    }}>
+                      {units.map(unit => (
+                        <button
+                          key={unit.id}
+                          onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                          className={cn(
+                            "w-full flex items-center gap-2.5 px-4 py-3 text-sm transition-all",
+                            unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                          )}
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
+                          <span className="truncate">{unit.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
-          {/* Navigation Grid — Monochrome Modern */}
-          <nav ref={navRef} className="flex-1 overflow-y-auto px-4 pb-8">
+            {/* App Grid by Group */}
             {groupedNav.map((group, gi) => (
-              <div key={group.label} className={cn(gi > 0 && "mt-5")}>
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40 px-1 mb-2.5 block">
+              <div key={group.label} className={cn("mb-6 launcher-item")} style={{ animationDelay: `${(gi + 1) * 60 + 40}ms` }}>
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
                   {group.label}
                 </span>
-                <div className="grid grid-cols-4 gap-3">
-                  {group.items.map((item, idx) => {
+                <div className="grid grid-cols-4 gap-x-4 gap-y-5">
+                  {group.items.map((item) => {
                     const isActive = location.pathname === item.href;
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
@@ -404,43 +289,34 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       <Link
                         key={item.href}
                         to={item.href}
-                        data-active={isActive}
-                        onClick={(e) => {
-                          if (isClosingDrawerRef.current) {
-                            e.preventDefault();
-                            return;
-                          }
-                          setSidebarOpen(false);
-                        }}
-                        className={cn(
-                          "flex flex-col items-center gap-1.5 py-2 text-center transition-all duration-200 relative active:scale-[0.92] rounded-xl",
-                          "animate-fade-in",
-                        )}
-                        style={{ animationDelay: `${(gi * 4 + idx) * 25}ms` }}
+                        onClick={() => setLauncherOpen(false)}
+                        className="flex flex-col items-center gap-1.5 active:scale-90 transition-all duration-150"
                       >
                         <div className="relative">
-                          {/* Icon container — monochrome filled style */}
                           <div
                             className={cn(
-                              "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200",
+                              "w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-200",
                               isActive
-                                ? "bg-primary shadow-lg shadow-primary/25"
-                                : "bg-secondary/80 border border-border/30"
+                                ? "bg-primary shadow-lg shadow-primary/30"
+                                : "bg-card/90 border border-border/40"
                             )}
+                            style={{
+                              boxShadow: isActive ? undefined : 'var(--shadow-card)',
+                            }}
                           >
                             <AppIcon
                               name={item.icon}
-                              size={22}
+                              size={24}
                               className={isActive ? "text-primary-foreground" : "text-muted-foreground"}
                               style={{
-                                filter: isActive ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' : 'none',
+                                filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
                           </div>
 
                           {/* Badges */}
                           {showBadge && (
-                            <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center animate-pulse bg-destructive text-destructive-foreground" style={{
+                            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse bg-destructive text-destructive-foreground" style={{
                               border: '2px solid hsl(var(--background))',
                             }}>
                               {badgeCount > 9 ? '9+' : badgeCount}
@@ -449,7 +325,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
                             <span
                               className={cn(
-                                "absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center",
+                                "absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center",
                                 (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
                               )}
                               style={{
@@ -470,8 +346,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )}
                         </div>
                         <span className={cn(
-                          "text-[10px] font-medium leading-tight max-w-full truncate transition-colors",
-                          isActive ? "text-foreground" : "text-muted-foreground"
+                          "text-[11px] font-medium leading-tight max-w-full truncate transition-colors",
+                          isActive ? "text-foreground" : "text-muted-foreground/80"
                         )}>{item.label}</span>
                       </Link>
                     );
@@ -480,19 +356,48 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </div>
             ))}
 
-            {/* Logout */}
-            <div className="mt-6 pt-4 border-t border-border/15">
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.97] text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-              >
-                <AppIcon name="LogOut" size={16} />
-                <span className="font-medium">Sair da conta</span>
-              </button>
+            {/* Profile + Logout */}
+            <div className="launcher-item mt-2 mb-4" style={{ animationDelay: `${(groupedNav.length + 1) * 60 + 40}ms` }}>
+              <div className="rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 overflow-hidden" style={{ boxShadow: 'var(--shadow-card)' }}>
+                <button
+                  onClick={() => { navigate('/profile/me'); setLauncherOpen(false); }}
+                  className="flex items-center gap-3 w-full px-4 py-3 active:bg-secondary/40 transition-colors"
+                >
+                  <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={36} />
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-semibold text-foreground truncate">
+                      {profile?.full_name || 'Usuário'}
+                    </p>
+                    <p className="text-[10px] font-medium" style={{ color: rank.color }}>
+                      {rank.title} · {earnedPoints} pts
+                    </p>
+                  </div>
+                  <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+                </button>
+                <div className="h-px bg-border/20" />
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2.5 w-full px-4 py-3 text-sm transition-all active:bg-secondary/40 text-muted-foreground"
+                >
+                  <AppIcon name="LogOut" size={18} />
+                  <span className="font-medium">Sair da conta</span>
+                </button>
+              </div>
             </div>
-          </nav>
-        </DrawerContent>
-      </Drawer>
+          </div>
+        </div>
+      )}
+
+      {/* ======= Main Content ======= */}
+      <main
+        className={cn(
+          "min-h-screen animate-page-enter transition-all duration-300",
+          launcherOpen && "pointer-events-none"
+        )}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.75rem)' }}
+      >
+        {children}
+      </main>
 
       {/* Unit transition overlay */}
       {isTransitioning && (
