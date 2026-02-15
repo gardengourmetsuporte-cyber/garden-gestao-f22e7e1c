@@ -794,90 +794,188 @@
     }
   }
 
-  /* ========== RANKED AVATAR EFFECTS ========== */
+  /* ========== RANK FRAME SVG EFFECTS ========== */
 
-  .ranked-avatar-pulse {
-    animation: rankPulseGlow 2s ease-in-out infinite;
+  /* Aprendiz — leaf pulse */
+  .rank-frame-aprendiz {
+    animation: rankLeafPulse 3s ease-in-out infinite;
   }
 
-  @keyframes rankPulseGlow {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.25); }
+  @keyframes rankLeafPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; filter: brightness(1.2); }
   }
 
-  .ranked-avatar-double-ring {
-    animation: rankDoubleRing 3s ease-in-out infinite;
+  .rank-leaf {
+    transform-origin: center;
+    animation: rankLeafSway 4s ease-in-out infinite;
   }
 
-  .ranked-avatar-outer-ring {
-    animation: rankOuterRing 3s ease-in-out infinite;
+  .rank-leaf-right {
+    animation-delay: -2s;
   }
 
-  @keyframes rankDoubleRing {
-    0%, 100% { box-shadow: 0 0 10px hsl(var(--neon-purple) / 0.35); }
-    50% { box-shadow: 0 0 18px hsl(var(--neon-purple) / 0.55), 0 0 4px hsl(var(--neon-purple) / 0.3); }
+  @keyframes rankLeafSway {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.08) rotate(3deg); }
   }
 
-  @keyframes rankOuterRing {
-    0%, 100% { opacity: 0.3; transform: scale(1.15); }
-    50% { opacity: 0.6; transform: scale(1.2); }
+  /* Dedicado — hex pulse */
+  .rank-hex-pulse {
+    animation: rankHexPulse 3s ease-in-out infinite;
   }
 
-  /* Orbit particles for Mestre */
-  .ranked-avatar-orbit-ring {
-    position: absolute;
-    top: 0;
-    left: 0;
-    pointer-events: none;
+  @keyframes rankHexPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
   }
 
-  .orbit-particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: hsl(var(--neon-amber));
-    box-shadow: 0 0 6px hsl(var(--neon-amber) / 0.8);
-    animation: rankOrbit 3s linear infinite;
+  .rank-hex-tip {
+    animation: rankTipGlow 2s ease-in-out infinite alternate;
   }
 
-  .orbit-particle-1 { animation-delay: 0s; }
-  .orbit-particle-2 { animation-delay: -1s; }
-  .orbit-particle-3 { animation-delay: -2s; }
-
-  @keyframes rankOrbit {
-    0% { top: 0%; left: 50%; }
-    25% { top: 50%; left: 100%; }
-    50% { top: 100%; left: 50%; }
-    75% { top: 50%; left: 0%; }
-    100% { top: 0%; left: 50%; }
+  @keyframes rankTipGlow {
+    0% { opacity: 0.4; }
+    100% { opacity: 0.9; }
   }
 
-  /* Fire glow for Lenda */
-  .ranked-avatar-fire {
-    animation: rankFireGlow 1.5s ease-in-out infinite alternate;
+  /* Wings — Veterano, Mítico, Imortal */
+  .rank-wing {
+    transform-origin: center;
   }
 
-  @keyframes rankFireGlow {
-    0% { box-shadow: 0 0 10px hsl(var(--neon-red) / 0.4), 0 0 20px hsl(var(--neon-red) / 0.15); }
-    50% { box-shadow: 0 0 18px hsl(var(--neon-red) / 0.6), 0 0 35px hsl(var(--neon-red) / 0.25), 0 -4px 12px hsl(var(--neon-amber) / 0.3); }
-    100% { box-shadow: 0 0 12px hsl(var(--neon-red) / 0.5), 0 0 25px hsl(var(--neon-red) / 0.2), 0 -2px 8px hsl(var(--neon-amber) / 0.2); }
+  .rank-wing-left {
+    animation: rankWingPulseLeft 3s ease-in-out infinite;
   }
 
-  /* Rainbow for Mítico */
-  .ranked-avatar-rainbow {
-    animation: neonRotate 3s linear infinite;
+  .rank-wing-right {
+    animation: rankWingPulseRight 3s ease-in-out infinite;
   }
 
-  /* Prisma shimmer for Imortal */
-  .ranked-avatar-prisma {
-    animation: neonRotate 3s linear infinite, rankPrismaShimmer 2s ease-in-out infinite alternate;
+  @keyframes rankWingPulseLeft {
+    0%, 100% { transform: scaleY(0.95) scaleX(0.97); }
+    50% { transform: scaleY(1.05) scaleX(1.03); }
   }
 
-  @keyframes rankPrismaShimmer {
-    0% { filter: brightness(1) saturate(1); box-shadow: 0 0 20px hsl(200 80% 80% / 0.4), 0 0 40px hsl(280 80% 75% / 0.2); }
-    50% { filter: brightness(1.15) saturate(1.2); box-shadow: 0 0 30px hsl(200 80% 80% / 0.6), 0 0 60px hsl(340 80% 70% / 0.3), 0 0 80px hsl(60 80% 75% / 0.15); }
-    100% { filter: brightness(1.05) saturate(1.1); box-shadow: 0 0 25px hsl(280 80% 75% / 0.5), 0 0 50px hsl(200 80% 80% / 0.25); }
+  @keyframes rankWingPulseRight {
+    0%, 100% { transform: scaleY(0.95) scaleX(0.97); }
+    50% { transform: scaleY(1.05) scaleX(1.03); }
+  }
+
+  /* Mestre — crown glow + orbit */
+  .rank-crown {
+    animation: rankCrownGlow 2.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes rankCrownGlow {
+    0% { opacity: 0.6; }
+    100% { opacity: 1; filter: brightness(1.3); }
+  }
+
+  .rank-orbit-particle {
+    transform-origin: 75px 75px;
+  }
+
+  .rank-orbit-1 { animation: rankOrbitSvg 4s linear infinite; }
+  .rank-orbit-2 { animation: rankOrbitSvg 4s linear infinite; animation-delay: -1.33s; }
+  .rank-orbit-3 { animation: rankOrbitSvg 4s linear infinite; animation-delay: -2.66s; }
+
+  @keyframes rankOrbitSvg {
+    0% { transform: rotate(0deg) translateY(-62px); }
+    100% { transform: rotate(360deg) translateY(-62px); }
+  }
+
+  /* Lenda — flame wave */
+  .rank-flame {
+    transform-origin: center bottom;
+  }
+
+  .rank-flame-left {
+    animation: rankFlameWave 1.8s ease-in-out infinite alternate;
+  }
+
+  .rank-flame-right {
+    animation: rankFlameWave 1.8s ease-in-out infinite alternate-reverse;
+  }
+
+  .rank-flame-top {
+    animation: rankFlameTop 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes rankFlameWave {
+    0% { transform: scaleY(0.9) translateY(2px); opacity: 0.4; }
+    100% { transform: scaleY(1.1) translateY(-2px); opacity: 0.7; }
+  }
+
+  @keyframes rankFlameTop {
+    0% { transform: scaleY(0.85) scaleX(0.9); opacity: 0.45; }
+    100% { transform: scaleY(1.15) scaleX(1.1); opacity: 0.75; }
+  }
+
+  /* Mítico — halo rotation + ring shimmer */
+  .rank-halo {
+    transform-origin: center;
+    animation: rankHaloSpin 6s linear infinite;
+  }
+
+  @keyframes rankHaloSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .rank-mitico-ring {
+    animation: rankMiticoShimmer 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes rankMiticoShimmer {
+    0% { opacity: 0.4; }
+    100% { opacity: 0.8; filter: brightness(1.2); }
+  }
+
+  /* Imortal — crystals float + ring rotate + aura */
+  .rank-imortal-ring {
+    transform-origin: center;
+    animation: rankImortalRing 8s linear infinite;
+  }
+
+  @keyframes rankImortalRing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .rank-imortal-inner {
+    transform-origin: center;
+    animation: rankImortalInner 6s linear infinite reverse;
+  }
+
+  @keyframes rankImortalInner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .rank-crystal {
+    animation: rankCrystalFloat 3s ease-in-out infinite;
+  }
+
+  .rank-crystal-2 { animation-delay: -0.75s; }
+  .rank-crystal-3 { animation-delay: -1.5s; }
+  .rank-crystal-4 { animation-delay: -2.25s; }
+
+  @keyframes rankCrystalFloat {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+    50% { transform: translateY(-4px) scale(1.15); opacity: 0.8; }
+  }
+
+  .rank-aura-particle {
+    animation: rankAuraFloat 4s ease-in-out infinite;
+  }
+
+  .rank-aura-2 { animation-delay: -1.33s; }
+  .rank-aura-3 { animation-delay: -2.66s; }
+
+  @keyframes rankAuraFloat {
+    0%, 100% { opacity: 0.3; transform: translateY(0) scale(0.8); }
+    50% { opacity: 0.7; transform: translateY(-6px) scale(1.2); }
   }
 
   /* Achievement shimmer */
