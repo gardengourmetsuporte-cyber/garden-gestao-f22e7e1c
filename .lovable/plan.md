@@ -1,105 +1,95 @@
 
-# Sistema de Pontuacao Justa - Funcionario do Mes
+# Bonus Separado, Pagina de Conquistas da Equipe e Simplificacao
 
-## Problema Atual
+## Resumo das Mudancas
 
-O ranking ordena por `earned_points` (soma total de `points_awarded` de checklists). Quem trabalha mais dias ou executa mais tarefas domina automaticamente. Nao existe bonus por qualidade, disciplina ou reconhecimento do gestor.
-
-## Solucao
-
-Criar um sistema de **pontos bonus** com pesos altos que funcionam como "viradas de jogo", permitindo que qualquer funcionario dispute o ranking mensal. O ranking passa a filtrar por mes e somar pontos base + bonus.
-
----
-
-## 1. Nova Tabela: `bonus_points`
-
-Armazena pontos bonus concedidos automaticamente (conquistas) ou manualmente (gestor).
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | uuid | PK |
-| user_id | uuid | Funcionario que recebeu |
-| unit_id | uuid | Unidade |
-| points | integer | Quantidade de pontos bonus |
-| reason | text | Descricao (ex: "Semana Perfeita") |
-| type | text | `auto` ou `manual` |
-| badge_id | text | ID da conquista (nullable, para auto) |
-| awarded_by | uuid | Quem concedeu (nullable, para manual) |
-| month | date | Primeiro dia do mes de referencia |
-| created_at | timestamptz | Quando foi concedido |
-
-RLS: Admins gerenciam tudo, usuarios veem os proprios.
+4 grandes melhorias:
+1. **Bonus com cor propria** -- separar visualmente pontos base dos bonus no perfil e leaderboard
+2. **Pagina "Conquistas da Equipe"** -- nova aba no modulo Funcionarios (visivel para todos) mostrando conquistas e medalhas de todos
+3. **Secao "Como Ganhar Bonus"** -- guia explicativo + acompanhamento das conquistas de alto valor com cooldown
+4. **Simplificar conquistas de titulos** -- reorganizar as 18 conquistas atuais, remover redundancias e deixar mais claro
 
 ---
 
-## 2. Conquistas de Alto Valor (automaticas)
+## 1. Bonus com Cor Propria
 
-Calculadas no frontend a partir de dados existentes, quando desbloqueadas geram um registro em `bonus_points` automaticamente.
+**Onde:** Perfil (`Profile.tsx`), Leaderboard (`Leaderboard.tsx`), UserPointsCard
 
-| Conquista | Condicao | Pontos Bonus | Frequencia |
-|-----------|----------|--------------|------------|
-| Pontualidade Perfeita | 5 dias consecutivos com tarefas antes das 9h | 15 pts | 1x por semana |
-| Semana Perfeita | Completou 100% dos checklists em todos os dias da semana | 25 pts | 1x por semana |
-| Sequencia de Fogo | 7 dias seguidos completando tarefas | 20 pts | 1x por mes |
-| Velocista | 5+ tarefas concluidas em 1 hora | 10 pts | 1x por semana |
-| Madrugador | Tarefa antes das 7h | 5 pts | 1x por semana |
+Os pontos bonus vao usar a cor **laranja/amber** (neon-amber) enquanto os pontos base continuam em verde. No card de pontos do perfil, adicionar uma terceira coluna "Bonus" com icone de chama e cor distinta.
 
-Anti-spam: cada conquista tem cooldown (semanal ou mensal) controlado pela coluna `badge_id` + `month`.
+**Arquivos a editar:**
+- `src/pages/Profile.tsx` -- separar grid de pontos: Ganhos (verde), Gastos (vermelho), Bonus (laranja), Saldo (ciano). Bonus em destaque com fundo amber/10
+- `src/components/dashboard/Leaderboard.tsx` -- nos itens do ranking, mostrar "Base" e "Bonus" com cores diferentes lado a lado
+- `src/components/dashboard/UserPointsCard.tsx` -- adicionar indicador de bonus do mes com cor amber
 
 ---
 
-## 3. Bonus Manual do Gestor ("Atitude Destaque")
+## 2. Pagina "Conquistas da Equipe"
 
-O admin podera conceder bonus diretamente a qualquer funcionario com:
-- Motivo descritivo (ex: "Resolveu problema do cliente sem ser solicitado")
-- Quantidade de pontos (sugestao: 10, 15, 20, 25)
+Nova aba no modulo de Funcionarios visivel para **todos** (nao apenas admin), onde qualquer funcionario pode ver as conquistas, medalhas e bonus de todos os colegas.
 
-Acessivel via um botao na aba de Performance do modulo de Funcionarios.
+**Novo componente:** `src/components/employees/TeamAchievements.tsx`
+- Lista todos os funcionarios da unidade com seus avatares rankeados
+- Para cada funcionario: conquistas desbloqueadas, medalhas ganhas, bonus do mes
+- Expandir para ver detalhes (accordion ou click para ir ao perfil)
+- Filtro por categoria (Tarefas, Pontos, Resgates, Medalhas)
+
+**Arquivo a editar:** `src/pages/Employees.tsx`
+- Adicionar aba "Conquistas" visivel para admin E funcionario
+- Para funcionarios, adicionar essa aba alem de Holerites e Folgas
+
+**Hook:** `src/hooks/useTeamAchievements.ts`
+- Busca dados de todos os funcionarios da unidade (profiles + completions + redemptions + bonus_points)
+- Calcula conquistas e medalhas para cada um
+- RLS ja permite que authenticated veja profiles e completions
 
 ---
 
-## 4. Ranking Mensal
+## 3. Secao "Como Ganhar Bonus"
 
-O leaderboard passa a exibir dados **filtrados por mes**:
-- **Pontos Base**: soma de `checklist_completions.points_awarded` do mes
-- **Pontos Bonus**: soma de `bonus_points.points` do mes
-- **Score Total**: Base + Bonus (ordenacao principal)
+Adicionar no componente `TeamAchievements` ou como secao separada um guia visual mostrando:
 
-Adicionar seletor de mes no componente Leaderboard.
+**Novo componente:** `src/components/employees/BonusGuide.tsx`
+- Lista as 5 conquistas de alto valor (HIGH_VALUE_BADGES do useBonusPoints)
+- Para cada uma: icone, titulo, pontos, como desbloquear, cooldown (semanal/mensal)
+- Status do usuario atual: "Ja conquistou esta semana" ou "Disponivel"
+- Visual de cards com cor amber, layout limpo
+
+Integrado na aba "Conquistas" como secao superior antes da lista de conquistas de todos.
 
 ---
 
-## 5. Funcionario do Mes
+## 4. Simplificar Conquistas de Titulos
 
-Destacar visualmente o 1o colocado do ranking mensal com:
-- Badge especial no perfil
-- Icone de trofeu no leaderboard
-- Label "Funcionario do Mes" no dashboard
+As conquistas atuais misturam 3 categorias (Tarefas, Pontos, Resgates) com 18 itens. Vamos:
+
+**Arquivo a editar:** `src/lib/achievements.ts`
+- Manter apenas conquistas com nomes claros e intuitivos
+- Remover redundancia de nomes entre conquistas e ranks (ex: "Aprendiz" existe como conquista E como rank)
+- Renomear para evitar confusao: conquistas de pontos terao nomes diferentes dos ranks
+- Simplificar descricoes para serem mais diretas
+
+**Arquivo a editar:** `src/components/profile/AchievementList.tsx`
+- Mostrar apenas conquistas desbloqueadas em destaque, com as bloqueadas em tamanho menor
+- Adicionar label de raridade visivel (Comum, Raro, Epico, Lendario)
+- Progresso mais claro: "23/50" com barra, sem poluir visualmente
 
 ---
 
 ## Detalhes Tecnicos
 
-### Banco de Dados (migracao SQL)
-- Criar tabela `bonus_points` com RLS
-- Politicas: admin ALL, usuario SELECT proprio
-
 ### Arquivos a criar:
-- `src/hooks/useBonusPoints.ts` -- CRUD de bonus, calculo de conquistas automaticas, concessao manual
-- `src/components/employees/BonusPointSheet.tsx` -- Sheet para admin conceder bonus manual
+- `src/components/employees/TeamAchievements.tsx` -- pagina de conquistas da equipe
+- `src/hooks/useTeamAchievements.ts` -- hook para buscar dados de todos
+- `src/components/employees/BonusGuide.tsx` -- guia de como ganhar bonus
 
 ### Arquivos a editar:
-- `src/hooks/useLeaderboard.ts` -- adicionar filtro por mes, somar bonus_points, novo campo `bonus_points` e `total_score` no LeaderboardEntry
-- `src/components/dashboard/Leaderboard.tsx` -- seletor de mes, exibir score total (base + bonus), badge "Func. do Mes"
-- `src/lib/achievements.ts` -- adicionar funcao para verificar conquistas de alto valor com cooldown
-- `src/components/employees/EmployeePerformance.tsx` -- botao "Dar Bonus" por funcionario
-- `src/hooks/useProfile.ts` -- incluir bonus_points no perfil
-- `src/pages/Profile.tsx` -- exibir bonus recebidos
+- `src/pages/Profile.tsx` -- bonus separado com cor amber
+- `src/pages/Employees.tsx` -- nova aba Conquistas (para todos)
+- `src/components/dashboard/Leaderboard.tsx` -- cores separadas base vs bonus
+- `src/components/dashboard/UserPointsCard.tsx` -- indicador de bonus
+- `src/lib/achievements.ts` -- renomear/simplificar conquistas
+- `src/components/profile/AchievementList.tsx` -- layout mais limpo
 
-### Fluxo de conquista automatica:
-1. Hook `useBonusPoints` verifica se o usuario desbloqueou alguma conquista de alto valor no mes atual
-2. Checa se ja existe registro em `bonus_points` com mesmo `badge_id` + `month` (cooldown)
-3. Se nao existe, insere automaticamente e mostra notificacao/animacao
-
-### Sem alteracao na logica base de pontos:
-Os pontos de checklists continuam funcionando exatamente como antes. O bonus e uma camada adicional que soma ao ranking mensal.
+### Sem mudancas no banco de dados
+Todos os dados necessarios ja existem (profiles, checklist_completions, reward_redemptions, bonus_points). RLS existente ja permite leitura dos dados necessarios.
