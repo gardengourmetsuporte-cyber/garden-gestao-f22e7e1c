@@ -719,6 +719,39 @@
   .fab-action-enter {
     animation: fabActionIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+
+  /* ========== APP LAUNCHER ========== */
+
+  .launcher-overlay {
+    background: hsl(222 70% 4% / 0.85);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    animation: launcherOverlayIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes launcherOverlayIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .launcher-item {
+    animation: launcherItemIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes launcherItemIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 }
 
 /* =========================================================
