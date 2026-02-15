@@ -3,13 +3,12 @@ import { useAutoOrderSuggestion, AutoOrderSuggestion } from '@/hooks/useAutoOrde
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 export function AutoOrderWidget() {
-  const { groupedSuggestions, createDraftOrder } = useAutoOrderSuggestion();
+  const { dailySuggestions, createDraftOrder } = useAutoOrderSuggestion();
   const [creating, setCreating] = useState<string | null>(null);
 
-  if (groupedSuggestions.length === 0) return null;
+  if (dailySuggestions.length === 0) return null;
 
   const handleCreate = async (s: AutoOrderSuggestion) => {
     setCreating(s.supplierId);
@@ -31,55 +30,40 @@ export function AutoOrderWidget() {
             <AppIcon name="ShoppingCart" size={18} className="text-primary" />
           </div>
           <div>
-            <span className="text-sm font-bold text-foreground">Pedidos Sugeridos</span>
-            <span className="text-[10px] text-muted-foreground block mt-0.5">Itens abaixo do mínimo com fornecedor</span>
+            <span className="text-sm font-bold text-foreground">Pedidos Diários</span>
+            <span className="text-[10px] text-muted-foreground block mt-0.5">Fornecedores com entrega diária</span>
           </div>
         </div>
 
-        <div className="space-y-4">
-          {groupedSuggestions.map(group => (
-            <div key={group.label}>
-              {/* Group header */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm">{group.emoji}</span>
-                <span className="text-xs font-semibold text-foreground">{group.label}</span>
-                <span className="text-[10px] text-muted-foreground">
-                  ({group.suggestions.length} fornecedor{group.suggestions.length > 1 ? 'es' : ''})
-                </span>
+        <div className="space-y-2">
+          {dailySuggestions.map(s => (
+            <div key={s.supplierId} className="rounded-xl bg-secondary/40 p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground">{s.supplierName}</span>
+                <span className="text-[10px] text-muted-foreground">{s.items.length} ite{s.items.length > 1 ? 'ns' : 'm'}</span>
               </div>
-
-              <div className="space-y-2">
-                {group.suggestions.map(s => (
-                  <div key={s.supplierId} className="rounded-xl bg-secondary/40 p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">{s.supplierName}</span>
-                      <span className="text-[10px] text-muted-foreground">{s.items.length} ite{s.items.length > 1 ? 'ns' : 'm'}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {s.items.slice(0, 4).map(i => (
-                        <span key={i.itemId} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground truncate max-w-[120px]">
-                          {i.itemName}
-                        </span>
-                      ))}
-                      {s.items.length > 4 && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
-                          +{s.items.length - 4}
-                        </span>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full text-xs gap-1.5"
-                      disabled={creating === s.supplierId}
-                      onClick={(e) => { e.stopPropagation(); handleCreate(s); }}
-                    >
-                      <AppIcon name="Plus" size={14} />
-                      {creating === s.supplierId ? 'Criando...' : 'Criar Rascunho'}
-                    </Button>
-                  </div>
+              <div className="flex flex-wrap gap-1">
+                {s.items.slice(0, 4).map(i => (
+                  <span key={i.itemId} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground truncate max-w-[120px]">
+                    {i.itemName}
+                  </span>
                 ))}
+                {s.items.length > 4 && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
+                    +{s.items.length - 4}
+                  </span>
+                )}
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full text-xs gap-1.5"
+                disabled={creating === s.supplierId}
+                onClick={(e) => { e.stopPropagation(); handleCreate(s); }}
+              >
+                <AppIcon name="Plus" size={14} />
+                {creating === s.supplierId ? 'Criando...' : 'Criar Rascunho'}
+              </Button>
             </div>
           ))}
         </div>

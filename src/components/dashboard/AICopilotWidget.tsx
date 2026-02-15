@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useManagementAI } from '@/hooks/useManagementAI';
 import { cn } from '@/lib/utils';
+import mascotImg from '@/assets/garden-mascot.png';
 
 export function AICopilotWidget() {
   const { messages, isLoading, hasGreeted, sendMessage, clearHistory } = useManagementAI();
   const [question, setQuestion] = useState('');
   const [expanded, setExpanded] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-greet on mount
   useEffect(() => {
@@ -18,9 +19,11 @@ export function AICopilotWidget() {
     }
   }, []);
 
+  // Scroll only within messages container
   useEffect(() => {
-    if (expanded) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (expanded && messagesContainerRef.current) {
+      const el = messagesContainerRef.current;
+      el.scrollTop = el.scrollHeight;
     }
   }, [messages, expanded]);
 
@@ -45,9 +48,7 @@ export function AICopilotWidget() {
         className="w-full px-4 py-3 flex items-center justify-between text-left"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-primary/15 border border-primary/20">
-            <AppIcon name="Bot" size={18} className="text-primary" />
-          </div>
+          <img src={mascotImg} alt="Garden Copiloto" className="w-9 h-9 rounded-xl object-cover border border-primary/20" />
           <div>
             <span className="text-sm font-bold text-foreground leading-none">Copiloto IA</span>
             <span className="text-[10px] text-muted-foreground block mt-0.5">Seu assistente de gestão</span>
@@ -94,7 +95,7 @@ export function AICopilotWidget() {
       {expanded && (
         <div className="px-4 pb-4 space-y-3">
           {/* Messages */}
-          <div className="max-h-64 overflow-y-auto space-y-2 scrollbar-thin">
+          <div ref={messagesContainerRef} className="max-h-64 overflow-y-auto space-y-2 scrollbar-thin">
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -115,7 +116,6 @@ export function AICopilotWidget() {
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}

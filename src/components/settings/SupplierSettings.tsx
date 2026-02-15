@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Trash2, Edit2, Truck, Phone, Mail, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Utility functions for WhatsApp validation
 const formatPhoneForWhatsApp = (phone: string): string => {
   const cleaned = phone.replace(/\D/g, '');
   if (!cleaned.startsWith('55')) {
@@ -30,6 +30,7 @@ export function SupplierSettings() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [deliveryFrequency, setDeliveryFrequency] = useState('weekly');
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -40,13 +41,15 @@ export function SupplierSettings() {
           name: name.trim(),
           phone: phone.trim() || null,
           email: email.trim() || null,
-        });
+          delivery_frequency: deliveryFrequency,
+        } as any);
       } else {
         await addSupplier({
           name: name.trim(),
           phone: phone.trim() || undefined,
           email: email.trim() || undefined,
-        });
+          delivery_frequency: deliveryFrequency,
+        } as any);
       }
       setSheetOpen(false);
       resetForm();
@@ -68,6 +71,7 @@ export function SupplierSettings() {
     setName(supplier.name);
     setPhone(supplier.phone || '');
     setEmail(supplier.email || '');
+    setDeliveryFrequency((supplier as any).delivery_frequency || 'weekly');
     setSheetOpen(true);
   };
 
@@ -81,6 +85,7 @@ export function SupplierSettings() {
     setName('');
     setPhone('');
     setEmail('');
+    setDeliveryFrequency('weekly');
   };
 
   return (
@@ -105,6 +110,11 @@ export function SupplierSettings() {
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="font-medium">{supplier.name}</span>
+                {(supplier as any).delivery_frequency === 'daily' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+                    Diário
+                  </span>
+                )}
                 {!hasValidWhatsApp(supplier.phone) && (
                   <span className="text-xs text-amber-500 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
@@ -204,6 +214,25 @@ export function SupplierSettings() {
                 placeholder="Ex: contato@fornecedor.com"
                 className="h-12"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Truck className="w-4 h-4" />
+                Frequência de Pedido
+              </Label>
+              <Select value={deliveryFrequency} onValueChange={setDeliveryFrequency}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Diário (aparece no dashboard)</SelectItem>
+                  <SelectItem value="weekly">Semanal</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Fornecedores diários aparecem no widget de pedidos sugeridos
+              </p>
             </div>
 
             <Button
