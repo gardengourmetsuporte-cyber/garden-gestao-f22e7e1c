@@ -74,6 +74,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    exclude: [],
+    force: true,
   },
 }));
