@@ -74,7 +74,7 @@ async function fetchTransactionsData(userId: string, unitId: string | null, mont
   return (data || []) as FinanceTransaction[];
 }
 
-async function initializeDefaults(userId: string) {
+async function initializeDefaults(userId: string, unitId: string | null) {
   const { data: existingAccounts } = await supabase
     .from('finance_accounts')
     .select('id')
@@ -88,7 +88,8 @@ async function initializeDefaults(userId: string) {
       type: 'wallet',
       balance: 0,
       color: '#3b82f6',
-      icon: 'Wallet'
+      icon: 'Wallet',
+      unit_id: unitId,
     });
   }
 
@@ -105,7 +106,8 @@ async function initializeDefaults(userId: string) {
         .from('finance_categories')
         .insert({
           user_id: userId, name: cat.name, type: 'expense',
-          icon: cat.icon, color: cat.color, is_system: true, sort_order: i
+          icon: cat.icon, color: cat.color, is_system: true, sort_order: i,
+          unit_id: unitId,
         })
         .select().single();
 
@@ -113,7 +115,8 @@ async function initializeDefaults(userId: string) {
         const subs = cat.subcategories.map((name, j) => ({
           user_id: userId, name, type: 'expense',
           icon: cat.icon, color: cat.color,
-          parent_id: parentData.id, is_system: true, sort_order: j
+          parent_id: parentData.id, is_system: true, sort_order: j,
+          unit_id: unitId,
         }));
         await supabase.from('finance_categories').insert(subs);
       }
@@ -125,7 +128,8 @@ async function initializeDefaults(userId: string) {
         .from('finance_categories')
         .insert({
           user_id: userId, name: cat.name, type: 'income',
-          icon: cat.icon, color: cat.color, is_system: true, sort_order: i
+          icon: cat.icon, color: cat.color, is_system: true, sort_order: i,
+          unit_id: unitId,
         })
         .select().single();
 
@@ -133,7 +137,8 @@ async function initializeDefaults(userId: string) {
         const subs = cat.subcategories.map((name, j) => ({
           user_id: userId, name, type: 'income',
           icon: cat.icon, color: cat.color,
-          parent_id: parentData.id, is_system: true, sort_order: j
+          parent_id: parentData.id, is_system: true, sort_order: j,
+          unit_id: unitId,
         }));
         await supabase.from('finance_categories').insert(subs);
       }
@@ -169,7 +174,7 @@ export function useFinance(selectedMonth: Date) {
   useEffect(() => {
     if (userId && !defaultsInitializedRef.current) {
       defaultsInitializedRef.current = true;
-      initializeDefaults(userId);
+      initializeDefaults(userId, activeUnitId);
     }
   }, [userId]);
 

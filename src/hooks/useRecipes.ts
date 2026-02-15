@@ -3,10 +3,12 @@
  import { supabase } from '@/integrations/supabase/client';
  import { useToast } from '@/hooks/use-toast';
 import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, IngredientSourceType } from '@/types/recipe';
+import { useUnit } from '@/contexts/UnitContext';
  
  export function useRecipes() {
    const { toast } = useToast();
    const queryClient = useQueryClient();
+   const { activeUnitId } = useUnit();
  
    // Fetch all recipe categories
    const { data: categories = [], isLoading: categoriesLoading } = useQuery({
@@ -131,14 +133,15 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
        const cost_per_portion = data.yield_quantity > 0 ? total_cost / data.yield_quantity : total_cost;
        
        // Insert recipe
-       const { data: recipe, error: recipeError } = await supabase
-         .from('recipes')
-         .insert({
-           ...recipeData,
-           total_cost,
-           cost_per_portion,
-           cost_updated_at: new Date().toISOString(),
-         })
+        const { data: recipe, error: recipeError } = await supabase
+          .from('recipes')
+          .insert({
+            ...recipeData,
+            total_cost,
+            cost_per_portion,
+            cost_updated_at: new Date().toISOString(),
+            unit_id: activeUnitId,
+          })
          .select()
          .single();
        
@@ -286,19 +289,20 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
        if (fetchError) throw fetchError;
        
        // Create new recipe
-       const { data: newRecipe, error: insertError } = await supabase
-         .from('recipes')
-         .insert({
-           name: `${existing.name} (cópia)`,
-           category_id: existing.category_id,
-           yield_quantity: existing.yield_quantity,
-           yield_unit: existing.yield_unit,
-           preparation_notes: existing.preparation_notes,
-           is_active: false,
-           total_cost: existing.total_cost,
-           cost_per_portion: existing.cost_per_portion,
-           cost_updated_at: new Date().toISOString(),
-         })
+        const { data: newRecipe, error: insertError } = await supabase
+          .from('recipes')
+          .insert({
+            name: `${existing.name} (cópia)`,
+            category_id: existing.category_id,
+            yield_quantity: existing.yield_quantity,
+            yield_unit: existing.yield_unit,
+            preparation_notes: existing.preparation_notes,
+            is_active: false,
+            total_cost: existing.total_cost,
+            cost_per_portion: existing.cost_per_portion,
+            cost_updated_at: new Date().toISOString(),
+            unit_id: activeUnitId,
+          })
          .select()
          .single();
        
@@ -365,12 +369,13 @@ import type { Recipe, RecipeCategory, RecipeIngredient, RecipeUnitType, Ingredie
          .limit(1)
          .single();
        
-       const { error } = await supabase
-         .from('recipe_categories')
-         .insert({
-           ...data,
-           sort_order: (maxOrder?.sort_order ?? 0) + 1,
-         });
+        const { error } = await supabase
+          .from('recipe_categories')
+          .insert({
+            ...data,
+            sort_order: (maxOrder?.sort_order ?? 0) + 1,
+            unit_id: activeUnitId,
+          });
        
        if (error) throw error;
      },

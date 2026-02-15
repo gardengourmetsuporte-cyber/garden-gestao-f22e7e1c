@@ -102,7 +102,10 @@ export function useRewards() {
 
   const createProductMut = useMutation({
     mutationFn: async (product: Omit<RewardProduct, 'id' | 'created_at' | 'updated_at'>) => {
-      const { error } = await supabase.from('reward_products').insert(product);
+      const { error } = await supabase.from('reward_products').insert({
+        ...product,
+        unit_id: activeUnitId,
+      });
       if (error) throw error;
     },
     onSuccess: invalidateAll,
@@ -132,6 +135,7 @@ export function useRewards() {
         product_id: productId,
         points_spent: pointsCost,
         status: 'pending',
+        unit_id: activeUnitId,
       });
       if (error) throw error;
     },
