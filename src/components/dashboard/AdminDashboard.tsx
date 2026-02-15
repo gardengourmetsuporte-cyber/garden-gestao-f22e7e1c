@@ -14,6 +14,7 @@ import { getRank } from '@/lib/ranks';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+import { FinanceChartWidget } from './FinanceChartWidget';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -104,6 +105,9 @@ export function AdminDashboard() {
           </div>
         </button>
 
+
+        {/* FINANCE CHART WIDGET - Donut expenses */}
+        <FinanceChartWidget />
 
         {/* AGENDA WIDGET - Premium redesign */}
         <button
