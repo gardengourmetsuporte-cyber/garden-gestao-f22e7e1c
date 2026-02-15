@@ -112,7 +112,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   }, []);
   const navRef = useRef<HTMLElement>(null);
 
-  const hasBottomNav = location.pathname === '/finance';
+  const hasBottomNav = location.pathname === '/finance' || location.pathname === '/chat';
 
   useEffect(() => {
     if (sidebarOpen && navRef.current) {
