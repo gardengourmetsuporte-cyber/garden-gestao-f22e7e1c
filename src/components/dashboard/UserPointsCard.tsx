@@ -58,20 +58,27 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 divide-x divide-border/30 border-t border-border/30">
+      <div className="grid grid-cols-3 divide-x divide-border/30 border-t border-border/30">
         <div className="p-3 text-center">
-          <div className="flex items-center justify-center gap-1 text-success mb-0.5">
+          <div className="flex items-center justify-center gap-1 mb-0.5" style={{ color: 'hsl(var(--neon-green))' }}>
             <AppIcon name="TrendingUp" size={14} />
             <span className="text-xl font-bold">{animatedEarned}</span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Pontos ganhos</p>
+          <p className="text-[10px] text-muted-foreground">Base</p>
+        </div>
+        <div className="p-3 text-center">
+          <div className="flex items-center justify-center gap-1 mb-0.5" style={{ color: 'hsl(var(--neon-amber))' }}>
+            <AppIcon name="Flame" size={14} />
+            <span className="text-xl font-bold">0</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground">Bônus</p>
         </div>
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-primary mb-0.5">
             <AppIcon name="Gift" size={14} />
             <span className="text-xl font-bold">{animatedSpent}</span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Pontos usados</p>
+          <p className="text-[10px] text-muted-foreground">Usados</p>
         </div>
       </div>
     </div>

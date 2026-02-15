@@ -41,15 +41,22 @@ export default function Profile() {
           earnedPoints={profile.earned}
         />
 
-        {/* Points Card */}
+        {/* Points Card - 4 columns: Ganhos, Bônus, Gastos, Saldo */}
         <div className="card-command p-4 space-y-3">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-2">
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <Star className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-green))' }} />
               </div>
               <p className="text-lg font-bold text-foreground">{formatPoints(profile.earned)}</p>
               <p className="text-[10px] text-muted-foreground">Ganhos</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Flame className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-amber))' }} />
+              </div>
+              <p className="text-lg font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{formatPoints(profile.totalBonusPoints)}</p>
+              <p className="text-[10px] text-muted-foreground">Bônus</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
@@ -74,15 +81,27 @@ export default function Profile() {
               </span>
             </div>
           )}
-          {profile.totalBonusPoints > 0 && (
-            <div className="flex items-center justify-center gap-2 pt-2" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
-              <Flame className="w-4 h-4" style={{ color: 'hsl(var(--neon-red))' }} />
-              <span className="text-sm text-muted-foreground">
-                <span className="font-bold text-foreground">+{profile.totalBonusPoints}</span> pontos bônus este mês
-              </span>
-            </div>
-          )}
         </div>
+
+        {/* Bonus do Mês */}
+        {profile.bonusPoints.length > 0 && (
+          <div className="card-command p-4" style={{ borderColor: 'hsl(var(--neon-amber) / 0.2)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Flame className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
+              <h3 className="font-semibold text-sm" style={{ color: 'hsl(var(--neon-amber))' }}>
+                Bônus do Mês (+{profile.totalBonusPoints} pts)
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {profile.bonusPoints.map((bp, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded-lg" style={{ background: 'hsl(var(--neon-amber) / 0.06)' }}>
+                  <span className="text-xs text-foreground truncate flex-1">{bp.reason}</span>
+                  <span className="text-xs font-bold ml-2 shrink-0" style={{ color: 'hsl(var(--neon-amber))' }}>+{bp.points}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2">
@@ -95,24 +114,6 @@ export default function Profile() {
             <p className="text-xs text-muted-foreground">Resgates feitos</p>
           </div>
         </div>
-
-        {/* Bonus Points */}
-        {profile.bonusPoints.length > 0 && (
-          <div className="card-command p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Award className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
-              <h3 className="font-semibold text-sm text-foreground">Bônus do Mês</h3>
-            </div>
-            <div className="space-y-2">
-              {profile.bonusPoints.map((bp, i) => (
-                <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-secondary/40">
-                  <span className="text-xs text-foreground truncate flex-1">{bp.reason}</span>
-                  <span className="text-xs font-bold ml-2 shrink-0" style={{ color: 'hsl(var(--neon-green))' }}>+{bp.points}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Achievements */}
         <AchievementList achievements={profile.achievements} />
