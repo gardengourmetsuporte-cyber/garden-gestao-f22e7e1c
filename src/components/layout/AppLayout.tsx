@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useRef, useCallback } from 'react';
+import { ReactNode, useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -100,10 +100,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     }
   });
 
-  // Close launcher on route change
   useEffect(() => {
     setLauncherOpen(false);
   }, [location.pathname]);
+
+  const fabBottom = hasBottomNav
+    ? 'calc(env(safe-area-inset-bottom) + 84px)'
+    : 'calc(env(safe-area-inset-bottom) + 24px)';
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,6 +131,46 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </button>
 
             <div className="flex items-center gap-1">
+              {/* Unit Selector Icon */}
+              {units.length > 0 && (
+                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
+                      <AppIcon name="Building2" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
+                      {activeUnit && (
+                        <span
+                          className="absolute top-1 right-1 w-3 h-3 rounded-full"
+                          style={{
+                            background: getThemeColor(activeUnit.slug),
+                            boxShadow: `0 0 6px ${getThemeColor(activeUnit.slug)}80`,
+                            border: '1.5px solid hsl(var(--card))',
+                          }}
+                        />
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
+                    <div className="px-3 py-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
+                    </div>
+                    {units.map(unit => (
+                      <button
+                        key={unit.id}
+                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                        className={cn(
+                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
+                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
+                        <span className="truncate font-medium">{unit.name}</span>
+                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              )}
+
               <button
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"
@@ -160,41 +203,50 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </header>
 
+      {/* ======= Home button above FAB ======= */}
+      {launcherOpen && (
+        <button
+          onClick={() => { navigate('/'); setLauncherOpen(false); }}
+          className="lg:hidden fixed z-[9999] w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-all duration-200 fab-action-enter"
+          style={{
+            bottom: `calc(${hasBottomNav ? 'env(safe-area-inset-bottom) + 84px' : 'env(safe-area-inset-bottom) + 24px'} + 68px)`,
+            right: '21px',
+            background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
+            boxShadow: '0 4px 20px hsl(var(--primary) / 0.4), 0 0 24px hsl(var(--neon-cyan) / 0.2)',
+            animationDelay: '80ms',
+          }}
+        >
+          <AppIcon name="Home" size={22} className="text-primary-foreground" />
+        </button>
+      )}
+
       {/* ======= FAB (Launcher Trigger) ======= */}
       <button
         onClick={() => setLauncherOpen(!launcherOpen)}
         className={cn(
-          "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300 active:scale-90",
-          launcherOpen ? "w-14 h-14 rotate-0" : "w-14 h-14 hover:scale-105"
+          "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300",
+          launcherOpen
+            ? "w-14 h-14 fab-close-spin"
+            : "w-14 h-14 hover:scale-110 active:scale-90 fab-idle-glow"
         )}
         style={{
-          bottom: hasBottomNav
-            ? 'calc(env(safe-area-inset-bottom) + 84px)'
-            : 'calc(env(safe-area-inset-bottom) + 24px)',
+          bottom: fabBottom,
           right: '20px',
           background: launcherOpen
             ? 'hsl(var(--destructive))'
             : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
           boxShadow: launcherOpen
-            ? '0 4px 24px hsl(var(--destructive) / 0.4)'
-            : '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15)',
+            ? '0 4px 24px hsl(var(--destructive) / 0.5)'
+            : '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.2), 0 0 80px hsl(var(--neon-cyan) / 0.08)',
         }}
       >
         {launcherOpen ? (
-          <AppIcon name="X" size={24} className="text-destructive-foreground" />
+          <AppIcon name="X" size={26} className="text-destructive-foreground" />
         ) : (
           <>
-            <AppIcon name="Grip" size={24} className="text-primary-foreground" />
-            {activeUnit && (
-              <span
-                className="absolute top-1 right-1 w-3 h-3 rounded-full border-2"
-                style={{
-                  borderColor: 'hsl(var(--primary))',
-                  background: getThemeColor(activeUnit.slug),
-                  boxShadow: `0 0 8px ${getThemeColor(activeUnit.slug)}80`,
-                }}
-              />
-            )}
+            {/* Rotating neon ring */}
+            <div className="absolute inset-[-3px] rounded-full fab-neon-border opacity-60" />
+            <AppIcon name="Grip" size={24} className="text-primary-foreground relative z-10" />
           </>
         )}
       </button>
@@ -207,74 +259,45 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             if (e.target === e.currentTarget) setLauncherOpen(false);
           }}
         >
-          {/* Scrollable content */}
           <div
             className="flex-1 overflow-y-auto px-5 launcher-content"
             style={{
               paddingTop: 'calc(env(safe-area-inset-top) + 80px)',
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)',
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 120px)',
             }}
           >
-            {/* Home Button */}
-            <div className="flex justify-center mb-6 launcher-item" style={{ animationDelay: '0ms' }}>
+            {/* ===== User Profile Card (top) ===== */}
+            <div className="launcher-item mb-6" style={{ animationDelay: '0ms' }}>
               <button
-                onClick={() => { navigate('/'); setLauncherOpen(false); }}
-                className="flex flex-col items-center gap-2 active:scale-90 transition-transform"
+                onClick={() => { navigate('/profile/me'); setLauncherOpen(false); }}
+                className="flex flex-col items-center gap-3 w-full py-4 active:scale-95 transition-transform"
               >
-                <div
-                  className="w-16 h-16 rounded-[20px] flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
-                    boxShadow: '0 4px 20px hsl(var(--primary) / 0.4), 0 0 30px hsl(var(--neon-cyan) / 0.15)',
-                  }}
-                >
-                  <AppIcon name="Home" size={28} className="text-primary-foreground" />
+                <div className="relative">
+                  <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={72} />
+                  {/* Glow ring behind avatar */}
+                  <div
+                    className="absolute inset-[-4px] rounded-full -z-10"
+                    style={{
+                      background: `conic-gradient(from 0deg, hsl(var(--primary)), hsl(var(--neon-cyan)), hsl(var(--neon-purple)), hsl(var(--primary)))`,
+                      filter: 'blur(8px)',
+                      opacity: 0.4,
+                    }}
+                  />
                 </div>
-                <span className="text-xs font-semibold text-foreground">Home</span>
+                <div className="text-center">
+                  <p className="text-base font-bold text-foreground">
+                    {profile?.full_name || 'Usuário'}
+                  </p>
+                  <p className="text-xs font-semibold mt-0.5" style={{ color: rank.color }}>
+                    {rank.title} · {earnedPoints} pts
+                  </p>
+                </div>
               </button>
             </div>
 
-            {/* Unit Selector */}
-            {units.length > 1 && (
-              <div className="flex justify-center mb-6 launcher-item" style={{ animationDelay: '40ms' }}>
-                <div className="relative">
-                  <button
-                    onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 active:scale-95 transition-transform"
-                  >
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{
-                      background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--primary))',
-                      boxShadow: activeUnit ? `0 0 8px ${getThemeColor(activeUnit.slug)}80` : undefined,
-                    }} />
-                    <span className="text-sm font-medium text-foreground">{activeUnit?.name || 'Unidade'}</span>
-                    <AppIcon name="ChevronDown" size={14} className={cn("text-muted-foreground transition-transform", unitDropdownOpen && "rotate-180")} />
-                  </button>
-                  {unitDropdownOpen && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 rounded-2xl overflow-hidden py-1 bg-card/95 backdrop-blur-xl border border-border/40 min-w-[200px]" style={{
-                      boxShadow: 'var(--shadow-elevated)',
-                    }}>
-                      {units.map(unit => (
-                        <button
-                          key={unit.id}
-                          onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                          className={cn(
-                            "w-full flex items-center gap-2.5 px-4 py-3 text-sm transition-all",
-                            unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                          )}
-                        >
-                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug) }} />
-                          <span className="truncate">{unit.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* App Grid by Group */}
+            {/* ===== App Grid by Group ===== */}
             {groupedNav.map((group, gi) => (
-              <div key={group.label} className={cn("mb-6 launcher-item")} style={{ animationDelay: `${(gi + 1) * 60 + 40}ms` }}>
+              <div key={group.label} className="mb-6 launcher-item" style={{ animationDelay: `${(gi + 1) * 60}ms` }}>
                 <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
                   {group.label}
                 </span>
@@ -314,7 +337,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             />
                           </div>
 
-                          {/* Badges */}
                           {showBadge && (
                             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse bg-destructive text-destructive-foreground" style={{
                               border: '2px solid hsl(var(--background))',
@@ -356,33 +378,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </div>
             ))}
 
-            {/* Profile + Logout */}
-            <div className="launcher-item mt-2 mb-4" style={{ animationDelay: `${(groupedNav.length + 1) * 60 + 40}ms` }}>
-              <div className="rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 overflow-hidden" style={{ boxShadow: 'var(--shadow-card)' }}>
-                <button
-                  onClick={() => { navigate('/profile/me'); setLauncherOpen(false); }}
-                  className="flex items-center gap-3 w-full px-4 py-3 active:bg-secondary/40 transition-colors"
-                >
-                  <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={36} />
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-semibold text-foreground truncate">
-                      {profile?.full_name || 'Usuário'}
-                    </p>
-                    <p className="text-[10px] font-medium" style={{ color: rank.color }}>
-                      {rank.title} · {earnedPoints} pts
-                    </p>
-                  </div>
-                  <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-                </button>
-                <div className="h-px bg-border/20" />
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2.5 w-full px-4 py-3 text-sm transition-all active:bg-secondary/40 text-muted-foreground"
-                >
-                  <AppIcon name="LogOut" size={18} />
-                  <span className="font-medium">Sair da conta</span>
-                </button>
-              </div>
+            {/* Logout */}
+            <div className="launcher-item mt-2 mb-4" style={{ animationDelay: `${(groupedNav.length + 1) * 60}ms` }}>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/20 text-sm text-muted-foreground active:bg-secondary/40 transition-all"
+              >
+                <AppIcon name="LogOut" size={18} />
+                <span className="font-medium">Sair da conta</span>
+              </button>
             </div>
           </div>
         </div>
@@ -399,7 +403,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {children}
       </main>
 
-      {/* Unit transition overlay */}
       {isTransitioning && (
         <div
           className="fixed inset-0 z-[100] pointer-events-none animate-unit-flash"
