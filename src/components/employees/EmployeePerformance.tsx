@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
@@ -8,6 +8,9 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { cn } from '@/lib/utils';
 import { calculateEarnedPoints } from '@/lib/points';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { BonusPointSheet } from './BonusPointSheet';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PerformanceEntry {
   employee_id: string;
@@ -23,6 +26,8 @@ interface PerformanceEntry {
 
 export function EmployeePerformance() {
   const { activeUnitId } = useUnit();
+  const { user } = useAuth();
+  const [bonusTarget, setBonusTarget] = useState<{ name: string; userId: string } | null>(null);
 
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ['employee-performance', activeUnitId],
@@ -72,8 +77,6 @@ export function EmployeePerformance() {
           const earnedPoints = calculateEarnedPoints(userCompletions);
           const cashClosings = closingsByUser.get(uid) || 0;
           const reds = redemptionsByUser.get(uid) || 0;
-
-          // Score = weighted sum
           const score = earnedPoints * 1 + cashClosings * 5 + reds * 2;
 
           return {
@@ -132,10 +135,7 @@ export function EmployeePerformance() {
       </div>
 
       {entries.map((entry, idx) => (
-        <div
-          key={entry.employee_id}
-          className="card-command p-4 space-y-3"
-        >
+        <div key={entry.employee_id} className="card-command p-4 space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold text-muted-foreground w-5 text-center">{idx + 1}º</span>
             <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earnedPoints} size={36} />
@@ -143,12 +143,21 @@ export function EmployeePerformance() {
               <span className="text-sm font-semibold text-foreground truncate block">{entry.full_name}</span>
               <span className="text-[10px] text-muted-foreground">Score: {entry.score}</span>
             </div>
+            {entry.user_id && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2 text-xs gap-1"
+                onClick={() => setBonusTarget({ name: entry.full_name, userId: entry.user_id! })}
+              >
+                <AppIcon name="Award" size={14} className="text-primary" />
+                Bônus
+              </Button>
+            )}
           </div>
 
-          {/* Progress bar */}
           <Progress value={(entry.score / maxScore) * 100} className="h-1.5" />
 
-          {/* Metrics grid */}
           <div className="grid grid-cols-4 gap-2">
             <MetricChip icon="CheckSquare" label="Checklists" value={entry.checklistsCompleted} />
             <MetricChip icon="Star" label="Pontos" value={entry.earnedPoints} />
@@ -157,6 +166,15 @@ export function EmployeePerformance() {
           </div>
         </div>
       ))}
+
+      {bonusTarget && (
+        <BonusPointSheet
+          open={!!bonusTarget}
+          onOpenChange={(open) => !open && setBonusTarget(null)}
+          employeeName={bonusTarget.name}
+          employeeUserId={bonusTarget.userId}
+        />
+      )}
     </div>
   );
 }

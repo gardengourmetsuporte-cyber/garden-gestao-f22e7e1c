@@ -21,7 +21,7 @@ import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
+  const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
 
@@ -157,11 +157,11 @@ export function AdminDashboard() {
                   {top3[1] && (
                     <button onClick={() => navigate(`/profile/${top3[1].user_id}`)} className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform">
                       <div className="relative">
-                        <RankedAvatar avatarUrl={top3[1].avatar_url} earnedPoints={top3[1].earned_points} size={44} />
+                        <RankedAvatar avatarUrl={top3[1].avatar_url} earnedPoints={top3[1].total_score} size={44} />
                         <span className="absolute -bottom-1 -right-1 text-base">🥈</span>
                       </div>
                       <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[1].user_id === user?.id && "text-primary")}>{top3[1].full_name?.split(' ')[0]}</span>
-                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[1].earned_points} pts</span>
+                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[1].total_score} pts</span>
                       <div className="w-[68px] h-14 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(215 20% 60% / 0.25), transparent)', border: '1px solid hsl(215 20% 60% / 0.3)', borderBottom: 'none' }} />
                     </button>
                   )}
@@ -169,22 +169,22 @@ export function AdminDashboard() {
                     <button onClick={() => navigate(`/profile/${top3[0].user_id}`)} className="flex flex-col items-center gap-1.5 -mt-2 active:scale-95 transition-transform">
                       <div className="relative">
                         <div className="absolute inset-0 rounded-full blur-md opacity-40" style={{ background: 'hsl(var(--neon-amber))' }} />
-                        <RankedAvatar avatarUrl={top3[0].avatar_url} earnedPoints={top3[0].earned_points} size={60} />
+                        <RankedAvatar avatarUrl={top3[0].avatar_url} earnedPoints={top3[0].total_score} size={60} />
                         <span className="absolute -bottom-1 -right-1 text-lg">🥇</span>
                       </div>
                       <span className={cn("text-xs font-bold truncate max-w-[80px] text-center", top3[0].user_id === user?.id ? "text-primary" : "text-foreground")}>{top3[0].full_name?.split(' ')[0]}</span>
-                      <span className="text-[11px] font-extrabold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[0].earned_points} pts</span>
+                      <span className="text-[11px] font-extrabold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[0].total_score} pts</span>
                       <div className="w-[72px] h-20 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(var(--neon-amber) / 0.25), transparent)', border: '1px solid hsl(var(--neon-amber) / 0.35)', borderBottom: 'none' }} />
                     </button>
                   )}
                   {top3[2] && (
                     <button onClick={() => navigate(`/profile/${top3[2].user_id}`)} className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform">
                       <div className="relative">
-                        <RankedAvatar avatarUrl={top3[2].avatar_url} earnedPoints={top3[2].earned_points} size={44} />
+                        <RankedAvatar avatarUrl={top3[2].avatar_url} earnedPoints={top3[2].total_score} size={44} />
                         <span className="absolute -bottom-1 -right-1 text-base">🥉</span>
                       </div>
                       <span className={cn("text-[11px] font-semibold truncate max-w-[72px] text-center", top3[2].user_id === user?.id && "text-primary")}>{top3[2].full_name?.split(' ')[0]}</span>
-                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[2].earned_points} pts</span>
+                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{top3[2].total_score} pts</span>
                       <div className="w-[68px] h-10 rounded-t-xl" style={{ background: 'linear-gradient(180deg, hsl(30 60% 40% / 0.25), transparent)', border: '1px solid hsl(30 60% 40% / 0.3)', borderBottom: 'none' }} />
                     </button>
                   )}
@@ -199,14 +199,14 @@ export function AdminDashboard() {
                     )}
                   >
                     <span className="text-xs font-bold text-muted-foreground w-5 text-center">{entry.rank}º</span>
-                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_points} size={28} />
+                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={28} />
                     <span className={cn("text-xs font-medium truncate flex-1", entry.user_id === user?.id && "text-primary")}>
                       {entry.full_name?.split(' ')[0]}
                       {entry.user_id === user?.id && <span className="text-[10px] text-muted-foreground ml-1">(você)</span>}
                     </span>
                     <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>
                       <AppIcon name="Star" size={12} style={{ color: 'hsl(var(--neon-amber))' }} />
-                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{entry.earned_points}</span>
+                      <span className="text-[10px] font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{entry.total_score}</span>
                     </div>
                   </button>
                 ))}

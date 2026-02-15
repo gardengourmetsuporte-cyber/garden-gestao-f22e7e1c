@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 export function EmployeeDashboard() {
   const { user, profile } = useAuth();
-  const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
+  const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { redemptions } = useRewards();
   const { earnedPoints } = usePoints();
 
@@ -105,6 +105,8 @@ export function EmployeeDashboard() {
           entries={leaderboard}
           currentUserId={user?.id}
           isLoading={leaderboardLoading}
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
         />
       </div>
 

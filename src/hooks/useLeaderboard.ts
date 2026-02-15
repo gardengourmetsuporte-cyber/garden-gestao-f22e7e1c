@@ -1,15 +1,18 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateEarnedPoints, calculateSpentPoints } from '@/lib/points';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
+import { startOfMonth, endOfMonth, format } from 'date-fns';
 
 export interface LeaderboardEntry {
   user_id: string;
   full_name: string;
   avatar_url: string | null;
   earned_points: number;
+  bonus_points: number;
+  total_score: number;
   spent_points: number;
   balance: number;
   rank: number;
@@ -23,11 +26,24 @@ export interface SectorPointsSummary {
   total_tasks: number;
 }
 
-async function fetchLeaderboardData(unitId: string): Promise<LeaderboardEntry[]> {
-  const [{ data: profiles }, { data: completions }, { data: redemptions }] = await Promise.all([
+async function fetchLeaderboardData(unitId: string, month: Date): Promise<LeaderboardEntry[]> {
+  const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
+  const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
+
+  const [{ data: profiles }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url'),
-    supabase.from('checklist_completions').select('completed_by, points_awarded, awarded_points').eq('unit_id', unitId),
+    supabase
+      .from('checklist_completions')
+      .select('completed_by, points_awarded, awarded_points, date')
+      .eq('unit_id', unitId)
+      .gte('date', monthStart)
+      .lte('date', monthEnd),
     supabase.from('reward_redemptions').select('user_id, points_spent, status').eq('unit_id', unitId),
+    supabase
+      .from('bonus_points')
+      .select('user_id, points')
+      .eq('unit_id', unitId)
+      .eq('month', monthStart),
   ]);
 
   const userCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
@@ -44,22 +60,30 @@ async function fetchLeaderboardData(unitId: string): Promise<LeaderboardEntry[]>
     userRedemptions.set(r.user_id, list);
   });
 
+  const userBonus = new Map<string, number>();
+  bonusRows?.forEach(b => {
+    userBonus.set(b.user_id, (userBonus.get(b.user_id) || 0) + b.points);
+  });
+
   const entries: LeaderboardEntry[] = (profiles || [])
     .map(profile => {
       const earned = calculateEarnedPoints(userCompletions.get(profile.user_id) || []);
       const spent = calculateSpentPoints(userRedemptions.get(profile.user_id) || []);
+      const bonus = userBonus.get(profile.user_id) || 0;
       return {
         user_id: profile.user_id,
         full_name: profile.full_name,
         avatar_url: profile.avatar_url,
         earned_points: earned,
+        bonus_points: bonus,
+        total_score: earned + bonus,
         spent_points: spent,
         balance: earned - spent,
         rank: 0,
       };
     })
-    .filter(e => e.earned_points > 0)
-    .sort((a, b) => b.earned_points - a.earned_points);
+    .filter(e => e.total_score > 0)
+    .sort((a, b) => b.total_score - a.total_score);
 
   entries.forEach((entry, index) => { entry.rank = index + 1; });
   return entries;
@@ -111,10 +135,11 @@ export function useLeaderboard() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
+  const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()));
 
   const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useQuery({
-    queryKey: ['leaderboard', activeUnitId],
-    queryFn: () => fetchLeaderboardData(activeUnitId!),
+    queryKey: ['leaderboard', activeUnitId, format(selectedMonth, 'yyyy-MM')],
+    queryFn: () => fetchLeaderboardData(activeUnitId!, selectedMonth),
     enabled: !!user && !!activeUnitId,
   });
 
@@ -130,6 +155,8 @@ export function useLeaderboard() {
     leaderboard,
     sectorPoints,
     isLoading,
+    selectedMonth,
+    setSelectedMonth,
     refetch: () => {
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       queryClient.invalidateQueries({ queryKey: ['sector-points'] });
