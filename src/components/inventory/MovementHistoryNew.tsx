@@ -60,10 +60,11 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
     );
   }
 
-  // Group movements by date
+  // Group movements by local date (avoid UTC offset shifting to previous day)
   const groupedByDate: Record<string, StockMovement[]> = {};
   movements.forEach(movement => {
-    const dateKey = format(new Date(movement.created_at), 'yyyy-MM-dd');
+    const localDate = new Date(movement.created_at);
+    const dateKey = format(localDate, 'yyyy-MM-dd');
     if (!groupedByDate[dateKey]) {
       groupedByDate[dateKey] = [];
     }
@@ -75,7 +76,7 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
       {Object.entries(groupedByDate).map(([dateKey, dayMovements]) => (
         <div key={dateKey}>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 sticky top-0 bg-background py-2">
-            {format(new Date(dateKey), "EEEE, d 'de' MMMM", { locale: ptBR })}
+            {format(new Date(dateKey + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
           </h3>
           <div className="space-y-2">
             {dayMovements.map((movement) => {
