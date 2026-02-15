@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { calculatePointsSummary } from '@/lib/points';
+import { calculatePointsSummary, calculateEarnedPoints } from '@/lib/points';
 import { calculateAchievements, type Achievement } from '@/lib/achievements';
 import { calculateMedals, type Medal } from '@/lib/medals';
-import { startOfMonth, format } from 'date-fns';
+import { startOfMonth, endOfMonth, format } from 'date-fns';
 
 export interface ProfileData {
   userId: string;
@@ -20,16 +20,22 @@ export interface ProfileData {
   leaderboardRank: number | null;
   bonusPoints: Array<{ points: number; reason: string; type: string; created_at: string }>;
   totalBonusPoints: number;
+  monthlyScore: number;
+  monthlyBase: number;
+  monthlyBonus: number;
 }
 
 async function fetchProfileData(userId: string): Promise<Omit<ProfileData, 'leaderboardRank'>> {
-  const currentMonth = format(startOfMonth(new Date()), 'yyyy-MM-dd');
+  const now = new Date();
+  const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+  const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
 
-  const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
+  const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }] = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url, job_title').eq('user_id', userId).single(),
     supabase.from('checklist_completions').select('points_awarded, awarded_points, completed_at, item_id').eq('completed_by', userId),
     supabase.from('reward_redemptions').select('points_spent, status').eq('user_id', userId),
-    supabase.from('bonus_points').select('points, reason, type, created_at').eq('user_id', userId).eq('month', currentMonth).order('created_at', { ascending: false }),
+    supabase.from('bonus_points').select('points, reason, type, created_at').eq('user_id', userId).eq('month', monthStart).order('created_at', { ascending: false }),
+    supabase.from('checklist_completions').select('points_awarded, awarded_points').eq('completed_by', userId).gte('completed_at', `${monthStart}T00:00:00`).lte('completed_at', `${monthEnd}T23:59:59`),
   ]);
 
   const summary = calculatePointsSummary(completions || [], redemptions || []);
@@ -42,6 +48,7 @@ async function fetchProfileData(userId: string): Promise<Omit<ProfileData, 'lead
 
   const bonusPoints = (bonusRows || []) as Array<{ points: number; reason: string; type: string; created_at: string }>;
   const totalBonusPoints = bonusPoints.reduce((sum, b) => sum + b.points, 0);
+  const monthlyBase = calculateEarnedPoints(monthlyCompletions || []);
 
   return {
     userId,
@@ -55,6 +62,9 @@ async function fetchProfileData(userId: string): Promise<Omit<ProfileData, 'lead
     medals,
     bonusPoints,
     totalBonusPoints,
+    monthlyScore: monthlyBase + totalBonusPoints,
+    monthlyBase,
+    monthlyBonus: totalBonusPoints,
   };
 }
 

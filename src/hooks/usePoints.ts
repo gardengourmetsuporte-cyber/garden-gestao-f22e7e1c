@@ -1,15 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { calculatePointsSummary, PointsSummary } from '@/lib/points';
+import { calculatePointsSummary, calculateEarnedPoints, PointsSummary } from '@/lib/points';
+import { startOfMonth, endOfMonth, format } from 'date-fns';
 
 export interface PointsData extends PointsSummary {
   earnedPoints: number;
   spentPoints: number;
+  monthlyScore: number;
+  monthlyBase: number;
+  monthlyBonus: number;
 }
 
 async function fetchPointsData(userId: string): Promise<PointsData> {
-  const [{ data: completions }, { data: redemptions }] = await Promise.all([
+  const now = new Date();
+  const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+  const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
+
+  const [
+    { data: completions },
+    { data: redemptions },
+    { data: monthlyCompletions },
+    { data: bonusRows },
+  ] = await Promise.all([
     supabase
       .from('checklist_completions')
       .select('points_awarded, awarded_points')
@@ -18,14 +31,30 @@ async function fetchPointsData(userId: string): Promise<PointsData> {
       .from('reward_redemptions')
       .select('points_spent, status')
       .eq('user_id', userId),
+    supabase
+      .from('checklist_completions')
+      .select('points_awarded, awarded_points')
+      .eq('completed_by', userId)
+      .gte('completed_at', `${monthStart}T00:00:00`)
+      .lte('completed_at', `${monthEnd}T23:59:59`),
+    supabase
+      .from('bonus_points')
+      .select('points')
+      .eq('user_id', userId)
+      .eq('month', monthStart),
   ]);
 
   const summary = calculatePointsSummary(completions || [], redemptions || []);
+  const monthlyBase = calculateEarnedPoints(monthlyCompletions || []);
+  const monthlyBonus = (bonusRows || []).reduce((sum, b) => sum + b.points, 0);
 
   return {
     ...summary,
     earnedPoints: summary.earned,
     spentPoints: summary.spent,
+    monthlyScore: monthlyBase + monthlyBonus,
+    monthlyBase,
+    monthlyBonus,
   };
 }
 
@@ -44,7 +73,10 @@ export function usePoints() {
     balance: points?.balance ?? 0,
     earnedPoints: points?.earnedPoints ?? 0,
     spentPoints: points?.spentPoints ?? 0,
+    monthlyScore: points?.monthlyScore ?? 0,
+    monthlyBase: points?.monthlyBase ?? 0,
+    monthlyBonus: points?.monthlyBonus ?? 0,
     isLoading,
-    refetch: () => {}, // React Query handles this via invalidation
+    refetch: () => {},
   };
 }
