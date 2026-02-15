@@ -15,6 +15,8 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
 import { useModuleStatus } from '@/hooks/useModuleStatus';
+import { useUserModules } from '@/hooks/useAccessLevels';
+import { getModuleKeyFromRoute } from '@/lib/modules';
 import { useTimeAlerts } from '@/hooks/useTimeAlerts';
 
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
@@ -130,7 +132,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     navigate('/auth');
   };
 
-  const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
+  const { hasAccess } = useUserModules();
+  const filteredNavItems = navItems.filter(item => {
+    if (item.adminOnly && !isAdmin) return false;
+    const moduleKey = getModuleKeyFromRoute(item.href);
+    if (moduleKey && !hasAccess(moduleKey)) return false;
+    return true;
+  });
 
   const groupedNav: { label: string; items: typeof filteredNavItems }[] = [];
   const seenGroups = new Set<string>();

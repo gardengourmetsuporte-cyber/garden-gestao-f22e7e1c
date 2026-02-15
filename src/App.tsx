@@ -3,10 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { UnitProvider } from "@/contexts/UnitContext";
 import { PageLoader } from "@/components/PageLoader";
+import { useUserModules } from "@/hooks/useAccessLevels";
+import { getModuleKeyFromRoute } from "@/lib/modules";
 
 // Lazy load all pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
@@ -47,6 +49,8 @@ const queryClient = new QueryClient({
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
+  const { hasAccess, isLoading: modulesLoading } = useUserModules();
 
   if (isLoading) {
     return <PageLoader />;
@@ -54,6 +58,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Check module access (skip during loading to avoid flash)
+  if (!modulesLoading) {
+    const moduleKey = getModuleKeyFromRoute(location.pathname);
+    if (moduleKey && !hasAccess(moduleKey)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;

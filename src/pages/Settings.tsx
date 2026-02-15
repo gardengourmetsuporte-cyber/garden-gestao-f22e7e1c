@@ -1,6 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator, ChevronRight, Building2, Bell } from 'lucide-react';
+import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator, ChevronRight, Building2, Bell, Shield } from 'lucide-react';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
 import { SupplierSettings } from '@/components/settings/SupplierSettings';
@@ -11,6 +11,7 @@ import { PaymentMethodSettings } from '@/components/settings/PaymentMethodSettin
 import { RecipeCostSettings } from '@/components/settings/RecipeCostSettings';
 import { UnitManagement } from '@/components/settings/UnitManagement';
 import { TimeAlertSettings } from '@/components/settings/TimeAlertSettings';
+import { AccessLevelSettings } from '@/components/settings/AccessLevelSettings';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +27,7 @@ interface MenuItem {
 const allMenuItems: MenuItem[] = [
   { value: 'profile', icon: User, label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
   { value: 'users', icon: Users, label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
+  { value: 'access-levels', icon: Shield, label: 'Níveis de Acesso', description: 'Controlar permissões por módulo', variant: 'cyan', section: 'Conta' },
   { value: 'categories', icon: Tag, label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
   { value: 'suppliers', icon: Truck, label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'green', section: 'Operação' },
   { value: 'checklists', icon: ClipboardCheck, label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'purple', section: 'Operação' },
@@ -51,6 +53,7 @@ export default function SettingsPage() {
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'units') return isSuperAdmin;
     if (item.value === 'alerts') return isAdmin;
+    if (item.value === 'access-levels') return isAdmin;
     if (item.value === 'profile') return true;
     return isAdmin;
   });
@@ -94,6 +97,7 @@ export default function SettingsPage() {
               {activeSection === 'costs' && <RecipeCostSettings />}
               {activeSection === 'units' && <UnitManagement />}
               {activeSection === 'alerts' && <TimeAlertSettings />}
+              {activeSection === 'access-levels' && <AccessLevelSettings />}
             </div>
           </div>
         </div>
