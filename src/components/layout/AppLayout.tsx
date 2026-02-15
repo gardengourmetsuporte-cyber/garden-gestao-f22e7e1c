@@ -39,17 +39,17 @@ const navItems: NavItem[] = [
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'producao', groupLabel: 'Produção' },
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'producao', groupLabel: 'Produção' },
-  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'producao', groupLabel: 'Produção' },
   { icon: 'Users', label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'MessageCircle', label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'producao', groupLabel: 'Produção' },
   { icon: 'Settings', label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
+  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção 🚧' },
+  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção 🚧' },
+  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção 🚧' },
+  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção 🚧' },
 ];
 
 function AppLayoutContent({ children }: AppLayoutProps) {
@@ -306,6 +306,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
                     const moduleStatus = moduleStatuses[item.href];
+                    const isEmProducao = item.group === 'em_producao';
 
                     return (
                       <Link
@@ -320,21 +321,31 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               "w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-200",
                               isActive
                                 ? "bg-primary shadow-lg shadow-primary/30"
-                                : "bg-card/90 border border-border/40"
+                                : isEmProducao
+                                  ? "bg-card/60 border border-dashed border-amber-500/40"
+                                  : "bg-card/90 border border-border/40"
                             )}
                             style={{
                               boxShadow: isActive ? undefined : 'var(--shadow-card)',
+                              opacity: isEmProducao && !isActive ? 0.7 : 1,
                             }}
                           >
                             <AppIcon
                               name={item.icon}
                               size={24}
-                              className={isActive ? "text-primary-foreground" : "text-muted-foreground"}
+                              className={isActive ? "text-primary-foreground" : isEmProducao ? "text-amber-400/70" : "text-muted-foreground"}
                               style={{
                                 filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
                           </div>
+
+                          {/* Em Produção indicator */}
+                          {isEmProducao && !isActive && (
+                            <span className="absolute -top-1.5 -right-1.5 text-[10px] leading-none">
+                              🚧
+                            </span>
+                          )}
 
                           {showBadge && (
                             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse bg-destructive text-destructive-foreground" style={{
