@@ -4,11 +4,17 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
+const INITIAL_VISIBLE = 2;
+
 export function AutoOrderWidget() {
   const { dailySuggestions, createDraftOrder } = useAutoOrderSuggestion();
   const [creating, setCreating] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   if (dailySuggestions.length === 0) return null;
+
+  const visibleSuggestions = expanded ? dailySuggestions : dailySuggestions.slice(0, INITIAL_VISIBLE);
+  const hasMore = dailySuggestions.length > INITIAL_VISIBLE;
 
   const handleCreate = async (s: AutoOrderSuggestion) => {
     setCreating(s.supplierId);
@@ -29,14 +35,16 @@ export function AutoOrderWidget() {
           <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-accent/50 border border-border">
             <AppIcon name="ShoppingCart" size={18} className="text-primary" />
           </div>
-          <div>
+          <div className="flex-1">
             <span className="text-sm font-bold text-foreground">Pedidos Diários</span>
-            <span className="text-[10px] text-muted-foreground block mt-0.5">Fornecedores com entrega diária</span>
+            <span className="text-[10px] text-muted-foreground block mt-0.5">
+              {dailySuggestions.length} fornecedor{dailySuggestions.length > 1 ? 'es' : ''}
+            </span>
           </div>
         </div>
 
         <div className="space-y-2">
-          {dailySuggestions.map(s => (
+          {visibleSuggestions.map(s => (
             <div key={s.supplierId} className="rounded-2xl bg-secondary/40 p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-foreground">{s.supplierName}</span>
@@ -67,6 +75,16 @@ export function AutoOrderWidget() {
             </div>
           ))}
         </div>
+
+        {hasMore && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="w-full flex items-center justify-center gap-1 mt-3 py-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            <AppIcon name={expanded ? 'ChevronUp' : 'ChevronDown'} size={14} />
+            {expanded ? 'Ver menos' : `Ver mais ${dailySuggestions.length - INITIAL_VISIBLE} fornecedor${dailySuggestions.length - INITIAL_VISIBLE > 1 ? 'es' : ''}`}
+          </button>
+        )}
       </div>
     </div>
   );

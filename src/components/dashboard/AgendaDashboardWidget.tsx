@@ -55,8 +55,7 @@ export function AgendaDashboardWidget() {
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const pendingTasks = (tasks || [])
-    .filter(t => !t.is_completed && (!t.due_date || t.due_date <= todayStr || t.date === todayStr))
-    .slice(0, 8);
+    .filter(t => !t.is_completed && (!t.due_date || t.due_date <= todayStr || t.date === todayStr));
 
   const handleEditTask = (task: ManagerTask) => {
     setEditingTask(task);
@@ -132,7 +131,7 @@ export function AgendaDashboardWidget() {
             {[1,2,3].map(i => <Skeleton key={i} className="h-14 w-full rounded-2xl" />)}
           </div>
         ) : pendingTasks.length > 0 ? (
-          <div className="px-3 pb-3 space-y-1">
+          <div className="px-3 pb-3 max-h-[260px] overflow-y-auto space-y-1 scrollbar-thin">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                 {pendingTasks.map(task => (
