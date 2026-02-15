@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_levels: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_default: boolean
+          modules: string[]
+          name: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          modules?: string[]
+          name: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          modules?: string[]
+          name?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_levels_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cash_closings: {
         Row: {
           cash_amount: number
@@ -2942,6 +2983,7 @@ export type Database = {
       }
       user_units: {
         Row: {
+          access_level_id: string | null
           created_at: string
           id: string
           is_default: boolean
@@ -2949,6 +2991,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_level_id?: string | null
           created_at?: string
           id?: string
           is_default?: boolean
@@ -2956,6 +2999,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_level_id?: string | null
           created_at?: string
           id?: string
           is_default?: boolean
@@ -2963,6 +3007,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_units_access_level_id_fkey"
+            columns: ["access_level_id"]
+            isOneToOne: false
+            referencedRelation: "access_levels"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_units_unit_id_fkey"
             columns: ["unit_id"]
