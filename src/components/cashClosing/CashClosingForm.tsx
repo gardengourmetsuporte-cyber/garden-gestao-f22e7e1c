@@ -44,6 +44,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   const { profile, isAdmin } = useAuth();
   const { uploadReceipt, createClosing, checkChecklistCompleted } = useCashClosing();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   
   // Use LOCAL date to match the operational day (not UTC which may be next day after midnight)
   // Allow selecting up to 3 days back for late closings (after midnight or delayed submissions)
@@ -543,6 +544,13 @@ export function CashClosingForm({ onSuccess }: Props) {
             className="hidden"
             onChange={handleFileChange}
           />
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={handleFileChange}
+          />
           
           {receiptPreview ? (
             <div className="relative">
@@ -551,24 +559,44 @@ export function CashClosingForm({ onSuccess }: Props) {
                 alt="Comprovante" 
                 className="w-full h-48 object-cover rounded-xl"
               />
-              <Button
-                variant="secondary"
-                size="sm"
-                className="absolute bottom-2 right-2"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Trocar
-              </Button>
+              <div className="absolute bottom-2 right-2 flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Camera className="w-4 h-4 mr-1" />
+                  Câmera
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => galleryInputRef.current?.click()}
+                >
+                  <Upload className="w-4 h-4 mr-1" />
+                  Galeria
+                </Button>
+              </div>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              className="w-full h-32 border-dashed flex flex-col gap-2"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Camera className="w-8 h-8 text-muted-foreground" />
-              <span className="text-muted-foreground">Tirar foto ou anexar arquivo</span>
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 h-32 border-dashed flex flex-col gap-2"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera className="w-7 h-7 text-muted-foreground" />
+                <span className="text-muted-foreground text-sm">Câmera</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-32 border-dashed flex flex-col gap-2"
+                onClick={() => galleryInputRef.current?.click()}
+              >
+                <Upload className="w-7 h-7 text-muted-foreground" />
+                <span className="text-muted-foreground text-sm">Galeria / Arquivo</span>
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>
