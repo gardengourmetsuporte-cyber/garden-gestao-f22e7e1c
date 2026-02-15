@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
+import { ChecklistClone } from '@/components/settings/ChecklistClone';
 import { Loader2, ClipboardCheck, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChecklistType } from '@/types/database';
@@ -27,6 +28,7 @@ export function ChecklistSettingsManager() {
     fetchDeletedItems,
     emptyTrash,
     reorderItems,
+    refetch,
   } = useChecklists();
 
   const [selectedType, setSelectedType] = useState<ChecklistType>('abertura');
@@ -183,6 +185,10 @@ export function ChecklistSettingsManager() {
         onDeleteItem={handleDeleteItem}
         onReorderItems={reorderItems}
       />
+
+
+      {/* Clone from another unit */}
+      <ChecklistClone onCloned={refetch} />
     </div>
   );
 }
