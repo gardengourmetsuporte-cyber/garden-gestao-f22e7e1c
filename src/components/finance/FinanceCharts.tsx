@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
 import { MonthSelector } from './MonthSelector';
 import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/finance';
+import { DREReport } from './DREReport';
 import { EntityStats } from '@/hooks/useFinanceStats';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,7 @@ interface FinanceChartsProps {
   getSupplierStats: (categoryId: string) => EntityStats[];
   getEmployeeStats: (categoryId: string) => EntityStats[];
   transactions: FinanceTransaction[];
+  categories?: FinanceCategory[];
 }
 
 const formatCurrency = (value: number) =>
@@ -54,7 +56,8 @@ export function FinanceCharts({
   getSubcategoryStats,
   getSupplierStats,
   getEmployeeStats,
-  transactions
+  transactions,
+  categories: categoriesProp = [],
 }: FinanceChartsProps) {
   const [viewType, setViewType] = useState<'categories' | 'timeline' | 'bars'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
@@ -497,6 +500,11 @@ export function FinanceCharts({
             )}
           </div>
         )}
+
+        {/* DRE Report */}
+        <div className="mt-8">
+          <DREReport transactions={transactions} categories={categoriesProp} />
+        </div>
       </div>
     </div>
   );

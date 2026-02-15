@@ -16,6 +16,8 @@ import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { FinanceChartWidget } from './FinanceChartWidget';
 import { AICopilotWidget } from './AICopilotWidget';
+import { StockPredictionWidget } from './StockPredictionWidget';
+import { AutoOrderWidget } from './AutoOrderWidget';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -112,6 +114,12 @@ export function AdminDashboard() {
 
         {/* FINANCE CHART WIDGET - Donut expenses */}
         <FinanceChartWidget />
+
+        {/* STOCK PREDICTION WIDGET */}
+        <StockPredictionWidget />
+
+        {/* AUTO ORDER WIDGET */}
+        <AutoOrderWidget />
 
         {/* AGENDA WIDGET - Premium redesign */}
         <button
