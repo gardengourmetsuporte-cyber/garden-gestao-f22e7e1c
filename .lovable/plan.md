@@ -1,190 +1,115 @@
 
-
-# Estudo Completo: Roadmap para App Unicornio de Gestao
-
-## O que ja existe (16 modulos ativos)
-
-O sistema ja possui uma base muito solida:
-
-| Modulo | Status | Observacao |
-|---|---|---|
-| Dashboard (Admin + Funcionario) | Completo | Widgets, ranking, agenda |
-| Financeiro | Avancado | Contas, categorias, graficos, cartao de credito, tags |
-| Estoque | Avancado | CRUD, movimentacoes, min stock, recebimento OCR com IA |
-| Pedidos a Fornecedores | Completo | Draft, envio, recebimento, vinculo com estoque |
-| Checklists Operacionais | Completo | Setores, subcategorias, pontuacao, frequencia |
-| Fechamento de Caixa | Avancado | Meios de pagamento, integracao financeira, validacao |
-| Fichas Tecnicas (Receitas) | Completo | Ingredientes vinculados ao estoque, custo |
-| Funcionarios + Holerites | Completo | Pagamentos, integra financeiro, CPF |
-| Escala de Trabalho | Basico | Solicitacao e aprovacao de folga |
-| Recompensas + Gamificacao | Completo | Pontos, ranking, resgate, loja interna |
-| Chat Interno | Completo | Direto, grupo, anuncios, pinned |
-| Marketing | Basico | Feed de posts, calendario, rascunhos |
-| Cardapio Digital | Avancado | Categorias, produtos, opcoes, grupos, vinculos |
-| Tablet (Pedido publico) | Avancado | QR Code, integracao Colibri |
-| WhatsApp Bot | Estruturado | Canais, conversas, IA, knowledge base, pedidos |
-| Notificacoes Push | Completo | VAPID, service worker, alertas por horario |
-
----
-
-## Lacunas Identificadas - O que Falta para ser Unicornio
-
-### BLOCO 1 - Inteligencia Artificial Acionavel (Maior Diferencial)
-
-**1.1 Assistente IA no Dashboard ("Copiloto de Gestao")**
-
-Hoje o `management-ai` existe como edge function mas nao aparece em lugar algum da interface. Implementar um widget de chat com IA no Dashboard que:
-- Resume o dia automaticamente ("Voce tem 3 contas vencendo, estoque critico de bacon, checklist de abertura incompleto")
-- Responde perguntas em linguagem natural ("Quanto gastei com fornecedores este mes?")
-- Sugere acoes proativas ("Bacon zerado ha 2 dias. Criar pedido para Distribuidora X?")
-
-Tecnologia: Edge function `management-ai` ja existente + modelo Lovable AI (gemini-2.5-flash) -- nao precisa de API key externa.
-
-**1.2 Previsao de Reposicao de Estoque (IA Preditiva)**
-
-Analisar historico de `stock_movements` para prever quando cada item vai zerar e sugerir pedidos automaticos. Exibir como alerta no dashboard: "Bacon deve acabar em ~3 dias baseado no consumo medio".
-
-Tecnologia: Calculo no frontend usando media movel simples dos ultimos 30 dias de saida.
-
-**1.3 Sugestao Inteligente de Categorias Financeiras**
-
-Ao digitar a descricao de uma transacao, a IA sugere automaticamente a categoria com base no historico. Exemplo: digitou "Coca-cola" -> sugere categoria "Bebidas > Refrigerantes".
-
-Tecnologia: Lookup local no historico de transacoes do usuario (sem custo de IA).
-
----
-
-### BLOCO 2 - Planejamento Financeiro (Modulo ja criado porem vazio)
-
-**2.1 Orcamentos por Categoria**
-
-A tabela `finance_budgets` ja existe no banco com `category_id`, `planned_amount`, `month`, `year`. O componente `FinancePlanning` exibe apenas "Em breve". Implementar:
-- Definir orcamento mensal por categoria (ex: "Carnes: R$5.000/mes")
-- Barra de progresso mostrando % gasto vs planejado
-- Alerta quando atingir 80% e 100% do orcamento
-- Comparativo mes a mes (gastou mais ou menos que o planejado)
-
-**2.2 Fluxo de Caixa Projetado**
-
-Calcular entradas e saidas futuras (parcelas, recorrentes, contas a pagar) e projetar o saldo futuro em grafico de linha com horizonte de 30/60/90 dias.
-
----
-
-### BLOCO 3 - Relatorios e Insights
-
-**3.1 DRE Simplificado (Demonstrativo de Resultados)**
-
-Micro e pequenas empresas precisam de um DRE basico:
-- Receita Bruta (vendas)
-- (-) Custos Diretos (CMV: custo de mercadoria via fichas tecnicas)
-- = Lucro Bruto
-- (-) Despesas Operacionais (salarios, aluguel, etc)
-- = Resultado Liquido
-
-Dados ja existem entre `finance_transactions`, `recipes` e `employee_payments`.
-
-**3.2 Relatorio de Performance por Funcionario**
-
-Cruzar dados de checklists concluidos, pontos, resgates e fechamentos de caixa para gerar um "score" de performance por colaborador. Util para avaliacoes e feedbacks.
-
----
-
-### BLOCO 4 - Automacoes que Economizam Tempo
-
-**4.1 Transacoes Financeiras Recorrentes Automaticas**
-
-O campo `is_recurring` e `recurring_interval` ja existem em `finance_transactions`, mas nao ha automacao que gere as transacoes futuras automaticamente. Criar uma logica que, ao abrir o mes, gere os lancamentos recorrentes pendentes (aluguel, internet, salarios).
-
-**4.2 Pedido Automatico ao Fornecedor**
-
-Quando um item de estoque atinge o `min_stock`, gerar automaticamente um rascunho de pedido ao fornecedor padrao do item. O gestor so precisa revisar e enviar.
-
-**4.3 Checklist Clone para Nova Unidade**
-
-Ao criar uma nova unidade, oferecer opcao de clonar toda a estrutura de checklists (setores, subcategorias, itens) de uma unidade existente.
-
----
-
-### BLOCO 5 - Experiencia Mobile Disruptiva
-
-**5.1 Onboarding Guiado (Wizard de Primeiro Uso)**
-
-Hoje o usuario cai no app sem contexto. Criar um wizard de 4-5 telas que:
-- Cadastra a primeira unidade (ja existe)
-- Importa categorias padrao de estoque
-- Configura meios de pagamento do fechamento de caixa
-- Cria o primeiro checklist com templates pre-definidos (hamburgueria, pizzaria, cafeteria)
-
-**5.2 Atalhos Rapidos com Gestos**
-
-- Swipe em item de estoque para entrada/saida rapida
-- Long-press em transacao financeira para duplicar
-- Shake-to-refresh no dashboard
-
-**5.3 Modo Offline Robusto**
-
-O PWA ja funciona offline para cache, mas nao ha fila de operacoes offline. Implementar queue de mutacoes que sincroniza quando reconectar.
-
----
-
-### BLOCO 6 - Integracao e Comunicacao
-
-**6.1 Exportacao de Relatorios (PDF/Excel)**
-
-Gerar PDF do DRE, do fechamento de caixa e da lista de estoque para compartilhar com contadores ou socios. Usar biblioteca de geracao de PDF no frontend.
-
-**6.2 Compartilhar Pedido via WhatsApp**
-
-Ao marcar um pedido como "enviado", gerar texto formatado e abrir link `wa.me` para enviar direto ao fornecedor. O telefone do fornecedor ja esta cadastrado.
-
----
-
-## Priorizacao Recomendada
-
-Considerando impacto vs esforco para micro/pequenas empresas:
-
-```text
-FASE 1 - Quick Wins (1-2 semanas)
-+--------------------------------------------------+
-| 1. Copiloto IA no Dashboard (1.1)                |
-| 2. Orcamentos por Categoria (2.1)                |
-| 3. Transacoes Recorrentes Automaticas (4.1)      |
-| 4. Compartilhar Pedido via WhatsApp (6.2)        |
-+--------------------------------------------------+
-
-FASE 2 - Diferenciacao (2-4 semanas)
-+--------------------------------------------------+
-| 5. Previsao de Reposicao de Estoque (1.2)        |
-| 6. DRE Simplificado (3.1)                        |
-| 7. Fluxo de Caixa Projetado (2.2)               |
-| 8. Pedido Automatico ao Fornecedor (4.2)         |
-+--------------------------------------------------+
-
-FASE 3 - Polimento (4-6 semanas)
-+--------------------------------------------------+
-| 9. Relatorio de Performance (3.2)                |
-| 10. Sugestao Inteligente de Categorias (1.3)     |
-| 11. Onboarding Guiado (5.1)                     |
-| 12. Exportacao PDF (6.1)                         |
-| 13. Checklist Clone entre Unidades (4.3)         |
-+--------------------------------------------------+
-```
-
-## Detalhes Tecnicos
-
-**Nenhuma dependencia externa necessaria** - Todas as features utilizam:
-- Lovable AI (gemini-2.5-flash) para funcoes de IA -- sem API key
-- Tabelas que ja existem no banco (`finance_budgets`, `recurring_interval`, etc)
-- Dados que ja estao sendo coletados (movimentacoes, transacoes, completions)
-- Bibliotecas ja instaladas (recharts para graficos, date-fns para datas)
-
-**Arquivos novos estimados**: ~8-12 componentes novos + 3-4 hooks
-**Arquivos editados**: ~6-8 hooks e componentes existentes
-**Migrations**: 1-2 (tabela de fila offline, campo de previsao)
-
----
+# Reformulacao do Sistema de Conquistas, Medalhas e Bordas
 
 ## Resumo
 
-O app ja tem 80% da infraestrutura de um unicornio. O que falta e a **camada de inteligencia** (IA acionavel, previsoes, automacoes) e a **camada de planejamento** (orcamentos, DRE, fluxo de caixa). Esses 13 itens transformam o app de "ferramenta de registro" em "copiloto de gestao" -- o verdadeiro diferencial para micro e pequenas empresas que hoje dependem de planilhas ou sistemas caros e complexos.
+Vamos transformar o sistema de gamificacao em algo muito mais envolvente, com:
+1. **Bordas de avatar dramaticamente diferentes** por rank (com efeitos visuais unicos)
+2. **Conquistas expandidas** com metas mais distantes e categorias variadas
+3. **Sistema de Medalhas** novo para feitos unicos/especiais
+4. **Visual premium** nos cards de conquista e medalha
 
+---
+
+## 1. Bordas de Avatar por Rank (mais chamativas)
+
+Cada rank tera um estilo visual totalmente distinto, nao apenas mudanca de cor:
+
+| Rank | Pontos | Borda | Efeito |
+|------|--------|-------|--------|
+| Iniciante | 0+ | Fina cinza, sem efeito | Nenhum |
+| Aprendiz | 10+ | Verde neon solida | Glow suave |
+| Dedicado | 25+ | Ciano com pulse lento | Pulse glow |
+| Veterano | 50+ | Roxo com borda dupla | Borda dupla + glow |
+| Mestre | 100+ | Dourado com particulas | Ring orbit animation |
+| Lenda | 300+ | Vermelho fogo, chamas | Fire glow pulsante |
+| Mitico | 750+ | Arco-iris rotativo + aura | Conic gradient + outer ring |
+| Imortal (NOVO) | 1500+ | Diamante cristalino, prismatico | Prisma multi-layer + shimmer |
+
+**Arquivo:** `src/lib/ranks.ts` -- adicionar rank "Imortal" (1500+) e ajustar "Lenda" para 300 e "Mitico" para 750.
+
+**Arquivo:** `src/components/profile/RankedAvatar.tsx` -- refatorar para suportar efeitos visuais mais complexos (ring externo animado, borda dupla, shimmer).
+
+**Arquivo:** `src/index.css` -- novas animacoes: `rankOrbit` (particulas orbitando), `rankFireGlow` (pulsacao fogo), `rankPrismaShimmer` (brilho diamante), `rankDoubleRing` (anel duplo).
+
+---
+
+## 2. Conquistas Expandidas (metas mais distantes)
+
+Ampliar de 11 para ~20 conquistas com metas progressivas mais desafiadoras:
+
+**Tarefas:**
+- Primeiro Passo (1), Fiel Escudeiro (10), Incansavel (50), Centuriao (100), **Titanique (250)**, **Inabalavel (500)**, **Maquina (1000)**
+
+**Pontos:**
+- Aprendiz (10), Dedicado (25), Veterano (50), Mestre (100), Lenda (200), Mitico (500), **Imortal (1000)**, **Transcendente (2000)**
+
+**Resgates:**
+- Colecionador (1), **Viciado (5)**, **Shopping (15)**
+
+**Arquivo:** `src/lib/achievements.ts` -- adicionar novas conquistas com icones unicos.
+
+---
+
+## 3. Sistema de Medalhas (NOVO)
+
+Medalhas sao premiacao por feitos unicos e especiais, diferentes de conquistas (que sao progressivas). Calculadas no frontend a partir dos dados existentes.
+
+**Exemplos de Medalhas:**
+- **Madrugador** -- completou tarefa antes das 7h
+- **Perfeicionista** -- completou todas as tarefas de um dia
+- **Sequencia de Fogo** -- 7 dias seguidos completando tarefas
+- **Primeiro do Mes** -- primeiro lugar no ranking mensal
+- **Velocista** -- completou 5 tarefas em 1 hora
+- **Multitarefa** -- completou tarefas em 3+ categorias no mesmo dia
+
+Como algumas medalhas precisam de dados de timestamps que ja existem em `checklist_completions.completed_at`, podemos calcular varias delas no frontend.
+
+**Novos arquivos:**
+- `src/lib/medals.ts` -- definicoes e logica de calculo
+- `src/components/profile/MedalList.tsx` -- componente visual
+
+**Arquivo:** `src/hooks/useProfile.ts` -- buscar dados extras (completed_at) para calcular medalhas.
+
+---
+
+## 4. Visual Premium dos Cards
+
+**Conquistas:**
+- Cards com gradiente de fundo baseado na raridade (comum, raro, epico, lendario)
+- Icone maior com glow quando desbloqueado
+- Barra de progresso mostrando % ate desbloquear
+- Efeito shimmer no card de conquistas lendarias
+
+**Medalhas:**
+- Visual diferente das conquistas: formato circular tipo "selo"
+- Cores metalicas (bronze, prata, ouro, platina) baseadas na dificuldade
+- Animacao de brilho ao ganhar
+
+**Arquivo:** `src/components/profile/AchievementList.tsx` -- redesign completo com categorias (Tarefas, Pontos, Resgates), raridade visual, progresso.
+
+---
+
+## 5. Integracao na Pagina de Perfil
+
+**Arquivo:** `src/pages/Profile.tsx` -- adicionar secao de Medalhas abaixo das Conquistas, com tabs ou secoes separadas.
+
+---
+
+## Detalhes Tecnicos
+
+### Arquivos a criar:
+- `src/lib/medals.ts`
+- `src/components/profile/MedalList.tsx`
+
+### Arquivos a editar:
+- `src/lib/ranks.ts` -- novo rank Imortal, ajustar thresholds
+- `src/lib/achievements.ts` -- ~9 novas conquistas, sistema de raridade
+- `src/components/profile/RankedAvatar.tsx` -- efeitos visuais por rank
+- `src/components/profile/AchievementList.tsx` -- redesign com raridade e progresso
+- `src/hooks/useProfile.ts` -- buscar completed_at para medalhas
+- `src/pages/Profile.tsx` -- integrar MedalList
+- `src/index.css` -- novas animacoes de borda/rank
+
+### Sem mudancas no banco de dados
+Tudo calculado no frontend a partir de dados existentes (checklist_completions, reward_redemptions).
