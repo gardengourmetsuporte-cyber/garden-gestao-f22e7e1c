@@ -244,11 +244,8 @@
   /* ========== COMMAND CENTER CARDS ========== */
 
   .card-command {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl border transition-all duration-300;
-    border-image: linear-gradient(135deg, hsl(var(--neon-cyan) / 0.4), hsl(var(--neon-purple) / 0.3), hsl(var(--primary) / 0.4)) 1;
-    border-width: 1px;
-    border-style: solid;
-    border-color: hsl(var(--neon-cyan) / 0.25);
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
+    border: 1px solid hsl(var(--neon-cyan) / 0.25);
     box-shadow: var(--shadow-card), var(--glow-cyan);
   }
 

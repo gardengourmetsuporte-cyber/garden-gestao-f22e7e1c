@@ -16,15 +16,15 @@ import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { FinanceChartWidget } from './FinanceChartWidget';
 import { AICopilotWidget } from './AICopilotWidget';
-import { StockPredictionWidget } from './StockPredictionWidget';
 import { AutoOrderWidget } from './AutoOrderWidget';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const { tasks: agendaTasks, isLoading: tasksLoading } = useAgenda();
+  const { tasks: agendaTasks, isLoading: tasksLoading, toggleTask } = useAgenda();
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
 
   const animatedBalance = useCountUpCurrency(stats.monthBalance);
@@ -115,22 +115,19 @@ export function AdminDashboard() {
         {/* FINANCE CHART WIDGET - Donut expenses */}
         <FinanceChartWidget />
 
-        {/* STOCK PREDICTION WIDGET */}
-        <StockPredictionWidget />
-
         {/* AUTO ORDER WIDGET */}
         <AutoOrderWidget />
 
-        {/* AGENDA WIDGET - Premium redesign */}
-        <button
-          onClick={() => navigate('/agenda')}
-          className="card-command col-span-2 p-0 text-left animate-slide-up stagger-3 transition-all duration-200 hover:scale-[1.005] active:scale-[0.98] overflow-hidden relative"
-        >
-          <div className="absolute -top-10 right-0 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: 'hsl(var(--primary))' }} />
-          <div className="p-4 pb-3">
-            <div className="flex items-center justify-between mb-4">
+        {/* AGENDA WIDGET - Interactive */}
+        <div className="col-span-2 rounded-2xl border border-border bg-card overflow-hidden animate-slide-up stagger-3 relative">
+          <div className="absolute -top-10 right-0 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none bg-primary" />
+          <button
+            onClick={() => navigate('/agenda')}
+            className="w-full p-4 pb-3 text-left"
+          >
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)', border: '1px solid hsl(var(--primary) / 0.25)' }}>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-primary/15 border border-primary/25">
                   <AppIcon name="CalendarDays" size={18} className="text-primary" />
                 </div>
                 <div>
@@ -140,41 +137,43 @@ export function AdminDashboard() {
               </div>
               <div className="flex items-center gap-2">
                 {!tasksLoading && pendingTasks.length > 0 && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'hsl(var(--primary) / 0.15)', color: 'hsl(var(--primary))' }}>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
                     {pendingTasks.length} pendente{pendingTasks.length > 1 ? 's' : ''}
                   </span>
                 )}
                 <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
               </div>
             </div>
-          </div>
+          </button>
           {tasksLoading ? (
             <div className="space-y-1 px-4 pb-4">
-              {[1,2,3].map(i => <Skeleton key={i} className="h-11 w-full rounded-xl" />)}
+              {[1,2,3].map(i => <Skeleton key={i} className="h-11 w-full rounded-2xl" />)}
             </div>
           ) : pendingTasks.length > 0 ? (
             <div className="px-3 pb-3 space-y-1">
-              {pendingTasks.map((task, idx) => {
+              {pendingTasks.map((task) => {
                 const isOverdue = task.due_date && isPast(new Date(task.due_date + 'T23:59:59')) && !isToday(new Date(task.due_date));
                 return (
                   <div
                     key={task.id}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors",
                       isOverdue ? "bg-destructive/8" : "bg-secondary/40"
                     )}
                   >
-                    <div className={cn(
-                      "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                      isOverdue ? "bg-destructive/15" : "bg-primary/10"
-                    )}>
-                      <AppIcon
-                        name={isOverdue ? "AlertTriangle" : "Check"}
-                        size={14}
-                        className={isOverdue ? "text-destructive" : "text-primary"}
-                      />
-                    </div>
-                    <span className={cn("text-sm text-foreground truncate flex-1", isOverdue && "text-destructive/90")}>{task.title}</span>
+                    <Checkbox
+                      checked={task.is_completed}
+                      onCheckedChange={(e) => {
+                        e && typeof e === 'boolean';
+                        toggleTask(task.id);
+                      }}
+                      className="w-5 h-5 rounded-full border-2 data-[state=checked]:bg-success data-[state=checked]:border-success shrink-0"
+                    />
+                    <span className={cn(
+                      "text-sm text-foreground truncate flex-1",
+                      isOverdue && "text-destructive/90",
+                      task.is_completed && "line-through text-muted-foreground"
+                    )}>{task.title}</span>
                     {task.due_date && (
                       <span className={cn(
                         "text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0",
@@ -191,13 +190,13 @@ export function AdminDashboard() {
             </div>
           ) : (
             <div className="text-center px-4 pb-5">
-              <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ background: 'hsl(142 60% 45% / 0.12)' }}>
+              <div className="w-10 h-10 rounded-2xl mx-auto mb-2 flex items-center justify-center" style={{ background: 'hsl(142 60% 45% / 0.12)' }}>
                 <AppIcon name="Check" size={20} style={{ color: 'hsl(142 60% 50%)' }} />
               </div>
               <p className="text-xs text-muted-foreground">Tudo em dia! 🎉</p>
             </div>
           )}
-        </button>
+        </div>
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (

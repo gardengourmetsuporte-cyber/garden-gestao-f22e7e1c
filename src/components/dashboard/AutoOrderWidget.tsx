@@ -37,7 +37,7 @@ export function AutoOrderWidget() {
 
         <div className="space-y-2">
           {dailySuggestions.map(s => (
-            <div key={s.supplierId} className="rounded-xl bg-secondary/40 p-3 space-y-2">
+            <div key={s.supplierId} className="rounded-2xl bg-secondary/40 p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-foreground">{s.supplierName}</span>
                 <span className="text-[10px] text-muted-foreground">{s.items.length} ite{s.items.length > 1 ? 'ns' : 'm'}</span>
