@@ -793,6 +793,138 @@
       transform: translateY(0) scale(1);
     }
   }
+
+  /* ========== RANKED AVATAR EFFECTS ========== */
+
+  .ranked-avatar-pulse {
+    animation: rankPulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes rankPulseGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.25); }
+  }
+
+  .ranked-avatar-double-ring {
+    animation: rankDoubleRing 3s ease-in-out infinite;
+  }
+
+  .ranked-avatar-outer-ring {
+    animation: rankOuterRing 3s ease-in-out infinite;
+  }
+
+  @keyframes rankDoubleRing {
+    0%, 100% { box-shadow: 0 0 10px hsl(var(--neon-purple) / 0.35); }
+    50% { box-shadow: 0 0 18px hsl(var(--neon-purple) / 0.55), 0 0 4px hsl(var(--neon-purple) / 0.3); }
+  }
+
+  @keyframes rankOuterRing {
+    0%, 100% { opacity: 0.3; transform: scale(1.15); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+
+  /* Orbit particles for Mestre */
+  .ranked-avatar-orbit-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  .orbit-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: hsl(var(--neon-amber));
+    box-shadow: 0 0 6px hsl(var(--neon-amber) / 0.8);
+    animation: rankOrbit 3s linear infinite;
+  }
+
+  .orbit-particle-1 { animation-delay: 0s; }
+  .orbit-particle-2 { animation-delay: -1s; }
+  .orbit-particle-3 { animation-delay: -2s; }
+
+  @keyframes rankOrbit {
+    0% { top: 0%; left: 50%; }
+    25% { top: 50%; left: 100%; }
+    50% { top: 100%; left: 50%; }
+    75% { top: 50%; left: 0%; }
+    100% { top: 0%; left: 50%; }
+  }
+
+  /* Fire glow for Lenda */
+  .ranked-avatar-fire {
+    animation: rankFireGlow 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes rankFireGlow {
+    0% { box-shadow: 0 0 10px hsl(var(--neon-red) / 0.4), 0 0 20px hsl(var(--neon-red) / 0.15); }
+    50% { box-shadow: 0 0 18px hsl(var(--neon-red) / 0.6), 0 0 35px hsl(var(--neon-red) / 0.25), 0 -4px 12px hsl(var(--neon-amber) / 0.3); }
+    100% { box-shadow: 0 0 12px hsl(var(--neon-red) / 0.5), 0 0 25px hsl(var(--neon-red) / 0.2), 0 -2px 8px hsl(var(--neon-amber) / 0.2); }
+  }
+
+  /* Rainbow for Mítico */
+  .ranked-avatar-rainbow {
+    animation: neonRotate 3s linear infinite;
+  }
+
+  /* Prisma shimmer for Imortal */
+  .ranked-avatar-prisma {
+    animation: neonRotate 3s linear infinite, rankPrismaShimmer 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes rankPrismaShimmer {
+    0% { filter: brightness(1) saturate(1); box-shadow: 0 0 20px hsl(200 80% 80% / 0.4), 0 0 40px hsl(280 80% 75% / 0.2); }
+    50% { filter: brightness(1.15) saturate(1.2); box-shadow: 0 0 30px hsl(200 80% 80% / 0.6), 0 0 60px hsl(340 80% 70% / 0.3), 0 0 80px hsl(60 80% 75% / 0.15); }
+    100% { filter: brightness(1.05) saturate(1.1); box-shadow: 0 0 25px hsl(280 80% 75% / 0.5), 0 0 50px hsl(200 80% 80% / 0.25); }
+  }
+
+  /* Achievement shimmer */
+  .achievement-shimmer {
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      hsl(38 80% 55% / 0.08) 37%,
+      hsl(38 80% 55% / 0.15) 50%,
+      hsl(38 80% 55% / 0.08) 63%,
+      transparent 75%
+    );
+    background-size: 250% 100%;
+    animation: achievementShimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes achievementShimmer {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
+
+  /* Medal shine */
+  .medal-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .medal-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      135deg,
+      transparent 40%,
+      hsl(0 0% 100% / 0.15) 50%,
+      transparent 60%
+    );
+    animation: medalShine 4s ease-in-out infinite;
+  }
+
+  @keyframes medalShine {
+    0%, 80%, 100% { transform: rotate(0deg) translate(-30%, -30%); }
+    40% { transform: rotate(0deg) translate(30%, 30%); }
+  }
 }
 
 /* =========================================================
