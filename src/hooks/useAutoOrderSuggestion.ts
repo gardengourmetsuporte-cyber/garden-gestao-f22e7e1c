@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useInventoryDB } from './useInventoryDB';
 import { useOrders } from './useOrders';
+import { useSuppliers } from './useSuppliers';
 
 export interface AutoOrderItem {
   itemId: string;
@@ -14,36 +15,23 @@ export interface AutoOrderSuggestion {
   supplierId: string;
   supplierName: string;
   supplierPhone: string | null;
-  deliveryDay: string; // 'daily' | day of week label
+  deliveryDay: string;
   items: AutoOrderItem[];
-}
-
-// Map supplier to typical delivery schedule
-// This is a simple heuristic: suppliers with perishable items (categories like meats, produce, bread)
-// deliver daily, while others deliver weekly on specific days
-const PERISHABLE_CATEGORIES = ['carnes', 'hortifruti', 'pães', 'laticínios', 'frios'];
-const WEEKLY_DAYS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-
-function inferDeliveryDay(items: AutoOrderItem[], allItems: any[]): string {
-  // Check if any item in this supplier group belongs to a perishable category
-  const supplierItemIds = new Set(items.map(i => i.itemId));
-  const hasPerishable = allItems
-    .filter(item => supplierItemIds.has(item.id))
-    .some(item => {
-      const catName = item.category?.name?.toLowerCase() || '';
-      return PERISHABLE_CATEGORIES.some(p => catName.includes(p));
-    });
-
-  if (hasPerishable) return 'diário';
-
-  // For non-perishable, suggest a weekly delivery
-  // Simple hash based on supplier name to distribute across weekdays
-  return 'semanal';
 }
 
 export function useAutoOrderSuggestion() {
   const { items } = useInventoryDB();
   const { orders, createOrder } = useOrders();
+  const { suppliers } = useSuppliers();
+
+  // Map supplier id -> delivery_frequency from DB
+  const supplierFreqMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    suppliers.forEach(s => {
+      map[s.id] = (s as any).delivery_frequency || 'weekly';
+    });
+    return map;
+  }, [suppliers]);
 
   const suggestions = useMemo(() => {
     const pendingOrderItemIds = new Set<string>();
@@ -62,11 +50,12 @@ export function useAutoOrderSuggestion() {
     lowStockItems.forEach(item => {
       const sid = item.supplier_id!;
       if (!bySupplier[sid]) {
+        const freq = supplierFreqMap[sid] || 'weekly';
         bySupplier[sid] = {
           supplierId: sid,
           supplierName: (item as any).supplier?.name || 'Fornecedor',
           supplierPhone: (item as any).supplier?.phone || null,
-          deliveryDay: 'diário',
+          deliveryDay: freq === 'daily' ? 'diário' : 'semanal',
           items: [],
         };
       }
@@ -79,28 +68,26 @@ export function useAutoOrderSuggestion() {
       });
     });
 
-    // Infer delivery day for each supplier
-    Object.values(bySupplier).forEach(s => {
-      s.deliveryDay = inferDeliveryDay(s.items, items);
-    });
-
     return Object.values(bySupplier);
-  }, [items, orders]);
+  }, [items, orders, supplierFreqMap]);
 
-  // Group suggestions by delivery schedule
+  // Only daily suggestions for the dashboard widget
+  const dailySuggestions = useMemo(() => {
+    return suggestions.filter(s => s.deliveryDay === 'diário');
+  }, [suggestions]);
+
+  // Grouped (all)
   const groupedSuggestions = useMemo(() => {
     const daily = suggestions.filter(s => s.deliveryDay === 'diário');
     const weekly = suggestions.filter(s => s.deliveryDay === 'semanal');
 
     const groups: { label: string; emoji: string; suggestions: AutoOrderSuggestion[] }[] = [];
-
     if (daily.length > 0) {
       groups.push({ label: 'Pedidos Diários', emoji: '📦', suggestions: daily });
     }
     if (weekly.length > 0) {
       groups.push({ label: 'Pedidos Semanais', emoji: '📋', suggestions: weekly });
     }
-
     return groups;
   }, [suggestions]);
 
@@ -112,5 +99,5 @@ export function useAutoOrderSuggestion() {
     await createOrder(suggestion.supplierId, orderItems);
   };
 
-  return { suggestions, groupedSuggestions, createDraftOrder };
+  return { suggestions, dailySuggestions, groupedSuggestions, createDraftOrder };
 }
