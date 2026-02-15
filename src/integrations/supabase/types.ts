@@ -55,6 +55,53 @@ export type Database = {
           },
         ]
       }
+      bonus_points: {
+        Row: {
+          awarded_by: string | null
+          badge_id: string | null
+          created_at: string
+          id: string
+          month: string
+          points: number
+          reason: string
+          type: string
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_by?: string | null
+          badge_id?: string | null
+          created_at?: string
+          id?: string
+          month: string
+          points?: number
+          reason: string
+          type?: string
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          awarded_by?: string | null
+          badge_id?: string | null
+          created_at?: string
+          id?: string
+          month?: string
+          points?: number
+          reason?: string
+          type?: string
+          unit_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_points_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cash_closings: {
         Row: {
           cash_amount: number

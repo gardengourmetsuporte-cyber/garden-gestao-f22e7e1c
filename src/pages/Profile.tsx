@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, TrendingDown, Coins, Trophy } from 'lucide-react';
+import { ArrowLeft, Star, TrendingDown, Coins, Trophy, Award, Flame } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { AchievementList } from '@/components/profile/AchievementList';
@@ -74,6 +74,14 @@ export default function Profile() {
               </span>
             </div>
           )}
+          {profile.totalBonusPoints > 0 && (
+            <div className="flex items-center justify-center gap-2 pt-2" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
+              <Flame className="w-4 h-4" style={{ color: 'hsl(var(--neon-red))' }} />
+              <span className="text-sm text-muted-foreground">
+                <span className="font-bold text-foreground">+{profile.totalBonusPoints}</span> pontos bônus este mês
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -87,6 +95,24 @@ export default function Profile() {
             <p className="text-xs text-muted-foreground">Resgates feitos</p>
           </div>
         </div>
+
+        {/* Bonus Points */}
+        {profile.bonusPoints.length > 0 && (
+          <div className="card-command p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Award className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
+              <h3 className="font-semibold text-sm text-foreground">Bônus do Mês</h3>
+            </div>
+            <div className="space-y-2">
+              {profile.bonusPoints.map((bp, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-secondary/40">
+                  <span className="text-xs text-foreground truncate flex-1">{bp.reason}</span>
+                  <span className="text-xs font-bold ml-2 shrink-0" style={{ color: 'hsl(var(--neon-green))' }}>+{bp.points}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Achievements */}
         <AchievementList achievements={profile.achievements} />
