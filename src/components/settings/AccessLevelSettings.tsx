@@ -304,15 +304,27 @@ export function AccessLevelSettings() {
         title="Nível de Acesso"
         items={[
           { id: '_full', label: 'Acesso completo' },
-          ...accessLevels.map(l => ({ id: l.id, label: l.name })),
+          ...accessLevels.map(l => ({ id: l.id, label: `${l.name} (${l.modules.length} módulos)` })),
         ]}
         selectedId={pickerUserId ? (getUserAccessLevel(pickerUserId) || '_full') : null}
         onSelect={(id) => {
           if (pickerUserId) {
+            if (id === '_create_new') {
+              setPickerUserId(null);
+              openCreate();
+              return;
+            }
             handleAssign(pickerUserId, id === '_full' ? null : id);
             setPickerUserId(null);
           }
         }}
+        onCreateNew={async () => {
+          setPickerUserId(null);
+          openCreate();
+          return null;
+        }}
+        createLabel="Criar nível"
+        createPlaceholder="Nome do nível..."
       />
     </div>
   );
