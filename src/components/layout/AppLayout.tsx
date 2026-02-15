@@ -207,16 +207,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       {launcherOpen && (
         <button
           onClick={() => { navigate('/'); setLauncherOpen(false); }}
-          className="lg:hidden fixed z-[9999] w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-all duration-200 fab-action-enter"
+          className="lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-all duration-200 launcher-home-btn"
           style={{
-            bottom: `calc(${hasBottomNav ? 'env(safe-area-inset-bottom) + 84px' : 'env(safe-area-inset-bottom) + 24px'} + 68px)`,
-            right: '21px',
-            background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
-            boxShadow: '0 4px 20px hsl(var(--primary) / 0.4), 0 0 24px hsl(var(--neon-cyan) / 0.2)',
-            animationDelay: '80ms',
+            bottom: `calc(${hasBottomNav ? 'env(safe-area-inset-bottom) + 84px' : 'env(safe-area-inset-bottom) + 24px'} + 70px)`,
+            right: '20px',
+            background: 'linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--primary)))',
+            boxShadow: '0 4px 20px hsl(var(--primary) / 0.4), 0 0 24px hsl(var(--neon-cyan) / 0.25)',
           }}
         >
-          <AppIcon name="Home" size={22} className="text-primary-foreground" />
+          <AppIcon name="Home" size={24} className="text-primary-foreground" />
         </button>
       )}
 
