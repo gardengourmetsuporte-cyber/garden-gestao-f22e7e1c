@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkSchedule, ScheduleStatus } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 export function useSchedule() {
   const { user, isAdmin } = useAuth();
+  const { activeUnitId } = useUnit();
   const [schedules, setSchedules] = useState<WorkSchedule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,7 +61,8 @@ export function useSchedule() {
           year,
           day_off: dayOff,
           notes: notes || null,
-        })
+          unit_id: activeUnitId,
+        } as any)
         .select()
         .single();
 
