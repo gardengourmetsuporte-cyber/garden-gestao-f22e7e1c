@@ -752,6 +752,38 @@
       transform: translateY(0) scale(1);
     }
   }
+
+  /* ========== FAB EFFECTS ========== */
+
+  .fab-idle-glow {
+    animation: fabIdleGlow 2.5s ease-in-out infinite;
+  }
+
+  @keyframes fabIdleGlow {
+    0%, 100% {
+      box-shadow: 0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.15);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 6px 32px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--neon-cyan) / 0.25), 0 0 100px hsl(var(--neon-cyan) / 0.1);
+      transform: scale(1.04);
+    }
+  }
+
+  .fab-close-spin {
+    animation: fabCloseSpin 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes fabCloseSpin {
+    from {
+      transform: rotate(-90deg) scale(0.8);
+      opacity: 0.5;
+    }
+    to {
+      transform: rotate(0deg) scale(1);
+      opacity: 1;
+    }
+  }
 }
 
 /* =========================================================
