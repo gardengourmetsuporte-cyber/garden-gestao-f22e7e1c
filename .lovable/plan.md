@@ -1,115 +1,105 @@
 
-# Reformulacao do Sistema de Conquistas, Medalhas e Bordas
+# Sistema de Pontuacao Justa - Funcionario do Mes
 
-## Resumo
+## Problema Atual
 
-Vamos transformar o sistema de gamificacao em algo muito mais envolvente, com:
-1. **Bordas de avatar dramaticamente diferentes** por rank (com efeitos visuais unicos)
-2. **Conquistas expandidas** com metas mais distantes e categorias variadas
-3. **Sistema de Medalhas** novo para feitos unicos/especiais
-4. **Visual premium** nos cards de conquista e medalha
+O ranking ordena por `earned_points` (soma total de `points_awarded` de checklists). Quem trabalha mais dias ou executa mais tarefas domina automaticamente. Nao existe bonus por qualidade, disciplina ou reconhecimento do gestor.
 
----
+## Solucao
 
-## 1. Bordas de Avatar por Rank (mais chamativas)
-
-Cada rank tera um estilo visual totalmente distinto, nao apenas mudanca de cor:
-
-| Rank | Pontos | Borda | Efeito |
-|------|--------|-------|--------|
-| Iniciante | 0+ | Fina cinza, sem efeito | Nenhum |
-| Aprendiz | 10+ | Verde neon solida | Glow suave |
-| Dedicado | 25+ | Ciano com pulse lento | Pulse glow |
-| Veterano | 50+ | Roxo com borda dupla | Borda dupla + glow |
-| Mestre | 100+ | Dourado com particulas | Ring orbit animation |
-| Lenda | 300+ | Vermelho fogo, chamas | Fire glow pulsante |
-| Mitico | 750+ | Arco-iris rotativo + aura | Conic gradient + outer ring |
-| Imortal (NOVO) | 1500+ | Diamante cristalino, prismatico | Prisma multi-layer + shimmer |
-
-**Arquivo:** `src/lib/ranks.ts` -- adicionar rank "Imortal" (1500+) e ajustar "Lenda" para 300 e "Mitico" para 750.
-
-**Arquivo:** `src/components/profile/RankedAvatar.tsx` -- refatorar para suportar efeitos visuais mais complexos (ring externo animado, borda dupla, shimmer).
-
-**Arquivo:** `src/index.css` -- novas animacoes: `rankOrbit` (particulas orbitando), `rankFireGlow` (pulsacao fogo), `rankPrismaShimmer` (brilho diamante), `rankDoubleRing` (anel duplo).
+Criar um sistema de **pontos bonus** com pesos altos que funcionam como "viradas de jogo", permitindo que qualquer funcionario dispute o ranking mensal. O ranking passa a filtrar por mes e somar pontos base + bonus.
 
 ---
 
-## 2. Conquistas Expandidas (metas mais distantes)
+## 1. Nova Tabela: `bonus_points`
 
-Ampliar de 11 para ~20 conquistas com metas progressivas mais desafiadoras:
+Armazena pontos bonus concedidos automaticamente (conquistas) ou manualmente (gestor).
 
-**Tarefas:**
-- Primeiro Passo (1), Fiel Escudeiro (10), Incansavel (50), Centuriao (100), **Titanique (250)**, **Inabalavel (500)**, **Maquina (1000)**
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid | PK |
+| user_id | uuid | Funcionario que recebeu |
+| unit_id | uuid | Unidade |
+| points | integer | Quantidade de pontos bonus |
+| reason | text | Descricao (ex: "Semana Perfeita") |
+| type | text | `auto` ou `manual` |
+| badge_id | text | ID da conquista (nullable, para auto) |
+| awarded_by | uuid | Quem concedeu (nullable, para manual) |
+| month | date | Primeiro dia do mes de referencia |
+| created_at | timestamptz | Quando foi concedido |
 
-**Pontos:**
-- Aprendiz (10), Dedicado (25), Veterano (50), Mestre (100), Lenda (200), Mitico (500), **Imortal (1000)**, **Transcendente (2000)**
-
-**Resgates:**
-- Colecionador (1), **Viciado (5)**, **Shopping (15)**
-
-**Arquivo:** `src/lib/achievements.ts` -- adicionar novas conquistas com icones unicos.
-
----
-
-## 3. Sistema de Medalhas (NOVO)
-
-Medalhas sao premiacao por feitos unicos e especiais, diferentes de conquistas (que sao progressivas). Calculadas no frontend a partir dos dados existentes.
-
-**Exemplos de Medalhas:**
-- **Madrugador** -- completou tarefa antes das 7h
-- **Perfeicionista** -- completou todas as tarefas de um dia
-- **Sequencia de Fogo** -- 7 dias seguidos completando tarefas
-- **Primeiro do Mes** -- primeiro lugar no ranking mensal
-- **Velocista** -- completou 5 tarefas em 1 hora
-- **Multitarefa** -- completou tarefas em 3+ categorias no mesmo dia
-
-Como algumas medalhas precisam de dados de timestamps que ja existem em `checklist_completions.completed_at`, podemos calcular varias delas no frontend.
-
-**Novos arquivos:**
-- `src/lib/medals.ts` -- definicoes e logica de calculo
-- `src/components/profile/MedalList.tsx` -- componente visual
-
-**Arquivo:** `src/hooks/useProfile.ts` -- buscar dados extras (completed_at) para calcular medalhas.
+RLS: Admins gerenciam tudo, usuarios veem os proprios.
 
 ---
 
-## 4. Visual Premium dos Cards
+## 2. Conquistas de Alto Valor (automaticas)
 
-**Conquistas:**
-- Cards com gradiente de fundo baseado na raridade (comum, raro, epico, lendario)
-- Icone maior com glow quando desbloqueado
-- Barra de progresso mostrando % ate desbloquear
-- Efeito shimmer no card de conquistas lendarias
+Calculadas no frontend a partir de dados existentes, quando desbloqueadas geram um registro em `bonus_points` automaticamente.
 
-**Medalhas:**
-- Visual diferente das conquistas: formato circular tipo "selo"
-- Cores metalicas (bronze, prata, ouro, platina) baseadas na dificuldade
-- Animacao de brilho ao ganhar
+| Conquista | Condicao | Pontos Bonus | Frequencia |
+|-----------|----------|--------------|------------|
+| Pontualidade Perfeita | 5 dias consecutivos com tarefas antes das 9h | 15 pts | 1x por semana |
+| Semana Perfeita | Completou 100% dos checklists em todos os dias da semana | 25 pts | 1x por semana |
+| Sequencia de Fogo | 7 dias seguidos completando tarefas | 20 pts | 1x por mes |
+| Velocista | 5+ tarefas concluidas em 1 hora | 10 pts | 1x por semana |
+| Madrugador | Tarefa antes das 7h | 5 pts | 1x por semana |
 
-**Arquivo:** `src/components/profile/AchievementList.tsx` -- redesign completo com categorias (Tarefas, Pontos, Resgates), raridade visual, progresso.
+Anti-spam: cada conquista tem cooldown (semanal ou mensal) controlado pela coluna `badge_id` + `month`.
 
 ---
 
-## 5. Integracao na Pagina de Perfil
+## 3. Bonus Manual do Gestor ("Atitude Destaque")
 
-**Arquivo:** `src/pages/Profile.tsx` -- adicionar secao de Medalhas abaixo das Conquistas, com tabs ou secoes separadas.
+O admin podera conceder bonus diretamente a qualquer funcionario com:
+- Motivo descritivo (ex: "Resolveu problema do cliente sem ser solicitado")
+- Quantidade de pontos (sugestao: 10, 15, 20, 25)
+
+Acessivel via um botao na aba de Performance do modulo de Funcionarios.
+
+---
+
+## 4. Ranking Mensal
+
+O leaderboard passa a exibir dados **filtrados por mes**:
+- **Pontos Base**: soma de `checklist_completions.points_awarded` do mes
+- **Pontos Bonus**: soma de `bonus_points.points` do mes
+- **Score Total**: Base + Bonus (ordenacao principal)
+
+Adicionar seletor de mes no componente Leaderboard.
+
+---
+
+## 5. Funcionario do Mes
+
+Destacar visualmente o 1o colocado do ranking mensal com:
+- Badge especial no perfil
+- Icone de trofeu no leaderboard
+- Label "Funcionario do Mes" no dashboard
 
 ---
 
 ## Detalhes Tecnicos
 
+### Banco de Dados (migracao SQL)
+- Criar tabela `bonus_points` com RLS
+- Politicas: admin ALL, usuario SELECT proprio
+
 ### Arquivos a criar:
-- `src/lib/medals.ts`
-- `src/components/profile/MedalList.tsx`
+- `src/hooks/useBonusPoints.ts` -- CRUD de bonus, calculo de conquistas automaticas, concessao manual
+- `src/components/employees/BonusPointSheet.tsx` -- Sheet para admin conceder bonus manual
 
 ### Arquivos a editar:
-- `src/lib/ranks.ts` -- novo rank Imortal, ajustar thresholds
-- `src/lib/achievements.ts` -- ~9 novas conquistas, sistema de raridade
-- `src/components/profile/RankedAvatar.tsx` -- efeitos visuais por rank
-- `src/components/profile/AchievementList.tsx` -- redesign com raridade e progresso
-- `src/hooks/useProfile.ts` -- buscar completed_at para medalhas
-- `src/pages/Profile.tsx` -- integrar MedalList
-- `src/index.css` -- novas animacoes de borda/rank
+- `src/hooks/useLeaderboard.ts` -- adicionar filtro por mes, somar bonus_points, novo campo `bonus_points` e `total_score` no LeaderboardEntry
+- `src/components/dashboard/Leaderboard.tsx` -- seletor de mes, exibir score total (base + bonus), badge "Func. do Mes"
+- `src/lib/achievements.ts` -- adicionar funcao para verificar conquistas de alto valor com cooldown
+- `src/components/employees/EmployeePerformance.tsx` -- botao "Dar Bonus" por funcionario
+- `src/hooks/useProfile.ts` -- incluir bonus_points no perfil
+- `src/pages/Profile.tsx` -- exibir bonus recebidos
 
-### Sem mudancas no banco de dados
-Tudo calculado no frontend a partir de dados existentes (checklist_completions, reward_redemptions).
+### Fluxo de conquista automatica:
+1. Hook `useBonusPoints` verifica se o usuario desbloqueou alguma conquista de alto valor no mes atual
+2. Checa se ja existe registro em `bonus_points` com mesmo `badge_id` + `month` (cooldown)
+3. Se nao existe, insere automaticamente e mostra notificacao/animacao
+
+### Sem alteracao na logica base de pontos:
+Os pontos de checklists continuam funcionando exatamente como antes. O bonus e uma camada adicional que soma ao ranking mensal.
