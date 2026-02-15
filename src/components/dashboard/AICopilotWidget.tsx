@@ -1,0 +1,129 @@
+import { useState, useEffect, useRef } from 'react';
+import { AppIcon } from '@/components/ui/app-icon';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useManagementAI } from '@/hooks/useManagementAI';
+import { cn } from '@/lib/utils';
+
+export function AICopilotWidget() {
+  const { messages, isLoading, hasGreeted, sendMessage } = useManagementAI();
+  const [question, setQuestion] = useState('');
+  const [expanded, setExpanded] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-greet on mount
+  useEffect(() => {
+    if (!hasGreeted) {
+      sendMessage();
+    }
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim() || isLoading) return;
+    sendMessage(question.trim());
+    setQuestion('');
+    setExpanded(true);
+  };
+
+  const lastAssistantMsg = messages.filter(m => m.role === 'assistant').at(-1);
+
+  return (
+    <div className="card-command col-span-2 overflow-hidden animate-slide-up stagger-2 relative">
+      {/* Glow */}
+      <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-15 blur-3xl pointer-events-none" style={{ background: 'hsl(var(--primary))' }} />
+
+      {/* Header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full p-4 pb-2 flex items-center justify-between text-left"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)', border: '1px solid hsl(var(--primary) / 0.25)' }}>
+            <AppIcon name="Bot" size={18} className="text-primary" />
+          </div>
+          <div>
+            <span className="text-sm font-bold text-foreground">Copiloto IA</span>
+            <span className="text-[10px] text-muted-foreground block">Seu assistente de gestão</span>
+          </div>
+        </div>
+        <AppIcon
+          name={expanded ? "ChevronUp" : "ChevronDown"}
+          size={16}
+          className="text-muted-foreground"
+        />
+      </button>
+
+      {/* Collapsed: show last message */}
+      {!expanded && lastAssistantMsg && (
+        <div className="px-4 pb-4">
+          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+            {lastAssistantMsg.content}
+          </p>
+        </div>
+      )}
+
+      {/* Loading state for initial greeting */}
+      {!expanded && !lastAssistantMsg && isLoading && (
+        <div className="px-4 pb-4">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+            <span className="text-[10px] text-muted-foreground">Analisando seu dia...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Expanded: full chat */}
+      {expanded && (
+        <div className="px-4 pb-4 space-y-3">
+          {/* Messages */}
+          <div className="max-h-60 overflow-y-auto space-y-2 scrollbar-thin">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "text-xs leading-relaxed rounded-xl px-3 py-2 max-w-[90%]",
+                  msg.role === 'assistant'
+                    ? "bg-secondary/60 text-foreground"
+                    : "bg-primary/15 text-primary ml-auto"
+                )}
+              >
+                {msg.content}
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex gap-1 px-3 py-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <form onSubmit={handleSubmit} className="flex gap-2">
+            <Input
+              value={question}
+              onChange={e => setQuestion(e.target.value)}
+              placeholder="Pergunte algo..."
+              className="h-9 text-xs"
+              disabled={isLoading}
+            />
+            <Button type="submit" size="sm" className="h-9 px-3 shrink-0" disabled={isLoading || !question.trim()}>
+              <AppIcon name="Send" size={14} />
+            </Button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}

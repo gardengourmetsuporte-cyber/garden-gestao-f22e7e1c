@@ -15,6 +15,7 @@ import { format, isToday, isTomorrow, isPast } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { FinanceChartWidget } from './FinanceChartWidget';
+import { AICopilotWidget } from './AICopilotWidget';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -66,6 +67,9 @@ export function AdminDashboard() {
 
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
+
+        {/* AI COPILOT WIDGET */}
+        <AICopilotWidget />
 
         {/* FINANCE WIDGET - large (full width) */}
         <button
