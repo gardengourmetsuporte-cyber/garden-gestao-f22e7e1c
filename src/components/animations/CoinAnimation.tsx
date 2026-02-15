@@ -32,19 +32,17 @@ function getCoinColors(points: number): { bg: string; glow: string } {
 
 function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinProps) {
   const { removeCoin, triggerPulse } = useCoinAnimation();
-  const [position, setPosition] = useState({ x: startX, y: startY, scale: 1, opacity: 1, rotation: 0 });
+  const [arrived, setArrived] = useState(false);
 
   const colors = useMemo(() => getCoinColors(points), [points]);
 
   useEffect(() => {
-    requestAnimationFrame(() => {
-      setPosition({
-        x: endX,
-        y: endY,
-        scale: 0.5,
-        opacity: 0,
-        rotation: 360,
+    // Use double-rAF to ensure the browser paints the start position first
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        setArrived(true);
       });
+      return () => cancelAnimationFrame(raf2);
     });
 
     const timer = setTimeout(() => {
@@ -52,17 +50,20 @@ function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinPr
       removeCoin(id);
     }, 600);
 
-    return () => clearTimeout(timer);
-  }, [id, endX, endY, removeCoin, triggerPulse]);
+    return () => {
+      cancelAnimationFrame(raf1);
+      clearTimeout(timer);
+    };
+  }, [id, removeCoin, triggerPulse]);
 
   return createPortal(
     <div
       className="fixed pointer-events-none z-[9999]"
       style={{
-        left: position.x,
-        top: position.y,
-        transform: `translate(-50%, -50%) scale(${position.scale}) rotate(${position.rotation}deg)`,
-        opacity: position.opacity,
+        left: arrived ? endX : startX,
+        top: arrived ? endY : startY,
+        transform: `translate(-50%, -50%) scale(${arrived ? 0.5 : 1}) rotate(${arrived ? 360 : 0}deg)`,
+        opacity: arrived ? 0 : 1,
         transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       }}
     >

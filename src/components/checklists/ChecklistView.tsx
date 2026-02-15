@@ -89,9 +89,9 @@ export function ChecklistView({
     setExpandedSectors(new Set(sectors.map(s => s.id)));
   }, [sectors]);
 
-  // Clear optimistic toggles when completions update
+  // Clear optimistic toggles when completions update — only if there are pending toggles
   useEffect(() => {
-    setOptimisticToggles(new Set());
+    setOptimisticToggles(prev => prev.size > 0 ? new Set() : prev);
   }, [completions]);
 
   const toggleSector = (sectorId: string) => {
