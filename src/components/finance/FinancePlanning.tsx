@@ -9,13 +9,15 @@ import { useBudgets } from '@/hooks/useBudgets';
 import { useFinance } from '@/hooks/useFinance';
 import { FinanceCategory } from '@/types/finance';
 import { cn } from '@/lib/utils';
+import { CashFlowProjection } from './CashFlowProjection';
 
 interface FinancePlanningProps {
   selectedMonth: Date;
   onMonthChange: (date: Date) => void;
+  totalBalance?: number;
 }
 
-export function FinancePlanning({ selectedMonth, onMonthChange }: FinancePlanningProps) {
+export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0 }: FinancePlanningProps) {
   const month = selectedMonth.getMonth() + 1;
   const year = selectedMonth.getFullYear();
   const { budgets, isLoading: budgetsLoading, upsertBudget, deleteBudget } = useBudgets(month, year);
@@ -220,6 +222,12 @@ export function FinancePlanning({ selectedMonth, onMonthChange }: FinancePlannin
             Adicionar Orçamento
           </Button>
         )}
+      </div>
+
+
+      {/* Cash Flow Projection */}
+      <div className="pb-4">
+        <CashFlowProjection totalBalance={totalBalance} />
       </div>
 
       {/* Add/Edit Budget Sheet */}

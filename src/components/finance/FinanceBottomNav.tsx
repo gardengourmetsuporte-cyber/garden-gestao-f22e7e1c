@@ -14,6 +14,7 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Principal' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
   { id: 'charts', icon: 'PieChart', label: 'Gráficos' },
+  { id: 'planning', icon: 'Target', label: 'Planejar' },
   { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 
@@ -130,7 +131,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
           </div>
 
           {/* Right tabs */}
-          {tabs.slice(2).map(tab => (
+          {tabs.slice(2, 5).map(tab => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}

@@ -5,6 +5,7 @@ import { FinanceHome } from '@/components/finance/FinanceHome';
 import { FinanceTransactions } from '@/components/finance/FinanceTransactions';
 import { FinanceCharts } from '@/components/finance/FinanceCharts';
 import { FinanceMore } from '@/components/finance/FinanceMore';
+import { FinancePlanning } from '@/components/finance/FinancePlanning';
 import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
@@ -181,6 +182,15 @@ export default function Finance() {
             getSupplierStats={getSupplierStats}
             getEmployeeStats={getEmployeeStats}
             transactions={transactions}
+            categories={categories}
+          />
+        )}
+
+        {activeTab === 'planning' && (
+          <FinancePlanning
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            totalBalance={totalBalance}
           />
         )}
 
