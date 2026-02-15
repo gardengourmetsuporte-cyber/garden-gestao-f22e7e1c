@@ -110,7 +110,7 @@ export function DREReport({ transactions, categories, monthLabel = '' }: DRERepo
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)' }}>
-            <AppIcon name="FileBarChart" size={18} className="text-primary" />
+            <AppIcon name="BarChart3" size={18} className="text-primary" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-foreground">DRE Simplificado</h3>
