@@ -97,18 +97,26 @@ export function FinanceTransactions({
 
   // Track "seen" new transactions — persisted in localStorage
   const SEEN_KEY = 'finance_seen_txns';
-  const [seenIds, setSeenIds] = useState<Set<string>>(() => {
+
+  const readSeen = useCallback((): Set<string> => {
     try {
       const stored = localStorage.getItem(SEEN_KEY);
       return stored ? new Set(JSON.parse(stored)) : new Set();
     } catch { return new Set(); }
-  });
+  }, []);
+
+  const [seenIds, setSeenIds] = useState<Set<string>>(readSeen);
+
+  // Re-sync from localStorage every time the component mounts (e.g. navigating back)
+  useEffect(() => {
+    setSeenIds(readSeen());
+  }, [readSeen]);
 
   const markSeen = useCallback((id: string) => {
     setSeenIds(prev => {
       const next = new Set(prev);
       next.add(id);
-      localStorage.setItem(SEEN_KEY, JSON.stringify([...next]));
+      try { localStorage.setItem(SEEN_KEY, JSON.stringify([...next])); } catch {}
       return next;
     });
   }, []);
