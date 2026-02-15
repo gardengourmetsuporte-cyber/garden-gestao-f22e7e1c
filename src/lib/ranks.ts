@@ -3,6 +3,8 @@
  * Inspirado no sistema de elos do League of Legends
  */
 
+export type RankEffect = 'none' | 'glow' | 'pulse' | 'double-ring' | 'orbit' | 'fire' | 'rainbow' | 'prisma';
+
 export interface RankInfo {
   level: number;
   title: string;
@@ -16,11 +18,25 @@ export interface RankInfo {
   borderWidth: number;
   /** Whether to animate the border */
   animated: boolean;
+  /** Visual effect type */
+  effect: RankEffect;
 }
 
 const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
   {
-    min: 500,
+    min: 1500,
+    info: {
+      title: 'Imortal',
+      color: 'hsl(200 80% 80%)',
+      borderColor: 'linear-gradient(135deg, hsl(200 90% 75%), hsl(280 80% 75%), hsl(340 80% 75%), hsl(60 80% 75%))',
+      glow: '0 0 20px hsl(200 80% 80% / 0.5), 0 0 40px hsl(280 80% 75% / 0.3), 0 0 60px hsl(340 80% 70% / 0.15)',
+      borderWidth: 4,
+      animated: true,
+      effect: 'prisma',
+    },
+  },
+  {
+    min: 750,
     info: {
       title: 'Mítico',
       color: 'hsl(280 80% 65%)',
@@ -28,17 +44,19 @@ const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
       glow: '0 0 16px hsl(280 80% 65% / 0.5), 0 0 32px hsl(190 90% 55% / 0.3)',
       borderWidth: 3,
       animated: true,
+      effect: 'rainbow',
     },
   },
   {
-    min: 200,
+    min: 300,
     info: {
       title: 'Lenda',
       color: 'hsl(var(--neon-red))',
       borderColor: 'hsl(var(--neon-red))',
-      glow: '0 0 14px hsl(var(--neon-red) / 0.5)',
+      glow: '0 0 14px hsl(var(--neon-red) / 0.5), 0 0 28px hsl(var(--neon-red) / 0.2)',
       borderWidth: 3,
       animated: true,
+      effect: 'fire',
     },
   },
   {
@@ -47,9 +65,10 @@ const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
       title: 'Mestre',
       color: 'hsl(var(--neon-amber))',
       borderColor: 'hsl(var(--neon-amber))',
-      glow: '0 0 12px hsl(var(--neon-amber) / 0.4)',
+      glow: '0 0 12px hsl(var(--neon-amber) / 0.4), 0 0 24px hsl(var(--neon-amber) / 0.15)',
       borderWidth: 3,
-      animated: false,
+      animated: true,
+      effect: 'orbit',
     },
   },
   {
@@ -59,8 +78,9 @@ const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
       color: 'hsl(var(--neon-purple))',
       borderColor: 'hsl(var(--neon-purple))',
       glow: '0 0 10px hsl(var(--neon-purple) / 0.35)',
-      borderWidth: 2,
-      animated: false,
+      borderWidth: 3,
+      animated: true,
+      effect: 'double-ring',
     },
   },
   {
@@ -71,7 +91,8 @@ const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
       borderColor: 'hsl(var(--neon-cyan))',
       glow: '0 0 8px hsl(var(--neon-cyan) / 0.3)',
       borderWidth: 2,
-      animated: false,
+      animated: true,
+      effect: 'pulse',
     },
   },
   {
@@ -83,6 +104,7 @@ const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
       glow: '0 0 6px hsl(var(--neon-green) / 0.25)',
       borderWidth: 2,
       animated: false,
+      effect: 'glow',
     },
   },
   {
@@ -94,6 +116,7 @@ const RANKS: { min: number; info: Omit<RankInfo, 'level'> }[] = [
       glow: 'none',
       borderWidth: 2,
       animated: false,
+      effect: 'none',
     },
   },
 ];
@@ -108,7 +131,7 @@ export function getRank(earnedPoints: number): RankInfo {
 }
 
 /**
- * Retorna o próximo rank e pontos necessários, ou null se já é Mítico
+ * Retorna o próximo rank e pontos necessários, ou null se já é Imortal
  */
 export function getNextRank(earnedPoints: number): { title: string; pointsNeeded: number } | null {
   const idx = RANKS.findIndex(r => earnedPoints >= r.min);

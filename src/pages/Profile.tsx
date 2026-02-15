@@ -3,6 +3,7 @@ import { ArrowLeft, Star, TrendingDown, Coins, Trophy } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { AchievementList } from '@/components/profile/AchievementList';
+import { MedalList } from '@/components/profile/MedalList';
 import { useProfile } from '@/hooks/useProfile';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,6 +90,9 @@ export default function Profile() {
 
         {/* Achievements */}
         <AchievementList achievements={profile.achievements} />
+
+        {/* Medals */}
+        <MedalList medals={profile.medals} />
       </div>
     </AppLayout>
   );
