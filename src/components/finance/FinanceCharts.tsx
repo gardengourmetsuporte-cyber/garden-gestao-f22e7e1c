@@ -189,14 +189,14 @@ export function FinanceCharts({
       )}
 
       {/* Charts */}
-      <div className="px-4 pb-24">
+      <div className="px-4 pb-24 overflow-hidden">
 
         {/* ═══ PIE / DONUT — Categories ═══ */}
         {viewType === 'categories' && !entityView && (
           <div className="space-y-5">
             {displayData.length > 0 ? (
               <>
-                <div className="relative" style={{ height: 260 }}>
+                <div className="relative overflow-hidden" style={{ height: 260 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -271,7 +271,7 @@ export function FinanceCharts({
           <div className="space-y-5">
             {entityData.length > 0 ? (
               <>
-                <div className="relative" style={{ height: 260 }}>
+                <div className="relative overflow-hidden" style={{ height: 260 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
