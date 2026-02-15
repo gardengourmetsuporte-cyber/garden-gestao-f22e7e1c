@@ -14,7 +14,6 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Principal' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
   { id: 'charts', icon: 'PieChart', label: 'Gráficos' },
-  { id: 'planning', icon: 'Target', label: 'Planejar' },
   { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 

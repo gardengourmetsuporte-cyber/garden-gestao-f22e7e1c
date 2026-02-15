@@ -123,6 +123,23 @@ export function FinanceHome({
         </button>
       </div>
 
+      {/* Planning Quick Access */}
+      <button
+        onClick={() => onNavigate?.('planning')}
+        className="w-full p-4 rounded-xl bg-card border border-border/50 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] animate-slide-up stagger-3"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
+            <AppIcon name="Target" size={22} className="text-primary" />
+          </div>
+          <div className="flex-1">
+            <span className="font-semibold text-sm text-foreground">Planejar</span>
+            <p className="text-[11px] text-muted-foreground">Orçamentos, DRE e Fluxo de Caixa</p>
+          </div>
+          <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+        </div>
+      </button>
+
       {/* Pending Alerts */}
       {(monthStats.pendingExpenses > 0 || monthStats.pendingIncome > 0) && (
         <button
