@@ -27,7 +27,7 @@ async function fetchSectorsData(unitId: string | null) {
     .order('sort_order', { referencedTable: 'checklist_subcategories' })
     .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
 
-  if (unitId) query = query.eq('unit_id', unitId);
+  if (unitId) query = query.or(`unit_id.eq.${unitId},unit_id.is.null`);
 
   const { data, error } = await query;
   if (error) throw error;
@@ -47,7 +47,7 @@ async function fetchCompletionsData(date: string, type: ChecklistType, unitId: s
     .select('*')
     .eq('date', date)
     .eq('checklist_type', type);
-  if (unitId) query = query.eq('unit_id', unitId);
+  if (unitId) query = query.or(`unit_id.eq.${unitId},unit_id.is.null`);
   const { data: completionsData, error } = await query;
 
   if (error) throw error;
