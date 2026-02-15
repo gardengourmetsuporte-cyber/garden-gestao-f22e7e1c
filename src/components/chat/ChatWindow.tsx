@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChatMessage, ChatConversation } from '@/hooks/useChat';
 import { ChatMessageComponent } from './ChatMessage';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Send, Megaphone, Users, User, Pin } from 'lucide-react';
+import { ArrowLeft, Send, Megaphone, Users, User, Pin, Camera, Smile } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -27,6 +27,19 @@ function getDateLabel(dateStr: string) {
   return format(d, "dd 'de' MMMM", { locale: ptBR });
 }
 
+function MessagesSkeleton() {
+  return (
+    <div className="flex-1 p-4 space-y-4">
+      {[false, true, false, true, false].map((isMine, i) => (
+        <div key={i} className={cn('flex gap-2', isMine ? 'justify-end' : 'justify-start')}>
+          {!isMine && <Skeleton className="w-8 h-8 rounded-full shrink-0" />}
+          <Skeleton className={cn('h-10 rounded-2xl', isMine ? 'w-40' : 'w-52')} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ChatWindow({ conversation, messages, isLoading, onSendMessage, onBack, onTogglePin, currentUserId }: ChatWindowProps) {
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -34,7 +47,6 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { isAdmin } = useAuth();
 
-  // Auto scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -61,9 +73,12 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
   if (!conversation) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-muted-foreground/60">
-          <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Selecione uma conversa</p>
+        <div className="text-center text-muted-foreground/40">
+          <div className="w-20 h-20 rounded-full border-2 border-muted-foreground/20 flex items-center justify-center mx-auto mb-4">
+            <Send className="w-8 h-8 text-muted-foreground/30 -rotate-45" />
+          </div>
+          <p className="text-lg font-light mb-1">Suas mensagens</p>
+          <p className="text-sm text-muted-foreground/40">Envie mensagens para a sua equipe</p>
         </div>
       </div>
     );
@@ -72,7 +87,6 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
   const isAnnouncement = conversation.type === 'announcement';
   const canSend = !isAnnouncement || isAdmin;
 
-  // Get display name
   const otherParticipant = conversation.type === 'direct'
     ? conversation.participants?.find(p => p.user_id !== currentUserId)
     : null;
@@ -82,79 +96,61 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
 
   const TypeIcon = conversation.type === 'announcement' ? Megaphone : conversation.type === 'group' ? Users : User;
 
-  // Pinned messages
   const pinnedMessages = messages.filter(m => m.is_pinned);
 
-  // Group messages by date
   let lastDate = '';
 
   return (
     <div className="flex-1 flex flex-col h-full">
-      {/* Header */}
-      <div
-        className="shrink-0 flex items-center gap-3 px-4 h-14"
-        style={{
-          background: 'hsl(var(--card) / 0.8)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid hsl(var(--border) / 0.2)',
-        }}
-      >
-        <button onClick={onBack} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-secondary transition-all">
-          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+      {/* Instagram-style header */}
+      <div className="shrink-0 flex items-center gap-3 px-3 h-[60px] border-b border-border/10 bg-background">
+        <button onClick={onBack} className="lg:hidden p-1.5 -ml-1 rounded-full hover:bg-muted/50 transition-colors">
+          <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
+        
         {conversation.type === 'direct' && otherParticipant ? (
-          <Avatar className="w-10 h-10">
+          <Avatar className="w-9 h-9">
             <AvatarImage src={otherParticipant.profile?.avatar_url || undefined} />
-            <AvatarFallback className="text-sm bg-secondary font-semibold">
+            <AvatarFallback className="text-xs bg-muted font-semibold">
               {displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         ) : (
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
             style={{
-              background: conversation.type === 'announcement'
-                ? 'linear-gradient(135deg, hsl(45 100% 50% / 0.15), hsl(45 100% 50% / 0.05))'
-                : 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--neon-cyan) / 0.08))',
-              border: `1px solid ${conversation.type === 'announcement' ? 'hsl(45 100% 50% / 0.2)' : 'hsl(var(--neon-cyan) / 0.2)'}`,
+              background: conversation.type === 'announcement' ? 'hsl(45 100% 50% / 0.1)' : 'hsl(var(--primary) / 0.1)',
             }}
           >
-            <TypeIcon className={cn('w-5 h-5', conversation.type === 'announcement' ? 'text-amber-400' : 'text-primary')} />
+            <TypeIcon className={cn('w-4 h-4', conversation.type === 'announcement' ? 'text-amber-400' : 'text-primary')} />
           </div>
         )}
+        
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm text-foreground truncate">{displayName}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {conversation.type === 'announcement' ? 'Canal de comunicados' :
+          <p className="text-[11px] text-muted-foreground/50">
+            {conversation.type === 'announcement' ? 'Canal' :
              conversation.type === 'group' ? `${conversation.participants?.length || 0} membros` :
-             'Online'}
+             'Ativo agora'}
           </p>
         </div>
       </div>
 
-      {/* Pinned messages bar */}
+      {/* Pinned */}
       {pinnedMessages.length > 0 && (
-        <div
-          className="shrink-0 px-4 py-2 flex items-center gap-2 text-xs"
-          style={{
-            background: 'hsl(45 100% 50% / 0.06)',
-            borderBottom: '1px solid hsl(45 100% 50% / 0.15)',
-          }}
-        >
+        <div className="shrink-0 px-4 py-2 flex items-center gap-2 text-xs bg-muted/30 border-b border-border/10">
           <Pin className="w-3 h-3 text-amber-400 fill-amber-400 shrink-0" />
-          <span className="text-amber-300/80 truncate">{pinnedMessages[pinnedMessages.length - 1]?.content}</span>
+          <span className="text-muted-foreground truncate">{pinnedMessages[pinnedMessages.length - 1]?.content}</span>
         </div>
       )}
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto py-3">
         {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-pulse text-muted-foreground text-sm">Carregando...</div>
-          </div>
+          <MessagesSkeleton />
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground/50 text-sm">Nenhuma mensagem ainda</p>
+            <p className="text-muted-foreground/30 text-sm">Nenhuma mensagem ainda</p>
           </div>
         ) : (
           <div className="space-y-0.5">
@@ -169,8 +165,8 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
               return (
                 <div key={msg.id}>
                   {showDate && (
-                    <div className="flex justify-center my-3">
-                      <span className="text-[10px] text-muted-foreground/50 bg-background/80 px-3 py-1 rounded-full backdrop-blur-sm">
+                    <div className="flex justify-center my-4">
+                      <span className="text-[11px] text-muted-foreground/40 font-medium">
                         {getDateLabel(msg.created_at)}
                       </span>
                     </div>
@@ -187,17 +183,10 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
         )}
       </div>
 
-      {/* Input */}
+      {/* Instagram-style input */}
       {canSend ? (
-        <div className="shrink-0 p-3">
-          <div
-            className="flex items-end gap-2 rounded-2xl px-4 py-2"
-            style={{
-              background: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--neon-cyan) / 0.15)',
-              boxShadow: '0 0 20px hsl(var(--neon-cyan) / 0.05)',
-            }}
-          >
+        <div className="shrink-0 px-3 py-2 border-t border-border/10">
+          <div className="flex items-end gap-2 rounded-full px-4 py-1.5 bg-muted/40 border border-border/10">
             <textarea
               ref={inputRef}
               value={input}
@@ -205,22 +194,24 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
               onKeyDown={handleKeyDown}
               placeholder={isAnnouncement ? 'Enviar comunicado...' : 'Mensagem...'}
               rows={1}
-              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 resize-none outline-none max-h-24 py-1"
-              style={{ lineHeight: '1.5' }}
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 resize-none outline-none max-h-24 py-1.5"
+              style={{ lineHeight: '1.4' }}
             />
-            <Button
-              size="icon"
-              onClick={handleSend}
-              disabled={!input.trim() || isSending}
-              className="w-8 h-8 rounded-xl shrink-0"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+            {input.trim() ? (
+              <Button
+                size="sm"
+                onClick={handleSend}
+                disabled={isSending}
+                className="rounded-full h-8 px-4 text-xs font-semibold shrink-0"
+              >
+                Enviar
+              </Button>
+            ) : null}
           </div>
         </div>
       ) : (
-        <div className="shrink-0 px-4 py-3 text-center">
-          <p className="text-xs text-muted-foreground/50">Apenas administradores podem enviar comunicados</p>
+        <div className="shrink-0 px-4 py-3 text-center border-t border-border/10">
+          <p className="text-xs text-muted-foreground/40">Apenas administradores podem enviar comunicados</p>
         </div>
       )}
     </div>

@@ -175,6 +175,7 @@ export function useChat() {
     queryKey: conversationsKey,
     queryFn: () => fetchConversationsData(user!.id, activeUnitId!),
     enabled: !!user && !!activeUnitId,
+    staleTime: 2 * 60 * 1000,
   });
 
   const { data: messages = [], isLoading: isLoadingMessages } = useQuery({
