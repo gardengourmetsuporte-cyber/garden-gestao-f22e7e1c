@@ -315,6 +315,7 @@ export function useChecklists() {
           item_id: itemId, checklist_type: checklistType,
           completed_by: targetUserId, date,
           awarded_points: points > 0, points_awarded: points,
+          unit_id: activeUnitId,
         }, { onConflict: 'item_id,completed_by,date,checklist_type' });
       if (error) throw error;
     }
