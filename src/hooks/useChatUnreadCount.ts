@@ -55,6 +55,7 @@ export function useChatUnreadCount() {
     queryKey,
     queryFn: () => fetchUnreadCount(user!.id, activeUnitId!),
     enabled: !!user && !!activeUnitId,
+    staleTime: 2 * 60 * 1000,
   });
 
   // Listen for new messages to invalidate cache

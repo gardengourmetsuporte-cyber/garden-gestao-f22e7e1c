@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { format, isToday, isYesterday } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -25,6 +26,21 @@ function formatTime(dateStr: string) {
   if (isToday(d)) return format(d, 'HH:mm');
   if (isYesterday(d)) return 'Ontem';
   return format(d, 'dd/MM');
+}
+
+function ConversationSkeleton() {
+  return (
+    <div className="flex items-center gap-3 px-3 py-3">
+      <Skeleton className="w-14 h-14 rounded-full shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="flex justify-between">
+          <Skeleton className="h-3.5 w-28" />
+          <Skeleton className="h-3 w-10" />
+        </div>
+        <Skeleton className="h-3 w-40" />
+      </div>
+    </div>
+  );
 }
 
 export default function Chat() {
@@ -63,13 +79,11 @@ export default function Chat() {
     })();
   }, [activeUnitId, user]);
 
-  // Filter contacts not already in a DM conversation
-  const contactsWithoutDM = contacts.filter(c => {
-    return !chat.conversations.some(conv =>
-      conv.type === 'direct' &&
-      conv.participants?.some(p => p.user_id === c.user_id)
-    );
-  });
+  const contactsWithoutDM = contacts.filter(c =>
+    !chat.conversations.some(conv =>
+      conv.type === 'direct' && conv.participants?.some(p => p.user_id === c.user_id)
+    )
+  );
 
   const filteredConversations = chat.conversations.filter(c => {
     if (!search) return true;
@@ -99,9 +113,7 @@ export default function Chat() {
     }
   };
 
-  const handleBack = () => {
-    setMobileShowChat(false);
-  };
+  const handleBack = () => setMobileShowChat(false);
 
   const handleCreateGroup = async () => {
     if (!groupName.trim() || selectedIds.length === 0) return;
@@ -129,63 +141,73 @@ export default function Chat() {
     !groupSearch || c.full_name.toLowerCase().includes(groupSearch.toLowerCase())
   );
 
-  // Conversation list view (Instagram-style)
   const renderConversationList = () => (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="shrink-0">
-        <header className="page-header-bar">
-          <div className="page-header-content flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-secondary/80 flex items-center justify-center">
-                <AppIcon name="Users" size={20} className="text-muted-foreground" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold">Mensagens</h1>
-                <p className="text-xs text-muted-foreground">Conversas da equipe</p>
-              </div>
-            </div>
+    <div className="flex flex-col h-full bg-background">
+      {/* Instagram-style header */}
+      <div className="shrink-0 px-5 pt-4 pb-1">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-bold tracking-tight">Mensagens</h1>
           {isAdmin && (
-            <div className="flex items-center gap-1">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => openGroupSheet('group')}
-                className="w-9 h-9 rounded-xl"
-                title="Novo grupo"
-              >
+            <div className="flex items-center gap-0.5">
+              <Button size="icon" variant="ghost" onClick={() => openGroupSheet('group')} className="w-9 h-9 rounded-full" title="Novo grupo">
                 <AppIcon name="Users" size={20} />
               </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => openGroupSheet('announcement')}
-                className="w-9 h-9 rounded-xl"
-                title="Novo canal"
-              >
+              <Button size="icon" variant="ghost" onClick={() => openGroupSheet('announcement')} className="w-9 h-9 rounded-full" title="Novo canal">
                 <AppIcon name="Megaphone" size={20} />
               </Button>
             </div>
           )}
-          </div>
-        </header>
-        <div className="px-4 pt-3 pb-2">
-        <div className="relative">
-          <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-3">
+          <AppIcon name="Search" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar..."
-            className="pl-9 h-10 rounded-full bg-secondary/50 border-border/20 text-sm"
+            placeholder="Pesquisar"
+            className="pl-10 h-9 rounded-xl bg-muted/50 border-0 text-sm placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-primary/30"
           />
-        </div>
         </div>
       </div>
 
+      {/* Stories-style online contacts bar */}
+      {contacts.length > 0 && !search && (
+        <div className="shrink-0 px-2 pb-3">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide px-2 py-1">
+            {contacts.slice(0, 12).map(contact => {
+              const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+              const firstName = contact.full_name.split(' ')[0];
+              return (
+                <button
+                  key={contact.user_id}
+                  onClick={() => handleStartDM(contact.user_id)}
+                  className="flex flex-col items-center gap-1 min-w-[60px] active:scale-95 transition-transform"
+                >
+                  <div className="relative">
+                    <div className="w-[56px] h-[56px] rounded-full p-[2px] bg-gradient-to-br from-primary via-primary/60 to-accent">
+                      <Avatar className="w-full h-full border-2 border-background">
+                        <AvatarImage src={contact.avatar_url || undefined} />
+                        <AvatarFallback className="text-xs bg-muted font-semibold">{initials}</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground truncate w-[60px] text-center">{firstName}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Conversation list */}
       <div className="flex-1 overflow-y-auto">
-        {/* Active Conversations */}
-        {filteredConversations.length > 0 && (
-          <div className="px-2 pb-1">
+        {chat.isLoadingConversations ? (
+          <div className="px-2">
+            {Array.from({ length: 6 }).map((_, i) => <ConversationSkeleton key={i} />)}
+          </div>
+        ) : (
+          <>
             {filteredConversations.map(conv => {
               const otherParticipant = conv.type === 'direct'
                 ? conv.participants?.find(p => p.user_id !== user?.id)
@@ -205,35 +227,34 @@ export default function Chat() {
                   key={conv.id}
                   onClick={() => handleSelectConversation(conv.id)}
                   className={cn(
-                    'w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left transition-all active:scale-[0.98]',
-                    isActive ? 'bg-secondary/60' : 'hover:bg-secondary/30'
+                    'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors active:bg-muted/60',
+                    isActive ? 'bg-muted/40' : 'hover:bg-muted/20'
                   )}
                 >
                   <div className="relative shrink-0">
                     {conv.type === 'direct' ? (
                       <Avatar className="w-14 h-14">
                         <AvatarImage src={avatarUrl || undefined} />
-                        <AvatarFallback className="text-sm bg-secondary font-semibold">{initials}</AvatarFallback>
+                        <AvatarFallback className="text-sm bg-muted font-semibold">{initials}</AvatarFallback>
                       </Avatar>
                     ) : (
                       <div
                         className="w-14 h-14 rounded-full flex items-center justify-center"
                         style={{
                           background: conv.type === 'announcement'
-                            ? 'linear-gradient(135deg, hsl(45 100% 50% / 0.15), hsl(45 100% 50% / 0.05))'
-                            : 'linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--neon-cyan) / 0.08))',
-                          border: `1px solid ${conv.type === 'announcement' ? 'hsl(45 100% 50% / 0.2)' : 'hsl(var(--neon-cyan) / 0.2)'}`,
+                            ? 'hsl(45 100% 50% / 0.1)'
+                            : 'hsl(var(--primary) / 0.1)',
                         }}
                       >
-                        {conv.type === 'announcement' ? (
-                          <AppIcon name="Megaphone" size={24} className="text-amber-400" />
-                        ) : (
-                          <AppIcon name="Users" size={24} className="text-primary" />
-                        )}
+                        <AppIcon
+                          name={conv.type === 'announcement' ? 'Megaphone' : 'Users'}
+                          size={22}
+                          className={conv.type === 'announcement' ? 'text-amber-400' : 'text-primary'}
+                        />
                       </div>
                     )}
                     {hasUnread && (
-                      <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
+                      <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
                         {conv.unread_count! > 9 ? '9+' : conv.unread_count}
                       </span>
                     )}
@@ -241,68 +262,65 @@ export default function Chat() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className={cn('text-sm font-semibold truncate', hasUnread && 'text-foreground')}>{displayName}</span>
-                      <span className="text-[11px] text-muted-foreground/50 shrink-0 ml-2">{formatTime(lastMsgTime)}</span>
+                      <span className={cn('text-[15px] truncate', hasUnread ? 'font-semibold text-foreground' : 'font-medium text-foreground/90')}>
+                        {displayName}
+                      </span>
+                      <span className={cn('text-xs shrink-0 ml-2', hasUnread ? 'text-primary font-medium' : 'text-muted-foreground/50')}>
+                        {formatTime(lastMsgTime)}
+                      </span>
                     </div>
-                    {lastMsg && (
-                      <p className={cn('text-[13px] truncate mt-0.5', hasUnread ? 'text-foreground/80 font-medium' : 'text-muted-foreground/60')}>
-                        {lastMsg.content}
-                      </p>
-                    )}
+                    <div className="flex items-center gap-1 mt-0.5">
+                      {lastMsg ? (
+                        <p className={cn('text-[13px] truncate', hasUnread ? 'text-foreground/70 font-medium' : 'text-muted-foreground/50')}>
+                          {lastMsg.content}
+                        </p>
+                      ) : (
+                        <p className="text-[13px] text-muted-foreground/40 italic">Sem mensagens</p>
+                      )}
+                    </div>
                   </div>
+
+                  {hasUnread && (
+                    <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  )}
                 </button>
               );
             })}
-          </div>
-        )}
 
-        {/* New contacts (no DM yet) — shown like Instagram suggested */}
-        {filteredNewContacts.length > 0 && (
-          <div className="px-4 pt-3">
-            {filteredConversations.length > 0 && (
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-px flex-1 bg-border/20" />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/40">Contatos</span>
-                <div className="h-px flex-1 bg-border/20" />
+            {/* New contacts section */}
+            {filteredNewContacts.length > 0 && search && (
+              <div className="px-4 pt-4">
+                <p className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">Iniciar conversa</p>
+                {filteredNewContacts.map(contact => {
+                  const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                  return (
+                    <button
+                      key={contact.user_id}
+                      onClick={() => handleStartDM(contact.user_id)}
+                      className="w-full flex items-center gap-3 px-1 py-2.5 transition-colors active:bg-muted/60 hover:bg-muted/20"
+                    >
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={contact.avatar_url || undefined} />
+                        <AvatarFallback className="text-sm bg-muted font-semibold">{initials}</AvatarFallback>
+                      </Avatar>
+                      <div className="text-left">
+                        <p className="text-[15px] font-medium text-foreground">{contact.full_name}</p>
+                        <p className="text-xs text-muted-foreground/40">Enviar mensagem</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
-            <div className="space-y-0.5">
-              {filteredNewContacts.map(contact => {
-                const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-                return (
-                  <button
-                    key={contact.user_id}
-                    onClick={() => handleStartDM(contact.user_id)}
-                    className="w-full flex items-center gap-3 px-2 py-2.5 rounded-2xl hover:bg-secondary/30 transition-all active:scale-[0.98]"
-                  >
-                    <Avatar className="w-14 h-14">
-                      <AvatarImage src={contact.avatar_url || undefined} />
-                      <AvatarFallback className="text-sm bg-secondary font-semibold">{initials}</AvatarFallback>
-                    </Avatar>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-foreground">{contact.full_name}</p>
-                      <p className="text-[12px] text-muted-foreground/50">Toque para enviar mensagem</p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
-        {/* Empty state */}
-        {filteredConversations.length === 0 && filteredNewContacts.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-muted-foreground/40">
-            <AppIcon name="Camera" size={64} className="mb-3 opacity-30" />
-            <p className="text-sm font-medium">{search ? 'Nenhum resultado' : 'Nenhuma conversa ainda'}</p>
-          </div>
-        )}
-
-        {/* Loading */}
-        {chat.isLoadingConversations && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-pulse text-muted-foreground text-sm">Carregando...</div>
-          </div>
+            {/* Empty */}
+            {filteredConversations.length === 0 && filteredNewContacts.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30">
+                <AppIcon name="MessageCircle" size={48} className="mb-3 opacity-40" />
+                <p className="text-sm font-medium">{search ? 'Nenhum resultado' : 'Nenhuma conversa'}</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -312,13 +330,11 @@ export default function Chat() {
     <AppLayout>
       <div className="h-[calc(100vh-env(safe-area-inset-top)-3.75rem)] lg:h-screen flex">
         {/* Left: Conversation list */}
-        <div
-          className={cn(
-            'w-full lg:w-96 shrink-0 flex flex-col',
-            'lg:border-r border-border/10',
-            mobileShowChat ? 'hidden lg:flex' : 'flex'
-          )}
-        >
+        <div className={cn(
+          'w-full lg:w-[380px] shrink-0 flex flex-col',
+          'lg:border-r border-border/10',
+          mobileShowChat ? 'hidden lg:flex' : 'flex'
+        )}>
           {renderConversationList()}
         </div>
 
@@ -344,28 +360,24 @@ export default function Chat() {
               {groupType === 'announcement' ? 'Novo Canal de Comunicados' : 'Novo Grupo'}
             </SheetTitle>
           </SheetHeader>
-
           <div className="mt-4 flex flex-col h-[calc(100%-80px)]">
             <div className="mb-3">
               <Input
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
                 placeholder={groupType === 'announcement' ? 'Nome do canal...' : 'Nome do grupo...'}
-                className="h-10 rounded-xl bg-secondary/50 border-border/20"
+                className="h-10 rounded-xl bg-muted/50 border-border/20"
               />
             </div>
-
             <div className="relative mb-3">
               <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
               <Input
                 value={groupSearch}
                 onChange={e => setGroupSearch(e.target.value)}
                 placeholder="Buscar contato..."
-                className="pl-9 h-9 rounded-xl bg-secondary/50 border-border/20 text-sm"
+                className="pl-9 h-9 rounded-xl bg-muted/50 border-border/20 text-sm"
               />
             </div>
-
-            {/* Selected chips */}
             {selectedIds.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {selectedIds.map(id => {
@@ -383,7 +395,6 @@ export default function Chat() {
                 })}
               </div>
             )}
-
             <div className="flex-1 overflow-y-auto space-y-0.5">
               {filteredGroupContacts.map(contact => {
                 const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -396,20 +407,19 @@ export default function Chat() {
                     )}
                     className={cn(
                       'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
-                      isSelected ? 'bg-primary/10' : 'hover:bg-secondary/50'
+                      isSelected ? 'bg-primary/10' : 'hover:bg-muted/50'
                     )}
                   >
                     <Checkbox checked={isSelected} className="pointer-events-none" />
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={contact.avatar_url || undefined} />
-                      <AvatarFallback className="text-xs bg-secondary">{initials}</AvatarFallback>
+                      <AvatarFallback className="text-xs bg-muted">{initials}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium text-foreground">{contact.full_name}</span>
                   </button>
                 );
               })}
             </div>
-
             <div className="shrink-0 pt-3">
               <Button
                 onClick={handleCreateGroup}
