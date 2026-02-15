@@ -4,6 +4,7 @@ import { Employee } from '@/types/employee';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { EmployeeList } from '@/components/employees/EmployeeList';
 import { EmployeePayments } from '@/components/employees/EmployeePayments';
+import { EmployeePerformance } from '@/components/employees/EmployeePerformance';
 import { MyPayslips } from '@/components/employees/MyPayslips';
 import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
@@ -57,6 +58,12 @@ export default function Employees() {
                     label: 'Folgas',
                     icon: <AppIcon name="Calendar" size={16} />,
                     content: <ScheduleManagement />,
+                  },
+                  {
+                    key: 'performance',
+                    label: 'Performance',
+                    icon: <AppIcon name="BarChart3" size={16} />,
+                    content: <EmployeePerformance />,
                   },
                 ]}
               />
