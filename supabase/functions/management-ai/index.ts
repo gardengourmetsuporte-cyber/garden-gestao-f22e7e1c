@@ -19,40 +19,86 @@ serve(async (req) => {
     const body = await req.json();
     const { messages: conversationHistory, context } = body;
 
-    const systemPrompt = `Você é o Copiloto IA, um assistente de gestão para restaurantes e estabelecimentos comerciais. Seu papel é ajudar o gestor a organizar seu dia e tomar decisões baseadas nos dados do sistema.
+    // Build a rich data snapshot for the AI
+    const dataLines: string[] = [];
 
-Seja sempre:
-- Direto e objetivo (máximo 3-4 frases)
-- Prático e focado em ações concretas
-- Amigável mas profissional
+    // Finance
+    if (context?.accounts?.length) {
+      dataLines.push(`\n💰 CONTAS BANCÁRIAS:\n${context.accounts.join('\n')}`);
+    }
+    if (context?.monthlyIncome !== undefined) {
+      dataLines.push(`\n📊 FINANCEIRO DO MÊS:\n- Receita: R$${Number(context.monthlyIncome).toFixed(2)}\n- Despesa: R$${Number(context.monthlyExpense).toFixed(2)}\n- Saldo: R$${Number(context.monthlyBalance).toFixed(2)}\n- Despesas pendentes: R$${Number(context.pendingExpensesTotal || 0).toFixed(2)}`);
+    }
+    if (context?.pendingExpenses?.length) {
+      dataLines.push(`\n📋 DESPESAS PENDENTES:\n${context.pendingExpenses.join('\n')}`);
+    }
+    if (context?.recentTransactions?.length) {
+      dataLines.push(`\n🔄 ÚLTIMAS TRANSAÇÕES (7 dias):\n${context.recentTransactions.join('\n')}`);
+    }
+
+    // Stock
+    if (context?.lowStockItems?.length) {
+      dataLines.push(`\n⚠️ ESTOQUE BAIXO (${context.criticalStockCount || 0} itens críticos):\n${context.lowStockItems.join('\n')}`);
+    }
+
+    // Orders
+    if (context?.pendingOrders?.length) {
+      dataLines.push(`\n📦 PEDIDOS PENDENTES:\n${context.pendingOrders.join('\n')}`);
+    }
+
+    // Cash closings
+    if (context?.pendingClosings?.length) {
+      dataLines.push(`\n🧾 FECHAMENTOS PENDENTES:\n${context.pendingClosings.join('\n')}`);
+    }
+
+    // Team
+    if (context?.employees?.length) {
+      dataLines.push(`\n👥 EQUIPE ATIVA (${context.employees.length}):\n${context.employees.join('\n')}`);
+    }
+
+    // Suppliers
+    if (context?.suppliers?.length) {
+      dataLines.push(`\n🚚 FORNECEDORES:\n${context.suppliers.join('\n')}`);
+    }
+
+    // Tasks
+    if (context?.todayTasks?.length) {
+      dataLines.push(`\n✅ TAREFAS DE HOJE:\n${context.todayTasks.join('\n')}`);
+    }
+
+    const dataSnapshot = dataLines.length > 0 ? dataLines.join('\n') : 'Dados ainda carregando...';
+
+    const systemPrompt = `Você é o Copiloto Garden, um assistente de gestão inteligente para restaurantes e estabelecimentos comerciais. Você tem acesso COMPLETO ao banco de dados do estabelecimento e deve usar esses dados para dar respostas precisas e actionáveis.
+
+REGRAS:
+- Seja direto e objetivo (máximo 4-5 frases por resposta)
+- Use números reais dos dados abaixo, nunca invente valores
+- Sugira ações concretas baseadas nos dados
 - Use português brasileiro natural
-- Use emojis com moderação para tornar a leitura agradável
+- Use emojis com moderação
+- Quando não souber algo específico, diga que não tem essa informação ainda
 
-Contexto atual do sistema:
-- Estoque crítico: ${context?.criticalStockCount || 0} itens com estoque baixo
-- Resgates de recompensas pendentes: ${context?.pendingRedemptions || 0}
-- Dia: ${context?.dayOfWeek || 'não informado'}
-- Período: ${context?.timeOfDay || 'não informado'}
+DADOS ATUAIS DO ESTABELECIMENTO:
+- Dia: ${context?.dayOfWeek || 'não informado'} (${context?.timeOfDay || ''})
+- Resgates pendentes: ${context?.pendingRedemptions || 0}
+${dataSnapshot}
 
-Você tem acesso ao histórico de conversa. Use-o para manter contexto e não repetir informações já ditas. Lembre-se das preferências e padrões do gestor ao longo da conversa.`;
+Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar preferências do gestor e não repetir informações.`;
 
-    // Build messages array with conversation history
     const aiMessages: { role: string; content: string }[] = [
       { role: "system", content: systemPrompt },
     ];
 
-    // Add conversation history for memory
     if (conversationHistory && Array.isArray(conversationHistory)) {
       for (const msg of conversationHistory) {
         aiMessages.push({ role: msg.role, content: msg.content });
       }
     }
 
-    // If no conversation history (initial greeting), add the greeting prompt
     if (!conversationHistory || conversationHistory.length === 0) {
       aiMessages.push({
         role: "user",
-        content: "Gere uma saudação personalizada com base no período do dia e uma ou duas sugestões práticas e específicas para ajudar o gestor a organizar o dia. Seja breve e direto.",
+        content: "Gere uma saudação personalizada com base no período do dia e dê um resumo rápido da situação financeira e operacional com base nos dados disponíveis. Inclua alertas importantes se houver.",
       });
     }
 
@@ -63,9 +109,9 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto e não re
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: aiMessages,
-        max_tokens: 400,
+        max_tokens: 600,
       }),
     });
 
