@@ -6,21 +6,23 @@ import { useManagementAI } from '@/hooks/useManagementAI';
 import { cn } from '@/lib/utils';
 
 export function AICopilotWidget() {
-  const { messages, isLoading, hasGreeted, sendMessage } = useManagementAI();
+  const { messages, isLoading, hasGreeted, sendMessage, clearHistory } = useManagementAI();
   const [question, setQuestion] = useState('');
   const [expanded, setExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-greet on mount
   useEffect(() => {
-    if (!hasGreeted) {
+    if (!hasGreeted && messages.length === 0) {
       sendMessage();
     }
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (expanded) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, expanded]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,35 +35,42 @@ export function AICopilotWidget() {
   const lastAssistantMsg = messages.filter(m => m.role === 'assistant').at(-1);
 
   return (
-    <div className="card-command col-span-2 overflow-hidden animate-slide-up stagger-2 relative">
-      {/* Glow */}
-      <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-15 blur-3xl pointer-events-none" style={{ background: 'hsl(var(--primary))' }} />
+    <div className="col-span-2 rounded-2xl border border-border bg-card overflow-hidden animate-slide-up stagger-2 relative">
+      {/* Subtle glow */}
+      <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-10 blur-2xl pointer-events-none bg-primary" />
 
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 pb-2 flex items-center justify-between text-left"
+        className="w-full px-4 py-3 flex items-center justify-between text-left"
       >
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)', border: '1px solid hsl(var(--primary) / 0.25)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-primary/15 border border-primary/20">
             <AppIcon name="Bot" size={18} className="text-primary" />
           </div>
           <div>
-            <span className="text-sm font-bold text-foreground">Copiloto IA</span>
-            <span className="text-[10px] text-muted-foreground block">Seu assistente de gestão</span>
+            <span className="text-sm font-bold text-foreground leading-none">Copiloto IA</span>
+            <span className="text-[10px] text-muted-foreground block mt-0.5">Seu assistente de gestão</span>
           </div>
         </div>
-        <AppIcon
-          name={expanded ? "ChevronUp" : "ChevronDown"}
-          size={16}
-          className="text-muted-foreground"
-        />
+        <div className="flex items-center gap-1.5">
+          {messages.length > 2 && (
+            <span className="text-[9px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
+              {messages.length} msgs
+            </span>
+          )}
+          <AppIcon
+            name={expanded ? "ChevronUp" : "ChevronDown"}
+            size={16}
+            className="text-muted-foreground"
+          />
+        </div>
       </button>
 
-      {/* Collapsed: show last message */}
+      {/* Collapsed: show last message preview */}
       {!expanded && lastAssistantMsg && (
-        <div className="px-4 pb-4">
-          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+        <div className="px-4 pb-3">
+          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
             {lastAssistantMsg.content}
           </p>
         </div>
@@ -69,7 +78,7 @@ export function AICopilotWidget() {
 
       {/* Loading state for initial greeting */}
       {!expanded && !lastAssistantMsg && isLoading && (
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-3">
           <div className="flex items-center gap-2">
             <div className="flex gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -85,15 +94,15 @@ export function AICopilotWidget() {
       {expanded && (
         <div className="px-4 pb-4 space-y-3">
           {/* Messages */}
-          <div className="max-h-60 overflow-y-auto space-y-2 scrollbar-thin">
+          <div className="max-h-64 overflow-y-auto space-y-2 scrollbar-thin">
             {messages.map((msg, i) => (
               <div
                 key={i}
                 className={cn(
-                  "text-xs leading-relaxed rounded-xl px-3 py-2 max-w-[90%]",
+                  "text-xs leading-relaxed rounded-2xl px-3 py-2",
                   msg.role === 'assistant'
-                    ? "bg-secondary/60 text-foreground"
-                    : "bg-primary/15 text-primary ml-auto"
+                    ? "bg-secondary/50 text-foreground mr-6"
+                    : "bg-primary/15 text-primary ml-6 text-right"
                 )}
               >
                 {msg.content}
@@ -115,13 +124,23 @@ export function AICopilotWidget() {
               value={question}
               onChange={e => setQuestion(e.target.value)}
               placeholder="Pergunte algo..."
-              className="h-9 text-xs"
+              className="h-9 text-xs rounded-full"
               disabled={isLoading}
             />
-            <Button type="submit" size="sm" className="h-9 px-3 shrink-0" disabled={isLoading || !question.trim()}>
+            <Button type="submit" size="sm" className="h-9 w-9 p-0 rounded-full shrink-0" disabled={isLoading || !question.trim()}>
               <AppIcon name="Send" size={14} />
             </Button>
           </form>
+
+          {/* Clear history */}
+          {messages.length > 4 && (
+            <button
+              onClick={clearHistory}
+              className="text-[10px] text-muted-foreground hover:text-foreground transition-colors mx-auto block"
+            >
+              Limpar histórico
+            </button>
+          )}
         </div>
       )}
     </div>

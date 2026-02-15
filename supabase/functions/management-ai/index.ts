@@ -5,19 +5,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface SystemContext {
-  criticalStockCount: number;
-  zeroStockCount: number;
-  pendingRedemptions: number;
-  pendingTasks: number;
-  completedTasks: number;
-  checklistOpeningStatus: string;
-  checklistClosingStatus: string;
-  dayOfWeek: string;
-  timeOfDay: string;
-  userQuestion?: string;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -29,44 +16,44 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const context: SystemContext = await req.json();
+    const body = await req.json();
+    const { messages: conversationHistory, context } = body;
 
-    const systemPrompt = `Você é um assistente de gestão para um restaurante/estabelecimento comercial. Seu papel é ajudar o gestor a organizar seu dia e tomar decisões baseadas nos dados do sistema.
+    const systemPrompt = `Você é o Copiloto IA, um assistente de gestão para restaurantes e estabelecimentos comerciais. Seu papel é ajudar o gestor a organizar seu dia e tomar decisões baseadas nos dados do sistema.
 
 Seja sempre:
-- Direto e objetivo
+- Direto e objetivo (máximo 3-4 frases)
 - Prático e focado em ações concretas
 - Amigável mas profissional
 - Use português brasileiro natural
+- Use emojis com moderação para tornar a leitura agradável
 
-Responda de forma concisa (máximo 2-3 frases curtas).`;
+Contexto atual do sistema:
+- Estoque crítico: ${context?.criticalStockCount || 0} itens com estoque baixo
+- Resgates de recompensas pendentes: ${context?.pendingRedemptions || 0}
+- Dia: ${context?.dayOfWeek || 'não informado'}
+- Período: ${context?.timeOfDay || 'não informado'}
 
-    let userPrompt: string;
+Você tem acesso ao histórico de conversa. Use-o para manter contexto e não repetir informações já ditas. Lembre-se das preferências e padrões do gestor ao longo da conversa.`;
 
-    if (context.userQuestion) {
-      userPrompt = `Contexto atual do sistema:
-- Estoque crítico: ${context.criticalStockCount} itens com estoque baixo, ${context.zeroStockCount} itens zerados
-- Resgates de recompensas pendentes: ${context.pendingRedemptions}
-- Tarefas: ${context.pendingTasks} pendentes, ${context.completedTasks} concluídas
-- Checklist abertura: ${context.checklistOpeningStatus}
-- Checklist fechamento: ${context.checklistClosingStatus}
-- Dia: ${context.dayOfWeek}
-- Período: ${context.timeOfDay}
+    // Build messages array with conversation history
+    const aiMessages: { role: string; content: string }[] = [
+      { role: "system", content: systemPrompt },
+    ];
 
-Pergunta do gestor: "${context.userQuestion}"
+    // Add conversation history for memory
+    if (conversationHistory && Array.isArray(conversationHistory)) {
+      for (const msg of conversationHistory) {
+        aiMessages.push({ role: msg.role, content: msg.content });
+      }
+    }
 
-Responda de forma útil e prática.`;
-    } else {
-      userPrompt = `Contexto atual do sistema:
-- Estoque crítico: ${context.criticalStockCount} itens com estoque baixo, ${context.zeroStockCount} itens zerados
-- Resgates de recompensas pendentes: ${context.pendingRedemptions}
-- Tarefas: ${context.pendingTasks} pendentes, ${context.completedTasks} concluídas
-- Checklist abertura: ${context.checklistOpeningStatus}
-- Checklist fechamento: ${context.checklistClosingStatus}
-- Dia: ${context.dayOfWeek}
-- Período: ${context.timeOfDay}
-
-Gere uma saudação personalizada com base no período do dia e uma ou duas sugestões práticas e específicas para ajudar o gestor a organizar o dia. Seja breve e direto.`;
+    // If no conversation history (initial greeting), add the greeting prompt
+    if (!conversationHistory || conversationHistory.length === 0) {
+      aiMessages.push({
+        role: "user",
+        content: "Gere uma saudação personalizada com base no período do dia e uma ou duas sugestões práticas e específicas para ajudar o gestor a organizar o dia. Seja breve e direto.",
+      });
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -77,11 +64,8 @@ Gere uma saudação personalizada com base no período do dia e uma ou duas suge
       },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        max_tokens: 300,
+        messages: aiMessages,
+        max_tokens: 400,
       }),
     });
 

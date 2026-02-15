@@ -1,7 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useDashboardStats } from './useDashboardStats';
-import { useChecklists } from './useChecklists';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -10,47 +9,80 @@ interface AIMessage {
   content: string;
 }
 
+const HISTORY_KEY = 'garden_copilot_history';
+const MAX_HISTORY = 20; // Keep last 20 messages for context
+
+function loadHistory(): AIMessage[] {
+  try {
+    const stored = localStorage.getItem(HISTORY_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return [];
+}
+
+function saveHistory(messages: AIMessage[]) {
+  try {
+    // Keep only the last MAX_HISTORY messages
+    const trimmed = messages.slice(-MAX_HISTORY);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+  } catch {}
+}
+
 export function useManagementAI() {
-  const [messages, setMessages] = useState<AIMessage[]>([]);
+  const [messages, setMessages] = useState<AIMessage[]>(loadHistory);
   const [isLoading, setIsLoading] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const { stats } = useDashboardStats();
+  const greetedRef = useRef(false);
 
   const now = new Date();
   const hour = now.getHours();
   const dayOfWeek = format(now, 'EEEE', { locale: ptBR });
   const timeOfDay = hour < 12 ? 'manhã' : hour < 18 ? 'tarde' : 'noite';
 
-  const buildContext = useCallback((question?: string) => ({
+  // Save history whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      saveHistory(messages);
+    }
+  }, [messages]);
+
+  const buildContext = useCallback(() => ({
     criticalStockCount: stats.criticalItems,
-    zeroStockCount: 0, // simplified
     pendingRedemptions: stats.pendingRedemptions,
-    pendingTasks: 0,
-    completedTasks: 0,
-    checklistOpeningStatus: 'não verificado',
-    checklistClosingStatus: 'não verificado',
     dayOfWeek,
     timeOfDay,
-    ...(question ? { userQuestion: question } : {}),
   }), [stats, dayOfWeek, timeOfDay]);
 
   const sendMessage = useCallback(async (question?: string) => {
     setIsLoading(true);
 
+    let updatedMessages = [...messages];
+
     if (question) {
-      setMessages(prev => [...prev, { role: 'user', content: question }]);
+      const userMsg: AIMessage = { role: 'user', content: question };
+      updatedMessages = [...updatedMessages, userMsg];
+      setMessages(updatedMessages);
     }
 
     try {
       const { data, error } = await supabase.functions.invoke('management-ai', {
-        body: buildContext(question),
+        body: {
+          // Send full conversation history for context/memory
+          messages: question ? updatedMessages : [],
+          context: buildContext(),
+        },
       });
 
       if (error) throw error;
 
       const response = data?.suggestion || 'Não consegui gerar uma resposta no momento.';
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
-      if (!question) setHasGreeted(true);
+      const assistantMsg: AIMessage = { role: 'assistant', content: response };
+      setMessages(prev => [...prev, assistantMsg]);
+      if (!question) {
+        setHasGreeted(true);
+        greetedRef.current = true;
+      }
     } catch (err: any) {
       const errorMsg = err?.message?.includes('429')
         ? 'Muitas requisições. Tente novamente em alguns minutos.'
@@ -59,12 +91,20 @@ export function useManagementAI() {
     } finally {
       setIsLoading(false);
     }
-  }, [buildContext]);
+  }, [messages, buildContext]);
+
+  const clearHistory = useCallback(() => {
+    setMessages([]);
+    localStorage.removeItem(HISTORY_KEY);
+    setHasGreeted(false);
+    greetedRef.current = false;
+  }, []);
 
   return {
     messages,
     isLoading,
     hasGreeted,
     sendMessage,
+    clearHistory,
   };
 }
