@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ListPicker, ListPickerItem } from '@/components/ui/list-picker';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useUnit } from '@/contexts/UnitContext';
@@ -45,6 +45,7 @@ export function AccessLevelSettings() {
   const [formDescription, setFormDescription] = useState('');
   const [formModules, setFormModules] = useState<string[]>([]);
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [pickerUserId, setPickerUserId] = useState<string | null>(null);
 
   // Fetch user assignments for current unit
   const { data: userAssignments = [] } = useQuery({
@@ -203,24 +204,14 @@ export function AccessLevelSettings() {
                     <p className="text-sm font-medium truncate">{user.full_name}</p>
                     <p className="text-[10px] text-muted-foreground capitalize">{user.role}</p>
                   </div>
-                  <Select
-                    value={currentLevel || '_full'}
-                    onValueChange={(val) => handleAssign(user.user_id, val === '_full' ? null : val)}
+                  <button
+                    onClick={() => setPickerUserId(user.user_id)}
+                    className="px-3 py-1.5 rounded-lg bg-secondary border border-border/30 text-xs font-medium truncate max-w-[160px]"
                   >
-                    <SelectTrigger className="w-[160px] h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="_full">
-                        <span className="text-xs">Acesso completo</span>
-                      </SelectItem>
-                      {accessLevels.map(level => (
-                        <SelectItem key={level.id} value={level.id}>
-                          <span className="text-xs">{level.name}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    {currentLevel
+                      ? accessLevels.find(l => l.id === currentLevel)?.name || 'Acesso completo'
+                      : 'Acesso completo'}
+                  </button>
                 </div>
               );
             })}
@@ -305,6 +296,24 @@ export function AccessLevelSettings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Access Level Picker (mobile-friendly) */}
+      <ListPicker
+        open={!!pickerUserId}
+        onOpenChange={(open) => { if (!open) setPickerUserId(null); }}
+        title="Nível de Acesso"
+        items={[
+          { id: '_full', label: 'Acesso completo' },
+          ...accessLevels.map(l => ({ id: l.id, label: l.name })),
+        ]}
+        selectedId={pickerUserId ? (getUserAccessLevel(pickerUserId) || '_full') : null}
+        onSelect={(id) => {
+          if (pickerUserId) {
+            handleAssign(pickerUserId, id === '_full' ? null : id);
+            setPickerUserId(null);
+          }
+        }}
+      />
     </div>
   );
 }
