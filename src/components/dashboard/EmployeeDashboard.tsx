@@ -14,7 +14,7 @@ export function EmployeeDashboard() {
   const { user, profile } = useAuth();
   const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { redemptions } = useRewards();
-  const { earnedPoints } = usePoints();
+  const { earned: earnedPoints } = usePoints();
 
   const userRank = leaderboard.find(e => e.user_id === user?.id)?.rank;
   const pendingRedemptions = redemptions.filter(r => r.status === 'pending').length;
@@ -32,7 +32,7 @@ export function EmployeeDashboard() {
           </h2>
           <p className="text-muted-foreground text-xs mt-1">
             {userRank ? (
-              <>Você está em <span className="font-bold text-primary">#{userRank}</span> no ranking!</>
+              <>Você está em <span className="font-bold text-primary">#{userRank}</span> no ranking mensal!</>
             ) : (
               'Complete tarefas para ganhar pontos'
             )}
@@ -45,7 +45,7 @@ export function EmployeeDashboard() {
         <UserPointsCard />
       </div>
 
-      {/* Next Rank Progress */}
+      {/* Next Rank Progress - uses accumulated points */}
       {nextRank && (
         <div className="animate-slide-up stagger-3">
           <div className="card-command p-4">
@@ -67,6 +67,9 @@ export function EmployeeDashboard() {
               value={nextRank.pointsNeeded > 0 ? Math.max(5, 100 - (nextRank.pointsNeeded / (nextRank.pointsNeeded + earnedPoints)) * 100) : 100}
               className="h-2 bg-secondary [&>div]:bg-gradient-to-r [&>div]:from-primary [&>div]:to-[hsl(var(--neon-cyan))]"
             />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Baseado em pontos acumulados (histórico total)
+            </p>
           </div>
         </div>
       )}
