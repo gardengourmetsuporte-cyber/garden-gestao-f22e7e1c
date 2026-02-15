@@ -188,8 +188,16 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
                         {entry.full_name}
                         {isCurrentUser && <span className="text-[10px] ml-1 text-muted-foreground">(você)</span>}
                       </p>
-                      <p className="text-[10px]" style={{ color: entryRank.color }}>
-                        {entryRank.title} • Base: {entry.earned_points} + Bônus: {entry.bonus_points}
+                      <p className="text-[10px] flex items-center gap-1.5">
+                        <span style={{ color: entryRank.color }}>{entryRank.title}</span>
+                        <span className="text-muted-foreground">•</span>
+                        <span style={{ color: 'hsl(var(--neon-green))' }}>{entry.earned_points} base</span>
+                        {entry.bonus_points > 0 && (
+                          <>
+                            <span className="text-muted-foreground">+</span>
+                            <span style={{ color: 'hsl(var(--neon-amber))' }}>{entry.bonus_points} bônus</span>
+                          </>
+                        )}
                       </p>
                     </div>
                     <div className="flex items-center gap-1 px-2 py-1 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>

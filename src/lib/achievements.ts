@@ -1,5 +1,6 @@
 /**
  * Sistema de Conquistas - Calculado no frontend a partir de dados existentes
+ * Simplificado: nomes claros, sem redundância com ranks
  */
 
 export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -9,13 +10,11 @@ export interface Achievement {
   id: string;
   title: string;
   description: string;
-  icon: string; // emoji
+  icon: string;
   unlocked: boolean;
   rarity: AchievementRarity;
   category: AchievementCategory;
-  /** Current progress value */
   current: number;
-  /** Target value to unlock */
   target: number;
 }
 
@@ -35,29 +34,25 @@ const ACHIEVEMENT_DEFS: {
   target: number;
   getValue: (d: AchievementData) => number;
 }[] = [
-  // Tasks
-  { id: 'first_task', title: 'Primeiro Passo', description: 'Completou a primeira tarefa', icon: '🎯', rarity: 'common', category: 'tasks', target: 1, getValue: d => d.totalCompletions },
-  { id: 'tasks_10', title: 'Fiel Escudeiro', description: '10 tarefas completadas', icon: '🛡️', rarity: 'common', category: 'tasks', target: 10, getValue: d => d.totalCompletions },
-  { id: 'tasks_50', title: 'Incansável', description: '50 tarefas completadas', icon: '⚡', rarity: 'rare', category: 'tasks', target: 50, getValue: d => d.totalCompletions },
-  { id: 'tasks_100', title: 'Centurião', description: '100 tarefas completadas', icon: '🏛️', rarity: 'rare', category: 'tasks', target: 100, getValue: d => d.totalCompletions },
-  { id: 'tasks_250', title: 'Titânico', description: '250 tarefas completadas', icon: '🗿', rarity: 'epic', category: 'tasks', target: 250, getValue: d => d.totalCompletions },
-  { id: 'tasks_500', title: 'Inabalável', description: '500 tarefas completadas', icon: '💪', rarity: 'epic', category: 'tasks', target: 500, getValue: d => d.totalCompletions },
-  { id: 'tasks_1000', title: 'Máquina', description: '1000 tarefas completadas', icon: '🤖', rarity: 'legendary', category: 'tasks', target: 1000, getValue: d => d.totalCompletions },
+  // Tasks - nomes de ação/feito
+  { id: 'first_task', title: 'Primeiro Passo', description: 'Complete 1 tarefa', icon: '🎯', rarity: 'common', category: 'tasks', target: 1, getValue: d => d.totalCompletions },
+  { id: 'tasks_10', title: 'Engrenagem', description: 'Complete 10 tarefas', icon: '⚙️', rarity: 'common', category: 'tasks', target: 10, getValue: d => d.totalCompletions },
+  { id: 'tasks_50', title: 'Operador', description: 'Complete 50 tarefas', icon: '🛡️', rarity: 'rare', category: 'tasks', target: 50, getValue: d => d.totalCompletions },
+  { id: 'tasks_100', title: 'Centurião', description: 'Complete 100 tarefas', icon: '🏛️', rarity: 'rare', category: 'tasks', target: 100, getValue: d => d.totalCompletions },
+  { id: 'tasks_500', title: 'Incansável', description: 'Complete 500 tarefas', icon: '💪', rarity: 'epic', category: 'tasks', target: 500, getValue: d => d.totalCompletions },
+  { id: 'tasks_1000', title: 'Máquina', description: 'Complete 1000 tarefas', icon: '🤖', rarity: 'legendary', category: 'tasks', target: 1000, getValue: d => d.totalCompletions },
 
-  // Points
-  { id: 'points_10', title: 'Aprendiz', description: 'Alcançou 10 pontos', icon: '🌱', rarity: 'common', category: 'points', target: 10, getValue: d => d.earnedPoints },
-  { id: 'points_25', title: 'Dedicado', description: 'Alcançou 25 pontos', icon: '💎', rarity: 'common', category: 'points', target: 25, getValue: d => d.earnedPoints },
-  { id: 'points_50', title: 'Veterano', description: 'Alcançou 50 pontos', icon: '🔮', rarity: 'rare', category: 'points', target: 50, getValue: d => d.earnedPoints },
-  { id: 'points_100', title: 'Mestre', description: 'Alcançou 100 pontos', icon: '👑', rarity: 'rare', category: 'points', target: 100, getValue: d => d.earnedPoints },
-  { id: 'points_200', title: 'Lenda', description: 'Alcançou 200 pontos', icon: '🔥', rarity: 'epic', category: 'points', target: 200, getValue: d => d.earnedPoints },
-  { id: 'points_500', title: 'Mítico', description: 'Alcançou 500 pontos', icon: '🌟', rarity: 'epic', category: 'points', target: 500, getValue: d => d.earnedPoints },
-  { id: 'points_1000', title: 'Imortal', description: 'Alcançou 1000 pontos', icon: '💠', rarity: 'legendary', category: 'points', target: 1000, getValue: d => d.earnedPoints },
-  { id: 'points_2000', title: 'Transcendente', description: 'Alcançou 2000 pontos', icon: '✨', rarity: 'legendary', category: 'points', target: 2000, getValue: d => d.earnedPoints },
+  // Points - nomes distintos dos ranks
+  { id: 'points_10', title: 'Semente', description: 'Acumule 10 pontos', icon: '🌱', rarity: 'common', category: 'points', target: 10, getValue: d => d.earnedPoints },
+  { id: 'points_50', title: 'Faísca', description: 'Acumule 50 pontos', icon: '✨', rarity: 'rare', category: 'points', target: 50, getValue: d => d.earnedPoints },
+  { id: 'points_100', title: 'Forja', description: 'Acumule 100 pontos', icon: '🔨', rarity: 'rare', category: 'points', target: 100, getValue: d => d.earnedPoints },
+  { id: 'points_500', title: 'Vulcão', description: 'Acumule 500 pontos', icon: '🌋', rarity: 'epic', category: 'points', target: 500, getValue: d => d.earnedPoints },
+  { id: 'points_1000', title: 'Supernova', description: 'Acumule 1000 pontos', icon: '💫', rarity: 'legendary', category: 'points', target: 1000, getValue: d => d.earnedPoints },
 
   // Redemptions
-  { id: 'first_redemption', title: 'Colecionador', description: 'Resgatou primeira recompensa', icon: '🎁', rarity: 'common', category: 'redemptions', target: 1, getValue: d => d.totalRedemptions },
-  { id: 'redemptions_5', title: 'Viciado', description: '5 resgates feitos', icon: '🛍️', rarity: 'rare', category: 'redemptions', target: 5, getValue: d => d.totalRedemptions },
-  { id: 'redemptions_15', title: 'Shopping', description: '15 resgates feitos', icon: '🏬', rarity: 'epic', category: 'redemptions', target: 15, getValue: d => d.totalRedemptions },
+  { id: 'first_redemption', title: 'Primeiro Resgate', description: 'Resgate 1 recompensa', icon: '🎁', rarity: 'common', category: 'redemptions', target: 1, getValue: d => d.totalRedemptions },
+  { id: 'redemptions_5', title: 'Colecionador', description: 'Resgate 5 recompensas', icon: '🛍️', rarity: 'rare', category: 'redemptions', target: 5, getValue: d => d.totalRedemptions },
+  { id: 'redemptions_15', title: 'Entusiasta', description: 'Resgate 15 recompensas', icon: '🏬', rarity: 'epic', category: 'redemptions', target: 15, getValue: d => d.totalRedemptions },
 ];
 
 export function calculateAchievements(data: AchievementData): Achievement[] {
