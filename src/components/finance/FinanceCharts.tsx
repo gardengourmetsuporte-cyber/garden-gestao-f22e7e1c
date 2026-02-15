@@ -503,7 +503,7 @@ export function FinanceCharts({
 
         {/* DRE Report */}
         <div className="mt-8">
-          <DREReport transactions={transactions} categories={categoriesProp} />
+          <DREReport transactions={transactions} categories={categoriesProp} monthLabel={`${selectedMonth.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`} />
         </div>
       </div>
     </div>

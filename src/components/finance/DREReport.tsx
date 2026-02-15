@@ -1,11 +1,14 @@
 import { useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FinanceTransaction, FinanceCategory } from '@/types/finance';
+import { exportDREPdf } from '@/lib/exportPdf';
 
 interface DREReportProps {
   transactions: FinanceTransaction[];
   categories: FinanceCategory[];
+  monthLabel?: string;
 }
 
 interface DRELine {
@@ -16,7 +19,7 @@ interface DRELine {
   indent?: boolean;
 }
 
-export function DREReport({ transactions, categories }: DREReportProps) {
+export function DREReport({ transactions, categories, monthLabel = '' }: DREReportProps) {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
@@ -104,14 +107,25 @@ export function DREReport({ transactions, categories }: DREReportProps) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)' }}>
-          <AppIcon name="FileBarChart" size={18} className="text-primary" />
+      <div className="flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--primary) / 0.15)' }}>
+            <AppIcon name="FileBarChart" size={18} className="text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">DRE Simplificado</h3>
+            <span className="text-[10px] text-muted-foreground">Demonstrativo de Resultados</span>
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm font-bold text-foreground">DRE Simplificado</h3>
-          <span className="text-[10px] text-muted-foreground">Demonstrativo de Resultados</span>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1 text-xs"
+          onClick={() => exportDREPdf(dre, monthLabel)}
+        >
+          <AppIcon name="Download" size={14} />
+          PDF
+        </Button>
       </div>
 
       {/* DRE Table */}

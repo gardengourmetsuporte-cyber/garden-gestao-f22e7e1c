@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
+import { exportCashClosingPdf } from '@/lib/exportPdf';
 import { ptBR } from 'date-fns/locale';
 import { 
    Banknote, 
@@ -127,17 +128,27 @@ import {
              {status.label}
            </Badge>
            
-           {isAdmin && (
-             <Button
-               variant="ghost"
-               size="icon"
-               className="text-destructive"
-               onClick={() => setShowDeleteDialog(true)}
-             >
-               <Trash2 className="w-5 h-5" />
-             </Button>
-           )}
-         </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground"
+                onClick={() => exportCashClosingPdf(closing)}
+              >
+                <Receipt className="w-5 h-5" />
+              </Button>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </Button>
+              )}
+             </div>
+          </div>
  
          {/* Info Card */}
          <Card className="card-unified">
