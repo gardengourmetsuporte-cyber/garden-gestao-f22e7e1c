@@ -93,11 +93,12 @@ async function initializeDefaults(userId: string, unitId: string | null) {
     });
   }
 
-  const { data: existingCategories } = await supabase
+  let catQuery = supabase
     .from('finance_categories')
     .select('id')
-    .eq('user_id', userId)
-    .limit(1);
+    .eq('user_id', userId);
+  if (unitId) catQuery = catQuery.eq('unit_id', unitId);
+  const { data: existingCategories } = await catQuery.limit(1);
 
   if (!existingCategories || existingCategories.length === 0) {
     for (let i = 0; i < DEFAULT_EXPENSE_CATEGORIES.length; i++) {
