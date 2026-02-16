@@ -33,6 +33,7 @@ const MenuAdmin = lazy(() => import("./pages/MenuAdmin"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Marketing = lazy(() => import("./pages/Marketing"));
+const Ranking = lazy(() => import("./pages/Ranking"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -206,6 +207,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <WhatsApp />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ranking"
+          element={
+            <ProtectedRoute>
+              <Ranking />
             </ProtectedRoute>
           }
         />
