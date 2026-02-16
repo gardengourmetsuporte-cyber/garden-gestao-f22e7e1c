@@ -132,7 +132,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
           <DrawerPrimitive.Content
             ref={ref as React.Ref<HTMLDivElement>}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[96vh] flex-col rounded-t-[10px] border bg-background",
+              "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto min-h-[55vh] max-h-[96vh] flex-col rounded-t-[10px] border bg-background",
               className,
             )}
             {...(props as any)}
