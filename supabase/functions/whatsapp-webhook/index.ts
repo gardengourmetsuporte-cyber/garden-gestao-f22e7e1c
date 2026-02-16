@@ -253,8 +253,10 @@ serve(async (req) => {
               : `${channel.api_url}/health`;
             
             const headers: Record<string, string> = { "Content-Type": "application/json" };
-            if (channel.provider === "evolution") headers["apikey"] = channel.api_key_ref;
-            else if (channel.provider === "zapi") headers["Client-Token"] = channel.api_key_ref;
+            if (channel.provider === "evolution") {
+              headers["apikey"] = channel.api_key_ref;
+              headers["Authorization"] = `Bearer ${channel.api_key_ref}`;
+            } else if (channel.provider === "zapi") headers["Client-Token"] = channel.api_key_ref;
             else headers["Authorization"] = `Bearer ${channel.api_key_ref}`;
 
             const resp = await fetch(testUrl, { method: "GET", headers, signal: AbortSignal.timeout(8000) });
