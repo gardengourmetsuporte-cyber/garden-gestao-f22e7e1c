@@ -1,111 +1,57 @@
 
 
-# Reorganizacao do Sistema de Pontuacao - Mensal vs Acumulado
+# Hub de Pontos e Ranking
 
-## Situacao Atual
-
-O ranking mensal ja funciona corretamente nos bastidores: o `useLeaderboard` filtra completions e bonus por mes. O problema principal e que a **interface nao diferencia claramente** Score Mensal de Pontos Acumulados, e alguns componentes misturam os dois.
+## Objetivo
+Centralizar tudo relacionado a pontos, ranking, conquistas e bonus em uma unica pagina dedicada (`/ranking`), acessivel por um icone no header do app (ao lado do chat e notificacoes). Remover as abas "Performance" e "Conquistas" do modulo de Funcionarios. Simplificar o sistema de conquistas eliminando medalhas e raridades, deixando apenas uma lista linear de objetivos vinculados a progressao de rank.
 
 ## O que muda
 
-### 1. Hook `usePoints` - Adicionar Score Mensal
+### 1. Nova pagina `/ranking` (Hub Central)
+Uma pagina unica com scroll vertical contendo:
+- **Seu perfil resumido** no topo (avatar rankeado, rank atual, barra de progresso para o proximo rank, pontos do mes)
+- **Ranking Mensal** (componente Leaderboard ja existente, com seletor de mes)
+- **Objetivos** (lista simplificada - substitui conquistas + medalhas): uma unica lista de metas com barra de progresso, sem categorias, sem raridades, sem tiers. Cada objetivo mostra titulo, progresso atual/meta e se esta desbloqueado
+- **Bonus do Mes** (lista de bonus recebidos + guia de como ganhar bonus)
+- **Admin: Dar Bonus** (botao para admins darem bonus a funcionarios, ja existente no BonusPointSheet)
 
-Atualmente o hook busca apenas pontos totais (historico). Sera adicionada uma query paralela que filtra completions e bonus do mes atual para calcular o **Score Mensal** separadamente.
+### 2. Icone no Header
+Adicionar um icone de trofeu (Trophy) no header principal, entre o chat e as notificacoes, que navega para `/ranking`. Opcional: badge com a posicao do usuario no ranking.
 
-- `monthlyScore`: pontos de checklists + bonus do mes atual
-- `earned` (historico): continua existindo para conquistas, medalhas e ranks
+### 3. Simplificacao das Conquistas
+- Eliminar o sistema de **medalhas** (`MedalList`, `lib/medals.ts`) da nova pagina
+- Eliminar **raridades** (comum, raro, epico, lendario) e **categorias** (tarefas, pontos, resgates)
+- Transformar em uma lista simples de **Objetivos** com titulo, descricao, icone, progresso e status (desbloqueado ou nao)
+- Manter os mesmos objetivos existentes (14 conquistas), apenas com visual simplificado
 
-### 2. Dashboard do Funcionario (`EmployeeDashboard`)
-
-- O card de pontos passara a mostrar **Score Mensal** em destaque (grande) e Pontos Acumulados em separado (menor)
-- A barra de progresso do rank continua usando pontos acumulados (historico)
-- Adicionar aviso visivel: "O ranking e mensal e reinicia todo mes. Apenas o score mensal conta."
-
-### 3. `UserPointsCard` - Reformular
-
-- Area principal: **Score Mensal** (destaque visual)
-- Linha inferior: Base Mensal | Bonus Mensal | Acumulado Total
-- Remover ambiguidade entre score mensal e pontos historicos
-
-### 4. Leaderboard - Manter como esta
-
-O Leaderboard ja e 100% mensal. Sem alteracoes necessarias na logica.
-
-### 5. Pagina de Perfil (`Profile`)
-
-- Separar visualmente: "Score do Mes" (card em destaque) e "Historico Total" (card secundario)
-- Manter conquistas e medalhas baseadas em pontos acumulados (historico)
-- Manter rank/moldura baseados em pontos acumulados
-
-### 6. Ranks e Conquistas
-
-- `getRank()` continua usando pontos acumulados (historico) - os ranks sao progressao de longo prazo
-- `calculateAchievements()` continua usando pontos acumulados - sao metas progressivas
-- Nenhuma alteracao necessaria nestes modulos
-
-### 7. Recompensas (Saldo para resgate)
-
-- O saldo para resgatar premios continua sendo: pontos acumulados ganhos - pontos gastos
-- Score mensal NAO afeta saldo de resgate (sao conceitos separados)
+### 4. Remover do Modulo de Funcionarios
+- Remover a aba "Performance" (`EmployeePerformance`)
+- Remover a aba "Conquistas" (`TeamAchievements`)
+- O modulo de Funcionarios fica com: Funcionarios, Ponto, Folgas (admin) ou Ponto, Holerites, Folgas (employee)
 
 ## Detalhes Tecnicos
 
-### Alteracoes em `usePoints.ts`
+### Arquivos novos
+- `src/pages/Ranking.tsx` - Pagina hub com todas as secoes
+- `src/components/ranking/ObjectivesList.tsx` - Lista simplificada de objetivos (substitui AchievementList + MedalList)
+- `src/components/ranking/MyRankCard.tsx` - Card resumo do usuario com rank e progresso
 
-```typescript
-// Adicionar query mensal paralela
-const monthStart = format(startOfMonth(new Date()), 'yyyy-MM-dd');
-const monthEnd = format(endOfMonth(new Date()), 'yyyy-MM-dd');
+### Arquivos modificados
+- `src/App.tsx` - Adicionar rota `/ranking`
+- `src/components/layout/AppLayout.tsx` - Adicionar icone Trophy no header (mobile e desktop)
+- `src/pages/Employees.tsx` - Remover abas Performance e Conquistas
+- `src/lib/achievements.ts` - Simplificar removendo raridades/categorias (ou criar nova versao)
 
-// Buscar completions do mes atual + bonus do mes
-// monthlyScore = earned_this_month + bonus_this_month
-```
+### Arquivos que continuam existindo (sem alteracao)
+- `src/pages/Profile.tsx` - Continua mostrando o perfil individual (pode linkar para /ranking)
+- `src/hooks/useLeaderboard.ts` - Reutilizado na pagina de ranking
+- `src/hooks/usePoints.ts` - Reutilizado
+- `src/components/dashboard/Leaderboard.tsx` - Reutilizado na pagina de ranking
+- `src/components/employees/BonusPointSheet.tsx` - Reutilizado para admins darem bonus
 
-### Alteracoes em `useProfile.ts`
-
-Adicionar campo `monthlyScore` ao `ProfileData`, buscando completions filtradas pelo mes atual.
-
-### Alteracoes em `UserPointsCard.tsx`
-
-- Redesenhar layout: Score Mensal como numero principal
-- Mover pontos acumulados para secao secundaria
-- Mostrar breakdown: base mensal + bonus mensal = score mensal
-
-### Alteracoes em `EmployeeDashboard.tsx`
-
-- Usar `monthlyScore` do `usePoints` para exibicao principal
-- Adicionar banner informativo sobre o reset mensal
-- Manter barra de progresso do rank com pontos acumulados
-
-### Alteracoes em `ProfileHeader.tsx`
-
-- Sem alteracoes (usa pontos acumulados para rank - correto)
-
-### Alteracoes em `Profile.tsx`
-
-- Adicionar card "Score do Mes" separado
-- Renomear card existente para "Historico Total"
-
-### Alteracoes em `EmployeePerformance.tsx`
-
-- O score de performance pode opcionalmente mostrar dados mensais em vez de all-time
-
-## Arquivos Modificados
-
-1. `src/hooks/usePoints.ts` - Adicionar calculo de score mensal
-2. `src/hooks/useProfile.ts` - Adicionar monthlyScore ao ProfileData
-3. `src/components/dashboard/UserPointsCard.tsx` - Redesenhar com Score Mensal em destaque
-4. `src/components/dashboard/EmployeeDashboard.tsx` - Usar score mensal + banner informativo
-5. `src/pages/Profile.tsx` - Separar score mensal de historico
-6. `src/components/rewards/PointsDisplay.tsx` - Mostrar saldo (acumulado, sem alteracao logica)
-
-## O que NAO muda
-
-- Logica do Leaderboard (ja e mensal)
-- Sistema de Ranks (usa historico, correto)
-- Sistema de Conquistas (usa historico, correto)
-- Sistema de Medalhas (usa historico, correto)
-- Checklists, fechamento de caixa, receitas
-- Sistema de resgate de recompensas (saldo acumulado)
-- Nenhuma tabela no banco de dados precisa ser criada ou modificada
+### Fluxo do usuario
+1. Abre o app -> ve icone de trofeu no header (ao lado do chat)
+2. Clica -> abre `/ranking`
+3. Ve seu rank, posicao, pontos do mes, ranking completo, objetivos e bonus
+4. Admin pode dar bonus diretamente dali
 
