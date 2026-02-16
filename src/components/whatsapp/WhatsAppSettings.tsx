@@ -23,12 +23,13 @@ export function WhatsAppSettings() {
   const { channels, isLoading, upsertChannel } = useWhatsAppChannels();
   const channel = channels[0]; // One channel per unit for MVP
 
-  const [form, setForm] = useState<Partial<WhatsAppChannel>>({
+  const [form, setForm] = useState<Partial<WhatsAppChannel> & { instance_name?: string }>({
     phone_number: '',
     provider: 'evolution',
     api_url: '',
     api_key_ref: '',
     is_active: false,
+    instance_name: '',
     ai_personality: 'Você é um assistente virtual simpático e eficiente. Responda de forma clara e objetiva.',
     fallback_message: 'Olá! No momento estamos fora do horário de atendimento. Retornaremos em breve!',
   });
@@ -42,6 +43,7 @@ export function WhatsAppSettings() {
         api_url: channel.api_url || '',
         api_key_ref: channel.api_key_ref || '',
         is_active: channel.is_active,
+        instance_name: (channel as any).instance_name || '',
         ai_personality: channel.ai_personality || '',
         fallback_message: channel.fallback_message || '',
         business_hours: channel.business_hours,
@@ -178,10 +180,23 @@ export function WhatsAppSettings() {
           <Input
             value={form.phone_number}
             onChange={(e) => setForm(p => ({ ...p, phone_number: e.target.value }))}
-            placeholder="+5511999999999"
+            placeholder="+5519999999999"
           />
         </div>
       </div>
+
+      {/* Instance Name (Evolution) */}
+      {form.provider === 'evolution' && (
+        <div className="space-y-2">
+          <Label className="text-sm">Nome da Instância (Evolution API)</Label>
+          <Input
+            value={form.instance_name || ''}
+            onChange={(e) => setForm(p => ({ ...p, instance_name: e.target.value }))}
+            placeholder="whatsapp-gestao"
+          />
+          <p className="text-[10px] text-muted-foreground">O nome da instância configurado na Evolution API (ex: whatsapp-gestao)</p>
+        </div>
+      )}
 
       {/* API URL & Key */}
       <div className="space-y-4">

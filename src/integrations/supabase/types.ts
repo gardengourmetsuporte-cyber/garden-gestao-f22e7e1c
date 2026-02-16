@@ -3127,6 +3127,7 @@ export type Database = {
           created_at: string
           fallback_message: string | null
           id: string
+          instance_name: string | null
           is_active: boolean
           phone_number: string
           provider: string
@@ -3141,6 +3142,7 @@ export type Database = {
           created_at?: string
           fallback_message?: string | null
           id?: string
+          instance_name?: string | null
           is_active?: boolean
           phone_number: string
           provider?: string
@@ -3155,6 +3157,7 @@ export type Database = {
           created_at?: string
           fallback_message?: string | null
           id?: string
+          instance_name?: string | null
           is_active?: boolean
           phone_number?: string
           provider?: string

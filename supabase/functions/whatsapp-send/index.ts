@@ -79,7 +79,7 @@ serve(async (req) => {
     const channel = conv.channel;
     const contact = conv.contact;
     if (channel?.api_url && channel?.api_key_ref && contact?.phone) {
-      const sendUrl = getSendUrl(channel.provider, channel.api_url);
+      const sendUrl = getSendUrl(channel.provider, channel.api_url, channel.instance_name);
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       let body: any = {};
 
@@ -124,10 +124,10 @@ serve(async (req) => {
   }
 });
 
-function getSendUrl(provider: string, apiUrl: string): string {
+function getSendUrl(provider: string, apiUrl: string, instanceName?: string): string {
   switch (provider) {
     case "evolution":
-      return `${apiUrl}/message/sendText`;
+      return `${apiUrl}/message/sendText/${instanceName || "whatsapp-gestao"}`;
     case "zapi":
       return `${apiUrl}/send-text`;
     default:
