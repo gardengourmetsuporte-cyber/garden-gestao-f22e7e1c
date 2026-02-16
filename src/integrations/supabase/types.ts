@@ -2983,6 +2983,124 @@ export type Database = {
           },
         ]
       }
+      time_records: {
+        Row: {
+          adjusted_by: string | null
+          check_in: string | null
+          check_out: string | null
+          created_at: string
+          date: string
+          early_departure_minutes: number
+          expected_end: string
+          expected_start: string
+          id: string
+          late_minutes: number
+          manual_entry: boolean
+          notes: string | null
+          points_awarded: number
+          points_processed: boolean
+          status: string
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adjusted_by?: string | null
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          date?: string
+          early_departure_minutes?: number
+          expected_end?: string
+          expected_start?: string
+          id?: string
+          late_minutes?: number
+          manual_entry?: boolean
+          notes?: string | null
+          points_awarded?: number
+          points_processed?: boolean
+          status?: string
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adjusted_by?: string | null
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          date?: string
+          early_departure_minutes?: number
+          expected_end?: string
+          expected_start?: string
+          id?: string
+          late_minutes?: number
+          manual_entry?: boolean
+          notes?: string | null
+          points_awarded?: number
+          points_processed?: boolean
+          status?: string
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_records_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_tracking_settings: {
+        Row: {
+          created_at: string
+          grace_period_minutes: number
+          id: string
+          max_penalty_per_day: number
+          points_on_time_bonus: number
+          points_per_minute_early: number
+          points_per_minute_late: number
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          grace_period_minutes?: number
+          id?: string
+          max_penalty_per_day?: number
+          points_on_time_bonus?: number
+          points_per_minute_early?: number
+          points_per_minute_late?: number
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          grace_period_minutes?: number
+          id?: string
+          max_penalty_per_day?: number
+          points_on_time_bonus?: number
+          points_per_minute_early?: number
+          points_per_minute_late?: number
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_tracking_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       units: {
         Row: {
           created_at: string
