@@ -69,7 +69,6 @@ const SelectContent = React.forwardRef<
   if (isMobile) {
     return (
       <SelectPrimitive.Portal>
-        <div className="fixed inset-0 z-[9999]" />
         <SelectPrimitive.Content
           ref={ref}
           className={cn(
@@ -78,10 +77,11 @@ const SelectContent = React.forwardRef<
             className,
           )}
           position="popper"
+          data-vaul-no-drag
           {...props}
         >
           <div className="mx-auto mt-4 h-2 w-[100px] shrink-0 rounded-full bg-muted" />
-          <SelectPrimitive.Viewport className="p-2 pb-6">
+          <SelectPrimitive.Viewport className="p-2 pb-6" data-vaul-no-drag>
             {children}
           </SelectPrimitive.Viewport>
         </SelectPrimitive.Content>
@@ -137,6 +137,7 @@ const SelectItem = React.forwardRef<
       "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 focus:bg-accent focus:text-accent-foreground",
       className,
     )}
+    data-vaul-no-drag
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
