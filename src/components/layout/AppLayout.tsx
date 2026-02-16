@@ -20,6 +20,7 @@ import { useTimeAlerts } from '@/hooks/useTimeAlerts';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
+import { useLeaderboard } from '@/hooks/useLeaderboard';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -59,7 +60,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { profile, isAdmin, signOut } = useAuth();
+  const { user, profile, isAdmin, signOut } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
@@ -68,6 +69,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
   useTimeAlerts();
+  const { leaderboard } = useLeaderboard();
+  const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
   const [notifOpen, setNotifOpen] = useState(false);
 
   const hasBottomNav = location.pathname === '/finance' || location.pathname === '/chat';
@@ -168,6 +171,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 </Popover>
               )}
 
+              <button
+                onClick={() => navigate('/ranking')}
+                className="relative p-2 rounded-lg hover:bg-secondary transition-all"
+              >
+                <AppIcon name="Trophy" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(var(--neon-amber) / 0.4))' }} />
+                {myPosition && myPosition <= 3 && (
+                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center" style={{
+                    background: 'hsl(var(--neon-amber) / 0.2)',
+                    color: 'hsl(var(--neon-amber))',
+                    border: '1.5px solid hsl(var(--card))',
+                  }}>
+                    #{myPosition}
+                  </span>
+                )}
+              </button>
               <button
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"

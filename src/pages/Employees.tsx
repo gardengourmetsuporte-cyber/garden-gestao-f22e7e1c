@@ -4,11 +4,11 @@ import { Employee } from '@/types/employee';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { EmployeeList } from '@/components/employees/EmployeeList';
 import { EmployeePayments } from '@/components/employees/EmployeePayments';
-import { EmployeePerformance } from '@/components/employees/EmployeePerformance';
+
 import { MyPayslips } from '@/components/employees/MyPayslips';
 import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
-import { TeamAchievements } from '@/components/employees/TeamAchievements';
+
 import { TimeTracking } from '@/components/employees/TimeTracking';
 import { SwipeableTabs } from '@/components/ui/swipeable-tabs';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -67,18 +67,6 @@ export default function Employees() {
                     icon: <AppIcon name="Calendar" size={16} />,
                     content: <ScheduleManagement />,
                   },
-                  {
-                    key: 'performance',
-                    label: 'Performance',
-                    icon: <AppIcon name="BarChart3" size={16} />,
-                    content: <EmployeePerformance />,
-                  },
-                  {
-                    key: 'achievements',
-                    label: 'Conquistas',
-                    icon: <AppIcon name="Trophy" size={16} />,
-                    content: <TeamAchievements />,
-                  },
                 ]}
               />
             )
@@ -102,12 +90,6 @@ export default function Employees() {
                   label: 'Folgas',
                   icon: <AppIcon name="Calendar" size={16} />,
                   content: <EmployeeScheduleRequest />,
-                },
-                {
-                  key: 'achievements',
-                  label: 'Conquistas',
-                  icon: <AppIcon name="Trophy" size={16} />,
-                  content: <TeamAchievements />,
                 },
               ]}
             />
