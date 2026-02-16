@@ -245,7 +245,7 @@ serve(async (req) => {
             const testUrl = channel.provider === "zapi" 
               ? `${channel.api_url}/status`
               : channel.provider === "evolution"
-              ? `${channel.api_url}/instance/connectionState`
+              ? `${channel.api_url}/instance/fetchInstances`
               : `${channel.api_url}/health`;
             
             const headers: Record<string, string> = { "Content-Type": "application/json" };
