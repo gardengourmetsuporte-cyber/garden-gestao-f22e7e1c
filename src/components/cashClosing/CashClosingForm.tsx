@@ -66,6 +66,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   const [pixAmount, setPixAmount] = useState(0);
   const [mealVoucherAmount, setMealVoucherAmount] = useState(0);
   const [deliveryAmount, setDeliveryAmount] = useState(0);
+  const [signedAccountAmount, setSignedAccountAmount] = useState(0);
   const [cashDifference, setCashDifference] = useState(0);
   const [notes, setNotes] = useState('');
   
@@ -84,7 +85,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   // Total esperado no caixa = Caixa inicial + Dinheiro vendido - Gastos (= cashCounted)
   const expectedCashInDrawer = initialCash + cashSold - totalExpenses;
   // Total de vendas = todos os meios
-  const totalPayments = cashSold + debitAmount + creditAmount + pixAmount + mealVoucherAmount + deliveryAmount;
+  const totalPayments = cashSold + debitAmount + creditAmount + pixAmount + mealVoucherAmount + deliveryAmount + signedAccountAmount;
 
   const paymentValues: Record<string, { value: number; setter: (v: number) => void }> = {
     cash_amount: { value: cashCounted, setter: setCashCounted },
@@ -93,6 +94,7 @@ export function CashClosingForm({ onSuccess }: Props) {
     pix_amount: { value: pixAmount, setter: setPixAmount },
     meal_voucher_amount: { value: mealVoucherAmount, setter: setMealVoucherAmount },
     delivery_amount: { value: deliveryAmount, setter: setDeliveryAmount },
+    signed_account_amount: { value: signedAccountAmount, setter: setSignedAccountAmount },
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,6 +182,7 @@ export function CashClosingForm({ onSuccess }: Props) {
         pix_amount: pixAmount,
         meal_voucher_amount: mealVoucherAmount,
         delivery_amount: deliveryAmount,
+        signed_account_amount: signedAccountAmount,
         cash_difference: cashDifference,
         receipt_url: receiptUrl,
         notes: notes,
@@ -206,6 +209,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       case 'Smartphone': return Smartphone;
       case 'Truck': return Truck;
       case 'Utensils': return Utensils;
+      case 'FileSignature': return Receipt;
       default: return Banknote;
     }
   };
@@ -474,6 +478,10 @@ export function CashClosingForm({ onSuccess }: Props) {
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">+ Delivery</span>
               <span>R$ {deliveryAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">+ Conta Assinada</span>
+              <span>R$ {signedAccountAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
 

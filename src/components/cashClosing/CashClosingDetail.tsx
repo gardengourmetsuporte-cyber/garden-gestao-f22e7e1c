@@ -82,8 +82,9 @@ import {
        case 'Banknote': return Banknote;
        case 'CreditCard': return CreditCard;
        case 'Smartphone': return Smartphone;
-       case 'Truck': return Truck;
-       default: return Banknote;
+      case 'Truck': return Truck;
+      case 'FileSignature': return Receipt;
+      default: return Banknote;
      }
    };
  
@@ -210,7 +211,7 @@ import {
             {/* Total real de vendas (sem descontar despesas) */}
             {(() => {
               const rawTotal = closing.cash_amount + closing.debit_amount + closing.credit_amount + 
-                closing.pix_amount + closing.meal_voucher_amount + closing.delivery_amount;
+                closing.pix_amount + closing.meal_voucher_amount + closing.delivery_amount + (closing.signed_account_amount || 0);
               return (
                 <div className="border-t pt-3 mt-3">
                   <div className="flex items-center justify-between">
