@@ -119,6 +119,7 @@ export type Database = {
           notes: string | null
           pix_amount: number
           receipt_url: string
+          signed_account_amount: number
           status: Database["public"]["Enums"]["cash_closing_status"]
           total_amount: number | null
           unit_id: string | null
@@ -145,6 +146,7 @@ export type Database = {
           notes?: string | null
           pix_amount?: number
           receipt_url: string
+          signed_account_amount?: number
           status?: Database["public"]["Enums"]["cash_closing_status"]
           total_amount?: number | null
           unit_id?: string | null
@@ -171,6 +173,7 @@ export type Database = {
           notes?: string | null
           pix_amount?: number
           receipt_url?: string
+          signed_account_amount?: number
           status?: Database["public"]["Enums"]["cash_closing_status"]
           total_amount?: number | null
           unit_id?: string | null

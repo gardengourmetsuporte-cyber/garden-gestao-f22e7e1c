@@ -94,7 +94,7 @@ export function useCashClosing() {
           initial_cash: formData.initial_cash, cash_amount: formData.cash_amount,
           debit_amount: formData.debit_amount, credit_amount: formData.credit_amount,
           pix_amount: formData.pix_amount, meal_voucher_amount: formData.meal_voucher_amount || 0,
-          delivery_amount: formData.delivery_amount, cash_difference: formData.cash_difference,
+          delivery_amount: formData.delivery_amount, signed_account_amount: formData.signed_account_amount || 0, cash_difference: formData.cash_difference,
           receipt_url: formData.receipt_url || '', notes: formData.notes,
           expenses: formData.expenses || [], user_id: user!.id,
         } as any);
@@ -370,6 +370,19 @@ export function useCashClosing() {
             });
           }
         }
+      }
+
+      // Signed Account (Conta Assinada)
+      if ((closing as any).signed_account_amount > 0 && getPaymentSetting('signed_account_amount')?.create_transaction !== false) {
+        const s = getPaymentSetting('signed_account_amount');
+        const signedSubcat = categories?.find(c => c.name.toLowerCase() === 'conta assinada');
+        const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
+        transactions.push({
+          user_id: user.id, unit_id: activeUnitId, type: 'income',
+          amount: (closing as any).signed_account_amount, description: `Conta Assinada (${formatDateLabel(closing.date)})`,
+          category_id: signedSubcat?.id || balcaoCategory?.id || null, account_id: bankAccountId,
+          date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
+        });
       }
 
       // Expenses from closing

@@ -20,6 +20,7 @@ export interface CashClosing {
   pix_amount: number;
   meal_voucher_amount: number;
   delivery_amount: number;
+  signed_account_amount: number;
   total_amount: number;
   
   // Cash difference
@@ -66,6 +67,7 @@ export interface CashClosingFormData {
   pix_amount: number;
   meal_voucher_amount: number;
   delivery_amount: number;
+  signed_account_amount: number;
   cash_difference: number;
   receipt_url?: string;
   notes?: string;
@@ -79,4 +81,5 @@ export const PAYMENT_METHODS = [
   { key: 'pix_amount', label: 'Pix', icon: 'Smartphone', color: '#06b6d4' },
   { key: 'meal_voucher_amount', label: 'Vale Alimentação', icon: 'Utensils', color: '#f59e0b' },
   { key: 'delivery_amount', label: 'iFood/Delivery', icon: 'Truck', color: '#f97316' },
+  { key: 'signed_account_amount', label: 'Conta Assinada', icon: 'FileSignature', color: '#64748b' },
 ] as const;
