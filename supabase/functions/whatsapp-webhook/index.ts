@@ -197,6 +197,104 @@ serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey);
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
+  // ============ Health Check / Connection Test ============
+  const url = new URL(req.url);
+  if (url.searchParams.get("action") === "health") {
+    try {
+      const providerParam = url.searchParams.get("provider") || "evolution";
+      const channelIdParam = url.searchParams.get("channel_id");
+
+      // Check DB connection
+      const { count, error: dbErr } = await supabase
+        .from("whatsapp_channels")
+        .select("*", { count: "exact", head: true });
+      
+      const dbOk = !dbErr;
+
+      // Check if channel exists
+      let channel: any = null;
+      if (channelIdParam) {
+        const { data } = await supabase
+          .from("whatsapp_channels")
+          .select("*")
+          .eq("id", channelIdParam)
+          .single();
+        channel = data;
+      } else {
+        const { data } = await supabase
+          .from("whatsapp_channels")
+          .select("*")
+          .eq("provider", providerParam)
+          .eq("is_active", true)
+          .limit(1)
+          .single();
+        channel = data;
+      }
+
+      // Check AI key
+      const aiKeyOk = !!LOVABLE_API_KEY;
+
+      // Check provider connectivity
+      let providerOk = false;
+      let providerError = "";
+      if (channel?.api_url && channel?.api_key_ref) {
+        if (isLocalUrl(channel.api_url)) {
+          providerError = "API URL é localhost — não acessível da nuvem";
+        } else {
+          try {
+            const testUrl = channel.provider === "zapi" 
+              ? `${channel.api_url}/status`
+              : channel.provider === "evolution"
+              ? `${channel.api_url}/instance/connectionState`
+              : `${channel.api_url}/health`;
+            
+            const headers: Record<string, string> = { "Content-Type": "application/json" };
+            if (channel.provider === "evolution") headers["apikey"] = channel.api_key_ref;
+            else if (channel.provider === "zapi") headers["Client-Token"] = channel.api_key_ref;
+            else headers["Authorization"] = `Bearer ${channel.api_key_ref}`;
+
+            const resp = await fetch(testUrl, { method: "GET", headers, signal: AbortSignal.timeout(8000) });
+            providerOk = resp.ok;
+            if (!resp.ok) {
+              providerError = `Status ${resp.status}: ${await resp.text().catch(() => "sem corpo")}`;
+            }
+          } catch (e) {
+            providerError = e instanceof Error ? e.message : "Erro desconhecido";
+          }
+        }
+      } else {
+        providerError = "API URL ou chave não configurada";
+      }
+
+      return new Response(JSON.stringify({
+        ok: true,
+        checks: {
+          webhook: { ok: true, message: "Webhook ativo e respondendo" },
+          database: { ok: dbOk, message: dbOk ? `Conectado (${count} canais)` : `Erro: ${dbErr?.message}` },
+          ai: { ok: aiKeyOk, message: aiKeyOk ? "Chave IA configurada" : "LOVABLE_API_KEY não configurada" },
+          channel: { 
+            ok: !!channel, 
+            message: channel 
+              ? `Canal ${channel.provider} ${channel.is_active ? "ativo" : "inativo"} — ${channel.phone_number}`
+              : "Nenhum canal encontrado" 
+          },
+          provider: { 
+            ok: providerOk, 
+            message: providerOk ? "Provedor acessível" : `Provedor offline: ${providerError}` 
+          },
+        }
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ ok: false, error: e instanceof Error ? e.message : "Erro" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
   try {
     const body = await req.json();
     console.log("[WEBHOOK] Received payload:", JSON.stringify(body).substring(0, 500));
