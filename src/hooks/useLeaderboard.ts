@@ -151,7 +151,7 @@ export function useLeaderboard() {
 
   const isLoading = isLoadingLeaderboard || isLoadingSectors;
 
-  return {
+  return useMemo(() => ({
     leaderboard,
     sectorPoints,
     isLoading,
@@ -161,5 +161,5 @@ export function useLeaderboard() {
       queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       queryClient.invalidateQueries({ queryKey: ['sector-points'] });
     },
-  };
+  }), [leaderboard, sectorPoints, isLoading, selectedMonth, queryClient]);
 }
