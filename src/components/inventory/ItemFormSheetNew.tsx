@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ListPicker } from '@/components/ui/list-picker';
 import { InventoryItem, Category, Supplier } from '@/types/database';
 import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -49,6 +50,8 @@ export function ItemFormSheetNew({
   const [recipeUnitType, setRecipeUnitType] = useState<string>('');
   const [recipeUnitPrice, setRecipeUnitPrice] = useState('');
   const [showRecipeSection, setShowRecipeSection] = useState(false);
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
+  const [supplierPickerOpen, setSupplierPickerOpen] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -145,42 +148,36 @@ export function ItemFormSheetNew({
           {/* Category */}
           <div className="space-y-2">
             <Label className="text-base font-medium">Categoria</Label>
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="h-14 text-lg rounded-xl">
-                <SelectValue placeholder="Selecione a categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id} className="text-base py-3">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: cat.color }}
-                      />
-                      {cat.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <button
+              type="button"
+              onClick={() => setCategoryPickerOpen(true)}
+              className="flex items-center justify-between w-full h-14 px-4 text-lg rounded-xl border border-input bg-background hover:bg-accent/50 transition-colors"
+            >
+              <span className={categoryId ? 'text-foreground' : 'text-muted-foreground'}>
+                {categoryId
+                  ? categories.find(c => c.id === categoryId)?.name || 'Selecione a categoria'
+                  : 'Selecione a categoria'}
+              </span>
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            </button>
           </div>
 
           {/* Supplier */}
           {suppliers.length > 0 && (
             <div className="space-y-2">
               <Label className="text-base font-medium">Fornecedor</Label>
-              <Select value={supplierId} onValueChange={setSupplierId}>
-                <SelectTrigger className="h-14 text-lg rounded-xl">
-                  <SelectValue placeholder="Selecione o fornecedor" />
-                </SelectTrigger>
-                <SelectContent>
-                  {suppliers.map((sup) => (
-                    <SelectItem key={sup.id} value={sup.id} className="text-base py-3">
-                      {sup.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <button
+                type="button"
+                onClick={() => setSupplierPickerOpen(true)}
+                className="flex items-center justify-between w-full h-14 px-4 text-lg rounded-xl border border-input bg-background hover:bg-accent/50 transition-colors"
+              >
+                <span className={supplierId ? 'text-foreground' : 'text-muted-foreground'}>
+                  {supplierId
+                    ? suppliers.find(s => s.id === supplierId)?.name || 'Selecione o fornecedor'
+                    : 'Selecione o fornecedor'}
+                </span>
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              </button>
             </div>
           )}
 
@@ -344,6 +341,28 @@ export function ItemFormSheetNew({
           </div>
         </div>
       </SheetContent>
+
+      <ListPicker
+        open={categoryPickerOpen}
+        onOpenChange={setCategoryPickerOpen}
+        title="Selecionar Categoria"
+        items={categories.map(c => ({ id: c.id, label: c.name }))}
+        selectedId={categoryId || null}
+        onSelect={(id) => setCategoryId(id || '')}
+        allowNone
+        noneLabel="Sem categoria"
+      />
+
+      <ListPicker
+        open={supplierPickerOpen}
+        onOpenChange={setSupplierPickerOpen}
+        title="Selecionar Fornecedor"
+        items={suppliers.map(s => ({ id: s.id, label: s.name }))}
+        selectedId={supplierId || null}
+        onSelect={(id) => setSupplierId(id || '')}
+        allowNone
+        noneLabel="Sem fornecedor"
+      />
     </Sheet>
   );
 }
