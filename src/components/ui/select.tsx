@@ -69,10 +69,11 @@ const SelectContent = React.forwardRef<
   if (isMobile) {
     return (
       <SelectPrimitive.Portal>
+        <div className="fixed inset-0 z-[9999]" />
         <SelectPrimitive.Content
           ref={ref}
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 max-h-[60vh] rounded-t-[10px] border bg-background shadow-lg",
+            "fixed inset-x-0 bottom-0 z-[10000] max-h-[60vh] rounded-t-[10px] border bg-card shadow-lg",
             "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
             className,
           )}

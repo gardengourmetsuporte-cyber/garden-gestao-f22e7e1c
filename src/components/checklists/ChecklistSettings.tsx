@@ -38,7 +38,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ListPicker, ListPickerItem } from '@/components/ui/list-picker';
+import { ChevronDown as SelectChevron } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getPointsColors, clampPoints } from '@/lib/points';
 
@@ -160,6 +161,9 @@ export function ChecklistSettings({
   const [sectorSheetOpen, setSectorSheetOpen] = useState(false);
   const [subcategorySheetOpen, setSubcategorySheetOpen] = useState(false);
   const [itemSheetOpen, setItemSheetOpen] = useState(false);
+  const [freqPickerOpen, setFreqPickerOpen] = useState(false);
+  const [typePickerOpen, setTypePickerOpen] = useState(false);
+  const [pointsPickerOpen, setPointsPickerOpen] = useState(false);
   
   // Editing states
   const [editingSector, setEditingSector] = useState<ChecklistSector | null>(null);
@@ -734,63 +738,69 @@ export function ChecklistSettings({
 
             <div className="space-y-2">
               <Label>Frequência</Label>
-              <Select value={itemFrequency} onValueChange={(v) => setItemFrequency(v as ItemFrequency)}>
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {frequencyOptions.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      <div className="flex items-center gap-2">
-                        <opt.icon className="w-4 h-4" />
-                        {opt.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <button
+                type="button"
+                onClick={() => setFreqPickerOpen(true)}
+                className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  {(() => { const opt = frequencyOptions.find(f => f.value === itemFrequency); return opt ? <><opt.icon className="w-4 h-4" />{opt.label}</> : 'Selecione'; })()}
+                </div>
+                <SelectChevron className="w-4 h-4 text-muted-foreground" />
+              </button>
+              <ListPicker
+                open={freqPickerOpen}
+                onOpenChange={setFreqPickerOpen}
+                title="Frequência"
+                items={frequencyOptions.map(o => ({ id: o.value, label: o.label }))}
+                selectedId={itemFrequency}
+                onSelect={(id) => { if (id) setItemFrequency(id as ItemFrequency); }}
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Tipo de Checklist</Label>
-              <Select value={itemChecklistType} onValueChange={(v) => setItemChecklistType(v as ChecklistType)}>
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {checklistTypeOptions.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      <div className="flex items-center gap-2">
-                        <opt.icon className="w-4 h-4" />
-                        {opt.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <button
+                type="button"
+                onClick={() => setTypePickerOpen(true)}
+                className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  {(() => { const opt = checklistTypeOptions.find(t => t.value === itemChecklistType); return opt ? <><opt.icon className="w-4 h-4" />{opt.label}</> : 'Selecione'; })()}
+                </div>
+                <SelectChevron className="w-4 h-4 text-muted-foreground" />
+              </button>
+              <ListPicker
+                open={typePickerOpen}
+                onOpenChange={setTypePickerOpen}
+                title="Tipo de Checklist"
+                items={checklistTypeOptions.map(o => ({ id: o.value, label: o.label }))}
+                selectedId={itemChecklistType}
+                onSelect={(id) => { if (id) setItemChecklistType(id as ChecklistType); }}
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Pontos</Label>
-              <Select value={itemPoints.toString()} onValueChange={(v) => setItemPoints(parseInt(v))}>
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {pointsOptions.map((opt) => {
-                    const toneStyle = getPointsToneStyle(opt.value);
-
-                    return (
-                      <SelectItem key={opt.value} value={opt.value.toString()}>
-                        <div className="flex items-center gap-2" style={toneStyle}>
-                          <Star className="w-4 h-4" style={{ ...toneStyle, fill: toneStyle.color as string }} />
-                          {opt.label}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+              <button
+                type="button"
+                onClick={() => setPointsPickerOpen(true)}
+                className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+              >
+                <div className="flex items-center gap-2" style={getPointsToneStyle(itemPoints)}>
+                  <Star className="w-4 h-4" style={{ ...getPointsToneStyle(itemPoints), fill: getPointsToneStyle(itemPoints).color as string }} />
+                  {pointsOptions.find(p => p.value === itemPoints)?.label || `${itemPoints} pontos`}
+                </div>
+                <SelectChevron className="w-4 h-4 text-muted-foreground" />
+              </button>
+              <ListPicker
+                open={pointsPickerOpen}
+                onOpenChange={setPointsPickerOpen}
+                title="Pontos"
+                items={pointsOptions.map(o => ({ id: o.value.toString(), label: o.label }))}
+                selectedId={itemPoints.toString()}
+                onSelect={(id) => { if (id) setItemPoints(parseInt(id)); }}
+              />
             </div>
 
             <Button
