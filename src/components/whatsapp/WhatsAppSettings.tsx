@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Copy, Save, Wifi, WifiOff } from 'lucide-react';
+import { Copy, Save, Wifi, WifiOff, CheckCircle2, XCircle, Loader2, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -61,10 +61,74 @@ export function WhatsAppSettings() {
     toast({ title: 'URL copiada!' });
   };
 
+  const [testing, setTesting] = useState(false);
+  const [healthResult, setHealthResult] = useState<any>(null);
+
+  const testConnection = async () => {
+    setTesting(true);
+    setHealthResult(null);
+    try {
+      const params = new URLSearchParams({ action: 'health', provider: form.provider || 'evolution' });
+      if (form.id) params.set('channel_id', form.id);
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-webhook?${params}`);
+      const data = await res.json();
+      setHealthResult(data);
+    } catch (e: any) {
+      setHealthResult({ ok: false, error: e.message || 'Falha ao conectar' });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   if (isLoading) return <div className="text-center py-10 text-muted-foreground">Carregando...</div>;
+
+  const StatusIcon = ({ ok }: { ok: boolean }) => ok 
+    ? <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--neon-green))' }} /> 
+    : <XCircle className="w-4 h-4 text-destructive shrink-0" />;
 
   return (
     <div className="p-4 space-y-6 max-w-2xl mx-auto">
+      {/* Connection Test */}
+      <div className="card-command p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Diagnóstico de Conexão</Label>
+          <Button size="sm" variant="outline" onClick={testConnection} disabled={testing} className="gap-2">
+            {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
+            {testing ? 'Testando...' : 'Testar Conexão'}
+          </Button>
+        </div>
+
+        {healthResult && (
+          <div className="space-y-2 mt-2">
+            {healthResult.checks ? (
+              Object.entries(healthResult.checks).map(([key, check]: [string, any]) => (
+                <div key={key} className="flex items-start gap-2 text-sm p-2 rounded-lg bg-secondary/40">
+                  <StatusIcon ok={check.ok} />
+                  <div className="min-w-0">
+                    <span className="font-medium capitalize">{
+                      key === 'webhook' ? '🌐 Webhook' :
+                      key === 'database' ? '🗄️ Banco de Dados' :
+                      key === 'ai' ? '🤖 IA (GPT)' :
+                      key === 'channel' ? '📱 Canal WhatsApp' :
+                      key === 'provider' ? '🔌 Provedor API' : key
+                    }</span>
+                    <p className="text-xs text-muted-foreground break-all">{check.message}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-start gap-2 text-sm p-2 rounded-lg bg-destructive/10">
+                <XCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-medium">Erro no teste</span>
+                  <p className="text-xs text-muted-foreground">{healthResult.error || 'Erro desconhecido'}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Webhook URL */}
       <div className="card-command p-4 space-y-2">
         <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">URL do Webhook</Label>
@@ -126,16 +190,19 @@ export function WhatsAppSettings() {
           <Input
             value={form.api_url || ''}
             onChange={(e) => setForm(p => ({ ...p, api_url: e.target.value }))}
-            placeholder="https://api.provedor.com/v1"
+            placeholder={form.provider === 'zapi' ? 'https://api.z-api.io/instances/ID/token/TOKEN' : 'https://api.provedor.com/v1'}
           />
+          {form.provider === 'zapi' && (
+            <p className="text-[10px] text-muted-foreground">Formato: https://api.z-api.io/instances/SEU_ID/token/SEU_TOKEN</p>
+          )}
         </div>
         <div className="space-y-2">
-          <Label className="text-sm">Chave de API</Label>
+          <Label className="text-sm">{form.provider === 'zapi' ? 'Client-Token' : 'Chave de API'}</Label>
           <Input
             type="password"
             value={form.api_key_ref || ''}
             onChange={(e) => setForm(p => ({ ...p, api_key_ref: e.target.value }))}
-            placeholder="Sua chave de API"
+            placeholder={form.provider === 'zapi' ? 'Seu Client-Token da Z-API' : 'Sua chave de API'}
           />
           <p className="text-[10px] text-muted-foreground">A chave é armazenada criptografada no banco.</p>
         </div>
