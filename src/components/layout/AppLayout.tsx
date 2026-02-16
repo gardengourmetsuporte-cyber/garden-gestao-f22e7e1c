@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -65,12 +65,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
   const { earned: earnedPoints } = usePoints();
-  const rank = getRank(earnedPoints);
+  const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
   const chatUnreadCount = useChatUnreadCount();
   const moduleStatuses = useModuleStatus();
   useTimeAlerts();
   const { leaderboard } = useLeaderboard();
-  const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
+  const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
 
   const hasBottomNav = location.pathname === '/finance' || location.pathname === '/chat';
