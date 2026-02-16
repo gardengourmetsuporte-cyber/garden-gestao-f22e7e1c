@@ -315,7 +315,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
                   {group.label}
                 </span>
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-5">
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-6">
                   {group.items.map((item) => {
                     const isActive = location.pathname === item.href;
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
