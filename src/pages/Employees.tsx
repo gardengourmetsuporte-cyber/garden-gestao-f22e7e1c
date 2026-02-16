@@ -9,6 +9,7 @@ import { MyPayslips } from '@/components/employees/MyPayslips';
 import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
 import { TeamAchievements } from '@/components/employees/TeamAchievements';
+import { TimeTracking } from '@/components/employees/TimeTracking';
 import { SwipeableTabs } from '@/components/ui/swipeable-tabs';
 import { AppIcon } from '@/components/ui/app-icon';
 
@@ -55,6 +56,12 @@ export default function Employees() {
                     content: <EmployeeList onSelectEmployee={setSelectedEmployee} />,
                   },
                   {
+                    key: 'time-tracking',
+                    label: 'Ponto',
+                    icon: <AppIcon name="Clock" size={16} />,
+                    content: <TimeTracking />,
+                  },
+                  {
                     key: 'schedules',
                     label: 'Folgas',
                     icon: <AppIcon name="Calendar" size={16} />,
@@ -78,6 +85,12 @@ export default function Employees() {
           ) : (
             <SwipeableTabs
               tabs={[
+                {
+                  key: 'time-tracking',
+                  label: 'Ponto',
+                  icon: <AppIcon name="Clock" size={16} />,
+                  content: <TimeTracking />,
+                },
                 {
                   key: 'payslips',
                   label: 'Holerites',
