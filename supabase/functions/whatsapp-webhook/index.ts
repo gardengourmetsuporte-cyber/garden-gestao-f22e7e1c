@@ -93,7 +93,8 @@ async function sendMessage(
   apiUrl: string,
   phone: string,
   text: string,
-  apiKey: string
+  apiKey: string,
+  instanceName?: string
 ): Promise<boolean> {
   // Skip sending if API URL is localhost (unreachable from cloud)
   if (isLocalUrl(apiUrl)) {
@@ -107,14 +108,16 @@ async function sendMessage(
     let body: any = {};
 
     switch (provider) {
-      case "evolution":
-        url = `${apiUrl}/message/sendText`;
+      case "evolution": {
+        const instName = instanceName || "whatsapp-gestao";
+        url = `${apiUrl}/message/sendText/${instName}`;
         headers["apikey"] = apiKey;
         body = {
           number: phone.includes("@") ? phone : `${phone}@s.whatsapp.net`,
           text,
         };
         break;
+      }
 
       case "zapi":
         url = `${apiUrl}/send-text`;
@@ -455,7 +458,7 @@ serve(async (req) => {
 
       // Send via provider
       if (channel.api_url && channel.api_key_ref) {
-        await sendMessage(channel.provider, channel.api_url, incoming.phone, fallback, channel.api_key_ref);
+        await sendMessage(channel.provider, channel.api_url, incoming.phone, fallback, channel.api_key_ref, channel.instance_name);
       }
 
       return new Response(JSON.stringify({ ok: true, action: "off_hours" }), {
@@ -632,7 +635,7 @@ Use as tools disponíveis para:
           content: fallbackMsg,
         });
         if (channel.api_url && channel.api_key_ref) {
-          await sendMessage(channel.provider, channel.api_url, incoming.phone, fallbackMsg, channel.api_key_ref);
+          await sendMessage(channel.provider, channel.api_url, incoming.phone, fallbackMsg, channel.api_key_ref, channel.instance_name);
         }
       }
 
@@ -743,7 +746,7 @@ Use as tools disponíveis para:
 
     // Send via provider
     if (channel.api_url && channel.api_key_ref) {
-      await sendMessage(channel.provider, channel.api_url, incoming.phone, responseText, channel.api_key_ref);
+      await sendMessage(channel.provider, channel.api_url, incoming.phone, responseText, channel.api_key_ref, channel.instance_name);
     }
 
     return new Response(
