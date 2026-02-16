@@ -245,10 +245,11 @@ serve(async (req) => {
           providerError = "API URL é localhost — não acessível da nuvem";
         } else {
           try {
+            const instName = channel.instance_name || "whatsapp-gestao";
             const testUrl = channel.provider === "zapi" 
               ? `${channel.api_url}/status`
               : channel.provider === "evolution"
-              ? `${channel.api_url}/instance/fetchInstances`
+              ? `${channel.api_url}/instance/connectionState/${instName}`
               : `${channel.api_url}/health`;
             
             const headers: Record<string, string> = { "Content-Type": "application/json" };
