@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useCallback } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -69,9 +69,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const moduleStatuses = useModuleStatus();
   useTimeAlerts();
   const [notifOpen, setNotifOpen] = useState(false);
-  const handleNotifOpenChange = useCallback((open: boolean) => {
-    setNotifOpen(prev => prev === open ? prev : open);
-  }, []);
 
   const hasBottomNav = location.pathname === '/finance' || location.pathname === '/chat';
 
@@ -182,7 +179,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </span>
                 )}
               </button>
-              <Popover open={notifOpen} onOpenChange={handleNotifOpenChange}>
+              <Popover open={notifOpen} onOpenChange={setNotifOpen}>
                 <PopoverTrigger asChild>
                   <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
