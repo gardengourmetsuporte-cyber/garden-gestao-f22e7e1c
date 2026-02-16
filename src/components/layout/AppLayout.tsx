@@ -315,7 +315,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
                   {group.label}
                 </span>
-                <div className="grid grid-cols-4 gap-x-4 gap-y-5">
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-5">
                   {group.items.map((item) => {
                     const isActive = location.pathname === item.href;
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
@@ -328,7 +328,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         key={item.href}
                         to={item.href}
                         onClick={() => setLauncherOpen(false)}
-                        className="flex flex-col items-center gap-1.5 active:scale-90 transition-all duration-150"
+                        className="flex flex-col items-center gap-1.5 active:scale-90 transition-all duration-150 w-16"
                       >
                         <div className="relative">
                           <div
