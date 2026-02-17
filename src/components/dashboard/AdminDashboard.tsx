@@ -7,7 +7,7 @@ import { usePoints } from '@/hooks/usePoints';
 import { cn } from '@/lib/utils';
 import { useCountUpCurrency } from '@/hooks/useCountUp';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RankedAvatar } from '@/components/profile/RankedAvatar';
+import { Podium } from '@/components/ranking/Podium';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
@@ -127,45 +127,33 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {/* RANKING WIDGET - Compact horizontal bar */}
+        {/* RANKING WIDGET - Podium */}
         <button
           onClick={() => navigate('/ranking')}
           className="col-span-2 animate-slide-up stagger-5"
         >
-          <div className="card-command w-full p-4 text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.15)', border: '1px solid hsl(var(--neon-amber) / 0.25)' }}>
-                <AppIcon name="Trophy" size={18} style={{ color: 'hsl(var(--neon-amber))' }} />
+          <div className="card-surface w-full p-4 text-left">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
+                <span className="text-sm font-semibold text-foreground">Ranking Mensal</span>
               </div>
-              <div className="flex-1 min-w-0">
-                {leaderboardLoading ? (
-                  <Skeleton className="h-4 w-40" />
-                ) : top3.length > 0 ? (
-                  <div className="flex items-center gap-2">
-                    <div className="flex -space-x-2">
-                      {top3.slice(0, 3).map((entry, idx) => (
-                        <div key={entry.user_id} className="ring-2 ring-background rounded-full">
-                          <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={24} />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-foreground truncate">
-                        🥇 {top3[0].full_name?.split(' ')[0]} · <span style={{ color: 'hsl(var(--neon-amber))' }}>{top3[0].total_score} pts</span>
-                      </p>
-                      {userRank && userRank.rank > 1 && (
-                        <p className="text-[10px] text-muted-foreground">
-                          Você está em {userRank.rank}º lugar
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground">Sem dados de ranking</p>
-                )}
-              </div>
-              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
             </div>
+            {leaderboardLoading ? (
+              <div className="flex items-end justify-center gap-4 py-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex flex-col items-center gap-2">
+                    <Skeleton className="w-10 h-10 rounded-full" />
+                    <Skeleton className="w-12 h-3" />
+                  </div>
+                ))}
+              </div>
+            ) : top3.length > 0 ? (
+              <Podium entries={leaderboard} currentUserId={user?.id} compact />
+            ) : (
+              <p className="text-xs text-muted-foreground py-4 text-center">Sem dados de ranking</p>
+            )}
           </div>
         </button>
       </div>
