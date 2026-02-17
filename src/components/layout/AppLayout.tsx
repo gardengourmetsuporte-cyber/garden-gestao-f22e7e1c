@@ -21,6 +21,7 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -132,6 +133,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </button>
 
             <div className="flex items-center gap-1">
+              <ThemeToggle className="p-1.5" />
               {/* Unit Selector Icon */}
               {units.length > 0 && (
                 <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
