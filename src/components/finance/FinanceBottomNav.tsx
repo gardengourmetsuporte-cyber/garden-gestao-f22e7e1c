@@ -8,6 +8,7 @@ interface FinanceBottomNavProps {
   activeTab: FinanceTab;
   onTabChange: (tab: FinanceTab) => void;
   onAddTransaction: (type: TransactionType) => void;
+  variant?: 'business' | 'personal';
 }
 
 const tabs: { id: FinanceTab; icon: string; label: string }[] = [
@@ -17,7 +18,10 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 
-export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: FinanceBottomNavProps) {
+export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, variant = 'business' }: FinanceBottomNavProps) {
+  const accentColor = variant === 'personal' ? 'hsl(160 60% 45%)' : 'hsl(var(--neon-cyan))';
+  const accentGlow = variant === 'personal' ? 'hsl(160 60% 45% / 0.5)' : 'hsl(var(--neon-cyan) / 0.5)';
+  const accentGlow2 = variant === 'personal' ? 'hsl(160 60% 45% / 0.2)' : 'hsl(var(--neon-cyan) / 0.2)';
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleAction = (type: TransactionType) => {
@@ -106,7 +110,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
-                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />
+                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: accentColor, boxShadow: `0 0 10px ${accentGlow}, 0 0 20px ${accentGlow2}` }} />
               )}
             </button>
           ))}
@@ -121,11 +125,11 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               )}
             >
               {/* Neon rotating border */}
-              <div className="absolute inset-0 rounded-full fab-neon-border" />
+              <div className={cn("absolute inset-0 rounded-full", variant === 'personal' ? 'fab-neon-border-personal' : 'fab-neon-border')} />
               {/* Inner background */}
               <div className="absolute inset-[2px] rounded-full bg-card" />
               {/* Icon */}
-              <AppIcon name="Plus" size={32} className="text-[hsl(var(--neon-cyan))] relative z-10" />
+              <AppIcon name="Plus" size={32} className="relative z-10" style={{ color: accentColor }} />
             </button>
           </div>
 
@@ -144,7 +148,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction }: F
               <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
               <span className="text-[10px] font-medium">{tab.label}</span>
               {activeTab === tab.id && (
-                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: 'hsl(var(--neon-cyan))', boxShadow: '0 0 10px hsl(var(--neon-cyan) / 0.5), 0 0 20px hsl(var(--neon-cyan) / 0.2)' }} />
+                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: accentColor, boxShadow: `0 0 10px ${accentGlow}, 0 0 20px ${accentGlow2}` }} />
               )}
             </button>
           ))}

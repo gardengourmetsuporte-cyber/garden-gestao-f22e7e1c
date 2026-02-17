@@ -112,6 +112,7 @@ export default function PersonalFinance() {
             monthStats={monthStats}
             onNavigate={handleFinanceNavigate}
             onAccountClick={handleAccountCardClick}
+            variant="personal"
           />
         )}
 
@@ -174,6 +175,7 @@ export default function PersonalFinance() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onAddTransaction={handleAddTransaction}
+        variant="personal"
       />
 
       <TransactionSheet

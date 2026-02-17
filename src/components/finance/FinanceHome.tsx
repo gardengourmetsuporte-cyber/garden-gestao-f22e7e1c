@@ -12,6 +12,7 @@ interface FinanceHomeProps {
   monthStats: MonthlyStats;
   onNavigate?: (tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => void;
   onAccountClick?: (account: FinanceAccount) => void;
+  variant?: 'business' | 'personal';
 }
 
 export function FinanceHome({
@@ -22,6 +23,7 @@ export function FinanceHome({
   monthStats,
   onNavigate,
   onAccountClick,
+  variant = 'business',
 }: FinanceHomeProps) {
   const formatCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -39,13 +41,13 @@ export function FinanceHome({
       {/* === HERO BALANCE CARD === */}
       <button
         onClick={() => onNavigate?.('more')}
-        className="finance-hero-card w-full text-left animate-slide-up stagger-1"
+        className={cn("finance-hero-card w-full text-left animate-slide-up stagger-1", variant === 'personal' && "finance-hero-card--personal")}
       >
         <div className="finance-hero-inner p-5 pb-4">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
-              Saldo em contas
+              {variant === 'personal' ? 'Meu saldo pessoal' : 'Saldo em contas'}
             </span>
             <AppIcon name="ChevronRight" size={18} className="text-white/50" />
           </div>
