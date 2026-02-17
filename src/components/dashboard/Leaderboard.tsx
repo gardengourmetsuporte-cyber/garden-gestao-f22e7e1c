@@ -4,6 +4,7 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { getRank } from '@/lib/ranks';
 import { Link } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Podium } from '@/components/ranking/Podium';
 import { format, addMonths, subMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -14,6 +15,7 @@ interface LeaderboardProps {
   maxEntries?: number;
   selectedMonth?: Date;
   onMonthChange?: (month: Date) => void;
+  showPodium?: boolean;
 }
 
 function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) => void }) {
@@ -37,8 +39,9 @@ function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) =
   );
 }
 
-export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, selectedMonth, onMonthChange }: LeaderboardProps) {
+export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, selectedMonth, onMonthChange, showPodium = true }: LeaderboardProps) {
   const displayEntries = maxEntries ? entries.slice(0, maxEntries) : entries;
+  const restEntries = showPodium ? displayEntries.slice(3) : displayEntries;
 
   if (isLoading) {
     return (
@@ -58,7 +61,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
 
   return (
     <div className="card-surface p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
           <h3 className="font-semibold text-sm text-foreground">Ranking Mensal</h3>
@@ -74,69 +77,62 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
           <p className="text-sm text-muted-foreground">Nenhum ponto registrado neste mês</p>
         </div>
       ) : (
-        <div className="space-y-1.5">
-          {displayEntries.map((entry, idx) => {
-            const isCurrentUser = entry.user_id === currentUserId;
-            const entryRank = getRank(entry.total_score);
-            const isTop3 = entry.rank <= 3;
+        <>
+          {/* Podium for top 3 */}
+          {showPodium && displayEntries.length >= 2 && (
+            <Podium entries={displayEntries} currentUserId={currentUserId} />
+          )}
 
-            const getRankLabel = (rank: number) => {
-              if (rank === 1) return { icon: 'Trophy', color: 'hsl(var(--neon-amber))' };
-              if (rank === 2) return { icon: 'Medal', color: 'hsl(215 20% 60%)' };
-              if (rank === 3) return { icon: 'Medal', color: 'hsl(30 60% 40%)' };
-              return null;
-            };
+          {/* Rest of leaderboard */}
+          {restEntries.length > 0 && (
+            <div className={cn("space-y-1.5", showPodium && "mt-3 pt-3 border-t border-border/30")}>
+              {restEntries.map((entry, idx) => {
+                const isCurrentUser = entry.user_id === currentUserId;
+                const entryRank = getRank(entry.total_score);
 
-            const rankLabel = getRankLabel(entry.rank);
-
-            return (
-              <Link
-                to={`/profile/${entry.user_id}`}
-                key={entry.user_id}
-                className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 animate-slide-up",
-                  isTop3 ? "bg-card border border-border/40" : "bg-secondary/30",
-                  isCurrentUser && "ring-1 ring-primary/30",
-                  entry.rank === 1 && "border-l-2",
-                  `stagger-${Math.min(idx + 1, 8)}`
-                )}
-                style={entry.rank === 1 ? { borderLeftColor: 'hsl(var(--neon-amber))' } : undefined}
-              >
-                {/* Rank number/icon */}
-                <div className="w-6 flex items-center justify-center shrink-0">
-                  {rankLabel ? (
-                    <AppIcon name={rankLabel.icon} size={16} style={{ color: rankLabel.color }} />
-                  ) : (
-                    <span className="text-xs font-bold text-muted-foreground">{entry.rank}</span>
-                  )}
-                </div>
-
-                <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={32} />
-
-                <div className="flex-1 min-w-0">
-                  <p className={cn("font-medium text-sm truncate", isCurrentUser && "text-primary")}>
-                    {entry.full_name}
-                    {isCurrentUser && <span className="text-xs ml-1 text-muted-foreground">(você)</span>}
-                  </p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <span style={{ color: entryRank.color }}>{entryRank.title}</span>
-                    {entry.bonus_points > 0 && (
-                      <>
-                        <span>·</span>
-                        <span style={{ color: 'hsl(var(--neon-amber))' }}>+{entry.bonus_points} bônus</span>
-                      </>
+                return (
+                  <Link
+                    to={`/profile/${entry.user_id}`}
+                    key={entry.user_id}
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 animate-slide-up",
+                      "bg-secondary/30",
+                      isCurrentUser && "ring-1 ring-primary/30 bg-primary/5",
+                      `stagger-${Math.min(idx + 1, 8)}`
                     )}
-                  </p>
-                </div>
+                  >
+                    <div className="w-6 flex items-center justify-center shrink-0">
+                      <span className="text-xs font-bold text-muted-foreground">{entry.rank}</span>
+                    </div>
 
-                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>
-                  <AppIcon name="Star" size={12} style={{ color: 'hsl(var(--neon-amber))' }} />
-                  <span className="font-bold text-xs" style={{ color: 'hsl(var(--neon-amber))' }}>{entry.total_score}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={32} />
+
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("font-medium text-sm truncate", isCurrentUser && "text-primary")}>
+                        {entry.full_name}
+                        {isCurrentUser && <span className="text-xs ml-1 text-muted-foreground">(você)</span>}
+                      </p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span style={{ color: entryRank.color }}>{entryRank.title}</span>
+                        {entry.bonus_points > 0 && (
+                          <>
+                            <span>·</span>
+                            <span style={{ color: 'hsl(var(--neon-amber))' }}>+{entry.bonus_points} bônus</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>
+                      <AppIcon name="Star" size={12} style={{ color: 'hsl(var(--neon-amber))' }} />
+                      <span className="font-bold text-xs" style={{ color: 'hsl(var(--neon-amber))' }}>{entry.total_score}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
