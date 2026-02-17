@@ -161,7 +161,7 @@ export default function Auth() {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden">
       {/* Theme Toggle */}
       <div className="absolute top-8 right-4 z-20">
         <ThemeToggle />
