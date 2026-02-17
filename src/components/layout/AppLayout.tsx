@@ -135,18 +135,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               {units.length > 0 && (
                 <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
                   <PopoverTrigger asChild>
-                    <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
+                     <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
                       <AppIcon name="Building2" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
-                      {activeUnit && (
-                        <span
-                          className="absolute top-1 right-1 w-3 h-3 rounded-full"
-                          style={{
-                            background: getThemeColor(activeUnit.slug),
-                            boxShadow: `0 0 6px ${getThemeColor(activeUnit.slug)}80`,
-                            border: '1.5px solid hsl(var(--card))',
-                          }}
-                        />
-                      )}
+                      <span
+                        className="absolute top-1 right-1 w-3 h-3 rounded-full"
+                        style={{
+                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'transparent',
+                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : 'none',
+                          border: activeUnit ? '1.5px solid hsl(var(--card))' : 'none',
+                          opacity: activeUnit ? 1 : 0,
+                        }}
+                      />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent align="end" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
