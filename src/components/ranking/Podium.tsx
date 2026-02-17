@@ -104,17 +104,25 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
             {/* Podium bar */}
             <div
               className={cn(
-                "w-full rounded-t-xl mt-1.5 bg-gradient-to-t border border-border/30 border-b-0",
+                "w-full rounded-t-xl mt-1.5 border-t border-x border-b-0 relative overflow-hidden",
                 compact ? "w-16" : "w-20",
                 height
               )}
               style={{
-                background: `linear-gradient(to top, ${crownColor}20, ${crownColor}05)`,
-                borderColor: `${crownColor}30`,
+                background: `linear-gradient(to top, ${crownColor}50, ${crownColor}25, ${crownColor}10)`,
+                borderColor: `${crownColor}40`,
+                boxShadow: `0 -4px 20px ${crownColor}20, inset 0 2px 10px ${crownColor}15`,
               }}
             >
-              <div className="flex items-center justify-center h-full">
-                <span className="text-xs font-bold text-muted-foreground/50">{label}</span>
+              {/* Shimmer effect */}
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  background: `linear-gradient(135deg, transparent 30%, ${crownColor}40 50%, transparent 70%)`,
+                }}
+              />
+              <div className="flex items-center justify-center h-full relative z-10">
+                <span className="text-xs font-bold" style={{ color: `${crownColor}cc` }}>{label}</span>
               </div>
             </div>
           </Link>
