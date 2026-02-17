@@ -1,224 +1,408 @@
 
-# Auditoria Completa e Plano de Evolucao - Garden Gestao
+# Auditoria de Design de Produto e Plano de Evolucao Premium
 
 ---
 
-## 1. AUDITORIA: PONTOS FORTES
+## 1. AUDITORIA VISUAL COMPLETA
 
-### O que funciona bem
-- **Arquitetura multi-tenant robusta**: isolamento por `unit_id` com RLS no banco e filtros nos hooks. Solucao madura para redes de franquias.
-- **Gamificacao bem estruturada**: sistema duplo de pontos (mensal para ranking, acumulado para progressao) evita injusticas e mantem engajamento de curto e longo prazo.
-- **Dashboard diferenciado por perfil**: admin ve financeiro + IA + estoque; funcionario ve pontos + checklists + recompensas. Cada papel ve o que importa.
-- **Copiloto com contexto real**: busca 13 fontes de dados em paralelo antes de cada resposta. Nao eh IA generica.
-- **Code splitting e lazy loading**: todas as paginas carregam sob demanda, melhorando tempo de abertura.
-- **PWA com push notifications**: triggers de banco notificam via edge function, cobrindo estoque zerado e mensagens de chat.
-- **Modulos desacoplaveis**: sistema de access levels permite ativar/desativar modulos por perfil, sem alterar codigo.
+### Veredicto: Intermediario-Alto (7/10)
 
----
+O sistema esta acima da media de ERPs e apps de gestao, mas abaixo do nivel de produtos como Linear, Notion ou Stripe. A distancia nao esta na tecnica (que eh boa), mas na **disciplina visual** e no **excesso de elementos competindo por atencao**.
 
-## 2. AUDITORIA: FRAGILIDADES E RISCOS
+### Pontos Fortes Reais
+- Paleta dark bem executada com tokens HSL consistentes
+- Sistema de glows/neons cria identidade propria
+- Login screen eh premium (efeitos de background, anel neon rotativo)
+- Animacoes staggered dao vida a interface
+- Scrollbar e selection customizados
 
-### Tecnicas
-| Problema | Impacto | Onde |
-|----------|---------|-----|
-| `useManagementAI` executa 13 queries paralelas no Supabase a cada mensagem do copiloto | Latencia alta (~2-4s), consumo de cota de requests, timeout em conexoes lentas | `useManagementAI.ts` |
-| Leaderboard carrega TODOS os perfis do sistema (`profiles.select(*)`) sem filtro de unidade | Em redes com muitas unidades, traz usuarios irrelevantes e dados imprecisos | `useLeaderboard.ts` linha 34 |
-| Pontos do usuario (`usePoints`) nao filtram por `unit_id` | Um funcionario que trabalha em 2 unidades mistura pontuacoes | `usePoints.ts` |
-| Dashboard admin faz 10 queries paralelas no mount sem cache compartilhado com o copiloto | Duplicacao de requests ao abrir a pagina | `useDashboardStats.ts` + `useManagementAI.ts` |
-| Historico de conversa do copiloto armazenado apenas em `localStorage` | Perde-se ao trocar de dispositivo ou limpar cache | `useManagementAI.ts` |
-| `addSector`, `addItem` nos checklists nao incluem `unit_id` | Registros ficam orfaos (sem unidade), quebrando filtros multi-tenant | `useChecklists.ts` linhas 121, 178 |
-| Edge functions com `verify_jwt = false` em todas | Qualquer pessoa pode invocar `management-ai`, `push-notifier`, etc. | `supabase/config.toml` |
+### Onde Perde Percepcao de Valor
 
-### UX/UI
-| Problema | Impacto |
-|----------|---------|
-| FAB (botao flutuante) no canto inferior direito eh o unico ponto de entrada para navegacao | Descoberta de modulos depende de clicar no botao; nao ha breadcrumbs ou barra lateral |
-| Copiloto ocupa widget inteiro no dashboard mas comeca colapsado com texto cortado | Primeira impressao eh de "widget morto" |
-| Selects e Sheets em mobile exigiam patches manuais (`data-vaul-no-drag`) -- fragil | Cada novo formulario pode regredir |
-| Dashboard do funcionario eh estatico: mesmos 3 botoes sempre | Nao se adapta ao turno, ao dia ou ao progresso do usuario |
-| Ranking widget no dashboard admin mostra todos os colocados, ocupando metade da tela | Informacao poluida; top 3 ja seria suficiente no dashboard |
+**a) Excesso de variantes de card** -- existem 7 tipos:
+`card-base`, `card-interactive`, `card-gradient`, `card-glow`, `card-command`, `card-command-success`, `card-command-danger`, `card-command-warning`, `card-command-info`, `finance-hero-card`
 
-### Logica de Negocio
-| Problema | Impacto |
-|----------|---------|
-| Pontos de bônus nao tem limite ou cooldown no banco | Um admin pode dar pontos infinitos sem restricao |
-| Fechamento de caixa nao valida soma das formas de pagamento vs total declarado antes de salvar | Inconsistencias financeiras |
-| Receitas/fichas tecnicas nao vinculam custo ao preco de venda | Margem de lucro eh invisivel |
+Isso gera inconsistencia. Um usuario ve cards com bordas cyan, outros com bordas amber, outros sem glow. Parece colcha de retalhos.
 
----
+**b) Tipografia sem escala rigida** -- tamanhos usados de forma ad-hoc:
+- `text-[8px]`, `text-[9px]`, `text-[10px]`, `text-[11px]`, `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`, `text-3xl`, `text-[2rem]`
+- Fontes com 10+ tamanhos diferentes numa mesma tela destroem hierarquia
 
-## 3. EVOLUCAO DE PRODUTO
+**c) Icones inconsistentes** -- mistura de Lucide React (imports diretos) com Material Icons (via AppIcon). O Leaderboard importa `Trophy, Medal, Star, Award, Flame` do Lucide enquanto o resto do app usa AppIcon. Dois sistemas visuais coexistindo.
 
-### 3.1 Modulos Estrategicos Novos
+**d) Bordas neon em excesso** -- quando tudo brilha, nada se destaca. O dashboard admin tem: copiloto com borda cyan, finance card com gradiente, chart widget com borda cyan, auto-order com borda cyan, ranking com borda cyan. Tudo parece "urgente".
 
-**a) Central de Alertas Inteligentes**
-- **Problema**: alertas estao espalhados (notificacoes, copiloto, badge do estoque). Nao ha um lugar unico.
-- **Para quem**: admin e gestor.
-- **Proposta**: tela `/alerts` que consolida: estoque critico, fechamentos pendentes, despesas vencidas, pedidos atrasados, anomalias financeiras. Prioriza por urgencia. Cada alerta tem acao direta (ex: "Fazer pedido" abre a tela de pedidos pre-preenchida).
+**e) Emoji como icone** -- `🎯`, `⭐`, `🥇`, `🥈`, `🥉`, `👋`, `☕`, `💪`, `🚀`, `🎉`, `🏆` usados como elementos visuais primarios. Emojis variam entre plataformas e quebram consistencia visual.
 
-**b) Relatorios e Insights**
-- **Problema**: admin precisa "perguntar" ao copiloto por analises que deveriam ser visuais.
-- **Para quem**: admin.
-- **Proposta**: tela `/reports` com DRE simplificado, evolucao de estoque, custo por funcionario, taxa de conclusao de checklists por setor. Graficos interativos com filtro por periodo e unidade.
+### Onde Ha Poluicao Visual
+- Dashboard admin: 6+ widgets com glows diferentes competindo
+- Employee dashboard: 3 cards de acao + leaderboard inteiro + link de estoque = 5 blocos em sequencia
+- Ranking page: MyRankCard + Leaderboard (com podium inteiro) + Objectives + Bonus section + BonusGuide = rolagem infinita
+- Checklist view: progress header + motivational message + sectors + subcategories + items = 4 niveis de hierarquia aninhados
 
-**c) Modo Turno (Shift Mode)**
-- **Problema**: funcionario abre o app e nao sabe por onde comecar.
-- **Para quem**: funcionario.
-- **Proposta**: ao detectar horario (abertura/fechamento), o dashboard se transforma num fluxo guiado: 1) Checklist do turno, 2) Conferencia de estoque rapida, 3) Fechamento de caixa. Progresso visivel. Ao completar, ganha bonus de "turno perfeito".
-
-**d) Auditoria de Acoes**
-- **Problema**: nao ha rastreabilidade de quem fez o que.
-- **Para quem**: admin e super_admin.
-- **Proposta**: log de acoes criticas (alteracao de estoque, aprovacao de bonus, edicao de transacoes) com timestamp, usuario e diff.
-
-### 3.2 Acoes Inteligentes
-
-- **Auto-provisionamento de pedidos**: quando o estoque de um item atinge 50% do minimo, o sistema cria um rascunho de pedido automaticamente para o fornecedor vinculado.
-- **Sugestao de escala baseada em historico**: IA analisa padroes de vendas por dia da semana e sugere quantos funcionarios escalar.
-- **Reconciliacao financeira**: ao integrar fechamento de caixa, o sistema cruza formas de pagamento com extrato bancario e sinaliza divergencias.
+### Onde Falta Clareza
+- Diferenca entre "Score Mensal", "Base Mensal", "Bonus Mensal" e "Acumulado" -- 4 metricas de pontos numa tela so
+- O que eh "card-command" vs "card-command-info" visualmente? Ambos tem borda cyan
+- Copiloto colapsado mostra texto truncado sem CTA claro
 
 ---
 
-## 4. IA E COPILOTO: UPGRADE
+## 2. MOBILE FIRST: EXPERIENCIA REAL
 
-### Estado Atual
-O copiloto funciona como chat reativo: o admin pergunta, ele responde. Busca 13 fontes de dados a cada mensagem. Nao sugere nada proativamente e nao executa acoes.
+### Problemas Criticos
 
-### Evolucao Proposta
+**a) Header sobrecarregado** -- 5 botoes em 1 linha de 14px de altura:
+- PointsDisplay (moeda animada)
+- Logo central
+- Building2 (unidades)
+- Trophy (ranking)
+- MessageCircle (chat)
+- Bell (notificacoes)
 
-**Nivel 1 -- IA como Analista (curto prazo)**
-- Criar uma edge function `daily-digest` que roda 1x/dia via cron e gera um resumo automatico (estoque critico, despesas vencidas, ranking do dia anterior).
-- Ao abrir o dashboard, mostrar o digest pronto em vez de gerar em tempo real. Reduz latencia de 3s para 0s.
-- Cachear o contexto em uma tabela `ai_daily_context` para evitar 13 queries por mensagem.
+6 elementos em ~360px de largura. Alvos de toque se encostam. Em telas de 320px, colidem.
 
-**Nivel 2 -- IA como Alerta (medio prazo)**
-- Copiloto envia notificacoes push proativas: "Voce tem R$2.400 em despesas vencendo amanha" ou "Estoque de carne moida zerou -- devo criar um pedido?".
-- Sugestoes contextuais no chat: ao abrir, mostrar 3 chips clicaveis ("Como esta meu caixa?", "Quem mais pontuou?", "Itens para pedir").
+**b) FAB como unico meio de navegacao** -- sem bottom tab bar, o usuario precisa:
+1. Clicar no FAB (canto inferior direito)
+2. Esperar overlay carregar
+3. Rolar entre grupos
+4. Encontrar o modulo
+5. Clicar
 
-**Nivel 3 -- IA como Executor Assistido (longo prazo)**
-- Copiloto pode executar acoes com confirmacao: "Criei um pedido de R$850 para o fornecedor X. Confirma o envio?"
-- Function calling: a edge function retorna acoes estruturadas (`{ action: 'create_order', data: {...} }`) e o frontend renderiza um botao de confirmacao.
-- Historico de conversa migra de localStorage para banco, permitindo continuidade entre dispositivos.
+Sao 5 passos para navegar. Linear/Notion fazem em 1 toque.
 
----
+**c) Textos de 8-9px em mobile** -- `text-[8px]`, `text-[9px]` sao ilegíveis em telas de baixa densidade. O minimo confortavel eh 11px.
 
-## 5. UX/UI: CRITICA DIRETA
+**d) Sheets sem padrao de altura** -- o global `min-h-[55vh]` eh aplicado em CSS mas nao ha padronizacao de conteudo. Sheets com 2 campos ficam com 55% da tela vazia.
 
-### O que precisa mudar
+**e) Popover de notificacoes em mobile** -- `w-[340px]` num dispositivo de 375px de largura causa overflow horizontal.
 
-1. **Navegacao**: o FAB eh criativo mas nao intuitivo. Usuarios novos nao entendem que ali estao todos os modulos. Proposta: manter o FAB mas adicionar uma bottom tab bar com 4 atalhos fixos (Dashboard, Checklists, Financeiro, Mais) visivel em todas as telas. O FAB vira atalho contextual (ex: "+" para adicionar transacao na tela de financas).
+### Propostas de Padrao Global
 
-2. **Sheets/Drawers**: o `min-h-[55vh]` global resolve o problema de altura, mas sheets com poucos campos (ex: editar nome de setor) ficam com muito espaco vazio. Proposta: usar `min-h-[40vh]` como padrao e `min-h-[55vh]` apenas em formularios grandes.
+**Escala tipografica mobile:**
+```
+Caption:     11px (min)
+Body Small:  12px
+Body:        14px
+Subtitle:    15px
+Title:       18px
+Headline:    22px
+Display:     28px
+```
 
-3. **Formularios**: inputs com label + placeholder + icon + help text ao mesmo tempo. Reduzir para label + placeholder. Mover help text para tooltip.
+**Touch targets:**
+- Minimo: 44x44px (ja implementado parcialmente)
+- Espacamento entre alvos: 8px minimo
+- Icones de acao no header: 40x40px com padding
 
-4. **Feedback de acao**: ao completar um checklist, a animacao de moeda eh sutil demais. Proposta: haptic feedback (vibration API) + feedback visual mais prominente (checkmark animado verde).
+**Sheets:**
+- Formulario simples (1-3 campos): `min-h-[35vh]`
+- Formulario medio (4-6 campos): `min-h-[50vh]`
+- Formulario complexo (7+ campos): `min-h-[65vh]`
 
-5. **Dashboard admin**: esta sobrecarregado. O widget de ranking ocupa ~40% da tela. Proposta: mostrar apenas "Voce esta em #X | Lider: [Nome] com Y pts" como barra horizontal. Ranking completo fica na tela `/ranking`.
-
-6. **Copiloto colapsado**: mostrar a primeira frase da saudacao + um CTA "Pergunte algo" em vez de text truncado.
-
-7. **Consistencia de cards**: existem `card-command`, `card-command-info`, `card-command-success`, `card-command-warning`, `finance-hero-card`. Padronizar em 3 variantes maximo.
-
----
-
-## 6. GAMIFICACAO: AJUSTES
-
-### Problemas Identificados
-1. **Bonus sem limite**: admin pode dar 1000 pontos a qualquer momento. Nao ha teto mensal.
-2. **Ranking so mede checklists**: ignora outras contribuicoes (fechamento de caixa preciso, pontualidade, etc.).
-3. **Recompensas desconectadas**: o catalogo de recompensas nao tem conexao com desempenho financeiro do restaurante.
-
-### Propostas
-1. **Teto de bonus**: maximo de 50 pontos de bonus por usuario por mes. Visivel no guia de cooldown.
-2. **Multiplicadores de turno**: completar todos os itens de abertura OU fechamento da +20% de bonus nos pontos daquele checklist.
-3. **Ranking multidimensional**: alem de pontos de checklist, pontuar:
-   - Precisao no fechamento de caixa (diferenca < R$5 = +3 pts)
-   - Registro de movimentacoes de estoque (+1 pt por registro)
-   - Tempo de resposta no chat da equipe
-4. **Recompensa vinculada a meta coletiva**: "Se a equipe toda completar 90% dos checklists no mes, todos ganham 50 pontos bonus." Incentiva cooperacao, nao apenas competicao.
-5. **Historico de "Funcionario do Mes"**: galeria com foto e nome dos campeoes mensais anteriores na tela de ranking.
+**Bottom Safe Area:**
+- Padding inferior em telas com conteudo rolavel: `pb-[calc(env(safe-area-inset-bottom)+80px)]`
 
 ---
 
-## 7. ROADMAP
+## 3. IDENTIDADE VISUAL ESTRATEGICA
 
-### Fase 1 -- Consolidacao (1-2 semanas)
-**Impacto alto, esforco baixo**
-- Corrigir `useChecklists` para incluir `unit_id` em inserts de setor e item
-- Corrigir `usePoints` para filtrar por `unit_id`
-- Filtrar leaderboard por `user_units` da unidade ativa
-- Cachear contexto do copiloto em variavel de estado (evitar 13 queries repetidas)
-- Habilitar `verify_jwt = true` em `management-ai` e `push-notifier`
-- Reduzir ranking widget no dashboard admin para 1 linha horizontal
+### Estado Atual: Dark Tech com tendencia a "Gaming"
+Os glows neon, bordas cianicas e animacoes de fogo/cristais criam uma estetica que oscila entre "app de gestao premium" e "interface de jogo". Para um ERP, isso pode afastar gestores mais conservadores.
 
-### Fase 2 -- Inteligencia (3-4 semanas)
-**Impacto alto, esforco medio**
-- Implementar `daily-digest` edge function + tabela `ai_daily_context`
-- Chips de sugestao no copiloto (3 perguntas contextuais)
-- Central de alertas (`/alerts`) com acoes diretas
-- Bottom tab bar fixa com 4 atalhos
-- Multiplicadores de turno na gamificacao
-- Modo Turno para funcionarios
+### Direcao Proposta: **Dark Minimal Premium** (inspiracao: Linear + Raycast)
 
-### Fase 3 -- Escala (1-2 meses)
-**Impacto transformador, esforco alto**
-- Copiloto com function calling (criar pedidos, aprovar bonus via chat)
-- Historico de conversa no banco (nao mais localStorage)
-- Tela de relatorios/insights com graficos interativos
-- Auditoria de acoes criticas
-- Ranking multidimensional
-- Reconciliacao financeira automatizada
-- Metas coletivas na gamificacao
+**Principio central:** Escuridao como tela, cor como destaque cirurgico.
+
+**a) Paleta Reduzida**
+
+| Token | Valor | Uso |
+|-------|-------|-----|
+| `--background` | `222 70% 4%` (manter) | Base |
+| `--card` | `222 45% 7%` (escurecer 2%) | Cards -- mais contraste com background |
+| `--primary` | `217 91% 60%` (manter) | Acoes primarias, links |
+| `--accent` | `190 80% 50%` (cyan refinado) | Destaque unico global |
+| `--success` | `142 71% 45%` (manter) | Confirmacoes |
+| `--destructive` | `0 72% 55%` (dessaturar levemente) | Alertas |
+| `--muted-foreground` | `215 20% 45%` (escurecer 5%) | Texto terciario |
+
+**Remover:** `--neon-amber`, `--neon-purple`, `--neon-red` como tokens globais. Usar apenas como variantes pontuais em gamificacao.
+
+**Justificativa psicologica:**
+- Azul profundo: confianca, profissionalismo, estabilidade
+- Cyan como acento unico: modernidade, tecnologia, foco
+- Reducao de cores: percepção de sofisticacao (marcas de luxo usam no maximo 2-3 cores)
+
+**b) Sistema de Icones: Unificar em Material Icons**
+- Remover TODOS os imports diretos do Lucide
+- Usar apenas `AppIcon` com mapa centralizado
+- Resultado: consistencia visual absoluta, peso de bundle reduzido
+
+**c) Escala Tipografica Fixa (8 tamanhos)**
+
+```
+--text-2xs:  11px   (caption, meta)
+--text-xs:   12px   (labels, badges)
+--text-sm:   14px   (body, inputs)
+--text-base: 15px   (body principal)
+--text-lg:   18px   (subtitulos)
+--text-xl:   22px   (titulos de secao)
+--text-2xl:  28px   (headlines)
+--text-3xl:  34px   (numeros hero)
+```
+
+Eliminar: `text-[8px]`, `text-[9px]`, `text-[10px]`, `text-[11px]`, `text-[2rem]`
+
+**d) Sistema de Cards: 3 Variantes**
+
+| Variante | Uso | Visual |
+|----------|-----|--------|
+| `card-surface` | Container padrao | `bg-card border-border/30` sem glow |
+| `card-elevated` | Destaque (hero, CTA) | `bg-card border-border/50 shadow-elevated` |
+| `card-interactive` | Clicavel | `card-surface + hover:border-primary/25 + active:scale` |
+
+Remover: `card-command`, `card-command-*`, `card-glow`, `card-gradient`, `finance-hero-card`
+
+O hero do financeiro vira um `card-elevated` com gradiente aplicado via `style` inline, nao uma classe dedicada.
+
+**e) Sombras e Profundidade**
+- Flat por padrao (sem sombra nos cards base)
+- Sombra apenas em elementos elevados: modais, sheets, popovers, FAB
+- Glows neon APENAS na gamificacao (ranking, pontos, conquistas)
+- Resto do app: limpo, sem brilho
+
+---
+
+## 4. SIMPLIFICACAO INTELIGENTE
+
+### Telas que Podem ser Unificadas
+
+**a) Ranking page + Bonus section + BonusGuide**
+- Hoje: 5 blocos separados em scroll vertical
+- Proposta: MyRankCard no topo (fixo), tabs abaixo: "Ranking" | "Objetivos" | "Bonus"
+- Cada tab carrega sob demanda
+
+**b) Employee Dashboard: 3 cards de acao + Leaderboard + Estoque**
+- Hoje: 5 blocos em sequencia
+- Proposta: Greeting card com posicao no ranking inline + 2 CTAs principais (Checklists, Caixa) + mini-leaderboard (top 3 em linha horizontal, sem podium)
+
+**c) Admin Dashboard: 6 widgets**
+- Proposta: 2 widgets primarios (Finance hero + Agenda) + 1 widget secundario (AI Copilot) + barra de alertas. Remover chart widget e auto-order do dashboard (mover para /finance e /inventory respectivamente).
+
+### Componentes que Devem Virar Padrao Global
+
+**a) `SectionHeader`** -- titulo + acao opcional, substituindo os 10+ padroes de cabecalho de secao espalhados (flex + gap + h3 + icon)
+
+**b) `MetricPill`** -- chip de metrica reutilizavel (icone + valor + label), substituindo as dezenas de `<div className="flex items-center gap-1"><span style={{color:...}}>{value}</span></div>`
+
+**c) `EmptyState`** -- ja existe em CSS mas nao como componente React. Tornar componente com props: icon, title, description, action.
+
+### Elementos que Podem ser Removidos
+
+- Emojis como icones (`🎯`, `⭐`, `🥇`) -- substituir por icones do sistema
+- Motivational messages no checklist ("Quase la!", "Voce esta indo bem!") -- ocupam espaco sem valor real
+- Stat `text-[10px]` disclaimers ("Baseado em pontos acumulados (historico total)") -- informacao obvia
+- Podium visual (barras de altura diferente) no leaderboard -- ocupa ~120px de altura para mostrar 3 nomes. Uma lista simples mostra o mesmo em 60px.
+- `BonusGuide` como componente separado na tela de ranking -- mover para tooltip ou collapse
+
+---
+
+## 5. EXPERIENCIA PREMIUM
+
+### Microinteracoes Propostas
+
+**a) Skeleton Loading Contextual**
+- Substituir "Carregando..." por skeletons que imitam a forma do conteudo final
+- Exemplo: skeleton do leaderboard mostra 3 barras com avatar circular + texto
+
+**b) Haptic Feedback (Vibration API)**
+- Ao completar item do checklist: `navigator.vibrate(10)`
+- Ao marcar todos os itens de um setor: `navigator.vibrate([10, 50, 20])`
+- Ao atingir nova conquista: `navigator.vibrate([20, 100, 20, 100, 30])`
+
+**c) Number Transitions**
+- Ja implementado (`useCountUp`) -- expandir para todos os numeros no dashboard
+- Adicionar em: posicao no ranking, progresso de checklist, saldo
+
+**d) Pull-to-Refresh nativo** (ja suportado pelo PWA, mas sem indicador visual)
+
+**e) Transicoes de pagina**
+- Ao navegar entre modulos: fade-in de 200ms + slide-up de 8px
+- Ao voltar: sem animacao (instantaneo -- percepção de velocidade)
+
+### Sistema de Status Claro
+
+Substituir o sistema atual de 5 cores de glow por 3 estados visuais:
+
+| Estado | Visual | Uso |
+|--------|--------|-----|
+| Neutral | Sem borda especial | Padrao |
+| Positive | Dot verde 6px no canto | Completo, pago, ativo |
+| Attention | Dot amber 6px no canto | Pendente, proximo do limite |
+
+Sem glows. Sem bordas coloridas. Apenas dots discretos.
+
+### Dashboard Estrategico
+
+O dashboard ideal nao mostra tudo. Mostra o que importa AGORA.
+
+Regra: maximo 3 widgets visiveis sem scroll. O resto eh acessivel via tabs ou swipe.
+
+---
+
+## 6. REDESENHO CONCEITUAL
+
+### Home Ideal (Admin)
+
+```text
++----------------------------------+
+| [Pontos]   GARDEN   [Chat] [🔔] |  <-- Header: 3 icones max
+|----------------------------------|
+| Bom dia, Lucas                   |  <-- Greeting (1 linha)
+| Seg, 17 de fevereiro             |
+|                                  |
+| +---------+ +---SALDO----------+|  <-- 2 cards lado a lado
+| | COPILOTO| | R$ 12.430        ||
+| | "Hoje..."| | +8% este mes    ||
+| +---------+ +------------------+|
+|                                  |
+| AGENDA HOJE                      |  <-- Secao unica
+| [x] Pedido fornecedor X    10:00|
+| [ ] Conferir estoque       14:00|
+| [ ] Fechamento de caixa    22:00|
+|                                  |
+| ALERTAS (2)                      |  <-- Collapse
+| ! Estoque critico: Carne moida  |
+| ! 3 despesas vencem amanha       |
++----------------------------------+
+| [Home]  [Check]  [FAB]  [$$]  [+]|  <-- Bottom tab bar
++----------------------------------+
+```
+
+### Hub de Ranking Ideal
+
+```text
++----------------------------------+
+| [<]        Ranking        [mes]  |
+|----------------------------------|
+| +-----MINHA POSICAO-------------+|
+| | [Avatar]  Lucas  #2           ||
+| | Dedicado  |  128 pts/mes      ||
+| | =====[====>  ] Veterano       ||
+| +-------------------------------+|
+|                                  |
+| [Ranking]  [Objetivos]  [Bonus] |  <-- Tabs
+|                                  |
+| 1  [Av] Maria     142 pts  ⭐   |  <-- Lista limpa
+| 2  [Av] Lucas     128 pts       |  <-- Highlight se eu
+| 3  [Av] Pedro     115 pts       |
+| 4  [Av] Ana        98 pts       |
+| 5  [Av] Joao       87 pts       |
++----------------------------------+
+```
+
+Sem podium visual. Sem emojis. Lista limpa com destaque por cor no usuario atual.
+
+### Copiloto Ideal
+
+```text
++----------------------------------+
+| [Garden mascot] Copiloto IA     |
+| "Bom dia! Hoje voce tem 3       |
+|  tarefas pendentes e R$2.400    |
+|  em despesas vencendo."         |
+|                                  |
+| [Como esta meu caixa?]          |  <-- Chips sugestao
+| [Quem mais pontuou?]            |
+| [Itens para pedir]              |
+|                                  |
+| [________________] [Enviar]      |
++----------------------------------+
+```
+
+Chips de sugestao aparecem ANTES do usuario digitar. Reduz friccao.
+
+### Convergencia Visual
+
+Todos os modulos compartilham:
+- Mesmo header pattern (titulo + icone a esquerda, acao a direita)
+- Mesmo card style (`card-surface` por padrao)
+- Mesma escala tipografica
+- Mesma paleta (sem cores extras por modulo)
+- Glows APENAS no contexto de gamificacao
+
+---
+
+## 7. ROADMAP DE DESIGN
+
+### Fase 1 -- Impacto Rapido (3-5 dias)
+
+**Objetivo: limpar ruido visual sem quebrar funcionalidade**
+
+1. Eliminar todos os `text-[8px]` e `text-[9px]` -- substituir por `text-[11px]` minimo
+2. Unificar todos os imports de Lucide para usar `AppIcon` no Leaderboard, ChecklistView e MyRankCard
+3. Substituir emojis por icones do Material Icons
+4. Reduzir Popover de notificacoes para `w-[calc(100vw-32px)] max-w-[340px]`
+5. Trocar podium visual do leaderboard por lista linear com destaque no top 3 (borda esquerda dourada)
+6. Remover motivational messages do checklist
+7. Copiloto: mostrar chips de sugestao quando colapsado em vez de texto truncado
+
+### Fase 2 -- Padronizacao Visual (1-2 semanas)
+
+**Objetivo: consistencia absoluta entre modulos**
+
+1. Criar componentes `SectionHeader`, `MetricPill`, `EmptyState` como React components
+2. Reduzir variantes de card de 10 para 3 (`card-surface`, `card-elevated`, `card-interactive`)
+3. Implementar escala tipografica fixa com classes utilitarias
+4. Bottom tab bar com 4 atalhos (Home, Checklists, Financeiro, Mais)
+5. Reorganizar dashboard admin: 2 widgets primarios + alertas colapsavel
+6. Ranking page: tabs (Ranking | Objetivos | Bonus) em vez de scroll vertical
+
+### Fase 3 -- Evolucao Premium (2-3 semanas)
+
+**Objetivo: elevar percepcao de qualidade**
+
+1. Haptic feedback em acoes de checklist e conquistas
+2. Skeleton loading contextual em todos os modulos
+3. Pull-to-refresh com indicador visual
+4. Transicoes de pagina (fade + slide)
+5. Number transitions em todos os valores numericos do dashboard
+6. Refinar paleta: remover neon tokens globais, manter apenas em gamificacao
+7. Cards sem sombra por padrao -- sombra apenas em elevados
+
+### Fase 4 -- Identidade Forte (1 mes)
+
+**Objetivo: sistema memoravel e referencia**
+
+1. Micro-branding: icone Garden como watermark sutil no background de telas vazias
+2. Onboarding visual: animacao de primeira vez ao abrir cada modulo pela primeira vez
+3. Dark/Light mode com transicao suave (ja tem tokens light, falta toggle e animacao)
+4. Custom illustrations para empty states (em vez de icones genericos)
+5. Sound design opcional: sons sutis ao completar checklist, ao atingir conquista
 
 ---
 
 ## Secao Tecnica: Detalhes de Implementacao
 
-### Correcoes Criticas (Fase 1)
+### Fase 1 -- Arquivos Impactados
 
-**1. unit_id em Checklists**
-Arquivos: `src/hooks/useChecklists.ts`
-- `addSector`: adicionar `unit_id: activeUnitId` no payload de insert
-- `addSubcategory`: adicionar `unit_id: activeUnitId`
-- `addItem`: adicionar `unit_id: activeUnitId`
+**Tipografia minima:**
+- Buscar e substituir `text-[8px]` e `text-[9px]` em todos os componentes (afeta ~15 arquivos)
+- Arquivos principais: `Leaderboard.tsx`, `UserPointsCard.tsx`, `ObjectivesList.tsx`, `ChecklistView.tsx`, `MyRankCard.tsx`
 
-**2. unit_id em Pontos**
-Arquivo: `src/hooks/usePoints.ts`
-- Adicionar `activeUnitId` como parametro
-- Filtrar `checklist_completions` e `bonus_points` por `unit_id`
+**Unificacao de icones:**
+- `Leaderboard.tsx`: remover imports de `Trophy, Medal, Star, ChevronLeft, ChevronRight, Award, Flame` do lucide-react, usar `AppIcon`
+- `ChecklistView.tsx`: remover imports de `Check, ChevronDown, Clock, User, Lock, Star, RefreshCw, Users, Sparkles`
+- `MyRankCard.tsx`: remover `Star, TrendingUp`
+- Adicionar entradas faltantes em `src/lib/iconMap.ts`
 
-**3. Leaderboard filtrado**
-Arquivo: `src/hooks/useLeaderboard.ts`
-- Substituir `profiles.select(*)` por join com `user_units` filtrando pela unidade ativa
-- Isso garante que so aparecem funcionarios da unidade no ranking
+**Cards simplificados:**
+- `src/index.css`: manter `card-base`, renomear para `card-surface`. Criar `card-elevated`. Manter `card-interactive`.
+- Deprecar `card-command-*` gradualmente -- substituir por `card-surface` + classe de borda condicional
 
-**4. Cache do contexto AI**
-Arquivo: `src/hooks/useManagementAI.ts`
-- Armazenar resultado de `fetchFullContext()` em `useRef` com TTL de 5 minutos
-- Reutilizar cache entre mensagens consecutivas
+**Bottom Tab Bar:**
+- Novo componente: `src/components/layout/BottomTabBar.tsx`
+- Integrar em `AppLayout.tsx` -- visivel em todas as telas mobile exceto Auth e Tablet
+- 4 items: Home (`/`), Checklists (`/checklists`), Financeiro (`/finance`), Mais (abre launcher)
 
-**5. JWT em Edge Functions**
-Arquivo: `supabase/config.toml`
-- Alterar `verify_jwt = false` para `true` em `management-ai` e `push-notifier`
-- Manter `false` apenas em `whatsapp-webhook` (webhook externo) e `tablet-order` (acesso publico)
-
-### Novas Estruturas (Fase 2)
-
-**Tabela `ai_daily_context`**
-```sql
-CREATE TABLE ai_daily_context (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  unit_id uuid NOT NULL,
-  date date NOT NULL DEFAULT CURRENT_DATE,
-  context_data jsonb NOT NULL DEFAULT '{}',
-  digest_text text,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(unit_id, date)
-);
-```
-
-**Edge Function `daily-digest`**
-- Cron trigger via pg_cron ou Supabase scheduled function
-- Executa as 13 queries uma vez, salva em `ai_daily_context`
-- Copiloto le do cache em vez de executar queries diretas
+**Ranking tabs:**
+- `src/pages/Ranking.tsx`: envolver Leaderboard, ObjectivesList e Bonus section em `SwipeableTabs` ou Radix Tabs
+- Remover scroll vertical de 5 blocos
