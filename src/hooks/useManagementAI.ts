@@ -71,6 +71,8 @@ export function useManagementAI() {
         suppliersRes,
         recentTxRes,
         tasksRes,
+        employeePaymentsRes,
+        allMonthTxRes,
       ] = await Promise.all([
         // Finance accounts with balances
         supabase.from('finance_accounts').select('name, type, balance').eq('unit_id', activeUnitId).eq('is_active', true),
@@ -78,8 +80,8 @@ export function useManagementAI() {
         supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).eq('type', 'income').eq('is_paid', true).gte('date', startDate).lte('date', endDate),
         // Monthly expense total
         supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
-        // Pending expenses
-        supabase.from('finance_transactions').select('amount, description, date').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', false).gte('date', startDate).lte('date', endDate).order('date').limit(10),
+        // Pending expenses (increased limit)
+        supabase.from('finance_transactions').select('amount, description, date, employee_id').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', false).gte('date', startDate).lte('date', endDate).order('date').limit(30),
         // Low stock items
         supabase.from('inventory_items').select('name, current_stock, min_stock, supplier:suppliers(name)').eq('unit_id', activeUnitId).order('current_stock'),
         // Recent orders
@@ -87,13 +89,17 @@ export function useManagementAI() {
         // Pending cash closings
         supabase.from('cash_closings').select('date, total_amount, status, unit_name').eq('unit_id', activeUnitId).eq('status', 'pending').order('date', { ascending: false }).limit(5),
         // Active employees
-        supabase.from('employees').select('full_name, role, is_active').eq('unit_id', activeUnitId).eq('is_active', true),
+        supabase.from('employees').select('full_name, role, is_active, base_salary').eq('unit_id', activeUnitId).eq('is_active', true),
         // Suppliers
         supabase.from('suppliers').select('name, delivery_frequency').eq('unit_id', activeUnitId),
-        // Recent transactions (last 7 days)
-        supabase.from('finance_transactions').select('description, amount, type, date, is_paid, category:finance_categories(name)').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', last7days).order('date', { ascending: false }).limit(15),
+        // Recent transactions (last 30 days, increased limit)
+        supabase.from('finance_transactions').select('description, amount, type, date, is_paid, category:finance_categories(name), employee:employees(full_name), supplier:suppliers(name)').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', last7days).order('date', { ascending: false }).limit(50),
         // Today's tasks
         supabase.from('manager_tasks').select('title, is_completed, priority, period').eq('user_id', user.id).eq('date', format(nowDate, 'yyyy-MM-dd')),
+        // Employee payments this month
+        supabase.from('employee_payments').select('amount, type, is_paid, payment_date, employee:employees(full_name)').eq('unit_id', activeUnitId).eq('reference_month', nowDate.getMonth() + 1).eq('reference_year', nowDate.getFullYear()).order('payment_date', { ascending: false }).limit(30),
+        // All month transactions (bigger picture)
+        supabase.from('finance_transactions').select('description, amount, type, date, is_paid').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', startDate).lte('date', endDate).order('date', { ascending: false }).limit(100),
       ]);
 
       const totalIncome = (incomeRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
@@ -115,7 +121,8 @@ export function useManagementAI() {
         monthlyBalance: totalIncome - totalExpense,
         pendingExpensesTotal: totalPending,
         pendingExpenses: (pendingExpRes.data || []).map((e: any) => `${e.description}: R$${Number(e.amount).toFixed(2)} (${e.date})`),
-        recentTransactions: (recentTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'} | cat: ${(t.category as any)?.name || 'sem'}`),
+        recentTransactions: (recentTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'} | cat: ${(t.category as any)?.name || 'sem'} | func: ${(t.employee as any)?.full_name || '-'} | forn: ${(t.supplier as any)?.name || '-'}`),
+        allMonthTransactions: (allMonthTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'}`),
         // Stock
         lowStockItems: lowStockItems.slice(0, 10).map((i: any) => `${i.name}: ${i.current_stock}/${i.min_stock} (forn: ${(i.supplier as any)?.name || 'nenhum'})`),
         // Orders
@@ -123,7 +130,9 @@ export function useManagementAI() {
         // Closings
         pendingClosings: (closingsRes.data || []).map((c: any) => `${c.date}: R$${Number(c.total_amount || 0).toFixed(2)} (${c.unit_name})`),
         // Team
-        employees: (employeesRes.data || []).map((e: any) => `${e.full_name} (${e.role || 'sem cargo'})`),
+        employees: (employeesRes.data || []).map((e: any) => `${e.full_name} (${e.role || 'sem cargo'}) - Salário base: R$${Number(e.base_salary || 0).toFixed(2)}`),
+        // Employee payments
+        employeePayments: (employeePaymentsRes.data || []).map((p: any) => `${(p.employee as any)?.full_name || '?'}: R$${Number(p.amount).toFixed(2)} (${p.type}) - ${p.is_paid ? 'pago' : 'pendente'} - ${p.payment_date}`),
         // Suppliers
         suppliers: (suppliersRes.data || []).map((s: any) => `${s.name} [${s.delivery_frequency || 'weekly'}]`),
         // Tasks
