@@ -88,7 +88,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
             <div className={cn("space-y-1.5", showPodium && "mt-3 pt-3 border-t border-border/30")}>
               {restEntries.map((entry, idx) => {
                 const isCurrentUser = entry.user_id === currentUserId;
-                const entryRank = getRank(entry.total_score);
+                const entryRank = getRank(entry.earned_all_time ?? entry.total_score);
 
                 return (
                   <Link
@@ -105,7 +105,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
                       <span className="text-xs font-bold text-muted-foreground">{entry.rank}</span>
                     </div>
 
-                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={32} />
+                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_all_time ?? entry.total_score} size={32} />
 
                     <div className="flex-1 min-w-0">
                       <p className={cn("font-medium text-sm truncate", isCurrentUser && "text-primary")}>

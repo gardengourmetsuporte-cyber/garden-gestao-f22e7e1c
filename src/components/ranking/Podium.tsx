@@ -41,7 +41,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
         }
 
         const isCurrentUser = entry.user_id === currentUserId;
-        const entryRank = getRank(entry.total_score);
+        const entryRank = getRank(entry.earned_all_time ?? entry.total_score);
 
         return (
           <Link
@@ -65,7 +65,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
             )}>
               <RankedAvatar
                 avatarUrl={entry.avatar_url}
-                earnedPoints={entry.total_score}
+                earnedPoints={entry.earned_all_time ?? entry.total_score}
                 size={avatarSize}
               />
               {/* Position badge */}
