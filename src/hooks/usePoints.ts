@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { calculatePointsSummary, calculateEarnedPoints, PointsSummary } from '@/lib/points';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 
@@ -12,10 +13,38 @@ export interface PointsData extends PointsSummary {
   monthlyBonus: number;
 }
 
-async function fetchPointsData(userId: string): Promise<PointsData> {
+async function fetchPointsData(userId: string, unitId: string | null): Promise<PointsData> {
   const now = new Date();
   const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
+
+  // Build queries with optional unit_id filter
+  let completionsQuery = supabase
+    .from('checklist_completions')
+    .select('points_awarded, awarded_points')
+    .eq('completed_by', userId);
+  if (unitId) completionsQuery = completionsQuery.eq('unit_id', unitId);
+
+  let redemptionsQuery = supabase
+    .from('reward_redemptions')
+    .select('points_spent, status')
+    .eq('user_id', userId);
+  if (unitId) redemptionsQuery = redemptionsQuery.eq('unit_id', unitId);
+
+  let monthlyCompletionsQuery = supabase
+    .from('checklist_completions')
+    .select('points_awarded, awarded_points')
+    .eq('completed_by', userId)
+    .gte('completed_at', `${monthStart}T00:00:00`)
+    .lte('completed_at', `${monthEnd}T23:59:59`);
+  if (unitId) monthlyCompletionsQuery = monthlyCompletionsQuery.eq('unit_id', unitId);
+
+  let bonusQuery = supabase
+    .from('bonus_points')
+    .select('points')
+    .eq('user_id', userId)
+    .eq('month', monthStart);
+  if (unitId) bonusQuery = bonusQuery.eq('unit_id', unitId);
 
   const [
     { data: completions },
@@ -23,25 +52,10 @@ async function fetchPointsData(userId: string): Promise<PointsData> {
     { data: monthlyCompletions },
     { data: bonusRows },
   ] = await Promise.all([
-    supabase
-      .from('checklist_completions')
-      .select('points_awarded, awarded_points')
-      .eq('completed_by', userId),
-    supabase
-      .from('reward_redemptions')
-      .select('points_spent, status')
-      .eq('user_id', userId),
-    supabase
-      .from('checklist_completions')
-      .select('points_awarded, awarded_points')
-      .eq('completed_by', userId)
-      .gte('completed_at', `${monthStart}T00:00:00`)
-      .lte('completed_at', `${monthEnd}T23:59:59`),
-    supabase
-      .from('bonus_points')
-      .select('points')
-      .eq('user_id', userId)
-      .eq('month', monthStart),
+    completionsQuery,
+    redemptionsQuery,
+    monthlyCompletionsQuery,
+    bonusQuery,
   ]);
 
   const summary = calculatePointsSummary(completions || [], redemptions || []);
@@ -60,10 +74,11 @@ async function fetchPointsData(userId: string): Promise<PointsData> {
 
 export function usePoints() {
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
 
   const { data: points, isLoading } = useQuery({
-    queryKey: ['points', user?.id],
-    queryFn: () => fetchPointsData(user!.id),
+    queryKey: ['points', user?.id, activeUnitId],
+    queryFn: () => fetchPointsData(user!.id, activeUnitId),
     enabled: !!user,
   });
 

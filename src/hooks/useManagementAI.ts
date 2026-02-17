@@ -37,6 +37,8 @@ export function useManagementAI() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const greetedRef = useRef(false);
+  const contextCacheRef = useRef<{ data: any; timestamp: number } | null>(null);
+  const CONTEXT_TTL = 5 * 60 * 1000; // 5 minutes
 
   const now = new Date();
   const hour = now.getHours();
@@ -52,6 +54,12 @@ export function useManagementAI() {
   // Fetch rich context from all modules
   const fetchFullContext = useCallback(async () => {
     if (!user || !activeUnitId) return {};
+
+    // Return cached context if still fresh
+    const now = Date.now();
+    if (contextCacheRef.current && (now - contextCacheRef.current.timestamp) < CONTEXT_TTL) {
+      return contextCacheRef.current.data;
+    }
 
     const nowDate = new Date();
     const startDate = format(startOfMonth(nowDate), 'yyyy-MM-dd');
@@ -108,7 +116,7 @@ export function useManagementAI() {
 
       const lowStockItems = (lowStockRes.data || []).filter((i: any) => i.current_stock <= i.min_stock);
 
-      return {
+      const contextData = {
         // Basic
         criticalStockCount: stats.criticalItems,
         pendingRedemptions: stats.pendingRedemptions,
@@ -138,6 +146,10 @@ export function useManagementAI() {
         // Tasks
         todayTasks: (tasksRes.data || []).map((t: any) => `${t.is_completed ? '✅' : '⬜'} ${t.title} (${t.priority}, ${t.period})`),
       };
+
+      // Cache the context
+      contextCacheRef.current = { data: contextData, timestamp: Date.now() };
+      return contextData;
     } catch (err) {
       console.error('Error fetching AI context:', err);
       return {
