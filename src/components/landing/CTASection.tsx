@@ -9,15 +9,23 @@ export function CTASection() {
           Pronto para centralizar sua gestão?
         </h2>
         <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
-          Comece agora e descubra como é ter financeiro, estoque, equipe e IA em um único sistema acessível.
+          Comece grátis com Dashboard, Agenda, Checklists e Chat. Faça upgrade quando quiser — sem compromisso.
         </p>
-        <Link
-          to="/auth"
-          className="inline-flex items-center gap-2 h-14 px-10 rounded-xl bg-white text-blue-600 font-bold text-lg hover:bg-blue-50 shadow-lg transition-all"
-        >
-          Comece agora — é grátis
-          <ArrowRight className="w-5 h-5" />
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 h-14 px-10 rounded-xl bg-white text-blue-600 font-bold text-lg hover:bg-blue-50 shadow-lg transition-all"
+          >
+            Comece grátis agora
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <a
+            href="#planos"
+            className="inline-flex items-center gap-2 h-14 px-10 rounded-xl border-2 border-white/30 text-white font-bold text-lg hover:bg-white/10 transition-all"
+          >
+            Ver planos
+          </a>
+        </div>
       </div>
     </section>
   );
