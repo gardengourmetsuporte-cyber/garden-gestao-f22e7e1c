@@ -18,7 +18,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen pb-28">
+      <div className="min-h-screen pb-24">
           {isAdmin ? <AdminDashboard /> : <EmployeeDashboard />}
       </div>
     </AppLayout>

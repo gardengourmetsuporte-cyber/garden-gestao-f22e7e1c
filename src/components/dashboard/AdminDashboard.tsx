@@ -1,26 +1,27 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePoints } from '@/hooks/usePoints';
 import { cn } from '@/lib/utils';
 import { useCountUpCurrency } from '@/hooks/useCountUp';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
+import { FinanceChartWidget } from './FinanceChartWidget';
 import { AICopilotWidget } from './AICopilotWidget';
+import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
-import { SectionHeader } from '@/components/ui/section-header';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { leaderboard, isLoading: leaderboardLoading } = useLeaderboard();
+  const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const [alertsOpen, setAlertsOpen] = useState(true);
+  const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
 
   const animatedBalance = useCountUpCurrency(stats.monthBalance);
 
@@ -36,147 +37,138 @@ export function AdminDashboard() {
 
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
 
+  // Leaderboard top 3
   const top3 = (leaderboard || []).slice(0, 3);
   const userRank = (leaderboard || []).find(e => e.user_id === user?.id);
 
-  // Collect all pending alerts
-  const alerts: { label: string; route: string; count?: number; variant: 'warning' | 'destructive' }[] = [];
-  if (stats.pendingExpenses > 0) {
-    alerts.push({ label: `${formatCurrency(stats.pendingExpenses)} em despesas pendentes`, route: '/finance', variant: 'warning' });
-  }
-  if (stats.pendingClosings > 0) {
-    alerts.push({ label: `${stats.pendingClosings} fechamento(s) pendente(s)`, route: '/cash-closing', variant: 'warning' });
-  }
-  if (stats.pendingRedemptions > 0) {
-    alerts.push({ label: `${stats.pendingRedemptions} resgate(s) aguardando`, route: '/rewards', variant: 'destructive' });
-  }
+  const nextMilestone = Math.ceil((earnedPoints + 1) / 50) * 50;
+  const progress = earnedPoints > 0 ? ((earnedPoints % 50) / 50) * 100 : 0;
 
   return (
     <div className="space-y-4 p-4 lg:p-6">
-      {/* Welcome */}
+      {/* Welcome - minimal */}
       <div className="animate-slide-up stagger-1">
         <h2 className="text-xl font-bold text-foreground">
-          {greeting}, {firstName}
+          {greeting}, {firstName} 👋
         </h2>
         <p className="text-muted-foreground text-xs capitalize mt-0.5">
           {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
         </p>
       </div>
 
-      {/* Primary row: Copilot + Finance */}
+      {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
-        {/* AI COPILOT */}
+
+        {/* AI COPILOT WIDGET */}
         <AICopilotWidget />
 
-        {/* FINANCE HERO */}
+        {/* FINANCE WIDGET - large (full width) */}
         <button
           onClick={() => navigate('/finance')}
-          className="finance-hero-card col-span-1 text-left animate-slide-up stagger-2"
+          className="finance-hero-card col-span-2 text-left animate-slide-up stagger-2"
         >
-          <div className="finance-hero-inner p-4">
-            <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-white/60">
-              Saldo
-            </span>
+          <div className="finance-hero-inner p-5 pb-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+                Saldo do mês
+              </span>
+              <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+            </div>
             <p className={cn(
-              "text-xl font-extrabold tracking-tight leading-tight mt-1",
+              "text-[2rem] font-extrabold tracking-tight leading-tight",
               stats.monthBalance >= 0 ? "text-white" : "text-red-300"
             )}>
-              {statsLoading ? <Skeleton className="h-7 w-28 bg-white/10" /> : formatCurrency(animatedBalance)}
+              {statsLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(animatedBalance)}
             </p>
-            {stats.pendingExpenses > 0 && (
-              <p className="text-[11px] text-white/50 mt-2">
-                {formatCurrency(stats.pendingExpenses)} pendente
-              </p>
-            )}
+            <div className="flex gap-2 mt-3">
+              <div className="finance-hero-chip finance-hero-chip--success">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
+                <span className={cn(
+                  "text-sm font-bold",
+                  stats.pendingExpenses > 0 ? "text-red-300" : "text-emerald-300"
+                )}>
+                  {statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}
+                </span>
+              </div>
+              {stats.pendingClosings > 0 && (
+                <div className="finance-hero-chip finance-hero-chip--neutral">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Fechamentos</span>
+                  <span className="text-sm font-bold text-amber-300">{stats.pendingClosings}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </button>
+
+
+        {/* FINANCE CHART WIDGET - Donut expenses */}
+        <FinanceChartWidget />
+
+        {/* AUTO ORDER WIDGET */}
+        <AutoOrderWidget />
+
+        {/* AGENDA WIDGET - Full featured */}
+        <AgendaDashboardWidget />
+
+        {/* ALERTS */}
+        {(stats.pendingRedemptions > 0) && (
+          <div className="card-command-info col-span-2 p-4 animate-slide-up stagger-4">
+            <div className="flex items-center gap-2 mb-2">
+              <AppIcon name="Bell" size={16} className="text-primary" />
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
+            </div>
+            <button
+              onClick={() => navigate('/rewards')}
+              className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors"
+            >
+              <span className="text-xs text-foreground">Resgates aguardando</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
+            </button>
+          </div>
+        )}
+
+        {/* RANKING WIDGET - Compact horizontal bar */}
+        <button
+          onClick={() => navigate('/ranking')}
+          className="col-span-2 animate-slide-up stagger-5"
+        >
+          <div className="card-command w-full p-4 text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.15)', border: '1px solid hsl(var(--neon-amber) / 0.25)' }}>
+                <AppIcon name="Trophy" size={18} style={{ color: 'hsl(var(--neon-amber))' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                {leaderboardLoading ? (
+                  <Skeleton className="h-4 w-40" />
+                ) : top3.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      {top3.slice(0, 3).map((entry, idx) => (
+                        <div key={entry.user_id} className="ring-2 ring-background rounded-full">
+                          <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={24} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">
+                        🥇 {top3[0].full_name?.split(' ')[0]} · <span style={{ color: 'hsl(var(--neon-amber))' }}>{top3[0].total_score} pts</span>
+                      </p>
+                      {userRank && userRank.rank > 1 && (
+                        <p className="text-[10px] text-muted-foreground">
+                          Você está em {userRank.rank}º lugar
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Sem dados de ranking</p>
+                )}
+              </div>
+              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+            </div>
           </div>
         </button>
       </div>
-
-      {/* AGENDA */}
-      <div className="animate-slide-up stagger-3">
-        <AgendaDashboardWidget />
-      </div>
-
-      {/* ALERTS */}
-      {alerts.length > 0 && (
-        <div className="animate-slide-up stagger-4">
-          <Collapsible open={alertsOpen} onOpenChange={setAlertsOpen}>
-            <CollapsibleTrigger className="w-full">
-              <div className="flex items-center justify-between px-1 py-2">
-                <div className="flex items-center gap-2">
-                  <AppIcon name="Bell" size={14} className="text-warning" />
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Alertas ({alerts.length})
-                  </span>
-                </div>
-                <AppIcon name={alertsOpen ? 'ChevronUp' : 'ChevronDown'} size={14} className="text-muted-foreground" />
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="card-surface p-3 space-y-1">
-                {alerts.map((alert, i) => (
-                  <button
-                    key={i}
-                    onClick={() => navigate(alert.route)}
-                    className="flex items-center justify-between w-full py-2 px-2 hover:bg-secondary/30 rounded-lg transition-colors"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        "w-1.5 h-1.5 rounded-full",
-                        alert.variant === 'destructive' ? 'bg-destructive' : 'bg-warning'
-                      )} />
-                      <span className="text-xs text-foreground">{alert.label}</span>
-                    </div>
-                    <AppIcon name="ChevronRight" size={12} className="text-muted-foreground" />
-                  </button>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      )}
-
-      {/* RANKING - compact */}
-      <button
-        onClick={() => navigate('/ranking')}
-        className="w-full animate-slide-up stagger-5"
-      >
-        <div className="card-interactive w-full p-4 text-left">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-warning/10 border border-warning/20">
-              <AppIcon name="Trophy" size={18} className="text-warning" />
-            </div>
-            <div className="flex-1 min-w-0">
-              {leaderboardLoading ? (
-                <Skeleton className="h-4 w-40" />
-              ) : top3.length > 0 ? (
-                <div className="flex items-center gap-2">
-                  <div className="flex -space-x-2">
-                    {top3.map((entry) => (
-                      <div key={entry.user_id} className="ring-2 ring-background rounded-full">
-                        <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.total_score} size={24} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-foreground truncate">
-                      {top3[0].full_name?.split(' ')[0]} lidera com {top3[0].total_score} pts
-                    </p>
-                    {userRank && userRank.rank > 1 && (
-                      <p className="text-[11px] text-muted-foreground">
-                        Você está em {userRank.rank}º
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">Sem dados de ranking</p>
-              )}
-            </div>
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-          </div>
-        </div>
-      </button>
     </div>
   );
 }

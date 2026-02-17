@@ -102,12 +102,12 @@ export function AgendaDashboardWidget() {
             </div>
             <div>
               <span className="text-sm font-bold text-foreground">Agenda</span>
-              <span className="text-xs text-muted-foreground block">Tarefas de hoje</span>
+              <span className="text-[10px] text-muted-foreground block">Tarefas de hoje</span>
             </div>
           </button>
           <div className="flex items-center gap-1.5">
             {!isLoading && pendingTasks.length > 0 && (
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
                 {pendingTasks.length}
               </span>
             )}

@@ -37,7 +37,7 @@ export function AutoOrderWidget() {
           </div>
           <div className="flex-1">
             <span className="text-sm font-bold text-foreground">Pedidos Diários</span>
-            <span className="text-xs text-muted-foreground block mt-0.5">
+            <span className="text-[10px] text-muted-foreground block mt-0.5">
               {dailySuggestions.length} fornecedor{dailySuggestions.length > 1 ? 'es' : ''}
             </span>
           </div>
@@ -48,16 +48,16 @@ export function AutoOrderWidget() {
             <div key={s.supplierId} className="rounded-2xl bg-secondary/40 p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-foreground">{s.supplierName}</span>
-                <span className="text-xs text-muted-foreground">{s.items.length} ite{s.items.length > 1 ? 'ns' : 'm'}</span>
+                <span className="text-[10px] text-muted-foreground">{s.items.length} ite{s.items.length > 1 ? 'ns' : 'm'}</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {s.items.slice(0, 4).map(i => (
-                  <span key={i.itemId} className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground truncate max-w-[120px]">
+                  <span key={i.itemId} className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground truncate max-w-[120px]">
                     {i.itemName}
                   </span>
                 ))}
                 {s.items.length > 4 && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
                     +{s.items.length - 4}
                   </span>
                 )}

@@ -69,7 +69,7 @@ export function FinanceChartWidget() {
             </div>
             <div>
               <span className="text-sm font-bold text-foreground">Despesas do mês</span>
-              <span className="text-xs text-muted-foreground block">Por categoria</span>
+              <span className="text-[10px] text-muted-foreground block">Por categoria</span>
             </div>
           </div>
           <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
@@ -106,7 +106,7 @@ export function FinanceChartWidget() {
                     : formatCurrency(totalExpense)
                   }
                 </p>
-                <p className="text-xs text-muted-foreground">total</p>
+                <p className="text-[9px] text-muted-foreground">total</p>
               </div>
             </div>
 
@@ -121,7 +121,7 @@ export function FinanceChartWidget() {
                   <span className="text-[11px] text-foreground truncate flex-1">
                     {item.category.name}
                   </span>
-                  <span className="text-xs font-semibold text-muted-foreground tabular-nums shrink-0">
+                  <span className="text-[10px] font-semibold text-muted-foreground tabular-nums shrink-0">
                     {item.percentage > 0 ? `${item.percentage.toFixed(0)}%` : ''}
                   </span>
                 </div>
