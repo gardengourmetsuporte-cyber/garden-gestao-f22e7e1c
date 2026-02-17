@@ -56,6 +56,11 @@ serve(async (req) => {
       dataLines.push(`\n👥 EQUIPE ATIVA (${context.employees.length}):\n${context.employees.join('\n')}`);
     }
 
+    // Employee payments
+    if (context?.employeePayments?.length) {
+      dataLines.push(`\n💸 PAGAMENTOS DE FUNCIONÁRIOS (mês atual):\n${context.employeePayments.join('\n')}`);
+    }
+
     // Suppliers
     if (context?.suppliers?.length) {
       dataLines.push(`\n🚚 FORNECEDORES:\n${context.suppliers.join('\n')}`);
@@ -64,6 +69,11 @@ serve(async (req) => {
     // Tasks
     if (context?.todayTasks?.length) {
       dataLines.push(`\n✅ TAREFAS DE HOJE:\n${context.todayTasks.join('\n')}`);
+    }
+
+    // All month transactions
+    if (context?.allMonthTransactions?.length) {
+      dataLines.push(`\n📑 TODAS TRANSAÇÕES DO MÊS (${context.allMonthTransactions.length}):\n${context.allMonthTransactions.join('\n')}`);
     }
 
     const dataSnapshot = dataLines.length > 0 ? dataLines.join('\n') : 'Dados ainda carregando...';
@@ -111,7 +121,7 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar 
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: aiMessages,
-        max_tokens: 600,
+        max_tokens: 800,
       }),
     });
 
