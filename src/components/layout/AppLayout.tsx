@@ -132,8 +132,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
             </button>
 
-            <div className="flex items-center gap-1">
-              <ThemeToggle className="p-1.5" />
+            <div className="flex items-center gap-0.5">
               {/* Unit Selector Icon */}
               {units.length > 0 && (
                 <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
@@ -214,6 +213,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <NotificationCard />
                 </PopoverContent>
               </Popover>
+              <ThemeToggle className="p-1.5" />
             </div>
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
