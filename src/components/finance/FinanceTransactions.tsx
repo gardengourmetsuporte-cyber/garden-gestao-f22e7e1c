@@ -98,34 +98,52 @@ export function FinanceTransactions({
   // Track "seen" new transactions — persisted in localStorage
   const SEEN_KEY = 'finance_seen_txns';
 
-  const readSeen = useCallback((): Set<string> => {
+  const readSeen = useCallback((): Record<string, number> => {
     try {
       const stored = localStorage.getItem(SEEN_KEY);
-      return stored ? new Set(JSON.parse(stored)) : new Set();
-    } catch { return new Set(); }
+      if (!stored) return {};
+      const parsed = JSON.parse(stored);
+      // Migrate from old array format to new object format
+      if (Array.isArray(parsed)) {
+        const migrated: Record<string, number> = {};
+        parsed.forEach((id: string) => { migrated[id] = Date.now(); });
+        try { localStorage.setItem(SEEN_KEY, JSON.stringify(migrated)); } catch {}
+        return migrated;
+      }
+      return parsed;
+    } catch { return {}; }
   }, []);
 
-  const [seenIds, setSeenIds] = useState<Set<string>>(readSeen);
+  // Clean old entries (older than 7 days) to prevent unbounded growth
+  const cleanOldEntries = useCallback((data: Record<string, number>): Record<string, number> => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const cleaned: Record<string, number> = {};
+    Object.entries(data).forEach(([id, ts]) => {
+      if (ts > cutoff) cleaned[id] = ts;
+    });
+    return cleaned;
+  }, []);
+
+  const [seenMap, setSeenMap] = useState<Record<string, number>>(() => cleanOldEntries(readSeen()));
 
   // Re-sync from localStorage every time the component mounts (e.g. navigating back)
   useEffect(() => {
-    setSeenIds(readSeen());
-  }, [readSeen]);
+    setSeenMap(cleanOldEntries(readSeen()));
+  }, [readSeen, cleanOldEntries]);
 
   const markSeen = useCallback((id: string) => {
-    setSeenIds(prev => {
-      const next = new Set(prev);
-      next.add(id);
-      try { localStorage.setItem(SEEN_KEY, JSON.stringify([...next])); } catch {}
+    setSeenMap(prev => {
+      const next = { ...prev, [id]: Date.now() };
+      try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
   }, []);
 
   const isNewTransaction = useCallback((t: FinanceTransaction) => {
-    if (seenIds.has(t.id)) return false;
+    if (t.id in seenMap) return false;
     const hoursAgo = differenceInHours(new Date(), new Date(t.created_at));
-    return hoursAgo < 24;
-  }, [seenIds]);
+    return hoursAgo < 48;
+  }, [seenMap]);
 
   // Apply initialFilters when they change from parent
   useEffect(() => {
