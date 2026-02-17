@@ -14,7 +14,7 @@ export function BonusGuide() {
         </div>
         <div>
           <h3 className="text-sm font-bold text-foreground">Como Ganhar Bônus</h3>
-          <p className="text-[10px] text-muted-foreground">Conquistas de alto valor que mudam o ranking</p>
+          <p className="text-xs text-muted-foreground">Conquistas de alto valor</p>
         </div>
       </div>
 
@@ -24,27 +24,27 @@ export function BonusGuide() {
           return (
             <div
               key={badge.id}
-              className="card-command p-3 flex items-center gap-3"
+              className="card-surface p-3 flex items-center gap-3"
               style={alreadyEarned ? { borderColor: 'hsl(var(--neon-amber) / 0.3)' } : undefined}
             >
               <span className="text-xl shrink-0">{badge.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-xs font-semibold text-foreground truncate">{badge.title}</p>
-                  <Badge variant="outline" className="text-[8px] px-1.5 py-0 h-4 shrink-0" style={{ borderColor: 'hsl(var(--neon-amber) / 0.5)', color: 'hsl(var(--neon-amber))' }}>
+                  <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 shrink-0" style={{ borderColor: 'hsl(var(--neon-amber) / 0.5)', color: 'hsl(var(--neon-amber))' }}>
                     +{badge.points} pts
                   </Badge>
                 </div>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {badge.cooldown === 'weekly' ? '1x por semana' : '1x por mês'}
                 </p>
               </div>
               {alreadyEarned ? (
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)', color: 'hsl(var(--neon-amber))' }}>
-                  ✓ Conquistado
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)', color: 'hsl(var(--neon-amber))' }}>
+                  <AppIcon name="Check" size={12} className="inline mr-0.5" /> Conquistado
                 </span>
               ) : (
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-green) / 0.1)', color: 'hsl(var(--neon-green))' }}>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-green) / 0.1)', color: 'hsl(var(--neon-green))' }}>
                   Disponível
                 </span>
               )}

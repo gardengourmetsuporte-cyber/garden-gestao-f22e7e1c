@@ -17,7 +17,7 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
 
   if (isLoading) {
     return (
-      <div className={cn("card-command animate-pulse", className)}>
+      <div className={cn("card-surface animate-pulse", className)}>
         <div className="p-5">
           <div className="h-20 bg-secondary rounded-xl" />
         </div>
@@ -26,7 +26,7 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
   }
 
   return (
-    <div className={cn("card-command-warning overflow-hidden", className)}>
+    <div className={cn("card-surface overflow-hidden", className)} style={{ borderColor: 'hsl(var(--neon-amber) / 0.2)' }}>
       {/* Monthly Score - Primary */}
       <div className="p-5">
         <div className="flex items-center justify-between mb-1">
@@ -40,34 +40,30 @@ export function UserPointsCard({ className }: UserPointsCardProps) {
           <span className="text-3xl font-bold tracking-tight text-foreground">{animatedScore}</span>
           <span className="text-sm text-muted-foreground">pts</span>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-2 flex items-center gap-1">
-          <AppIcon name="Info" size={10} />
-          O ranking é mensal e reinicia todo mês. Apenas o score mensal conta.
-        </p>
       </div>
 
-      {/* Stats Row: Base Mensal | Bônus Mensal | Acumulado Total */}
+      {/* Stats Row */}
       <div className="grid grid-cols-3 divide-x divide-border/30 border-t border-border/30">
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-0.5" style={{ color: 'hsl(var(--neon-green))' }}>
             <AppIcon name="TrendingUp" size={14} />
             <span className="text-xl font-bold">{animatedBase}</span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Base Mensal</p>
+          <p className="text-xs text-muted-foreground">Base</p>
         </div>
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-0.5" style={{ color: 'hsl(var(--neon-amber))' }}>
             <AppIcon name="Flame" size={14} />
             <span className="text-xl font-bold">{animatedBonus}</span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Bônus Mensal</p>
+          <p className="text-xs text-muted-foreground">Bônus</p>
         </div>
         <div className="p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-muted-foreground mb-0.5">
             <AppIcon name="Star" size={14} />
             <span className="text-xl font-bold text-foreground">{animatedAccum}</span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Acumulado</p>
+          <p className="text-xs text-muted-foreground">Total</p>
         </div>
       </div>
     </div>
