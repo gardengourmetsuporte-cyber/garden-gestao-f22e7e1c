@@ -2,9 +2,12 @@ import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
+import { ScreenshotsSection } from "@/components/landing/ScreenshotsSection";
 import { BenefitsSection } from "@/components/landing/BenefitsSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { DifferentialsSection } from "@/components/landing/DifferentialsSection";
+import { FAQSection } from "@/components/landing/FAQSection";
 import { TrustSection } from "@/components/landing/TrustSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { FooterSection } from "@/components/landing/FooterSection";
@@ -16,9 +19,12 @@ export default function Landing() {
       <HeroSection />
       <ProblemSection />
       <SolutionSection />
+      <ScreenshotsSection />
       <BenefitsSection />
       <HowItWorksSection />
+      <PricingSection />
       <DifferentialsSection />
+      <FAQSection />
       <TrustSection />
       <CTASection />
       <FooterSection />

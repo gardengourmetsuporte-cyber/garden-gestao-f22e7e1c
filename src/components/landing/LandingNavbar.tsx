@@ -14,6 +14,7 @@ export function LandingNavbar() {
   const links = [
     { label: "Benefícios", href: "#beneficios" },
     { label: "Como funciona", href: "#como-funciona" },
+    { label: "Planos", href: "#planos" },
     { label: "Diferenciais", href: "#diferenciais" },
   ];
 
