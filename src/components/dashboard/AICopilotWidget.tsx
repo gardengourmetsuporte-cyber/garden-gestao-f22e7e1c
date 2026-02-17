@@ -51,13 +51,13 @@ export function AICopilotWidget() {
           <img src={mascotImg} alt="Garden Copiloto" className="w-9 h-9 rounded-xl object-cover border border-primary/20" />
           <div>
             <span className="text-sm font-bold text-foreground leading-none">Copiloto IA</span>
-            <span className="text-[10px] text-muted-foreground block mt-0.5">Seu assistente de gestão</span>
+            <span className="text-xs text-muted-foreground block mt-0.5">Seu assistente de gestão</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
           {messages.length > 2 && (
-            <span className="text-[9px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
-              {messages.length} msgs
+            <span className="text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
+              {messages.length}
             </span>
           )}
           <AppIcon
@@ -86,7 +86,7 @@ export function AICopilotWidget() {
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
-            <span className="text-[10px] text-muted-foreground">Analisando seu dia...</span>
+            <span className="text-xs text-muted-foreground">Analisando seu dia...</span>
           </div>
         </div>
       )}
@@ -136,7 +136,7 @@ export function AICopilotWidget() {
           {messages.length > 4 && (
             <button
               onClick={clearHistory}
-              className="text-[10px] text-muted-foreground hover:text-foreground transition-colors mx-auto block"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors mx-auto block"
             >
               Limpar histórico
             </button>

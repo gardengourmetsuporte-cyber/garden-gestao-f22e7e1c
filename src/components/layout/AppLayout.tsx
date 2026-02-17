@@ -21,6 +21,7 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { BottomTabBar } from '@/components/layout/BottomTabBar';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -104,9 +105,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     setLauncherOpen(false);
   }, [location.pathname]);
 
-  const fabBottom = hasBottomNav
-    ? 'calc(env(safe-area-inset-bottom) + 84px)'
-    : 'calc(env(safe-area-inset-bottom) + 24px)';
+  // Bottom tab bar adds 56px + safe area at bottom
+  const hasBottomTabBar = !hasBottomNav;
 
   return (
     <div className="min-h-screen bg-background">
@@ -217,52 +217,26 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       </header>
 
-      {/* ======= Home button above FAB ======= */}
-      {launcherOpen && (
-        <button
-          onClick={() => { navigate('/'); setLauncherOpen(false); }}
-          className="lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-all duration-200 launcher-home-btn"
-          style={{
-            bottom: `calc(${hasBottomNav ? 'env(safe-area-inset-bottom) + 84px' : 'env(safe-area-inset-bottom) + 24px'} + 70px)`,
-            right: '20px',
-            background: 'linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--primary)))',
-            boxShadow: '0 4px 20px hsl(var(--primary) / 0.4), 0 0 24px hsl(var(--neon-cyan) / 0.25)',
-          }}
-        >
-          <AppIcon name="Home" size={24} className="text-primary-foreground" />
-        </button>
+      {/* ======= Bottom Tab Bar ======= */}
+      {!launcherOpen && (
+        <BottomTabBar onOpenLauncher={() => setLauncherOpen(true)} />
       )}
 
-      {/* ======= FAB (Launcher Trigger) ======= */}
-      <button
-        onClick={() => setLauncherOpen(!launcherOpen)}
-        className={cn(
-          "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300",
-          launcherOpen
-            ? "w-14 h-14 fab-close-spin"
-            : "w-14 h-14 hover:scale-110 active:scale-90 fab-idle-glow"
-        )}
-        style={{
-          bottom: fabBottom,
-          right: '20px',
-          background: launcherOpen
-            ? 'hsl(var(--destructive))'
-            : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))',
-          boxShadow: launcherOpen
-            ? '0 4px 24px hsl(var(--destructive) / 0.5)'
-            : '0 4px 24px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--neon-cyan) / 0.2), 0 0 80px hsl(var(--neon-cyan) / 0.08)',
-        }}
-      >
-        {launcherOpen ? (
+      {/* ======= FAB Close button (only when launcher open) ======= */}
+      {launcherOpen && (
+        <button
+          onClick={() => setLauncherOpen(false)}
+          className="lg:hidden fixed z-[9999] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 fab-close-spin"
+          style={{
+            bottom: 'calc(env(safe-area-inset-bottom) + 24px)',
+            right: '20px',
+            background: 'hsl(var(--destructive))',
+            boxShadow: '0 4px 24px hsl(var(--destructive) / 0.5)',
+          }}
+        >
           <AppIcon name="X" size={26} className="text-destructive-foreground" />
-        ) : (
-          <>
-            {/* Rotating neon ring */}
-            <div className="absolute inset-[-3px] rounded-full fab-neon-border opacity-60" />
-            <AppIcon name="Grip" size={24} className="text-primary-foreground relative z-10" />
-          </>
-        )}
-      </button>
+        </button>
+      )}
 
       {/* ======= App Launcher Overlay ======= */}
       {launcherOpen && (
