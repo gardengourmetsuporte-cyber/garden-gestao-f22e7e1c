@@ -219,6 +219,27 @@
     transform: scale(0.98);
   }
 
+  /* Personal Finance variant */
+  .finance-hero-card--personal {
+    background: linear-gradient(135deg, 
+      hsl(160 60% 22%) 0%, 
+      hsl(170 50% 18%) 30%, 
+      hsl(150 45% 25%) 70%, 
+      hsl(140 40% 20%) 100%
+    );
+    box-shadow: 
+      0 4px 24px hsl(160 60% 22% / 0.4),
+      0 8px 48px hsl(150 45% 25% / 0.2),
+      inset 0 1px 0 hsl(0 0% 100% / 0.08);
+  }
+
+  .finance-hero-card--personal:hover {
+    box-shadow: 
+      0 6px 32px hsl(160 60% 22% / 0.5),
+      0 12px 56px hsl(150 45% 25% / 0.3),
+      inset 0 1px 0 hsl(0 0% 100% / 0.1);
+  }
+
   .finance-hero-inner {
     position: relative;
   }
@@ -538,6 +559,18 @@
     );
     animation: neonRotate 3s linear infinite;
     box-shadow: 0 0 16px hsl(var(--neon-cyan) / 0.3), 0 0 32px hsl(var(--neon-purple) / 0.15);
+  }
+
+  .fab-neon-border-personal {
+    background: conic-gradient(
+      from var(--neon-angle, 0deg),
+      hsl(160 60% 45%),
+      hsl(140 50% 35%),
+      hsl(170 55% 40%),
+      hsl(160 60% 45%)
+    );
+    animation: neonRotate 3s linear infinite;
+    box-shadow: 0 0 16px hsl(160 60% 45% / 0.3), 0 0 32px hsl(150 45% 35% / 0.15);
   }
 
   .fab {
