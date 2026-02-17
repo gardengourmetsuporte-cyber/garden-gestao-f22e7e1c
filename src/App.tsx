@@ -34,6 +34,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Marketing = lazy(() => import("./pages/Marketing"));
 const Ranking = lazy(() => import("./pages/Ranking"));
+const PersonalFinance = lazy(() => import("./pages/PersonalFinance"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -215,6 +216,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Ranking />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/personal-finance"
+          element={
+            <ProtectedRoute>
+              <PersonalFinance />
             </ProtectedRoute>
           }
         />
