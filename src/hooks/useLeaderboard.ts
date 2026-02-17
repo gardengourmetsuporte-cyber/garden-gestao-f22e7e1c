@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateEarnedPoints, calculateSpentPoints } from '@/lib/points';
@@ -30,8 +30,17 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
 
-  const [{ data: unitUsers }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
-    supabase.from('user_units').select('user_id, profiles:profiles!inner(user_id, full_name, avatar_url)').eq('unit_id', unitId),
+  // First get user_ids for this unit
+  const { data: unitUsers } = await supabase
+    .from('user_units')
+    .select('user_id')
+    .eq('unit_id', unitId);
+
+  const unitUserIds = (unitUsers || []).map(u => u.user_id);
+  if (unitUserIds.length === 0) return [];
+
+  const [{ data: profilesData }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
+    supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', unitUserIds),
     supabase
       .from('checklist_completions')
       .select('completed_by, points_awarded, awarded_points, date')
@@ -65,7 +74,7 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
     userBonus.set(b.user_id, (userBonus.get(b.user_id) || 0) + b.points);
   });
 
-  const profiles = (unitUsers || []).map((u: any) => u.profiles).filter(Boolean);
+  const profiles = (profilesData || []).filter(Boolean);
 
   const entries: LeaderboardEntry[] = profiles
     .map((profile: any) => {
@@ -153,15 +162,17 @@ export function useLeaderboard() {
 
   const isLoading = isLoadingLeaderboard || isLoadingSectors;
 
+  const refetch = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['sector-points'] });
+  }, [queryClient]);
+
   return useMemo(() => ({
     leaderboard,
     sectorPoints,
     isLoading,
     selectedMonth,
     setSelectedMonth,
-    refetch: () => {
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
-      queryClient.invalidateQueries({ queryKey: ['sector-points'] });
-    },
-  }), [leaderboard, sectorPoints, isLoading, selectedMonth, queryClient]);
+    refetch,
+  }), [leaderboard, sectorPoints, isLoading, selectedMonth, setSelectedMonth, refetch]);
 }
