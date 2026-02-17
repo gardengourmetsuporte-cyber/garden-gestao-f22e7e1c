@@ -247,36 +247,30 @@
     border: 1px solid hsl(0 0% 100% / 0.08);
   }
 
-  /* ========== COMMAND CENTER CARDS ========== */
+  /* ========== LEGACY COMMAND CARDS (mapped to standard variants) ========== */
 
   .card-command {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-cyan) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-cyan);
+    @apply card-surface;
   }
 
   .card-command-success {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-green) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-success);
+    @apply card-surface;
+    border-left: 3px solid hsl(var(--neon-green) / 0.4);
   }
 
   .card-command-danger {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-red) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-destructive);
+    @apply card-surface;
+    border-left: 3px solid hsl(var(--neon-red) / 0.4);
   }
 
   .card-command-warning {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-amber) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-warning);
+    @apply card-surface;
+    border-left: 3px solid hsl(var(--neon-amber) / 0.4);
   }
 
   .card-command-info {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-cyan) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-cyan);
+    @apply card-surface;
+    border-left: 3px solid hsl(var(--neon-cyan) / 0.4);
   }
 
   /* ========== PAGE HEADERS ========== */
