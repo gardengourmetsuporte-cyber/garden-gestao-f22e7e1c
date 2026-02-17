@@ -7,7 +7,7 @@ import { usePoints } from '@/hooks/usePoints';
 import { cn } from '@/lib/utils';
 import { useCountUpCurrency } from '@/hooks/useCountUp';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Podium } from '@/components/ranking/Podium';
+import { Leaderboard } from '@/components/dashboard/Leaderboard';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
@@ -127,35 +127,16 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {/* RANKING WIDGET - Podium */}
-        <button
-          onClick={() => navigate('/ranking')}
-          className="col-span-2 animate-slide-up stagger-5"
-        >
-          <div className="card-surface w-full p-4 text-left">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
-                <span className="text-sm font-semibold text-foreground">Ranking Mensal</span>
-              </div>
-              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
-            </div>
-            {leaderboardLoading ? (
-              <div className="flex items-end justify-center gap-4 py-6">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <Skeleton className="w-10 h-10 rounded-full" />
-                    <Skeleton className="w-12 h-3" />
-                  </div>
-                ))}
-              </div>
-            ) : top3.length > 0 ? (
-              <Podium entries={leaderboard} currentUserId={user?.id} compact />
-            ) : (
-              <p className="text-xs text-muted-foreground py-4 text-center">Sem dados de ranking</p>
-            )}
-          </div>
-        </button>
+        {/* RANKING WIDGET - Full leaderboard */}
+        <div className="col-span-2 animate-slide-up stagger-5">
+          <Leaderboard
+            entries={leaderboard}
+            currentUserId={user?.id}
+            isLoading={leaderboardLoading}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+          />
+        </div>
       </div>
     </div>
   );

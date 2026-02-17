@@ -12,9 +12,9 @@ interface PodiumProps {
 }
 
 const PODIUM_CONFIG = [
-  { position: 1, order: 2, height: 'h-20', barColor: 'from-amber-500/30 to-amber-600/10', crownColor: 'hsl(var(--neon-amber))', label: '1º' },
-  { position: 2, order: 1, height: 'h-14', barColor: 'from-slate-400/20 to-slate-500/10', crownColor: 'hsl(215 20% 65%)', label: '2º' },
-  { position: 3, order: 3, height: 'h-10', barColor: 'from-orange-700/20 to-orange-800/10', crownColor: 'hsl(30 50% 45%)', label: '3º' },
+  { position: 1, order: 2, height: 'h-20', crownColor: 'hsl(var(--neon-amber))', rgb: '217, 166, 30', label: '1º' },
+  { position: 2, order: 1, height: 'h-14', crownColor: 'hsl(215 20% 65%)', rgb: '146, 155, 170', label: '2º' },
+  { position: 3, order: 3, height: 'h-10', crownColor: 'hsl(30 50% 45%)', rgb: '172, 120, 57', label: '3º' },
 ];
 
 export function Podium({ entries, currentUserId, compact = false }: PodiumProps) {
@@ -30,7 +30,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
 
   return (
     <div className="flex items-end justify-center gap-2 pt-4 pb-2">
-      {PODIUM_CONFIG.map(({ position, order, height, barColor, crownColor, label }) => {
+      {PODIUM_CONFIG.map(({ position, order, height, crownColor, rgb, label }) => {
         const entry = top3[position - 1];
         if (!entry) {
           return (
@@ -109,20 +109,20 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
                 height
               )}
               style={{
-                background: `linear-gradient(to top, ${crownColor}90, ${crownColor}55, ${crownColor}30)`,
-                borderColor: `${crownColor}70`,
-                boxShadow: `0 -4px 20px ${crownColor}35, inset 0 2px 10px ${crownColor}30`,
+                background: `linear-gradient(to top, rgba(${rgb}, 0.85), rgba(${rgb}, 0.5), rgba(${rgb}, 0.25))`,
+                borderColor: `rgba(${rgb}, 0.7)`,
+                boxShadow: `0 -4px 20px rgba(${rgb}, 0.35), inset 0 2px 10px rgba(${rgb}, 0.3)`,
               }}
             >
               {/* Shimmer effect */}
               <div
-                className="absolute inset-0 opacity-30"
+                className="absolute inset-0 opacity-40"
                 style={{
-                  background: `linear-gradient(135deg, transparent 30%, ${crownColor}40 50%, transparent 70%)`,
+                  background: `linear-gradient(135deg, transparent 30%, rgba(${rgb}, 0.5) 50%, transparent 70%)`,
                 }}
               />
               <div className="flex items-center justify-center h-full relative z-10">
-                <span className="text-xs font-bold" style={{ color: `${crownColor}cc` }}>{label}</span>
+                <span className="text-xs font-bold" style={{ color: crownColor }}>{label}</span>
               </div>
             </div>
           </Link>
