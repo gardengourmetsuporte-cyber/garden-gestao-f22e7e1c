@@ -163,7 +163,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
       {/* Theme Toggle */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-8 right-4 z-20">
         <ThemeToggle />
       </div>
       {/* Animated background effects */}
@@ -401,6 +401,8 @@ export default function Auth() {
                       <Input
                         id="fullName"
                         type="text"
+                        autoComplete="name"
+                        autoCapitalize="words"
                         value={fullName}
                         onChange={e => setFullName(e.target.value)}
                         onFocus={() => setFocusedField('fullName')}
@@ -431,6 +433,9 @@ export default function Auth() {
                     <Input
                       id="email"
                       type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      autoCapitalize="none"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       onFocus={() => setFocusedField('email')}
@@ -471,6 +476,7 @@ export default function Auth() {
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
+                      autoComplete={isLogin ? "current-password" : "new-password"}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       onFocus={() => setFocusedField('password')}
