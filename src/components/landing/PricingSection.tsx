@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Check, Star } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { PlanCheckoutDialog } from "@/components/landing/PlanCheckoutDialog";
 
 const plans = [
   {
+    id: "free",
     name: "Grátis",
     description: "Para quem está começando",
     monthly: 0,
@@ -20,6 +21,7 @@ const plans = [
     cta: "Comece grátis",
   },
   {
+    id: "pro",
     name: "Pro",
     description: "O mais escolhido",
     monthly: 97,
@@ -38,6 +40,7 @@ const plans = [
     cta: "Assinar Pro",
   },
   {
+    id: "business",
     name: "Business",
     description: "Para operações avançadas",
     monthly: 197,
@@ -60,24 +63,31 @@ const plans = [
 
 export function PricingSection() {
   const [yearly, setYearly] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
 
   return (
-    <section id="planos" className="py-20 md:py-28 bg-slate-50">
+    <section id="planos" className="py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--neon-cyan))" }}>
+            Planos
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             Planos para cada fase do seu negócio
           </h2>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-muted-foreground">
             Comece grátis e escale conforme cresce. Sem surpresas.
           </p>
 
           <div className="mt-8 flex items-center justify-center gap-3">
-            <span className={`text-sm font-medium ${!yearly ? "text-slate-900" : "text-slate-500"}`}>Mensal</span>
+            <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Mensal</span>
             <Switch checked={yearly} onCheckedChange={setYearly} />
-            <span className={`text-sm font-medium ${yearly ? "text-slate-900" : "text-slate-500"}`}>
+            <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
               Anual{" "}
-              <span className="inline-block ml-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-bold">
+              <span
+                className="inline-block ml-1 px-2 py-0.5 rounded-full text-xs font-bold"
+                style={{ background: "hsl(var(--neon-green) / 0.15)", color: "hsl(var(--neon-green))" }}
+              >
                 -20%
               </span>
             </span>
@@ -88,43 +98,63 @@ export function PricingSection() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl p-8 transition-all ${
-                plan.highlight
-                  ? "bg-white border-2 border-blue-600 shadow-xl shadow-blue-600/10 scale-[1.02]"
-                  : "bg-white border border-slate-200 shadow-sm"
+              className={`relative rounded-2xl p-8 transition-all duration-300 ${
+                plan.highlight ? "scale-[1.02]" : ""
               }`}
+              style={{
+                background: plan.highlight
+                  ? "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))"
+                  : "hsl(var(--card))",
+                border: plan.highlight
+                  ? "2px solid hsl(var(--neon-cyan) / 0.5)"
+                  : "1px solid hsl(var(--border) / 0.5)",
+                boxShadow: plan.highlight
+                  ? "0 0 40px hsl(var(--neon-cyan) / 0.15), var(--shadow-elevated)"
+                  : "var(--shadow-card)",
+              }}
             >
               {plan.highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold">
+                <div
+                  className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
+                  style={{
+                    background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
+                    color: "white",
+                    boxShadow: "0 0 15px hsl(var(--neon-cyan) / 0.4)",
+                  }}
+                >
                   <Star className="w-3 h-3" /> Mais popular
                 </div>
               )}
 
-              <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
-              <p className="text-sm text-slate-500 mt-1">{plan.description}</p>
+              <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
 
               <div className="mt-6 mb-8">
-                <span className="text-4xl font-extrabold text-slate-900">
+                <span className="text-4xl font-extrabold text-foreground">
                   R$ {yearly ? plan.yearly : plan.monthly}
                 </span>
-                <span className="text-slate-500 text-sm">/mês</span>
+                <span className="text-muted-foreground text-sm">/mês</span>
               </div>
 
-              <Link
-                to="/auth"
-                className={`block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-colors ${
-                  plan.highlight
-                    ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
+              <button
+                onClick={() => setSelectedPlan(plan)}
+                className="block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-all hover:scale-[1.01] active:scale-[0.98]"
+                style={plan.highlight ? {
+                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
+                  color: "white",
+                  boxShadow: "0 0 20px hsl(var(--neon-cyan) / 0.3)",
+                } : {
+                  background: "hsl(var(--secondary))",
+                  color: "hsl(var(--foreground))",
+                }}
               >
                 {plan.cta}
-              </Link>
+              </button>
 
               <ul className="mt-8 space-y-3">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                  <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(var(--neon-green))" }} />
                     {f}
                   </li>
                 ))}
@@ -133,6 +163,14 @@ export function PricingSection() {
           ))}
         </div>
       </div>
+
+      {selectedPlan && (
+        <PlanCheckoutDialog
+          plan={selectedPlan}
+          yearly={yearly}
+          onClose={() => setSelectedPlan(null)}
+        />
+      )}
     </section>
   );
 }
