@@ -35,6 +35,7 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Marketing = lazy(() => import("./pages/Marketing"));
 const Ranking = lazy(() => import("./pages/Ranking"));
 const PersonalFinance = lazy(() => import("./pages/PersonalFinance"));
+const Landing = lazy(() => import("./pages/Landing"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +79,7 @@ function AppRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/auth" element={<Auth />} />
+        <Route path="/landing" element={<Landing />} />
         <Route
           path="/"
           element={
