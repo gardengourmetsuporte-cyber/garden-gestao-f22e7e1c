@@ -120,7 +120,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="bg-card backdrop-blur-xl border-b border-border/20">
           <div className="flex items-center justify-between h-14 px-3">
-            <div className="w-10">
+            <div className="flex items-center gap-1">
+              <ThemeToggle className="p-1.5" />
               <PointsDisplay isPulsing={isPulsing} showLabel={false} className="scale-75 origin-left" />
             </div>
 
@@ -132,7 +133,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
             </button>
 
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-1">
               {/* Unit Selector Icon */}
               {units.length > 0 && (
                 <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
@@ -213,7 +214,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <NotificationCard />
                 </PopoverContent>
               </Popover>
-              <ThemeToggle className="p-1.5" />
             </div>
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
