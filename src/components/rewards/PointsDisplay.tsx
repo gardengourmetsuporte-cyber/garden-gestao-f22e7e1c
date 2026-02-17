@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { usePoints } from '@/hooks/usePoints';
 import { cn } from '@/lib/utils';
 
@@ -26,7 +26,7 @@ export function PointsDisplay({ className, showLabel = true, isPulsing = false }
         "flex items-center justify-center w-8 h-8 rounded-full bg-amber-500/20",
         isPulsing && "animate-coin-pulse"
       )}>
-        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+        <AppIcon name="Star" size={16} style={{ color: 'hsl(38 92% 50%)' }} />
       </div>
       <div className="flex flex-col">
         <span className={cn("font-bold text-foreground", isPulsing && "animate-coin-pulse")}>{balance}</span>

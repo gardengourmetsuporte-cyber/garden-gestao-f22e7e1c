@@ -150,7 +150,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </PopoverTrigger>
                   <PopoverContent align="end" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
                     <div className="px-3 py-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
                     </div>
                     {units.map(unit => (
                       <button
@@ -176,7 +176,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               >
                 <AppIcon name="Trophy" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(var(--neon-amber) / 0.4))' }} />
                 {myPosition && myPosition <= 3 && (
-                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full text-[8px] font-bold flex items-center justify-center" style={{
+                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full text-[11px] font-bold flex items-center justify-center" style={{
                     background: 'hsl(var(--neon-amber) / 0.2)',
                     color: 'hsl(var(--neon-amber))',
                     border: '1.5px solid hsl(var(--card))',
@@ -191,7 +191,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               >
                 <AppIcon name="MessageCircle" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                 {chatUnreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
+                   <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
                     {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
                   </span>
                 )}
@@ -201,13 +201,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[7px] font-bold flex items-center justify-center">
+                      <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent align="end" className="w-[340px] p-0 rounded-2xl border-border/50 bg-card max-h-[70vh] overflow-y-auto" sideOffset={8}>
+                <PopoverContent align="end" className="w-[calc(100vw-32px)] max-w-[340px] p-0 rounded-2xl border-border/50 bg-card max-h-[70vh] overflow-y-auto" sideOffset={8}>
                   <NotificationCard />
                 </PopoverContent>
               </Popover>
@@ -311,7 +311,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             {/* ===== App Grid by Group ===== */}
             {groupedNav.map((group, gi) => (
               <div key={group.label} className="mb-6 launcher-item" style={{ animationDelay: `${(gi + 1) * 60}ms` }}>
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
+                <span className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
                   {group.label}
                 </span>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-6">

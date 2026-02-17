@@ -155,9 +155,15 @@
 
   /* ========== CARDS ========== */
   
-  .card-base {
+  .card-base,
+  .card-surface {
     @apply bg-card rounded-2xl border border-border/50 transition-all duration-200;
     box-shadow: var(--shadow-card);
+  }
+
+  .card-elevated {
+    @apply bg-card rounded-2xl border border-border/50 transition-all duration-200;
+    box-shadow: var(--shadow-elevated);
   }
 
   .card-interactive {

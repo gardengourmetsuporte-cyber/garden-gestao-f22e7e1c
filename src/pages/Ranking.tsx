@@ -12,7 +12,9 @@ import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useBonusPoints } from '@/hooks/useBonusPoints';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Flame, Award } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+type TabKey = 'ranking' | 'objetivos' | 'bonus';
 
 export default function Ranking() {
   const { user, profile, isAdmin } = useAuth();
@@ -21,8 +23,15 @@ export default function Ranking() {
   const { bonusPoints } = useBonusPoints();
   const [bonusSheetOpen, setBonusSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<{ name: string; userId: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<TabKey>('ranking');
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
+
+  const tabs: { key: TabKey; label: string; icon: string }[] = [
+    { key: 'ranking', label: 'Ranking', icon: 'Trophy' },
+    { key: 'objetivos', label: 'Objetivos', icon: 'Target' },
+    { key: 'bonus', label: 'Bônus', icon: 'Flame' },
+  ];
 
   return (
     <AppLayout>
@@ -50,77 +59,100 @@ export default function Ranking() {
             leaderboardPosition={myPosition}
           />
 
-          {/* Leaderboard */}
-          <Leaderboard
-            entries={leaderboard}
-            currentUserId={user?.id}
-            isLoading={isLoading}
-            selectedMonth={selectedMonth}
-            onMonthChange={setSelectedMonth}
-          />
-
-          {/* Objectives */}
-          <ObjectivesList
-            data={{
-              totalCompletions: earned,
-              earnedPoints: earned,
-              totalRedemptions: 0,
-            }}
-          />
-
-          {/* Bonus section */}
-          <div className="card-command p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
-                <h3 className="font-semibold text-sm text-foreground">Bônus do Mês</h3>
-              </div>
-              {monthlyBonus > 0 && (
-                <Badge variant="outline" className="text-[10px]" style={{ borderColor: 'hsl(var(--neon-amber) / 0.5)', color: 'hsl(var(--neon-amber))' }}>
-                  +{monthlyBonus} pts
-                </Badge>
-              )}
-            </div>
-
-            {bonusPoints.length > 0 ? (
-              <div className="space-y-1.5 mb-3">
-                {bonusPoints.map(bp => (
-                  <div key={bp.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/30">
-                    <span className="text-sm">⭐</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-foreground truncate">{bp.reason}</p>
-                      <p className="text-[9px] text-muted-foreground">{bp.type === 'auto' ? 'Automático' : 'Manual'}</p>
-                    </div>
-                    <span className="text-[11px] font-bold shrink-0" style={{ color: 'hsl(var(--neon-amber))' }}>+{bp.points}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-muted-foreground mb-3">Nenhum bônus recebido este mês</p>
-            )}
-
-            {isAdmin && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  // Pick first employee from leaderboard that isn't current user
-                  const target = leaderboard.find(e => e.user_id !== user?.id);
-                  if (target) {
-                    setSelectedEmployee({ name: target.full_name, userId: target.user_id });
-                    setBonusSheetOpen(true);
-                  }
-                }}
+          {/* Tabs */}
+          <div className="tab-command">
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  "tab-command-item",
+                  activeTab === tab.key ? "tab-command-active" : "tab-command-inactive"
+                )}
               >
-                <Award className="w-4 h-4 mr-2" />
-                Dar Bônus a Funcionário
-              </Button>
-            )}
+                <AppIcon name={tab.icon} size={14} />
+                <span className="text-xs">{tab.label}</span>
+              </button>
+            ))}
           </div>
 
-          {/* Bonus Guide */}
-          <BonusGuide />
+          {/* Tab Content */}
+          {activeTab === 'ranking' && (
+            <Leaderboard
+              entries={leaderboard}
+              currentUserId={user?.id}
+              isLoading={isLoading}
+              selectedMonth={selectedMonth}
+              onMonthChange={setSelectedMonth}
+            />
+          )}
+
+          {activeTab === 'objetivos' && (
+            <ObjectivesList
+              data={{
+                totalCompletions: earned,
+                earnedPoints: earned,
+                totalRedemptions: 0,
+              }}
+            />
+          )}
+
+          {activeTab === 'bonus' && (
+            <div className="space-y-4">
+              {/* Current bonus points */}
+              <div className="card-surface p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <AppIcon name="Flame" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
+                    <h3 className="font-semibold text-sm text-foreground">Bônus do Mês</h3>
+                  </div>
+                  {monthlyBonus > 0 && (
+                    <Badge variant="outline" className="text-xs" style={{ borderColor: 'hsl(var(--neon-amber) / 0.5)', color: 'hsl(var(--neon-amber))' }}>
+                      +{monthlyBonus} pts
+                    </Badge>
+                  )}
+                </div>
+
+                {bonusPoints.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {bonusPoints.map(bp => (
+                      <div key={bp.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30">
+                        <AppIcon name="Star" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-foreground truncate">{bp.reason}</p>
+                          <p className="text-xs text-muted-foreground">{bp.type === 'auto' ? 'Automático' : 'Manual'}</p>
+                        </div>
+                        <span className="text-xs font-bold shrink-0" style={{ color: 'hsl(var(--neon-amber))' }}>+{bp.points}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Nenhum bônus recebido este mês</p>
+                )}
+
+                {isAdmin && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-3"
+                    onClick={() => {
+                      const target = leaderboard.find(e => e.user_id !== user?.id);
+                      if (target) {
+                        setSelectedEmployee({ name: target.full_name, userId: target.user_id });
+                        setBonusSheetOpen(true);
+                      }
+                    }}
+                  >
+                    <AppIcon name="Medal" size={14} className="mr-2" />
+                    Dar Bônus a Funcionário
+                  </Button>
+                )}
+              </div>
+
+              {/* Bonus Guide */}
+              <BonusGuide />
+            </div>
+          )}
         </div>
       </div>
 
