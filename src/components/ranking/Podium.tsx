@@ -109,9 +109,9 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
                 height
               )}
               style={{
-                background: `linear-gradient(to top, ${crownColor}50, ${crownColor}25, ${crownColor}10)`,
-                borderColor: `${crownColor}40`,
-                boxShadow: `0 -4px 20px ${crownColor}20, inset 0 2px 10px ${crownColor}15`,
+                background: `linear-gradient(to top, ${crownColor}90, ${crownColor}55, ${crownColor}30)`,
+                borderColor: `${crownColor}70`,
+                boxShadow: `0 -4px 20px ${crownColor}35, inset 0 2px 10px ${crownColor}30`,
               }}
             >
               {/* Shimmer effect */}
