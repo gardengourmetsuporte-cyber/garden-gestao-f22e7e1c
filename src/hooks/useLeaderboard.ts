@@ -30,8 +30,8 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
 
-  const [{ data: profiles }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
-    supabase.from('profiles').select('user_id, full_name, avatar_url'),
+  const [{ data: unitUsers }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
+    supabase.from('user_units').select('user_id, profiles:profiles!inner(user_id, full_name, avatar_url)').eq('unit_id', unitId),
     supabase
       .from('checklist_completions')
       .select('completed_by, points_awarded, awarded_points, date')
@@ -65,8 +65,10 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
     userBonus.set(b.user_id, (userBonus.get(b.user_id) || 0) + b.points);
   });
 
-  const entries: LeaderboardEntry[] = (profiles || [])
-    .map(profile => {
+  const profiles = (unitUsers || []).map((u: any) => u.profiles).filter(Boolean);
+
+  const entries: LeaderboardEntry[] = profiles
+    .map((profile: any) => {
       const earned = calculateEarnedPoints(userCompletions.get(profile.user_id) || []);
       const spent = calculateSpentPoints(userRedemptions.get(profile.user_id) || []);
       const bonus = userBonus.get(profile.user_id) || 0;

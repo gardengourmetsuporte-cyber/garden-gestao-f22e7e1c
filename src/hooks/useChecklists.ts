@@ -119,12 +119,12 @@ export function useChecklists() {
     const maxOrder = sectors.reduce((max, s) => Math.max(max, s.sort_order), 0);
     const { data, error } = await supabase
       .from('checklist_sectors')
-      .insert({ ...sector, sort_order: maxOrder + 1 })
+      .insert({ ...sector, sort_order: maxOrder + 1, unit_id: activeUnitId })
       .select().single();
     if (error) throw error;
     invalidateSectors();
     return { ...data, subcategories: [] } as ChecklistSector;
-  }, [sectors, invalidateSectors]);
+  }, [sectors, invalidateSectors, activeUnitId]);
 
   const updateSector = useCallback(async (id: string, updates: Partial<ChecklistSector>) => {
     const { subcategories, ...updateData } = updates;
@@ -147,12 +147,12 @@ export function useChecklists() {
     const maxOrder = sector?.subcategories?.reduce((max, s) => Math.max(max, s.sort_order), 0) || 0;
     const { data, error } = await supabase
       .from('checklist_subcategories')
-      .insert({ ...subcategory, sort_order: maxOrder + 1 })
+      .insert({ ...subcategory, sort_order: maxOrder + 1, unit_id: activeUnitId })
       .select().single();
     if (error) throw error;
     invalidateSectors();
     return data as ChecklistSubcategory;
-  }, [sectors, invalidateSectors]);
+  }, [sectors, invalidateSectors, activeUnitId]);
 
   const updateSubcategory = useCallback(async (id: string, updates: Partial<ChecklistSubcategory>) => {
     const { items, sector, ...updateData } = updates;
@@ -181,12 +181,13 @@ export function useChecklists() {
         subcategory_id: item.subcategory_id, name: item.name,
         description: item.description, frequency: item.frequency || 'daily',
         checklist_type: item.checklist_type || 'abertura', points: item.points ?? 1,
+        unit_id: activeUnitId,
       })
       .select().single();
     if (error) throw error;
     invalidateSectors();
     return data as ChecklistItem;
-  }, [invalidateSectors]);
+  }, [invalidateSectors, activeUnitId]);
 
   const updateItem = useCallback(async (id: string, updates: Partial<ChecklistItem>) => {
     const { subcategory, ...updateData } = updates;
