@@ -1,119 +1,111 @@
 
 
-# Landing Page Profissional com Planos e Imagens
+# Redesign Completo da Landing Page - Nivel Premium
 
-## Objetivo
-Transformar a landing page atual de "rascunho textual" em uma pagina de vendas profissional e completa, com mockups visuais do sistema, secao de planos com precos, e visual premium de verdade.
+## Problemas Identificados
 
-## O que muda
+1. **Identidade visual desconectada**: A landing usa light mode generico (branco/azul claro) enquanto o app real usa Dark Command Center com neon cyan -- parecem produtos diferentes
+2. **Imagem do Hero e falsa**: Mockup gerado por IA, nao e uma foto real do sistema
+3. **Secao de Screenshots vazia**: Mostra apenas icones placeholder em vez de telas reais
+4. **Planos sem fluxo de compra**: Botoes levam direto para /auth sem nenhuma etapa de checkout ou selecao de plano
+5. **Falta de prova social**: Sem depoimentos, sem logos de clientes, sem numeros reais
+6. **Navbar sem menu mobile**: Links de navegacao somem no celular
+7. **Secoes repetitivas**: Problema, Solucao e Beneficios se sobrepoe em conteudo
 
-### 1. Hero Section reformulado
-- Adicionar um **mockup do dashboard** no hero (imagem gerada via IA mostrando a interface do sistema em um notebook/celular)
-- Layout split: texto a esquerda, imagem a direita (desktop) / empilhado (mobile)
-- Badge animado "Novo" ou "IA integrada"
-- Numeros de impacto abaixo do CTA (ex: "500+ empresas", "10 modulos", "IA inclusa")
+## Solucao
 
-### 2. Secao de Screenshots do Sistema (nova)
-- Criar componente `ScreenshotsSection.tsx`
-- Tabs ou carousel mostrando telas reais do sistema: Dashboard, Financeiro, Estoque, Checklists
-- Cada tab com titulo + descricao + screenshot
-- Usar screenshots capturados do proprio sistema
+### 1. Identidade Visual Alinhada ao App
 
-### 3. Secao de Planos e Precos (nova)
-- Criar componente `PricingSection.tsx`
-- 3 planos:
-  - **Gratis**: Dashboard, Agenda, 1 Checklist, Chat interno (R$ 0/mes)
-  - **Pro**: Tudo do Gratis + Financeiro, Estoque, Equipe, Receitas, Gamificacao (R$ 97/mes)
-  - **Business**: Tudo do Pro + IA Copiloto, WhatsApp Bot, Marketing, Pedidos Online, Suporte prioritario (R$ 197/mes)
-- Card do plano Pro destacado como "Mais popular"
-- Botao CTA em cada plano levando para `/auth` (cadastro)
-- Toggle mensal/anual com desconto de 20% no anual
-- Lista de features com checkmarks verdes
+Migrar a landing page para o estilo dark premium do app, usando o mesmo design system:
+- Fundo escuro (`bg-[hsl(222,70%,4%)]`) com gradientes sutis
+- Cards com backdrop-blur e bordas cyan neon
+- Tipografia bold com glow effects nos destaques
+- Manter contraste alto para legibilidade
 
-### 4. Secao de FAQ (nova)
-- Criar componente `FAQSection.tsx`
-- Accordion com perguntas frequentes:
-  - "Posso testar gratis?"
-  - "Como funciona o plano gratis?"
-  - "Preciso de cartao de credito?"
-  - "Posso mudar de plano depois?"
-  - "Meus dados estao seguros?"
+### 2. Hero com Screenshot Real do Sistema
 
-### 5. Melhorias visuais gerais
-- **Navbar**: Adicionar link "Planos" apontando para `#planos`
-- **Hero**: Adicionar contadores animados (empresas, modulos)
-- **Problem/Solution/Benefits**: Melhorar com ilustracoes via icones maiores e mais espacamento
-- **CTA Final**: Referenciar o plano gratis ("Comece gratis, upgrade quando quiser")
-- **Footer**: Adicionar links para Termos, Privacidade, Planos
+- Capturar screenshot real do dashboard do app (via browser tool)
+- Exibir dentro de um frame de laptop/celular estilizado com CSS (sem imagem de computador)
+- Adicionar glow effect atras da imagem para efeito premium
+- Animacao sutil de entrada (fade + slide up)
 
-### 6. Geracao de imagens do sistema
-- Usar a IA de geracao de imagem para criar um mockup profissional mostrando o dashboard do Garden em um laptop/celular
-- A imagem sera salva no storage e referenciada no Hero
+### 3. Secao de Modulos com Screenshots Reais
 
-## Estrutura final da pagina (ordem das secoes)
+- Capturar screenshots reais das telas: Dashboard, Financeiro, Estoque, Equipe
+- Substituir os placeholders por imagens reais do sistema
+- Animacao de transicao ao trocar de tab
+- Frame com borda neon cyan
 
-1. Navbar (com link "Planos")
-2. Hero (com mockup visual)
-3. Logos/numeros de confianca
-4. O Problema
-5. A Solucao
-6. Screenshots do Sistema (nova)
-7. Beneficios
-8. Como Funciona
-9. Planos e Precos (nova)
-10. Diferenciais
-11. FAQ (nova)
-12. Confianca/LGPD
-13. CTA Final
-14. Footer
+### 4. Fluxo de Compra nos Planos
+
+- Ao clicar "Assinar Pro" ou "Assinar Business", abrir modal/dialog com:
+  - Resumo do plano selecionado
+  - Opcao mensal/anual com preco
+  - Formulario de dados basicos (nome, email)
+  - Botao "Ir para pagamento" que redireciona para /auth com query param do plano (`/auth?plan=pro`)
+- Auth page reconhece o parametro e exibe mensagem contextual ("Cadastre-se para ativar o plano Pro")
+- Nota: pagamento real via Stripe sera integrado em etapa futura; por ora o fluxo captura o lead com o plano escolhido
+
+### 5. Melhorias de Qualidade Premium
+
+- **Navbar mobile**: Adicionar hamburger menu com drawer para links
+- **Animacoes de scroll**: Elementos aparecem com fade-in conforme scroll (IntersectionObserver)
+- **Secao de depoimentos**: 3 cards com depoimentos ficticios mas realistas de empresarios
+- **Comparativo visual**: Tabela "Antes vs Depois" mostrando caos de planilhas vs Garden organizado
+- **Video placeholder**: Secao com botao de play para futuro video demo
+- **Gradiente hero**: Background com mesh gradient animado (estilo Linear.app)
+- **Footer completo**: Links organizados em colunas, redes sociais, selo de seguranca
+
+### 6. Secoes Reestruturadas (ordem final)
+
+1. Navbar (dark, blur, hamburger mobile)
+2. Hero (dark, screenshot real, CTA duplo, contadores)
+3. Logos de confianca (band de logos ou numeros)
+4. O Problema (visual dark com icones glow)
+5. A Solucao (comparativo antes/depois)
+6. Modulos do Sistema (tabs com screenshots reais)
+7. Beneficios (cards dark com icone glow)
+8. Como Funciona (timeline vertical com steps)
+9. Depoimentos (cards com avatar + texto)
+10. Planos e Precos (cards dark, toggle, modal de compra)
+11. FAQ (accordion dark)
+12. CTA Final (gradiente cyan, botao glow)
+13. Footer (dark, colunas, links)
 
 ## Secao Tecnica
 
-### Arquivos a criar
-- `src/components/landing/PricingSection.tsx` -- Cards de planos com toggle mensal/anual
-- `src/components/landing/ScreenshotsSection.tsx` -- Tabs com screenshots do sistema
-- `src/components/landing/FAQSection.tsx` -- Accordion de perguntas frequentes
+### Componentes novos
+- `src/components/landing/TestimonialsSection.tsx` -- Depoimentos ficticios
+- `src/components/landing/PlanCheckoutDialog.tsx` -- Modal de selecao de plano pre-checkout
+
+### Componentes a reescrever (estilo dark + melhorias)
+- `src/components/landing/LandingNavbar.tsx` -- Dark + hamburger mobile
+- `src/components/landing/HeroSection.tsx` -- Dark, screenshot real, mesh gradient
+- `src/components/landing/ProblemSection.tsx` -- Dark, icones glow
+- `src/components/landing/SolutionSection.tsx` -- Dark, comparativo
+- `src/components/landing/ScreenshotsSection.tsx` -- Screenshots reais com frame neon
+- `src/components/landing/BenefitsSection.tsx` -- Cards dark glow
+- `src/components/landing/HowItWorksSection.tsx` -- Timeline dark
+- `src/components/landing/PricingSection.tsx` -- Cards dark + modal checkout
+- `src/components/landing/DifferentialsSection.tsx` -- Dark
+- `src/components/landing/FAQSection.tsx` -- Accordion dark
+- `src/components/landing/TrustSection.tsx` -- Dark
+- `src/components/landing/CTASection.tsx` -- Gradiente neon
+- `src/components/landing/FooterSection.tsx` -- Dark completo
+- `src/pages/Landing.tsx` -- Wrapper dark + scroll animations
 
 ### Arquivos a editar
-- `src/components/landing/HeroSection.tsx` -- Layout split com mockup + contadores
-- `src/components/landing/LandingNavbar.tsx` -- Adicionar link "Planos"
-- `src/components/landing/CTASection.tsx` -- Referenciar plano gratis
-- `src/components/landing/FooterSection.tsx` -- Mais links
-- `src/pages/Landing.tsx` -- Adicionar novas secoes na ordem correta
+- `src/pages/Auth.tsx` -- Ler query param `?plan=` e exibir contexto
 
-### Planos detalhados
-
-**Gratis (R$ 0/mes)**
-- Dashboard basico
-- Agenda
-- 1 Checklist
-- Chat interno
-- Ate 3 usuarios
-
-**Pro (R$ 97/mes) -- DESTAQUE**
-- Tudo do Gratis
-- Financeiro completo
-- Estoque inteligente
-- Gestao de equipe
-- Fichas tecnicas
-- Gamificacao e ranking
-- Fechamento de caixa
-- Ate 15 usuarios
-
-**Business (R$ 197/mes)**
-- Tudo do Pro
-- IA Copiloto
-- WhatsApp Bot
-- Marketing
-- Pedidos online (tablet)
-- Cardapio digital
-- Financas pessoais
-- Usuarios ilimitados
-- Suporte prioritario
-
-### Sobre pagamentos
-Neste primeiro momento os planos serao informativos (o botao leva para cadastro em `/auth`). A integracao com pagamento real (Stripe) pode ser feita em uma etapa seguinte apos validar o interesse.
+### Screenshots a capturar
+- Dashboard principal (via browser tool, navegando para / logado)
+- Tela financeira
+- Tela de estoque
+- Tela de equipe
 
 ### Banco de dados
 Nenhuma migracao necessaria nesta etapa.
+
+### Dependencias
+Nenhuma nova dependencia necessaria. Scroll animations serao implementadas com IntersectionObserver nativo.
 
