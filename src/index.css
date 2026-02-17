@@ -15,8 +15,30 @@
    ========================================================= */
 
 @layer base {
+  /* Base tokens shared by both themes */
   :root {
-    /* Dark Command Center palette — refined */
+    --radius: 0.875rem;
+
+    /* Neon glow tokens */
+    --neon-cyan: 190 90% 55%;
+    --neon-green: 142 71% 45%;
+    --neon-red: 0 84% 60%;
+    --neon-amber: 38 92% 50%;
+    --neon-purple: 262 80% 65%;
+
+    /* Coin animation tokens */
+    --coin-1: 190 90% 55%;
+    --coin-1-glow: 190 90% 55% / 0.9;
+    --coin-2: 45 96% 56%;
+    --coin-2-glow: 45 96% 56% / 0.9;
+    --coin-3: 328 92% 62%;
+    --coin-3-glow: 328 92% 62% / 0.9;
+    --coin-4: 262 92% 70%;
+    --coin-4-glow: 262 92% 70% / 0.9;
+  }
+
+  /* ===== DARK THEME (default) ===== */
+  .dark {
     --background: 222 70% 4%;
     --foreground: 210 40% 96%;
 
@@ -51,15 +73,6 @@
     --input: 222 30% 11%;
     --ring: 217 91% 60%;
 
-    --radius: 0.875rem;
-
-    /* Neon glow tokens */
-    --neon-cyan: 190 90% 55%;
-    --neon-green: 142 71% 45%;
-    --neon-red: 0 84% 60%;
-    --neon-amber: 38 92% 50%;
-    --neon-purple: 262 80% 65%;
-
     /* Glow & Shadow tokens */
     --glow-primary: 0 0 24px hsl(217 91% 60% / 0.2), 0 0 48px hsl(217 91% 60% / 0.08);
     --glow-success: 0 0 24px hsl(142 71% 45% / 0.2), 0 0 48px hsl(142 71% 45% / 0.08);
@@ -70,20 +83,10 @@
     --shadow-card: 0 2px 8px hsl(222 50% 3% / 0.5), 0 4px 20px hsl(222 50% 3% / 0.3);
     --shadow-card-hover: 0 4px 24px hsl(222 50% 3% / 0.6), 0 8px 40px hsl(222 50% 3% / 0.3);
     --shadow-elevated: 0 8px 40px hsl(222 50% 3% / 0.7), 0 16px 64px hsl(222 50% 3% / 0.3);
-
-    /* Coin animation tokens */
-    --coin-1: 190 90% 55%;
-    --coin-1-glow: 190 90% 55% / 0.9;
-    --coin-2: 45 96% 56%;
-    --coin-2-glow: 45 96% 56% / 0.9;
-    --coin-3: 328 92% 62%;
-    --coin-3-glow: 328 92% 62% / 0.9;
-    --coin-4: 262 92% 70%;
-    --coin-4-glow: 262 92% 70% / 0.9;
   }
 
-  /* Light mode override (optional) */
-  .light {
+  /* ===== LIGHT THEME ===== */
+  :root:not(.dark) {
     --background: 210 20% 98%;
     --foreground: 220 25% 10%;
 
@@ -117,7 +120,19 @@
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 220 70% 50%;
+
+    /* Light glow & shadow tokens */
+    --glow-primary: 0 0 12px hsl(220 70% 50% / 0.1);
+    --glow-success: 0 0 12px hsl(142 71% 45% / 0.1);
+    --glow-destructive: 0 0 12px hsl(0 72% 51% / 0.1);
+    --glow-warning: 0 0 12px hsl(38 92% 50% / 0.1);
+    --glow-cyan: 0 0 12px hsl(190 90% 55% / 0.1);
+
+    --shadow-card: 0 1px 3px hsl(220 25% 10% / 0.06), 0 2px 8px hsl(220 25% 10% / 0.04);
+    --shadow-card-hover: 0 2px 8px hsl(220 25% 10% / 0.08), 0 4px 16px hsl(220 25% 10% / 0.04);
+    --shadow-elevated: 0 4px 16px hsl(220 25% 10% / 0.1), 0 8px 32px hsl(220 25% 10% / 0.05);
   }
+
 }
 
 @layer base {

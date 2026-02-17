@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logoImg from "@/assets/logo.png";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,7 +47,8 @@ export function LandingNavbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             to="/auth"
             className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold transition-all"

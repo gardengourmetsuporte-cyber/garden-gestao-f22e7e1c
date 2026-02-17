@@ -2,7 +2,7 @@ import logoImg from "@/assets/logo.png";
 
 export function FooterSection() {
   return (
-    <footer className="py-12" style={{ background: "hsl(222 70% 3%)", borderTop: "1px solid hsl(var(--border) / 0.3)" }}>
+    <footer className="py-12 bg-card border-t border-border/30">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-8 mb-10">
           <div>
