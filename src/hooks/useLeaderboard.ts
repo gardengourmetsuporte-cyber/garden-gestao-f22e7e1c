@@ -16,6 +16,8 @@ export interface LeaderboardEntry {
   spent_points: number;
   balance: number;
   rank: number;
+  /** All-time earned points (for rank/frame calculation) */
+  earned_all_time: number;
 }
 
 export interface SectorPointsSummary {
@@ -39,7 +41,7 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const unitUserIds = (unitUsers || []).map(u => u.user_id);
   if (unitUserIds.length === 0) return [];
 
-  const [{ data: profilesData }, { data: completions }, { data: redemptions }, { data: bonusRows }] = await Promise.all([
+  const [{ data: profilesData }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: allTimeCompletions }] = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', unitUserIds),
     supabase
       .from('checklist_completions')
@@ -53,6 +55,11 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
       .select('user_id, points')
       .eq('unit_id', unitId)
       .eq('month', monthStart),
+    // All-time completions for rank calculation
+    supabase
+      .from('checklist_completions')
+      .select('completed_by, points_awarded, awarded_points')
+      .eq('unit_id', unitId),
   ]);
 
   const userCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
@@ -74,6 +81,14 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
     userBonus.set(b.user_id, (userBonus.get(b.user_id) || 0) + b.points);
   });
 
+  // All-time completions map for rank calculation
+  const userAllTimeCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
+  allTimeCompletions?.forEach(c => {
+    const list = userAllTimeCompletions.get(c.completed_by) || [];
+    list.push({ points_awarded: c.points_awarded, awarded_points: c.awarded_points });
+    userAllTimeCompletions.set(c.completed_by, list);
+  });
+
   const profiles = (profilesData || []).filter(Boolean);
 
   const entries: LeaderboardEntry[] = profiles
@@ -81,6 +96,7 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
       const earned = calculateEarnedPoints(userCompletions.get(profile.user_id) || []);
       const spent = calculateSpentPoints(userRedemptions.get(profile.user_id) || []);
       const bonus = userBonus.get(profile.user_id) || 0;
+      const allTimeEarned = calculateEarnedPoints(userAllTimeCompletions.get(profile.user_id) || []);
       return {
         user_id: profile.user_id,
         full_name: profile.full_name,
@@ -91,6 +107,7 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
         spent_points: spent,
         balance: earned - spent,
         rank: 0,
+        earned_all_time: allTimeEarned,
       };
     })
     .filter(e => e.total_score > 0)
