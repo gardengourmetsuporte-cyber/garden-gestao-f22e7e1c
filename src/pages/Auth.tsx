@@ -1,6 +1,6 @@
 // Auth page v2
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,8 @@ export default function Auth() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { user, signIn, signUp, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const planFromUrl = searchParams.get('plan');
 
   // Listen for PASSWORD_RECOVERY event
   useEffect(() => {
@@ -251,6 +253,8 @@ export default function Auth() {
                   ? 'Informe seu email para recuperação'
                   : isLogin
                   ? 'Acesse sua conta para continuar'
+                  : planFromUrl
+                  ? `Cadastre-se para ativar o plano ${planFromUrl.charAt(0).toUpperCase() + planFromUrl.slice(1)}`
                   : 'Preencha os dados para se cadastrar'}
               </p>
             </div>

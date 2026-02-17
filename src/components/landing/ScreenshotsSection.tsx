@@ -8,7 +8,7 @@ const tabs = [
     icon: BarChart3,
     title: "Visão geral em tempo real",
     description: "KPIs, gráficos financeiros, agenda e alertas de estoque — tudo em uma tela.",
-    color: "bg-blue-50 text-blue-600",
+    image: "/debug/IMG_2687.png",
   },
   {
     id: "financeiro",
@@ -16,7 +16,7 @@ const tabs = [
     icon: BarChart3,
     title: "Controle financeiro completo",
     description: "Contas a pagar/receber, categorias, gráficos e DRE automático.",
-    color: "bg-emerald-50 text-emerald-600",
+    image: "/debug/IMG_2688.png",
   },
   {
     id: "estoque",
@@ -24,7 +24,7 @@ const tabs = [
     icon: Package,
     title: "Estoque inteligente",
     description: "Movimentações, alertas de mínimo, fichas técnicas e sugestão de compra com IA.",
-    color: "bg-amber-50 text-amber-600",
+    image: "/debug/IMG_2687.png",
   },
   {
     id: "equipe",
@@ -32,7 +32,7 @@ const tabs = [
     icon: Users,
     title: "Gestão de equipe gamificada",
     description: "Escalas, ponto digital, ranking de desempenho e sistema de recompensas.",
-    color: "bg-purple-50 text-purple-600",
+    image: "/debug/IMG_2688.png",
   },
 ];
 
@@ -41,13 +41,16 @@ export function ScreenshotsSection() {
   const current = tabs.find((t) => t.id === active)!;
 
   return (
-    <section className="py-20 md:py-28 bg-white">
+    <section className="py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--neon-cyan))" }}>
+            Módulos
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             Conheça os módulos
           </h2>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-muted-foreground">
             Tudo que você precisa para gerenciar seu negócio, integrado em um único sistema.
           </p>
         </div>
@@ -56,15 +59,20 @@ export function ScreenshotsSection() {
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isActive = active === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActive(tab.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-                  active === tab.id
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all"
+                style={isActive ? {
+                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
+                  color: "white",
+                  boxShadow: "0 0 20px hsl(var(--neon-cyan) / 0.3)",
+                } : {
+                  background: "hsl(var(--secondary))",
+                  color: "hsl(var(--muted-foreground))",
+                }}
               >
                 <Icon className="w-4 h-4" />
                 {tab.label}
@@ -74,23 +82,38 @@ export function ScreenshotsSection() {
         </div>
 
         {/* Content */}
-        <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 md:p-12">
+        <div className="card-surface p-8 md:p-12">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4 ${current.color}`}>
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
+                style={{
+                  background: "hsl(var(--neon-cyan) / 0.1)",
+                  border: "1px solid hsl(var(--neon-cyan) / 0.2)",
+                  color: "hsl(var(--neon-cyan))",
+                }}
+              >
                 <current.icon className="w-3.5 h-3.5" />
                 {current.label}
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">{current.title}</h3>
-              <p className="text-slate-600 leading-relaxed">{current.description}</p>
+              <h3 className="text-2xl font-bold text-foreground mb-3">{current.title}</h3>
+              <p className="text-muted-foreground leading-relaxed">{current.description}</p>
             </div>
 
-            {/* Placeholder for screenshot */}
-            <div className="aspect-video bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
-              <div className="text-center p-8">
-                <current.icon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <p className="text-sm text-slate-400">Módulo {current.label}</p>
-              </div>
+            {/* Screenshot with neon frame */}
+            <div
+              className="aspect-video rounded-xl overflow-hidden"
+              style={{
+                border: "1px solid hsl(var(--neon-cyan) / 0.25)",
+                boxShadow: "0 0 30px hsl(var(--neon-cyan) / 0.1), var(--shadow-card)",
+              }}
+            >
+              <img
+                src={current.image}
+                alt={`Módulo ${current.label}`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
