@@ -1,111 +1,62 @@
 
+# Tema Claro/Escuro com Botao de Toggle
 
-# Redesign Completo da Landing Page - Nivel Premium
+## O que sera feito
 
-## Problemas Identificados
+Adicionar um botao de alternancia de tema (dark/light) tanto na landing page quanto no app principal, permitindo ao usuario escolher entre modo escuro e claro. A preferencia sera salva automaticamente no localStorage.
 
-1. **Identidade visual desconectada**: A landing usa light mode generico (branco/azul claro) enquanto o app real usa Dark Command Center com neon cyan -- parecem produtos diferentes
-2. **Imagem do Hero e falsa**: Mockup gerado por IA, nao e uma foto real do sistema
-3. **Secao de Screenshots vazia**: Mostra apenas icones placeholder em vez de telas reais
-4. **Planos sem fluxo de compra**: Botoes levam direto para /auth sem nenhuma etapa de checkout ou selecao de plano
-5. **Falta de prova social**: Sem depoimentos, sem logos de clientes, sem numeros reais
-6. **Navbar sem menu mobile**: Links de navegacao somem no celular
-7. **Secoes repetitivas**: Problema, Solucao e Beneficios se sobrepoe em conteudo
+## Escopo das mudancas
 
-## Solucao
+### 1. Configurar o ThemeProvider (next-themes)
+O pacote `next-themes` ja esta instalado. Sera adicionado o `ThemeProvider` no `App.tsx` envolvendo toda a aplicacao, configurado com `attribute="class"` para funcionar com o Tailwind (`darkMode: ["class"]`). O tema padrao sera "dark" (mantendo a experiencia atual).
 
-### 1. Identidade Visual Alinhada ao App
+### 2. Ajustar o CSS
+O arquivo `index.css` ja possui a classe `.light` com as variaveis de tema claro (linhas 86-120). Sera necessario:
+- Mover as variaveis do `:root` para `.dark` para que o sistema de classes funcione corretamente
+- Ajustar glows, sombras e tokens neon para o tema claro
+- Garantir que a landing page (que usa cores hardcoded como `bg-[hsl(222,70%,4%)]`) use as variaveis CSS em vez de valores fixos
 
-Migrar a landing page para o estilo dark premium do app, usando o mesmo design system:
-- Fundo escuro (`bg-[hsl(222,70%,4%)]`) com gradientes sutis
-- Cards com backdrop-blur e bordas cyan neon
-- Tipografia bold com glow effects nos destaques
-- Manter contraste alto para legibilidade
+### 3. Botao de Toggle no App (AppLayout)
+Adicionar um icone de Sol/Lua no header do `AppLayout.tsx` que alterna entre os temas usando `useTheme()` do `next-themes`.
 
-### 2. Hero com Screenshot Real do Sistema
+### 4. Botao de Toggle na Landing (LandingNavbar)
+Adicionar o mesmo botao Sol/Lua na navbar da landing page.
 
-- Capturar screenshot real do dashboard do app (via browser tool)
-- Exibir dentro de um frame de laptop/celular estilizado com CSS (sem imagem de computador)
-- Adicionar glow effect atras da imagem para efeito premium
-- Animacao sutil de entrada (fade + slide up)
-
-### 3. Secao de Modulos com Screenshots Reais
-
-- Capturar screenshots reais das telas: Dashboard, Financeiro, Estoque, Equipe
-- Substituir os placeholders por imagens reais do sistema
-- Animacao de transicao ao trocar de tab
-- Frame com borda neon cyan
-
-### 4. Fluxo de Compra nos Planos
-
-- Ao clicar "Assinar Pro" ou "Assinar Business", abrir modal/dialog com:
-  - Resumo do plano selecionado
-  - Opcao mensal/anual com preco
-  - Formulario de dados basicos (nome, email)
-  - Botao "Ir para pagamento" que redireciona para /auth com query param do plano (`/auth?plan=pro`)
-- Auth page reconhece o parametro e exibe mensagem contextual ("Cadastre-se para ativar o plano Pro")
-- Nota: pagamento real via Stripe sera integrado em etapa futura; por ora o fluxo captura o lead com o plano escolhido
-
-### 5. Melhorias de Qualidade Premium
-
-- **Navbar mobile**: Adicionar hamburger menu com drawer para links
-- **Animacoes de scroll**: Elementos aparecem com fade-in conforme scroll (IntersectionObserver)
-- **Secao de depoimentos**: 3 cards com depoimentos ficticios mas realistas de empresarios
-- **Comparativo visual**: Tabela "Antes vs Depois" mostrando caos de planilhas vs Garden organizado
-- **Video placeholder**: Secao com botao de play para futuro video demo
-- **Gradiente hero**: Background com mesh gradient animado (estilo Linear.app)
-- **Footer completo**: Links organizados em colunas, redes sociais, selo de seguranca
-
-### 6. Secoes Reestruturadas (ordem final)
-
-1. Navbar (dark, blur, hamburger mobile)
-2. Hero (dark, screenshot real, CTA duplo, contadores)
-3. Logos de confianca (band de logos ou numeros)
-4. O Problema (visual dark com icones glow)
-5. A Solucao (comparativo antes/depois)
-6. Modulos do Sistema (tabs com screenshots reais)
-7. Beneficios (cards dark com icone glow)
-8. Como Funciona (timeline vertical com steps)
-9. Depoimentos (cards com avatar + texto)
-10. Planos e Precos (cards dark, toggle, modal de compra)
-11. FAQ (accordion dark)
-12. CTA Final (gradiente cyan, botao glow)
-13. Footer (dark, colunas, links)
+### 5. Corrigir Landing Page para usar variaveis CSS
+Varias secoes da landing usam cores hardcoded escuras (ex: `bg-[hsl(222,70%,4%)]`). Essas serao substituidas pelas variaveis do design system (`bg-background`, `text-foreground`, `bg-card`, etc.) para que o tema claro funcione automaticamente.
 
 ## Secao Tecnica
 
-### Componentes novos
-- `src/components/landing/TestimonialsSection.tsx` -- Depoimentos ficticios
-- `src/components/landing/PlanCheckoutDialog.tsx` -- Modal de selecao de plano pre-checkout
-
-### Componentes a reescrever (estilo dark + melhorias)
-- `src/components/landing/LandingNavbar.tsx` -- Dark + hamburger mobile
-- `src/components/landing/HeroSection.tsx` -- Dark, screenshot real, mesh gradient
-- `src/components/landing/ProblemSection.tsx` -- Dark, icones glow
-- `src/components/landing/SolutionSection.tsx` -- Dark, comparativo
-- `src/components/landing/ScreenshotsSection.tsx` -- Screenshots reais com frame neon
-- `src/components/landing/BenefitsSection.tsx` -- Cards dark glow
-- `src/components/landing/HowItWorksSection.tsx` -- Timeline dark
-- `src/components/landing/PricingSection.tsx` -- Cards dark + modal checkout
-- `src/components/landing/DifferentialsSection.tsx` -- Dark
-- `src/components/landing/FAQSection.tsx` -- Accordion dark
-- `src/components/landing/TrustSection.tsx` -- Dark
-- `src/components/landing/CTASection.tsx` -- Gradiente neon
-- `src/components/landing/FooterSection.tsx` -- Dark completo
-- `src/pages/Landing.tsx` -- Wrapper dark + scroll animations
+### Arquivos a criar
+- `src/components/ui/theme-toggle.tsx` -- Componente reutilizavel com icone Sol/Lua que alterna o tema
 
 ### Arquivos a editar
-- `src/pages/Auth.tsx` -- Ler query param `?plan=` e exibir contexto
+- `src/App.tsx` -- Envolver com `ThemeProvider` do next-themes (defaultTheme="dark", attribute="class")
+- `src/index.css` -- Mover variaveis de `:root` para `.dark`, manter `.light` como esta, ajustar tokens de glow/sombra para light
+- `src/components/layout/AppLayout.tsx` -- Adicionar o ThemeToggle no header
+- `src/components/landing/LandingNavbar.tsx` -- Adicionar o ThemeToggle na navbar
+- `src/components/landing/HeroSection.tsx` -- Trocar cores hardcoded por variaveis CSS
+- `src/components/landing/ProblemSection.tsx` -- Trocar cores hardcoded por variaveis CSS
+- `src/components/landing/SolutionSection.tsx` -- Idem
+- `src/components/landing/ScreenshotsSection.tsx` -- Idem
+- `src/components/landing/BenefitsSection.tsx` -- Idem
+- `src/components/landing/HowItWorksSection.tsx` -- Idem
+- `src/components/landing/TestimonialsSection.tsx` -- Idem
+- `src/components/landing/PricingSection.tsx` -- Idem
+- `src/components/landing/DifferentialsSection.tsx` -- Idem
+- `src/components/landing/FAQSection.tsx` -- Idem
+- `src/components/landing/TrustSection.tsx` -- Idem
+- `src/components/landing/CTASection.tsx` -- Idem
+- `src/components/landing/FooterSection.tsx` -- Idem
+- `src/pages/Landing.tsx` -- Trocar bg hardcoded por bg-background
 
-### Screenshots a capturar
-- Dashboard principal (via browser tool, navegando para / logado)
-- Tela financeira
-- Tela de estoque
-- Tela de equipe
+### Logica do toggle
+```text
+Clique no botao Sol/Lua
+  -> useTheme().setTheme("light" | "dark")
+  -> next-themes adiciona/remove classe "dark" no <html>
+  -> Tailwind + variaveis CSS atualizam automaticamente
+  -> Preferencia salva no localStorage (automatico pelo next-themes)
+```
 
-### Banco de dados
-Nenhuma migracao necessaria nesta etapa.
-
-### Dependencias
-Nenhuma nova dependencia necessaria. Scroll animations serao implementadas com IntersectionObserver nativo.
-
+### Nenhuma migracao de banco necessaria
