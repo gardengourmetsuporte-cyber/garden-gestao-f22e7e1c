@@ -1,100 +1,119 @@
 
 
-# Landing Page Comercial - Garden Gestao
+# Landing Page Profissional com Planos e Imagens
 
-## Resumo
+## Objetivo
+Transformar a landing page atual de "rascunho textual" em uma pagina de vendas profissional e completa, com mockups visuais do sistema, secao de planos com precos, e visual premium de verdade.
 
-Criar uma landing page profissional de venda para o Garden, acessivel em `/landing`. A pagina sera publica (sem autenticacao), com visual **light mode** premium inspirado em Mobills/Stripe, contrastando com o dark mode do app interno.
+## O que muda
 
-## Estrutura da Pagina
+### 1. Hero Section reformulado
+- Adicionar um **mockup do dashboard** no hero (imagem gerada via IA mostrando a interface do sistema em um notebook/celular)
+- Layout split: texto a esquerda, imagem a direita (desktop) / empilhado (mobile)
+- Badge animado "Novo" ou "IA integrada"
+- Numeros de impacto abaixo do CTA (ex: "500+ empresas", "10 modulos", "IA inclusa")
 
-### Secoes (scroll unico)
-1. **Navbar** -- Logo + links de ancora + CTA "Entrar"
-2. **Hero** -- Headline forte, subheadline, CTA principal, mockup ilustrativo
-3. **O Problema** -- 3 pain points com icones
-4. **A Solucao** -- Apresentacao do Garden como centralizador com IA
-5. **Beneficios** -- 6 cards com icone + titulo + texto
-6. **Como Funciona** -- 4 steps numerados
-7. **Diferenciais** -- Grid comparativo
-8. **Confianca** -- LGPD, seguranca, profissionalismo
-9. **CTA Final** -- Reforco + botao grande
-10. **Footer** -- Links, copyright
+### 2. Secao de Screenshots do Sistema (nova)
+- Criar componente `ScreenshotsSection.tsx`
+- Tabs ou carousel mostrando telas reais do sistema: Dashboard, Financeiro, Estoque, Checklists
+- Cada tab com titulo + descricao + screenshot
+- Usar screenshots capturados do proprio sistema
 
-## Decisoes de Design
+### 3. Secao de Planos e Precos (nova)
+- Criar componente `PricingSection.tsx`
+- 3 planos:
+  - **Gratis**: Dashboard, Agenda, 1 Checklist, Chat interno (R$ 0/mes)
+  - **Pro**: Tudo do Gratis + Financeiro, Estoque, Equipe, Receitas, Gamificacao (R$ 97/mes)
+  - **Business**: Tudo do Pro + IA Copiloto, WhatsApp Bot, Marketing, Pedidos Online, Suporte prioritario (R$ 197/mes)
+- Card do plano Pro destacado como "Mais popular"
+- Botao CTA em cada plano levando para `/auth` (cadastro)
+- Toggle mensal/anual com desconto de 20% no anual
+- Lista de features com checkmarks verdes
 
-- **Light mode exclusivo** para a landing (fundo branco/cinza claro) -- diferencia do app dark
-- **Cor primaria**: azul do sistema (`hsl(217 91% 60%)`) como accent
-- **Tipografia**: Inter (ja carregada), titulos grandes (48px hero, 36px secoes)
-- **Espacamento**: Muito white space, padding generoso (py-20 a py-28)
-- **Mobile-first**: Stack vertical em mobile, grids em desktop
-- **Scroll suave**: `scroll-behavior: smooth` no container
-- **Sem dependencias novas**: Usa apenas Tailwind, AppIcon, e componentes existentes
+### 4. Secao de FAQ (nova)
+- Criar componente `FAQSection.tsx`
+- Accordion com perguntas frequentes:
+  - "Posso testar gratis?"
+  - "Como funciona o plano gratis?"
+  - "Preciso de cartao de credito?"
+  - "Posso mudar de plano depois?"
+  - "Meus dados estao seguros?"
 
-## Foco na Proposta de Valor
+### 5. Melhorias visuais gerais
+- **Navbar**: Adicionar link "Planos" apontando para `#planos`
+- **Hero**: Adicionar contadores animados (empresas, modulos)
+- **Problem/Solution/Benefits**: Melhorar com ilustracoes via icones maiores e mais espacamento
+- **CTA Final**: Referenciar o plano gratis ("Comece gratis, upgrade quando quiser")
+- **Footer**: Adicionar links para Termos, Privacidade, Planos
 
-A mensagem central e: **"Um unico sistema para quem nao tem orcamento para varios"**. Voltado para pequenos e medios empresarios que precisam centralizar operacao sem pagar por 5 ferramentas diferentes.
+### 6. Geracao de imagens do sistema
+- Usar a IA de geracao de imagem para criar um mockup profissional mostrando o dashboard do Garden em um laptop/celular
+- A imagem sera salva no storage e referenciada no Hero
+
+## Estrutura final da pagina (ordem das secoes)
+
+1. Navbar (com link "Planos")
+2. Hero (com mockup visual)
+3. Logos/numeros de confianca
+4. O Problema
+5. A Solucao
+6. Screenshots do Sistema (nova)
+7. Beneficios
+8. Como Funciona
+9. Planos e Precos (nova)
+10. Diferenciais
+11. FAQ (nova)
+12. Confianca/LGPD
+13. CTA Final
+14. Footer
 
 ## Secao Tecnica
 
-### Arquivos a Criar
-- `src/pages/Landing.tsx` -- Pagina completa com todas as secoes
-- `src/components/landing/LandingNavbar.tsx` -- Navbar fixa com transparencia
-- `src/components/landing/HeroSection.tsx` -- Hero com headline + CTA
-- `src/components/landing/ProblemSection.tsx` -- 3 pain points
-- `src/components/landing/SolutionSection.tsx` -- Apresentacao da solucao
-- `src/components/landing/BenefitsSection.tsx` -- 6 cards de beneficios
-- `src/components/landing/HowItWorksSection.tsx` -- 4 steps
-- `src/components/landing/DifferentialsSection.tsx` -- Grid de diferenciais
-- `src/components/landing/TrustSection.tsx` -- Confianca e LGPD
-- `src/components/landing/CTASection.tsx` -- CTA final
-- `src/components/landing/FooterSection.tsx` -- Footer
+### Arquivos a criar
+- `src/components/landing/PricingSection.tsx` -- Cards de planos com toggle mensal/anual
+- `src/components/landing/ScreenshotsSection.tsx` -- Tabs com screenshots do sistema
+- `src/components/landing/FAQSection.tsx` -- Accordion de perguntas frequentes
 
-### Arquivos a Editar
-- `src/App.tsx` -- Adicionar rota publica `/landing`
+### Arquivos a editar
+- `src/components/landing/HeroSection.tsx` -- Layout split com mockup + contadores
+- `src/components/landing/LandingNavbar.tsx` -- Adicionar link "Planos"
+- `src/components/landing/CTASection.tsx` -- Referenciar plano gratis
+- `src/components/landing/FooterSection.tsx` -- Mais links
+- `src/pages/Landing.tsx` -- Adicionar novas secoes na ordem correta
 
-### Estilo Visual
+### Planos detalhados
 
-Todas as secoes usam classes Tailwind inline (sem CSS custom novo). Exemplo de paleta light:
+**Gratis (R$ 0/mes)**
+- Dashboard basico
+- Agenda
+- 1 Checklist
+- Chat interno
+- Ate 3 usuarios
 
-```
-Fundo: bg-white / bg-slate-50 (secoes alternadas)
-Texto: text-slate-900 (titulos), text-slate-600 (corpo)
-Accent: bg-blue-600 / text-blue-600 (CTAs e destaques)
-Cards: bg-white border border-slate-200 shadow-sm
-```
-
-### Conteudo das Secoes
-
-**Hero:**
-- Headline: "Toda a gestao do seu negocio em um so lugar"
-- Sub: "Financeiro, estoque, equipe, checklists e IA -- tudo integrado para pequenos e medios empresarios que precisam de controle sem complexidade."
-- CTA: "Comece agora" (link para /auth)
-
-**Problema:**
-- "Planilhas espalhadas, sem visao real do negocio"
-- "Pagar por 5 sistemas diferentes que nao conversam"
-- "Equipe desengajada sem acompanhamento"
-
-**Beneficios (6 cards):**
-- Gestao financeira integrada
-- Controle de equipe e desempenho
-- Gamificacao e ranking
-- Copiloto com IA
+**Pro (R$ 97/mes) -- DESTAQUE**
+- Tudo do Gratis
+- Financeiro completo
 - Estoque inteligente
-- Checklists e operacao
+- Gestao de equipe
+- Fichas tecnicas
+- Gamificacao e ranking
+- Fechamento de caixa
+- Ate 15 usuarios
 
-**Como Funciona:**
-1. Cadastre sua empresa
-2. Configure seus modulos
-3. Acompanhe tudo em tempo real
-4. Use a IA para decidir melhor
+**Business (R$ 197/mes)**
+- Tudo do Pro
+- IA Copiloto
+- WhatsApp Bot
+- Marketing
+- Pedidos online (tablet)
+- Cardapio digital
+- Financas pessoais
+- Usuarios ilimitados
+- Suporte prioritario
 
-**Diferenciais:**
-- IA integrada ao dia a dia
-- Gamificacao real
-- Mobile-first
-- Preco justo para PMEs
+### Sobre pagamentos
+Neste primeiro momento os planos serao informativos (o botao leva para cadastro em `/auth`). A integracao com pagamento real (Stripe) pode ser feita em uma etapa seguinte apos validar o interesse.
 
-### Banco de Dados
-Nenhuma migracao necessaria.
+### Banco de dados
+Nenhuma migracao necessaria nesta etapa.
 
