@@ -1,0 +1,205 @@
+import { useState, useCallback, useEffect } from 'react';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
+import { FinanceHome } from '@/components/finance/FinanceHome';
+import { FinanceTransactions } from '@/components/finance/FinanceTransactions';
+import { FinanceCharts } from '@/components/finance/FinanceCharts';
+import { FinanceMore } from '@/components/finance/FinanceMore';
+import { FinancePlanning } from '@/components/finance/FinancePlanning';
+import { TransactionSheet } from '@/components/finance/TransactionSheet';
+import { AccountManagement } from '@/components/finance/AccountManagement';
+import { usePersonalFinance } from '@/hooks/usePersonalFinance';
+import { useFinanceStats } from '@/hooks/useFinanceStats';
+import { FinanceTab, TransactionType, FinanceTransaction, FinanceAccount } from '@/types/finance';
+import { TransactionFiltersState } from '@/components/finance/TransactionFilters';
+import { Loader2 } from 'lucide-react';
+import { RecurringEditMode } from '@/components/finance/TransactionSheet';
+
+export default function PersonalFinance() {
+  const [activeTab, setActiveTab] = useState<FinanceTab>('home');
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (activeTab !== 'home') {
+        e.preventDefault();
+        setActiveTab('home');
+      }
+    };
+    window.addEventListener('app-back-swipe', handler);
+    return () => window.removeEventListener('app-back-swipe', handler);
+  }, [activeTab]);
+
+  const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
+  const [transactionType, setTransactionType] = useState<TransactionType>('expense');
+  const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
+  const [accountManagementOpen, setAccountManagementOpen] = useState(false);
+  const [transactionInitialFilters, setTransactionInitialFilters] = useState<Partial<TransactionFiltersState>>({});
+
+  const handleFinanceNavigate = useCallback((tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => {
+    if (filter) {
+      const newFilters: Partial<TransactionFiltersState> = {};
+      if (filter.type) newFilters.type = filter.type;
+      if (filter.status) newFilters.status = filter.status;
+      setTransactionInitialFilters(newFilters);
+    } else {
+      setTransactionInitialFilters({});
+    }
+    setActiveTab(tab);
+  }, []);
+
+  const handleAccountCardClick = useCallback((account: FinanceAccount) => {
+    setTransactionInitialFilters({ accountId: account.id });
+    setActiveTab('transactions');
+  }, []);
+
+  const {
+    accounts, categories, transactions, transactionsByDate,
+    monthStats, totalBalance, isLoading,
+    addTransaction, updateTransaction, deleteTransaction,
+    toggleTransactionPaid, addAccount, updateAccount, deleteAccount,
+    updateRecurringTransaction, reorderTransactions, updateTransactionDate,
+    refetch
+  } = usePersonalFinance(selectedMonth);
+
+  const {
+    expensesByCategory, incomeByCategory, dailyExpenses, dailyIncome,
+    getSubcategoryStats, getSupplierStats, getEmployeeStats
+  } = useFinanceStats(transactions, categories);
+
+  const handleAddTransaction = (type: TransactionType) => {
+    setEditingTransaction(null);
+    setTransactionType(type);
+    setTransactionSheetOpen(true);
+  };
+
+  const handleTransactionClick = (transaction: FinanceTransaction) => {
+    setEditingTransaction(transaction);
+    setTransactionType(transaction.type);
+    setTransactionSheetOpen(true);
+  };
+
+  const handleSaveTransaction = async (data: Parameters<typeof addTransaction>[0]) => {
+    if (editingTransaction) {
+      await updateTransaction(editingTransaction.id, data);
+    } else {
+      await addTransaction(data);
+    }
+  };
+
+  const handleRefreshCategories = async () => { await refetch(); };
+  const handleRefreshAll = async () => { await refetch(); };
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout>
+      <div className="pb-20 lg:pb-20">
+        {activeTab === 'home' && (
+          <FinanceHome
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            accounts={accounts}
+            totalBalance={totalBalance}
+            monthStats={monthStats}
+            onNavigate={handleFinanceNavigate}
+            onAccountClick={handleAccountCardClick}
+          />
+        )}
+
+        {activeTab === 'transactions' && (
+          <FinanceTransactions
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            transactionsByDate={transactionsByDate}
+            monthStats={monthStats}
+            onTransactionClick={handleTransactionClick}
+            onTogglePaid={toggleTransactionPaid}
+            onDeleteTransaction={deleteTransaction}
+            onReorderTransactions={reorderTransactions}
+            categories={categories}
+            accounts={accounts}
+            initialFilters={transactionInitialFilters}
+          />
+        )}
+
+        {activeTab === 'charts' && (
+          <FinanceCharts
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            expensesByCategory={expensesByCategory}
+            incomeByCategory={incomeByCategory}
+            dailyExpenses={dailyExpenses}
+            dailyIncome={dailyIncome}
+            getSubcategoryStats={getSubcategoryStats}
+            getSupplierStats={getSupplierStats}
+            getEmployeeStats={getEmployeeStats}
+            transactions={transactions}
+            categories={categories}
+          />
+        )}
+
+        {activeTab === 'planning' && (
+          <FinancePlanning
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            totalBalance={totalBalance}
+          />
+        )}
+
+        {activeTab === 'more' && (
+          <FinanceMore
+            accounts={accounts}
+            categories={categories}
+            transactions={transactions}
+            selectedMonth={selectedMonth}
+            onAddAccount={addAccount}
+            onUpdateAccount={updateAccount}
+            onDeleteAccount={deleteAccount}
+            onRefreshCategories={handleRefreshCategories}
+            onRefreshAll={handleRefreshAll}
+          />
+        )}
+      </div>
+
+      <FinanceBottomNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onAddTransaction={handleAddTransaction}
+      />
+
+      <TransactionSheet
+        open={transactionSheetOpen}
+        onOpenChange={setTransactionSheetOpen}
+        defaultType={transactionType}
+        categories={categories}
+        accounts={accounts}
+        suppliers={[]}
+        employees={[]}
+        onSave={handleSaveTransaction}
+        onDelete={deleteTransaction}
+        editingTransaction={editingTransaction}
+        onUpdateRecurring={updateRecurringTransaction}
+        onRefreshCategories={handleRefreshCategories}
+        allTransactions={transactions}
+      />
+
+      <AccountManagement
+        open={accountManagementOpen}
+        onOpenChange={setAccountManagementOpen}
+        accounts={accounts}
+        onAdd={addAccount}
+        onUpdate={updateAccount}
+        onDelete={deleteAccount}
+      />
+    </AppLayout>
+  );
+}

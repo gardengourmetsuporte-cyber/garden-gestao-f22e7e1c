@@ -123,6 +123,25 @@ export const DEFAULT_INCOME_CATEGORIES = [
   { name: 'Outros', icon: 'Plus', color: '#059669', subcategories: [] },
 ];
 
+// Default personal categories
+export const DEFAULT_PERSONAL_EXPENSE_CATEGORIES = [
+  { name: 'Moradia', icon: 'House', color: '#ef4444', subcategories: ['Aluguel', 'Condomínio', 'IPTU', 'Energia', 'Água', 'Gás', 'Internet'] },
+  { name: 'Alimentação', icon: 'Coffee', color: '#f97316', subcategories: ['Supermercado', 'Restaurantes', 'Delivery', 'Lanches'] },
+  { name: 'Transporte', icon: 'Car', color: '#eab308', subcategories: ['Combustível', 'Uber/99', 'Estacionamento', 'Manutenção Carro', 'Seguro Auto'] },
+  { name: 'Saúde', icon: 'HeartPulse', color: '#22c55e', subcategories: ['Plano de Saúde', 'Farmácia', 'Consultas', 'Academia'] },
+  { name: 'Educação', icon: 'GraduationCap', color: '#14b8a6', subcategories: ['Cursos', 'Livros', 'Escola/Faculdade'] },
+  { name: 'Lazer', icon: 'Gamepad2', color: '#3b82f6', subcategories: ['Streaming', 'Viagens', 'Passeios', 'Hobbies'] },
+  { name: 'Vestuário', icon: 'Shirt', color: '#8b5cf6', subcategories: ['Roupas', 'Calçados', 'Acessórios'] },
+  { name: 'Financeiro', icon: 'Landmark', color: '#06b6d4', subcategories: ['Cartão de Crédito', 'Empréstimos', 'Investimentos', 'Seguros'] },
+  { name: 'Pessoal', icon: 'Heart', color: '#ec4899', subcategories: ['Cuidados Pessoais', 'Presentes', 'Assinaturas'] },
+];
+
+export const DEFAULT_PERSONAL_INCOME_CATEGORIES = [
+  { name: 'Salário/Pró-labore', icon: 'Briefcase', color: '#22c55e', subcategories: [] },
+  { name: 'Investimentos', icon: 'TrendingUp', color: '#10b981', subcategories: ['Dividendos', 'Rendimentos'] },
+  { name: 'Extras', icon: 'Plus', color: '#059669', subcategories: ['Freelance', 'Vendas', 'Outros'] },
+];
+
 export type FinanceTab = 'home' | 'transactions' | 'charts' | 'planning' | 'more' | 'cards';
 
 // Credit card invoices
