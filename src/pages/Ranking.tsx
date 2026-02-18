@@ -5,26 +5,19 @@ import { MyRankCard } from '@/components/ranking/MyRankCard';
 import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
 import { Leaderboard } from '@/components/dashboard/Leaderboard';
-import { BonusGuide } from '@/components/employees/BonusGuide';
-import { BonusPointSheet } from '@/components/employees/BonusPointSheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePoints } from '@/hooks/usePoints';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
-import { useBonusPoints } from '@/hooks/useBonusPoints';
 import { useProfile } from '@/hooks/useProfile';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
 
 export default function Ranking() {
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile } = useAuth();
   const { earned, monthlyScore } = usePoints();
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
-  const { bonusPoints } = useBonusPoints();
   const { profile: userProfile } = useProfile(user?.id, leaderboard);
-  const [bonusSheetOpen, setBonusSheetOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<{ name: string; userId: string } | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
@@ -93,44 +86,11 @@ export default function Ranking() {
             <EloList earnedPoints={earned} />
           )}
 
-          {activeTab === 'medalhas' && (
-            <div className="space-y-4">
-              {userProfile && (
-                <MedalList medals={userProfile.medals} />
-              )}
-
-              {isAdmin && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    const target = leaderboard.find(e => e.user_id !== user?.id);
-                    if (target) {
-                      setSelectedEmployee({ name: target.full_name, userId: target.user_id });
-                      setBonusSheetOpen(true);
-                    }
-                  }}
-                >
-                  <AppIcon name="Medal" size={14} className="mr-2" />
-                  Dar Bônus a Funcionário
-                </Button>
-              )}
-
-              <BonusGuide />
-            </div>
+          {activeTab === 'medalhas' && userProfile && (
+            <MedalList medals={userProfile.medals} />
           )}
         </div>
       </div>
-
-      {selectedEmployee && (
-        <BonusPointSheet
-          open={bonusSheetOpen}
-          onOpenChange={setBonusSheetOpen}
-          employeeName={selectedEmployee.name}
-          employeeUserId={selectedEmployee.userId}
-        />
-      )}
     </AppLayout>
   );
 }

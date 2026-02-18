@@ -10,7 +10,6 @@ export interface Medal {
   id: string;
   title: string;
   description: string;
-  icon: string;
   tier: MedalTier;
   unlocked: boolean;
   bonusPoints: number;
@@ -32,7 +31,6 @@ export function calculateMedals(data: MedalData): Medal[] {
       id: 'employee_of_month',
       title: 'Funcionário do Mês',
       description: 'Reconhecido como o melhor do mês pelo gestor',
-      icon: '🏆',
       tier: 'platinum',
       unlocked: data.hasEmployeeOfMonth ?? false,
       bonusPoints: 50,
@@ -41,7 +39,6 @@ export function calculateMedals(data: MedalData): Medal[] {
       id: 'six_months',
       title: '6 Meses de Casa',
       description: 'Completou 6 meses na empresa',
-      icon: '🎖️',
       tier: 'gold',
       unlocked: !!data.admissionDate && monthsSinceAdmission >= 6,
       bonusPoints: 30,
@@ -50,7 +47,6 @@ export function calculateMedals(data: MedalData): Medal[] {
       id: 'one_year',
       title: '1 Ano de Casa',
       description: 'Completou 1 ano na empresa',
-      icon: '👑',
       tier: 'platinum',
       unlocked: !!data.admissionDate && monthsSinceAdmission >= 12,
       bonusPoints: 75,
@@ -59,7 +55,6 @@ export function calculateMedals(data: MedalData): Medal[] {
       id: 'inventor',
       title: 'Inventor',
       description: 'Criou uma receita oficial para o Garden',
-      icon: '🧪',
       tier: 'gold',
       unlocked: data.hasInventedRecipe ?? false,
       bonusPoints: 40,
