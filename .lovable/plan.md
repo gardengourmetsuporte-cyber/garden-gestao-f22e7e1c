@@ -1,64 +1,59 @@
 
 
-# Renomear Abas e Expandir Medalhas
+# Medalhas Premium - Visual Unico com Efeitos
 
 ## Resumo
-Consolidacao dos dois planos aprovados anteriormente:
-1. Renomear abas no Ranking Hub: "Objetivos" vira **"Elos"**, "Bonus" vira **"Medalhas"**
-2. Remover medalha "Dia Perfeito" e expandir para 4 medalhas especiais com bonus de pontos
+Remover o botao de bonus e o BonusGuide da aba de medalhas, deixando somente as medalhas com visual premium. Substituir os emojis por icones SVG customizados com efeitos de brilho, rotacao e pulso - cada medalha tera um visual unico e marcante.
 
-## Mudancas nas Abas (Ranking.tsx)
+## O que muda
 
-| Antes | Depois | Icone |
-|-------|--------|-------|
-| Ranking | Ranking (sem mudanca) | Trophy |
-| Objetivos | Elos | Shield |
-| Bonus | Medalhas | Medal |
+### 1. Remover da aba Medalhas
+- Botao "Dar Bonus a Funcionario" (admin) - removido da aba medalhas
+- Componente `BonusGuide` - removido da aba medalhas
+- Manter apenas o `MedalList` puro
 
-A aba "Medalhas" vai exibir o componente `MedalList` com as medalhas do usuario, mais o botao admin de dar bonus.
+### 2. Visual premium para cada medalha
+Em vez de emojis genericos, cada medalha tera um **icone SVG inline** com efeitos CSS unicos:
 
-## Novas Medalhas (4 total)
+| Medalha | Visual | Efeito |
+|---------|--------|--------|
+| Funcionario do Mes | Estrela dourada com raios | Rotacao lenta dos raios + pulso de brilho |
+| 6 Meses de Casa | Escudo com "6" | Glow ciano pulsante |
+| 1 Ano de Casa | Coroa com diamante | Brilho prismatico animado |
+| Inventor | Lampada/frasco com faiscas | Faiscas aparecendo e sumindo |
 
-| Medalha | Descricao | Tier | Bonus |
-|---------|-----------|------|-------|
-| Funcionario do Mes | Reconhecido pelo gestor | Platinum | +50 pts |
-| 6 Meses de Casa | Completou 6 meses na empresa | Gold | +30 pts |
-| 1 Ano de Casa | Completou 1 ano na empresa | Platinum | +75 pts |
-| Inventor | Criou uma receita oficial para o Garden | Gold | +40 pts |
+### 3. Layout das medalhas
+- Grid 2 colunas (em vez de 4) para dar mais destaque
+- Card maior com mais espaco para o icone e efeito
+- Fundo com gradiente sutil do tier
+- Borda animada quando desbloqueada (glow-border)
+- Pontos de bonus bem visiveis: "+50 pts" com cor do tier
 
 ## Detalhes Tecnicos
 
-### `src/lib/medals.ts`
-- Adicionar tier `silver` ao `MedalTier`
-- Remover `hasPerfectDay` do `MedalData`
-- Adicionar `admissionDate?: string` e `hasInventedRecipe?: boolean` ao `MedalData`
-- Adicionar campo `bonusPoints: number` na interface `Medal`
-- Expandir `calculateMedals()` para retornar 4 medalhas com logica de admissao e badges
-- Adicionar config de cor para tier `silver` no `TIER_CONFIG`
-
 ### `src/pages/Ranking.tsx`
-- Mudar `TabKey` para `'ranking' | 'elos' | 'medalhas'`
-- Renomear labels e icones das abas
-- Aba "elos" exibe `EloList` diretamente
-- Aba "medalhas" exibe `MedalList` + botao admin de bonus
-- Importar `useProfile` para obter medalhas do usuario
-- Atualizar subtitulo do header
-
-### `src/hooks/useProfile.ts`
-- Remover logica de `hasPerfectDay` (agrupamento por dia)
-- Buscar `admission_date` da tabela `employees` para o usuario
-- Buscar `badge_id = 'inventor'` nos `bonus_points`
-- Passar `admissionDate` e `hasInventedRecipe` para `calculateMedals()`
-
-### `src/hooks/useTeamAchievements.ts`
-- Remover calculo de `hasPerfectDay` por usuario
-- Buscar `admission_date` dos employees
-- Verificar badges `inventor` para cada membro
-- Passar dados corretos para `calculateMedals()`
+- Remover `BonusGuide` import e uso
+- Remover botao admin de bonus da aba medalhas
+- Remover imports nao utilizados (`Button`, `BonusPointSheet`, `BonusGuide`, estados `bonusSheetOpen`/`selectedEmployee`)
+- Aba medalhas fica somente: `<MedalList medals={userProfile.medals} />`
 
 ### `src/components/profile/MedalList.tsx`
-- Mostrar o bonus de pontos de cada medalha no visual ("+50 pts" abaixo do titulo)
+- Reescrever completamente com visual premium
+- Grid `grid-cols-2` com cards maiores
+- Cada medalha renderiza um SVG inline customizado (componente interno `MedalIcon`)
+- Icone SVG com ~48x48px, com animacoes CSS (keyframes)
+- Card com gradiente de fundo, borda com glow animado quando desbloqueada
+- Mostrar: icone SVG animado, titulo, descricao curta, "+X pts" com destaque
+- Medalhas bloqueadas: grayscale, sem animacao, opacity reduzida
 
-### `src/components/ranking/ObjectivesList.tsx`
-- Nao precisa mudar (ja aponta para EloList, sera usado pela aba "elos")
+### `src/lib/medals.ts`
+- Remover campo `icon` (emoji) da interface `Medal`
+- O icone agora sera determinado pelo `id` da medalha dentro do componente `MedalList`
+
+### CSS (inline nos componentes)
+Animacoes via `@keyframes` inline no SVG ou via classes Tailwind existentes:
+- `medal-spin`: rotacao lenta (8s) para raios da estrela
+- `medal-sparkle`: opacidade piscando para faiscas
+- `medal-glow-pulse`: glow expandindo e contraindo
+- Usar animacoes ja existentes no tailwind config (`glow`, `pulse-soft`, `glow-border`) quando possivel
 
