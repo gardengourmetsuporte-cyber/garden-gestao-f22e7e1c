@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { startOfWeek, endOfWeek, format, parseISO, isWithinInterval } from 'date-fns';
+import { useMemo, useState } from 'react';
+import { startOfWeek, endOfWeek, format, parseISO, isWithinInterval, addWeeks, subWeeks, isSameWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CashClosing, PAYMENT_METHODS } from '@/types/cashClosing';
@@ -9,10 +9,12 @@ interface Props {
 }
 
 export function WeeklySummary({ closings }: Props) {
+  const [weekOffset, setWeekOffset] = useState(0);
+
   const summary = useMemo(() => {
-    const today = new Date();
-    const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
-    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
+    const target = addWeeks(new Date(), weekOffset);
+    const weekStart = startOfWeek(target, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(target, { weekStartsOn: 1 });
 
     const weekClosings = closings.filter(c => {
       const d = parseISO(c.date);
@@ -35,65 +37,80 @@ export function WeeklySummary({ closings }: Props) {
       .filter(m => m.value > 0)
       .sort((a, b) => b.value - a.value);
 
+    const isCurrentWeek = isSameWeek(target, new Date(), { weekStartsOn: 1 });
+
     return {
       total,
       count,
       topMethods,
       weekLabel: `${format(weekStart, "dd/MM", { locale: ptBR })} – ${format(weekEnd, "dd/MM", { locale: ptBR })}`,
+      isCurrentWeek,
     };
-  }, [closings]);
+  }, [closings, weekOffset]);
 
-  if (summary.count === 0) {
-    return (
-      <div className="card-command p-4 text-center">
-        <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-          <AppIcon name="CalendarRange" size={16} />
-          <span>Nenhum fechamento nesta semana ({summary.weekLabel})</span>
-        </div>
-      </div>
-    );
-  }
+  const formatCurrency = (v: number) =>
+    `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
   return (
     <div className="card-command p-4 space-y-3">
-      {/* Header */}
+      {/* Header with navigation */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/15">
-            <AppIcon name="CalendarRange" size={18} className="text-primary" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-foreground">Resumo da Semana</h3>
-            <span className="text-[10px] text-muted-foreground">{summary.weekLabel} • {summary.count} fechamento{summary.count !== 1 ? 's' : ''}</span>
-          </div>
+        <button
+          onClick={() => setWeekOffset(o => o - 1)}
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/60 hover:bg-secondary transition-colors"
+        >
+          <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
+        </button>
+
+        <div className="text-center flex-1">
+          <h3 className="text-sm font-bold text-foreground">Resumo da Semana</h3>
+          <span className="text-[10px] text-muted-foreground">
+            {summary.weekLabel} • {summary.count} fechamento{summary.count !== 1 ? 's' : ''}
+          </span>
         </div>
+
+        <button
+          onClick={() => setWeekOffset(o => o + 1)}
+          disabled={summary.isCurrentWeek}
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/60 hover:bg-secondary transition-colors disabled:opacity-30 disabled:pointer-events-none"
+        >
+          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+        </button>
       </div>
 
-      {/* Total */}
-      <div className="text-center py-2">
-        <span className="text-2xl font-black text-foreground">
-          R$ {summary.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </span>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Total em vendas na semana</p>
-      </div>
+      {summary.count === 0 ? (
+        <div className="text-center py-4">
+          <p className="text-sm text-muted-foreground">Nenhum fechamento nesta semana</p>
+        </div>
+      ) : (
+        <>
+          {/* Total */}
+          <div className="text-center py-2">
+            <span className="text-2xl font-black text-foreground">
+              {formatCurrency(summary.total)}
+            </span>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Total em vendas na semana</p>
+          </div>
 
-      {/* Breakdown by method */}
-      {summary.topMethods.length > 0 && (
-        <div className="grid grid-cols-2 gap-2">
-          {summary.topMethods.map(m => (
-            <div key={m.key} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/40">
-              <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: m.color + '20' }}>
-                <AppIcon name={m.icon} size={12} style={{ color: m.color }} />
-              </div>
-              <div className="min-w-0">
-                <span className="text-[10px] text-muted-foreground block truncate">{m.label}</span>
-                <span className="text-xs font-bold text-foreground">
-                  R$ {m.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+          {/* Breakdown by method */}
+          {summary.topMethods.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {summary.topMethods.map(m => (
+                <div key={m.key} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/40">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: m.color + '20' }}>
+                    <AppIcon name={m.icon} size={12} style={{ color: m.color }} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] text-muted-foreground block truncate">{m.label}</span>
+                    <span className="text-xs font-bold text-foreground">
+                      {formatCurrency(m.value)}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
