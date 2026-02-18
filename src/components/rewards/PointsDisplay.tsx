@@ -1,5 +1,6 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { usePoints } from '@/hooks/usePoints';
+import { useCountUp } from '@/hooks/useCountUp';
 import { cn } from '@/lib/utils';
 
 interface PointsDisplayProps {
@@ -10,6 +11,7 @@ interface PointsDisplayProps {
 
 export function PointsDisplay({ className, showLabel = true, isPulsing = false }: PointsDisplayProps) {
   const { balance, isLoading } = usePoints();
+  const animatedBalance = useCountUp(balance);
 
   if (isLoading) {
     return (
@@ -29,7 +31,7 @@ export function PointsDisplay({ className, showLabel = true, isPulsing = false }
         <AppIcon name="Star" size={16} style={{ color: 'hsl(38 92% 50%)' }} />
       </div>
       <div className="flex flex-col">
-        <span className={cn("font-bold text-foreground", isPulsing && "animate-coin-pulse")}>{balance}</span>
+        <span className={cn("font-bold text-foreground", isPulsing && "animate-coin-pulse")}>{animatedBalance}</span>
         {showLabel && (
           <span className="text-xs text-muted-foreground">pontos</span>
         )}

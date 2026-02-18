@@ -1,11 +1,17 @@
 import { useMemo, useState } from 'react';
-import { startOfWeek, endOfWeek, format, parseISO, isWithinInterval, addWeeks, subWeeks, isSameWeek } from 'date-fns';
+import { startOfWeek, endOfWeek, format, parseISO, isWithinInterval, addWeeks, isSameWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CashClosing, PAYMENT_METHODS } from '@/types/cashClosing';
+import { useCountUpCurrency } from '@/hooks/useCountUp';
 
 interface Props {
   closings: CashClosing[];
+}
+
+function AnimatedCurrency({ value }: { value: number }) {
+  const animated = useCountUpCurrency(value);
+  return <>{`R$ ${animated.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}</>;
 }
 
 export function WeeklySummary({ closings }: Props) {
@@ -87,7 +93,7 @@ export function WeeklySummary({ closings }: Props) {
           {/* Total */}
           <div className="text-center py-2">
             <span className="text-2xl font-black text-foreground">
-              {formatCurrency(summary.total)}
+              <AnimatedCurrency value={summary.total} />
             </span>
             <p className="text-[10px] text-muted-foreground mt-0.5">Total em vendas na semana</p>
           </div>

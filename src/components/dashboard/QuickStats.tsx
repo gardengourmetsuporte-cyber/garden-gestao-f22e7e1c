@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useCountUp } from '@/hooks/useCountUp';
 
 interface StatItem {
   title: string;
@@ -32,6 +33,12 @@ const variantStyles = {
   primary: 'bg-primary/10 text-primary',
 };
 
+function AnimatedStatValue({ value }: { value: number | string }) {
+  const numericValue = typeof value === 'number' ? value : null;
+  const animated = useCountUp(numericValue ?? 0);
+  return <>{numericValue !== null ? animated : value}</>;
+}
+
 export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
   return (
     <div className={cn(
@@ -50,7 +57,7 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">{stat.title}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-2xl font-bold"><AnimatedStatValue value={stat.value} /></p>
                   {stat.subtitle && (
                     <p className="text-xs text-muted-foreground mt-0.5">{stat.subtitle}</p>
                   )}
