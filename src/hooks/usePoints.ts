@@ -22,13 +22,15 @@ async function fetchPointsData(userId: string, unitId: string | null): Promise<P
   let completionsQuery = supabase
     .from('checklist_completions')
     .select('points_awarded, awarded_points')
-    .eq('completed_by', userId);
+    .eq('completed_by', userId)
+    .limit(10000);
   if (unitId) completionsQuery = completionsQuery.eq('unit_id', unitId);
 
   let redemptionsQuery = supabase
     .from('reward_redemptions')
     .select('points_spent, status')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .limit(10000);
   if (unitId) redemptionsQuery = redemptionsQuery.eq('unit_id', unitId);
 
   let monthlyCompletionsQuery = supabase
@@ -36,14 +38,16 @@ async function fetchPointsData(userId: string, unitId: string | null): Promise<P
     .select('points_awarded, awarded_points')
     .eq('completed_by', userId)
     .gte('completed_at', `${monthStart}T00:00:00`)
-    .lte('completed_at', `${monthEnd}T23:59:59`);
+    .lte('completed_at', `${monthEnd}T23:59:59`)
+    .limit(10000);
   if (unitId) monthlyCompletionsQuery = monthlyCompletionsQuery.eq('unit_id', unitId);
 
   let bonusQuery = supabase
     .from('bonus_points')
     .select('points')
     .eq('user_id', userId)
-    .eq('month', monthStart);
+    .eq('month', monthStart)
+    .limit(10000);
   if (unitId) bonusQuery = bonusQuery.eq('unit_id', unitId);
 
   const [

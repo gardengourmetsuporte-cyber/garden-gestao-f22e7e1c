@@ -48,18 +48,21 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
       .select('completed_by, points_awarded, awarded_points, date')
       .eq('unit_id', unitId)
       .gte('date', monthStart)
-      .lte('date', monthEnd),
-    supabase.from('reward_redemptions').select('user_id, points_spent, status').eq('unit_id', unitId),
+      .lte('date', monthEnd)
+      .limit(10000),
+    supabase.from('reward_redemptions').select('user_id, points_spent, status').eq('unit_id', unitId).limit(10000),
     supabase
       .from('bonus_points')
       .select('user_id, points')
       .eq('unit_id', unitId)
-      .eq('month', monthStart),
+      .eq('month', monthStart)
+      .limit(10000),
     // All-time completions for rank calculation
     supabase
       .from('checklist_completions')
       .select('completed_by, points_awarded, awarded_points')
-      .eq('unit_id', unitId),
+      .eq('unit_id', unitId)
+      .limit(10000),
   ]);
 
   const userCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
@@ -120,9 +123,9 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
 async function fetchSectorPointsData(unitId: string): Promise<SectorPointsSummary[]> {
   const [{ data: sectors }, { data: subcategories }, { data: items }, { data: completions }] = await Promise.all([
     supabase.from('checklist_sectors').select('id, name, color').eq('unit_id', unitId).order('sort_order'),
-    supabase.from('checklist_subcategories').select('id, sector_id').eq('unit_id', unitId),
-    supabase.from('checklist_items').select('id, subcategory_id, is_active').eq('unit_id', unitId),
-    supabase.from('checklist_completions').select('item_id').eq('unit_id', unitId),
+    supabase.from('checklist_subcategories').select('id, sector_id').eq('unit_id', unitId).limit(10000),
+    supabase.from('checklist_items').select('id, subcategory_id, is_active').eq('unit_id', unitId).limit(10000),
+    supabase.from('checklist_completions').select('item_id').eq('unit_id', unitId).limit(10000),
   ]);
 
   const subcatToSectorMap = new Map<string, string>();
