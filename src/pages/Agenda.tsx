@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgenda } from '@/hooks/useAgenda';
+import { useCountUp } from '@/hooks/useCountUp';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
+import { CategoryChips } from '@/components/agenda/CategoryChips';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { ManagerTask, TaskCategory } from '@/types/agenda';
@@ -25,12 +28,16 @@ const CATEGORY_COLORS = [
 
 function SortableTaskItem({ id, children }: { id: string; children: React.ReactNode }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  const style = {
+  const style: React.CSSProperties = {
     transform: CSS.Translate.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 50 : undefined,
-    scale: isDragging ? '1.02' : undefined,
+    zIndex: isDragging ? 50 : 'auto',
+    position: 'relative',
+    willChange: 'transform',
+    ...(isDragging && {
+      scale: '1.03',
+      opacity: 0.95,
+    }),
   };
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
@@ -44,14 +51,18 @@ export default function Agenda() {
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [viewMode, setViewMode] = useState('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  // Optimistic local state for reorder
+  const [tempTasks, setTempTasks] = useState<ManagerTask[] | null>(null);
 
   const sensors = useSensors(
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
-    useSensor(MouseSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(MouseSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
   const {
@@ -71,11 +82,24 @@ export default function Agenda() {
     isUpdatingTask,
   } = useAgenda();
 
+  // Use tempTasks if available (during reorder), else server data
+  const displayTasks = useMemo(() => tempTasks || tasks, [tempTasks, tasks]);
+
+  // Clear temp after server catches up
   useEffect(() => {
-    if (!isAdmin) {
-      navigate('/');
+    if (tempTasks && tasks) {
+      const timer = setTimeout(() => setTempTasks(null), 600);
+      return () => clearTimeout(timer);
     }
+  }, [tasks, tempTasks]);
+
+  useEffect(() => {
+    if (!isAdmin) navigate('/');
   }, [isAdmin, navigate]);
+
+  // Stats
+  const pendingCount = useCountUp(displayTasks.filter(t => !t.is_completed).length);
+  const completedCount = useCountUp(displayTasks.filter(t => t.is_completed).length);
 
   const handleEditTask = (task: ManagerTask) => {
     setEditingTask(task);
@@ -99,21 +123,33 @@ export default function Agenda() {
     if (!open) setEditingTask(null);
   };
 
-  const pendingTasks = tasks.filter(t => !t.is_completed);
-  const completedTasks = tasks.filter(t => t.is_completed);
+  // Filter tasks
+  const filteredTasks = useMemo(() => {
+    if (!selectedCategoryId) return displayTasks;
+    return displayTasks.filter(t => t.category_id === selectedCategoryId);
+  }, [displayTasks, selectedCategoryId]);
+
+  const pendingTasks = filteredTasks.filter(t => !t.is_completed);
+  const completedTasks = filteredTasks.filter(t => t.is_completed);
 
   // Group pending tasks by category
   const uncategorizedTasks = pendingTasks.filter(t => !t.category_id);
-  const tasksByCategory = categories.map(cat => ({
-    category: cat,
-    tasks: pendingTasks.filter(t => t.category_id === cat.id),
-  })).filter(g => g.tasks.length > 0);
+  const tasksByCategory = categories
+    .filter(cat => !selectedCategoryId || cat.id === selectedCategoryId)
+    .map(cat => ({
+      category: cat,
+      tasks: pendingTasks.filter(t => t.category_id === cat.id),
+    })).filter(g => g.tasks.length > 0);
 
   const toggleCategoryExpanded = (catId: string) => {
     setExpandedCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
 
   if (!isAdmin) return null;
+
+  const handleDragStart = (_event: DragStartEvent) => {
+    try { navigator.vibrate?.(10); } catch {}
+  };
 
   const handleDragEnd = (event: DragEndEvent, taskList: ManagerTask[]) => {
     const { active, over } = event;
@@ -122,6 +158,16 @@ export default function Agenda() {
     const newIndex = taskList.findIndex(t => t.id === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
     const reordered = arrayMove(taskList, oldIndex, newIndex);
+    
+    // Optimistic local state
+    setTempTasks(prev => {
+      const base = prev || tasks;
+      const taskIds = new Set(reordered.map(t => t.id));
+      const orderMap = new Map(reordered.map((t, i) => [t.id, i]));
+      return base.map(t => taskIds.has(t.id) ? { ...t, sort_order: orderMap.get(t.id)! } : t)
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    });
+    
     reorderTasks(reordered.map((t, i) => ({ id: t.id, sort_order: i })));
   };
 
@@ -140,14 +186,21 @@ export default function Agenda() {
   );
 
   const ListContent = () => (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {isLoading ? (
-        <p className="text-center text-muted-foreground py-8">Carregando...</p>
+        <div className="space-y-3">
+          {[1,2,3,4].map(i => (
+            <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+          ))}
+        </div>
       ) : pendingTasks.length === 0 && !showCompleted ? (
-        <div className="empty-state">
-          <p className="empty-state-title">Nenhum lembrete pendente</p>
-          <Button variant="link" className="mt-1 text-primary" onClick={() => setTaskSheetOpen(true)}>
-            Criar novo
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'hsl(142 60% 45% / 0.12)' }}>
+            <AppIcon name="Check" size={28} style={{ color: 'hsl(142 60% 50%)' }} />
+          </div>
+          <p className="text-muted-foreground text-sm font-medium">Tudo em dia! 🎉</p>
+          <Button variant="link" className="mt-1 text-primary text-sm" onClick={() => setTaskSheetOpen(true)}>
+            Criar novo lembrete
           </Button>
         </div>
       ) : (
@@ -165,9 +218,10 @@ export default function Agenda() {
                       {catTasks.length}
                     </span>
                   </div>
+                  <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-180")} />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 space-y-2 pl-2">
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
+                <CollapsibleContent className="mt-2 space-y-1.5 pl-2">
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
                     <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                       {catTasks.map(task => renderTaskItem(task))}
                     </SortableContext>
@@ -179,11 +233,11 @@ export default function Agenda() {
 
           {/* Uncategorized tasks */}
           {uncategorizedTasks.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {tasksByCategory.length > 0 && (
                 <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
               )}
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)}>
                 <SortableContext items={uncategorizedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                   {uncategorizedTasks.map(task => renderTaskItem(task))}
                 </SortableContext>
@@ -191,15 +245,29 @@ export default function Agenda() {
             </div>
           )}
 
-          {/* Completed tasks (togglable) */}
+          {/* Completed tasks */}
           {showCompleted && completedTasks.length > 0 && (
-            <div className="space-y-2 mt-4">
-              <div className="flex items-center gap-2 px-1">
+            <Collapsible defaultOpen>
+              <CollapsibleTrigger className="flex items-center gap-2 px-1 py-2 w-full">
                 <AppIcon name="CheckCircle2" size={16} className="text-success" />
                 <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
-              </div>
-              {completedTasks.map(task => renderTaskItem(task))}
-            </div>
+                <AppIcon name="ChevronDown" size={14} className="text-muted-foreground ml-auto" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-1.5 mt-1">
+                {completedTasks.map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggle={toggleTask}
+                    onDelete={deleteTask}
+                    onClick={() => handleEditTask(task)}
+                    onInlineUpdate={handleInlineUpdate}
+                    onAddSubtask={handleAddSubtask}
+                    onUpdateSubtask={handleUpdateSubtask}
+                  />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </>
       )}
@@ -208,7 +276,7 @@ export default function Agenda() {
 
   const CalendarContent = () => (
     <AgendaCalendarView 
-      tasks={tasks}
+      tasks={displayTasks}
       onTaskClick={handleEditTask}
       onToggleTask={toggleTask}
     />
@@ -220,15 +288,20 @@ export default function Agenda() {
         {/* Header */}
         <div className="page-header-bar">
           <div className="page-header-content flex items-center justify-between">
-            <h1 className="page-title">Agenda</h1>
+            <div>
+              <h1 className="page-title">Agenda</h1>
+              {!isLoading && (
+                <div className="flex items-center gap-3 mt-0.5">
+                  <span className="text-xs text-muted-foreground">
+                    <span className="font-bold text-foreground">{pendingCount}</span> pendentes
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    <span className="font-bold text-success">{completedCount}</span> concluídos
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2">
-              <Button 
-                size="icon" 
-                className="rounded-xl w-10 h-10 shadow-lg shadow-primary/20"
-                onClick={() => setTaskSheetOpen(true)}
-              >
-                <AppIcon name="Plus" size={20} />
-              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="ghost" className="rounded-xl w-10 h-10">
@@ -252,25 +325,59 @@ export default function Agenda() {
         </div>
 
         <div className="px-4 py-4 space-y-4">
-          <div className="tab-command">
+          {/* View mode tabs with animated indicator */}
+          <div className="relative flex bg-muted/50 rounded-2xl p-1 border border-border">
+            <div
+              className="absolute top-1 bottom-1 rounded-xl bg-card shadow-sm border border-border transition-all duration-300 ease-out"
+              style={{
+                width: 'calc(50% - 4px)',
+                left: viewMode === 'list' ? '4px' : 'calc(50% + 0px)',
+              }}
+            />
             <button
               onClick={() => setViewMode('list')}
-              className={cn("tab-command-item", viewMode === 'list' ? "tab-command-active" : "tab-command-inactive")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
+                viewMode === 'list' ? 'text-foreground' : 'text-muted-foreground'
+              )}
             >
               <AppIcon name="ListChecks" size={16} />
               Lista
             </button>
             <button
               onClick={() => setViewMode('calendar')}
-              className={cn("tab-command-item", viewMode === 'calendar' ? "tab-command-active" : "tab-command-inactive")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
+                viewMode === 'calendar' ? 'text-foreground' : 'text-muted-foreground'
+              )}
             >
               <AppIcon name="Calendar" size={16} />
               Calendário
             </button>
           </div>
 
-          {viewMode === 'list' ? <ListContent /> : <CalendarContent />}
+          {/* Category filter chips */}
+          {viewMode === 'list' && categories.length > 0 && (
+            <CategoryChips
+              categories={categories}
+              selectedCategoryId={selectedCategoryId}
+              onSelectCategory={setSelectedCategoryId}
+            />
+          )}
+
+          {/* Content with fade transition */}
+          <div className="animate-fade-in" key={viewMode}>
+            {viewMode === 'list' ? <ListContent /> : <CalendarContent />}
+          </div>
         </div>
+
+        {/* FAB */}
+        <button
+          onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }}
+          className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        >
+          <AppIcon name="Plus" size={24} />
+        </button>
       </div>
 
       <TaskSheet

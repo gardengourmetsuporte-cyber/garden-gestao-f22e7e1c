@@ -42,6 +42,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const subtasks = task.subtasks || [];
   const hasSubtasks = subtasks.length > 0;
   const completedSubtasks = subtasks.filter(s => s.is_completed).length;
+  const categoryColor = task.category?.color;
 
   // Expand state
   const [expanded, setExpanded] = useState(false);
@@ -62,6 +63,9 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const [editingSubId, setEditingSubId] = useState<string | null>(null);
   const [editingSubTitle, setEditingSubTitle] = useState('');
   const editSubRef = useRef<HTMLInputElement>(null);
+
+  // Completion animation
+  const [completing, setCompleting] = useState(false);
 
   const SWIPE_THRESHOLD = -70;
   const MAX_SWIPE = -240;
@@ -103,12 +107,25 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
 
   const closeSwipe = () => setSwipeX(0);
 
+  const handleToggle = () => {
+    if (!task.is_completed) {
+      // Animate completion
+      setCompleting(true);
+      try { navigator.vibrate?.(10); } catch {}
+      setTimeout(() => {
+        onToggle(task.id);
+        setCompleting(false);
+      }, 300);
+    } else {
+      onToggle(task.id);
+    }
+  };
+
   const handleAddSubtask = () => {
     const title = newSubtaskTitle.trim();
     if (!title || !onAddSubtask) return;
     onAddSubtask(task.id, title);
     setNewSubtaskTitle('');
-    // Keep input focused for rapid entry
     subtaskInputRef.current?.focus();
   };
 
@@ -124,7 +141,14 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl" {...dragHandleProps}>
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl",
+        completing && "animate-task-complete"
+      )}
+      style={{ willChange: 'transform' }}
+      {...dragHandleProps}
+    >
       {/* Swipe background actions */}
       <div className="absolute inset-y-0 right-0 flex items-stretch z-0">
         <button
@@ -150,12 +174,17 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
       {/* Main content - slides */}
       <div
         className={cn(
-          'relative z-10 bg-card border border-border shadow-sm',
-          task.is_completed && 'opacity-60 bg-muted',
-          isDragging && 'shadow-lg ring-2 ring-primary/50',
+          'relative z-10 bg-card border shadow-sm overflow-hidden',
+          task.is_completed && 'opacity-50',
+          isDragging && 'shadow-xl ring-2 ring-primary/40 scale-[1.03]',
           !isSwiping && 'transition-transform duration-200',
+          categoryColor ? 'border-border/50' : 'border-border',
         )}
-        style={{ transform: `translateX(${swipeX}px)` }}
+        style={{
+          transform: `translateX(${swipeX}px)`,
+          borderLeftWidth: categoryColor ? '3px' : undefined,
+          borderLeftColor: categoryColor || undefined,
+        }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -164,9 +193,13 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
         <div className="flex items-start gap-3 p-4">
           <Checkbox
             checked={task.is_completed}
-            onCheckedChange={() => onToggle(task.id)}
+            onCheckedChange={handleToggle}
             onClick={(e) => e.stopPropagation()}
-            className="w-6 h-6 rounded-full border-2 mt-0.5 shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
+            className={cn(
+              "w-6 h-6 rounded-full border-2 mt-0.5 shrink-0 transition-all duration-300",
+              "data-[state=checked]:bg-success data-[state=checked]:border-success",
+              completing && "scale-125"
+            )}
           />
 
           <button 
@@ -186,7 +219,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
               </p>
               {hasSubtasks && (
                 <ChevronRight className={cn(
-                  'w-4 h-4 text-muted-foreground transition-transform shrink-0',
+                  'w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0',
                   expanded && 'rotate-90'
                 )} />
               )}
@@ -203,8 +236,14 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           <div className="flex items-center gap-2 flex-wrap mt-1 shrink-0">
             {dueLabel && (
               <span className={cn(
-                'text-xs flex items-center gap-1',
-                overdue ? 'text-destructive' : 'text-muted-foreground'
+                'text-[11px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1',
+                overdue
+                  ? 'bg-destructive/10 text-destructive'
+                  : dueLabel.includes('Hoje')
+                    ? 'bg-warning/10 text-warning'
+                    : dueLabel.includes('Amanhã')
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-muted text-muted-foreground'
               )}>
                 <CalendarDays className={cn(
                   'w-3 h-3',
@@ -217,11 +256,13 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           </div>
         </div>
 
-
-
-
         {/* Expanded subtasks */}
-        {expanded && (
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-300 ease-in-out",
+            expanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          )}
+        >
           <div className="border-t border-border/50">
             {subtasks.map(sub => (
               <div key={sub.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-border/30 last:border-b-0">
@@ -299,7 +340,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
               />
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

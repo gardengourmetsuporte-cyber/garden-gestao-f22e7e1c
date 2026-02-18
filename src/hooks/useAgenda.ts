@@ -17,6 +17,8 @@ export function useAgenda() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const queryKey = ['manager-tasks', user?.id, activeUnitId];
+
   // Fetch task categories
   const { data: categories = [] } = useQuery({
     queryKey: ['task-categories', user?.id],
@@ -36,7 +38,7 @@ export function useAgenda() {
 
   // Fetch all tasks for user (not filtered by date)
   const { data: allTasks = [], isLoading: tasksLoading } = useQuery({
-    queryKey: ['manager-tasks', user?.id, activeUnitId],
+    queryKey,
     queryFn: async () => {
       if (!user?.id || !activeUnitId) return [];
       const { data, error } = await supabase
@@ -120,7 +122,7 @@ export function useAgenda() {
     },
   });
 
-  // Toggle task completion mutation
+  // Toggle task completion mutation with optimistic update
   const toggleTaskMutation = useMutation({
     mutationFn: async (taskId: string) => {
       const task = allTasks.find(t => t.id === taskId);
@@ -135,7 +137,18 @@ export function useAgenda() {
         .eq('id', taskId);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onMutate: async (taskId: string) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<ManagerTask[]>(queryKey);
+      queryClient.setQueryData<ManagerTask[]>(queryKey, (old) =>
+        old?.map(t => t.id === taskId ? { ...t, is_completed: !t.is_completed, completed_at: !t.is_completed ? new Date().toISOString() : null } : t)
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
     },
   });
@@ -158,10 +171,9 @@ export function useAgenda() {
     },
   });
 
-  // Reorder tasks mutation
+  // Reorder tasks mutation with optimistic update
   const reorderTasksMutation = useMutation({
     mutationFn: async (updates: ReorderUpdate[]) => {
-      // Batch update all sort_order values
       const promises = updates.map(({ id, sort_order }) =>
         supabase
           .from('manager_tasks')
@@ -173,11 +185,33 @@ export function useAgenda() {
       const error = results.find(r => r.error)?.error;
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
+    onMutate: async (updates: ReorderUpdate[]) => {
+      // Cancel in-flight queries to prevent overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<ManagerTask[]>(queryKey);
+      
+      // Apply optimistic reorder to cache
+      queryClient.setQueryData<ManagerTask[]>(queryKey, (old) => {
+        if (!old) return old;
+        const orderMap = new Map(updates.map(u => [u.id, u.sort_order]));
+        return old.map(t => {
+          const newOrder = orderMap.get(t.id);
+          return newOrder !== undefined ? { ...t, sort_order: newOrder } : t;
+        }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+      });
+      
+      return { previous };
     },
-    onError: () => {
+    onError: (_err, _updates, context) => {
+      // Rollback on error
+      if (context?.previous) {
+        queryClient.setQueryData(queryKey, context.previous);
+      }
       toast({ title: 'Erro ao reordenar', variant: 'destructive' });
+    },
+    onSettled: () => {
+      // Re-sync with server
+      queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
     },
   });
 
@@ -262,6 +296,7 @@ export function useAgenda() {
 
   return {
     tasks,
+    allTasks,
     categories,
     isLoading: tasksLoading,
     addTask: addTaskMutation.mutate,
