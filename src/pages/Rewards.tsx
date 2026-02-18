@@ -1,28 +1,23 @@
 import { useState } from 'react';
-import { Star, Gift } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AppIcon } from '@/components/ui/app-icon';
+import { EmptyState } from '@/components/ui/empty-state';
 import { ProductCard } from '@/components/rewards/ProductCard';
 import { RedemptionHistory } from '@/components/rewards/RedemptionHistory';
 import { usePoints } from '@/hooks/usePoints';
 import { useRewards, RewardProduct } from '@/hooks/useRewards';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
 export default function RewardsPage() {
   const { balance, refetch: refetchPoints } = usePoints();
   const { products, redemptions, redeemProduct, refetch: refetchRewards } = useRewards();
   const { toast } = useToast();
-  
+
   const [selectedProduct, setSelectedProduct] = useState<RewardProduct | null>(null);
   const [isRedeeming, setIsRedeeming] = useState(false);
 
@@ -30,22 +25,14 @@ export default function RewardsPage() {
 
   const handleRedeem = async () => {
     if (!selectedProduct) return;
-    
     setIsRedeeming(true);
     try {
       await redeemProduct(selectedProduct.id, selectedProduct.points_cost);
-      toast({
-        title: 'Resgate solicitado!',
-        description: `Seu pedido de ${selectedProduct.name} foi enviado para aprovação.`,
-      });
+      toast({ title: 'Resgate solicitado!', description: `Seu pedido de ${selectedProduct.name} foi enviado para aprovação.` });
       refetchPoints();
       refetchRewards();
-    } catch (error) {
-      toast({
-        title: 'Erro ao resgatar',
-        description: 'Não foi possível processar seu resgate. Tente novamente.',
-        variant: 'destructive',
-      });
+    } catch {
+      toast({ title: 'Erro ao resgatar', description: 'Tente novamente.', variant: 'destructive' });
     } finally {
       setIsRedeeming(false);
       setSelectedProduct(null);
@@ -55,12 +42,11 @@ export default function RewardsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header */}
-        <div className="page-header-bar">
+        <header className="page-header-bar">
           <div className="page-header-content">
             <h1 className="page-title">Recompensas</h1>
           </div>
-        </div>
+        </header>
 
         <div className="px-4 py-4 space-y-6">
           {/* Points Balance */}
@@ -68,7 +54,7 @@ export default function RewardsPage() {
             <p className="text-sm text-muted-foreground mb-1">Seu saldo</p>
             <div className="flex items-center gap-3">
               <div className="icon-glow icon-glow-lg icon-glow-warning">
-                <Star className="w-6 h-6 fill-warning" />
+                <AppIcon name="Star" size={24} className="text-warning" />
               </div>
               <span className="text-4xl font-bold text-foreground">{balance}</span>
               <span className="text-lg text-muted-foreground">pontos</span>
@@ -78,22 +64,18 @@ export default function RewardsPage() {
           {/* Products Grid */}
           <section>
             <h2 className="section-title mb-4">Prêmios Disponíveis</h2>
-            
             {activeProducts.length === 0 ? (
-              <div className="empty-state">
-                <Gift className="empty-state-icon" />
-                <p className="empty-state-title">Nenhum prêmio disponível</p>
-                <p className="empty-state-text">Volte mais tarde para conferir novidades.</p>
-              </div>
+              <EmptyState
+                icon="Gift"
+                title="Nenhum prêmio disponível"
+                subtitle="Volte mais tarde para conferir novidades."
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {activeProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    userBalance={balance}
-                    onRedeem={setSelectedProduct}
-                  />
+                {activeProducts.map((product, idx) => (
+                  <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${idx * 50}ms` }}>
+                    <ProductCard product={product} userBalance={balance} onRedeem={setSelectedProduct} />
+                  </div>
                 ))}
               </div>
             )}
@@ -107,16 +89,12 @@ export default function RewardsPage() {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <AlertDialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Resgate</AlertDialogTitle>
             <AlertDialogDescription>
-              Deseja resgatar <strong>{selectedProduct?.name}</strong> por{' '}
-              <strong>{selectedProduct?.points_cost} pontos</strong>?
-              <br /><br />
-              Após o resgate, o administrador irá aprovar e entregar seu prêmio.
+              Deseja resgatar <strong>{selectedProduct?.name}</strong> por <strong>{selectedProduct?.points_cost} pontos</strong>?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

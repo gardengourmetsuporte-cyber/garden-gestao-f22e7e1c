@@ -286,7 +286,7 @@ export default function Agenda() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
-        <div className="page-header-bar">
+        <header className="page-header-bar">
           <div className="page-header-content flex items-center justify-between">
             <div>
               <h1 className="page-title">Agenda</h1>
@@ -322,7 +322,7 @@ export default function Agenda() {
               </DropdownMenu>
             </div>
           </div>
-        </div>
+        </header>
 
         <div className="px-4 py-4 space-y-4">
           {/* View mode tabs with animated indicator */}

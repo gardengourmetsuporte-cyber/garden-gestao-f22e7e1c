@@ -12,7 +12,7 @@ import { usePersonalFinance } from '@/hooks/usePersonalFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
 import { FinanceTab, TransactionType, FinanceTransaction, FinanceAccount } from '@/types/finance';
 import { TransactionFiltersState } from '@/components/finance/TransactionFilters';
-import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
 
 export default function PersonalFinance() {
@@ -93,8 +93,13 @@ export default function PersonalFinance() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="px-4 py-4 space-y-4">
+          <Skeleton className="h-8 w-40" />
+          <div className="grid grid-cols-2 gap-3">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-2xl" />)}
+          </div>
+          <Skeleton className="h-48 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
         </div>
       </AppLayout>
     );
