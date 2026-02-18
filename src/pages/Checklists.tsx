@@ -11,6 +11,7 @@ import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -161,8 +162,19 @@ export default function ChecklistsPage() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-pulse text-muted-foreground">Carregando...</div>
+        <div className="min-h-screen bg-background pb-24">
+          <header className="page-header-bar">
+            <div className="page-header-content">
+              <Skeleton className="h-7 w-28" />
+            </div>
+          </header>
+          <div className="px-4 py-4 space-y-4">
+            <Skeleton className="h-12 rounded-xl" />
+            <div className="grid grid-cols-2 gap-3">
+              {[1,2].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+            </div>
+            {[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}
+          </div>
         </div>
       </AppLayout>
     );

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
+import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
@@ -159,33 +160,15 @@ export default function OrdersPage() {
         </header>
 
         <div className="px-4 py-4 space-y-4">
-          {/* Tab Toggle */}
-          <div className="tab-command">
-            <button
-              onClick={() => setOrderTab('to-order')}
-              className={cn("tab-command-item", orderTab === 'to-order' ? 'tab-command-active' : 'tab-command-inactive')}
-            >
-              <Package className="w-4 h-4" />
-              Sugestões
-              {lowStockItems.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-warning/10 text-warning">
-                  {lowStockItems.length}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setOrderTab('orders')}
-              className={cn("tab-command-item", orderTab === 'orders' ? 'tab-command-active' : 'tab-command-inactive')}
-            >
-              <Clock className="w-4 h-4" />
-              Histórico
-              {pendingOrders.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary">
-                  {pendingOrders.length}
-                </span>
-              )}
-            </button>
-          </div>
+          {/* Animated Tabs */}
+          <AnimatedTabs
+            tabs={[
+              { key: 'to-order', label: 'Sugestões', icon: <Package className="w-4 h-4" />, badge: lowStockItems.length },
+              { key: 'orders', label: 'Histórico', icon: <Clock className="w-4 h-4" />, badge: pendingOrders.length },
+            ]}
+            activeTab={orderTab}
+            onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders')}
+          />
 
           {/* Sugestões Tab */}
           {orderTab === 'to-order' && (
