@@ -13,7 +13,8 @@ import {
   CalendarRange,
   Sun,
   Moon,
-  Star
+  Star,
+  Zap
 } from 'lucide-react';
 import {
   DndContext,
@@ -58,6 +59,7 @@ const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Cale
 const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof Sun }[] = [
   { value: 'abertura', label: 'Abertura', icon: Sun },
   { value: 'fechamento', label: 'Fechamento', icon: Moon },
+  { value: 'bonus', label: 'Bônus', icon: Zap },
 ];
 
 const pointsOptions = [
