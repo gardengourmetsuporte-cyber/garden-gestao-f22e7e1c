@@ -24,14 +24,18 @@ export function DifferentialsSection() {
           {diffs.map((d) => (
             <div key={d.title} className="flex gap-5 card-surface p-7">
               <div
-                className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
+                className="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center"
                 style={{
-                  background: `hsl(var(${d.glow}) / 0.1)`,
-                  border: `1px solid hsl(var(${d.glow}) / 0.2)`,
+                  background: 'hsl(var(--card))',
+                  boxShadow: `
+                    6px 6px 14px hsl(var(--foreground) / 0.08),
+                    -4px -4px 10px hsl(var(--background) / 0.9),
+                    inset 0 1px 2px hsl(var(--background) / 0.6)
+                  `,
                   color: `hsl(var(${d.glow}))`,
                 }}
               >
-                <d.icon className="w-5 h-5" style={{ filter: "drop-shadow(0 0 6px currentColor)" }} />
+                <d.icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
               <div>
                 <h3 className="text-base font-bold text-foreground mb-1">{d.title}</h3>
