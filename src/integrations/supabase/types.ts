@@ -470,6 +470,7 @@ export type Database = {
           icon: string | null
           id: string
           name: string
+          scope: string
           sort_order: number
           unit_id: string | null
           updated_at: string
@@ -480,6 +481,7 @@ export type Database = {
           icon?: string | null
           id?: string
           name: string
+          scope?: string
           sort_order?: number
           unit_id?: string | null
           updated_at?: string
@@ -490,6 +492,7 @@ export type Database = {
           icon?: string | null
           id?: string
           name?: string
+          scope?: string
           sort_order?: number
           unit_id?: string | null
           updated_at?: string
@@ -509,6 +512,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          scope: string
           sector_id: string
           sort_order: number
           unit_id: string | null
@@ -518,6 +522,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          scope?: string
           sector_id: string
           sort_order?: number
           unit_id?: string | null
@@ -527,6 +532,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          scope?: string
           sector_id?: string
           sort_order?: number
           unit_id?: string | null
