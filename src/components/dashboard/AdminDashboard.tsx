@@ -17,6 +17,7 @@ import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
+import { ChecklistDashboardWidget } from './ChecklistDashboardWidget';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -62,8 +63,7 @@ export function AdminDashboard() {
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
 
-        {/* AI COPILOT WIDGET */}
-        <AICopilotWidget />
+        {/* === FINANCIAL BLOCK - grouped together === */}
 
         {/* FINANCE WIDGET - large (full width) */}
         <button
@@ -103,20 +103,21 @@ export function AdminDashboard() {
           </div>
         </button>
 
-
-        {/* FINANCE CHART WIDGET - Donut expenses */}
+        {/* FINANCE CHART + WEEKLY SUMMARY - side by side */}
         <FinanceChartWidget />
 
-        {/* AUTO ORDER WIDGET */}
-        <AutoOrderWidget />
-
-        {/* AGENDA WIDGET - Full featured */}
-        <AgendaDashboardWidget />
-
         {/* WEEKLY CASH SUMMARY */}
-        <div className="col-span-2 animate-slide-up stagger-4">
+        <div className="animate-slide-up stagger-3">
           <WeeklySummary closings={closings} />
         </div>
+
+        {/* === OPERATIONAL BLOCK === */}
+
+        {/* CHECKLIST PROGRESS WIDGET */}
+        <ChecklistDashboardWidget />
+
+        {/* AI COPILOT WIDGET */}
+        <AICopilotWidget />
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (
