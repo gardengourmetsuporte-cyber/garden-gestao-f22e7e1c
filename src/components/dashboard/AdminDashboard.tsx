@@ -15,6 +15,8 @@ import { FinanceChartWidget } from './FinanceChartWidget';
 import { AICopilotWidget } from './AICopilotWidget';
 import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
+import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
+import { useCashClosing } from '@/hooks/useCashClosing';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export function AdminDashboard() {
   const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
+  const { closings } = useCashClosing();
 
   const animatedBalance = useCountUpCurrency(stats.monthBalance);
 
@@ -109,6 +112,11 @@ export function AdminDashboard() {
 
         {/* AGENDA WIDGET - Full featured */}
         <AgendaDashboardWidget />
+
+        {/* WEEKLY CASH SUMMARY */}
+        <div className="col-span-2 animate-slide-up stagger-4">
+          <WeeklySummary closings={closings} />
+        </div>
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (
