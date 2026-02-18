@@ -109,6 +109,10 @@ export default {
           "0%, 100%": { borderColor: "hsl(190 90% 55% / 0.2)" },
           "50%": { borderColor: "hsl(190 90% 55% / 0.45)" },
         },
+        "task-complete": {
+          "0%": { opacity: "1", transform: "translateX(0)" },
+          "100%": { opacity: "0", transform: "translateX(40px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -118,6 +122,7 @@ export default {
         "coin-pulse": "coin-pulse 0.3s ease-out",
         "glow": "glow 2s ease-in-out infinite",
         "glow-border": "glow-border 3s ease-in-out infinite",
+        "task-complete": "task-complete 0.3s ease-out forwards",
       },
     },
   },
