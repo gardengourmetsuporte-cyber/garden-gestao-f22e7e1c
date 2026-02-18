@@ -126,21 +126,6 @@ export function ChecklistView({
   const isBonus = checklistType === 'bonus';
   const getItemPointsColors = isBonus ? getBonusPointsColors : getPointsColors;
 
-  const totalProgress = sectors.reduce(
-    (acc, sector) => {
-      const progress = getCompletionProgress(sector.id);
-      return {
-        completed: acc.completed + progress.completed,
-        total: acc.total + progress.total,
-      };
-    },
-    { completed: 0, total: 0 }
-  );
-
-  const progressPercent = totalProgress.total > 0 
-    ? Math.round((totalProgress.completed / totalProgress.total) * 100) 
-    : 0;
-
   const isTodayDate = isToday(date);
 
   const canToggleItem = (completion: ChecklistCompletion | undefined, completed: boolean) => {
@@ -149,14 +134,6 @@ export function ChecklistView({
     if (isAdmin) return true;
     if (completion?.completed_by === currentUserId) return true;
     return false;
-  };
-
-  const getMotivationalMessage = () => {
-    if (progressPercent === 100) return "🎉 Excelente! Tudo concluído!";
-    if (progressPercent >= 75) return "💪 Quase lá! Continue assim!";
-    if (progressPercent >= 50) return "👍 Bom progresso!";
-    if (progressPercent >= 25) return "🚀 Você está indo bem!";
-    return "☕ Vamos começar!";
   };
 
   // Optimistic item completed check
@@ -205,65 +182,25 @@ export function ChecklistView({
     setOpenPopover(null);
   };
 
+  // Filter sectors to only show those with active items for this checklist type
+  const filteredSectors = sectors.filter(sector => {
+    const hasActiveItems = sector.subcategories?.some(sub =>
+      sub.items?.some(i => i.is_active && (i as any).checklist_type === checklistType)
+    );
+    return hasActiveItems;
+  });
+
   return (
     <div className="space-y-4">
-      {/* Progress Header */}
-      <div className={cn(
-        "card-command p-5 transition-all duration-700 ease-out animate-fade-in",
-        progressPercent === 100 && "card-command-success ring-2 ring-success/20"
-      )}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
-              {getTypeLabel(checklistType)}
-              {progressPercent === 100 && (
-                <Sparkles className="w-5 h-5 text-success animate-pulse" />
-              )}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {format(parseISO(date + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
-            </p>
-          </div>
-          <div className="text-right">
-            <div className={cn(
-              "text-3xl font-black transition-all duration-500",
-              progressPercent === 100 ? "text-success scale-110" : "text-primary"
-            )}>
-              {progressPercent}%
-            </div>
-            <p className="text-xs text-muted-foreground font-medium">
-              {totalProgress.completed} de {totalProgress.total}
-            </p>
-          </div>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="h-3 bg-secondary/50 rounded-full overflow-hidden">
-          <div
-            className={cn(
-              "h-full rounded-full transition-all duration-700 ease-out",
-              progressPercent === 100 ? "bg-success" : "bg-primary"
-            )}
-            style={{ 
-              width: `${progressPercent}%`,
-              boxShadow: progressPercent === 100 
-                ? '0 0 16px hsl(var(--neon-green) / 0.5), 0 0 32px hsl(var(--neon-green) / 0.2)' 
-                : '0 0 12px hsl(var(--primary) / 0.3)' 
-            }}
-          />
-        </div>
-        
-        {/* Motivational Message */}
-        <p className={cn(
-          "text-center mt-3 text-sm font-medium transition-all duration-500",
-          progressPercent === 100 ? "text-success" : "text-muted-foreground"
-        )}>
-          {getMotivationalMessage()}
-        </p>
-      </div>
-
       {/* Sectors */}
-      {sectors.map((sector, sectorIndex) => {
+      {filteredSectors.length === 0 && (
+        <div className="card-command p-8 text-center">
+          <p className="text-muted-foreground text-sm">
+            Nenhuma tarefa configurada para {getTypeLabel(checklistType)}.
+          </p>
+        </div>
+      )}
+      {filteredSectors.map((sector, sectorIndex) => {
         const isExpanded = expandedSectors.has(sector.id);
         const progress = getCompletionProgress(sector.id);
         const sectorComplete = progress.total > 0 && progress.completed === progress.total;
