@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTeamAchievements, TeamMember } from '@/hooks/useTeamAchievements';
 import { BonusGuide } from './BonusGuide';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
-import { AchievementList } from '@/components/profile/AchievementList';
+import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -72,10 +72,7 @@ function TeamMemberCard({ member, isExpanded, onToggle }: { member: TeamMember; 
             <p className="text-xs font-semibold text-foreground truncate">{member.full_name}</p>
             <div className="flex items-center gap-3 mt-0.5">
               <span className="text-[10px] text-muted-foreground">
-                🏅 {member.unlockedAchievements} conquistas
-              </span>
-              <span className="text-[10px] text-muted-foreground">
-                🎖️ {member.unlockedMedals} medalhas
+                ⭐ {member.earnedPoints} pts
               </span>
               {member.bonusPoints > 0 && (
                 <span className="text-[10px] font-semibold" style={{ color: 'hsl(var(--neon-amber))' }}>
@@ -94,7 +91,7 @@ function TeamMemberCard({ member, isExpanded, onToggle }: { member: TeamMember; 
       <CollapsibleContent>
         <div className="px-3 pb-3 space-y-4">
           <div className="pt-2 border-t border-border/30">
-            <AchievementList achievements={member.achievements} />
+            <EloList earnedPoints={member.earnedPoints} />
           </div>
           <MedalList medals={member.medals} />
           <Link

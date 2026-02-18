@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, TrendingDown, Coins, Trophy, Award, Flame, TrendingUp } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
-import { AchievementList } from '@/components/profile/AchievementList';
+import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
 import { useProfile } from '@/hooks/useProfile';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
@@ -144,8 +144,8 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Achievements */}
-        <AchievementList achievements={profile.achievements} />
+        {/* Elo Progression */}
+        <EloList earnedPoints={profile.earned} />
 
         {/* Medals */}
         <MedalList medals={profile.medals} />

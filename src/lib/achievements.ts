@@ -1,106 +1,75 @@
 /**
- * Sistema de Conquistas - Calculado no frontend a partir de dados existentes
- * Simplificado: nomes claros, sem redundância com ranks
+ * Sistema de Elos - Lista de progressão baseada em pontos ganhos
+ * Reutiliza os ranks de ranks.ts para exibir a progressão completa
  */
 
-export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary';
-export type AchievementCategory = 'tasks' | 'points' | 'redemptions';
+import { getRank, getNextRank } from './ranks';
 
-export interface Achievement {
-  id: string;
+export interface EloTier {
   title: string;
-  description: string;
-  icon: string;
+  minPoints: number;
+  color: string;
   unlocked: boolean;
-  rarity: AchievementRarity;
-  category: AchievementCategory;
-  current: number;
-  target: number;
+  isCurrent: boolean;
+  progress: number; // 0-100
 }
 
-export interface AchievementData {
-  totalCompletions: number;
-  earnedPoints: number;
-  totalRedemptions: number;
-}
-
-const ACHIEVEMENT_DEFS: {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  rarity: AchievementRarity;
-  category: AchievementCategory;
-  target: number;
-  getValue: (d: AchievementData) => number;
-}[] = [
-  // Tasks - nomes de ação/feito
-  { id: 'first_task', title: 'Primeiro Passo', description: 'Complete 1 tarefa', icon: '🎯', rarity: 'common', category: 'tasks', target: 1, getValue: d => d.totalCompletions },
-  { id: 'tasks_10', title: 'Engrenagem', description: 'Complete 10 tarefas', icon: '⚙️', rarity: 'common', category: 'tasks', target: 10, getValue: d => d.totalCompletions },
-  { id: 'tasks_50', title: 'Operador', description: 'Complete 50 tarefas', icon: '🛡️', rarity: 'rare', category: 'tasks', target: 50, getValue: d => d.totalCompletions },
-  { id: 'tasks_100', title: 'Centurião', description: 'Complete 100 tarefas', icon: '🏛️', rarity: 'rare', category: 'tasks', target: 100, getValue: d => d.totalCompletions },
-  { id: 'tasks_500', title: 'Incansável', description: 'Complete 500 tarefas', icon: '💪', rarity: 'epic', category: 'tasks', target: 500, getValue: d => d.totalCompletions },
-  { id: 'tasks_1000', title: 'Máquina', description: 'Complete 1000 tarefas', icon: '🤖', rarity: 'legendary', category: 'tasks', target: 1000, getValue: d => d.totalCompletions },
-
-  // Points - nomes distintos dos ranks
-  { id: 'points_10', title: 'Semente', description: 'Acumule 10 pontos', icon: '🌱', rarity: 'common', category: 'points', target: 10, getValue: d => d.earnedPoints },
-  { id: 'points_50', title: 'Faísca', description: 'Acumule 50 pontos', icon: '✨', rarity: 'rare', category: 'points', target: 50, getValue: d => d.earnedPoints },
-  { id: 'points_100', title: 'Forja', description: 'Acumule 100 pontos', icon: '🔨', rarity: 'rare', category: 'points', target: 100, getValue: d => d.earnedPoints },
-  { id: 'points_500', title: 'Vulcão', description: 'Acumule 500 pontos', icon: '🌋', rarity: 'epic', category: 'points', target: 500, getValue: d => d.earnedPoints },
-  { id: 'points_1000', title: 'Supernova', description: 'Acumule 1000 pontos', icon: '💫', rarity: 'legendary', category: 'points', target: 1000, getValue: d => d.earnedPoints },
-
-  // Redemptions
-  { id: 'first_redemption', title: 'Primeiro Resgate', description: 'Resgate 1 recompensa', icon: '🎁', rarity: 'common', category: 'redemptions', target: 1, getValue: d => d.totalRedemptions },
-  { id: 'redemptions_5', title: 'Colecionador', description: 'Resgate 5 recompensas', icon: '🛍️', rarity: 'rare', category: 'redemptions', target: 5, getValue: d => d.totalRedemptions },
-  { id: 'redemptions_15', title: 'Entusiasta', description: 'Resgate 15 recompensas', icon: '🏬', rarity: 'epic', category: 'redemptions', target: 15, getValue: d => d.totalRedemptions },
+// Definição dos 8 elos em ordem crescente
+const ELO_TIERS: { title: string; min: number }[] = [
+  { title: 'Iniciante', min: 0 },
+  { title: 'Aprendiz', min: 10 },
+  { title: 'Dedicado', min: 25 },
+  { title: 'Veterano', min: 50 },
+  { title: 'Mestre', min: 100 },
+  { title: 'Lenda', min: 300 },
+  { title: 'Mítico', min: 750 },
+  { title: 'Imortal', min: 1500 },
 ];
 
-export function calculateAchievements(data: AchievementData): Achievement[] {
-  return ACHIEVEMENT_DEFS.map(def => {
-    const current = def.getValue(data);
+const ELO_COLORS: Record<string, string> = {
+  'Iniciante': 'hsl(var(--muted-foreground))',
+  'Aprendiz': 'hsl(var(--neon-green))',
+  'Dedicado': 'hsl(var(--neon-cyan))',
+  'Veterano': 'hsl(var(--neon-purple))',
+  'Mestre': 'hsl(var(--neon-amber))',
+  'Lenda': 'hsl(var(--neon-red))',
+  'Mítico': 'hsl(280 80% 65%)',
+  'Imortal': 'hsl(200 80% 80%)',
+};
+
+export function getEloList(earnedPoints: number): EloTier[] {
+  const currentRank = getRank(earnedPoints);
+
+  return ELO_TIERS.map((tier, i) => {
+    const nextMin = i < ELO_TIERS.length - 1 ? ELO_TIERS[i + 1].min : tier.min;
+    const unlocked = earnedPoints >= tier.min;
+    const isCurrent = currentRank.title === tier.title;
+
+    let progress = 0;
+    if (unlocked) {
+      progress = 100;
+    } else {
+      // Progress towards this tier from previous tier
+      const prevMin = i > 0 ? ELO_TIERS[i - 1].min : 0;
+      const range = tier.min - prevMin;
+      progress = range > 0 ? Math.round(((earnedPoints - prevMin) / range) * 100) : 0;
+      progress = Math.max(0, Math.min(99, progress));
+    }
+
     return {
-      id: def.id,
-      title: def.title,
-      description: def.description,
-      icon: def.icon,
-      rarity: def.rarity,
-      category: def.category,
-      current: Math.min(current, def.target),
-      target: def.target,
-      unlocked: current >= def.target,
+      title: tier.title,
+      minPoints: tier.min,
+      color: ELO_COLORS[tier.title] || 'hsl(var(--muted-foreground))',
+      unlocked,
+      isCurrent,
+      progress,
     };
   });
 }
 
-export const RARITY_CONFIG: Record<AchievementRarity, { label: string; gradient: string; border: string; glow: string }> = {
-  common: {
-    label: 'Comum',
-    gradient: 'linear-gradient(135deg, hsl(215 20% 14%), hsl(215 20% 18%))',
-    border: 'hsl(215 20% 25%)',
-    glow: 'none',
-  },
-  rare: {
-    label: 'Raro',
-    gradient: 'linear-gradient(135deg, hsl(217 40% 14%), hsl(217 50% 20%))',
-    border: 'hsl(217 70% 45%)',
-    glow: '0 0 8px hsl(217 70% 45% / 0.2)',
-  },
-  epic: {
-    label: 'Épico',
-    gradient: 'linear-gradient(135deg, hsl(280 30% 14%), hsl(280 40% 20%))',
-    border: 'hsl(280 70% 55%)',
-    glow: '0 0 10px hsl(280 70% 55% / 0.25)',
-  },
-  legendary: {
-    label: 'Lendário',
-    gradient: 'linear-gradient(135deg, hsl(38 40% 12%), hsl(38 50% 18%))',
-    border: 'hsl(38 80% 55%)',
-    glow: '0 0 14px hsl(38 80% 55% / 0.3)',
-  },
-};
-
-export const CATEGORY_LABELS: Record<AchievementCategory, string> = {
-  tasks: '⚔️ Tarefas',
-  points: '⭐ Pontos',
-  redemptions: '🎁 Resgates',
-};
+// Keep backward-compatible exports for any remaining references
+export type AchievementData = { totalCompletions: number; earnedPoints: number; totalRedemptions: number };
+export type Achievement = EloTier;
+export function calculateAchievements(data: AchievementData): EloTier[] {
+  return getEloList(data.earnedPoints);
+}
