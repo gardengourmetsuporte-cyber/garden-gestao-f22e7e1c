@@ -82,14 +82,8 @@ export default function TabletAdmin() {
     <AppLayout>
       {/* Header */}
       <div className="page-header-bar">
-        <div className="page-header-content flex items-center gap-3">
-          <div className="icon-glow icon-glow-md icon-glow-primary">
-            <Monitor className="w-5 h-5" />
-          </div>
-          <div className="flex-1">
-            <h1 className="page-title">Pedidos Tablet</h1>
-            <p className="page-subtitle">Cardápio digital e integração PDV</p>
-          </div>
+        <div className="page-header-content flex items-center justify-between">
+          <h1 className="page-title">Pedidos Tablet</h1>
           {activeUnit && (
             <a
               href={`/tablet/${activeUnit.id}`}

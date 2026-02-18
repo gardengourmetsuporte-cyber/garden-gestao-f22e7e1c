@@ -43,15 +43,7 @@ export default function WhatsAppPage() {
         {/* Header */}
         <div className="page-header-bar shrink-0">
           <div className="page-header-content">
-            <div className="flex items-center gap-3">
-              <div className="icon-glow icon-glow-md icon-glow-success">
-                <AppIcon name="MessageSquare" size={20} />
-              </div>
-              <div>
-                <h1 className="page-title">WhatsApp</h1>
-                <p className="page-subtitle">Atendimento inteligente</p>
-              </div>
-            </div>
+            <h1 className="page-title">WhatsApp</h1>
           </div>
           {/* Tab bar */}
           <div className="px-4 pb-2">

@@ -220,28 +220,18 @@ export default function Agenda() {
         {/* Header */}
         <div className="page-header-bar">
           <div className="page-header-content flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="icon-glow icon-glow-md icon-glow-primary">
-                <AppIcon name="ListChecks" size={20} />
-              </div>
-              <div>
-                <h1 className="page-title">Agenda</h1>
-                <p className="page-subtitle">
-                  {pendingTasks.length} pendente{pendingTasks.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-            </div>
+            <h1 className="page-title">Agenda</h1>
             <div className="flex items-center gap-2">
               <Button 
                 size="icon" 
-                className="rounded-xl w-11 h-11 shadow-lg shadow-primary/20"
+                className="rounded-xl w-10 h-10 shadow-lg shadow-primary/20"
                 onClick={() => setTaskSheetOpen(true)}
               >
                 <AppIcon name="Plus" size={20} />
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" className="rounded-xl w-11 h-11">
+                  <Button size="icon" variant="ghost" className="rounded-xl w-10 h-10">
                     <AppIcon name="MoreHorizontal" size={20} />
                   </Button>
                 </DropdownMenuTrigger>

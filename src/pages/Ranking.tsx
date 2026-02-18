@@ -33,14 +33,8 @@ export default function Ranking() {
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
         <div className="page-header-bar">
-          <div className="page-header-content flex items-center gap-3">
-            <div className="icon-glow icon-glow-md icon-glow-primary">
-              <AppIcon name="Trophy" size={20} />
-            </div>
-            <div>
-              <h1 className="page-title">Ranking & Pontos</h1>
-              <p className="page-subtitle">Ranking, progressão e medalhas</p>
-            </div>
+          <div className="page-header-content">
+            <h1 className="page-title">Ranking</h1>
           </div>
         </div>
 

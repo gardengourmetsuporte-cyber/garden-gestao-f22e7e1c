@@ -27,19 +27,8 @@ export default function CashClosing() {
       <div className="min-h-screen bg-background pb-36">
         {/* Header */}
         <div className="page-header-bar">
-          <div className="page-header-content flex items-center gap-3">
-            <div className="icon-glow icon-glow-md icon-glow-primary">
-              <AppIcon name="Receipt" size={20} />
-            </div>
-            <div>
-              <h1 className="page-title">Fechamento de Caixa</h1>
-              <p className="page-subtitle">
-                {isAdmin 
-                  ? `${closings.length} registro${closings.length !== 1 ? 's' : ''}${pendingCount > 0 ? ` • ${pendingCount} pendente${pendingCount !== 1 ? 's' : ''}` : ''}`
-                  : 'Envie seu fechamento diário'
-                }
-              </p>
-            </div>
+          <div className="page-header-content">
+            <h1 className="page-title">Fechamento de Caixa</h1>
           </div>
         </div>
 

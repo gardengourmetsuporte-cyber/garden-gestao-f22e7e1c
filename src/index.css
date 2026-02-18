@@ -341,8 +341,12 @@
     @apply px-4 py-3 lg:px-6;
   }
 
-  .page-header-content {
-    @apply px-4 py-3 lg:px-6;
+  .page-title {
+    @apply text-lg font-bold tracking-tight text-foreground;
+  }
+
+  .page-subtitle {
+    @apply text-xs text-muted-foreground;
   }
 
   .page-header-icon {

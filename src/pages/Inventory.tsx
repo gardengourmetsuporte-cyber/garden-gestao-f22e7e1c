@@ -193,26 +193,16 @@ export default function InventoryPage() {
       <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
         {/* Header */}
         <header className="page-header-bar">
-          <div className="page-header-content">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                 <div className="icon-glow icon-glow-md icon-glow-primary">
-                   <AppIcon name="Package" size={20} />
-                </div>
-                <div>
-                  <h1 className="page-title">Controle de Estoque</h1>
-                  <p className="page-subtitle">{items.length} itens cadastrados</p>
-                </div>
-              </div>
-              {isAdmin && (
-                <button
-                  onClick={handleAddItem}
-                  className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg shadow-primary/30"
-                >
-                  <AppIcon name="Plus" size={24} />
-                </button>
-              )}
-            </div>
+          <div className="page-header-content flex items-center justify-between">
+            <h1 className="page-title">Estoque</h1>
+            {isAdmin && (
+              <button
+                onClick={handleAddItem}
+                className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg shadow-primary/30"
+              >
+                <AppIcon name="Plus" size={20} />
+              </button>
+            )}
           </div>
         </header>
 

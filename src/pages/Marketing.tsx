@@ -43,7 +43,7 @@ export default function Marketing() {
     <AppLayout>
       <div className="page-header-bar">
         <div className="page-header-content flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground">Marketing</h1>
+          <h1 className="page-title">Marketing</h1>
           <Button size="sm" onClick={handleNew} className="gap-1.5">
             <Plus className="w-4 h-4" /> Novo Post
           </Button>

@@ -154,19 +154,7 @@ export default function OrdersPage() {
         {/* Header */}
         <header className="page-header-bar">
           <div className="page-header-content">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="icon-glow icon-glow-md icon-glow-primary">
-                  <ShoppingCart className="w-5 h-5" />
-                </div>
-                <div>
-                  <h1 className="page-title">Pedidos</h1>
-                  <p className="page-subtitle">
-                    {pendingOrders.length} pendente{pendingOrders.length !== 1 ? 's' : ''} · {lowStockItems.length} itens baixos
-                  </p>
-                </div>
-              </div>
-            </div>
+            <h1 className="page-title">Pedidos</h1>
           </div>
         </header>
 

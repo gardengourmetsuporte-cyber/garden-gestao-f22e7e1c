@@ -91,31 +91,21 @@ export default function ChecklistsPage() {
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
         <header className="page-header-bar">
-          <div className="page-header-content">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                 <div className="icon-glow icon-glow-md icon-glow-success">
-                   <AppIcon name="ClipboardCheck" size={20} />
-                </div>
-                <div>
-                  <h1 className="page-title">Checklists</h1>
-                  <p className="page-subtitle">Controle de tarefas diárias</p>
-                </div>
-              </div>
-              {isAdmin && (
-                <button
-                  onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
-                  className={cn(
-                    "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
-                    currentTab === 'settings'
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                      : "bg-secondary text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <AppIcon name="Settings" size={20} />
-                </button>
-              )}
-            </div>
+          <div className="page-header-content flex items-center justify-between">
+            <h1 className="page-title">Checklists</h1>
+            {isAdmin && (
+              <button
+                onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
+                className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                  currentTab === 'settings'
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <AppIcon name="Settings" size={18} />
+              </button>
+            )}
           </div>
         </header>
 
