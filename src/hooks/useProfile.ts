@@ -28,32 +28,25 @@ async function fetchProfileData(userId: string): Promise<Omit<ProfileData, 'lead
   const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
 
-  const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }, { data: badgeRows }] = await Promise.all([
+  const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }, { data: badgeRows }, { data: employeeRow }, { data: inventorRows }] = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url, job_title').eq('user_id', userId).single(),
     supabase.from('checklist_completions').select('points_awarded, awarded_points, completed_at, item_id').eq('completed_by', userId),
     supabase.from('reward_redemptions').select('points_spent, status').eq('user_id', userId),
     supabase.from('bonus_points').select('points, reason, type, created_at').eq('user_id', userId).eq('month', monthStart).order('created_at', { ascending: false }),
     supabase.from('checklist_completions').select('points_awarded, awarded_points').eq('completed_by', userId).gte('completed_at', `${monthStart}T00:00:00`).lte('completed_at', `${monthEnd}T23:59:59`),
     supabase.from('bonus_points').select('badge_id').eq('user_id', userId).eq('badge_id', 'employee_of_month'),
+    supabase.from('employees').select('admission_date').eq('user_id', userId).maybeSingle(),
+    supabase.from('bonus_points').select('badge_id').eq('user_id', userId).eq('badge_id', 'inventor'),
   ]);
 
   const summary = calculatePointsSummary(completions || [], redemptions || []);
   const totalCompletions = (completions || []).filter(c => c.awarded_points !== false).length;
   const totalRedemptions = (redemptions || []).filter(r => r.status === 'approved' || r.status === 'delivered').length;
 
-  // Check for perfect day (a day where user completed all checklist items)
-  const completionsByDay = new Map<string, Set<string>>();
-  (completions || []).forEach(c => {
-    const day = c.completed_at.slice(0, 10);
-    if (!completionsByDay.has(day)) completionsByDay.set(day, new Set());
-    completionsByDay.get(day)!.add(c.item_id);
-  });
-  const hasPerfectDay = Array.from(completionsByDay.values()).some(s => s.size >= 10);
-
   const medals = calculateMedals({
-    completions: (completions || []).map(c => ({ completed_at: c.completed_at, item_id: c.item_id })),
     hasEmployeeOfMonth: (badgeRows || []).length > 0,
-    hasPerfectDay,
+    admissionDate: employeeRow?.admission_date || null,
+    hasInventedRecipe: (inventorRows || []).length > 0,
   });
 
   const bonusPoints = (bonusRows || []) as Array<{ points: number; reason: string; type: string; created_at: string }>;

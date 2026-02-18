@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { MyRankCard } from '@/components/ranking/MyRankCard';
-import { ObjectivesList } from '@/components/ranking/ObjectivesList';
+import { EloList } from '@/components/profile/EloList';
+import { MedalList } from '@/components/profile/MedalList';
 import { Leaderboard } from '@/components/dashboard/Leaderboard';
 import { BonusGuide } from '@/components/employees/BonusGuide';
 import { BonusPointSheet } from '@/components/employees/BonusPointSheet';
@@ -10,17 +11,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePoints } from '@/hooks/usePoints';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useBonusPoints } from '@/hooks/useBonusPoints';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-type TabKey = 'ranking' | 'objetivos' | 'bonus';
+type TabKey = 'ranking' | 'elos' | 'medalhas';
 
 export default function Ranking() {
   const { user, profile, isAdmin } = useAuth();
-  const { earned, monthlyScore, monthlyBonus } = usePoints();
+  const { earned, monthlyScore } = usePoints();
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { bonusPoints } = useBonusPoints();
+  const { profile: userProfile } = useProfile(user?.id, leaderboard);
   const [bonusSheetOpen, setBonusSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<{ name: string; userId: string } | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
@@ -29,8 +31,8 @@ export default function Ranking() {
 
   const tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'ranking', label: 'Ranking', icon: 'Trophy' },
-    { key: 'objetivos', label: 'Objetivos', icon: 'Target' },
-    { key: 'bonus', label: 'Bônus', icon: 'Flame' },
+    { key: 'elos', label: 'Elos', icon: 'Shield' },
+    { key: 'medalhas', label: 'Medalhas', icon: 'Medal' },
   ];
 
   return (
@@ -44,7 +46,7 @@ export default function Ranking() {
             </div>
             <div>
               <h1 className="page-title">Ranking & Pontos</h1>
-              <p className="page-subtitle">Seu progresso, ranking e objetivos</p>
+              <p className="page-subtitle">Ranking, progressão e medalhas</p>
             </div>
           </div>
         </div>
@@ -87,69 +89,34 @@ export default function Ranking() {
             />
           )}
 
-          {activeTab === 'objetivos' && (
-            <ObjectivesList
-              data={{
-                totalCompletions: earned,
-                earnedPoints: earned,
-                totalRedemptions: 0,
-              }}
-            />
+          {activeTab === 'elos' && (
+            <EloList earnedPoints={earned} />
           )}
 
-          {activeTab === 'bonus' && (
+          {activeTab === 'medalhas' && (
             <div className="space-y-4">
-              {/* Current bonus points */}
-              <div className="card-surface p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <AppIcon name="Flame" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
-                    <h3 className="font-semibold text-sm text-foreground">Bônus do Mês</h3>
-                  </div>
-                  {monthlyBonus > 0 && (
-                    <Badge variant="outline" className="text-xs" style={{ borderColor: 'hsl(var(--neon-amber) / 0.5)', color: 'hsl(var(--neon-amber))' }}>
-                      +{monthlyBonus} pts
-                    </Badge>
-                  )}
-                </div>
+              {userProfile && (
+                <MedalList medals={userProfile.medals} />
+              )}
 
-                {bonusPoints.length > 0 ? (
-                  <div className="space-y-1.5">
-                    {bonusPoints.map(bp => (
-                      <div key={bp.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30">
-                        <AppIcon name="Star" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-foreground truncate">{bp.reason}</p>
-                          <p className="text-xs text-muted-foreground">{bp.type === 'auto' ? 'Automático' : 'Manual'}</p>
-                        </div>
-                        <span className="text-xs font-bold shrink-0" style={{ color: 'hsl(var(--neon-amber))' }}>+{bp.points}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground">Nenhum bônus recebido este mês</p>
-                )}
+              {isAdmin && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const target = leaderboard.find(e => e.user_id !== user?.id);
+                    if (target) {
+                      setSelectedEmployee({ name: target.full_name, userId: target.user_id });
+                      setBonusSheetOpen(true);
+                    }
+                  }}
+                >
+                  <AppIcon name="Medal" size={14} className="mr-2" />
+                  Dar Bônus a Funcionário
+                </Button>
+              )}
 
-                {isAdmin && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full mt-3"
-                    onClick={() => {
-                      const target = leaderboard.find(e => e.user_id !== user?.id);
-                      if (target) {
-                        setSelectedEmployee({ name: target.full_name, userId: target.user_id });
-                        setBonusSheetOpen(true);
-                      }
-                    }}
-                  >
-                    <AppIcon name="Medal" size={14} className="mr-2" />
-                    Dar Bônus a Funcionário
-                  </Button>
-                )}
-              </div>
-
-              {/* Bonus Guide */}
               <BonusGuide />
             </div>
           )}
