@@ -103,7 +103,7 @@ export function ChecklistTrash({
             Lixeira
           </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
+        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle className="flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
