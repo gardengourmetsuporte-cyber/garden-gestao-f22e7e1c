@@ -335,30 +335,36 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         <div className="relative">
                           <div
                             className={cn(
-                              "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200",
-                              isActive
-                                ? "bg-primary"
-                                : isEmProducao
-                                  ? "border border-dashed border-amber-500/40"
-                                  : ""
+                              "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 relative",
+                              isActive ? "bg-primary" : ""
                             )}
                             style={{
-                              background: isActive ? undefined : 'hsl(var(--card))',
+                              background: isActive
+                                ? undefined
+                                : 'linear-gradient(145deg, hsl(0 0% 95%), hsl(0 0% 88%))',
                               boxShadow: isActive
                                 ? '0 4px 16px hsl(var(--primary) / 0.4)'
                                 : `
-                                  6px 6px 12px hsl(var(--foreground) / 0.07),
-                                  -4px -4px 8px hsl(var(--background) / 0.8),
-                                  inset 0 1px 2px hsl(var(--background) / 0.5)
+                                  4px 4px 10px hsl(0 0% 0% / 0.12),
+                                  -3px -3px 8px hsl(0 0% 100% / 0.7),
+                                  inset 0 1px 1px hsl(0 0% 100% / 0.8)
                                 `,
                               opacity: isEmProducao && !isActive ? 0.7 : 1,
+                              border: isEmProducao && !isActive
+                                ? '1px dashed hsl(var(--neon-amber) / 0.4)'
+                                : isActive ? 'none' : '1px solid hsl(0 0% 100% / 0.5)',
                             }}
                           >
                             <AppIcon
                               name={item.icon}
                               size={22}
-                              className={isActive ? "text-primary-foreground" : isEmProducao ? "text-amber-400/70" : "text-muted-foreground"}
+                              className={isActive ? "text-primary-foreground" : ""}
                               style={{
+                                color: isActive
+                                  ? undefined
+                                  : isEmProducao
+                                    ? 'hsl(var(--neon-amber) / 0.7)'
+                                    : 'hsl(220 15% 35%)',
                                 filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
