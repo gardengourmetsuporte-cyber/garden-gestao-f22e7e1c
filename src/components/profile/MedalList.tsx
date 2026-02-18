@@ -48,6 +48,9 @@ export function MedalList({ medals }: MedalListProps) {
               <p className="text-[9px] font-semibold text-center leading-tight text-foreground">
                 {m.title}
               </p>
+              <p className="text-[8px] font-bold text-center" style={{ color: m.unlocked ? tier.color : 'hsl(215 15% 30%)' }}>
+                +{m.bonusPoints} pts
+              </p>
             </div>
           );
         })}

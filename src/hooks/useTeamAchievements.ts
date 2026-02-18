@@ -28,12 +28,14 @@ export function useTeamAchievements() {
     queryFn: async () => {
       if (!activeUnitId) return [];
 
-      const [{ data: profiles }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: badgeRows }] = await Promise.all([
+      const [{ data: profiles }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: badgeRows }, { data: employees }, { data: inventorRows }] = await Promise.all([
         supabase.from('profiles').select('user_id, full_name, avatar_url'),
         supabase.from('checklist_completions').select('completed_by, points_awarded, awarded_points, completed_at, item_id').eq('unit_id', activeUnitId),
         supabase.from('reward_redemptions').select('user_id, points_spent, status').eq('unit_id', activeUnitId),
         supabase.from('bonus_points').select('user_id, points').eq('unit_id', activeUnitId).eq('month', currentMonth),
         supabase.from('bonus_points').select('user_id, badge_id').eq('unit_id', activeUnitId).eq('badge_id', 'employee_of_month'),
+        supabase.from('employees').select('user_id, admission_date').eq('unit_id', activeUnitId),
+        supabase.from('bonus_points').select('user_id, badge_id').eq('unit_id', activeUnitId).eq('badge_id', 'inventor'),
       ]);
 
       const completionsByUser = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean; completed_at: string; item_id: string }>>();
@@ -54,6 +56,11 @@ export function useTeamAchievements() {
       });
 
       const badgeUserIds = new Set((badgeRows || []).map(b => b.user_id));
+      const inventorUserIds = new Set((inventorRows || []).map(b => b.user_id));
+      const employeeMap = new Map<string, string | null>();
+      (employees || []).forEach(e => {
+        if (e.user_id) employeeMap.set(e.user_id, e.admission_date);
+      });
 
       const result: TeamMember[] = (profiles || [])
         .map(p => {
@@ -63,18 +70,10 @@ export function useTeamAchievements() {
           const totalRedemptions = redemptionsByUser.get(p.user_id) || 0;
           const bonusPoints = bonusByUser.get(p.user_id) || 0;
 
-          const completionsByDay = new Map<string, Set<string>>();
-          userComps.forEach(c => {
-            const day = c.completed_at.slice(0, 10);
-            if (!completionsByDay.has(day)) completionsByDay.set(day, new Set());
-            completionsByDay.get(day)!.add(c.item_id);
-          });
-          const hasPerfectDay = Array.from(completionsByDay.values()).some(s => s.size >= 10);
-
           const medals = calculateMedals({
-            completions: userComps.map(c => ({ completed_at: c.completed_at, item_id: c.item_id })),
             hasEmployeeOfMonth: badgeUserIds.has(p.user_id),
-            hasPerfectDay,
+            admissionDate: employeeMap.get(p.user_id) || null,
+            hasInventedRecipe: inventorUserIds.has(p.user_id),
           });
 
           return {
