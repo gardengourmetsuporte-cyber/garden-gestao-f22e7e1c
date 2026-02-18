@@ -145,10 +145,12 @@ export function FinanceTransactions({
     return hoursAgo < 48;
   }, [seenMap]);
 
-  // Apply initialFilters when they change from parent
+  // Apply initialFilters when they change from parent (reset to defaults when empty)
   useEffect(() => {
-    if (initialFilters) {
+    if (initialFilters && Object.keys(initialFilters).length > 0) {
       setFilters(prev => ({ ...prev, ...initialFilters }));
+    } else {
+      setFilters({ status: 'all', type: 'all', categoryId: null, accountId: null });
     }
   }, [initialFilters]);
   const todayRef = useRef<HTMLDivElement>(null);
