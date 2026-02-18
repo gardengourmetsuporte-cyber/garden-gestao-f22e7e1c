@@ -65,7 +65,7 @@ export function ChecklistView({
   isAdmin,
 }: ChecklistViewProps) {
   const { triggerCoin } = useCoinAnimation();
-  const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set(sectors.map(s => s.id)));
+  const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set());
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<Pick<Profile, 'user_id' | 'full_name'>[]>([]);
@@ -86,10 +86,8 @@ export function ChecklistView({
     }
   }, [isAdmin]);
 
-  // Keep sectors expanded when they change
-  useEffect(() => {
-    setExpandedSectors(new Set(sectors.map(s => s.id)));
-  }, [sectors]);
+  // Reset collapsed state when sectors change (keep collapsed)
+  // No need to auto-expand
 
   // Clear optimistic toggles when completions update — only if there are pending toggles
   useEffect(() => {
