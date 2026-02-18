@@ -3,6 +3,7 @@ import { getRank, getNextRank } from '@/lib/ranks';
 import { formatPoints } from '@/lib/points';
 import { Progress } from '@/components/ui/progress';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useCountUp } from '@/hooks/useCountUp';
 
 interface MyRankCardProps {
   fullName: string;
@@ -15,6 +16,7 @@ interface MyRankCardProps {
 export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, leaderboardPosition }: MyRankCardProps) {
   const rank = getRank(earnedPoints);
   const next = getNextRank(earnedPoints);
+  const animatedMonthly = useCountUp(monthlyScore);
 
   return (
     <div className="card-surface p-5">
@@ -28,7 +30,7 @@ export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, le
           <div className="flex items-center gap-3 mt-2">
             <div className="flex items-center gap-1">
               <AppIcon name="Star" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
-              <span className="text-xs font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{monthlyScore} pts/mês</span>
+              <span className="text-xs font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{animatedMonthly} pts/mês</span>
             </div>
             {leaderboardPosition && (
               <div className="flex items-center gap-1">

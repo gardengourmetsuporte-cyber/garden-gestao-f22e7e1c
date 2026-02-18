@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useCountUp } from '@/hooks/useCountUp';
 
 interface StatsCardProps {
   title: string;
@@ -34,6 +35,8 @@ const variantStyles = {
 
 export function StatsCard({ title, value, icon, variant = 'default', onClick }: StatsCardProps) {
   const styles = variantStyles[variant];
+  const numericValue = typeof value === 'number' ? value : null;
+  const animatedValue = useCountUp(numericValue ?? 0);
 
   return (
     <button
@@ -50,7 +53,7 @@ export function StatsCard({ title, value, icon, variant = 'default', onClick }: 
           <AppIcon name={icon} size={16} className={styles.iconColor} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-2xl font-bold text-foreground">{numericValue !== null ? animatedValue : value}</p>
     </button>
   );
 }

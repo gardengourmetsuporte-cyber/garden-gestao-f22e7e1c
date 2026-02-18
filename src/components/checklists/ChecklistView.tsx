@@ -144,6 +144,9 @@ export function ChecklistView({
   }, [isItemCompleted, optimisticToggles]);
 
   const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(10);
+
     // Optimistic toggle
     setOptimisticToggles(prev => {
       const next = new Set(prev);
