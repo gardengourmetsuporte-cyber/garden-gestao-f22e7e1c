@@ -142,10 +142,10 @@ export default function ChecklistsPage() {
   const handleDeleteSubcategory = async (id: string) => {
     try { await deleteSubcategory(id); } catch { toast.error('Erro ao excluir subcategoria'); }
   };
-  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string }) => {
+  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
     try { await addItem(data); } catch { toast.error('Erro ao criar item'); }
   };
-  const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean }) => {
+  const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
     try { await updateItem(id, data); } catch { toast.error('Erro ao atualizar item'); }
   };
   const handleDeleteItem = async (id: string) => {
