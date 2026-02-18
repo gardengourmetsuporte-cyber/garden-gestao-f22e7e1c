@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { AppLayout } from '@/components/layout/AppLayout';
 import { CashClosingForm } from '@/components/cashClosing/CashClosingForm';
 import { CashClosingList } from '@/components/cashClosing/CashClosingList';
+import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,11 +51,14 @@ export default function CashClosing() {
               ))}
             </div>
           ) : isAdmin ? (
-            <CashClosingList 
-              closings={closings} 
-              isAdmin={isAdmin}
-              onRefresh={refetch}
-            />
+            <div className="space-y-4">
+              <WeeklySummary closings={closings} />
+              <CashClosingList 
+                closings={closings} 
+                isAdmin={isAdmin}
+                onRefresh={refetch}
+              />
+            </div>
           ) : (
             <EmployeeClosingView 
               todaysClosing={todaysClosing}
