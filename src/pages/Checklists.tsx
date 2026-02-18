@@ -135,51 +135,136 @@ export default function ChecklistsPage() {
                 </PopoverContent>
               </Popover>
 
-              {/* Checklist Type Selector */}
-              <div className="tab-command">
+              {/* Checklist Type Cards */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Abertura Card */}
                 <button
                   onClick={() => setChecklistType('abertura')}
                   className={cn(
-                    "tab-command-item gap-2",
-                    checklistType === 'abertura' ? "tab-command-active" : "tab-command-inactive"
+                    "relative overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
+                    checklistType === 'abertura'
+                      ? "ring-2 ring-amber-400/60 scale-[1.02] shadow-lg"
+                      : "ring-1 ring-border/40 hover:ring-border opacity-80 hover:opacity-100"
                   )}
-                  style={checklistType === 'abertura' ? { borderColor: 'hsl(38 92% 50% / 0.4)', boxShadow: '0 0 12px hsl(38 92% 50% / 0.15)' } : undefined}
+                  style={{
+                    background: checklistType === 'abertura'
+                      ? 'linear-gradient(135deg, hsl(38 92% 50% / 0.15), hsl(45 100% 60% / 0.05))'
+                      : 'hsl(var(--card))',
+                  }}
                 >
-                  <AppIcon name="Sun" size={20} />
-                   <span className="font-bold text-sm">Abertura</span>
+                  <div className="flex flex-col gap-3">
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
+                      checklistType === 'abertura'
+                        ? "bg-amber-400/20 shadow-inner"
+                        : "bg-secondary"
+                    )}>
+                      <AppIcon name="Sun" size={24} className={cn(
+                        "transition-colors",
+                        checklistType === 'abertura' ? "text-amber-400" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">Abertura</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">Tarefas do início</p>
+                    </div>
+                  </div>
+                  {checklistType === 'abertura' && (
+                    <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                  )}
                 </button>
 
+                {/* Fechamento Card */}
                 <button
                   onClick={() => setChecklistType('fechamento')}
                   className={cn(
-                    "tab-command-item gap-2",
-                    checklistType === 'fechamento' ? "tab-command-active" : "tab-command-inactive"
+                    "relative overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
+                    checklistType === 'fechamento'
+                      ? "ring-2 ring-violet-400/60 scale-[1.02] shadow-lg"
+                      : "ring-1 ring-border/40 hover:ring-border opacity-80 hover:opacity-100"
                   )}
-                  style={checklistType === 'fechamento' ? { borderColor: 'hsl(262 80% 65% / 0.4)', boxShadow: '0 0 12px hsl(262 80% 65% / 0.15)' } : undefined}
+                  style={{
+                    background: checklistType === 'fechamento'
+                      ? 'linear-gradient(135deg, hsl(262 80% 65% / 0.15), hsl(280 90% 70% / 0.05))'
+                      : 'hsl(var(--card))',
+                  }}
                 >
-                  <AppIcon name="Moon" size={20} />
-                   <span className="font-bold text-sm">Fechamento</span>
-                </button>
-
-                <button
-                  onClick={() => setChecklistType('bonus')}
-                  className={cn(
-                    "tab-command-item gap-1.5 relative overflow-hidden",
-                    checklistType === 'bonus' ? "tab-command-active" : "tab-command-inactive"
-                  )}
-                  style={checklistType === 'bonus' ? { 
-                    borderColor: 'hsl(38 92% 50% / 0.5)', 
-                    boxShadow: '0 0 16px hsl(38 92% 50% / 0.25), 0 0 32px hsl(280 90% 65% / 0.1)',
-                    background: 'linear-gradient(135deg, hsl(38 92% 50% / 0.08), hsl(280 90% 65% / 0.08))'
-                  } : undefined}
-                >
-                  <AppIcon name="Zap" size={16} className={cn(checklistType === 'bonus' && "animate-pulse")} />
-                  <span className="font-bold text-xs">Bônus</span>
-                  {checklistType === 'bonus' && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse pointer-events-none" />
+                  <div className="flex flex-col gap-3">
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
+                      checklistType === 'fechamento'
+                        ? "bg-violet-400/20 shadow-inner"
+                        : "bg-secondary"
+                    )}>
+                      <AppIcon name="Moon" size={24} className={cn(
+                        "transition-colors",
+                        checklistType === 'fechamento' ? "text-violet-400" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">Fechamento</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">Tarefas do final</p>
+                    </div>
+                  </div>
+                  {checklistType === 'fechamento' && (
+                    <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-violet-400 animate-pulse" />
                   )}
                 </button>
               </div>
+
+              {/* Bônus Card - Full width, eye-catching */}
+              <button
+                onClick={() => setChecklistType('bonus')}
+                className={cn(
+                  "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
+                  checklistType === 'bonus'
+                    ? "ring-2 ring-amber-400/60 scale-[1.01] shadow-xl"
+                    : "ring-1 ring-amber-500/20 hover:ring-amber-500/40"
+                )}
+                style={{
+                  background: checklistType === 'bonus'
+                    ? 'linear-gradient(135deg, hsl(38 92% 50% / 0.18), hsl(280 90% 65% / 0.12), hsl(38 92% 50% / 0.08))'
+                    : 'linear-gradient(135deg, hsl(38 92% 50% / 0.06), hsl(280 90% 65% / 0.04))',
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={cn(
+                    "w-14 h-14 rounded-xl flex items-center justify-center relative",
+                    checklistType === 'bonus'
+                      ? "bg-gradient-to-br from-amber-400/30 to-violet-500/20"
+                      : "bg-amber-500/10"
+                  )}>
+                    <AppIcon name="Zap" size={28} className={cn(
+                      "transition-all",
+                      checklistType === 'bonus' ? "text-amber-400 animate-pulse" : "text-amber-500/60"
+                    )} />
+                    {checklistType === 'bonus' && (
+                      <div className="absolute inset-0 rounded-xl bg-amber-400/10 animate-ping" style={{ animationDuration: '2s' }} />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-black text-foreground">Bônus</h3>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-400">
+                        Extra pts
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Tarefas extras para ganhar mais pontos ⚡
+                    </p>
+                  </div>
+                  <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+                </div>
+                {/* Shimmer effect */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-30"
+                  style={{
+                    background: 'linear-gradient(105deg, transparent 40%, hsl(38 92% 60% / 0.15) 45%, hsl(280 90% 65% / 0.1) 55%, transparent 60%)',
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 3s ease-in-out infinite',
+                  }}
+                />
+              </button>
 
               {/* Checklist View */}
               <ChecklistView
