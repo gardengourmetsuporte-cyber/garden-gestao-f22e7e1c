@@ -1,62 +1,66 @@
 
-# Tema Claro/Escuro com Botao de Toggle
+# Reformulacao do Sistema de Gamificacao
 
-## O que sera feito
+## Resumo
+Substituir o sistema atual de conquistas (3 categorias: Tarefas, Pontos, Resgates) e medalhas genericas por:
+1. **Sistema de Elo unico** - Uma unica lista de ranking/elo progressivo (tipo LoL) que substitui as conquistas por categoria
+2. **Medalhas especiais** - Apenas 2 medalhas realmente significativas para comecar (ex: Funcionario do Mes)
 
-Adicionar um botao de alternancia de tema (dark/light) tanto na landing page quanto no app principal, permitindo ao usuario escolher entre modo escuro e claro. A preferencia sera salva automaticamente no localStorage.
+O ranking de elo ja existe parcialmente (`src/lib/ranks.ts` com Iniciante -> Imortal), mas nao e exibido como lista de progressao. As conquistas atuais (14 itens em 3 categorias) serao removidas e substituidas pela lista de elos.
 
-## Escopo das mudancas
+---
 
-### 1. Configurar o ThemeProvider (next-themes)
-O pacote `next-themes` ja esta instalado. Sera adicionado o `ThemeProvider` no `App.tsx` envolvendo toda a aplicacao, configurado com `attribute="class"` para funcionar com o Tailwind (`darkMode: ["class"]`). O tema padrao sera "dark" (mantendo a experiencia atual).
+## O que muda
 
-### 2. Ajustar o CSS
-O arquivo `index.css` ja possui a classe `.light` com as variaveis de tema claro (linhas 86-120). Sera necessario:
-- Mover as variaveis do `:root` para `.dark` para que o sistema de classes funcione corretamente
-- Ajustar glows, sombras e tokens neon para o tema claro
-- Garantir que a landing page (que usa cores hardcoded como `bg-[hsl(222,70%,4%)]`) use as variaveis CSS em vez de valores fixos
+### 1. Lista de Elos (substitui "Conquistas/Objetivos")
+A aba "Objetivos" no Ranking Hub e a secao "Conquistas" no Perfil serao substituidas por uma **lista visual de elos** mostrando a progressao do usuario:
 
-### 3. Botao de Toggle no App (AppLayout)
-Adicionar um icone de Sol/Lua no header do `AppLayout.tsx` que alterna entre os temas usando `useTheme()` do `next-themes`.
+| Elo | Pontos | Borda |
+|-----|--------|-------|
+| Iniciante | 0+ | Cinza simples, sem efeito |
+| Aprendiz | 10+ | Verde com glow suave |
+| Dedicado | 25+ | Ciano com pulso |
+| Veterano | 50+ | Roxo com anel duplo |
+| Mestre | 100+ | Dourado com orbita + coroa |
+| Lenda | 300+ | Vermelho fogo com chamas |
+| Mitico | 750+ | Arco-iris com efeito rainbow |
+| Imortal | 1500+ | Prismatico multicolorido |
 
-### 4. Botao de Toggle na Landing (LandingNavbar)
-Adicionar o mesmo botao Sol/Lua na navbar da landing page.
+Cada elo na lista mostrara: avatar com a borda animada correspondente, nome do elo, pontos necessarios, e barra de progresso se nao desbloqueado.
 
-### 5. Corrigir Landing Page para usar variaveis CSS
-Varias secoes da landing usam cores hardcoded escuras (ex: `bg-[hsl(222,70%,4%)]`). Essas serao substituidas pelas variaveis do design system (`bg-background`, `text-foreground`, `bg-card`, etc.) para que o tema claro funcione automaticamente.
+### 2. Medalhas Especiais (substitui medalhas genericas)
+Apenas 2 medalhas iniciais, realmente memoraveis:
+- **Funcionario do Mes** - Concedida pelo admin (usa sistema de bonus existente com `badge_id`)
+- **Primeiro Dia Perfeito** - Completou 100% das tarefas em um unico dia
 
-## Secao Tecnica
+### 3. Bordas com efeito de movimento
+As bordas SVG existentes nos rank-frames ja possuem animacoes (flames, orbit, pulse). Elas serao utilizadas na lista de elos para que o usuario veja como sera sua borda ao atingir cada nivel.
 
-### Arquivos a criar
-- `src/components/ui/theme-toggle.tsx` -- Componente reutilizavel com icone Sol/Lua que alterna o tema
+---
 
-### Arquivos a editar
-- `src/App.tsx` -- Envolver com `ThemeProvider` do next-themes (defaultTheme="dark", attribute="class")
-- `src/index.css` -- Mover variaveis de `:root` para `.dark`, manter `.light` como esta, ajustar tokens de glow/sombra para light
-- `src/components/layout/AppLayout.tsx` -- Adicionar o ThemeToggle no header
-- `src/components/landing/LandingNavbar.tsx` -- Adicionar o ThemeToggle na navbar
-- `src/components/landing/HeroSection.tsx` -- Trocar cores hardcoded por variaveis CSS
-- `src/components/landing/ProblemSection.tsx` -- Trocar cores hardcoded por variaveis CSS
-- `src/components/landing/SolutionSection.tsx` -- Idem
-- `src/components/landing/ScreenshotsSection.tsx` -- Idem
-- `src/components/landing/BenefitsSection.tsx` -- Idem
-- `src/components/landing/HowItWorksSection.tsx` -- Idem
-- `src/components/landing/TestimonialsSection.tsx` -- Idem
-- `src/components/landing/PricingSection.tsx` -- Idem
-- `src/components/landing/DifferentialsSection.tsx` -- Idem
-- `src/components/landing/FAQSection.tsx` -- Idem
-- `src/components/landing/TrustSection.tsx` -- Idem
-- `src/components/landing/CTASection.tsx` -- Idem
-- `src/components/landing/FooterSection.tsx` -- Idem
-- `src/pages/Landing.tsx` -- Trocar bg hardcoded por bg-background
+## Detalhes Tecnicos
 
-### Logica do toggle
-```text
-Clique no botao Sol/Lua
-  -> useTheme().setTheme("light" | "dark")
-  -> next-themes adiciona/remove classe "dark" no <html>
-  -> Tailwind + variaveis CSS atualizam automaticamente
-  -> Preferencia salva no localStorage (automatico pelo next-themes)
-```
+### Arquivos removidos/simplificados:
+- `src/lib/achievements.ts` - Reescrito para exportar a lista de elos em vez de conquistas por categoria
+- `src/components/profile/AchievementList.tsx` - Reescrito como `EloList.tsx` mostrando a progressao de elos
+- `src/components/ranking/ObjectivesList.tsx` - Atualizado para usar a nova lista de elos
 
-### Nenhuma migracao de banco necessaria
+### Arquivos modificados:
+- `src/lib/medals.ts` - Simplificado para apenas 2 medalhas especiais
+- `src/components/profile/MedalList.tsx` - Atualizado para exibir as novas medalhas
+- `src/pages/Profile.tsx` - Trocar `AchievementList` por `EloList`
+- `src/hooks/useProfile.ts` - Remover calculo de achievements antigo, usar elos
+- `src/hooks/useTeamAchievements.ts` - Simplificar para usar elos
+- `src/components/employees/TeamAchievements.tsx` - Atualizar referencias
+
+### Nova lista de elos (logica):
+A lista reutiliza os ranks existentes de `src/lib/ranks.ts` e mostra todos os 8 niveis com:
+- Avatar preview com a borda animada do elo
+- Nome e cor do elo
+- Pontos minimos para desbloquear
+- Status: desbloqueado (check) ou progresso (barra)
+- Elo atual destacado com borda brilhante
+
+### Medalhas novas:
+- **Funcionario do Mes**: verificado pelo campo `badge_id = 'employee_of_month'` na tabela `bonus_points`
+- **Primeiro Dia Perfeito**: calculado verificando se houve um dia onde todas as tarefas do checklist foram completadas
