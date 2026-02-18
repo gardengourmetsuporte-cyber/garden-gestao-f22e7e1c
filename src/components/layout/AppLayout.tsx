@@ -344,11 +344,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                 : 'linear-gradient(145deg, hsl(0 0% 95%), hsl(0 0% 88%))',
                               boxShadow: isActive
                                 ? '0 4px 16px hsl(var(--primary) / 0.4)'
-                                : `
-                                  4px 4px 10px hsl(0 0% 0% / 0.12),
-                                  -3px -3px 8px hsl(0 0% 100% / 0.7),
-                                  inset 0 1px 1px hsl(0 0% 100% / 0.8)
-                                `,
+                                : 'none',
                               opacity: isEmProducao && !isActive ? 0.7 : 1,
                               border: isEmProducao && !isActive
                                 ? '1px dashed hsl(var(--neon-amber) / 0.4)'
