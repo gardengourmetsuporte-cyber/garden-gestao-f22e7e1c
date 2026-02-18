@@ -462,16 +462,31 @@ export function ChecklistView({
                   if (activeItems.length === 0) return null;
 
                   return (
-                    <div key={subcategory.id} className="ml-4 space-y-1 mb-2 animate-fade-in" style={{ animationDelay: `${subIndex * 50}ms` }}>
+                    <div key={subcategory.id} className="ml-2 space-y-1 mb-2 animate-fade-in" style={{ animationDelay: `${subIndex * 50}ms` }}>
                       <button onClick={() => toggleSubcategory(subcategory.id)}
-                        className={cn("w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300",
-                          subComplete ? "bg-success/8 border border-success/15" : "bg-secondary/50 hover:bg-secondary")}>
-                        <div className="flex items-center gap-2">
-                          {subComplete ? <Check className="w-4 h-4 text-success animate-scale-in" /> : <Clock className="w-4 h-4 text-muted-foreground" />}
-                          <span className={cn("font-medium transition-colors duration-300", subComplete ? "text-success" : "text-foreground")}>{subcategory.name}</span>
-                          <span className="text-xs text-muted-foreground">({completedItems.length}/{activeItems.length})</span>
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-300 border",
+                          subComplete 
+                            ? "border-success/20 bg-success/5" 
+                            : "border-border/50 bg-card/50 hover:bg-card hover:border-border"
+                        )}>
+                        <div className="flex items-center gap-2.5">
+                          <div className={cn(
+                            "w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300",
+                            subComplete ? "bg-success/15" : "bg-muted/50"
+                          )}>
+                            {subComplete 
+                              ? <Check className="w-3.5 h-3.5 text-success animate-scale-in" /> 
+                              : <ChevronRight className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform duration-300", isSubExpanded && "rotate-90")} />
+                            }
+                          </div>
+                          <span className={cn("font-medium text-sm transition-colors duration-300", subComplete ? "text-success" : "text-foreground")}>{subcategory.name}</span>
+                          <span className={cn(
+                            "text-[11px] px-1.5 py-0.5 rounded-md font-medium",
+                            subComplete ? "bg-success/10 text-success" : "bg-muted/50 text-muted-foreground"
+                          )}>{completedItems.length}/{activeItems.length}</span>
                         </div>
-                        <div className={cn("transition-transform duration-300", isSubExpanded ? "rotate-0" : "-rotate-90")}><ChevronDown className="w-4 h-4 text-muted-foreground" /></div>
+                        <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform duration-300", isSubExpanded ? "rotate-0" : "-rotate-90")} />
                       </button>
 
                       <div className={cn("overflow-hidden transition-all duration-300 ease-out", isSubExpanded ? "max-h-[3000px] opacity-100" : "max-h-0 opacity-0")}>
