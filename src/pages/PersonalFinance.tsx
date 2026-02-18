@@ -30,6 +30,13 @@ export default function PersonalFinance() {
     return () => window.removeEventListener('app-back-swipe', handler);
   }, [activeTab]);
 
+  // Reset filters when leaving the transactions tab
+  useEffect(() => {
+    if (activeTab !== 'transactions') {
+      setTransactionInitialFilters({});
+    }
+  }, [activeTab]);
+
   const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<TransactionType>('expense');
   const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
