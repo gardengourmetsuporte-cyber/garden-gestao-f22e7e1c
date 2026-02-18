@@ -115,11 +115,12 @@ export function useChecklists() {
   }, [queryClient, sectorsKey]);
 
   // ---- Sector CRUD ----
-  const addSector = useCallback(async (sector: { name: string; color: string; icon?: string }) => {
+  const addSector = useCallback(async (sector: { name: string; color: string; icon?: string; scope?: string }) => {
     const maxOrder = sectors.reduce((max, s) => Math.max(max, s.sort_order), 0);
+    const { scope, ...rest } = sector;
     const { data, error } = await supabase
       .from('checklist_sectors')
-      .insert({ ...sector, sort_order: maxOrder + 1, unit_id: activeUnitId })
+      .insert({ ...rest, sort_order: maxOrder + 1, unit_id: activeUnitId, scope: scope || 'standard' } as any)
       .select().single();
     if (error) throw error;
     invalidateSectors();

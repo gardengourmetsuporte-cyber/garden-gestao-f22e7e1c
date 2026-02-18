@@ -124,7 +124,8 @@ export default function ChecklistsPage() {
   };
 
   const handleAddSector = async (data: { name: string; color: string }) => {
-    try { await addSector(data); } catch { toast.error('Erro ao criar setor'); }
+    const scope = settingsType === 'bonus' ? 'bonus' : 'standard';
+    try { await addSector({ ...data, scope }); } catch { toast.error('Erro ao criar setor'); }
   };
   const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
     try { await updateSector(id, data); } catch { toast.error('Erro ao atualizar setor'); }
@@ -401,7 +402,7 @@ export default function ChecklistsPage() {
 
               {/* Checklist View */}
               <ChecklistView
-                sectors={sectors}
+                sectors={sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
                 checklistType={checklistType}
                 date={currentDate}
                 completions={completions}
@@ -470,7 +471,7 @@ export default function ChecklistsPage() {
 
               {/* Settings Component */}
               <ChecklistSettings
-                sectors={sectors}
+                sectors={sectors.filter((s: any) => settingsType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
                 selectedType={settingsType}
                 onTypeChange={setSettingsType}
                 onAddSector={handleAddSector}
