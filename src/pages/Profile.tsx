@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, TrendingDown, Coins, Trophy, Award, Flame, TrendingUp } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AppIcon } from '@/components/ui/app-icon';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
@@ -24,14 +24,14 @@ export default function Profile() {
 
   return (
     <AppLayout>
-      <div className="page-header-bar">
+      <header className="page-header-bar">
         <div className="page-header-content flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-2 rounded-xl hover:bg-secondary transition-all">
-            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+            <AppIcon name="ArrowLeft" size={20} className="text-muted-foreground" />
           </button>
           <h1 className="page-title">Perfil</h1>
         </div>
-      </div>
+      </header>
 
       <div className="p-4 space-y-4 max-w-lg mx-auto">
         <ProfileHeader
@@ -44,25 +44,25 @@ export default function Profile() {
         {/* Score do Mês - Card em destaque */}
         <div className="card-command p-4 space-y-3" style={{ borderColor: 'hsl(var(--warning) / 0.3)' }}>
           <div className="flex items-center gap-2 mb-1">
-            <Trophy className="w-4 h-4 text-warning" />
+            <AppIcon name="Trophy" size={16} className="text-warning" />
             <h3 className="font-semibold text-sm text-warning">Score do Mês</h3>
           </div>
           <div className="flex items-center justify-center gap-2 py-2">
-            <Flame className="w-6 h-6 text-warning" />
+            <AppIcon name="Flame" size={24} className="text-warning" />
             <span className="text-3xl font-bold text-foreground">{formatPoints(profile.monthlyScore)}</span>
             <span className="text-sm text-muted-foreground">pts</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(var(--neon-green) / 0.08)' }}>
               <div className="flex items-center justify-center gap-1 mb-0.5">
-                <TrendingUp className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-green))' }} />
+                <AppIcon name="TrendingUp" size={14} style={{ color: 'hsl(var(--neon-green))' }} />
               </div>
               <p className="text-base font-bold text-foreground">{formatPoints(profile.monthlyBase)}</p>
               <p className="text-[10px] text-muted-foreground">Base Mensal</p>
             </div>
             <div className="text-center p-2 rounded-lg" style={{ background: 'hsl(var(--neon-amber) / 0.08)' }}>
               <div className="flex items-center justify-center gap-1 mb-0.5">
-                <Flame className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-amber))' }} />
+                <AppIcon name="Flame" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
               </div>
               <p className="text-base font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{formatPoints(profile.monthlyBonus)}</p>
               <p className="text-[10px] text-muted-foreground">Bônus Mensal</p>
@@ -70,7 +70,7 @@ export default function Profile() {
           </div>
           {profile.leaderboardRank && (
             <div className="flex items-center justify-center gap-2 pt-2" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
-              <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
+              <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
               <span className="text-sm text-muted-foreground">
                 Posição <span className="font-bold text-foreground">#{profile.leaderboardRank}</span> no ranking mensal
               </span>
@@ -85,7 +85,7 @@ export default function Profile() {
         {profile.bonusPoints.length > 0 && (
           <div className="card-command p-4" style={{ borderColor: 'hsl(var(--neon-amber) / 0.2)' }}>
             <div className="flex items-center gap-2 mb-3">
-              <Flame className="w-4 h-4" style={{ color: 'hsl(var(--neon-amber))' }} />
+              <AppIcon name="Flame" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
               <h3 className="font-semibold text-sm" style={{ color: 'hsl(var(--neon-amber))' }}>
                 Bônus do Mês (+{profile.totalBonusPoints} pts)
               </h3>
@@ -104,27 +104,27 @@ export default function Profile() {
         {/* Histórico Total - Card secundário */}
         <div className="card-command p-4 space-y-3">
           <div className="flex items-center gap-2 mb-1">
-            <Star className="w-4 h-4 text-muted-foreground" />
+            <AppIcon name="Star" size={16} className="text-muted-foreground" />
             <h3 className="font-semibold text-sm text-muted-foreground">Histórico Total</h3>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <Star className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-green))' }} />
+                <AppIcon name="Star" size={14} style={{ color: 'hsl(var(--neon-green))' }} />
               </div>
               <p className="text-lg font-bold text-foreground">{formatPoints(profile.earned)}</p>
               <p className="text-[10px] text-muted-foreground">Ganhos</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <TrendingDown className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-red))' }} />
+                <AppIcon name="TrendingDown" size={14} style={{ color: 'hsl(var(--neon-red))' }} />
               </div>
               <p className="text-lg font-bold text-foreground">{formatPoints(profile.spent)}</p>
               <p className="text-[10px] text-muted-foreground">Gastos</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <Coins className="w-3.5 h-3.5" style={{ color: 'hsl(var(--neon-cyan))' }} />
+                <AppIcon name="Coins" size={14} style={{ color: 'hsl(var(--neon-cyan))' }} />
               </div>
               <p className="text-lg font-bold text-foreground">{formatPoints(profile.balance)}</p>
               <p className="text-[10px] text-muted-foreground">Saldo</p>

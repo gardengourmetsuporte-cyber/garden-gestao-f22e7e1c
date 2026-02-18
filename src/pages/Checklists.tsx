@@ -204,9 +204,9 @@ export default function ChecklistsPage() {
         </header>
 
         <div className="px-4 py-4 lg:px-6 space-y-4">
+          <div className="animate-fade-in" key={currentTab}>
           {currentTab === 'checklist' ? (
             <>
-              {/* Date Picker */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -507,6 +507,7 @@ export default function ChecklistsPage() {
               />
             </>
           )}
+          </div>
         </div>
       </div>
     </AppLayout>
