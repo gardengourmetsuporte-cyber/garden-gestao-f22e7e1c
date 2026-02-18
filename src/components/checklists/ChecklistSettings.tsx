@@ -41,7 +41,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { ListPicker, ListPickerItem } from '@/components/ui/list-picker';
 import { ChevronDown as SelectChevron } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getPointsColors, clampPoints } from '@/lib/points';
+import { getPointsColors, clampPoints, getBonusPointsColors } from '@/lib/points';
 
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
@@ -66,6 +66,13 @@ const pointsOptions = [
   { value: 2, label: '2 pontos' },
   { value: 3, label: '3 pontos' },
   { value: 4, label: '4 pontos' },
+];
+
+const bonusPointsOptions = [
+  { value: 5, label: '5 pontos' },
+  { value: 10, label: '10 pontos' },
+  { value: 15, label: '15 pontos' },
+  { value: 20, label: '20 pontos' },
 ];
 
 function getPointsToneStyle(points: number): React.CSSProperties {
@@ -331,7 +338,7 @@ export function ChecklistSettings({
       setItemFrequency('daily');
       // Use selected type as default for new items
       setItemChecklistType(selectedType);
-      setItemPoints(1);
+      setItemPoints(selectedType === 'bonus' ? 5 : 1);
     }
     setItemSheetOpen(true);
   };
@@ -782,25 +789,36 @@ export function ChecklistSettings({
 
             <div className="space-y-2">
               <Label>Pontos</Label>
-              <button
-                type="button"
-                onClick={() => setPointsPickerOpen(true)}
-                className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
-              >
-                <div className="flex items-center gap-2" style={getPointsToneStyle(itemPoints)}>
-                  <Star className="w-4 h-4" style={{ ...getPointsToneStyle(itemPoints), fill: getPointsToneStyle(itemPoints).color as string }} />
-                  {pointsOptions.find(p => p.value === itemPoints)?.label || `${itemPoints} pontos`}
-                </div>
-                <SelectChevron className="w-4 h-4 text-muted-foreground" />
-              </button>
-              <ListPicker
-                open={pointsPickerOpen}
-                onOpenChange={setPointsPickerOpen}
-                title="Pontos"
-                items={pointsOptions.map(o => ({ id: o.value.toString(), label: o.label }))}
-                selectedId={itemPoints.toString()}
-                onSelect={(id) => { if (id) setItemPoints(parseInt(id)); }}
-              />
+              {(() => {
+                const isBonus = itemChecklistType === 'bonus';
+                const currentOptions = isBonus ? bonusPointsOptions : pointsOptions;
+                const style = isBonus 
+                  ? { color: getBonusPointsColors(itemPoints).color }
+                  : getPointsToneStyle(itemPoints);
+                return (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setPointsPickerOpen(true)}
+                      className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                    >
+                      <div className="flex items-center gap-2" style={style}>
+                        <Star className="w-4 h-4" style={{ ...style, fill: style.color as string }} />
+                        {currentOptions.find(p => p.value === itemPoints)?.label || `${itemPoints} pontos`}
+                      </div>
+                      <SelectChevron className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                    <ListPicker
+                      open={pointsPickerOpen}
+                      onOpenChange={setPointsPickerOpen}
+                      title="Pontos"
+                      items={currentOptions.map(o => ({ id: o.value.toString(), label: o.label }))}
+                      selectedId={itemPoints.toString()}
+                      onSelect={(id) => { if (id) setItemPoints(parseInt(id)); }}
+                    />
+                  </>
+                );
+              })()}
             </div>
 
             <Button

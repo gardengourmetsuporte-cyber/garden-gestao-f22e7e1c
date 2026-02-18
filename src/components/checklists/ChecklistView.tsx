@@ -16,13 +16,15 @@ import {
   Star,
   RefreshCw,
   Users,
-  Sparkles
+  Sparkles,
+  X,
+  Zap
 } from 'lucide-react';
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { getPointsColors } from '@/lib/points';
+import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ChecklistViewProps {
@@ -31,7 +33,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, points: number, completedByUserId?: string) => void;
+  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -116,9 +118,13 @@ export function ChecklistView({
     switch (type) {
       case 'abertura': return 'Abertura';
       case 'fechamento': return 'Fechamento';
+      case 'bonus': return 'Bônus';
       default: return 'Abertura';
     }
   };
+
+  const isBonus = checklistType === 'bonus';
+  const getItemPointsColors = isBonus ? getBonusPointsColors : getPointsColors;
 
   const totalProgress = sectors.reduce(
     (acc, sector) => {
@@ -162,7 +168,7 @@ export function ChecklistView({
     return isItemCompleted(itemId);
   }, [isItemCompleted, optimisticToggles]);
 
-  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement) => {
+  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
     // Optimistic toggle
     setOptimisticToggles(prev => {
       const next = new Set(prev);
@@ -170,8 +176,8 @@ export function ChecklistView({
       return next;
     });
 
-    // Burst animation for completion
-    if (points > 0) {
+    // Burst animation for completion (not for skip)
+    if (points > 0 && !isSkipped) {
       setRecentlyCompleted(prev => {
         const next = new Set(prev);
         next.add(itemId);
@@ -186,15 +192,16 @@ export function ChecklistView({
       }, 600);
     }
 
-    if (points > 0 && buttonElement) {
+    if (points > 0 && !isSkipped && buttonElement) {
       const rect = buttonElement.getBoundingClientRect();
-      for (let i = 0; i < points; i++) {
+      const coinCount = isBonus ? Math.min(points, 5) : points;
+      for (let i = 0; i < coinCount; i++) {
         setTimeout(() => {
           triggerCoin(rect.right - 40 + (i * 10), rect.top + rect.height / 2, configuredPoints);
         }, i * 100);
       }
     }
-    onToggleItem(itemId, points, completedByUserId);
+    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped);
     setOpenPopover(null);
   };
 
@@ -387,6 +394,7 @@ export function ChecklistView({
                           const canToggle = canToggleItem(completion, completed);
                           const isLockedByOther = completed && !canToggle;
                           const wasAwardedPoints = completion?.awarded_points !== false;
+                          const wasSkipped = completion?.is_skipped === true;
                           const pointsAwarded = completion?.points_awarded ?? item.points;
                           const configuredPoints = item.points ?? 1;
                           const isJustCompleted = recentlyCompleted.has(item.id);
@@ -397,7 +405,6 @@ export function ChecklistView({
                                 key={item.id}
                                 onClick={() => {
                                   if (!canToggle) return;
-                                  // Optimistic uncheck
                                   setOptimisticToggles(prev => {
                                     const next = new Set(prev);
                                     next.add(item.id);
@@ -410,20 +417,28 @@ export function ChecklistView({
                                   "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
                                   !canToggle && "cursor-not-allowed opacity-80",
                                   canToggle && "active:scale-[0.97] hover:shadow-md",
-                                  "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
+                                  wasSkipped
+                                    ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                                    : "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
                                   isJustCompleted && "animate-scale-in"
                                 )}
                                 style={{ animationDelay: `${itemIndex * 40}ms` }}
                               >
                                 <div className={cn(
-                                  "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-success text-white shadow-lg shadow-success/30 transition-all duration-300",
+                                  "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
+                                  wasSkipped 
+                                    ? "bg-destructive shadow-destructive/30" 
+                                    : "bg-success shadow-success/30",
                                   isJustCompleted && "scale-125"
                                 )}>
-                                  <Check className="w-5 h-5" />
+                                  {wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
                                 </div>
                                 <div className="flex-1 text-left">
                                   <div className="flex items-center gap-2">
-                                    <p className="font-medium text-success line-through">
+                                    <p className={cn(
+                                      "font-medium line-through",
+                                      wasSkipped ? "text-destructive" : "text-success"
+                                    )}>
                                       {item.name}
                                     </p>
                                     {isLockedByOther && (
@@ -442,7 +457,10 @@ export function ChecklistView({
                                         {completion.profile?.full_name || 'Usuário'} às{' '}
                                         {format(new Date(completion.completed_at), 'HH:mm')}
                                       </span>
-                                      {!wasAwardedPoints && (
+                                      {wasSkipped && (
+                                        <span className="text-destructive ml-1">(não fiz)</span>
+                                      )}
+                                      {!wasSkipped && !wasAwardedPoints && (
                                         <span className="text-primary ml-1">(já pronto)</span>
                                       )}
                                     </div>
@@ -452,30 +470,37 @@ export function ChecklistView({
                                 <div
                                   className={cn(
                                     "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
-                                    !wasAwardedPoints
-                                      ? "bg-primary/10 text-primary border-primary/20"
-                                      : "border-border"
+                                    wasSkipped
+                                      ? "bg-destructive/10 text-destructive border-destructive/20"
+                                      : !wasAwardedPoints
+                                        ? "bg-primary/10 text-primary border-primary/20"
+                                        : "border-border"
                                   )}
                                   style={
-                                    wasAwardedPoints && pointsAwarded > 0
+                                    !wasSkipped && wasAwardedPoints && pointsAwarded > 0
                                       ? {
-                                          backgroundColor: getPointsColors(pointsAwarded).bg,
-                                          color: getPointsColors(pointsAwarded).color,
-                                          borderColor: getPointsColors(pointsAwarded).border,
+                                          backgroundColor: getItemPointsColors(pointsAwarded).bg,
+                                          color: getItemPointsColors(pointsAwarded).color,
+                                          borderColor: getItemPointsColors(pointsAwarded).border,
                                         }
                                       : undefined
                                   }
                                 >
-                                  {!wasAwardedPoints ? (
+                                  {wasSkipped ? (
+                                    <>
+                                      <X className="w-3 h-3" />
+                                      <span>não fiz</span>
+                                    </>
+                                  ) : !wasAwardedPoints ? (
                                     <>
                                       <RefreshCw className="w-3 h-3" />
                                       <span>pronto</span>
                                     </>
                                   ) : (
                                     <div className="flex items-center gap-0.5">
-                                      {pointsAwarded > 0 &&
+                                      {pointsAwarded > 0 && !isBonus &&
                                         Array.from({ length: pointsAwarded }).map((_, i) => {
-                                          const colors = getPointsColors(pointsAwarded);
+                                          const colors = getItemPointsColors(pointsAwarded);
                                           return (
                                             <Star
                                               key={i}
@@ -484,6 +509,7 @@ export function ChecklistView({
                                             />
                                           );
                                         })}
+                                      {isBonus && <Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
                                       <span className="ml-0.5">+{pointsAwarded}</span>
                                     </div>
                                   )}
@@ -524,20 +550,17 @@ export function ChecklistView({
                                   {/* Points badge */}
                                   {configuredPoints > 0 ? (
                                     <div
-                                      className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200"
+                                      className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
                                       style={{
-                                        backgroundColor: getPointsColors(configuredPoints).bg,
-                                        color: getPointsColors(configuredPoints).color,
-                                        borderColor: getPointsColors(configuredPoints).border,
+                                        backgroundColor: getItemPointsColors(configuredPoints).bg,
+                                        color: getItemPointsColors(configuredPoints).color,
+                                        borderColor: getItemPointsColors(configuredPoints).border,
+                                        boxShadow: isBonus ? `0 0 12px ${getItemPointsColors(configuredPoints).glow}` : undefined,
                                       }}
                                     >
-                                      <Star
-                                        className="w-3 h-3"
-                                        style={{
-                                          color: getPointsColors(configuredPoints).color,
-                                          fill: getPointsColors(configuredPoints).color,
-                                        }}
-                                      />
+                                      {isBonus ? <Zap className="w-3 h-3" /> : (
+                                        <Star className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />
+                                      )}
                                       <span>+{configuredPoints}</span>
                                     </div>
                                   ) : (
@@ -596,26 +619,33 @@ export function ChecklistView({
                                           <p className="font-semibold text-success">Concluí agora</p>
                                           {configuredPoints > 0 ? (
                                             <div className="flex items-center gap-0.5 mt-0.5">
-                                              {Array.from({ length: configuredPoints }).map((_, i) => (
-                                                <Star
-                                                  key={i}
-                                                  className="w-3 h-3"
-                                                  style={{
-                                                    color: getPointsColors(configuredPoints).color,
-                                                    fill: getPointsColors(configuredPoints).color,
-                                                  }}
-                                                />
-                                              ))}
-                                              <span
-                                                className="text-xs font-bold ml-0.5"
-                                                style={{ color: getPointsColors(configuredPoints).color }}
-                                              >
+                                              {isBonus ? <Zap className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} /> : (
+                                                Array.from({ length: configuredPoints }).map((_, i) => (
+                                                  <Star key={i} className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />
+                                                ))
+                                              )}
+                                              <span className="text-xs font-bold ml-0.5" style={{ color: getItemPointsColors(configuredPoints).color }}>
                                                 +{configuredPoints}
                                               </span>
                                             </div>
                                           ) : (
                                             <span className="text-xs text-muted-foreground">Tarefa sem pontos</span>
                                           )}
+                                        </div>
+                                      </button>
+
+                                      {/* Não fiz */}
+                                      <div className="border-t border-border" />
+                                      <button
+                                        onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
+                                        className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]"
+                                      >
+                                        <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center">
+                                          <X className="w-5 h-5 text-destructive" />
+                                        </div>
+                                        <div>
+                                          <p className="font-semibold text-destructive">Não fiz</p>
+                                          <p className="text-xs text-muted-foreground">Sem pontos</p>
                                         </div>
                                       </button>
                                       
@@ -653,6 +683,25 @@ export function ChecklistView({
                                         <p className="text-xs text-muted-foreground">Sem pontos (eu marquei)</p>
                                       </div>
                                     </button>
+                                  )}
+
+                                  {/* Admin + Non-admin: Não fiz */}
+                                  {isAdmin && (
+                                    <>
+                                      <div className="border-t border-border" />
+                                      <button
+                                        onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
+                                        className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]"
+                                      >
+                                        <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center">
+                                          <X className="w-5 h-5 text-destructive" />
+                                        </div>
+                                        <div>
+                                          <p className="font-semibold text-destructive">Não fiz</p>
+                                          <p className="text-xs text-muted-foreground">Sem pontos</p>
+                                        </div>
+                                      </button>
+                                    </>
                                   )}
                                 </div>
                               </PopoverContent>

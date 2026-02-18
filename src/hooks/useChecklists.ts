@@ -296,7 +296,8 @@ export function useChecklists() {
   // ---- Completion toggle ----
   const toggleCompletion = useCallback(async (
     itemId: string, checklistType: ChecklistType, date: string,
-    isAdmin?: boolean, points: number = 1, completedByUserId?: string
+    isAdmin?: boolean, points: number = 1, completedByUserId?: string,
+    isSkipped?: boolean
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -315,7 +316,9 @@ export function useChecklists() {
         .upsert({
           item_id: itemId, checklist_type: checklistType,
           completed_by: targetUserId, date,
-          awarded_points: points > 0, points_awarded: points,
+          awarded_points: !isSkipped && points > 0,
+          points_awarded: isSkipped ? 0 : points,
+          is_skipped: isSkipped || false,
           unit_id: activeUnitId,
         }, { onConflict: 'item_id,completed_by,date,checklist_type' });
       if (error) throw error;

@@ -23,25 +23,10 @@ export default function ChecklistsPage() {
     sectors,
     completions,
     isLoading,
-    // Sector operations
-    addSector,
-    updateSector,
-    deleteSector,
-    reorderSectors,
-    // Subcategory operations
-    addSubcategory,
-    updateSubcategory,
-    deleteSubcategory,
-    reorderSubcategories,
-    // Item operations
-    addItem,
-    updateItem,
-    deleteItem,
-    reorderItems,
-    // Completion operations
-    toggleCompletion,
-    isItemCompleted,
-    getCompletionProgress,
+    addSector, updateSector, deleteSector, reorderSectors,
+    addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
+    addItem, updateItem, deleteItem, reorderItems,
+    toggleCompletion, isItemCompleted, getCompletionProgress,
     fetchCompletions,
   } = useChecklists();
 
@@ -55,84 +40,40 @@ export default function ChecklistsPage() {
     fetchCompletions(currentDate, checklistType);
   }, [currentDate, checklistType, fetchCompletions]);
 
-  const handleToggleItem = async (itemId: string, points: number = 1, completedByUserId?: string) => {
+  const handleToggleItem = async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean) => {
     try {
-      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId);
+      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao marcar item');
     }
   };
 
   const handleAddSector = async (data: { name: string; color: string }) => {
-    try {
-      await addSector(data);
-    } catch (error) {
-      toast.error('Erro ao criar setor');
-    }
+    try { await addSector(data); } catch { toast.error('Erro ao criar setor'); }
   };
-
   const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
-    try {
-      await updateSector(id, data);
-    } catch (error) {
-      toast.error('Erro ao atualizar setor');
-    }
+    try { await updateSector(id, data); } catch { toast.error('Erro ao atualizar setor'); }
   };
-
   const handleDeleteSector = async (id: string) => {
-    try {
-      await deleteSector(id);
-    } catch (error) {
-      toast.error('Erro ao excluir setor');
-    }
+    try { await deleteSector(id); } catch { toast.error('Erro ao excluir setor'); }
   };
-
   const handleAddSubcategory = async (data: { sector_id: string; name: string }) => {
-    try {
-      await addSubcategory(data);
-    } catch (error) {
-      toast.error('Erro ao criar subcategoria');
-    }
+    try { await addSubcategory(data); } catch { toast.error('Erro ao criar subcategoria'); }
   };
-
   const handleUpdateSubcategory = async (id: string, data: { name?: string }) => {
-    try {
-      await updateSubcategory(id, data);
-    } catch (error) {
-      toast.error('Erro ao atualizar subcategoria');
-    }
+    try { await updateSubcategory(id, data); } catch { toast.error('Erro ao atualizar subcategoria'); }
   };
-
   const handleDeleteSubcategory = async (id: string) => {
-    try {
-      await deleteSubcategory(id);
-    } catch (error) {
-      toast.error('Erro ao excluir subcategoria');
-    }
+    try { await deleteSubcategory(id); } catch { toast.error('Erro ao excluir subcategoria'); }
   };
-
   const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string }) => {
-    try {
-      await addItem(data);
-    } catch (error) {
-      toast.error('Erro ao criar item');
-    }
+    try { await addItem(data); } catch { toast.error('Erro ao criar item'); }
   };
-
   const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean }) => {
-    try {
-      await updateItem(id, data);
-    } catch (error) {
-      toast.error('Erro ao atualizar item');
-    }
+    try { await updateItem(id, data); } catch { toast.error('Erro ao atualizar item'); }
   };
-
   const handleDeleteItem = async (id: string) => {
-    try {
-      await deleteItem(id);
-    } catch (error) {
-      toast.error('Erro ao excluir item');
-    }
+    try { await deleteItem(id); } catch { toast.error('Erro ao excluir item'); }
   };
 
   if (isLoading) {
@@ -229,6 +170,25 @@ export default function ChecklistsPage() {
                   <AppIcon name="Moon" size={20} />
                    <span className="font-bold text-sm">Fechamento</span>
                 </button>
+
+                <button
+                  onClick={() => setChecklistType('bonus')}
+                  className={cn(
+                    "tab-command-item gap-1.5 relative overflow-hidden",
+                    checklistType === 'bonus' ? "tab-command-active" : "tab-command-inactive"
+                  )}
+                  style={checklistType === 'bonus' ? { 
+                    borderColor: 'hsl(38 92% 50% / 0.5)', 
+                    boxShadow: '0 0 16px hsl(38 92% 50% / 0.25), 0 0 32px hsl(280 90% 65% / 0.1)',
+                    background: 'linear-gradient(135deg, hsl(38 92% 50% / 0.08), hsl(280 90% 65% / 0.08))'
+                  } : undefined}
+                >
+                  <AppIcon name="Zap" size={16} className={cn(checklistType === 'bonus' && "animate-pulse")} />
+                  <span className="font-bold text-xs">Bônus</span>
+                  {checklistType === 'bonus' && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse pointer-events-none" />
+                  )}
+                </button>
               </div>
 
               {/* Checklist View */}
@@ -282,6 +242,21 @@ export default function ChecklistsPage() {
                 >
                   <AppIcon name="Moon" size={20} />
                    <span className="font-semibold">Fechamento</span>
+                </button>
+                <button
+                  onClick={() => setSettingsType('bonus')}
+                  className={cn(
+                    "tab-command-item gap-1.5",
+                    settingsType === 'bonus' ? "tab-command-active" : "tab-command-inactive"
+                  )}
+                  style={settingsType === 'bonus' ? { 
+                    borderColor: 'hsl(38 92% 50% / 0.5)', 
+                    boxShadow: '0 0 16px hsl(38 92% 50% / 0.25)',
+                    background: 'linear-gradient(135deg, hsl(38 92% 50% / 0.08), hsl(280 90% 65% / 0.08))'
+                  } : undefined}
+                >
+                  <AppIcon name="Zap" size={16} />
+                  <span className="font-semibold text-xs">Bônus</span>
                 </button>
               </div>
 

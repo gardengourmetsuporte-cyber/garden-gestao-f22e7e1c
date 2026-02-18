@@ -351,6 +351,7 @@ export type Database = {
           completed_by: string
           date: string
           id: string
+          is_skipped: boolean
           item_id: string
           notes: string | null
           points_awarded: number
@@ -363,6 +364,7 @@ export type Database = {
           completed_by: string
           date?: string
           id?: string
+          is_skipped?: boolean
           item_id: string
           notes?: string | null
           points_awarded?: number
@@ -375,6 +377,7 @@ export type Database = {
           completed_by?: string
           date?: string
           id?: string
+          is_skipped?: boolean
           item_id?: string
           notes?: string | null
           points_awarded?: number
@@ -3625,7 +3628,7 @@ export type Database = {
       app_role: "admin" | "funcionario" | "super_admin"
       cash_closing_status: "pending" | "approved" | "divergent"
       chat_conversation_type: "direct" | "group" | "announcement"
-      checklist_type: "abertura" | "fechamento" | "limpeza"
+      checklist_type: "abertura" | "fechamento" | "limpeza" | "bonus"
       day_period: "morning" | "afternoon" | "evening"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
@@ -3765,7 +3768,7 @@ export const Constants = {
       app_role: ["admin", "funcionario", "super_admin"],
       cash_closing_status: ["pending", "approved", "divergent"],
       chat_conversation_type: ["direct", "group", "announcement"],
-      checklist_type: ["abertura", "fechamento", "limpeza"],
+      checklist_type: ["abertura", "fechamento", "limpeza", "bonus"],
       day_period: ["morning", "afternoon", "evening"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
