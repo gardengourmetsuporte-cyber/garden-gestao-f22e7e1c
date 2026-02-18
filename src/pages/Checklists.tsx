@@ -125,7 +125,13 @@ export default function ChecklistsPage() {
 
   const handleAddSector = async (data: { name: string; color: string }) => {
     const scope = settingsType === 'bonus' ? 'bonus' : 'standard';
-    try { await addSector({ ...data, scope }); } catch { toast.error('Erro ao criar setor'); }
+    try { 
+      const newSector = await addSector({ ...data, scope });
+      // Auto-create a default subcategory for bonus sectors
+      if (scope === 'bonus' && newSector?.id) {
+        await addSubcategory({ sector_id: newSector.id, name: 'Geral' });
+      }
+    } catch { toast.error('Erro ao criar setor'); }
   };
   const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
     try { await updateSector(id, data); } catch { toast.error('Erro ao atualizar setor'); }
