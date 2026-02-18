@@ -143,7 +143,7 @@ export default function ChecklistsPage() {
     try { await deleteSubcategory(id); } catch { toast.error('Erro ao excluir subcategoria'); }
   };
   const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
-    try { await addItem(data); } catch { toast.error('Erro ao criar item'); }
+    try { await addItem(data); } catch (err: any) { console.error('addItem error:', err); toast.error(err?.message || 'Erro ao criar item'); }
   };
   const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
     try { await updateItem(id, data); } catch { toast.error('Erro ao atualizar item'); }
