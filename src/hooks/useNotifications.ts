@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,15 +19,41 @@ async function fetchNotificationsData(userId: string): Promise<AppNotification[]
     .from('notifications')
     .select('*')
     .eq('user_id', userId)
+    .eq('read', false)
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(20);
 
   return (data as unknown as AppNotification[]) || [];
+}
+
+// Debounced sound - only play once per 5 seconds
+let lastSoundTime = 0;
+function playNotificationSound() {
+  const now = Date.now();
+  if (now - lastSoundTime < 5000) return;
+  lastSoundTime = now;
+
+  try {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.value = 830;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.2);
+  } catch {
+    // Audio not available
+  }
 }
 
 export function useNotifications() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const soundDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const queryKey = ['notifications', user?.id];
 
@@ -35,9 +61,11 @@ export function useNotifications() {
     queryKey,
     queryFn: () => fetchNotificationsData(user!.id),
     enabled: !!user,
+    staleTime: 30_000, // Don't refetch for 30s
+    refetchInterval: 60_000, // Poll every 60s as fallback
   });
 
-  // Realtime subscription - update cache directly
+  // Realtime subscription - debounced batch updates
   useEffect(() => {
     if (!user) return;
 
@@ -45,20 +73,26 @@ export function useNotifications() {
       .channel('notifications-realtime')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications' },
+        { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
         (payload) => {
           if (payload.eventType === 'INSERT') {
             const newNotif = payload.new as unknown as AppNotification;
-            if (newNotif.user_id === user.id) {
+            if (!newNotif.read) {
               queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
-                old ? [newNotif, ...old] : [newNotif]
+                old ? [newNotif, ...old].slice(0, 20) : [newNotif]
               );
-              playNotificationSound();
+              // Debounce sound: wait 500ms to batch rapid inserts
+              if (soundDebounceRef.current) clearTimeout(soundDebounceRef.current);
+              soundDebounceRef.current = setTimeout(playNotificationSound, 500);
             }
           } else if (payload.eventType === 'UPDATE') {
-            queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
-              old?.map(n => n.id === (payload.new as any).id ? { ...n, ...(payload.new as any) } : n) ?? []
-            );
+            const updated = payload.new as any;
+            if (updated.read) {
+              // Remove read notifications from unread list
+              queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
+                old?.filter(n => n.id !== updated.id) ?? []
+              );
+            }
           } else if (payload.eventType === 'DELETE') {
             queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
               old?.filter(n => n.id !== (payload.old as any).id) ?? []
@@ -68,13 +102,15 @@ export function useNotifications() {
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+      if (soundDebounceRef.current) clearTimeout(soundDebounceRef.current);
+    };
   }, [user, queryClient]);
 
   const markAsRead = useCallback(async (notificationId: string) => {
-    // Optimistic update
     queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
-      old?.map(n => n.id === notificationId ? { ...n, read: true } : n) ?? []
+      old?.filter(n => n.id !== notificationId) ?? []
     );
     await supabase
       .from('notifications')
@@ -83,59 +119,25 @@ export function useNotifications() {
   }, [queryClient]);
 
   const markAllAsRead = useCallback(async () => {
-    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    const unreadIds = notifications.map(n => n.id);
     if (unreadIds.length === 0) return;
 
-    // Optimistic update
-    queryClient.setQueryData<AppNotification[]>(queryKey, (old) =>
-      old?.map(n => ({ ...n, read: true })) ?? []
-    );
+    queryClient.setQueryData<AppNotification[]>(queryKey, () => []);
     await supabase
       .from('notifications')
       .update({ read: true } as any)
       .in('id', unreadIds);
   }, [notifications, queryClient]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const unreadNotifications = notifications.filter(n => !n.read);
+  const unreadCount = notifications.length;
 
   return {
     notifications,
-    unreadNotifications,
+    unreadNotifications: notifications,
     unreadCount,
     isLoading,
     markAsRead,
     markAllAsRead,
     refetch: () => queryClient.invalidateQueries({ queryKey }),
   };
-}
-
-function playNotificationSound() {
-  try {
-    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
-    const osc1 = audioCtx.createOscillator();
-    const gain1 = audioCtx.createGain();
-    osc1.connect(gain1);
-    gain1.connect(audioCtx.destination);
-    osc1.frequency.value = 830;
-    osc1.type = 'sine';
-    gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-    osc1.start(audioCtx.currentTime);
-    osc1.stop(audioCtx.currentTime + 0.15);
-
-    const osc2 = audioCtx.createOscillator();
-    const gain2 = audioCtx.createGain();
-    osc2.connect(gain2);
-    gain2.connect(audioCtx.destination);
-    osc2.frequency.value = 1200;
-    osc2.type = 'sine';
-    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime + 0.12);
-    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-    osc2.start(audioCtx.currentTime + 0.12);
-    osc2.stop(audioCtx.currentTime + 0.3);
-  } catch {
-    // Audio not available
-  }
 }

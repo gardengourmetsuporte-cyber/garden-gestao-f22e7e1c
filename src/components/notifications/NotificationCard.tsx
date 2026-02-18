@@ -1,5 +1,5 @@
 import { Bell, AlertTriangle, Info, CheckCircle, Check, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNotifications, AppNotification } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -11,8 +11,49 @@ const typeConfig = {
   success: { icon: CheckCircle, color: 'text-success', bg: 'bg-success/10', border: 'border-success/20' },
 };
 
-function NotificationItem({ notification, onMarkRead }: { notification: AppNotification; onMarkRead: (id: string) => void }) {
-  const config = typeConfig[notification.type] || typeConfig.info;
+interface GroupedNotification {
+  key: string;
+  title: string;
+  description: string;
+  type: AppNotification['type'];
+  origin: string;
+  count: number;
+  ids: string[];
+  latestDate: string;
+}
+
+function groupNotifications(notifications: AppNotification[]): GroupedNotification[] {
+  const groups = new Map<string, GroupedNotification>();
+
+  for (const n of notifications) {
+    const key = `${n.title}__${n.origin}`;
+    const existing = groups.get(key);
+    if (existing) {
+      existing.count++;
+      existing.ids.push(n.id);
+      if (n.created_at > existing.latestDate) {
+        existing.latestDate = n.created_at;
+        existing.description = n.description;
+      }
+    } else {
+      groups.set(key, {
+        key,
+        title: n.title,
+        description: n.description,
+        type: n.type,
+        origin: n.origin,
+        count: 1,
+        ids: [n.id],
+        latestDate: n.created_at,
+      });
+    }
+  }
+
+  return Array.from(groups.values()).sort((a, b) => b.latestDate.localeCompare(a.latestDate));
+}
+
+function NotificationGroupItem({ group, onMarkRead }: { group: GroupedNotification; onMarkRead: (ids: string[]) => void }) {
+  const config = typeConfig[group.type] || typeConfig.info;
   const Icon = config.icon;
 
   return (
@@ -25,18 +66,25 @@ function NotificationItem({ notification, onMarkRead }: { notification: AppNotif
         <Icon className={cn("w-4 h-4", config.color)} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-xs text-foreground">{notification.title}</p>
-        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{notification.description}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="font-semibold text-xs text-foreground">{group.title}</p>
+          {group.count > 1 && (
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+              {group.count}×
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{group.description}</p>
         <div className="flex items-center gap-2 mt-1.5">
           <span className="text-[10px] text-muted-foreground/70">
-            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: ptBR })}
+            {formatDistanceToNow(new Date(group.latestDate), { addSuffix: true, locale: ptBR })}
           </span>
           <span className="text-[10px] text-muted-foreground/50">•</span>
-          <span className="text-[10px] text-muted-foreground/70 capitalize">{notification.origin}</span>
+          <span className="text-[10px] text-muted-foreground/70 capitalize">{group.origin}</span>
         </div>
       </div>
       <button
-        onClick={() => onMarkRead(notification.id)}
+        onClick={() => onMarkRead(group.ids)}
         className="p-1.5 rounded-lg hover:bg-success/10 transition-colors shrink-0 group"
         title="Marcar como lida"
       >
@@ -47,8 +95,16 @@ function NotificationItem({ notification, onMarkRead }: { notification: AppNotif
 }
 
 export function NotificationCard() {
-  const { unreadNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [expanded, setExpanded] = useState(true);
+
+  const grouped = useMemo(() => groupNotifications(notifications), [notifications]);
+
+  const handleMarkRead = async (ids: string[]) => {
+    for (const id of ids) {
+      await markAsRead(id);
+    }
+  };
 
   if (unreadCount === 0) return (
     <div className="p-6 text-center">
@@ -60,7 +116,6 @@ export function NotificationCard() {
   return (
     <div>
       <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
-        {/* Header */}
         <button
           onClick={() => setExpanded(!expanded)}
           className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors"
@@ -69,16 +124,16 @@ export function NotificationCard() {
             <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center relative">
               <Bell className="w-4.5 h-4.5 text-destructive" />
               <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
-                {unreadCount}
+                {grouped.length}
               </span>
             </div>
             <div className="text-left">
               <h3 className="font-semibold text-sm text-foreground">Notificações</h3>
-              <p className="text-[10px] text-muted-foreground">{unreadCount} não lida{unreadCount > 1 ? 's' : ''}</p>
+              <p className="text-[10px] text-muted-foreground">{grouped.length} pendente{grouped.length > 1 ? 's' : ''}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {unreadCount > 1 && (
+            {grouped.length > 1 && (
               <span
                 onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
                 className="text-[10px] text-primary font-medium hover:underline cursor-pointer"
@@ -90,11 +145,10 @@ export function NotificationCard() {
           </div>
         </button>
 
-        {/* Notification List */}
         {expanded && (
           <div className="px-3 pb-3 space-y-2 max-h-[300px] overflow-y-auto">
-            {unreadNotifications.slice(0, 10).map(n => (
-              <NotificationItem key={n.id} notification={n} onMarkRead={markAsRead} />
+            {grouped.slice(0, 10).map(g => (
+              <NotificationGroupItem key={g.key} group={g} onMarkRead={handleMarkRead} />
             ))}
           </div>
         )}
