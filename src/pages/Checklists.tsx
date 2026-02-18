@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useChecklists } from '@/hooks/useChecklists';
@@ -33,6 +33,7 @@ export default function ChecklistsPage() {
     fetchCompletions,
   } = useChecklists();
 
+  const queryClient = useQueryClient();
   const { activeUnitId } = useUnit();
   const [currentTab, setCurrentTab] = useState<TabView>('checklist');
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
@@ -93,6 +94,26 @@ export default function ChecklistsPage() {
   useEffect(() => {
     fetchCompletions(currentDate, checklistType);
   }, [currentDate, checklistType, fetchCompletions]);
+
+  // Realtime: invalidate progress queries when completions change
+  useEffect(() => {
+    const channel = supabase
+      .channel('checklist-completions-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'checklist_completions' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, 'abertura', activeUnitId] });
+          queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, 'fechamento', activeUnitId] });
+          fetchCompletions(currentDate, checklistType);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentDate, activeUnitId, checklistType, queryClient, fetchCompletions]);
 
   const handleToggleItem = async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean) => {
     try {
