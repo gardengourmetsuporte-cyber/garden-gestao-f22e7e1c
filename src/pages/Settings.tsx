@@ -1,6 +1,7 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Tag, Truck, ClipboardCheck, Users, Gift, Settings as SettingsIcon, Wallet, Calculator, ChevronRight, Building2, Bell, Shield } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
 import { SupplierSettings } from '@/components/settings/SupplierSettings';
@@ -17,7 +18,7 @@ import { cn } from '@/lib/utils';
 
 interface MenuItem {
   value: string;
-  icon: React.ElementType;
+  icon: string;
   label: string;
   description: string;
   variant: string;
@@ -25,17 +26,17 @@ interface MenuItem {
 }
 
 const allMenuItems: MenuItem[] = [
-  { value: 'profile', icon: User, label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
-  { value: 'users', icon: Users, label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
-  { value: 'access-levels', icon: Shield, label: 'Níveis de Acesso', description: 'Controlar permissões por módulo', variant: 'cyan', section: 'Conta' },
-  { value: 'categories', icon: Tag, label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
-  { value: 'suppliers', icon: Truck, label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'green', section: 'Operação' },
-  { value: 'checklists', icon: ClipboardCheck, label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'purple', section: 'Operação' },
-  { value: 'payments', icon: Wallet, label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'green', section: 'Operação' },
-  { value: 'costs', icon: Calculator, label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'red', section: 'Operação' },
-  { value: 'rewards', icon: Gift, label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'amber', section: 'Sistema' },
-  { value: 'units', icon: Building2, label: 'Unidades', description: 'Gerenciar filiais e lojas', variant: 'purple', section: 'Sistema' },
-  { value: 'alerts', icon: Bell, label: 'Alertas e Sinalização', description: 'Horários de notificação por módulo', variant: 'red', section: 'Sistema' },
+  { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
+  { value: 'users', icon: 'Users', label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
+  { value: 'access-levels', icon: 'Shield', label: 'Níveis de Acesso', description: 'Controlar permissões por módulo', variant: 'cyan', section: 'Conta' },
+  { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
+  { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'green', section: 'Operação' },
+  { value: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'purple', section: 'Operação' },
+  { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'green', section: 'Operação' },
+  { value: 'costs', icon: 'Calculator', label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'red', section: 'Operação' },
+  { value: 'rewards', icon: 'Gift', label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'amber', section: 'Sistema' },
+  { value: 'units', icon: 'Building2', label: 'Unidades', description: 'Gerenciar filiais e lojas', variant: 'purple', section: 'Sistema' },
+  { value: 'alerts', icon: 'Bell', label: 'Alertas e Sinalização', description: 'Horários de notificação por módulo', variant: 'red', section: 'Sistema' },
 ];
 
 const variantBorderColors: Record<string, string> = {
@@ -139,7 +140,7 @@ export default function SettingsPage() {
                           color: borderColor
                         }}
                       >
-                        <item.icon className="w-5 h-5" />
+                        <AppIcon name={item.icon} size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="font-medium text-sm block">{item.label}</span>

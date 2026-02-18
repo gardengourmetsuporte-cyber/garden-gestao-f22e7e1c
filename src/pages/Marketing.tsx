@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus, CalendarDays, LayoutList, Lightbulb } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AppIcon } from '@/components/ui/app-icon';
+import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useMarketing } from '@/hooks/useMarketing';
 import { MarketingCalendar } from '@/components/marketing/MarketingCalendar';
 import { MarketingFeed } from '@/components/marketing/MarketingFeed';
@@ -16,6 +15,7 @@ export default function Marketing() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<MarketingPost | null>(null);
   const [publishPost, setPublishPost] = useState<MarketingPost | null>(null);
+  const [activeTab, setActiveTab] = useState('calendar');
 
   const handleEdit = (post: MarketingPost) => {
     setEditingPost(post);
@@ -41,56 +41,56 @@ export default function Marketing() {
 
   return (
     <AppLayout>
-      <div className="page-header-bar">
-        <div className="page-header-content flex items-center justify-between">
-          <h1 className="page-title">Marketing</h1>
-          <Button size="sm" onClick={handleNew} className="gap-1.5">
-            <Plus className="w-4 h-4" /> Novo Post
-          </Button>
+      <div className="min-h-screen bg-background pb-24">
+        <header className="page-header-bar">
+          <div className="page-header-content flex items-center justify-between">
+            <h1 className="page-title">Marketing</h1>
+          </div>
+        </header>
+
+        <div className="px-4 py-4 space-y-4">
+          <AnimatedTabs
+            tabs={[
+              { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
+              { key: 'feed', label: 'Feed', icon: <AppIcon name="LayoutList" size={16} /> },
+              { key: 'ideas', label: 'Ideias', icon: <AppIcon name="Lightbulb" size={16} /> },
+            ]}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+
+          <div className="animate-fade-in" key={activeTab}>
+            {activeTab === 'calendar' && (
+              <MarketingCalendar
+                posts={posts}
+                onEdit={handleEdit}
+                onDelete={id => deletePost.mutate(id)}
+                onPublish={p => setPublishPost(p)}
+              />
+            )}
+            {activeTab === 'feed' && (
+              <MarketingFeed
+                posts={posts}
+                onEdit={handleEdit}
+                onDelete={id => deletePost.mutate(id)}
+                onPublish={p => setPublishPost(p)}
+              />
+            )}
+            {activeTab === 'ideas' && (
+              <MarketingIdeas
+                posts={posts}
+                onCreate={handleQuickIdea}
+                onEdit={handleEdit}
+                onDelete={id => deletePost.mutate(id)}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="p-4 pb-24">
-        <Tabs defaultValue="calendar" className="space-y-4">
-          <TabsList className="w-full grid grid-cols-3">
-            <TabsTrigger value="calendar" className="gap-1.5 text-xs">
-              <CalendarDays className="w-3.5 h-3.5" /> Calendário
-            </TabsTrigger>
-            <TabsTrigger value="feed" className="gap-1.5 text-xs">
-              <LayoutList className="w-3.5 h-3.5" /> Feed
-            </TabsTrigger>
-            <TabsTrigger value="ideas" className="gap-1.5 text-xs">
-              <Lightbulb className="w-3.5 h-3.5" /> Ideias
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="calendar">
-            <MarketingCalendar
-              posts={posts}
-              onEdit={handleEdit}
-              onDelete={id => deletePost.mutate(id)}
-              onPublish={p => setPublishPost(p)}
-            />
-          </TabsContent>
-
-          <TabsContent value="feed">
-            <MarketingFeed
-              posts={posts}
-              onEdit={handleEdit}
-              onDelete={id => deletePost.mutate(id)}
-              onPublish={p => setPublishPost(p)}
-            />
-          </TabsContent>
-
-          <TabsContent value="ideas">
-            <MarketingIdeas
-              posts={posts}
-              onCreate={handleQuickIdea}
-              onEdit={handleEdit}
-              onDelete={id => deletePost.mutate(id)}
-            />
-          </TabsContent>
-        </Tabs>
+        {/* FAB */}
+        <button onClick={handleNew} className="fab">
+          <AppIcon name="Plus" size={24} />
+        </button>
       </div>
 
       <PostSheet

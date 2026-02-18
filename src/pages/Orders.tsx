@@ -170,7 +170,7 @@ export default function OrdersPage() {
             onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders')}
           />
 
-          {/* Sugestões Tab */}
+          <div className="animate-fade-in" key={orderTab}>
           {orderTab === 'to-order' && (
             Object.keys(itemsBySupplier).length === 0 ? (
               <div className="text-center py-16 animate-fade-in">
@@ -181,7 +181,7 @@ export default function OrdersPage() {
                 <p className="text-sm text-muted-foreground mt-1">Todos os itens estão acima do mínimo</p>
               </div>
             ) : (
-              <div className="space-y-3 animate-fade-in">
+              <div className="space-y-3">
                 {Object.entries(itemsBySupplier).map(([supplierId, supplierItems], index) => {
                   const supplier = suppliers.find(s => s.id === supplierId);
                   const isNoSupplier = supplierId === 'no-supplier';
@@ -461,6 +461,7 @@ export default function OrdersPage() {
               </div>
             )
           )}
+          </div>
         </div>
 
         {/* Sheets */}

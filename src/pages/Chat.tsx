@@ -173,7 +173,9 @@ export default function Chat() {
 
       {/* Stories-style online contacts bar */}
       {contacts.length > 0 && !search && (
-        <div className="shrink-0 px-2 pb-3">
+        <div className="shrink-0 px-2 pb-3 relative">
+          <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           <div className="flex gap-3 overflow-x-auto scrollbar-hide px-2 py-1">
             {contacts.slice(0, 12).map(contact => {
               const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
