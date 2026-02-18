@@ -22,20 +22,8 @@ export default function Employees() {
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
         <div className="page-header-bar">
-          <div className="page-header-content flex items-center gap-3">
-            <div className="icon-glow icon-glow-md icon-glow-primary">
-              <AppIcon name="Users" size={20} />
-            </div>
-            <div>
-              <h1 className="page-title">
-                {isAdmin ? 'Funcionários' : 'Meus Dados'}
-              </h1>
-              <p className="page-subtitle">
-                {isAdmin 
-                  ? 'Gerencie funcionários, pagamentos e folgas' 
-                  : 'Consulte seus holerites e solicite folgas'}
-              </p>
-            </div>
+          <div className="page-header-content">
+            <h1 className="page-title">{isAdmin ? 'Funcionários' : 'Meus Dados'}</h1>
           </div>
         </div>
 

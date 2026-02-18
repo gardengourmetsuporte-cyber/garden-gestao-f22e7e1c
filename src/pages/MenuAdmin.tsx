@@ -86,14 +86,8 @@ export default function MenuAdmin() {
     <AppLayout>
       {/* Header */}
       <div className="page-header-bar">
-        <div className="page-header-content flex items-center gap-3">
-          <div className="icon-glow icon-glow-md icon-glow-purple">
-            <AppIcon name="BookOpen" size={20} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-base font-bold text-foreground">Cardápio</h1>
-            <p className="text-[11px] text-muted-foreground">Categorias, produtos e opcionais</p>
-          </div>
+        <div className="page-header-content">
+          <h1 className="page-title">Cardápio</h1>
         </div>
       </div>
 

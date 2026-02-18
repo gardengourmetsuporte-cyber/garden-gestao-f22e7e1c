@@ -109,16 +109,8 @@ export default function SettingsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <header className="page-header-bar">
-          <div className="page-header-content flex items-center gap-3">
-             <div className="icon-glow icon-glow-md icon-glow-muted">
-               <SettingsIcon className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">Configurações</h1>
-              <p className="text-xs text-muted-foreground">
-                {isAdmin ? 'Gerencie o sistema completo' : 'Gerencie seu perfil'}
-              </p>
-            </div>
+          <div className="page-header-content">
+            <h1 className="page-title">Configurações</h1>
           </div>
         </header>
 
