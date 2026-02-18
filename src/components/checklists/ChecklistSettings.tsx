@@ -655,7 +655,7 @@ export function ChecklistSettings({
 
       {/* Sector Sheet */}
       <Sheet open={sectorSheetOpen} onOpenChange={setSectorSheetOpen}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
+        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle>
               {editingSector ? 'Editar Setor' : 'Novo Setor'}
@@ -704,7 +704,7 @@ export function ChecklistSettings({
 
       {/* Subcategory Sheet */}
       <Sheet open={subcategorySheetOpen} onOpenChange={setSubcategorySheetOpen}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
+        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle>
               {editingSubcategory ? 'Editar Subcategoria' : 'Nova Subcategoria'}
@@ -735,7 +735,7 @@ export function ChecklistSettings({
 
       {/* Item Sheet */}
       <Sheet open={itemSheetOpen} onOpenChange={setItemSheetOpen}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
+        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle>{editingItem ? 'Editar Item' : 'Novo Item'}</SheetTitle>
           </SheetHeader>
