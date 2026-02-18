@@ -335,21 +335,28 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         <div className="relative">
                           <div
                             className={cn(
-                              "w-14 h-14 rounded-[16px] flex items-center justify-center transition-all duration-200",
+                              "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200",
                               isActive
-                                ? "bg-primary shadow-lg shadow-primary/30"
+                                ? "bg-primary"
                                 : isEmProducao
-                                  ? "bg-card/60 border border-dashed border-amber-500/40"
-                                  : "bg-card/90 border border-border/40"
+                                  ? "border border-dashed border-amber-500/40"
+                                  : ""
                             )}
                             style={{
-                              boxShadow: isActive ? undefined : 'var(--shadow-card)',
+                              background: isActive ? undefined : 'hsl(var(--card))',
+                              boxShadow: isActive
+                                ? '0 4px 16px hsl(var(--primary) / 0.4)'
+                                : `
+                                  6px 6px 12px hsl(var(--foreground) / 0.07),
+                                  -4px -4px 8px hsl(var(--background) / 0.8),
+                                  inset 0 1px 2px hsl(var(--background) / 0.5)
+                                `,
                               opacity: isEmProducao && !isActive ? 0.7 : 1,
                             }}
                           >
                             <AppIcon
                               name={item.icon}
-                              size={24}
+                              size={22}
                               className={isActive ? "text-primary-foreground" : isEmProducao ? "text-amber-400/70" : "text-muted-foreground"}
                               style={{
                                 filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
