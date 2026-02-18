@@ -371,10 +371,11 @@ export default function Agenda() {
           </div>
         </div>
 
-        {/* FAB */}
+        {/* FAB - positioned above the App Launcher */}
         <button
           onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }}
-          className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
         >
           <AppIcon name="Plus" size={24} />
         </button>
