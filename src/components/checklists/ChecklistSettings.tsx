@@ -390,6 +390,7 @@ export function ChecklistSettings({
         <SortableContext items={sectors.map(s => s.id)} strategy={verticalListSortingStrategy}>
           {sectors.map(sector => {
             const isExpanded = expandedSectors.has(sector.id);
+            const isBonusMode = selectedType === 'bonus';
 
             return (
               <SortableItem key={sector.id} id={sector.id} className="bg-card rounded-xl border overflow-hidden mb-4">
@@ -407,18 +408,42 @@ export function ChecklistSettings({
                         <Folder className="w-4 h-4" />
                       </div>
                       <span className="font-semibold text-foreground">{sector.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({sector.subcategories?.length || 0} subcategorias)
-                      </span>
+                      {!isBonusMode && (
+                        <span className="text-xs text-muted-foreground">
+                          ({sector.subcategories?.length || 0} subcategorias)
+                        </span>
+                      )}
+                      {isBonusMode && (
+                        <span className="text-xs text-muted-foreground">
+                          ({sector.subcategories?.flatMap(s => s.items || []).filter(i => i.checklist_type === 'bonus').length || 0} tarefas)
+                        </span>
+                      )}
                     </button>
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleOpenSubcategorySheet(sector.id)}
-                        className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary"
-                        title="Adicionar subcategoria"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                      {!isBonusMode && (
+                        <button
+                          onClick={() => handleOpenSubcategorySheet(sector.id)}
+                          className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary"
+                          title="Adicionar subcategoria"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      )}
+                      {isBonusMode && (
+                        <button
+                          onClick={() => {
+                            // For bonus, add item to the first (or auto) subcategory
+                            const defaultSub = sector.subcategories?.[0];
+                            if (defaultSub) {
+                              handleOpenItemSheet(defaultSub.id);
+                            }
+                          }}
+                          className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary"
+                          title="Adicionar tarefa"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      )}
                       <button
                         onClick={() => handleOpenSectorSheet(sector)}
                         className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground"
@@ -439,186 +464,177 @@ export function ChecklistSettings({
                     </div>
                   </div>
 
-                  {/* Subcategories with DnD */}
+                  {/* Content when expanded */}
                   {isExpanded && (
                     <div className="p-2 space-y-2">
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={(e) => handleSubcategoryDragEnd(sector.id, sector.subcategories || [], e)}
-                      >
-                        <SortableContext 
-                          items={(sector.subcategories || []).map(s => s.id)} 
-                          strategy={verticalListSortingStrategy}
-                        >
-                          {sector.subcategories?.map(subcategory => {
-                            const isSubExpanded = expandedSubcategories.has(subcategory.id);
-
+                      {isBonusMode ? (
+                        /* BONUS: Items directly under sector, no subcategory UI */
+                        (() => {
+                          const allBonusItems = sector.subcategories?.flatMap(sub => 
+                            (sub.items || []).filter(i => i.checklist_type === 'bonus').map(item => ({ ...item, _subcategoryId: sub.id }))
+                          ) || [];
+                          
+                          if (allBonusItems.length === 0) {
                             return (
-                              <SortableItem 
-                                key={subcategory.id} 
-                                id={subcategory.id}
-                                className="bg-secondary/20 rounded-lg overflow-hidden"
-                              >
-                                <div className="flex-1">
-                                  {/* Subcategory Header */}
-                                  <div className="flex items-center gap-2 p-2">
-                                    <button
-                                      onClick={() => toggleSubcategory(subcategory.id)}
-                                      className="flex-1 flex items-center gap-2"
-                                    >
-                                      <span className="font-medium text-foreground">{subcategory.name}</span>
-                                      <span className="text-xs text-muted-foreground">
-                                        ({(subcategory.items || []).filter(i => i.checklist_type === selectedType).length} itens de {selectedType})
-                                      </span>
-                                    </button>
-                                    <div className="flex items-center gap-1">
+                              <p className="text-sm text-muted-foreground text-center py-4">
+                                Nenhuma tarefa bônus. Clique em + para adicionar.
+                              </p>
+                            );
+                          }
+
+                          return (
+                            <div className="space-y-1">
+                              {allBonusItems.map(item => (
+                                <div key={item.id} className={cn("p-3 rounded-lg bg-card", !item.is_active && "opacity-50")}>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-start gap-2">
+                                      <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium">{item.name}</p>
+                                        {item.description && <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>}
+                                        <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                                          <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                                            {getFrequencyLabel(item.frequency || 'daily')}
+                                          </span>
+                                          <span className={cn(
+                                            "text-xs px-1.5 py-0.5 rounded flex items-center gap-1",
+                                            item.points === 0 ? "bg-muted text-muted-foreground" : "bg-emerald-500/10 text-emerald-500"
+                                          )}>
+                                            <Zap className="w-3 h-3" />
+                                            {item.points === 0 ? 'Sem pts' : `${item.points} pt${item.points > 1 ? 's' : ''}`}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-border/50">
                                       <button
-                                        onClick={() => handleOpenItemSheet(subcategory.id)}
-                                        className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-primary"
-                                        title="Adicionar item"
+                                        onClick={() => onUpdateItem(item.id, { is_active: !item.is_active })}
+                                        className={cn("text-xs px-3 py-1.5 rounded-lg font-medium transition-colors",
+                                          item.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}
                                       >
-                                        <Plus className="w-3 h-3" />
+                                        {item.is_active ? 'Ativo' : 'Inativo'}
                                       </button>
                                       <button
-                                        onClick={() => handleOpenSubcategorySheet(sector.id, subcategory)}
-                                        className="p-1.5 rounded hover:bg-secondary text-muted-foreground"
+                                        onClick={() => handleOpenItemSheet((item as any)._subcategoryId, item)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-xs font-medium"
                                       >
-                                        <Edit2 className="w-3 h-3" />
+                                        <Edit2 className="w-3.5 h-3.5" /> Editar
                                       </button>
                                       <button
-                                        onClick={() => onDeleteSubcategory(subcategory.id)}
-                                        className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                                        onClick={() => onDeleteItem(item.id)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs font-medium"
                                       >
-                                        <Trash2 className="w-3 h-3" />
+                                        <Trash2 className="w-3.5 h-3.5" /> Excluir
                                       </button>
-                                      {isSubExpanded ? (
-                                        <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                                      ) : (
-                                        <ChevronRight className="w-3 h-3 text-muted-foreground" />
-                                      )}
                                     </div>
                                   </div>
-
-                                  {isSubExpanded && subcategory.items && (() => {
-                                    // Filter items by selected type
-                                    const filteredItems = subcategory.items.filter(
-                                      item => item.checklist_type === selectedType
-                                    );
-                                    
-                                    if (filteredItems.length === 0) {
-                                      return (
-                                        <div className="px-2 pb-2">
-                                          <p className="text-xs text-muted-foreground text-center py-2">
-                                            Nenhum item de {selectedType === 'abertura' ? 'abertura' : 'fechamento'} nesta subcategoria
-                                          </p>
-                                        </div>
-                                      );
-                                    }
-                                    
-                                    return (
-                                    <div className="px-2 pb-2 space-y-1">
-                                      <DndContext
-                                        sensors={sensors}
-                                        collisionDetection={closestCenter}
-                                        onDragEnd={(e) => handleItemDragEnd(subcategory.id, filteredItems, e)}
-                                      >
-                                        <SortableContext 
-                                          items={filteredItems.map(i => i.id)} 
-                                          strategy={verticalListSortingStrategy}
-                                        >
-                                          {filteredItems.map(item => (
-                                            <SortableItem
-                                              key={item.id}
-                                              id={item.id}
-                                              className={cn(
-                                                "p-3 rounded-lg bg-card",
-                                                !item.is_active && "opacity-50"
-                                              )}
-                                            >
-                                              <div className="flex-1 min-w-0">
-                                                {/* Item content - stacked on mobile */}
-                                                <div className="flex items-start gap-2">
-                                                  <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                                                  <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium">{item.name}</p>
-                                                    {item.description && (
-                                                      <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
-                                                    )}
-                                                    {/* Badges row */}
-                                                    <div className="flex items-center gap-1.5 flex-wrap mt-2">
-                                                      <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
-                                                        {getFrequencyLabel(item.frequency || 'daily')}
-                                                      </span>
-                                                      <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary flex items-center gap-1">
-                                                        {(() => {
-                                                          const itemType = (item as any).checklist_type || 'abertura';
-                                                          const Icon = getChecklistTypeIcon(itemType as ChecklistType);
-                                                          return <Icon className="w-3 h-3" />;
-                                                        })()}
-                                                        {getChecklistTypeLabel(((item as any).checklist_type || 'abertura') as ChecklistType)}
-                                                      </span>
-                                                      {/* Points badge */}
-                                                      <span className={cn(
-                                                        "text-xs px-1.5 py-0.5 rounded flex items-center gap-1",
-                                                        item.points === 0 
-                                                          ? "bg-muted text-muted-foreground" 
-                                                          : "bg-amber-500/10 text-amber-600"
-                                                      )}>
-                                                        <Star className="w-3 h-3" />
-                                                        {item.points === 0 ? 'Sem pts' : `${item.points} pt${item.points > 1 ? 's' : ''}`}
-                                                      </span>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                                
-                                                {/* Action buttons - always visible, properly sized for touch */}
-                                                <div className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-border/50">
-                                                  <button
-                                                    onClick={() => onUpdateItem(item.id, { is_active: !item.is_active })}
-                                                    className={cn(
-                                                      "text-xs px-3 py-1.5 rounded-lg font-medium transition-colors",
-                                                      item.is_active 
-                                                        ? "bg-success/10 text-success" 
-                                                        : "bg-muted text-muted-foreground"
-                                                    )}
-                                                  >
-                                                    {item.is_active ? 'Ativo' : 'Inativo'}
-                                                  </button>
-                                                  <button
-                                                    onClick={() => handleOpenItemSheet(subcategory.id, item)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-xs font-medium"
-                                                  >
-                                                    <Edit2 className="w-3.5 h-3.5" />
-                                                    Editar
-                                                  </button>
-                                                  <button
-                                                    onClick={() => onDeleteItem(item.id)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs font-medium"
-                                                  >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                    Excluir
-                                                  </button>
-                                                </div>
-                                              </div>
-                                            </SortableItem>
-                                          ))}
-                                        </SortableContext>
-                                      </DndContext>
-                                    </div>
-                                    );
-                                  })()}
                                 </div>
-                              </SortableItem>
-                            );
-                          })}
-                        </SortableContext>
-                      </DndContext>
+                              ))}
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        /* STANDARD: Subcategories with items */
+                        <>
+                          <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={(e) => handleSubcategoryDragEnd(sector.id, sector.subcategories || [], e)}
+                          >
+                            <SortableContext 
+                              items={(sector.subcategories || []).map(s => s.id)} 
+                              strategy={verticalListSortingStrategy}
+                            >
+                              {sector.subcategories?.map(subcategory => {
+                                const isSubExpanded = expandedSubcategories.has(subcategory.id);
 
-                      {(!sector.subcategories || sector.subcategories.length === 0) && (
-                        <p className="text-sm text-muted-foreground text-center py-4">
-                          Nenhuma subcategoria. Clique em + para adicionar.
-                        </p>
+                                return (
+                                  <SortableItem 
+                                    key={subcategory.id} 
+                                    id={subcategory.id}
+                                    className="bg-secondary/20 rounded-lg overflow-hidden"
+                                  >
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 p-2">
+                                        <button
+                                          onClick={() => toggleSubcategory(subcategory.id)}
+                                          className="flex-1 flex items-center gap-2"
+                                        >
+                                          <span className="font-medium text-foreground">{subcategory.name}</span>
+                                          <span className="text-xs text-muted-foreground">
+                                            ({(subcategory.items || []).filter(i => i.checklist_type === selectedType).length} itens de {selectedType})
+                                          </span>
+                                        </button>
+                                        <div className="flex items-center gap-1">
+                                          <button onClick={() => handleOpenItemSheet(subcategory.id)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-primary" title="Adicionar item"><Plus className="w-3 h-3" /></button>
+                                          <button onClick={() => handleOpenSubcategorySheet(sector.id, subcategory)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground"><Edit2 className="w-3 h-3" /></button>
+                                          <button onClick={() => onDeleteSubcategory(subcategory.id)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"><Trash2 className="w-3 h-3" /></button>
+                                          {isSubExpanded ? <ChevronDown className="w-3 h-3 text-muted-foreground" /> : <ChevronRight className="w-3 h-3 text-muted-foreground" />}
+                                        </div>
+                                      </div>
+
+                                      {isSubExpanded && subcategory.items && (() => {
+                                        const filteredItems = subcategory.items.filter(item => item.checklist_type === selectedType);
+                                        if (filteredItems.length === 0) {
+                                          return (
+                                            <div className="px-2 pb-2">
+                                              <p className="text-xs text-muted-foreground text-center py-2">
+                                                Nenhum item de {selectedType === 'abertura' ? 'abertura' : 'fechamento'} nesta subcategoria
+                                              </p>
+                                            </div>
+                                          );
+                                        }
+                                        return (
+                                          <div className="px-2 pb-2 space-y-1">
+                                            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleItemDragEnd(subcategory.id, filteredItems, e)}>
+                                              <SortableContext items={filteredItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                                                {filteredItems.map(item => (
+                                                  <SortableItem key={item.id} id={item.id} className={cn("p-3 rounded-lg bg-card", !item.is_active && "opacity-50")}>
+                                                    <div className="flex-1 min-w-0">
+                                                      <div className="flex items-start gap-2">
+                                                        <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                                                        <div className="flex-1 min-w-0">
+                                                          <p className="text-sm font-medium">{item.name}</p>
+                                                          {item.description && <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>}
+                                                          <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                                                            <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">{getFrequencyLabel(item.frequency || 'daily')}</span>
+                                                            <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary flex items-center gap-1">
+                                                              {(() => { const itemType = (item as any).checklist_type || 'abertura'; const Icon = getChecklistTypeIcon(itemType as ChecklistType); return <Icon className="w-3 h-3" />; })()}
+                                                              {getChecklistTypeLabel(((item as any).checklist_type || 'abertura') as ChecklistType)}
+                                                            </span>
+                                                            <span className={cn("text-xs px-1.5 py-0.5 rounded flex items-center gap-1", item.points === 0 ? "bg-muted text-muted-foreground" : "bg-amber-500/10 text-amber-600")}>
+                                                              <Star className="w-3 h-3" />
+                                                              {item.points === 0 ? 'Sem pts' : `${item.points} pt${item.points > 1 ? 's' : ''}`}
+                                                            </span>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <div className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-border/50">
+                                                        <button onClick={() => onUpdateItem(item.id, { is_active: !item.is_active })} className={cn("text-xs px-3 py-1.5 rounded-lg font-medium transition-colors", item.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}>{item.is_active ? 'Ativo' : 'Inativo'}</button>
+                                                        <button onClick={() => handleOpenItemSheet(subcategory.id, item)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-xs font-medium"><Edit2 className="w-3.5 h-3.5" /> Editar</button>
+                                                        <button onClick={() => onDeleteItem(item.id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs font-medium"><Trash2 className="w-3.5 h-3.5" /> Excluir</button>
+                                                      </div>
+                                                    </div>
+                                                  </SortableItem>
+                                                ))}
+                                              </SortableContext>
+                                            </DndContext>
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+                                  </SortableItem>
+                                );
+                              })}
+                            </SortableContext>
+                          </DndContext>
+
+                          {(!sector.subcategories || sector.subcategories.length === 0) && (
+                            <p className="text-sm text-muted-foreground text-center py-4">
+                              Nenhuma subcategoria. Clique em + para adicionar.
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
@@ -767,6 +783,7 @@ export function ChecklistSettings({
               />
             </div>
 
+            {selectedType !== 'bonus' && (
             <div className="space-y-2">
               <Label>Tipo de Checklist</Label>
               <button
@@ -788,6 +805,7 @@ export function ChecklistSettings({
                 onSelect={(id) => { if (id) setItemChecklistType(id as ChecklistType); }}
               />
             </div>
+            )}
 
             <div className="space-y-2">
               <Label>Pontos</Label>
