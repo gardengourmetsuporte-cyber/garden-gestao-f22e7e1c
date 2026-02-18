@@ -419,10 +419,120 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </div>
       )}
 
+      {/* ======= Desktop Sidebar ======= */}
+      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card border-r border-border/20">
+        {/* Logo + Unit */}
+        <div className="flex items-center gap-3 px-4 h-16 border-b border-border/15 shrink-0">
+          <button
+            onClick={() => navigate('/')}
+            className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 border border-border/20 active:scale-95 transition-transform shrink-0"
+          >
+            <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
+          </div>
+          <ThemeToggle className="p-1.5 shrink-0" />
+        </div>
+
+        {/* User card */}
+        <button
+          onClick={() => navigate('/profile/me')}
+          className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors border-b border-border/10"
+        >
+          <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={36} />
+          <div className="text-left min-w-0 flex-1">
+            <p className="text-sm font-semibold text-foreground truncate">{profile?.full_name || 'Usuário'}</p>
+            <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
+          </div>
+        </button>
+
+        {/* Nav items */}
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4 scrollbar-thin">
+          {/* Home */}
+          <Link
+            to="/"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all",
+              location.pathname === '/'
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+            )}
+          >
+            <AppIcon name="Home" size={20} />
+            <span>Início</span>
+          </Link>
+
+          {groupedNav.map((group) => (
+            <div key={group.label}>
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/40 px-3 mb-1 block">
+                {group.label}
+              </span>
+              {group.items.map((item) => {
+                const isActive = location.pathname === item.href;
+                const showBadge = (item.href === '/chat' && chatUnreadCount > 0);
+                const badgeCount = chatUnreadCount;
+                const moduleStatus = moduleStatuses[item.href];
+                const isEmProducao = item.group === 'em_producao';
+
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all relative",
+                      isActive
+                        ? "bg-primary/15 text-primary"
+                        : isEmProducao
+                          ? "text-muted-foreground/60 hover:text-foreground hover:bg-secondary/30"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                    )}
+                  >
+                    <AppIcon name={item.icon} size={20} />
+                    <span className="truncate flex-1">{item.label}</span>
+                    {isEmProducao && !isActive && <span className="text-[10px]">🚧</span>}
+                    {showBadge && (
+                      <span className="min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center bg-destructive text-destructive-foreground">
+                        {badgeCount > 9 ? '9+' : badgeCount}
+                      </span>
+                    )}
+                    {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
+                      <span
+                        className="min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center"
+                        style={{
+                          background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
+                          color: moduleStatus.level === 'critical' ? '#fff' : '#000',
+                        }}
+                      >
+                        {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+
+        {/* Bottom actions */}
+        <div className="px-3 py-3 border-t border-border/15 space-y-1 shrink-0">
+          <div className="flex items-center gap-2 px-3 py-1.5">
+            <PointsDisplay isPulsing={isPulsing} showLabel className="scale-90 origin-left" />
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+          >
+            <AppIcon name="LogOut" size={18} />
+            <span className="font-medium">Sair</span>
+          </button>
+        </div>
+      </aside>
+
       {/* ======= Main Content ======= */}
       <main
         className={cn(
-          "min-h-screen animate-page-enter transition-all duration-300",
+          "min-h-screen animate-page-enter transition-all duration-300 lg:ml-[260px] lg:pt-0",
           launcherOpen && "pointer-events-none"
         )}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.75rem)' }}
