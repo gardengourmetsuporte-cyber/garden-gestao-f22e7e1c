@@ -142,19 +142,13 @@ export function ChecklistDashboardWidget() {
           />
         </div>
 
-        {/* CTA */}
-        <div className="flex items-center justify-center gap-2 pt-1">
-          {isComplete ? (
-            <span className="text-sm text-success font-semibold flex items-center gap-1.5">
-              <AppIcon name="CheckCircle2" size={16} /> Checklist completo! 🎉
-            </span>
-          ) : (
-            <span className="text-sm text-muted-foreground font-medium flex items-center gap-1.5 group-hover:text-primary transition-colors">
-              {current.emoji} {progress.percent === 0 ? 'Vamos começar!' : 'Continuar checklist'}
-              <AppIcon name="ArrowRight" size={14} className="group-hover:translate-x-0.5 transition-transform" />
-            </span>
-          )}
-        </div>
+        {/* Status indicator */}
+        {isComplete && (
+          <div className="flex items-center justify-center gap-1.5 pt-1">
+            <AppIcon name="CheckCircle2" size={14} className="text-success" />
+            <span className="text-xs text-success font-semibold">Completo 🎉</span>
+          </div>
+        )}
       </div>
     </button>
   );
