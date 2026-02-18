@@ -103,11 +103,11 @@ export function AdminDashboard() {
           </div>
         </button>
 
-        {/* FINANCE CHART + WEEKLY SUMMARY - side by side */}
+        {/* FINANCE CHART + WEEKLY SUMMARY */}
         <FinanceChartWidget />
 
-        {/* WEEKLY CASH SUMMARY */}
-        <div className="animate-slide-up stagger-3">
+        {/* WEEKLY CASH SUMMARY - full width */}
+        <div className="col-span-2 animate-slide-up stagger-3">
           <WeeklySummary closings={closings} />
         </div>
 
