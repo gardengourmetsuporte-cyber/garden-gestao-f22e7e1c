@@ -3,7 +3,7 @@ export type AppRole = 'admin' | 'funcionario' | 'super_admin';
 export type UnitType = 'unidade' | 'kg' | 'litro';
 export type MovementType = 'entrada' | 'saida';
 export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';
-export type ChecklistType = 'abertura' | 'fechamento';
+export type ChecklistType = 'abertura' | 'fechamento' | 'bonus';
 export type ScheduleStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Profile {
@@ -155,6 +155,7 @@ export interface ChecklistCompletion {
   date: string;
   awarded_points: boolean;
   points_awarded: number; // 1-4 stars, 0 means "already done"
+  is_skipped: boolean; // "Não fiz" — marked but not done
   // Joined data
   item?: ChecklistItem;
   profile?: Profile;

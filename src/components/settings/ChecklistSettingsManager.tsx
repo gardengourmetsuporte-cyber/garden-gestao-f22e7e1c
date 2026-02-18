@@ -3,7 +3,7 @@ import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
 import { ChecklistClone } from '@/components/settings/ChecklistClone';
-import { Loader2, ClipboardCheck, Sun, Moon } from 'lucide-react';
+import { Loader2, ClipboardCheck, Sun, Moon, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChecklistType } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -141,7 +141,7 @@ export function ChecklistSettingsManager() {
       </p>
 
       {/* Type Selector */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-3 gap-3 mb-4">
         <button
           onClick={() => setSelectedType('abertura')}
           className={cn(
@@ -152,7 +152,7 @@ export function ChecklistSettingsManager() {
           )}
         >
           <Sun className="w-5 h-5" />
-          <span className="font-semibold">Abertura</span>
+          <span className="font-semibold text-sm">Abertura</span>
         </button>
         <button
           onClick={() => setSelectedType('fechamento')}
@@ -164,7 +164,19 @@ export function ChecklistSettingsManager() {
           )}
         >
           <Moon className="w-5 h-5" />
-          <span className="font-semibold">Fechamento</span>
+          <span className="font-semibold text-sm">Fechamento</span>
+        </button>
+        <button
+          onClick={() => setSelectedType('bonus' as any)}
+          className={cn(
+            "flex items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all",
+            selectedType === ('bonus' as any)
+              ? "border-amber-500 bg-gradient-to-br from-amber-50 to-purple-50 text-amber-700 dark:from-amber-950/30 dark:to-purple-950/20 dark:text-amber-400" 
+              : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+          )}
+        >
+          <Zap className="w-4 h-4" />
+          <span className="font-semibold text-xs">Bônus</span>
         </button>
       </div>
       

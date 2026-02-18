@@ -53,6 +53,19 @@ export function getPointsColors(points: number): PointsColors {
 }
 
 /**
+ * Cores para pontos de bônus (5, 10, 15, 20)
+ */
+export function getBonusPointsColors(points: number): PointsColors {
+  const tier = points <= 5 ? 5 : points <= 10 ? 10 : points <= 15 ? 15 : 20;
+  return {
+    color: `hsl(var(--bonus-${tier}))`,
+    bg: `hsl(var(--bonus-${tier}) / 0.18)`,
+    border: `hsl(var(--bonus-${tier}) / 0.35)`,
+    glow: `hsl(var(--bonus-${tier}-glow))`,
+  };
+}
+
+/**
  * Garante que o valor de pontos está entre 1 e 4
  */
 export function clampPoints(points: number): PointsLevel {
