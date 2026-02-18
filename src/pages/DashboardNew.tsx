@@ -1,3 +1,4 @@
+// Dashboard page
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
 import { EmployeeDashboard } from '@/components/dashboard/EmployeeDashboard';
