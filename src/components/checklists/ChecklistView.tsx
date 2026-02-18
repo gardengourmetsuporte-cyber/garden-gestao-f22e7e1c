@@ -192,7 +192,7 @@ export function ChecklistView({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Sectors */}
       {filteredSectors.length === 0 && (
         <div className="card-command p-8 text-center">
