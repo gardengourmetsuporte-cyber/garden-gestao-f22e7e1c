@@ -50,12 +50,8 @@ async function handleShare(post: MarketingPost) {
     }
   }
 
-  // Fallback: open Instagram directly
-  window.open('instagram://camera', '_blank');
-  setTimeout(() => {
-    // If deep link didn't work, try web
-    window.open('https://www.instagram.com/', '_blank');
-  }, 2000);
+  // Fallback: open Instagram create page
+  window.open('https://www.instagram.com/create/select/', '_blank');
 }
 
 export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
