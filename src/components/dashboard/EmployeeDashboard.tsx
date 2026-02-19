@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
+import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 import { cn } from '@/lib/utils';
 
 export function EmployeeDashboard() {
@@ -75,6 +76,7 @@ export function EmployeeDashboard() {
       {/* Personal Expense Chart */}
       <div className="grid grid-cols-2 gap-3">
         <PersonalFinanceChartWidget />
+        <AgendaDashboardWidget />
       </div>
 
       {/* Leaderboard */}
