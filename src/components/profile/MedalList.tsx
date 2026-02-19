@@ -137,7 +137,10 @@ export function MedalList({ medals }: MedalListProps) {
             return (
               <div
                 key={m.id}
-                className="flex flex-col items-center gap-1 pt-3 pb-2 transition-all"
+                className={cn(
+                  "flex flex-col items-center gap-1 pt-3 pb-2 transition-all",
+                  !m.unlocked && "grayscale opacity-40"
+                )}
               >
                 {/* Floating medal icon */}
                 <div className="relative">
