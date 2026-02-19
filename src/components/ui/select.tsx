@@ -68,24 +68,25 @@ const SelectContent = React.forwardRef<
 
   if (isMobile) {
     return (
-      <SelectPrimitive.Portal>
-        <div className="fixed inset-0 z-[9999] bg-black/40" data-vaul-no-drag />
-        <SelectPrimitive.Content
-          ref={ref}
-          className={cn(
-            "fixed inset-x-0 bottom-0 z-[10000] max-h-[60vh] rounded-t-[10px] border bg-card shadow-lg",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-            className,
-          )}
-          data-vaul-no-drag
-          {...props}
-        >
-          <div className="mx-auto mt-4 h-2 w-[100px] shrink-0 rounded-full bg-muted" />
-          <SelectPrimitive.Viewport className="p-2 pb-6" data-vaul-no-drag>
-            {children}
-          </SelectPrimitive.Viewport>
-        </SelectPrimitive.Content>
-      </SelectPrimitive.Portal>
+      <>
+        <SelectPrimitive.Portal>
+          <SelectPrimitive.Content
+            ref={ref}
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-[10000] max-h-[60vh] rounded-t-[10px] border bg-card shadow-lg",
+              "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+              className,
+            )}
+            data-vaul-no-drag
+            {...props}
+          >
+            <div className="mx-auto mt-4 h-2 w-[100px] shrink-0 rounded-full bg-muted" />
+            <SelectPrimitive.Viewport className="p-2 pb-6" data-vaul-no-drag>
+              {children}
+            </SelectPrimitive.Viewport>
+          </SelectPrimitive.Content>
+        </SelectPrimitive.Portal>
+      </>
     );
   }
 
