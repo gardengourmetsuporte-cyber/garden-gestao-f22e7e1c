@@ -1,42 +1,39 @@
 
-# Redesign do Layout do Chat
 
-## Objetivo
-Refazer o layout completo do modulo de Chat (Messenger) com um design mais moderno e diferente para testar uma nova abordagem visual.
+# Resumo Pessoal Financeiro no Dashboard dos Funcionarios
 
-## Mudancas Propostas
+## O que vai mudar
 
-### 1. Lista de Conversas (Chat.tsx)
-- Remover a barra de "Stories/Contatos" horizontal do topo
-- Header mais limpo e minimalista com titulo e botoes de acao
-- Cards de conversa com layout mais espassado, avatar maior (56px) e preview da mensagem com 2 linhas
-- Separador sutil entre conversas ao inves de hover/bg
-- Badge de nao lidas redesenhado (pill ao lado do horario ao inves de bolinha no avatar)
-- Busca com visual "floating" (icone animado, sem borda visivel)
+O Dashboard do funcionario vai ganhar um card de resumo financeiro pessoal (saldo do mes, despesas, pendencias) igual ao card do admin, porem mostrando os dados do modulo de Financas Pessoais (unit_id = NULL) de cada usuario.
 
-### 2. Janela de Chat (ChatWindow.tsx)
-- Header mais alto (h-16) com avatar circular maior e status "online" com bolinha verde
-- Area de mensagens com fundo sutil de pattern (usando CSS gradient muito leve)
-- Campo de input redesenhado: textarea expansivel (auto-grow ate 4 linhas) ao inves de input single-line, com botao de enviar que aparece apenas quando ha texto (transicao suave)
-- Botao de "+" para anexos futuro (placeholder)
+Nao sera necessario criar tabelas novas. O modulo de Financas Pessoais ja existe e usa as mesmas tabelas (finance_accounts, finance_transactions, finance_categories) com unit_id = NULL para isolar os dados pessoais.
 
-### 3. Boloes de Mensagem (ChatMessage.tsx)
-- Estilo mais "flat": sem gradientes nos baloes, cores solidas
-- Balao do usuario: cor primaria solid com cantos mais arredondados
-- Balao do outro: bg-muted sem sombra
-- Horario dentro do balao alinhado na parte inferior
-- Avatar do remetente menor (28px) e posicionado mais proximo ao balao
+## Alteracoes
 
-### 4. Sidebar Desktop (ChatSidebar.tsx)
-- Nao e usado atualmente no fluxo principal (o Chat.tsx tem sua propria lista). Manter como esta.
+### 1. Criar hook `usePersonalFinanceStats`
+- Novo arquivo: `src/hooks/usePersonalFinanceStats.ts`
+- Busca dados de `finance_accounts` e `finance_transactions` onde `unit_id IS NULL` e `user_id = auth.uid()`
+- Retorna: saldo total das contas, receitas do mes, despesas do mes, despesas pendentes
+- Usa React Query com cache de 2 minutos
+
+### 2. Atualizar `EmployeeDashboard.tsx`
+- Importar o novo hook `usePersonalFinanceStats`
+- Adicionar um card financeiro pessoal logo apos o card de boas-vindas (antes do card de pontos)
+- O card tera o mesmo visual do card financeiro do admin (finance-hero-card) mas com a identidade visual verde-esmeralda do modulo pessoal (classe `finance-hero-card--personal`)
+- Ao clicar, navega para `/personal-finance`
+- Mostra: Saldo pessoal (valor grande), Despesas do mes, Pendencias
+
+### 3. Atualizar `AdminDashboard.tsx`
+- Adicionar um segundo card financeiro pessoal abaixo do card do financeiro empresarial
+- Mesmo visual verde-esmeralda do modulo pessoal
+- Ao clicar, navega para `/personal-finance`
 
 ## Detalhes Tecnicos
 
-**Arquivos modificados:**
-- `src/pages/Chat.tsx` -- Remover stories bar, redesenhar lista de conversas
-- `src/components/chat/ChatWindow.tsx` -- Novo header, textarea auto-grow, layout de input
-- `src/components/chat/ChatMessage.tsx` -- Baloes flat, avatar menor, horario reposicionado
+O hook `usePersonalFinanceStats` fara 3 queries em paralelo:
+1. `finance_accounts` com `user_id = uid` e `unit_id IS NULL` para saldo total
+2. `finance_transactions` com `type = 'income'`, `is_paid = true`, mes atual para receitas
+3. `finance_transactions` com `type IN ('expense', 'credit_card')`, mes atual para despesas (pagas e pendentes separadas)
 
-**Sem dependencias novas.** Tudo feito com Tailwind existente.
+O card usara as classes CSS ja existentes `finance-hero-card` e `finance-hero-card--personal` que ja tem a identidade visual verde-esmeralda.
 
-**Textarea auto-grow:** Usar ref + ajuste de `scrollHeight` no `onChange` para expandir automaticamente ate `max-h-24` (4 linhas).
