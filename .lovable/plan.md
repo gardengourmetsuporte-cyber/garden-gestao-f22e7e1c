@@ -1,63 +1,47 @@
 
 
-# Login Social: Google + Apple
+# Correções: Calendário da Agenda + Bug de Scroll
 
-Adicionar botoes "Entrar com Google" e "Entrar com Apple" na tela de autenticacao, usando o sistema gerenciado do Lovable Cloud.
+## Problema 1: Tarefas sem data aparecendo no calendário
 
----
+O componente `AgendaCalendarView.tsx` possui uma seção "Sem data definida" (linhas 202-230) que lista todas as tarefas sem `due_date` abaixo do calendário. Na visão de calendário, isso nao faz sentido -- essas tarefas ja aparecem corretamente na visão de lista.
 
-## O que sera feito
-
-### 1. Configurar os provedores OAuth
-- Ativar Google e Apple Sign-In via ferramenta de configuracao do Cloud
-- Isso gera automaticamente o modulo `src/integrations/lovable/` com a funcao `lovable.auth.signInWithOAuth`
-
-### 2. Atualizar a tela de login (`src/pages/Auth.tsx`)
-- Adicionar dois botoes estilizados abaixo do formulario de login/cadastro:
-  - **"Entrar com Google"** com icone do Google
-  - **"Entrar com Apple"** com icone da Apple
-- Separador visual "ou" entre o formulario e os botoes sociais
-- Ambos os botoes chamam `lovable.auth.signInWithOAuth("google"/"apple")`
-- Redirecionam de volta para a origem (`window.location.origin`)
-
-### 3. Atualizar o PWA (`vite.config.ts`)
-- Adicionar `/~oauth` ao `navigateFallbackDenylist` do service worker para que o redirecionamento OAuth nunca seja interceptado pelo cache
+**Correção:** Remover a seção "Sem data definida" do `AgendaCalendarView.tsx` (linhas 199-235). O calendário passa a mostrar apenas tarefas COM data atribuída.
 
 ---
 
-## Secao Tecnica
+## Problema 2: Página subindo e descendo sozinha
 
-### Codigo dos botoes (resumo):
-```typescript
-import { lovable } from "@/integrations/lovable/index";
+O arquivo `main.tsx` tem um sistema de estabilização de foco para iOS (linhas 38-75) que usa `window.scrollTo()` com múltiplos `setTimeout` (50ms, 150ms, 350ms). Esse sistema foi criado para prevenir saltos do teclado virtual, mas pode conflitar com:
+- Eventos de toque do dnd-kit (drag and drop)
+- Scroll natural da página quando não há overlay aberto
+- Interações rápidas que disparam `focusin` repetidamente
 
-const handleGoogleLogin = async () => {
-  await lovable.auth.signInWithOAuth("google", {
-    redirect_uri: window.location.origin,
-  });
-};
+**Correção:** Refinar o sistema de focus handling para:
+1. Verificar se o foco realmente veio de uma interação do usuário (não de eventos programáticos)
+2. Usar `requestAnimationFrame` em vez de múltiplos `setTimeout` para restaurar posição
+3. Adicionar um guard para evitar conflitos quando dnd-kit está ativo (verificando se existe um elemento com `[data-dnd-dragging]` ou se o evento veio de dentro de um container sortable)
 
-const handleAppleLogin = async () => {
-  await lovable.auth.signInWithOAuth("apple", {
-    redirect_uri: window.location.origin,
-  });
-};
-```
+---
 
-### PWA fix:
-```typescript
-workbox: {
-  navigateFallbackDenylist: [/^\/~oauth/],
-  // ... resto da config
-}
-```
+## Arquivos modificados
 
-### Arquivos envolvidos:
-- `src/integrations/lovable/` (gerado automaticamente pela ferramenta)
-- `src/pages/Auth.tsx` (botoes Google + Apple)
-- `vite.config.ts` (denylist OAuth no PWA)
+### `src/components/agenda/AgendaCalendarView.tsx`
+- Remover bloco de "Sem data definida" (linhas 199-235)
+- O calendário mostra apenas tarefas com data, e ao clicar num dia mostra as tarefas daquele dia
 
-### Estilo dos botoes:
-- Mesma estetica glassmorphism da tela atual
-- Icones SVG inline do Google e Apple
-- Hover com escala sutil e glow consistente com o design "Dark Command Center"
+### `src/main.tsx`
+- Refinar o handler de `focusin` para:
+  - Ignorar eventos quando dnd-kit está ativo
+  - Reduzir os setTimeout de 3 para 1 (apenas o de 150ms como fallback)
+  - Adicionar debounce para evitar chamadas repetidas de `scrollTo`
+
+---
+
+## Impacto
+
+- Zero mudanças no banco de dados
+- Apenas 2 arquivos editados
+- A visão de lista continua mostrando todas as tarefas (com e sem data) normalmente
+- O scroll fica estável no mobile sem afetar a correção do teclado virtual em overlays
+
