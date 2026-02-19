@@ -203,7 +203,7 @@ export default function ChecklistsPage() {
           </div>
         </header>
 
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+        <div className="px-4 py-4 lg:px-6 space-y-5">
           <div className="animate-fade-in" key={currentTab}>
           {currentTab === 'checklist' ? (
             <>
@@ -230,7 +230,7 @@ export default function ChecklistsPage() {
               </Popover>
 
               {/* Checklist Type Cards */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 {/* Abertura Card */}
                 <button
                   onClick={() => setChecklistType('abertura')}
