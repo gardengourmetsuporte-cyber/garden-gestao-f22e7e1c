@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
 
 export function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -112,6 +113,11 @@ export function EmployeeDashboard() {
           </div>
         </div>
       )}
+
+      {/* Personal Expense Chart */}
+      <div className="grid grid-cols-2 gap-3">
+        <PersonalFinanceChartWidget />
+      </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-3 gap-2.5">
