@@ -289,22 +289,23 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             {/* ===== Unit Selector (top-left corner) ===== */}
             {units.length > 0 && (
               <div className="absolute left-4 launcher-item" style={{ top: 'calc(env(safe-area-inset-top) + 20px)', animationDelay: '0ms', zIndex: 10000 }}>
-                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
-                  <PopoverTrigger asChild>
-                    <button className="relative p-2 rounded-xl hover:bg-white/10 transition-all">
-                      <AppIcon name="Building2" size={24} className="text-white/80" style={{ filter: 'drop-shadow(0 0 6px hsl(215 20% 50% / 0.4))' }} />
-                      <span
-                        className="absolute top-1 right-1 w-3 h-3 rounded-full"
-                        style={{
-                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'transparent',
-                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : 'none',
-                          border: activeUnit ? '1.5px solid hsl(var(--card))' : 'none',
-                          opacity: activeUnit ? 1 : 0,
-                        }}
-                      />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="start" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card shadow-xl" sideOffset={8} style={{ zIndex: 10001 }}>
+                <button
+                  className="relative p-2 rounded-xl hover:bg-white/10 transition-all"
+                  onClick={() => setUnitDropdownOpen(prev => !prev)}
+                >
+                  <AppIcon name="Building2" size={24} className="text-white/80" style={{ filter: 'drop-shadow(0 0 6px hsl(215 20% 50% / 0.4))' }} />
+                  <span
+                    className="absolute top-1 right-1 w-3 h-3 rounded-full"
+                    style={{
+                      background: activeUnit ? getThemeColor(activeUnit.slug) : 'transparent',
+                      boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : 'none',
+                      border: activeUnit ? '1.5px solid hsl(var(--card))' : 'none',
+                      opacity: activeUnit ? 1 : 0,
+                    }}
+                  />
+                </button>
+                {unitDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-[220px] p-1 rounded-2xl border border-border/50 bg-card shadow-xl" style={{ zIndex: 10001 }}>
                     <div className="px-3 py-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
                     </div>
@@ -322,8 +323,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
                       </button>
                     ))}
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                )}
               </div>
             )}
 

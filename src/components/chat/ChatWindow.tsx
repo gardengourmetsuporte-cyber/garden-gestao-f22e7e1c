@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { ChatMessage, ChatConversation } from '@/hooks/useChat';
 import { ChatMessageComponent } from './ChatMessage';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Send, Megaphone, Users, User, Pin, Camera, Smile } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
+import { DefaultAvatar } from '@/components/profile/DefaultAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,14 +33,14 @@ function MessagesSkeleton() {
       {[false, true, false, true, false].map((isMine, i) => (
         <div key={i} className={cn('flex gap-2', isMine ? 'justify-end' : 'justify-start')}>
           {!isMine && <Skeleton className="w-8 h-8 rounded-full shrink-0" />}
-          <Skeleton className={cn('h-10 rounded-2xl', isMine ? 'w-40' : 'w-52')} />
+          <Skeleton className={cn('h-12 rounded-2xl', isMine ? 'w-44' : 'w-56')} />
         </div>
       ))}
     </div>
   );
 }
 
-export function ChatWindow({ conversation, messages, isLoading, onSendMessage, onBack, onTogglePin, currentUserId }: ChatWindowProps) {
+export const ChatWindow = memo(function ChatWindow({ conversation, messages, isLoading, onSendMessage, onBack, onTogglePin, currentUserId }: ChatWindowProps) {
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -73,12 +73,12 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
   if (!conversation) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-muted-foreground/40">
-          <div className="w-20 h-20 rounded-full border-2 border-muted-foreground/20 flex items-center justify-center mx-auto mb-4">
-            <Send className="w-8 h-8 text-muted-foreground/30 -rotate-45" />
+        <div className="text-center text-muted-foreground/30">
+          <div className="w-24 h-24 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-5">
+            <AppIcon name="MessageCircle" size={40} className="text-muted-foreground/20" />
           </div>
-          <p className="text-lg font-light mb-1">Suas mensagens</p>
-          <p className="text-sm text-muted-foreground/40">Envie mensagens para a sua equipe</p>
+          <p className="text-lg font-medium mb-1 text-muted-foreground/50">Suas mensagens</p>
+          <p className="text-sm text-muted-foreground/30">Selecione uma conversa para começar</p>
         </div>
       </div>
     );
@@ -94,63 +94,83 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
     ? otherParticipant?.profile?.full_name || 'Conversa'
     : conversation.name || 'Grupo';
 
-  const TypeIcon = conversation.type === 'announcement' ? Megaphone : conversation.type === 'group' ? Users : User;
-
+  const avatarUrl = conversation.type === 'direct' ? otherParticipant?.profile?.avatar_url : null;
+  const isGroup = conversation.type !== 'direct';
   const pinnedMessages = messages.filter(m => m.is_pinned);
 
   let lastDate = '';
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      {/* Instagram-style header */}
-      <div className="shrink-0 flex items-center gap-3 px-3 h-[60px] border-b border-border/10 bg-background">
-        <button onClick={onBack} className="lg:hidden p-1.5 -ml-1 rounded-full hover:bg-muted/50 transition-colors">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="flex-1 flex flex-col h-full bg-background">
+      {/* Header */}
+      <div className="shrink-0 flex items-center gap-3 px-3 h-[60px] border-b border-border/10 bg-background/80 backdrop-blur-sm">
+        <button onClick={onBack} className="lg:hidden p-2 -ml-1 rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
+          <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
         </button>
         
-        {conversation.type === 'direct' && otherParticipant ? (
-          <Avatar className="w-9 h-9">
-            <AvatarImage src={otherParticipant.profile?.avatar_url || undefined} />
-            <AvatarFallback className="text-xs bg-muted font-semibold">
-              {displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-            style={{
-              background: conversation.type === 'announcement' ? 'hsl(45 100% 50% / 0.1)' : 'hsl(var(--primary) / 0.1)',
-            }}
-          >
-            <TypeIcon className={cn('w-4 h-4', conversation.type === 'announcement' ? 'text-amber-400' : 'text-primary')} />
-          </div>
-        )}
+        {/* Avatar */}
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-border/20">
+          {conversation.type === 'direct' && otherParticipant ? (
+            avatarUrl ? (
+              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <DefaultAvatar name={displayName} size={40} userId={otherParticipant.user_id} />
+            )
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{
+                background: conversation.type === 'announcement'
+                  ? 'linear-gradient(135deg, hsl(45 90% 55%), hsl(35 90% 45%))'
+                  : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))',
+              }}
+            >
+              <AppIcon
+                name={conversation.type === 'announcement' ? 'Megaphone' : 'Users'}
+                size={18}
+                className="text-white"
+              />
+            </div>
+          )}
+        </div>
         
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm text-foreground truncate">{displayName}</p>
           <p className="text-[11px] text-muted-foreground/50">
-            {conversation.type === 'announcement' ? 'Canal' :
+            {conversation.type === 'announcement' ? 'Canal de comunicados' :
              conversation.type === 'group' ? `${conversation.participants?.length || 0} membros` :
-             'Ativo agora'}
+             'Online'}
           </p>
         </div>
       </div>
 
       {/* Pinned */}
       {pinnedMessages.length > 0 && (
-        <div className="shrink-0 px-4 py-2 flex items-center gap-2 text-xs bg-muted/30 border-b border-border/10">
-          <Pin className="w-3 h-3 text-amber-400 fill-amber-400 shrink-0" />
+        <div className="shrink-0 px-4 py-2 flex items-center gap-2 text-xs bg-amber-500/5 border-b border-amber-500/10">
+          <AppIcon name="Pin" size={12} className="text-amber-400 shrink-0" />
           <span className="text-muted-foreground truncate">{pinnedMessages[pinnedMessages.length - 1]?.content}</span>
         </div>
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto py-3">
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto py-3"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.02), transparent 70%)',
+        }}
+      >
         {isLoading ? (
           <MessagesSkeleton />
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground/30 text-sm">Nenhuma mensagem ainda</p>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-3">
+                <AppIcon name="MessageCircle" size={28} className="text-muted-foreground/20" />
+              </div>
+              <p className="text-muted-foreground/40 text-sm font-medium">Nenhuma mensagem</p>
+              <p className="text-muted-foreground/25 text-xs mt-1">Diga olá! 👋</p>
+            </div>
           </div>
         ) : (
           <div className="space-y-0.5">
@@ -166,7 +186,7 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
                 <div key={msg.id}>
                   {showDate && (
                     <div className="flex justify-center my-4">
-                      <span className="text-[11px] text-muted-foreground/40 font-medium">
+                      <span className="text-[11px] text-muted-foreground/50 font-medium px-3 py-1 rounded-full bg-muted/30">
                         {getDateLabel(msg.created_at)}
                       </span>
                     </div>
@@ -175,6 +195,7 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
                     message={msg}
                     onTogglePin={onTogglePin}
                     showAvatar={showAvatar}
+                    showName={isGroup}
                   />
                 </div>
               );
@@ -183,37 +204,41 @@ export function ChatWindow({ conversation, messages, isLoading, onSendMessage, o
         )}
       </div>
 
-      {/* Instagram-style input */}
+      {/* Input */}
       {canSend ? (
-        <div className="shrink-0 px-3 py-2 border-t border-border/10">
-          <div className="flex items-end gap-2 rounded-full px-4 py-1.5 bg-muted/40 border border-border/10">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={isAnnouncement ? 'Enviar comunicado...' : 'Mensagem...'}
-              rows={1}
-              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 resize-none outline-none max-h-24 py-1.5"
-              style={{ lineHeight: '1.4' }}
-            />
-            {input.trim() ? (
-              <Button
-                size="sm"
-                onClick={handleSend}
-                disabled={isSending}
-                className="rounded-full h-8 px-4 text-xs font-semibold shrink-0"
-              >
-                Enviar
-              </Button>
-            ) : null}
+        <div className="shrink-0 px-3 py-2.5 border-t border-border/10 bg-background/80 backdrop-blur-sm">
+          <div className="flex items-end gap-2">
+            <div className="flex-1 flex items-end rounded-2xl px-4 py-2 bg-muted/40 border border-border/10 focus-within:border-primary/20 transition-colors">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={isAnnouncement ? 'Escrever comunicado...' : 'Mensagem...'}
+                rows={1}
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 resize-none outline-none max-h-24 py-0.5"
+                style={{ lineHeight: '1.5' }}
+              />
+            </div>
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || isSending}
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all active:scale-90',
+                input.trim()
+                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                  : 'bg-muted/50 text-muted-foreground/30'
+              )}
+            >
+              <AppIcon name="Send" size={18} />
+            </button>
           </div>
         </div>
       ) : (
-        <div className="shrink-0 px-4 py-3 text-center border-t border-border/10">
+        <div className="shrink-0 px-4 py-3 text-center border-t border-border/10 bg-muted/20">
           <p className="text-xs text-muted-foreground/40">Apenas administradores podem enviar comunicados</p>
         </div>
       )}
     </div>
   );
-}
+});
