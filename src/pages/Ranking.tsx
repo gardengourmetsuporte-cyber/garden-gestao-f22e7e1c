@@ -64,7 +64,8 @@ export default function Ranking() {
   const [syncing, setSyncing] = useState(false);
   const handleSync = useCallback(async () => {
     setSyncing(true);
-    await Promise.all([refetchPoints(), refetchLeaderboard()]);
+    await refetchLeaderboard();
+    await refetchPoints();
     setSyncing(false);
     toast.success('Ranking atualizado!');
   }, [refetchPoints, refetchLeaderboard]);
@@ -75,13 +76,6 @@ export default function Ranking() {
         <header className="page-header-bar">
           <div className="page-header-content">
             <h1 className="page-title">Ranking</h1>
-            <button
-              onClick={handleSync}
-              disabled={syncing}
-              className="p-2 rounded-lg hover:bg-secondary transition-all active:scale-95 disabled:opacity-50"
-            >
-              <AppIcon name="RefreshCw" size={20} className={syncing ? 'animate-spin text-primary' : 'text-muted-foreground'} />
-            </button>
           </div>
         </header>
 
@@ -92,6 +86,8 @@ export default function Ranking() {
             earnedPoints={earned}
             monthlyScore={monthlyScore}
             leaderboardPosition={myPosition}
+            onRefresh={handleSync}
+            isSyncing={syncing}
           />
 
           <AnimatedTabs
