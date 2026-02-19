@@ -218,28 +218,8 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* Stories-style contacts */}
-      {contacts.length > 0 && !search && (
-        <div className="shrink-0 px-2 pb-3 relative">
-          <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide px-3 py-1">
-            {contacts.slice(0, 12).map(contact => {
-              const firstName = contact.full_name.split(' ')[0];
-              return (
-                <button
-                  key={contact.user_id}
-                  onClick={() => handleStartDM(contact.user_id)}
-                  className="flex flex-col items-center gap-1.5 min-w-[64px] active:scale-95 transition-transform"
-                >
-                  <ContactAvatar contact={contact} size={52} />
-                  <span className="text-[11px] text-muted-foreground/70 truncate w-[64px] text-center font-medium">{firstName}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* Divider */}
+      <div className="h-px bg-border/10 mx-5" />
 
       {/* Conversation list */}
       <div className="flex-1 overflow-y-auto">
@@ -262,37 +242,39 @@ export default function Chat() {
               const isActive = conv.id === chat.activeConversationId;
 
               return (
-                <button
+                  <button
                   key={conv.id}
                   onClick={() => handleSelectConversation(conv.id)}
                   className={cn(
-                    'w-full flex items-center gap-3 px-4 py-3 text-left transition-all active:bg-muted/50',
+                    'w-full flex items-center gap-3.5 px-5 py-3.5 text-left transition-all active:bg-muted/50 border-b border-border/5',
                     isActive ? 'bg-primary/5' : 'hover:bg-muted/20'
                   )}
                 >
-                  <div className="relative shrink-0">
-                    <ConvAvatar conv={conv} currentUserId={user?.id} size={52} />
-                    {hasUnread && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1 shadow-sm shadow-primary/20">
-                        {conv.unread_count! > 99 ? '99+' : conv.unread_count}
-                      </span>
-                    )}
+                  <div className="shrink-0">
+                    <ConvAvatar conv={conv} currentUserId={user?.id} size={56} />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
+                    <div className="flex items-center justify-between mb-1">
                       <span className={cn(
                         'text-[15px] truncate',
                         hasUnread ? 'font-bold text-foreground' : 'font-medium text-foreground/85'
                       )}>
                         {displayName}
                       </span>
-                      <span className={cn(
-                        'text-[11px] shrink-0 ml-2',
-                        hasUnread ? 'text-primary font-semibold' : 'text-muted-foreground/40'
-                      )}>
-                        {formatTime(lastMsgTime)}
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        <span className={cn(
+                          'text-[11px]',
+                          hasUnread ? 'text-primary font-semibold' : 'text-muted-foreground/40'
+                        )}>
+                          {formatTime(lastMsgTime)}
+                        </span>
+                        {hasUnread && (
+                          <span className="min-w-[20px] h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1.5">
+                            {conv.unread_count! > 99 ? '99+' : conv.unread_count}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {conv.type !== 'direct' && (
@@ -304,7 +286,7 @@ export default function Chat() {
                       )}
                       {lastMsg ? (
                         <p className={cn(
-                          'text-[13px] truncate',
+                          'text-[13px] line-clamp-2',
                           hasUnread ? 'text-foreground/60 font-medium' : 'text-muted-foreground/40'
                         )}>
                           {lastMsg.content}
