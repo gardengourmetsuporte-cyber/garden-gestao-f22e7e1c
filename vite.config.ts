@@ -50,6 +50,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
+        navigateFallbackDenylist: [/^\/~oauth/],
         skipWaiting: true,
         clientsClaim: true,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
