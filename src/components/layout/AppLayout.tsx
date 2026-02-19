@@ -301,7 +301,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   />
                 </div>
                 <div className="text-center">
-                  <p className="text-base font-bold text-foreground">
+                  <p className="text-base font-bold" style={{ color: '#fff' }}>
                     {profile?.full_name || 'Usuário'}
                   </p>
                   <p className="text-xs font-semibold mt-0.5" style={{ color: rank.color }}>
@@ -314,7 +314,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             {/* ===== App Grid by Group ===== */}
             {groupedNav.map((group, gi) => (
               <div key={group.label} className="mb-6 launcher-item" style={{ animationDelay: `${(gi + 1) * 60}ms` }}>
-                <span className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/50 px-1 mb-3 block text-center">
+                <span className="text-xs font-bold uppercase tracking-[0.15em] px-1 mb-3 block text-center" style={{ color: 'hsl(220 20% 65%)' }}>
                   {group.label}
                 </span>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-6">
@@ -403,10 +403,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             }} />
                           )}
                         </div>
-                        <span className={cn(
-                          "text-[11px] font-medium leading-tight max-w-full truncate transition-colors",
-                          isActive ? "text-foreground" : "text-muted-foreground/80"
-                        )}>{item.label}</span>
+                        <span
+                          className="text-[11px] font-medium leading-tight max-w-full truncate transition-colors"
+                          style={{ color: isActive ? '#fff' : 'hsl(220 20% 75%)' }}
+                        >{item.label}</span>
                       </Link>
                     );
                   })}
