@@ -7,17 +7,19 @@ import { MedalList } from '@/components/profile/MedalList';
 import { useProfile } from '@/hooks/useProfile';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { formatPoints } from '@/lib/points';
 import { PageLoader } from '@/components/PageLoader';
 
 export default function Profile() {
   const { userId } = useParams();
   const { user } = useAuth();
+  const { activeUnitId } = useUnit();
   const navigate = useNavigate();
   const { leaderboard } = useLeaderboard();
 
   const resolvedUserId = userId === 'me' ? user?.id : userId;
-  const { profile, isLoading } = useProfile(resolvedUserId, leaderboard);
+  const { profile, isLoading } = useProfile(resolvedUserId, leaderboard, activeUnitId);
 
   if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
   if (!profile) return <AppLayout><div className="p-6 text-center text-muted-foreground">Perfil não encontrado</div></AppLayout>;
