@@ -139,7 +139,7 @@ export function MedalList({ medals }: MedalListProps) {
                 key={m.id}
                 className={cn(
                   "flex flex-col items-center gap-1 pt-3 pb-2 transition-all",
-                  !m.unlocked && "opacity-30 grayscale"
+                  !m.unlocked && "opacity-50 grayscale-[60%]"
                 )}
               >
                 {/* Floating medal icon — no card background */}
