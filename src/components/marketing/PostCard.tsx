@@ -158,9 +158,9 @@ export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
           className="w-full gap-2 text-xs border-pink-500/30 hover:bg-pink-500/10 text-pink-400"
           onClick={() => handleShare(post)}
         >
-          <Instagram className="w-3.5 h-3.5" />
-          Compartilhar no Instagram
-          <Share2 className="w-3 h-3 ml-auto" />
+          <Share2 className="w-3.5 h-3.5" />
+          Compartilhar
+          <Instagram className="w-3 h-3 ml-auto" />
         </Button>
       </div>
     </div>
