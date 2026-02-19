@@ -205,7 +205,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const hasBottomNav = location.pathname === '/finance' || location.pathname === '/chat';
+  const hasBottomNav = location.pathname === '/finance' || location.pathname === '/personal-finance' || location.pathname === '/chat';
 
   const handleSignOut = async () => {
     await signOut();
