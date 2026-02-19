@@ -86,8 +86,6 @@ export default function Ranking() {
             earnedPoints={earned}
             monthlyScore={monthlyScore}
             leaderboardPosition={myPosition}
-            onRefresh={handleSync}
-            isSyncing={syncing}
           />
 
           <AnimatedTabs
@@ -108,6 +106,8 @@ export default function Ranking() {
                 isLoading={isLoading}
                 selectedMonth={selectedMonth}
                 onMonthChange={setSelectedMonth}
+                onRefresh={handleSync}
+                isSyncing={syncing}
               />
             )}
             {activeTab === 'elos' && <EloList earnedPoints={earned} />}
