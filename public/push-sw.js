@@ -67,5 +67,13 @@ self.addEventListener('notificationclick', function(event) {
   );
 });
 
+// Force activate new service worker immediately
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[Push-SW] Skipping waiting, activating new version');
+    self.skipWaiting();
+  }
+});
+
 // Log that push-sw.js was loaded successfully
-console.log('[Push-SW] Push notification handler loaded successfully');
+console.log('[Push-SW] Push notification handler loaded successfully v2');

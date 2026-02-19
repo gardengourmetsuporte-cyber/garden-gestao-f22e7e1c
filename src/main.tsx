@@ -4,6 +4,28 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+// Force update: when a new service worker is installed, reload immediately
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+
+  // Also check for waiting SW and skip it
+  navigator.serviceWorker.getRegistration().then((reg) => {
+    if (reg?.waiting) {
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+    reg?.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW?.addEventListener('statechange', () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          newSW.postMessage({ type: 'SKIP_WAITING' });
+        }
+      });
+    });
+  });
+}
+
 // Fix: prevent page jump when virtual keyboard opens on iOS/mobile
 if ("ontouchstart" in window) {
   // Record scroll position before focus to restore if browser jumps
