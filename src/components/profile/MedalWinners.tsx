@@ -5,7 +5,6 @@ import { TIER_CONFIG, type MedalTier } from '@/lib/medals';
 import { AppIcon } from '@/components/ui/app-icon';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
 
 interface BadgeWinner {
   id: string;
@@ -56,7 +55,6 @@ export function MedalWinners() {
 
   if (isLoading || !winners?.length) return null;
 
-  // Group by badge_id
   const grouped = Object.entries(BADGE_META).map(([badgeId, meta]) => ({
     ...meta,
     badgeId,
@@ -66,34 +64,48 @@ export function MedalWinners() {
   if (!grouped.length) return null;
 
   return (
-    <div className="space-y-4 mt-4">
+    <div className="space-y-5 mt-6">
       <div className="flex items-center gap-2 px-1">
-        <AppIcon name="Users" size={16} className="text-primary" />
+        <AppIcon name="Trophy" size={16} className="text-warning" />
         <h3 className="text-sm font-semibold text-foreground">Hall da Fama</h3>
       </div>
 
       {grouped.map(group => {
         const tier = TIER_CONFIG[group.tier];
         return (
-          <div key={group.badgeId} className="space-y-2">
-            <div className="flex items-center gap-2 px-1">
-              <AppIcon name={group.icon} size={14} style={{ color: tier.color }} />
+          <div key={group.badgeId} className="space-y-3">
+            {/* Category header */}
+            <div
+              className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ background: `${tier.color}12`, border: `1px solid ${tier.color}25` }}
+            >
+              <AppIcon name={group.icon} size={16} style={{ color: tier.color }} />
               <span className="text-xs font-bold" style={{ color: tier.color }}>
                 {group.title}
               </span>
-              <span className="text-[10px] text-muted-foreground">({group.winners.length})</span>
+              <span className="text-[10px] text-muted-foreground ml-auto">{group.winners.length} premiação{group.winners.length > 1 ? 'ões' : ''}</span>
             </div>
 
-            <div className="space-y-1.5">
-              {group.winners.map(w => (
+            {/* Winners list */}
+            <div className="space-y-2 pl-1">
+              {group.winners.map((w, i) => (
                 <div
                   key={w.id}
-                  className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary/30 border border-border/20"
+                  className="flex items-center gap-3 p-3 rounded-xl transition-all"
+                  style={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border) / 0.3)',
+                  }}
                 >
+                  {/* Position */}
+                  <span className="text-[10px] font-bold text-muted-foreground w-4 text-center shrink-0">
+                    {i + 1}
+                  </span>
+
                   {/* Avatar */}
                   <div
-                    className="w-8 h-8 rounded-full shrink-0 overflow-hidden border-2"
-                    style={{ borderColor: tier.border }}
+                    className="w-9 h-9 rounded-full shrink-0 overflow-hidden ring-2"
+                    style={{ ['--tw-ring-color' as any]: tier.color }}
                   >
                     {w.avatar_url ? (
                       <img src={w.avatar_url} alt={w.full_name} className="w-full h-full object-cover" />
@@ -111,17 +123,17 @@ export function MedalWinners() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-foreground truncate">{w.full_name}</p>
                     <p className="text-[10px] text-muted-foreground">
-                      {format(new Date(w.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {format(new Date(w.created_at), "MMM yyyy", { locale: ptBR })}
                     </p>
                   </div>
 
-                  {/* Points */}
-                  <span
-                    className="text-xs font-bold shrink-0"
-                    style={{ color: tier.color }}
+                  {/* Points badge */}
+                  <div
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0"
+                    style={{ background: `${tier.color}18`, color: tier.color }}
                   >
-                    +{w.points}
-                  </span>
+                    +{w.points} pts
+                  </div>
                 </div>
               ))}
             </div>
