@@ -9,42 +9,54 @@ export interface MarketingDate {
 export const marketingDates: MarketingDate[] = [
   // Janeiro
   { month: 1, day: 1, title: 'Ano Novo', emoji: '🎆', suggestion: 'Comece o ano com uma promoção especial!' },
-  { month: 1, day: 15, title: 'Dia do Adulto', emoji: '🧑', suggestion: 'Post motivacional para seus clientes' },
+  { month: 1, day: 25, title: 'Aniversário de São Paulo', emoji: '🏙️', suggestion: 'Promoção especial para paulistanos' },
   // Fevereiro
-  { month: 2, day: 14, title: 'Valentine\'s Day', emoji: '💕', suggestion: 'Promoção para casais' },
-  { month: 2, day: 22, title: 'Carnaval', emoji: '🎭', suggestion: 'Post temático de carnaval' },
+  { month: 2, day: 16, title: 'Carnaval 2026', emoji: '🎭', suggestion: 'Post temático de carnaval com promoções' },
+  { month: 2, day: 17, title: 'Carnaval (terça)', emoji: '🎉', suggestion: 'Último dia de folia! Aproveite' },
   // Março
-  { month: 3, day: 8, title: 'Dia da Mulher', emoji: '👩', suggestion: 'Homenageie suas clientes e colaboradoras' },
+  { month: 3, day: 8, title: 'Dia Internacional da Mulher', emoji: '👩', suggestion: 'Homenageie suas clientes e colaboradoras' },
   { month: 3, day: 15, title: 'Dia do Consumidor', emoji: '🛍️', suggestion: 'Mega promoção para fidelizar clientes' },
   { month: 3, day: 20, title: 'Início do Outono', emoji: '🍂', suggestion: 'Novidades de outono no cardápio' },
   // Abril
+  { month: 4, day: 3, title: 'Sexta-feira Santa', emoji: '✝️', suggestion: 'Horário especial de funcionamento' },
+  { month: 4, day: 5, title: 'Páscoa', emoji: '🐣', suggestion: 'Promoção de Páscoa para famílias' },
   { month: 4, day: 7, title: 'Dia Mundial da Saúde', emoji: '💚', suggestion: 'Destaque opções saudáveis do cardápio' },
-  { month: 4, day: 18, title: 'Sexta-feira Santa', emoji: '✝️', suggestion: 'Horário especial de funcionamento' },
-  { month: 4, day: 21, title: 'Tiradentes', emoji: '🇧🇷', suggestion: 'Post sobre história e tradição' },
+  { month: 4, day: 21, title: 'Tiradentes', emoji: '🇧🇷', suggestion: 'Feriado nacional — horário especial' },
+  { month: 4, day: 22, title: 'Descobrimento do Brasil', emoji: '🇧🇷', suggestion: 'Post sobre história e tradição' },
   // Maio
   { month: 5, day: 1, title: 'Dia do Trabalho', emoji: '👷', suggestion: 'Homenageie sua equipe' },
   { month: 5, day: 11, title: 'Dia das Mães', emoji: '👩‍👧', suggestion: 'Promoção especial para o Dia das Mães' },
   // Junho
-  { month: 6, day: 12, title: 'Dia dos Namorados', emoji: '❤️', suggestion: 'Crie um combo romântico' },
+  { month: 5, day: 15, title: 'Dia do Gerente', emoji: '💼', suggestion: 'Valorize a liderança do seu negócio' },
+  { month: 6, day: 5, title: 'Dia do Meio Ambiente', emoji: '🌍', suggestion: 'Mostre seu compromisso ambiental' },
+  { month: 6, day: 12, title: 'Dia dos Namorados', emoji: '❤️', suggestion: 'Crie um combo romântico para casais' },
+  { month: 6, day: 13, title: 'Dia de Santo Antônio', emoji: '🙏', suggestion: 'Início das festas juninas!' },
   { month: 6, day: 24, title: 'São João', emoji: '🔥', suggestion: 'Festa junina com comidas típicas' },
   { month: 6, day: 29, title: 'São Pedro', emoji: '🎉', suggestion: 'Encerre o arraiá com promoção' },
   // Julho
-  { month: 7, day: 13, title: 'Dia do Rock', emoji: '🎸', suggestion: 'Promoção temática de rock' },
+  { month: 7, day: 2, title: 'Dia do Bombeiro', emoji: '🚒', suggestion: 'Homenagem aos heróis do dia a dia' },
+  { month: 7, day: 13, title: 'Dia do Rock', emoji: '🎸', suggestion: 'Noite temática de rock no estabelecimento' },
   { month: 7, day: 20, title: 'Dia do Amigo', emoji: '🤝', suggestion: 'Leve um amigo e ganhe desconto' },
+  { month: 7, day: 25, title: 'Dia do Escritor', emoji: '📝', suggestion: 'Post cultural e inspirador' },
   // Agosto
   { month: 8, day: 10, title: 'Dia dos Pais', emoji: '👨‍👧', suggestion: 'Promoção especial para o Dia dos Pais' },
   { month: 8, day: 11, title: 'Dia do Estudante', emoji: '📚', suggestion: 'Desconto para estudantes' },
+  { month: 8, day: 22, title: 'Dia do Folclore', emoji: '🎪', suggestion: 'Post sobre cultura e tradição brasileira' },
   // Setembro
   { month: 9, day: 5, title: 'Dia da Amazônia', emoji: '🌳', suggestion: 'Post sobre sustentabilidade' },
-  { month: 9, day: 7, title: 'Independência', emoji: '🇧🇷', suggestion: 'Post patriótico' },
+  { month: 9, day: 7, title: 'Independência do Brasil', emoji: '🇧🇷', suggestion: 'Post patriótico — feriado nacional' },
   { month: 9, day: 21, title: 'Dia da Árvore', emoji: '🌲', suggestion: 'Compromisso ambiental do negócio' },
+  { month: 9, day: 27, title: 'Dia do Turismo', emoji: '✈️', suggestion: 'Destaque sua região e seu negócio' },
   // Outubro
-  { month: 10, day: 12, title: 'Dia das Crianças', emoji: '👶', suggestion: 'Promoção para famílias' },
+  { month: 10, day: 1, title: 'Dia do Idoso', emoji: '👴', suggestion: 'Promoção especial para a melhor idade' },
+  { month: 10, day: 12, title: 'Dia das Crianças', emoji: '👶', suggestion: 'Promoção para famílias com crianças' },
+  { month: 10, day: 12, title: 'Nossa Sra. Aparecida', emoji: '🙏', suggestion: 'Feriado nacional — post especial' },
   { month: 10, day: 15, title: 'Dia do Professor', emoji: '📖', suggestion: 'Homenagem aos professores' },
-  { month: 10, day: 31, title: 'Halloween', emoji: '🎃', suggestion: 'Post temático de Halloween' },
+  { month: 10, day: 31, title: 'Dia do Saci', emoji: '🎃', suggestion: 'Folclore brasileiro no Halloween' },
   // Novembro
+  { month: 11, day: 2, title: 'Finados', emoji: '🕯️', suggestion: 'Post respeitoso — feriado nacional' },
   { month: 11, day: 15, title: 'Proclamação da República', emoji: '🇧🇷', suggestion: 'Feriado: horário especial' },
-  { month: 11, day: 20, title: 'Dia da Consciência Negra', emoji: '✊🏿', suggestion: 'Post sobre diversidade e inclusão' },
+  { month: 11, day: 20, title: 'Consciência Negra', emoji: '✊🏿', suggestion: 'Post sobre diversidade e inclusão' },
   { month: 11, day: 28, title: 'Black Friday', emoji: '🏷️', suggestion: 'Mega promoções de Black Friday' },
   // Dezembro
   { month: 12, day: 25, title: 'Natal', emoji: '🎄', suggestion: 'Feliz Natal! Promoção natalina' },
