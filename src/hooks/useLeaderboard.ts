@@ -186,11 +186,11 @@ export function useLeaderboard() {
 
   const refetch = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] }),
-      queryClient.invalidateQueries({ queryKey: ['sector-points'] }),
-      queryClient.invalidateQueries({ queryKey: ['points'] }),
+      queryClient.refetchQueries({ queryKey: ['leaderboard', activeUnitId] }),
+      queryClient.refetchQueries({ queryKey: ['sector-points', activeUnitId] }),
+      queryClient.refetchQueries({ queryKey: ['points'] }),
     ]);
-  }, [queryClient]);
+  }, [queryClient, activeUnitId]);
 
   return useMemo(() => ({
     leaderboard,
