@@ -209,19 +209,15 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
           className="shrink-0 border-t border-border/30 bg-card px-4 py-3"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
         >
-          <div className="flex items-end gap-2">
-            <div className="flex-1 flex items-end rounded-full px-4 py-2 bg-secondary/50 border border-border/30 focus-within:border-primary/30 transition-colors">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={isAnnouncement ? 'Escrever comunicado...' : 'Mensagem...'}
-                rows={1}
-                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 resize-none outline-none max-h-24 py-0.5"
-                style={{ lineHeight: '1.5' }}
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <input
+              ref={inputRef as any}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={isAnnouncement ? 'Escrever comunicado...' : 'Mensagem...'}
+              className="flex-1 h-11 text-sm rounded-full bg-secondary/50 border border-border/30 focus:border-primary/30 focus:outline-none px-4 text-foreground placeholder:text-muted-foreground/40 transition-colors"
+            />
             <button
               onClick={handleSend}
               disabled={!input.trim() || isSending}
