@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { calculateEarnedPoints, calculateSpentPoints } from '@/lib/points';
+// Points calculation now happens server-side via RPC
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
@@ -32,76 +32,34 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
 
-  // First get user_ids for this unit
-  const { data: unitUsers } = await supabase
-    .from('user_units')
-    .select('user_id')
-    .eq('unit_id', unitId);
-
-  const unitUserIds = (unitUsers || []).map(u => u.user_id);
-  if (unitUserIds.length === 0) return [];
-
-  const [{ data: profilesData }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: allTimeCompletions }] = await Promise.all([
-    supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', unitUserIds),
+  // Use server-side RPC to avoid the 1000-row default limit
+  const [{ data: rpcData }, { data: profilesData }] = await Promise.all([
+    supabase.rpc('get_leaderboard_data', {
+      p_unit_id: unitId,
+      p_month_start: monthStart,
+      p_month_end: monthEnd,
+    }),
     supabase
-      .from('checklist_completions')
-      .select('completed_by, points_awarded, awarded_points, date')
-      .eq('unit_id', unitId)
-      .gte('date', monthStart)
-      .lte('date', monthEnd)
-      .limit(10000),
-    supabase.from('reward_redemptions').select('user_id, points_spent, status').eq('unit_id', unitId).limit(10000),
-    supabase
-      .from('bonus_points')
-      .select('user_id, points')
-      .eq('unit_id', unitId)
-      .eq('month', monthStart)
-      .limit(10000),
-    // All-time completions for rank calculation
-    supabase
-      .from('checklist_completions')
-      .select('completed_by, points_awarded, awarded_points')
-      .eq('unit_id', unitId)
-      .limit(10000),
+      .from('profiles')
+      .select('user_id, full_name, avatar_url')
+      .in('user_id', (
+        await supabase.from('user_units').select('user_id').eq('unit_id', unitId)
+      ).data?.map(u => u.user_id) || []),
   ]);
 
-  const userCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
-  completions?.forEach(c => {
-    const list = userCompletions.get(c.completed_by) || [];
-    list.push({ points_awarded: c.points_awarded, awarded_points: c.awarded_points });
-    userCompletions.set(c.completed_by, list);
-  });
+  const profileMap = new Map<string, { full_name: string; avatar_url: string | null }>();
+  (profilesData || []).forEach((p: any) => profileMap.set(p.user_id, p));
 
-  const userRedemptions = new Map<string, Array<{ points_spent: number; status: string }>>();
-  redemptions?.forEach(r => {
-    const list = userRedemptions.get(r.user_id) || [];
-    list.push({ points_spent: r.points_spent, status: r.status });
-    userRedemptions.set(r.user_id, list);
-  });
-
-  const userBonus = new Map<string, number>();
-  bonusRows?.forEach(b => {
-    userBonus.set(b.user_id, (userBonus.get(b.user_id) || 0) + b.points);
-  });
-
-  // All-time completions map for rank calculation
-  const userAllTimeCompletions = new Map<string, Array<{ points_awarded: number; awarded_points?: boolean }>>();
-  allTimeCompletions?.forEach(c => {
-    const list = userAllTimeCompletions.get(c.completed_by) || [];
-    list.push({ points_awarded: c.points_awarded, awarded_points: c.awarded_points });
-    userAllTimeCompletions.set(c.completed_by, list);
-  });
-
-  const profiles = (profilesData || []).filter(Boolean);
-
-  const entries: LeaderboardEntry[] = profiles
-    .map((profile: any) => {
-      const earned = calculateEarnedPoints(userCompletions.get(profile.user_id) || []);
-      const spent = calculateSpentPoints(userRedemptions.get(profile.user_id) || []);
-      const bonus = userBonus.get(profile.user_id) || 0;
-      const allTimeEarned = calculateEarnedPoints(userAllTimeCompletions.get(profile.user_id) || []);
+  const entries: LeaderboardEntry[] = (rpcData || [])
+    .map((row: any) => {
+      const profile = profileMap.get(row.user_id);
+      if (!profile) return null;
+      const earned = Number(row.earned_points) || 0;
+      const bonus = Number(row.bonus_points) || 0;
+      const spent = Number(row.spent_points) || 0;
+      const allTimeEarned = Number(row.earned_all_time) || 0;
       return {
-        user_id: profile.user_id,
+        user_id: row.user_id,
         full_name: profile.full_name,
         avatar_url: profile.avatar_url,
         earned_points: earned,
@@ -113,8 +71,8 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
         earned_all_time: allTimeEarned,
       };
     })
-    .filter(e => e.total_score > 0)
-    .sort((a, b) => b.total_score - a.total_score);
+    .filter((e: any): e is LeaderboardEntry => e !== null && e.total_score > 0)
+    .sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.total_score - a.total_score);
 
   entries.forEach((entry, index) => { entry.rank = index + 1; });
   return entries;

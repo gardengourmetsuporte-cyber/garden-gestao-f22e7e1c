@@ -3609,6 +3609,16 @@ export type Database = {
         Args: { _conversation_id: string }
         Returns: Database["public"]["Enums"]["chat_conversation_type"]
       }
+      get_leaderboard_data: {
+        Args: { p_month_end: string; p_month_start: string; p_unit_id: string }
+        Returns: {
+          bonus_points: number
+          earned_all_time: number
+          earned_points: number
+          spent_points: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
