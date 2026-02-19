@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useMemo } from 'react';
+import { ReactNode, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
@@ -58,6 +58,49 @@ const navItems: NavItem[] = [
 function AppLayoutContent({ children }: AppLayoutProps) {
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
+
+  // Pull-to-refresh state
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const PULL_THRESHOLD = 80;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (isRefreshing) return;
+    const scrollTop = mainRef.current?.scrollTop ?? window.scrollY;
+    if (scrollTop <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, [isRefreshing]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current || isRefreshing) return;
+    const diff = e.touches[0].clientY - touchStartY.current;
+    if (diff > 0) {
+      setPullDistance(Math.min(diff * 0.4, 120));
+    } else {
+      isPulling.current = false;
+      setPullDistance(0);
+    }
+  }, [isRefreshing]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isPulling.current) return;
+    isPulling.current = false;
+    if (pullDistance >= PULL_THRESHOLD) {
+      setIsRefreshing(true);
+      setPullDistance(PULL_THRESHOLD * 0.5);
+      // Reload after a brief visual delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 400);
+    } else {
+      setPullDistance(0);
+    }
+  }, [pullDistance]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -540,12 +583,35 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
+        ref={mainRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         className={cn(
           "min-h-screen animate-page-enter transition-all duration-300 lg:ml-[260px] lg:pt-0",
           launcherOpen && "pointer-events-none"
         )}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 4.75rem)' }}
       >
+        {/* Pull-to-refresh indicator */}
+        <div
+          className="flex items-center justify-center overflow-hidden transition-all duration-200 ease-out"
+          style={{
+            height: pullDistance > 0 ? `${pullDistance}px` : '0px',
+            opacity: Math.min(pullDistance / PULL_THRESHOLD, 1),
+          }}
+        >
+          <div
+            className={cn(
+              "w-8 h-8 rounded-full border-2 border-primary border-t-transparent",
+              isRefreshing ? "animate-spin" : ""
+            )}
+            style={{
+              transform: isRefreshing ? 'none' : `rotate(${(pullDistance / PULL_THRESHOLD) * 360}deg)`,
+              transition: isRefreshing ? 'none' : 'transform 0s',
+            }}
+          />
+        </div>
         {children}
       </main>
 
