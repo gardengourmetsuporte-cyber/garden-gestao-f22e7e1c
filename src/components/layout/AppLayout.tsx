@@ -59,14 +59,29 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
 
-  // Pull-to-refresh — fully ref-based for 60fps (zero React re-renders during drag)
+  // Pull-to-refresh — robust, professional implementation
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef(0);
+  const touchStartX = useRef(0);
   const isPulling = useRef(false);
+  const gestureDecided = useRef(false); // true once we know if it's a pull or scroll
   const pullDistRef = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
-  const PULL_THRESHOLD = 64;
+  const PULL_THRESHOLD = 80; // higher = less sensitive
+  const DEAD_ZONE = 12; // px of movement before deciding gesture direction
+
+  const isAtTop = useCallback(() => {
+    const mainScroll = mainRef.current?.scrollTop ?? 0;
+    const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
+    // Also check all scrollable parents
+    let el = mainRef.current;
+    while (el) {
+      if (el.scrollTop > 2) return false;
+      el = el.parentElement as HTMLElement | null;
+    }
+    return mainScroll <= 2 && windowScroll <= 2;
+  }, []);
 
   const updateIndicatorDOM = useCallback((dist: number, releasing = false) => {
     const el = indicatorRef.current;
@@ -75,66 +90,88 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     const spinner = el.querySelector('[data-spinner]') as HTMLElement;
     const label = el.querySelector('[data-label]') as HTMLElement;
 
-    el.style.transition = releasing ? 'height 0.25s cubic-bezier(.4,.0,.2,1), opacity 0.25s ease' : 'none';
+    el.style.transition = releasing ? 'height 0.3s cubic-bezier(.4,.0,.2,1), opacity 0.3s ease' : 'none';
     el.style.height = `${dist}px`;
-    el.style.opacity = `${progress}`;
+    el.style.opacity = `${Math.max(progress - 0.15, 0)}`;
 
     if (spinner) {
-      spinner.style.transition = releasing ? 'transform 0.25s ease' : 'none';
-      spinner.style.transform = `rotate(${progress * 540}deg) scale(${0.6 + progress * 0.4})`;
+      spinner.style.transition = releasing ? 'transform 0.3s ease' : 'none';
+      spinner.style.transform = `rotate(${progress * 540}deg) scale(${0.5 + progress * 0.5})`;
     }
     if (label) {
       label.textContent = progress >= 1 ? 'Solte para atualizar' : 'Puxe para atualizar';
-      label.style.opacity = `${progress > 0.3 ? 1 : 0}`;
+      label.style.transition = 'opacity 0.15s ease';
+      label.style.opacity = `${progress > 0.5 ? 1 : 0}`;
     }
   }, []);
 
+  const resetPull = useCallback(() => {
+    isPulling.current = false;
+    gestureDecided.current = false;
+    pullDistRef.current = 0;
+    updateIndicatorDOM(0, true);
+  }, [updateIndicatorDOM]);
+
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (isRefreshing) return;
-    // Use both the main container AND the window/document scroll
-    const mainScroll = mainRef.current?.scrollTop ?? 0;
-    const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
-    // Only allow pull-to-refresh when FULLY at the top (tolerance of 2px)
-    if (mainScroll <= 2 && windowScroll <= 2) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-      pullDistRef.current = 0;
-    }
-  }, [isRefreshing]);
+    if (!isAtTop()) return;
+    touchStartY.current = e.touches[0].clientY;
+    touchStartX.current = e.touches[0].clientX;
+    isPulling.current = true;
+    gestureDecided.current = false;
+    pullDistRef.current = 0;
+  }, [isRefreshing, isAtTop]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isPulling.current || isRefreshing) return;
-    // Cancel pull if page scrolled away from top during gesture
-    const mainScroll = mainRef.current?.scrollTop ?? 0;
-    const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
-    if (mainScroll > 2 || windowScroll > 2) {
-      isPulling.current = false;
-      pullDistRef.current = 0;
-      updateIndicatorDOM(0, true);
+
+    const dy = e.touches[0].clientY - touchStartY.current;
+    const dx = e.touches[0].clientX - touchStartX.current;
+
+    // Dead zone: wait until enough movement to decide direction
+    if (!gestureDecided.current) {
+      const totalMove = Math.sqrt(dy * dy + dx * dx);
+      if (totalMove < DEAD_ZONE) return; // not enough movement yet
+      // If horizontal movement dominates or scroll is up, cancel
+      if (Math.abs(dx) > Math.abs(dy) || dy <= 0) {
+        resetPull();
+        return;
+      }
+      // Double-check we're still at top
+      if (!isAtTop()) {
+        resetPull();
+        return;
+      }
+      gestureDecided.current = true;
+    }
+
+    // Re-check scroll position during pull
+    if (!isAtTop()) {
+      resetPull();
       return;
     }
-    const diff = e.touches[0].clientY - touchStartY.current;
-    if (diff > 0) {
-      const raw = diff * 0.45;
-      const dist = raw < PULL_THRESHOLD ? raw : PULL_THRESHOLD + (raw - PULL_THRESHOLD) * 0.3;
-      const clamped = Math.min(dist, 110);
+
+    if (dy > 0) {
+      // Stronger friction: feels heavier/more intentional
+      const raw = dy * 0.35;
+      const dist = raw < PULL_THRESHOLD ? raw : PULL_THRESHOLD + (raw - PULL_THRESHOLD) * 0.2;
+      const clamped = Math.min(dist, 100);
       pullDistRef.current = clamped;
       updateIndicatorDOM(clamped);
     } else {
-      isPulling.current = false;
-      pullDistRef.current = 0;
-      updateIndicatorDOM(0, true);
+      resetPull();
     }
-  }, [isRefreshing, updateIndicatorDOM]);
+  }, [isRefreshing, updateIndicatorDOM, isAtTop, resetPull]);
 
   const handleTouchEnd = useCallback(() => {
     if (!isPulling.current) return;
     isPulling.current = false;
+    gestureDecided.current = false;
     if (pullDistRef.current >= PULL_THRESHOLD) {
       setIsRefreshing(true);
       const el = indicatorRef.current;
       if (el) {
-        el.style.transition = 'height 0.25s cubic-bezier(.4,.0,.2,1)';
+        el.style.transition = 'height 0.3s cubic-bezier(.4,.0,.2,1)';
         el.style.height = '48px';
         el.style.opacity = '1';
         const spinner = el.querySelector('[data-spinner]') as HTMLElement;
@@ -145,7 +182,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         const label = el.querySelector('[data-label]') as HTMLElement;
         if (label) label.textContent = 'Atualizando...';
       }
-      setTimeout(() => window.location.reload(), 150);
+      setTimeout(() => window.location.reload(), 200);
     } else {
       pullDistRef.current = 0;
       updateIndicatorDOM(0, true);
