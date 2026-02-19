@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserModules } from '@/hooks/useAccessLevels';
 import { useAgenda } from '@/hooks/useAgenda';
 import { useCountUp } from '@/hooks/useCountUp';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
@@ -48,6 +49,8 @@ function SortableTaskItem({ id, children }: { id: string; children: React.ReactN
 
 export default function Agenda() {
   const { isAdmin } = useAuth();
+  const { hasAccess } = useUserModules();
+  const canAccessAgenda = isAdmin || hasAccess('agenda');
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
@@ -94,8 +97,8 @@ export default function Agenda() {
   }, [tasks, tempTasks]);
 
   useEffect(() => {
-    if (!isAdmin) navigate('/');
-  }, [isAdmin, navigate]);
+    if (!canAccessAgenda) navigate('/');
+  }, [canAccessAgenda, navigate]);
 
   // Stats
   const pendingCount = useCountUp(displayTasks.filter(t => !t.is_completed).length);
@@ -145,7 +148,7 @@ export default function Agenda() {
     setExpandedCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
 
-  if (!isAdmin) return null;
+  if (!canAccessAgenda) return null;
 
   const handleDragStart = (_event: DragStartEvent) => {
     try { navigator.vibrate?.(10); } catch {}
