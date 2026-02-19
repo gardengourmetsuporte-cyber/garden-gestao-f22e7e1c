@@ -19,7 +19,7 @@ export function SolutionSection() {
             Um sistema que substitui vários
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            O Garden centraliza financeiro, estoque, equipe, checklists e marketing — com inteligência artificial integrada.
+            O Bosst centraliza financeiro, estoque, equipe, checklists e marketing — com inteligência artificial integrada.
           </p>
         </div>
 

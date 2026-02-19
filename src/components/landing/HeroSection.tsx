@@ -118,7 +118,7 @@ export function HeroSection() {
             >
               <img
                 src={dashboardMockup}
-                alt="Dashboard do Garden Gestão"
+                alt="Dashboard do Bosst"
                 className="w-full"
                 loading="lazy"
               />

@@ -25,7 +25,7 @@ interface UnitContextType {
 
 const UnitContext = createContext<UnitContextType | undefined>(undefined);
 
-const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
+const ACTIVE_UNIT_KEY = 'bosst_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();

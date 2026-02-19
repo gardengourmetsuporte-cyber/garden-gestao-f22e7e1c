@@ -11,7 +11,7 @@ const faqs = [
   { q: "Preciso de cartão de crédito para começar?", a: "Não. Você cria sua conta e começa a usar o plano Grátis imediatamente, sem nenhuma cobrança." },
   { q: "Posso mudar de plano depois?", a: "Claro! Você pode fazer upgrade ou downgrade a qualquer momento. A mudança é instantânea e proporcional ao período restante." },
   { q: "Meus dados estão seguros?", a: "Sim. Utilizamos criptografia de ponta a ponta, backups automáticos diários e infraestrutura em nuvem com certificação ISO 27001. Seus dados são 100% seus." },
-  { q: "Funciona no celular?", a: "Sim! O Garden é um PWA (Progressive Web App) que funciona perfeitamente no navegador do celular, como se fosse um app nativo. Basta adicionar à tela inicial." },
+  { q: "Funciona no celular?", a: "Sim! O Bosst é um PWA (Progressive Web App) que funciona perfeitamente no navegador do celular, como se fosse um app nativo. Basta adicionar à tela inicial." },
 ];
 
 export function FAQSection() {
