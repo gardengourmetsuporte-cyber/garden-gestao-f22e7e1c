@@ -86,6 +86,8 @@ export function usePoints() {
     enabled: !!user,
     staleTime: 0,
     gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
   });
 
   return {
