@@ -48,7 +48,7 @@ export function AICopilotWidget() {
         className="w-full px-4 py-3 flex items-center justify-between text-left"
       >
         <div className="flex items-center gap-3">
-          <img src={mascotImg} alt="Bosst Copiloto" className="w-9 h-9 rounded-xl object-cover border border-primary/20" />
+          <img src={mascotImg} alt="Garden Copiloto" className="w-9 h-9 rounded-xl object-cover border border-primary/20" />
           <div>
             <span className="text-sm font-bold text-foreground leading-none">Copiloto IA</span>
             <span className="text-[10px] text-muted-foreground block mt-0.5">Seu assistente de gestão</span>

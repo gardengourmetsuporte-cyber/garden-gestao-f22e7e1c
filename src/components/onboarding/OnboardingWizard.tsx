@@ -140,9 +140,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       }
 
       // Mark onboarding complete
-      localStorage.setItem('bosst_onboarding_done', 'true');
+      localStorage.setItem('garden_onboarding_done', 'true');
       await refetchUnits();
-      toast.success('Tudo pronto! Bem-vindo ao Bosst 🚀');
+      toast.success('Tudo pronto! Bem-vindo ao Garden 🌱');
       onComplete();
     } catch (err: any) {
       console.error('Onboarding error:', err);

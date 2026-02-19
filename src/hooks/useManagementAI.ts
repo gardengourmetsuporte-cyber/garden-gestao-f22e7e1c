@@ -11,7 +11,7 @@ interface AIMessage {
   content: string;
 }
 
-const HISTORY_KEY = 'bosst_copilot_history';
+const HISTORY_KEY = 'garden_copilot_history';
 const MAX_HISTORY = 20;
 
 function loadHistory(): AIMessage[] {

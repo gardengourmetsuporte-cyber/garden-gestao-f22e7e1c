@@ -39,7 +39,7 @@ const AVAILABLE_MEDALS: MedalType[] = [
   {
     badge_id: 'inventor',
     title: 'Inventor',
-    description: 'Criou uma receita oficial para o negócio',
+    description: 'Criou uma receita oficial para o Garden',
     tier: 'gold',
     bonusPoints: 40,
     icon: 'FlaskConical',

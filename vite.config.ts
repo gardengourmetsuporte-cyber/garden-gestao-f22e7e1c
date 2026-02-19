@@ -21,9 +21,9 @@ export default defineConfig(({ mode }) => ({
       selfDestroying: false,
       includeAssets: ["favicon.ico", "lovable-uploads/**/*"],
       manifest: {
-        name: "Bosst",
-        short_name: "Bosst",
-        description: "Plataforma completa de gestão empresarial",
+        name: "Garden Gestão",
+        short_name: "Garden",
+        description: "Sistema completo de gestão empresarial",
         theme_color: "#0c1120",
         background_color: "#0c1120",
         display: "standalone",
