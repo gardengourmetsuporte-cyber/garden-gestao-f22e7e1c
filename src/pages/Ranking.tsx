@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { MyRankCard } from '@/components/ranking/MyRankCard';
@@ -8,19 +10,46 @@ import { MedalWinners } from '@/components/profile/MedalWinners';
 import { Leaderboard } from '@/components/dashboard/Leaderboard';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { usePoints } from '@/hooks/usePoints';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
-import { useProfile } from '@/hooks/useProfile';
-import { useUnit } from '@/contexts/UnitContext';
+import { calculateMedals } from '@/lib/medals';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
+
+/** Fetch global medal unlock status for the entire unit */
+function useGlobalMedals(unitId: string | null) {
+  return useQuery({
+    queryKey: ['global-medals', unitId],
+    queryFn: async () => {
+      const [{ data: empOfMonth }, { data: inventors }, { data: employees }] = await Promise.all([
+        supabase.from('bonus_points').select('id').eq('badge_id', 'employee_of_month').eq('unit_id', unitId!).limit(1),
+        supabase.from('bonus_points').select('id').eq('badge_id', 'inventor').eq('unit_id', unitId!).limit(1),
+        supabase.from('employees').select('admission_date').eq('unit_id', unitId!).not('admission_date', 'is', null).limit(1000),
+      ]);
+
+      const admissionDates = (employees || []).map(e => e.admission_date).filter(Boolean) as string[];
+      // Find the earliest admission date to check 6mo/1yr milestones
+      const earliest = admissionDates.length > 0
+        ? admissionDates.sort()[0]
+        : null;
+
+      return calculateMedals({
+        hasEmployeeOfMonth: (empOfMonth || []).length > 0,
+        admissionDate: earliest,
+        hasInventedRecipe: (inventors || []).length > 0,
+      });
+    },
+    enabled: !!unitId,
+  });
+}
 
 export default function Ranking() {
   const { user, profile } = useAuth();
   const { activeUnitId } = useUnit();
   const { earned, monthlyScore } = usePoints();
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
-  const { profile: userProfile } = useProfile(user?.id, leaderboard, activeUnitId);
+  const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
@@ -64,9 +93,9 @@ export default function Ranking() {
               />
             )}
             {activeTab === 'elos' && <EloList earnedPoints={earned} />}
-            {activeTab === 'medalhas' && userProfile && (
+            {activeTab === 'medalhas' && globalMedals && (
               <>
-                <MedalList medals={userProfile.medals} />
+                <MedalList medals={globalMedals} />
                 <MedalWinners />
               </>
             )}
