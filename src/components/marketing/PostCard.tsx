@@ -22,36 +22,39 @@ interface PostCardProps {
 }
 
 async function handleShare(post: MarketingPost) {
-  // Copy caption to clipboard first
-  if (post.caption) {
-    try {
-      await navigator.clipboard.writeText(post.caption);
-      toast.success('Legenda copiada! Cole no Instagram');
-    } catch {
-      // silent
-    }
-  }
-
-  // Try Web Share API with image file
+  // Try Web Share API with image file (works on mobile - opens system share sheet)
   if (navigator.share && post.media_urls.length > 0) {
     try {
       const response = await fetch(post.media_urls[0]);
       const blob = await response.blob();
       const ext = blob.type.includes('png') ? 'png' : 'jpg';
       const file = new File([blob], `post.${ext}`, { type: blob.type });
-      await navigator.share({
-        title: post.title,
-        text: post.caption || '',
-        files: [file],
-      });
-      return;
+      
+      // Check if sharing files is supported
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: post.title,
+          text: post.caption || '',
+          files: [file],
+        });
+        return;
+      }
     } catch {
       // fallback below
     }
   }
 
-  // Fallback: open Instagram create page
-  window.open('https://www.instagram.com/create/select/', '_blank');
+  // Fallback: copy caption and show instructions
+  if (post.caption) {
+    try {
+      await navigator.clipboard.writeText(post.caption);
+      toast.success('Legenda copiada! Abra o Instagram e cole na sua postagem.');
+    } catch {
+      toast.info('Abra o Instagram manualmente e crie sua postagem.');
+    }
+  } else {
+    toast.info('Abra o Instagram manualmente e crie sua postagem.');
+  }
 }
 
 export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
