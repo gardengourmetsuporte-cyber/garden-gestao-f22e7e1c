@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { FinanceChartWidget } from './FinanceChartWidget';
-import { AICopilotWidget } from './AICopilotWidget';
+
 import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
@@ -116,8 +116,8 @@ export function AdminDashboard() {
         {/* CHECKLIST PROGRESS WIDGET */}
         <ChecklistDashboardWidget />
 
-        {/* AI COPILOT WIDGET */}
-        <AICopilotWidget />
+        {/* AGENDA WIDGET */}
+        <AgendaDashboardWidget />
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (
