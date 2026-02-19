@@ -325,7 +325,6 @@ export function FinanceTransactions({
                                   onClick={() => {
                                     if (isNewTransaction(transaction)) {
                                       markSeen(transaction.id);
-                                      return;
                                     }
                                     onTransactionClick(transaction);
                                   }}
