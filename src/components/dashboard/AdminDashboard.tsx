@@ -63,50 +63,13 @@ export function AdminDashboard() {
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
 
-        {/* === PERSONAL FINANCIAL BLOCK === */}
-
-        {/* PERSONAL FINANCE CARD */}
-        <button
-          onClick={() => navigate('/personal-finance')}
-          className="finance-hero-card finance-hero-card--personal col-span-2 text-left animate-slide-up stagger-2"
-        >
-          <div className="finance-hero-inner p-5 pb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
-                Meu saldo pessoal
-              </span>
-              <AppIcon name="ChevronRight" size={18} className="text-white/50" />
-            </div>
-            <p className={cn(
-              "text-[2rem] font-extrabold tracking-tight leading-tight",
-              personalBalance >= 0 ? "text-white" : "text-red-300"
-            )}>
-              {personalLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(personalBalance)}
-            </p>
-            <div className="flex gap-2 mt-3">
-              <div className="finance-hero-chip finance-hero-chip--success">
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas do mês</span>
-                <span className="text-sm font-bold text-white">{personalLoading ? '...' : formatCurrency(personalExpenses)}</span>
-              </div>
-              {personalPending > 0 && (
-                <div className="finance-hero-chip finance-hero-chip--neutral">
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
-                  <span className="text-sm font-bold text-amber-300">{formatCurrency(personalPending)}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </button>
-
-        {/* PERSONAL EXPENSE CHART */}
-        <PersonalFinanceChartWidget />
-
-        {/* === BUSINESS FINANCE (SUPER ADMIN ONLY) === */}
-        {isSuperAdmin && (
+        {/* === FINANCE BLOCK === */}
+        {isSuperAdmin ? (
           <>
+            {/* BUSINESS FINANCE CARD (super admin only) */}
             <button
               onClick={() => navigate('/finance')}
-              className="finance-hero-card col-span-2 text-left animate-slide-up stagger-3"
+              className="finance-hero-card col-span-2 text-left animate-slide-up stagger-2"
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
@@ -121,9 +84,55 @@ export function AdminDashboard() {
                 )}>
                   {statsLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(stats.monthBalance)}
                 </p>
+                {stats.pendingExpenses > 0 && (
+                  <div className="flex gap-2 mt-3">
+                    <div className="finance-hero-chip finance-hero-chip--neutral">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
+                      <span className="text-sm font-bold text-amber-300">{statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </button>
+            {/* BUSINESS EXPENSE CHART */}
             <FinanceChartWidget />
+          </>
+        ) : (
+          <>
+            {/* PERSONAL FINANCE CARD (admin/gerente) */}
+            <button
+              onClick={() => navigate('/personal-finance')}
+              className="finance-hero-card finance-hero-card--personal col-span-2 text-left animate-slide-up stagger-2"
+            >
+              <div className="finance-hero-inner p-5 pb-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+                    Meu saldo pessoal
+                  </span>
+                  <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+                </div>
+                <p className={cn(
+                  "text-[2rem] font-extrabold tracking-tight leading-tight",
+                  personalBalance >= 0 ? "text-white" : "text-red-300"
+                )}>
+                  {personalLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(personalBalance)}
+                </p>
+                <div className="flex gap-2 mt-3">
+                  <div className="finance-hero-chip finance-hero-chip--success">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas do mês</span>
+                    <span className="text-sm font-bold text-white">{personalLoading ? '...' : formatCurrency(personalExpenses)}</span>
+                  </div>
+                  {personalPending > 0 && (
+                    <div className="finance-hero-chip finance-hero-chip--neutral">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
+                      <span className="text-sm font-bold text-amber-300">{formatCurrency(personalPending)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </button>
+            {/* PERSONAL EXPENSE CHART */}
+            <PersonalFinanceChartWidget />
           </>
         )}
 
