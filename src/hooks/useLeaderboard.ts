@@ -174,6 +174,8 @@ export function useLeaderboard() {
     enabled: !!user && !!activeUnitId,
     staleTime: 0,
     gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
   });
 
   const { data: sectorPoints = [], isLoading: isLoadingSectors } = useQuery({

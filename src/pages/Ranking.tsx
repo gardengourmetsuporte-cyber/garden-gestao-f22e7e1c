@@ -52,12 +52,16 @@ export default function Ranking() {
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard();
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
+  const [mountRefreshed, setMountRefreshed] = useState(false);
 
   // Force fresh data on mount to avoid stale cache discrepancies
   useEffect(() => {
-    refetchPoints();
-    refetchLeaderboard();
-  }, [refetchPoints, refetchLeaderboard]);
+    const forceRefresh = async () => {
+      await Promise.all([refetchPoints(), refetchLeaderboard()]);
+      setMountRefreshed(true);
+    };
+    forceRefresh();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
 
