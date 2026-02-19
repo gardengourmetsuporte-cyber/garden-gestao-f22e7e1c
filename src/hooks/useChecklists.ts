@@ -305,8 +305,18 @@ export function useChecklists() {
     );
 
     if (existing) {
-      const canDelete = isAdmin || existing.completed_by === user?.id;
-      if (!canDelete) throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
+      // Protection: after 5 minutes, only admins can uncheck
+      const completedAt = new Date(existing.completed_at);
+      const minutesSinceCompletion = (Date.now() - completedAt.getTime()) / 60_000;
+      const isOwnCompletion = existing.completed_by === user?.id;
+      const isWithinGracePeriod = minutesSinceCompletion <= 5;
+
+      if (!isAdmin && !isOwnCompletion) {
+        throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
+      }
+      if (!isAdmin && !isWithinGracePeriod) {
+        throw new Error('Não é possível desmarcar após 5 minutos. Solicite ao administrador.');
+      }
 
       const { error } = await supabase.from('checklist_completions').delete().eq('id', existing.id);
       if (error) throw error;
