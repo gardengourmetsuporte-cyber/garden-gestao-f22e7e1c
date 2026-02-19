@@ -22,15 +22,14 @@ interface PostCardProps {
 }
 
 async function handleShare(post: MarketingPost) {
-  // Try Web Share API with image file (works on mobile - opens system share sheet)
+  // Try Web Share API with image file (works on mobile)
   if (navigator.share && post.media_urls.length > 0) {
     try {
       const response = await fetch(post.media_urls[0]);
       const blob = await response.blob();
       const ext = blob.type.includes('png') ? 'png' : 'jpg';
       const file = new File([blob], `post.${ext}`, { type: blob.type });
-      
-      // Check if sharing files is supported
+
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           title: post.title,
@@ -44,16 +43,34 @@ async function handleShare(post: MarketingPost) {
     }
   }
 
-  // Fallback: copy caption and show instructions
+  // Fallback: download image + copy caption
+  if (post.media_urls.length > 0) {
+    try {
+      const response = await fetch(post.media_urls[0]);
+      const blob = await response.blob();
+      const ext = blob.type.includes('png') ? 'png' : 'jpg';
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `post.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // silent
+    }
+  }
+
   if (post.caption) {
     try {
       await navigator.clipboard.writeText(post.caption);
-      toast.success('Legenda copiada! Abra o Instagram e cole na sua postagem.');
+      toast.success('Imagem baixada e legenda copiada! Abra o Instagram e poste.');
     } catch {
-      toast.info('Abra o Instagram manualmente e crie sua postagem.');
+      toast.success('Imagem baixada! Copie a legenda manualmente.');
     }
   } else {
-    toast.info('Abra o Instagram manualmente e crie sua postagem.');
+    toast.success('Imagem baixada! Abra o Instagram e poste.');
   }
 }
 
