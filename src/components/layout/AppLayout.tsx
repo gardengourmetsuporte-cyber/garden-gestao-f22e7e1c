@@ -163,91 +163,56 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="bg-card backdrop-blur-xl border-b border-border/20">
           <div className="flex items-center justify-between h-14 px-3">
-            <div className="flex items-center gap-1">
-              <ThemeToggle className="p-1.5" />
-              <PointsDisplay isPulsing={isPulsing} showLabel={false} className="scale-75 origin-left" />
-            </div>
-
+            {/* Zona Esquerda — Identidade */}
             <button
               onClick={() => navigate('/')}
-              className="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20 active:scale-95 transition-transform"
-              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.15)' }}
+              className="flex items-center gap-2 active:scale-95 transition-transform min-w-0"
             >
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 border border-border/20 shrink-0">
+                <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+              </div>
+              <span className="text-sm font-semibold text-foreground truncate max-w-[100px]">
+                {activeUnit?.name || 'Garden'}
+              </span>
             </button>
 
-            <div className="flex items-center gap-1">
-              {/* Unit Selector Icon */}
-              {units.length > 0 && (
-                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
-                  <PopoverTrigger asChild>
-                     <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
-                      <AppIcon name="Building2" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
-                      <span
-                        className="absolute top-1 right-1 w-3 h-3 rounded-full"
-                        style={{
-                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'transparent',
-                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : 'none',
-                          border: activeUnit ? '1.5px solid hsl(var(--card))' : 'none',
-                          opacity: activeUnit ? 1 : 0,
-                        }}
-                      />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
-                    <div className="px-3 py-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
-                    </div>
-                    {units.map(unit => (
-                      <button
-                        key={unit.id}
-                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                        className={cn(
-                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
-                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                        )}
-                      >
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
-                        <span className="truncate font-medium">{unit.name}</span>
-                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
-                      </button>
-                    ))}
-                  </PopoverContent>
-                </Popover>
-              )}
-
+            {/* Zona Direita — Score + Ações */}
+            <div className="flex items-center gap-2">
+              {/* Badge de pontos → /ranking */}
               <button
                 onClick={() => navigate('/ranking')}
-                className="relative p-2 rounded-lg hover:bg-secondary transition-all"
+                className="flex items-center gap-1.5 rounded-full px-2.5 py-1 border transition-all active:scale-95"
+                style={{
+                  background: 'hsl(var(--neon-amber) / 0.1)',
+                  borderColor: 'hsl(var(--neon-amber) / 0.2)',
+                }}
               >
-                <AppIcon name="Trophy" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(var(--neon-amber) / 0.4))' }} />
-                {myPosition && myPosition <= 3 && (
-                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] rounded-full text-[11px] font-bold flex items-center justify-center" style={{
-                    background: 'hsl(var(--neon-amber) / 0.2)',
-                    color: 'hsl(var(--neon-amber))',
-                    border: '1.5px solid hsl(var(--card))',
-                  }}>
-                    #{myPosition}
-                  </span>
-                )}
+                <AppIcon name="Star" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
+                <span className="text-xs font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>
+                  {earnedPoints}
+                </span>
               </button>
+
+              {/* Chat */}
               <button
                 onClick={() => navigate('/chat')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"
               >
-                <AppIcon name="MessageCircle" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
+                <AppIcon name="MessageCircle" size={20} className="text-muted-foreground" />
                 {chatUnreadCount > 0 && (
-                   <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                     {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
                   </span>
                 )}
               </button>
+
+              {/* Notificações */}
               <Popover open={notifOpen} onOpenChange={setNotifOpen}>
                 <PopoverTrigger asChild>
                   <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
-                    <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
+                    <AppIcon name="Bell" size={20} className="text-muted-foreground" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                      <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -257,6 +222,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <NotificationCard />
                 </PopoverContent>
               </Popover>
+
+              {/* Mini Avatar → /profile/me */}
+              <button
+                onClick={() => navigate('/profile/me')}
+                className="active:scale-90 transition-transform"
+              >
+                <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={28} />
+              </button>
             </div>
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -352,6 +325,49 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </p>
                 </div>
               </button>
+            </div>
+
+            {/* ===== Quick Settings (Theme + Unit) ===== */}
+            <div className="launcher-item flex items-center justify-center gap-3 mb-6" style={{ animationDelay: '30ms' }}>
+              <ThemeToggle className="p-2" />
+              {units.length > 1 && (
+                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-card/60 border border-border/20 active:bg-secondary/40 transition-all">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{
+                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--muted))',
+                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}60` : 'none',
+                        }}
+                      />
+                      <span className="text-sm font-medium truncate max-w-[120px]" style={{ color: 'hsl(220 20% 75%)' }}>
+                        {activeUnit?.name || 'Unidade'}
+                      </span>
+                      <AppIcon name="ChevronDown" size={14} style={{ color: 'hsl(220 20% 55%)' }} />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="center" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
+                    <div className="px-3 py-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
+                    </div>
+                    {units.map(unit => (
+                      <button
+                        key={unit.id}
+                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                        className={cn(
+                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
+                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
+                        <span className="truncate font-medium">{unit.name}</span>
+                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             {/* ===== App Grid by Group ===== */}
