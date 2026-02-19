@@ -3,9 +3,10 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useMarketing } from '@/hooks/useMarketing';
-import { MarketingCalendar } from '@/components/marketing/MarketingCalendar';
+import { MarketingCalendarGrid } from '@/components/marketing/MarketingCalendarGrid';
+import { MarketingSmartSuggestions } from '@/components/marketing/MarketingSmartSuggestions';
 import { MarketingFeed } from '@/components/marketing/MarketingFeed';
-import { MarketingIdeas } from '@/components/marketing/MarketingIdeas';
+import { MarketingIdeasAI } from '@/components/marketing/MarketingIdeasAI';
 import { PostSheet } from '@/components/marketing/PostSheet';
 import { PublishActions } from '@/components/marketing/PublishActions';
 import type { MarketingPost } from '@/types/marketing';
@@ -16,14 +17,28 @@ export default function Marketing() {
   const [editingPost, setEditingPost] = useState<MarketingPost | null>(null);
   const [publishPost, setPublishPost] = useState<MarketingPost | null>(null);
   const [activeTab, setActiveTab] = useState('calendar');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [prefillDate, setPrefillDate] = useState<Date | null>(null);
+  const [prefillTitle, setPrefillTitle] = useState('');
 
   const handleEdit = (post: MarketingPost) => {
     setEditingPost(post);
+    setPrefillDate(null);
+    setPrefillTitle('');
     setSheetOpen(true);
   };
 
-  const handleNew = () => {
+  const handleNewPost = (date?: Date) => {
     setEditingPost(null);
+    setPrefillDate(date || null);
+    setPrefillTitle('');
+    setSheetOpen(true);
+  };
+
+  const handleSuggestionClick = (title: string, date: Date) => {
+    setEditingPost(null);
+    setPrefillDate(date);
+    setPrefillTitle(title);
     setSheetOpen(true);
   };
 
@@ -35,8 +50,8 @@ export default function Marketing() {
     }
   };
 
-  const handleQuickIdea = (title: string) => {
-    createPost.mutate({ title, status: 'draft' });
+  const handleAISchedule = (data: Partial<MarketingPost>) => {
+    createPost.mutate(data);
   };
 
   return (
@@ -53,7 +68,7 @@ export default function Marketing() {
             tabs={[
               { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
               { key: 'feed', label: 'Feed', icon: <AppIcon name="LayoutList" size={16} /> },
-              { key: 'ideas', label: 'Ideias', icon: <AppIcon name="Lightbulb" size={16} /> },
+              { key: 'ideas', label: 'Ideias IA', icon: <AppIcon name="Sparkles" size={16} /> },
             ]}
             activeTab={activeTab}
             onTabChange={setActiveTab}
@@ -61,12 +76,19 @@ export default function Marketing() {
 
           <div className="animate-fade-in" key={activeTab}>
             {activeTab === 'calendar' && (
-              <MarketingCalendar
-                posts={posts}
-                onEdit={handleEdit}
-                onDelete={id => deletePost.mutate(id)}
-                onPublish={p => setPublishPost(p)}
-              />
+              <div className="space-y-4">
+                <MarketingSmartSuggestions
+                  currentMonth={currentMonth}
+                  onSuggestionClick={handleSuggestionClick}
+                />
+                <MarketingCalendarGrid
+                  posts={posts}
+                  onEdit={handleEdit}
+                  onDelete={id => deletePost.mutate(id)}
+                  onPublish={p => setPublishPost(p)}
+                  onNewPost={handleNewPost}
+                />
+              </div>
             )}
             {activeTab === 'feed' && (
               <MarketingFeed
@@ -77,18 +99,13 @@ export default function Marketing() {
               />
             )}
             {activeTab === 'ideas' && (
-              <MarketingIdeas
-                posts={posts}
-                onCreate={handleQuickIdea}
-                onEdit={handleEdit}
-                onDelete={id => deletePost.mutate(id)}
-              />
+              <MarketingIdeasAI onSchedule={handleAISchedule} />
             )}
           </div>
         </div>
 
         {/* FAB */}
-        <button onClick={handleNew} className="fab">
+        <button onClick={() => handleNewPost()} className="fab">
           <AppIcon name="Plus" size={24} />
         </button>
       </div>
@@ -101,6 +118,8 @@ export default function Marketing() {
         onPublish={p => setPublishPost(p)}
         uploadMedia={uploadMedia}
         isSaving={createPost.isPending || updatePost.isPending}
+        prefillDate={prefillDate}
+        prefillTitle={prefillTitle}
       />
 
       <PublishActions

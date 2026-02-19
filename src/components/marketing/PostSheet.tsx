@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Instagram, MessageCircle, CalendarIcon, ImagePlus, X, Save, Send } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Instagram, MessageCircle, CalendarIcon, ImagePlus, X, Save, Send, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MarketingPost, MarketingChannel } from '@/types/marketing';
@@ -20,13 +21,16 @@ interface PostSheetProps {
   onPublish: (post: MarketingPost) => void;
   uploadMedia: (file: File) => Promise<string>;
   isSaving: boolean;
+  prefillDate?: Date | null;
+  prefillTitle?: string;
 }
 
-export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadMedia, isSaving }: PostSheetProps) {
+export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadMedia, isSaving, prefillDate, prefillTitle }: PostSheetProps) {
   const [title, setTitle] = useState('');
   const [caption, setCaption] = useState('');
   const [channels, setChannels] = useState<MarketingChannel[]>([]);
   const [scheduledAt, setScheduledAt] = useState<Date | undefined>();
+  const [scheduledTime, setScheduledTime] = useState('12:00');
   const [tags, setTags] = useState('');
   const [notes, setNotes] = useState('');
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -38,15 +42,33 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
       setTitle(post.title);
       setCaption(post.caption || '');
       setChannels(post.channels || []);
-      setScheduledAt(post.scheduled_at ? new Date(post.scheduled_at) : undefined);
+      if (post.scheduled_at) {
+        const d = new Date(post.scheduled_at);
+        setScheduledAt(d);
+        setScheduledTime(format(d, 'HH:mm'));
+      } else {
+        setScheduledAt(undefined);
+        setScheduledTime('12:00');
+      }
       setTags((post.tags || []).join(', '));
       setNotes(post.notes || '');
       setMediaUrls(post.media_urls || []);
     } else {
-      setTitle(''); setCaption(''); setChannels([]); setScheduledAt(undefined);
-      setTags(''); setNotes(''); setMediaUrls([]);
+      setTitle(prefillTitle || '');
+      setCaption('');
+      setChannels([]);
+      if (prefillDate) {
+        setScheduledAt(prefillDate);
+        setScheduledTime('12:00');
+      } else {
+        setScheduledAt(undefined);
+        setScheduledTime('12:00');
+      }
+      setTags('');
+      setNotes('');
+      setMediaUrls([]);
     }
-  }, [post, open]);
+  }, [post, open, prefillDate, prefillTitle]);
 
   const toggleChannel = (ch: MarketingChannel) => {
     setChannels(prev => prev.includes(ch) ? prev.filter(c => c !== ch) : [...prev, ch]);
@@ -75,21 +97,35 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
     setMediaUrls(prev => prev.filter((_, i) => i !== idx));
   };
 
+  const buildScheduledAt = (): string | null => {
+    if (!scheduledAt) return null;
+    const [h, m] = scheduledTime.split(':').map(Number);
+    const d = new Date(scheduledAt);
+    d.setHours(h || 0, m || 0, 0, 0);
+    return d.toISOString();
+  };
+
   const buildData = (): Partial<MarketingPost> => ({
     ...(post ? { id: post.id } : {}),
     title: title.trim() || 'Sem título',
     caption,
     channels,
-    scheduled_at: scheduledAt?.toISOString() || null,
+    scheduled_at: buildScheduledAt(),
     status: scheduledAt ? 'scheduled' : 'draft',
     tags: tags.split(',').map(t => t.trim()).filter(Boolean),
     notes: notes || null,
     media_urls: mediaUrls,
   });
 
+  const timeOptions = Array.from({ length: 48 }, (_, i) => {
+    const h = Math.floor(i / 2);
+    const m = i % 2 === 0 ? '00' : '30';
+    return `${String(h).padStart(2, '0')}:${m}`;
+  });
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="space-y-4 max-h-[90vh]">
+      <SheetContent side="bottom" className="space-y-4 max-h-[90vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{post ? 'Editar Post' : 'Novo Post'}</SheetTitle>
           <SheetDescription>Planeje seu conteúdo de marketing</SheetDescription>
@@ -162,20 +198,35 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
             </div>
           </div>
 
-          {/* Schedule */}
-          <div>
+          {/* Schedule with time */}
+          <div className="space-y-2">
             <Label>Agendar para</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {scheduledAt ? format(scheduledAt, "PPP", { locale: ptBR }) : 'Sem agendamento'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={scheduledAt} onSelect={setScheduledAt} locale={ptBR} />
-              </PopoverContent>
-            </Popover>
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex-1 justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {scheduledAt ? format(scheduledAt, "dd/MM/yyyy", { locale: ptBR }) : 'Sem agendamento'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={scheduledAt} onSelect={setScheduledAt} locale={ptBR} />
+                </PopoverContent>
+              </Popover>
+              {scheduledAt && (
+                <Select value={scheduledTime} onValueChange={setScheduledTime}>
+                  <SelectTrigger className="w-[100px]">
+                    <Clock className="w-3.5 h-3.5 mr-1 text-muted-foreground" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                    {timeOptions.map(t => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
           </div>
 
           {/* Tags */}
