@@ -204,9 +204,9 @@ export default function ChecklistsPage() {
         </header>
 
         <div className="px-4 py-4 lg:px-6 space-y-8">
-          <div className="animate-fade-in" key={currentTab}>
+          <div className="animate-fade-in space-y-6" key={currentTab}>
           {currentTab === 'checklist' ? (
-            <>
+            <div className="space-y-6">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -430,7 +430,7 @@ export default function ChecklistsPage() {
                 currentUserId={user?.id}
                 isAdmin={isAdmin}
               />
-            </>
+            </div>
           ) : (
             <>
               {/* Settings Header */}
