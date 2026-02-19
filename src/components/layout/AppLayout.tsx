@@ -91,8 +91,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (isRefreshing) return;
-    const scrollTop = mainRef.current?.scrollTop ?? 0;
-    if (scrollTop <= 0) {
+    // Use both the main container AND the window/document scroll
+    const mainScroll = mainRef.current?.scrollTop ?? 0;
+    const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
+    // Only allow pull-to-refresh when FULLY at the top (tolerance of 2px)
+    if (mainScroll <= 2 && windowScroll <= 2) {
       touchStartY.current = e.touches[0].clientY;
       isPulling.current = true;
       pullDistRef.current = 0;
@@ -101,6 +104,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isPulling.current || isRefreshing) return;
+    // Cancel pull if page scrolled away from top during gesture
+    const mainScroll = mainRef.current?.scrollTop ?? 0;
+    const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
+    if (mainScroll > 2 || windowScroll > 2) {
+      isPulling.current = false;
+      pullDistRef.current = 0;
+      updateIndicatorDOM(0, true);
+      return;
+    }
     const diff = e.touches[0].clientY - touchStartY.current;
     if (diff > 0) {
       const raw = diff * 0.45;
