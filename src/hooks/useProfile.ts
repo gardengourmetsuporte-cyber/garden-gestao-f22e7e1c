@@ -9,6 +9,7 @@ export interface ProfileData {
   fullName: string;
   avatarUrl: string | null;
   jobTitle: string | null;
+  selectedFrame: string | null;
   earned: number;
   spent: number;
   balance: number;
@@ -78,7 +79,7 @@ async function fetchProfileData(userId: string, unitId: string | null): Promise<
   if (unitId) inventorQuery = inventorQuery.eq('unit_id', unitId);
 
   const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }, { data: badgeRows }, { data: employeeRow }, { data: inventorRows }] = await Promise.all([
-    supabase.from('profiles').select('user_id, full_name, avatar_url, job_title').eq('user_id', userId).single(),
+    supabase.from('profiles').select('user_id, full_name, avatar_url, job_title, selected_frame').eq('user_id', userId).single(),
     completionsQuery,
     redemptionsQuery,
     bonusQuery,
@@ -107,6 +108,7 @@ async function fetchProfileData(userId: string, unitId: string | null): Promise<
     fullName: profile?.full_name || 'Usuário',
     avatarUrl: profile?.avatar_url || null,
     jobTitle: profile?.job_title || null,
+    selectedFrame: (profile as any)?.selected_frame || null,
     ...summary,
     totalCompletions,
     totalRedemptions,

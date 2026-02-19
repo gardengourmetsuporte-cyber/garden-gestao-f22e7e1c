@@ -334,7 +334,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 className="flex flex-col items-center gap-3 w-full py-4 active:scale-95 transition-transform"
               >
                 <div className="relative">
-                  <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={72} />
+                  <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={72} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
                   {/* Glow ring behind avatar */}
                   <div
                     className="absolute inset-[-4px] rounded-full -z-10"

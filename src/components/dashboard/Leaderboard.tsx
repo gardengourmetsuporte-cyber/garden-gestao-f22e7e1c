@@ -116,7 +116,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
                       <span className="text-xs font-bold text-muted-foreground">{entry.rank}</span>
                     </div>
 
-                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_all_time ?? entry.total_score} size={32} />
+                    <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_all_time ?? entry.total_score} size={32} userName={entry.full_name} userId={entry.user_id} />
 
                     <div className="flex-1 min-w-0">
                       <p className={cn("font-medium text-sm truncate", isCurrentUser && "text-primary")}>

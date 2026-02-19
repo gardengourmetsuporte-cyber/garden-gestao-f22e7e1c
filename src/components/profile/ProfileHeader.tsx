@@ -8,15 +8,25 @@ interface ProfileHeaderProps {
   avatarUrl?: string | null;
   jobTitle?: string | null;
   earnedPoints: number;
+  selectedFrame?: string | null;
+  userId?: string;
 }
 
-export function ProfileHeader({ fullName, avatarUrl, jobTitle, earnedPoints }: ProfileHeaderProps) {
+export function ProfileHeader({ fullName, avatarUrl, jobTitle, earnedPoints, selectedFrame, userId }: ProfileHeaderProps) {
   const rank = getRank(earnedPoints);
   const next = getNextRank(earnedPoints);
 
   return (
     <div className="flex flex-col items-center gap-3 py-6">
-      <RankedAvatar avatarUrl={avatarUrl} earnedPoints={earnedPoints} size={96} showTitle />
+      <RankedAvatar
+        avatarUrl={avatarUrl}
+        earnedPoints={earnedPoints}
+        size={96}
+        showTitle
+        overrideFrame={selectedFrame}
+        userName={fullName}
+        userId={userId}
+      />
       <div className="text-center">
         <h1 className="text-xl font-bold text-foreground">{fullName}</h1>
         {jobTitle && <p className="text-sm text-muted-foreground">{jobTitle}</p>}

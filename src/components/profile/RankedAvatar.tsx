@@ -1,6 +1,6 @@
-import { User } from 'lucide-react';
 import { getRank } from '@/lib/ranks';
 import { RANK_FRAMES } from './rank-frames';
+import { DefaultAvatar } from './DefaultAvatar';
 import { cn } from '@/lib/utils';
 
 interface RankedAvatarProps {
@@ -10,11 +10,20 @@ interface RankedAvatarProps {
   size?: number;
   showTitle?: boolean;
   className?: string;
+  /** Override the frame to display (rank title). null = auto based on points */
+  overrideFrame?: string | null;
+  /** User's full name for default avatar */
+  userName?: string;
+  /** User ID for deterministic color */
+  userId?: string;
 }
 
-export function RankedAvatar({ avatarUrl, earnedPoints, size = 40, showTitle = false, className }: RankedAvatarProps) {
+export function RankedAvatar({ avatarUrl, earnedPoints, size = 40, showTitle = false, className, overrideFrame, userName, userId }: RankedAvatarProps) {
   const rank = getRank(earnedPoints);
-  const FrameComponent = RANK_FRAMES[rank.title];
+
+  // Determine which frame to use
+  const frameTitle = overrideFrame || rank.title;
+  const FrameComponent = RANK_FRAMES[frameTitle];
 
   const avatar = (
     <div
@@ -23,8 +32,10 @@ export function RankedAvatar({ avatarUrl, earnedPoints, size = 40, showTitle = f
     >
       {avatarUrl ? (
         <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+      ) : userName ? (
+        <DefaultAvatar name={userName} size={size} userId={userId} />
       ) : (
-        <User className="text-muted-foreground" style={{ width: size * 0.45, height: size * 0.45 }} />
+        <DefaultAvatar name={userId || '?'} size={size} userId={userId} />
       )}
     </div>
   );
