@@ -59,20 +59,43 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
 
-  // Pull-to-refresh state
-  const [pullDistance, setPullDistance] = useState(0);
+  // Pull-to-refresh — fully ref-based for 60fps (zero React re-renders during drag)
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
+  const pullDistRef = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
-  const PULL_THRESHOLD = 60;
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  const PULL_THRESHOLD = 64;
+
+  const updateIndicatorDOM = useCallback((dist: number, releasing = false) => {
+    const el = indicatorRef.current;
+    if (!el) return;
+    const progress = Math.min(dist / PULL_THRESHOLD, 1);
+    const spinner = el.querySelector('[data-spinner]') as HTMLElement;
+    const label = el.querySelector('[data-label]') as HTMLElement;
+
+    el.style.transition = releasing ? 'height 0.25s cubic-bezier(.4,.0,.2,1), opacity 0.25s ease' : 'none';
+    el.style.height = `${dist}px`;
+    el.style.opacity = `${progress}`;
+
+    if (spinner) {
+      spinner.style.transition = releasing ? 'transform 0.25s ease' : 'none';
+      spinner.style.transform = `rotate(${progress * 540}deg) scale(${0.6 + progress * 0.4})`;
+    }
+    if (label) {
+      label.textContent = progress >= 1 ? 'Solte para atualizar' : 'Puxe para atualizar';
+      label.style.opacity = `${progress > 0.3 ? 1 : 0}`;
+    }
+  }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (isRefreshing) return;
-    const scrollTop = mainRef.current?.scrollTop ?? window.scrollY;
+    const scrollTop = mainRef.current?.scrollTop ?? 0;
     if (scrollTop <= 0) {
       touchStartY.current = e.touches[0].clientY;
       isPulling.current = true;
+      pullDistRef.current = 0;
     }
   }, [isRefreshing]);
 
@@ -80,33 +103,42 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     if (!isPulling.current || isRefreshing) return;
     const diff = e.touches[0].clientY - touchStartY.current;
     if (diff > 0) {
-      // Direct DOM update for 60fps fluidity — skip React state during drag
-      const distance = Math.min(diff * 0.5, 100);
-      const indicator = mainRef.current?.querySelector('[data-pull-indicator]') as HTMLElement;
-      if (indicator) {
-        indicator.style.height = `${distance}px`;
-        indicator.style.opacity = `${Math.min(distance / PULL_THRESHOLD, 1)}`;
-        const spinner = indicator.firstElementChild as HTMLElement;
-        if (spinner) spinner.style.transform = `rotate(${(distance / PULL_THRESHOLD) * 360}deg)`;
-      }
-      setPullDistance(distance);
+      const raw = diff * 0.45;
+      const dist = raw < PULL_THRESHOLD ? raw : PULL_THRESHOLD + (raw - PULL_THRESHOLD) * 0.3;
+      const clamped = Math.min(dist, 110);
+      pullDistRef.current = clamped;
+      updateIndicatorDOM(clamped);
     } else {
       isPulling.current = false;
-      setPullDistance(0);
+      pullDistRef.current = 0;
+      updateIndicatorDOM(0, true);
     }
-  }, [isRefreshing]);
+  }, [isRefreshing, updateIndicatorDOM]);
 
   const handleTouchEnd = useCallback(() => {
     if (!isPulling.current) return;
     isPulling.current = false;
-    if (pullDistance >= PULL_THRESHOLD) {
+    if (pullDistRef.current >= PULL_THRESHOLD) {
       setIsRefreshing(true);
-      setPullDistance(PULL_THRESHOLD * 0.6);
-      window.location.reload();
+      const el = indicatorRef.current;
+      if (el) {
+        el.style.transition = 'height 0.25s cubic-bezier(.4,.0,.2,1)';
+        el.style.height = '48px';
+        el.style.opacity = '1';
+        const spinner = el.querySelector('[data-spinner]') as HTMLElement;
+        if (spinner) {
+          spinner.style.transition = 'none';
+          spinner.classList.add('animate-spin');
+        }
+        const label = el.querySelector('[data-label]') as HTMLElement;
+        if (label) label.textContent = 'Atualizando...';
+      }
+      setTimeout(() => window.location.reload(), 150);
     } else {
-      setPullDistance(0);
+      pullDistRef.current = 0;
+      updateIndicatorDOM(0, true);
     }
-  }, [pullDistance]);
+  }, [updateIndicatorDOM]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -604,23 +636,24 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         {/* Pull-to-refresh indicator */}
         <div
-          data-pull-indicator
-          className="flex items-center justify-center overflow-hidden"
-          style={{
-            height: isRefreshing ? `${PULL_THRESHOLD * 0.6}px` : pullDistance > 0 ? `${pullDistance}px` : '0px',
-            opacity: isRefreshing ? 1 : Math.min(pullDistance / PULL_THRESHOLD, 1),
-            transition: isPulling.current ? 'none' : 'height 0.15s ease-out, opacity 0.15s ease-out',
-          }}
+          ref={indicatorRef}
+          className="flex flex-col items-center justify-center overflow-hidden"
+          style={{ height: '0px', opacity: '0' }}
         >
-          <div
-            className={cn(
-              "w-7 h-7 rounded-full border-2 border-primary border-t-transparent",
-              isRefreshing ? "animate-spin" : ""
-            )}
-            style={{
-              transform: isRefreshing ? 'none' : `rotate(${(pullDistance / PULL_THRESHOLD) * 360}deg)`,
-            }}
-          />
+          <svg
+            data-spinner
+            className="w-6 h-6 text-primary"
+            viewBox="0 0 24 24"
+            fill="none"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            stroke="currentColor"
+          >
+            <path d="M21 12a9 9 0 1 1-6.22-8.56" />
+          </svg>
+          <span data-label className="text-[10px] font-medium text-muted-foreground mt-1" style={{ opacity: '0' }}>
+            Puxe para atualizar
+          </span>
         </div>
         {children}
       </main>
