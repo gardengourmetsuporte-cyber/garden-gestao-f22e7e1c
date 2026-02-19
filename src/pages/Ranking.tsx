@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -60,12 +61,27 @@ export default function Ranking() {
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
 
+  const [syncing, setSyncing] = useState(false);
+  const handleSync = useCallback(async () => {
+    setSyncing(true);
+    await Promise.all([refetchPoints(), refetchLeaderboard()]);
+    setSyncing(false);
+    toast.success('Ranking atualizado!');
+  }, [refetchPoints, refetchLeaderboard]);
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <header className="page-header-bar">
           <div className="page-header-content">
             <h1 className="page-title">Ranking</h1>
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className="p-2 rounded-lg hover:bg-secondary transition-all active:scale-95 disabled:opacity-50"
+            >
+              <AppIcon name="RefreshCw" size={20} className={syncing ? 'animate-spin text-primary' : 'text-muted-foreground'} />
+            </button>
           </div>
         </header>
 
