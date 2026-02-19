@@ -15,6 +15,7 @@ import { TimeAlertSettings } from '@/components/settings/TimeAlertSettings';
 import { AccessLevelSettings } from '@/components/settings/AccessLevelSettings';
 import { MedalSettings } from '@/components/settings/MedalSettings';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { AuditLogSettings } from '@/components/settings/AuditLogSettings';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -41,6 +42,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'medals', icon: 'Award', label: 'Medalhas', description: 'Conceder medalhas de prestígio', variant: 'amber', section: 'Sistema' },
   { value: 'units', icon: 'Building2', label: 'Unidades', description: 'Gerenciar filiais e lojas', variant: 'purple', section: 'Sistema' },
   { value: 'alerts', icon: 'Bell', label: 'Alertas e Sinalização', description: 'Horários de notificação por módulo', variant: 'red', section: 'Sistema' },
+  { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'cyan', section: 'Sistema' },
 ];
 
 const variantBorderColors: Record<string, string> = {
@@ -58,6 +60,7 @@ export default function SettingsPage() {
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'units') return isSuperAdmin;
     if (item.value === 'alerts') return isAdmin;
+    if (item.value === 'audit-log') return isAdmin;
     if (item.value === 'access-levels') return isAdmin;
     if (item.value === 'medals') return isAdmin;
     if (item.value === 'profile' || item.value === 'notifications') return true;
@@ -106,6 +109,7 @@ export default function SettingsPage() {
               {activeSection === 'access-levels' && <AccessLevelSettings />}
               {activeSection === 'medals' && <MedalSettings />}
               {activeSection === 'notifications' && <NotificationSettings />}
+              {activeSection === 'audit-log' && <AuditLogSettings />}
             </div>
           </div>
         </div>
