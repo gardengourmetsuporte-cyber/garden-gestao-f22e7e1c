@@ -1,8 +1,10 @@
-import { Instagram, MessageCircle, Calendar, MoreVertical, Trash2, Edit, Send } from 'lucide-react';
+import { Instagram, MessageCircle, Calendar, MoreVertical, Trash2, Edit, Send, Share2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 import type { MarketingPost } from '@/types/marketing';
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -17,6 +19,43 @@ interface PostCardProps {
   onEdit: (post: MarketingPost) => void;
   onDelete: (id: string) => void;
   onPublish: (post: MarketingPost) => void;
+}
+
+async function handleShare(post: MarketingPost) {
+  // Copy caption to clipboard first
+  if (post.caption) {
+    try {
+      await navigator.clipboard.writeText(post.caption);
+      toast.success('Legenda copiada! Cole no Instagram');
+    } catch {
+      // silent
+    }
+  }
+
+  // Try Web Share API with image file
+  if (navigator.share && post.media_urls.length > 0) {
+    try {
+      const response = await fetch(post.media_urls[0]);
+      const blob = await response.blob();
+      const ext = blob.type.includes('png') ? 'png' : 'jpg';
+      const file = new File([blob], `post.${ext}`, { type: blob.type });
+      await navigator.share({
+        title: post.title,
+        text: post.caption || '',
+        files: [file],
+      });
+      return;
+    } catch {
+      // fallback below
+    }
+  }
+
+  // Fallback: open Instagram directly
+  window.open('instagram://camera', '_blank');
+  setTimeout(() => {
+    // If deep link didn't work, try web
+    window.open('https://www.instagram.com/', '_blank');
+  }, 2000);
 }
 
 export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
@@ -95,6 +134,18 @@ export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
             ))}
           </div>
         )}
+
+        {/* Share button */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full gap-2 text-xs border-pink-500/30 hover:bg-pink-500/10 text-pink-400"
+          onClick={() => handleShare(post)}
+        >
+          <Instagram className="w-3.5 h-3.5" />
+          Compartilhar no Instagram
+          <Share2 className="w-3 h-3 ml-auto" />
+        </Button>
       </div>
     </div>
   );
