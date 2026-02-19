@@ -203,7 +203,7 @@ export default function ChecklistsPage() {
           </div>
         </header>
 
-        <div className="px-4 py-4 lg:px-6 space-y-6">
+        <div className="px-4 py-4 lg:px-6 space-y-8">
           <div className="animate-fade-in" key={currentTab}>
           {currentTab === 'checklist' ? (
             <>
@@ -361,7 +361,7 @@ export default function ChecklistsPage() {
               <button
                 onClick={() => setChecklistType('bonus')}
                 className={cn(
-                  "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300 mt-2",
+                  "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
                   checklistType === 'bonus'
                     ? "ring-2 scale-[1.01] shadow-xl"
                     : "ring-1 hover:ring-emerald-500/40"
