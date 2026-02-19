@@ -252,12 +252,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-1">
               <ThemeToggle className="p-1.5" />
-              <button
-                onClick={() => navigate('/copilot')}
-                className="relative p-1.5 rounded-lg hover:bg-secondary transition-all"
-              >
-                <AppIcon name="Sparkles" size={20} className="text-primary" style={{ filter: 'drop-shadow(0 0 6px hsl(var(--primary) / 0.4))' }} />
-              </button>
+              {hasAccess('copilot') && (
+                <button
+                  onClick={() => navigate('/copilot')}
+                  className="relative p-1.5 rounded-lg hover:bg-secondary transition-all"
+                >
+                  <AppIcon name="Sparkles" size={20} className="text-primary" style={{ filter: 'drop-shadow(0 0 6px hsl(var(--primary) / 0.4))' }} />
+                </button>
+              )}
               <PointsDisplay isPulsing={isPulsing} showLabel={false} className="scale-75 origin-left" />
             </div>
 
