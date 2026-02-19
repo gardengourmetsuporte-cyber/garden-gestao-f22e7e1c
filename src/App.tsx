@@ -55,6 +55,7 @@ const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
+const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -253,6 +254,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/copilot"
+          element={
+            <ProtectedRoute>
+              <Copilot />
             </ProtectedRoute>
           }
         />
