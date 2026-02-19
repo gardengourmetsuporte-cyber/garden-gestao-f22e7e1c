@@ -34,6 +34,9 @@ export interface ChatMessage {
   content: string;
   is_pinned: boolean;
   created_at: string;
+  attachment_url?: string | null;
+  attachment_type?: string | null;
+  attachment_name?: string | null;
   sender_profile?: { full_name: string; avatar_url: string | null };
 }
 
@@ -187,8 +190,8 @@ export function useChat() {
   }, [queryClient, activeConversationId]);
 
   // Optimistic send message
-  const sendMessage = useCallback(async (content: string) => {
-    if (!user || !activeConversationId || !content.trim()) return;
+  const sendMessage = useCallback(async (content: string, attachment?: { url: string; type: string; name: string }) => {
+    if (!user || !activeConversationId || (!content.trim() && !attachment)) return;
 
     const optimisticMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
@@ -197,6 +200,9 @@ export function useChat() {
       content: content.trim(),
       is_pinned: false,
       created_at: new Date().toISOString(),
+      attachment_url: attachment?.url || null,
+      attachment_type: attachment?.type || null,
+      attachment_name: attachment?.name || null,
       sender_profile: profileCache.get(user.id) || { full_name: 'Eu', avatar_url: null },
     };
 
@@ -206,7 +212,10 @@ export function useChat() {
     await supabase.from('chat_messages').insert({
       conversation_id: activeConversationId,
       sender_id: user.id,
-      content: content.trim(),
+      content: content.trim() || (attachment ? `📎 ${attachment.name}` : ''),
+      attachment_url: attachment?.url || null,
+      attachment_type: attachment?.type || null,
+      attachment_name: attachment?.name || null,
     });
 
     supabase.from('chat_conversations')

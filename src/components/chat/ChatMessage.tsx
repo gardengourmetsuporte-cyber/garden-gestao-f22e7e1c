@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { ChatMessage as ChatMessageType } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
 import { DefaultAvatar } from '@/components/profile/DefaultAvatar';
-import { Pin } from 'lucide-react';
+import { Pin, FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -56,7 +56,37 @@ export const ChatMessageComponent = memo(function ChatMessageComponent({ message
           {message.is_pinned && (
             <Pin className="absolute -top-1.5 -right-1.5 w-3 h-3 text-amber-400 fill-amber-400" />
           )}
-          <span className="whitespace-pre-wrap">{message.content}</span>
+
+          {/* Attachment */}
+          {message.attachment_url && message.attachment_type === 'image' && (
+            <a href={message.attachment_url} target="_blank" rel="noopener noreferrer" className="block mb-1.5 -mx-1 -mt-0.5">
+              <img
+                src={message.attachment_url}
+                alt={message.attachment_name || 'Imagem'}
+                className="rounded-lg max-w-full max-h-60 object-cover"
+              />
+            </a>
+          )}
+          {message.attachment_url && message.attachment_type === 'file' && (
+            <a
+              href={message.attachment_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                'flex items-center gap-2 mb-1.5 px-3 py-2 rounded-lg text-xs',
+                isMine ? 'bg-primary-foreground/10' : 'bg-foreground/5'
+              )}
+            >
+              <FileText className="w-4 h-4 shrink-0" />
+              <span className="truncate flex-1">{message.attachment_name || 'Arquivo'}</span>
+              <Download className="w-3.5 h-3.5 shrink-0 opacity-60" />
+            </a>
+          )}
+
+          {/* Text content - hide if it's just the attachment placeholder */}
+          {message.content && !(message.attachment_url && message.content.startsWith('📎')) && (
+            <span className="whitespace-pre-wrap">{message.content}</span>
+          )}
           <span className={cn(
             'inline-block ml-2 text-[10px] align-bottom opacity-50 float-right mt-1',
             isMine ? 'text-primary-foreground' : 'text-muted-foreground'
