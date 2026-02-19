@@ -155,11 +155,23 @@
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  :root:not(.dark) {
+    color-scheme: light;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     overscroll-behavior-y: contain;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
    
   /* Hide the Lovable preview banner when keyboard is open */
@@ -1101,6 +1113,42 @@
 /* =========================================================
    GLOBAL OVERRIDES FOR DARK PREMIUM FEEL
    ========================================================= */
+
+/* Cross-browser rendering normalization (iOS ↔ Android) */
+
+/* Force GPU compositing for consistent blur/glow rendering */
+.card-base,
+.card-surface,
+.card-elevated,
+.card-interactive,
+.card-command,
+.card-command-success,
+.card-command-danger,
+.card-command-warning,
+.card-command-info,
+.card-glow,
+.page-header,
+.page-header-bar,
+.launcher-overlay {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Ensure backdrop-filter works consistently */
+@supports not (backdrop-filter: blur(1px)) {
+  .card-command,
+  .card-command-success,
+  .card-command-danger,
+  .card-command-warning,
+  .card-command-info,
+  .page-header,
+  .page-header-bar,
+  .launcher-overlay {
+    background-color: hsl(var(--card));
+  }
+}
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
