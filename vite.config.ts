@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      selfDestroying: false,
       includeAssets: ["favicon.ico", "lovable-uploads/**/*"],
       manifest: {
         name: "Garden Gestão",
