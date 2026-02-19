@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -47,10 +47,16 @@ function useGlobalMedals(unitId: string | null) {
 export default function Ranking() {
   const { user, profile } = useAuth();
   const { activeUnitId } = useUnit();
-  const { earned, monthlyScore } = usePoints();
-  const { leaderboard, isLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
+  const { earned, monthlyScore, refetch: refetchPoints } = usePoints();
+  const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard();
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
+
+  // Force fresh data on mount to avoid stale cache discrepancies
+  useEffect(() => {
+    refetchPoints();
+    refetchLeaderboard();
+  }, [refetchPoints, refetchLeaderboard]);
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
 
