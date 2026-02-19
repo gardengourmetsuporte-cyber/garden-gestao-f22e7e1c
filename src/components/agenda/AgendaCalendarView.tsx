@@ -206,31 +206,6 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
         </div>
       )}
 
-      {/* Tasks without dates */}
-      {tasks.filter(t => !t.due_date && !t.is_completed).length > 0 && (
-        <div className="mt-6 space-y-2">
-          <p className="text-sm font-medium text-muted-foreground px-1">Sem data definida</p>
-          <div className="space-y-1.5">
-            {tasks.filter(t => !t.due_date && !t.is_completed).map(task => (
-              <button
-                key={task.id}
-                onClick={() => onTaskClick(task)}
-                className="w-full text-left p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"
-              >
-                <div className="flex items-center gap-2">
-                  {task.category && (
-                    <div 
-                      className="w-2.5 h-2.5 rounded-full shrink-0" 
-                      style={{ backgroundColor: task.category.color }}
-                    />
-                  )}
-                  <span className="text-sm font-medium truncate">{task.title}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
