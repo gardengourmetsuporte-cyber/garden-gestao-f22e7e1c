@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.smart-receiving-ocr]
 verify_jwt = false
+
+[functions.marketing-suggestions]
+verify_jwt = false
