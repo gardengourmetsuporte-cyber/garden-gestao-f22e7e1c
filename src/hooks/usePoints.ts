@@ -80,10 +80,12 @@ export function usePoints() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
 
-  const { data: points, isLoading } = useQuery({
+  const { data: points, isLoading, refetch } = useQuery({
     queryKey: ['points', user?.id, activeUnitId],
     queryFn: () => fetchPointsData(user!.id, activeUnitId),
     enabled: !!user,
+    staleTime: 30_000, // 30s before considered stale
+    refetchInterval: 60_000, // auto-refresh every 60s
   });
 
   return {
@@ -96,6 +98,6 @@ export function usePoints() {
     monthlyBase: points?.monthlyBase ?? 0,
     monthlyBonus: points?.monthlyBonus ?? 0,
     isLoading,
-    refetch: () => {},
+    refetch,
   };
 }
