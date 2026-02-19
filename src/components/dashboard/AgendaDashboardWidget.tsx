@@ -69,7 +69,7 @@ export function AgendaDashboardWidget() {
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const pendingTasks = (displayTasks || [])
-    .filter(t => !t.is_completed && (!t.due_date || t.due_date <= todayStr || t.date === todayStr));
+    .filter(t => !t.is_completed);
 
   const handleEditTask = (task: ManagerTask) => {
     setEditingTask(task);
