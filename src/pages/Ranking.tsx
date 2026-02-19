@@ -4,6 +4,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { MyRankCard } from '@/components/ranking/MyRankCard';
 import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
+import { MedalWinners } from '@/components/profile/MedalWinners';
 import { Leaderboard } from '@/components/dashboard/Leaderboard';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -61,7 +62,12 @@ export default function Ranking() {
               />
             )}
             {activeTab === 'elos' && <EloList earnedPoints={earned} />}
-            {activeTab === 'medalhas' && userProfile && <MedalList medals={userProfile.medals} />}
+            {activeTab === 'medalhas' && userProfile && (
+              <>
+                <MedalList medals={userProfile.medals} />
+                <MedalWinners />
+              </>
+            )}
           </div>
         </div>
       </div>
