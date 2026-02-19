@@ -78,7 +78,6 @@ export default function Marketing() {
             {activeTab === 'calendar' && (
               <div className="space-y-4">
                 <MarketingSmartSuggestions
-                  currentMonth={currentMonth}
                   onSuggestionClick={handleSuggestionClick}
                 />
                 <MarketingCalendarGrid

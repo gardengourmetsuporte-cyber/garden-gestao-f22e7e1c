@@ -4,6 +4,7 @@ export interface MarketingDate {
   title: string;
   emoji: string;
   suggestion: string;
+  type?: 'holiday' | 'commercial' | 'recurring';
 }
 
 export const marketingDates: MarketingDate[] = [
@@ -26,8 +27,8 @@ export const marketingDates: MarketingDate[] = [
   // Maio
   { month: 5, day: 1, title: 'Dia do Trabalho', emoji: '👷', suggestion: 'Homenageie sua equipe' },
   { month: 5, day: 11, title: 'Dia das Mães', emoji: '👩‍👧', suggestion: 'Promoção especial para o Dia das Mães' },
-  // Junho
   { month: 5, day: 15, title: 'Dia do Gerente', emoji: '💼', suggestion: 'Valorize a liderança do seu negócio' },
+  // Junho
   { month: 6, day: 5, title: 'Dia do Meio Ambiente', emoji: '🌍', suggestion: 'Mostre seu compromisso ambiental' },
   { month: 6, day: 12, title: 'Dia dos Namorados', emoji: '❤️', suggestion: 'Crie um combo romântico para casais' },
   { month: 6, day: 13, title: 'Dia de Santo Antônio', emoji: '🙏', suggestion: 'Início das festas juninas!' },
@@ -63,10 +64,68 @@ export const marketingDates: MarketingDate[] = [
   { month: 12, day: 31, title: 'Réveillon', emoji: '🎇', suggestion: 'Encerre o ano com chave de ouro' },
 ];
 
+/** Recurring monthly commercial dates (vale, pagamento, etc.) */
+export const recurringCommercialDates: MarketingDate[] = [
+  { month: 0, day: 1, title: 'Início do mês', emoji: '📅', suggestion: 'Promoção de início de mês — cliente com dinheiro novo!', type: 'recurring' },
+  { month: 0, day: 5, title: 'Dia do pagamento', emoji: '💰', suggestion: 'Muita gente recebeu! Hora de promoção especial', type: 'recurring' },
+  { month: 0, day: 10, title: 'Segundo pagamento', emoji: '💳', suggestion: 'Outra leva de salários — aproveite para atrair clientes', type: 'recurring' },
+  { month: 0, day: 15, title: 'Dia do vale/adiantamento', emoji: '🤑', suggestion: 'Vale caiu! Promoção para quem recebeu adiantamento', type: 'recurring' },
+  { month: 0, day: 20, title: 'Pré-pagamento', emoji: '💵', suggestion: 'Faltam poucos dias pro salário — promoção acessível', type: 'recurring' },
+  { month: 0, day: 25, title: 'Véspera de pagamento', emoji: '📊', suggestion: 'Semana do pagamento — antecipe promoções', type: 'recurring' },
+];
+
 export function getDatesForMonth(month: number): MarketingDate[] {
   return marketingDates.filter(d => d.month === month);
 }
 
 export function getDateForDay(month: number, day: number): MarketingDate | undefined {
   return marketingDates.find(d => d.month === month && d.day === day);
+}
+
+/** Get upcoming dates (holidays + recurring commercial) from today, up to `count` items */
+export function getUpcomingDates(count = 8): (MarketingDate & { fullDate: Date })[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const year = today.getFullYear();
+
+  // Generate holiday dates for this year and next
+  const holidayDates = [
+    ...marketingDates.map(d => ({
+      ...d,
+      fullDate: new Date(year, d.month - 1, d.day),
+    })),
+    ...marketingDates.map(d => ({
+      ...d,
+      fullDate: new Date(year + 1, d.month - 1, d.day),
+    })),
+  ];
+
+  // Generate recurring commercial dates for this month and next 2
+  const commercialDates: (MarketingDate & { fullDate: Date })[] = [];
+  for (let offset = 0; offset <= 2; offset++) {
+    const m = new Date(year, today.getMonth() + offset, 1);
+    recurringCommercialDates.forEach(d => {
+      commercialDates.push({
+        ...d,
+        month: m.getMonth() + 1,
+        fullDate: new Date(m.getFullYear(), m.getMonth(), d.day),
+      });
+    });
+  }
+
+  // Merge, filter future only, sort by date, dedupe by date+title
+  const all = [...holidayDates, ...commercialDates]
+    .filter(d => d.fullDate >= today)
+    .sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
+
+  const seen = new Set<string>();
+  const result: (MarketingDate & { fullDate: Date })[] = [];
+  for (const d of all) {
+    const key = `${d.fullDate.toISOString().slice(0, 10)}-${d.title}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(d);
+    if (result.length >= count) break;
+  }
+  return result;
 }
