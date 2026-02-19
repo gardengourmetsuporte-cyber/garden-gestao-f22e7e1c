@@ -31,8 +31,8 @@ export function LandingNavbar() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src={logoImg} alt="Garden" className="h-8 w-8 rounded-lg" />
-          <span className="font-bold text-lg text-foreground">Garden</span>
+          <img src={logoImg} alt="Bosst" className="h-8 w-8 rounded-lg" />
+          <span className="font-bold text-lg text-foreground">Bosst</span>
         </div>
 
         <div className="hidden md:flex items-center gap-8">

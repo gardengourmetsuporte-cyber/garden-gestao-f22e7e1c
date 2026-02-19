@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { useSetupProgress } from '@/hooks/useSetupProgress';
 import { cn } from '@/lib/utils';
 
-const DISMISSED_KEY = 'garden-setup-guide-dismissed';
+const DISMISSED_KEY = 'bosst-setup-guide-dismissed';
 
 export function SetupGuide() {
   const navigate = useNavigate();

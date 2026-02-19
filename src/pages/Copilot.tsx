@@ -48,7 +48,7 @@ export default function CopilotPage() {
           </button>
           <img
             src={mascotImg}
-            alt="Garden Copiloto"
+            alt="Bosst Copiloto"
             className="w-9 h-9 rounded-xl object-cover border border-primary/20"
           />
           <div className="flex-1 min-w-0">

@@ -7,8 +7,8 @@ export function FooterSection() {
         <div className="grid md:grid-cols-4 gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logoImg} alt="Garden" className="h-7 w-7 rounded-lg" />
-              <span className="font-bold text-foreground">Garden</span>
+              <img src={logoImg} alt="Bosst" className="h-7 w-7 rounded-lg" />
+              <span className="font-bold text-foreground">Bosst</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Gestão inteligente para pequenos e médios negócios.
@@ -45,7 +45,7 @@ export function FooterSection() {
         </div>
 
         <div className="pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground" style={{ borderColor: "hsl(var(--border) / 0.3)" }}>
-          <span>© {new Date().getFullYear()} Garden Gestão. Todos os direitos reservados.</span>
+          <span>© {new Date().getFullYear()} Bosst. Todos os direitos reservados.</span>
         </div>
       </div>
     </footer>

@@ -16,7 +16,7 @@ export function DifferentialsSection() {
             Diferenciais
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-            Por que o Garden é diferente
+            Por que o Bosst é diferente
           </h2>
         </div>
 

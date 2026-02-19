@@ -4,7 +4,7 @@ const testimonials = [
   {
     name: "Ana Carolina",
     role: "Dona de restaurante",
-    text: "Antes eu usava 4 sistemas diferentes. Com o Garden, centralizei tudo e economizo mais de R$ 400/mês em assinaturas.",
+    text: "Antes eu usava 4 sistemas diferentes. Com o Bosst, centralizei tudo e economizo mais de R$ 400/mês em assinaturas.",
     avatar: "AC",
   },
   {

@@ -585,7 +585,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
           </button>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
+            <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Bosst'}</p>
           </div>
           <ThemeToggle className="p-1.5 shrink-0" />
         </div>

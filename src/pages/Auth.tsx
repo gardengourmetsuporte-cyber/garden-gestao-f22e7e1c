@@ -218,7 +218,7 @@ export default function Auth() {
               />
               <div className="absolute inset-[1px] rounded-full overflow-hidden bg-white">
                 <img
-                  alt="Garden Logo"
+                  alt="Bosst Logo"
                   className="w-full h-full object-cover"
                   src="/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg"
                 />
@@ -226,7 +226,7 @@ export default function Auth() {
             </div>
             <div className="text-center space-y-1">
               <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-                Garden
+                Bosst
               </h1>
               <p className="text-sm text-muted-foreground tracking-widest uppercase">
                 Gestão Inteligente
@@ -613,7 +613,7 @@ export default function Auth() {
 
       {/* Footer */}
       <div className="p-4 text-center text-xs text-muted-foreground/50 relative z-10">
-        © {new Date().getFullYear()} Garden — Gestão Inteligente
+        © {new Date().getFullYear()} Bosst — Gestão Inteligente
       </div>
     </div>
   );
