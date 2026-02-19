@@ -214,8 +214,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const { hasAccess } = useUserModules();
   const filteredNavItems = navItems.filter(item => {
-    if (item.adminOnly && !isAdmin) return false;
     const moduleKey = getModuleKeyFromRoute(item.href);
+    // If module is explicitly granted by access level, show it regardless of adminOnly
+    if (moduleKey && hasAccess(moduleKey)) return true;
+    // If adminOnly and user is not admin, hide it
+    if (item.adminOnly && !isAdmin) return false;
+    // If module key exists but user doesn't have access, hide it
     if (moduleKey && !hasAccess(moduleKey)) return false;
     return true;
   });
