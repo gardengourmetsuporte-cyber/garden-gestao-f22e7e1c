@@ -23,20 +23,69 @@ export interface ProfileData {
   monthlyBonus: number;
 }
 
-async function fetchProfileData(userId: string): Promise<Omit<ProfileData, 'leaderboardRank'>> {
+async function fetchProfileData(userId: string, unitId: string | null): Promise<Omit<ProfileData, 'leaderboardRank'>> {
   const now = new Date();
   const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
 
+  // Build queries with optional unit_id filter (same logic as usePoints)
+  let completionsQuery = supabase
+    .from('checklist_completions')
+    .select('points_awarded, awarded_points, completed_at, item_id')
+    .eq('completed_by', userId)
+    .limit(10000);
+  if (unitId) completionsQuery = completionsQuery.eq('unit_id', unitId);
+
+  let redemptionsQuery = supabase
+    .from('reward_redemptions')
+    .select('points_spent, status')
+    .eq('user_id', userId)
+    .limit(10000);
+  if (unitId) redemptionsQuery = redemptionsQuery.eq('unit_id', unitId);
+
+  let bonusQuery = supabase
+    .from('bonus_points')
+    .select('points, reason, type, created_at')
+    .eq('user_id', userId)
+    .eq('month', monthStart)
+    .order('created_at', { ascending: false })
+    .limit(10000);
+  if (unitId) bonusQuery = bonusQuery.eq('unit_id', unitId);
+
+  let monthlyCompletionsQuery = supabase
+    .from('checklist_completions')
+    .select('points_awarded, awarded_points')
+    .eq('completed_by', userId)
+    .gte('completed_at', `${monthStart}T00:00:00`)
+    .lte('completed_at', `${monthEnd}T23:59:59`)
+    .limit(10000);
+  if (unitId) monthlyCompletionsQuery = monthlyCompletionsQuery.eq('unit_id', unitId);
+
+  let badgeQuery = supabase
+    .from('bonus_points')
+    .select('badge_id')
+    .eq('user_id', userId)
+    .eq('badge_id', 'employee_of_month')
+    .limit(10000);
+  if (unitId) badgeQuery = badgeQuery.eq('unit_id', unitId);
+
+  let inventorQuery = supabase
+    .from('bonus_points')
+    .select('badge_id')
+    .eq('user_id', userId)
+    .eq('badge_id', 'inventor')
+    .limit(10000);
+  if (unitId) inventorQuery = inventorQuery.eq('unit_id', unitId);
+
   const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }, { data: badgeRows }, { data: employeeRow }, { data: inventorRows }] = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url, job_title').eq('user_id', userId).single(),
-    supabase.from('checklist_completions').select('points_awarded, awarded_points, completed_at, item_id').eq('completed_by', userId),
-    supabase.from('reward_redemptions').select('points_spent, status').eq('user_id', userId),
-    supabase.from('bonus_points').select('points, reason, type, created_at').eq('user_id', userId).eq('month', monthStart).order('created_at', { ascending: false }),
-    supabase.from('checklist_completions').select('points_awarded, awarded_points').eq('completed_by', userId).gte('completed_at', `${monthStart}T00:00:00`).lte('completed_at', `${monthEnd}T23:59:59`),
-    supabase.from('bonus_points').select('badge_id').eq('user_id', userId).eq('badge_id', 'employee_of_month'),
+    completionsQuery,
+    redemptionsQuery,
+    bonusQuery,
+    monthlyCompletionsQuery,
+    badgeQuery,
     supabase.from('employees').select('admission_date').eq('user_id', userId).maybeSingle(),
-    supabase.from('bonus_points').select('badge_id').eq('user_id', userId).eq('badge_id', 'inventor'),
+    inventorQuery,
   ]);
 
   const summary = calculatePointsSummary(completions || [], redemptions || []);
@@ -70,10 +119,10 @@ async function fetchProfileData(userId: string): Promise<Omit<ProfileData, 'lead
   };
 }
 
-export function useProfile(userId: string | undefined, leaderboard?: Array<{ user_id: string; rank: number }>) {
+export function useProfile(userId: string | undefined, leaderboard?: Array<{ user_id: string; rank: number }>, unitId?: string | null) {
   const { data, isLoading } = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: () => fetchProfileData(userId!),
+    queryKey: ['profile', userId, unitId],
+    queryFn: () => fetchProfileData(userId!, unitId ?? null),
     enabled: !!userId,
   });
 
