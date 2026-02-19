@@ -184,9 +184,12 @@ export function useLeaderboard() {
 
   const isLoading = isLoadingLeaderboard || isLoadingSectors;
 
-  const refetch = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
-    queryClient.invalidateQueries({ queryKey: ['sector-points'] });
+  const refetch = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] }),
+      queryClient.invalidateQueries({ queryKey: ['sector-points'] }),
+      queryClient.invalidateQueries({ queryKey: ['points'] }),
+    ]);
   }, [queryClient]);
 
   return useMemo(() => ({
