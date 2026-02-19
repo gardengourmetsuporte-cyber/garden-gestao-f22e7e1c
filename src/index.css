@@ -83,16 +83,16 @@
     --input: 222 30% 11%;
     --ring: 217 91% 60%;
 
-    /* Glow & Shadow tokens */
-    --glow-primary: 0 0 24px hsl(217 91% 60% / 0.2), 0 0 48px hsl(217 91% 60% / 0.08);
-    --glow-success: 0 0 24px hsl(142 71% 45% / 0.2), 0 0 48px hsl(142 71% 45% / 0.08);
-    --glow-destructive: 0 0 24px hsl(0 84% 60% / 0.2), 0 0 48px hsl(0 84% 60% / 0.08);
-    --glow-warning: 0 0 24px hsl(38 92% 50% / 0.2), 0 0 48px hsl(38 92% 50% / 0.08);
-    --glow-cyan: 0 0 24px hsl(190 90% 55% / 0.2), 0 0 48px hsl(190 90% 55% / 0.08);
+    /* Glow & Shadow tokens — intensified for Android parity */
+    --glow-primary: 0 0 20px hsl(217 91% 60% / 0.25), 0 0 40px hsl(217 91% 60% / 0.12);
+    --glow-success: 0 0 20px hsl(142 71% 45% / 0.25), 0 0 40px hsl(142 71% 45% / 0.12);
+    --glow-destructive: 0 0 20px hsl(0 84% 60% / 0.25), 0 0 40px hsl(0 84% 60% / 0.12);
+    --glow-warning: 0 0 20px hsl(38 92% 50% / 0.25), 0 0 40px hsl(38 92% 50% / 0.12);
+    --glow-cyan: 0 0 20px hsl(190 90% 55% / 0.25), 0 0 40px hsl(190 90% 55% / 0.12);
 
-    --shadow-card: 0 2px 8px hsl(222 50% 3% / 0.5), 0 4px 20px hsl(222 50% 3% / 0.3);
-    --shadow-card-hover: 0 4px 24px hsl(222 50% 3% / 0.6), 0 8px 40px hsl(222 50% 3% / 0.3);
-    --shadow-elevated: 0 8px 40px hsl(222 50% 3% / 0.7), 0 16px 64px hsl(222 50% 3% / 0.3);
+    --shadow-card: 0 2px 8px hsl(222 50% 3% / 0.5), 0 4px 16px hsl(222 50% 3% / 0.3);
+    --shadow-card-hover: 0 4px 20px hsl(222 50% 3% / 0.6), 0 8px 32px hsl(222 50% 3% / 0.3);
+    --shadow-elevated: 0 8px 32px hsl(222 50% 3% / 0.7), 0 12px 48px hsl(222 50% 3% / 0.3);
   }
 
   /* ===== LIGHT THEME ===== */
