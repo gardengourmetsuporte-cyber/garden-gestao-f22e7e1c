@@ -1,39 +1,118 @@
 
 
-# Resumo Pessoal Financeiro no Dashboard dos Funcionarios
+# Plano: Central de Alertas + Setup Guide + Log de Auditoria
 
-## O que vai mudar
+---
 
-O Dashboard do funcionario vai ganhar um card de resumo financeiro pessoal (saldo do mes, despesas, pendencias) igual ao card do admin, porem mostrando os dados do modulo de Financas Pessoais (unit_id = NULL) de cada usuario.
+## 1. Central de Alertas (/alerts)
 
-Nao sera necessario criar tabelas novas. O modulo de Financas Pessoais ja existe e usa as mesmas tabelas (finance_accounts, finance_transactions, finance_categories) com unit_id = NULL para isolar os dados pessoais.
+Uma pagina dedicada full-page para visualizar, filtrar e agir sobre todas as notificacoes.
 
-## Alteracoes
+**O que sera feito:**
 
-### 1. Criar hook `usePersonalFinanceStats`
-- Novo arquivo: `src/hooks/usePersonalFinanceStats.ts`
-- Busca dados de `finance_accounts` e `finance_transactions` onde `unit_id IS NULL` e `user_id = auth.uid()`
-- Retorna: saldo total das contas, receitas do mes, despesas do mes, despesas pendentes
-- Usa React Query com cache de 2 minutos
+- Nova pagina `src/pages/Alerts.tsx` com layout padrao (AppLayout)
+- Busca TODAS as notificacoes (lidas e nao lidas) do usuario, com paginacao
+- Filtros por: origem (estoque, financeiro, checklist, sistema), tipo (info, alert, success), status (lido/nao lido)
+- Cada alerta tera botao de acao direta contextual:
+  - Origem "estoque" -> botao "Ver Estoque" navega para /inventory
+  - Origem "financeiro" -> botao "Ver Financeiro" navega para /finance
+  - Origem "checklist" -> botao "Ver Checklist" navega para /checklists
+- Botao "Marcar todas como lidas" no topo
+- Rota `/alerts` registrada no App.tsx como ProtectedRoute
+- Modulo adicionado em `src/lib/modules.ts`
+- Link adicionado na navegacao (AppLayout navItems)
 
-### 2. Atualizar `EmployeeDashboard.tsx`
-- Importar o novo hook `usePersonalFinanceStats`
-- Adicionar um card financeiro pessoal logo apos o card de boas-vindas (antes do card de pontos)
-- O card tera o mesmo visual do card financeiro do admin (finance-hero-card) mas com a identidade visual verde-esmeralda do modulo pessoal (classe `finance-hero-card--personal`)
-- Ao clicar, navega para `/personal-finance`
-- Mostra: Saldo pessoal (valor grande), Despesas do mes, Pendencias
+**Arquivos envolvidos:**
+- `src/pages/Alerts.tsx` (novo)
+- `src/App.tsx` (nova rota)
+- `src/lib/modules.ts` (novo modulo)
+- `src/components/layout/AppLayout.tsx` (novo item de nav)
+- `src/hooks/useNotifications.ts` (nova funcao para buscar todas as notificacoes, incluindo lidas)
 
-### 3. Atualizar `AdminDashboard.tsx`
-- Adicionar um segundo card financeiro pessoal abaixo do card do financeiro empresarial
-- Mesmo visual verde-esmeralda do modulo pessoal
-- Ao clicar, navega para `/personal-finance`
+---
 
-## Detalhes Tecnicos
+## 2. Setup Guide (Checklist de Primeiro Uso)
 
-O hook `usePersonalFinanceStats` fara 3 queries em paralelo:
-1. `finance_accounts` com `user_id = uid` e `unit_id IS NULL` para saldo total
-2. `finance_transactions` com `type = 'income'`, `is_paid = true`, mes atual para receitas
-3. `finance_transactions` com `type IN ('expense', 'credit_card')`, mes atual para despesas (pagas e pendentes separadas)
+Uma barra de progresso persistente no dashboard que guia o admin nos primeiros passos.
 
-O card usara as classes CSS ja existentes `finance-hero-card` e `finance-hero-card--personal` que ja tem a identidade visual verde-esmeralda.
+**O que sera feito:**
+
+- Novo componente `src/components/dashboard/SetupGuide.tsx`
+- Exibido apenas para admins que ainda nao completaram todos os passos
+- 5 passos verificados em tempo real contra o banco:
+  1. "Cadastre um fornecedor" -> verifica se existe ao menos 1 supplier
+  2. "Adicione um item ao estoque" -> verifica se existe ao menos 1 inventory_item
+  3. "Configure um checklist" -> verifica se existe ao menos 1 checklist_item
+  4. "Convide um funcionario" -> verifica se existe mais de 1 user_unit na unidade
+  5. "Faca seu primeiro fechamento" -> verifica se existe ao menos 1 cash_closing
+- Cada passo incompleto mostra um botao CTA que navega para o modulo correto
+- Quando todos concluidos, exibe mensagem de parabens e um botao para dispensar permanentemente (salvo em localStorage)
+- Barra de progresso visual estilo iOS no topo do card
+- Integrado no `AdminDashboard.tsx` logo apos o welcome header
+
+**Arquivos envolvidos:**
+- `src/components/dashboard/SetupGuide.tsx` (novo)
+- `src/hooks/useSetupProgress.ts` (novo - hook que consulta o banco)
+- `src/components/dashboard/AdminDashboard.tsx` (integrar o componente)
+
+---
+
+## 3. Log de Auditoria
+
+Registro automatico de acoes criticas com visualizacao para admins.
+
+**O que sera feito:**
+
+### Banco de dados:
+- Nova tabela `audit_logs` com colunas:
+  - `id` (uuid, PK)
+  - `user_id` (uuid, NOT NULL)
+  - `unit_id` (uuid, nullable)
+  - `action` (text) - ex: "stock_movement", "transaction_created", "checklist_completed", "cash_closing_created"
+  - `entity_type` (text) - ex: "inventory_items", "finance_transactions"
+  - `entity_id` (uuid, nullable)
+  - `details` (jsonb) - metadados da acao (ex: quantidade, valor)
+  - `created_at` (timestamptz, default now())
+- RLS: admins podem visualizar logs da unidade; insercao via SECURITY DEFINER function
+- Funcao `log_audit_event()` SECURITY DEFINER chamada por triggers nos pontos criticos
+
+### Triggers automaticos:
+- `stock_movements` -> INSERT: registra movimentacao de estoque
+- `finance_transactions` -> INSERT/DELETE: registra transacao financeira criada/removida
+- `cash_closings` -> INSERT/UPDATE: registra fechamento de caixa
+- `checklist_completions` -> INSERT: registra checklist completado
+
+### Frontend:
+- Novo componente `src/components/settings/AuditLogSettings.tsx` (visualizador)
+- Listagem paginada com filtros por tipo de acao e periodo
+- Exibe: quem fez, o que fez, quando, em qual modulo
+- Nomes de usuario resolvidos via join com profiles
+- Acessivel em Configuracoes > Log de Atividades (somente admin)
+- Nova entrada no menu de Settings
+
+**Arquivos envolvidos:**
+- Migration SQL (nova tabela + funcao + triggers)
+- `src/components/settings/AuditLogSettings.tsx` (novo)
+- `src/hooks/useAuditLogs.ts` (novo)
+- `src/pages/Settings.tsx` (novo item de menu + renderizacao)
+
+---
+
+## Secao Tecnica
+
+### Ordem de implementacao:
+1. Migration do banco (audit_logs + funcao + triggers)
+2. Central de Alertas (pagina + rota + navegacao)
+3. Setup Guide (hook + componente + integracao no dashboard)
+4. Log de Auditoria (hook + componente + integracao em Settings)
+
+### Estimativa de arquivos:
+- 5 novos arquivos
+- 5 arquivos editados
+- 1 migration SQL
+
+### Impacto em performance:
+- Setup Guide faz 5 COUNT queries leves na montagem (com staleTime alto)
+- Audit Logs usa paginacao (LIMIT 50) para nao sobrecarregar
+- Central de Alertas reutiliza a tabela notifications existente, sem nova tabela
 
