@@ -11,14 +11,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePoints } from '@/hooks/usePoints';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useProfile } from '@/hooks/useProfile';
+import { useUnit } from '@/contexts/UnitContext';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
 
 export default function Ranking() {
   const { user, profile } = useAuth();
+  const { activeUnitId } = useUnit();
   const { earned, monthlyScore } = usePoints();
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
-  const { profile: userProfile } = useProfile(user?.id, leaderboard);
+  const { profile: userProfile } = useProfile(user?.id, leaderboard, activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;

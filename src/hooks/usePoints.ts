@@ -37,8 +37,8 @@ async function fetchPointsData(userId: string, unitId: string | null): Promise<P
     .from('checklist_completions')
     .select('points_awarded, awarded_points')
     .eq('completed_by', userId)
-    .gte('completed_at', `${monthStart}T00:00:00`)
-    .lte('completed_at', `${monthEnd}T23:59:59`)
+    .gte('date', monthStart)
+    .lte('date', monthEnd)
     .limit(10000);
   if (unitId) monthlyCompletionsQuery = monthlyCompletionsQuery.eq('unit_id', unitId);
 
