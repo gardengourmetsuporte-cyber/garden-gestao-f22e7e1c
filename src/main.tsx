@@ -6,16 +6,22 @@ import "./index.css";
 
 // Force update: when a new service worker is installed, reload immediately
 if ('serviceWorker' in navigator) {
+  // Force reload when new SW takes control
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     window.location.reload();
   });
 
-  // Also check for waiting SW and skip it
+  // Aggressively update any waiting or installing SW
   navigator.serviceWorker.getRegistration().then((reg) => {
-    if (reg?.waiting) {
+    if (!reg) return;
+    
+    // If there's a waiting SW, skip waiting immediately
+    if (reg.waiting) {
       reg.waiting.postMessage({ type: 'SKIP_WAITING' });
     }
-    reg?.addEventListener('updatefound', () => {
+
+    // Watch for new SW installations
+    reg.addEventListener('updatefound', () => {
       const newSW = reg.installing;
       newSW?.addEventListener('statechange', () => {
         if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
@@ -23,6 +29,9 @@ if ('serviceWorker' in navigator) {
         }
       });
     });
+
+    // Force check for updates every time app loads
+    reg.update().catch(() => {});
   });
 }
 
