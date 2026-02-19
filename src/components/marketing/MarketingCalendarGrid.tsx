@@ -41,8 +41,8 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
-    const calStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
 
     const days: Date[] = [];
     let day = calStart;
@@ -53,7 +53,7 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
     return days;
   }, [currentMonth]);
 
-  const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
   const handleDayClick = (day: Date) => {
     setSelectedDate(day);
