@@ -168,12 +168,12 @@ export function useLeaderboard() {
   const { activeUnitId } = useUnit();
   const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()));
 
-  const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useQuery({
+  const { data: leaderboard = [], isLoading: isLoadingLeaderboard, refetch: refetchLeaderboard } = useQuery({
     queryKey: ['leaderboard', activeUnitId, format(selectedMonth, 'yyyy-MM')],
     queryFn: () => fetchLeaderboardData(activeUnitId!, selectedMonth),
     enabled: !!user && !!activeUnitId,
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const { data: sectorPoints = [], isLoading: isLoadingSectors } = useQuery({
@@ -186,11 +186,10 @@ export function useLeaderboard() {
 
   const refetch = useCallback(async () => {
     await Promise.all([
-      queryClient.refetchQueries({ queryKey: ['leaderboard', activeUnitId] }),
-      queryClient.refetchQueries({ queryKey: ['sector-points', activeUnitId] }),
+      refetchLeaderboard(),
       queryClient.refetchQueries({ queryKey: ['points'] }),
     ]);
-  }, [queryClient, activeUnitId]);
+  }, [refetchLeaderboard, queryClient]);
 
   return useMemo(() => ({
     leaderboard,

@@ -84,8 +84,8 @@ export function usePoints() {
     queryKey: ['points', user?.id, activeUnitId],
     queryFn: () => fetchPointsData(user!.id, activeUnitId),
     enabled: !!user,
-    staleTime: 30_000, // 30s before considered stale
-    refetchInterval: 60_000, // auto-refresh every 60s
+    staleTime: 0,
+    gcTime: 0,
   });
 
   return {
