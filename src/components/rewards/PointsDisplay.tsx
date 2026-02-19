@@ -10,8 +10,8 @@ interface PointsDisplayProps {
 }
 
 export function PointsDisplay({ className, showLabel = true, isPulsing = false }: PointsDisplayProps) {
-  const { balance, isLoading } = usePoints();
-  const animatedBalance = useCountUp(balance);
+  const { monthlyScore, isLoading } = usePoints();
+  const animatedBalance = useCountUp(monthlyScore);
 
   if (isLoading) {
     return (
