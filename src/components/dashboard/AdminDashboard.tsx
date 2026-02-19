@@ -18,6 +18,7 @@ import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { ChecklistDashboardWidget } from './ChecklistDashboardWidget';
+import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export function AdminDashboard() {
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
   const { closings } = useCashClosing();
-
+  const { totalBalance: personalBalance, monthExpenses: personalExpenses, pendingExpenses: personalPending, isLoading: personalLoading } = usePersonalFinanceStats();
   const animatedBalance = useCountUpCurrency(stats.monthBalance);
 
   const formatCurrency = (value: number) =>
@@ -97,6 +98,39 @@ export function AdminDashboard() {
                 <div className="finance-hero-chip finance-hero-chip--neutral">
                   <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Fechamentos</span>
                   <span className="text-sm font-bold text-amber-300">{stats.pendingClosings}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </button>
+
+        {/* PERSONAL FINANCE CARD */}
+        <button
+          onClick={() => navigate('/personal-finance')}
+          className="finance-hero-card finance-hero-card--personal col-span-2 text-left animate-slide-up stagger-2"
+        >
+          <div className="finance-hero-inner p-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+                Meu saldo pessoal
+              </span>
+              <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+            </div>
+            <p className={cn(
+              "text-2xl font-extrabold tracking-tight leading-tight",
+              personalBalance >= 0 ? "text-white" : "text-red-300"
+            )}>
+              {personalLoading ? <Skeleton className="h-7 w-32 bg-white/10" /> : formatCurrency(personalBalance)}
+            </p>
+            <div className="flex gap-2 mt-2">
+              <div className="finance-hero-chip finance-hero-chip--success">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas</span>
+                <span className="text-sm font-bold text-white">{personalLoading ? '...' : formatCurrency(personalExpenses)}</span>
+              </div>
+              {personalPending > 0 && (
+                <div className="finance-hero-chip finance-hero-chip--neutral">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
+                  <span className="text-sm font-bold text-amber-300">{formatCurrency(personalPending)}</span>
                 </div>
               )}
             </div>
