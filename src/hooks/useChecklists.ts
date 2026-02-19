@@ -24,8 +24,8 @@ async function fetchSectorsData(unitId: string | null) {
       )
     `)
     .order('sort_order')
-    .order('sort_order', { referencedTable: 'checklist_subcategories' })
-    .order('sort_order', { referencedTable: 'checklist_subcategories.checklist_items' });
+    .order('sort_order', { referencedTable: 'subcategories' })
+    .order('sort_order', { referencedTable: 'subcategories.items' });
 
   if (unitId) query = query.or(`unit_id.eq.${unitId},unit_id.is.null`);
 

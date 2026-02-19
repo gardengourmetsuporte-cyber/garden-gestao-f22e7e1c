@@ -31,7 +31,9 @@ export function ChecklistDashboardWidget() {
       let query = supabase
         .from('checklist_sectors')
         .select(`*, subcategories:checklist_subcategories(*, items:checklist_items(*))`)
-        .order('sort_order');
+        .order('sort_order')
+        .order('sort_order', { referencedTable: 'subcategories' })
+        .order('sort_order', { referencedTable: 'subcategories.items' });
       if (activeUnitId) query = query.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
       const { data } = await query;
       return (data || []).map((s: any) => ({
