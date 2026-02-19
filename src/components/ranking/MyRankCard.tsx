@@ -11,11 +11,9 @@ interface MyRankCardProps {
   earnedPoints: number;
   monthlyScore: number;
   leaderboardPosition?: number;
-  onRefresh?: () => Promise<void>;
-  isSyncing?: boolean;
 }
 
-export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, leaderboardPosition, onRefresh, isSyncing }: MyRankCardProps) {
+export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, leaderboardPosition }: MyRankCardProps) {
   const rank = getRank(earnedPoints);
   const next = getNextRank(earnedPoints);
   const animatedMonthly = useCountUp(monthlyScore);
@@ -25,18 +23,6 @@ export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, le
       <div className="flex items-center gap-4">
         <RankedAvatar avatarUrl={avatarUrl} earnedPoints={earnedPoints} size={72} showTitle />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-foreground truncate">{fullName}</h2>
-            {onRefresh && (
-              <button
-                onClick={onRefresh}
-                disabled={isSyncing}
-                className="p-1.5 rounded-lg hover:bg-secondary transition-all active:scale-95 disabled:opacity-50"
-              >
-                <AppIcon name="RefreshCw" size={16} className={isSyncing ? 'animate-spin text-primary' : 'text-muted-foreground'} />
-              </button>
-            )}
-          </div>
           <h2 className="text-base font-bold text-foreground truncate">{fullName}</h2>
           <p className="text-xs font-semibold mt-0.5" style={{ color: rank.color }}>
             {rank.title}

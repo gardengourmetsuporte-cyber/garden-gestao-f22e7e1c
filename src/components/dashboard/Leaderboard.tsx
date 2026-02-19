@@ -16,6 +16,8 @@ interface LeaderboardProps {
   selectedMonth?: Date;
   onMonthChange?: (month: Date) => void;
   showPodium?: boolean;
+  onRefresh?: () => Promise<void>;
+  isSyncing?: boolean;
 }
 
 function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) => void }) {
@@ -39,7 +41,7 @@ function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) =
   );
 }
 
-export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, selectedMonth, onMonthChange, showPodium = true }: LeaderboardProps) {
+export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, selectedMonth, onMonthChange, showPodium = true, onRefresh, isSyncing }: LeaderboardProps) {
   const displayEntries = maxEntries ? entries.slice(0, maxEntries) : entries;
   const restEntries = showPodium ? displayEntries.slice(3) : displayEntries;
 
@@ -65,6 +67,15 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
         <div className="flex items-center gap-2">
           <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
           <h3 className="font-semibold text-sm text-foreground">Ranking Mensal</h3>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isSyncing}
+              className="p-1 rounded-md hover:bg-secondary transition-all active:scale-95 disabled:opacity-50"
+            >
+              <AppIcon name="RefreshCw" size={14} className={isSyncing ? 'animate-spin text-primary' : 'text-muted-foreground'} />
+            </button>
+          )}
         </div>
         {selectedMonth && onMonthChange && (
           <MonthSelector month={selectedMonth} onChange={onMonthChange} />
