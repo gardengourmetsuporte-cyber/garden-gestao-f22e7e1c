@@ -26,10 +26,11 @@ self.addEventListener('push', function(event) {
     icon: '/pwa-192x192.png',
     badge: '/pwa-192x192.png',
     data: { url: data.url || '/' },
-    vibrate: [200, 100, 200],
+    vibrate: [200, 100, 200, 100, 200],
     tag: data.tag || 'default',
     renotify: true,
     requireInteraction: true,
+    silent: false,
     actions: [
       { action: 'open', title: 'Abrir' },
       { action: 'close', title: 'Fechar' },
@@ -76,4 +77,4 @@ self.addEventListener('message', function(event) {
 });
 
 // Log that push-sw.js was loaded successfully
-console.log('[Push-SW] Push notification handler loaded successfully v2');
+console.log('[Push-SW] Push notification handler loaded successfully v3 (sound enabled)');
