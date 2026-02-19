@@ -98,52 +98,47 @@ export function FinanceTransactions({
   // Track "seen" new transactions — persisted in localStorage
   const SEEN_KEY = 'finance_seen_txns';
 
-  const readSeen = useCallback((): Record<string, number> => {
+  const seenRef = useRef<Record<string, number>>({});
+  const [seenVersion, setSeenVersion] = useState(0);
+
+  // Load from localStorage once on mount
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(SEEN_KEY);
-      if (!stored) return {};
-      const parsed = JSON.parse(stored);
-      // Migrate from old array format to new object format
-      if (Array.isArray(parsed)) {
-        const migrated: Record<string, number> = {};
-        parsed.forEach((id: string) => { migrated[id] = Date.now(); });
-        try { localStorage.setItem(SEEN_KEY, JSON.stringify(migrated)); } catch {}
-        return migrated;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const migrated: Record<string, number> = {};
+          parsed.forEach((id: string) => { migrated[id] = Date.now(); });
+          seenRef.current = migrated;
+        } else {
+          seenRef.current = parsed;
+        }
+        // Clean entries older than 7 days
+        const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const cleaned: Record<string, number> = {};
+        Object.entries(seenRef.current).forEach(([id, ts]) => {
+          if ((ts as number) > cutoff) cleaned[id] = ts as number;
+        });
+        seenRef.current = cleaned;
+        localStorage.setItem(SEEN_KEY, JSON.stringify(cleaned));
       }
-      return parsed;
-    } catch { return {}; }
+    } catch {}
+    setSeenVersion(v => v + 1);
   }, []);
-
-  // Clean old entries (older than 7 days) to prevent unbounded growth
-  const cleanOldEntries = useCallback((data: Record<string, number>): Record<string, number> => {
-    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const cleaned: Record<string, number> = {};
-    Object.entries(data).forEach(([id, ts]) => {
-      if (ts > cutoff) cleaned[id] = ts;
-    });
-    return cleaned;
-  }, []);
-
-  const [seenMap, setSeenMap] = useState<Record<string, number>>(() => cleanOldEntries(readSeen()));
-
-  // Re-sync from localStorage every time the component mounts (e.g. navigating back)
-  useEffect(() => {
-    setSeenMap(cleanOldEntries(readSeen()));
-  }, [readSeen, cleanOldEntries]);
 
   const markSeen = useCallback((id: string) => {
-    setSeenMap(prev => {
-      const next = { ...prev, [id]: Date.now() };
-      try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch {}
-      return next;
-    });
+    seenRef.current = { ...seenRef.current, [id]: Date.now() };
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify(seenRef.current)); } catch {}
+    setSeenVersion(v => v + 1);
   }, []);
 
   const isNewTransaction = useCallback((t: FinanceTransaction) => {
-    if (t.id in seenMap) return false;
+    if (t.id in seenRef.current) return false;
     const hoursAgo = differenceInHours(new Date(), new Date(t.created_at));
     return hoursAgo < 48;
-  }, [seenMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seenVersion]);
 
   // Apply initialFilters when they change from parent (reset to defaults when empty)
   useEffect(() => {
@@ -325,6 +320,7 @@ export function FinanceTransactions({
                                   onClick={() => {
                                     if (isNewTransaction(transaction)) {
                                       markSeen(transaction.id);
+                                      return;
                                     }
                                     onTransactionClick(transaction);
                                   }}
