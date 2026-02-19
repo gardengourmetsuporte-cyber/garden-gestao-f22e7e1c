@@ -185,12 +185,12 @@ export function MedalSettings() {
 
         <div className="space-y-3">
           <Select value={selectedUser} onValueChange={setSelectedUser}>
-            <SelectTrigger>
+            <SelectTrigger data-vaul-no-drag>
               <SelectValue placeholder="Selecione o funcionário" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[10000]" position="popper" sideOffset={4}>
               {(users || []).map(u => (
-                <SelectItem key={u.user_id} value={u.user_id}>
+                <SelectItem key={u.user_id} value={u.user_id} data-vaul-no-drag>
                   {u.full_name}
                 </SelectItem>
               ))}
@@ -198,12 +198,12 @@ export function MedalSettings() {
           </Select>
 
           <Select value={selectedMedal} onValueChange={setSelectedMedal}>
-            <SelectTrigger>
+            <SelectTrigger data-vaul-no-drag>
               <SelectValue placeholder="Selecione a medalha" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[10000]" position="popper" sideOffset={4}>
               {AVAILABLE_MEDALS.map(m => (
-                <SelectItem key={m.badge_id} value={m.badge_id}>
+                <SelectItem key={m.badge_id} value={m.badge_id} data-vaul-no-drag>
                   {m.title} (+{m.bonusPoints} pts)
                 </SelectItem>
               ))}

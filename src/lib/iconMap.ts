@@ -122,7 +122,10 @@ export const ICON_MAP: Record<string, string> = {
   Trophy: 'emoji_events',
   Crown: 'workspace_premium',
   Medal: 'military_tech',
+  Award: 'military_tech',
   PartyPopper: 'celebration',
+  FlaskConical: 'science',
+  Calculator: 'calculate',
 
   // Misc
   Sun: 'light_mode',
