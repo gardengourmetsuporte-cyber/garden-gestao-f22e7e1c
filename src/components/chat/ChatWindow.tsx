@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { ChatMessage, ChatConversation } from '@/hooks/useChat';
 import { ChatMessageComponent } from './ChatMessage';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -7,12 +7,15 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface ChatWindowProps {
   conversation: ChatConversation | null;
   messages: ChatMessage[];
   isLoading: boolean;
-  onSendMessage: (content: string) => Promise<void>;
+  onSendMessage: (content: string, attachment?: { url: string; type: string; name: string }) => Promise<void>;
   onBack: () => void;
   onTogglePin: (messageId: string, isPinned: boolean) => void;
   currentUserId?: string;
@@ -43,8 +46,12 @@ function MessagesSkeleton() {
 export const ChatWindow = memo(function ChatWindow({ conversation, messages, isLoading, onSendMessage, onBack, onTogglePin, currentUserId }: ChatWindowProps) {
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [plusOpen, setPlusOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { isAdmin } = useAuth();
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -53,6 +60,51 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
     el.style.height = 'auto';
     el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
   };
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    if (!conversation) return;
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      toast.error('Arquivo muito grande (máx 10MB)');
+      return;
+    }
+
+    setIsUploading(true);
+    setPlusOpen(false);
+
+    try {
+      const ext = file.name.split('.').pop() || 'bin';
+      const path = `${conversation.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('chat-attachments')
+        .upload(path, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('chat-attachments')
+        .getPublicUrl(path);
+
+      const isImage = file.type.startsWith('image/');
+
+      await onSendMessage(
+        input.trim(),
+        {
+          url: urlData.publicUrl,
+          type: isImage ? 'image' : 'file',
+          name: file.name,
+        }
+      );
+      setInput('');
+      if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('Erro ao enviar arquivo');
+    } finally {
+      setIsUploading(false);
+    }
+  }, [conversation, input, onSendMessage]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -224,9 +276,51 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
         >
           <div className="flex items-end gap-2">
-            <button className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-muted-foreground/40 hover:bg-muted/50 transition-colors mb-0.5">
-              <AppIcon name="Plus" size={20} />
-            </button>
+            <Popover open={plusOpen} onOpenChange={setPlusOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  disabled={isUploading}
+                  className={cn(
+                    'w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all mb-0.5',
+                    isUploading
+                      ? 'text-muted-foreground/20 animate-pulse'
+                      : 'text-muted-foreground/40 hover:bg-muted/50 hover:text-muted-foreground/70'
+                  )}
+                >
+                  <AppIcon name={isUploading ? 'Loader2' : 'Plus'} size={20} className={isUploading ? 'animate-spin' : ''} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="start" className="w-48 p-1.5 rounded-xl">
+                <button
+                  onClick={() => { imageInputRef.current?.click(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <AppIcon name="Image" size={18} className="text-primary" />
+                  <span>Imagem / Foto</span>
+                </button>
+                <button
+                  onClick={() => { fileInputRef.current?.click(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <AppIcon name="FileText" size={18} className="text-primary" />
+                  <span>Arquivo</span>
+                </button>
+              </PopoverContent>
+            </Popover>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleFileUpload(e.target.files[0]); e.target.value = ''; }}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar"
+              className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleFileUpload(e.target.files[0]); e.target.value = ''; }}
+            />
             <textarea
               ref={textareaRef}
               value={input}
