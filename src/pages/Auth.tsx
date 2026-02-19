@@ -540,6 +540,7 @@ export default function Auth() {
                       try {
                         await lovable.auth.signInWithOAuth("google", {
                           redirect_uri: window.location.origin,
+                          extraParams: { prompt: "select_account" },
                         });
                       } catch {
                         toast.error('Erro ao conectar com Google');
