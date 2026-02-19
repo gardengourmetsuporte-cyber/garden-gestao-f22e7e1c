@@ -155,8 +155,12 @@ export function useUserModules() {
   const hasAccess = (moduleKey: string): boolean => {
     // Super admins always have full access
     if (isSuperAdmin) return true;
+    // During loading, hide restricted modules to avoid flash
+    if (isLoading) return moduleKey === 'dashboard' || moduleKey === 'settings';
     // If no access level assigned (null), user has full access
-    if (allowedModules === null || allowedModules === undefined) return true;
+    if (allowedModules === null) return true;
+    // If query hasn't returned yet but loading is done, default to full access
+    if (allowedModules === undefined) return true;
     // Dashboard and settings always accessible
     if (moduleKey === 'dashboard' || moduleKey === 'settings') return true;
     return allowedModules.includes(moduleKey);
