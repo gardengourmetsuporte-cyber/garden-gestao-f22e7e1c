@@ -19,6 +19,7 @@ import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { ChecklistDashboardWidget } from './ChecklistDashboardWidget';
 import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
+import { SetupGuide } from './SetupGuide';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -59,6 +60,9 @@ export function AdminDashboard() {
           {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
         </p>
       </div>
+
+      {/* Setup Guide for new admins */}
+      <SetupGuide />
 
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">

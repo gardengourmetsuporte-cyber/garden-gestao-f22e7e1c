@@ -29,6 +29,7 @@ export const ALL_MODULES: ModuleDef[] = [
   { key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Principal' },
   { key: 'personal-finance', label: 'Finanças Pessoais', icon: 'Wallet', route: '/personal-finance', routes: ['/personal-finance'], group: 'Pessoal' },
   { key: 'settings', label: 'Configurações', icon: 'Settings', route: '/settings', routes: ['/settings'], group: 'Sistema' },
+  { key: 'alerts', label: 'Central de Alertas', icon: 'Bell', route: '/alerts', routes: ['/alerts'], group: 'Sistema' },
 ];
 
 export const MODULE_KEYS = ALL_MODULES.map(m => m.key);
