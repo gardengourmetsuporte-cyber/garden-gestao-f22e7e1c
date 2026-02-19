@@ -8,6 +8,7 @@ import { useRewards } from '@/hooks/useRewards';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank, getNextRank } from '@/lib/ranks';
 import { Progress } from '@/components/ui/progress';
+import { PointsHistoryWidget } from './PointsHistoryWidget';
 import { cn } from '@/lib/utils';
 
 export function EmployeeDashboard() {
@@ -98,8 +99,13 @@ export function EmployeeDashboard() {
         ))}
       </div>
 
-      {/* Leaderboard */}
+      {/* Points History */}
       <div className="animate-slide-up stagger-7">
+        <PointsHistoryWidget />
+      </div>
+
+      {/* Leaderboard */}
+      <div className="animate-slide-up stagger-8">
         <Leaderboard 
           entries={leaderboard}
           currentUserId={user?.id}
