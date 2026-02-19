@@ -1,15 +1,20 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
+import { FrameSelector } from '@/components/profile/FrameSelector';
 import { useProfile } from '@/hooks/useProfile';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { formatPoints } from '@/lib/points';
 import { PageLoader } from '@/components/PageLoader';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export default function Profile() {
   const { userId } = useParams();
@@ -17,9 +22,27 @@ export default function Profile() {
   const { activeUnitId } = useUnit();
   const navigate = useNavigate();
   const { leaderboard } = useLeaderboard();
+  const queryClient = useQueryClient();
+  const [frameOpen, setFrameOpen] = useState(false);
 
   const resolvedUserId = userId === 'me' ? user?.id : userId;
+  const isOwnProfile = resolvedUserId === user?.id;
   const { profile, isLoading } = useProfile(resolvedUserId, leaderboard, activeUnitId);
+
+  const handleSelectFrame = async (frame: string | null) => {
+    if (!resolvedUserId) return;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ selected_frame: frame } as any)
+      .eq('user_id', resolvedUserId);
+
+    if (error) {
+      toast.error('Erro ao salvar moldura');
+      return;
+    }
+    toast.success('Moldura atualizada!');
+    queryClient.invalidateQueries({ queryKey: ['profile', resolvedUserId] });
+  };
 
   if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
   if (!profile) return <AppLayout><div className="p-6 text-center text-muted-foreground">Perfil não encontrado</div></AppLayout>;
@@ -41,7 +64,20 @@ export default function Profile() {
           avatarUrl={profile.avatarUrl}
           jobTitle={profile.jobTitle}
           earnedPoints={profile.earned}
+          selectedFrame={profile.selectedFrame}
+          userId={profile.userId}
         />
+
+        {/* Frame selector button - only on own profile */}
+        {isOwnProfile && (
+          <button
+            onClick={() => setFrameOpen(true)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-all active:scale-[0.98]"
+          >
+            <AppIcon name="Sparkles" size={16} className="text-primary" />
+            <span className="text-sm font-medium text-muted-foreground">Trocar Moldura</span>
+          </button>
+        )}
 
         {/* Score do Mês - Card em destaque */}
         <div className="card-command p-4 space-y-3" style={{ borderColor: 'hsl(var(--warning) / 0.3)' }}>
@@ -152,6 +188,20 @@ export default function Profile() {
         {/* Medals */}
         <MedalList medals={profile.medals} />
       </div>
+
+      {/* Frame Selector Sheet */}
+      {isOwnProfile && (
+        <FrameSelector
+          open={frameOpen}
+          onOpenChange={setFrameOpen}
+          earnedPoints={profile.earned}
+          selectedFrame={profile.selectedFrame}
+          onSelectFrame={handleSelectFrame}
+          avatarUrl={profile.avatarUrl}
+          fullName={profile.fullName}
+          userId={profile.userId}
+        />
+      )}
     </AppLayout>
   );
 }

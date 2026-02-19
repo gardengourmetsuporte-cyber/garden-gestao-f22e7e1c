@@ -67,6 +67,8 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
                 avatarUrl={entry.avatar_url}
                 earnedPoints={entry.earned_all_time ?? entry.total_score}
                 size={avatarSize}
+                userName={entry.full_name}
+                userId={entry.user_id}
               />
               {/* Position badge */}
               <div
