@@ -177,45 +177,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </button>
 
             <div className="flex items-center gap-1">
-              {/* Unit Selector Icon */}
-              {units.length > 0 && (
-                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
-                  <PopoverTrigger asChild>
-                     <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
-                      <AppIcon name="Building2" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
-                      <span
-                        className="absolute top-1 right-1 w-3 h-3 rounded-full"
-                        style={{
-                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'transparent',
-                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : 'none',
-                          border: activeUnit ? '1.5px solid hsl(var(--card))' : 'none',
-                          opacity: activeUnit ? 1 : 0,
-                        }}
-                      />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
-                    <div className="px-3 py-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
-                    </div>
-                    {units.map(unit => (
-                      <button
-                        key={unit.id}
-                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                        className={cn(
-                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
-                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                        )}
-                      >
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
-                        <span className="truncate font-medium">{unit.name}</span>
-                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
-                      </button>
-                    ))}
-                  </PopoverContent>
-                </Popover>
-              )}
-
               <button
                 onClick={() => navigate('/ranking')}
                 className="relative p-2 rounded-lg hover:bg-secondary transition-all"
@@ -325,6 +286,47 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 120px)',
             }}
           >
+            {/* ===== Unit Selector (top-left corner) ===== */}
+            {units.length > 1 && (
+              <div className="absolute left-4 launcher-item" style={{ top: 'calc(env(safe-area-inset-top) + 20px)', animationDelay: '0ms' }}>
+                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="relative p-2 rounded-xl hover:bg-white/10 transition-all">
+                      <AppIcon name="Building2" size={24} className="text-white/80" style={{ filter: 'drop-shadow(0 0 6px hsl(215 20% 50% / 0.4))' }} />
+                      <span
+                        className="absolute top-1 right-1 w-3 h-3 rounded-full"
+                        style={{
+                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'transparent',
+                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}80` : 'none',
+                          border: activeUnit ? '1.5px solid hsl(var(--card))' : 'none',
+                          opacity: activeUnit ? 1 : 0,
+                        }}
+                      />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
+                    <div className="px-3 py-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
+                    </div>
+                    {units.map(unit => (
+                      <button
+                        key={unit.id}
+                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                        className={cn(
+                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
+                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
+                        <span className="truncate font-medium">{unit.name}</span>
+                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+
             {/* ===== User Profile Card (top) ===== */}
             <div className="launcher-item mb-6" style={{ animationDelay: '0ms' }}>
               <button
