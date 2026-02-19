@@ -203,7 +203,7 @@ export default function ChecklistsPage() {
           </div>
         </header>
 
-        <div className="px-4 py-4 lg:px-6 space-y-5">
+        <div className="px-4 py-4 lg:px-6 space-y-6">
           <div className="animate-fade-in" key={currentTab}>
           {currentTab === 'checklist' ? (
             <>
