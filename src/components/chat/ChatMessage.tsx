@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { ChatMessage as ChatMessageType } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DefaultAvatar } from '@/components/profile/DefaultAvatar';
 import { Pin } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -10,63 +11,75 @@ interface ChatMessageProps {
   message: ChatMessageType;
   onTogglePin?: (messageId: string, isPinned: boolean) => void;
   showAvatar?: boolean;
+  showName?: boolean;
 }
 
-export function ChatMessageComponent({ message, onTogglePin, showAvatar = true }: ChatMessageProps) {
+export const ChatMessageComponent = memo(function ChatMessageComponent({ message, onTogglePin, showAvatar = true, showName = true }: ChatMessageProps) {
   const { user, isAdmin } = useAuth();
   const isMine = message.sender_id === user?.id;
-  const initials = (message.sender_profile?.full_name || 'U')
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const senderName = message.sender_profile?.full_name || 'Usuário';
+  const avatarUrl = message.sender_profile?.avatar_url;
 
   return (
     <div className={cn('flex gap-2 px-4 py-0.5 group', isMine ? 'flex-row-reverse' : 'flex-row')}>
-      {showAvatar ? (
-        <Avatar className="w-7 h-7 shrink-0 mt-1">
-          <AvatarImage src={message.sender_profile?.avatar_url || undefined} />
-          <AvatarFallback className="text-[9px] bg-muted text-muted-foreground font-semibold">{initials}</AvatarFallback>
-        </Avatar>
-      ) : (
-        <div className="w-7 shrink-0" />
-      )}
+      {/* Avatar */}
+      {!isMine && showAvatar ? (
+        <div className="w-8 h-8 shrink-0 mt-1 rounded-full overflow-hidden border border-border/20">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <DefaultAvatar name={senderName} size={32} userId={message.sender_id} />
+          )}
+        </div>
+      ) : !isMine ? (
+        <div className="w-8 shrink-0" />
+      ) : null}
 
-      <div className={cn('max-w-[75%] flex flex-col', isMine ? 'items-end' : 'items-start')}>
-        {showAvatar && !isMine && (
-          <span className="text-[11px] text-muted-foreground/50 mb-0.5 px-1 font-medium">
-            {message.sender_profile?.full_name}
+      <div className={cn('max-w-[78%] flex flex-col', isMine ? 'items-end' : 'items-start')}>
+        {/* Sender name */}
+        {showAvatar && showName && !isMine && (
+          <span className="text-[11px] text-muted-foreground/60 mb-0.5 px-2 font-semibold tracking-wide">
+            {senderName}
           </span>
         )}
+
+        {/* Message bubble */}
         <div
           className={cn(
-            'relative rounded-2xl px-3.5 py-2 text-[14px] leading-relaxed break-words',
-            isMine ? 'rounded-tr-sm' : 'rounded-tl-sm',
+            'relative px-3.5 py-2.5 text-[14px] leading-[1.45] break-words',
+            isMine
+              ? 'rounded-[20px] rounded-br-[6px]'
+              : 'rounded-[20px] rounded-bl-[6px]',
             message.is_pinned && 'ring-1 ring-amber-500/30'
           )}
           style={
             isMine
               ? {
-                  background: 'hsl(var(--primary))',
+                  background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.85))',
                   color: 'hsl(var(--primary-foreground))',
+                  boxShadow: '0 1px 3px hsl(var(--primary) / 0.15)',
                 }
               : {
-                  background: 'hsl(var(--muted) / 0.6)',
+                  background: 'hsl(var(--muted) / 0.5)',
                   color: 'hsl(var(--foreground))',
+                  boxShadow: '0 1px 2px hsl(var(--foreground) / 0.04)',
                 }
           }
         >
           {message.is_pinned && (
             <Pin className="absolute -top-1.5 -right-1.5 w-3 h-3 text-amber-400 fill-amber-400" />
           )}
-          {message.content}
+          <span className="whitespace-pre-wrap">{message.content}</span>
+          <span className={cn(
+            'inline-block ml-2 text-[10px] align-bottom opacity-60 float-right mt-1',
+            isMine ? 'text-primary-foreground/70' : 'text-muted-foreground/50'
+          )}>
+            {format(new Date(message.created_at), 'HH:mm', { locale: ptBR })}
+          </span>
         </div>
-        <span className="text-[10px] text-muted-foreground/40 mt-0.5 px-1">
-          {format(new Date(message.created_at), 'HH:mm', { locale: ptBR })}
-        </span>
       </div>
 
+      {/* Pin action */}
       {isAdmin && onTogglePin && (
         <button
           onClick={() => onTogglePin(message.id, message.is_pinned)}
@@ -78,4 +91,4 @@ export function ChatMessageComponent({ message, onTogglePin, showAvatar = true }
       )}
     </div>
   );
-}
+});

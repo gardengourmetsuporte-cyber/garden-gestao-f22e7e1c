@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { useChat, ChatConversation } from '@/hooks/useChat';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DefaultAvatar } from '@/components/profile/DefaultAvatar';
 import { cn } from '@/lib/utils';
 import { format, isToday, isYesterday } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -30,8 +30,8 @@ function formatTime(dateStr: string) {
 
 function ConversationSkeleton() {
   return (
-    <div className="flex items-center gap-3 px-3 py-3">
-      <Skeleton className="w-14 h-14 rounded-full shrink-0" />
+    <div className="flex items-center gap-3 px-4 py-3">
+      <Skeleton className="w-13 h-13 rounded-full shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="flex justify-between">
           <Skeleton className="h-3.5 w-28" />
@@ -39,6 +39,53 @@ function ConversationSkeleton() {
         </div>
         <Skeleton className="h-3 w-40" />
       </div>
+    </div>
+  );
+}
+
+function ContactAvatar({ contact, size = 52 }: { contact: Contact; size?: number }) {
+  return (
+    <div className="rounded-full overflow-hidden border border-border/20" style={{ width: size, height: size }}>
+      {contact.avatar_url ? (
+        <img src={contact.avatar_url} alt="" className="w-full h-full object-cover" />
+      ) : (
+        <DefaultAvatar name={contact.full_name} size={size} userId={contact.user_id} />
+      )}
+    </div>
+  );
+}
+
+function ConvAvatar({ conv, currentUserId, size = 52 }: { conv: ChatConversation; currentUserId?: string; size?: number }) {
+  if (conv.type === 'direct') {
+    const other = conv.participants?.find(p => p.user_id !== currentUserId);
+    const displayName = other?.profile?.full_name || 'Usuário';
+    return (
+      <div className="rounded-full overflow-hidden border border-border/20" style={{ width: size, height: size }}>
+        {other?.profile?.avatar_url ? (
+          <img src={other.profile.avatar_url} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <DefaultAvatar name={displayName} size={size} userId={other?.user_id} />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="rounded-full flex items-center justify-center"
+      style={{
+        width: size,
+        height: size,
+        background: conv.type === 'announcement'
+          ? 'linear-gradient(135deg, hsl(45 90% 55%), hsl(35 90% 45%))'
+          : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))',
+      }}
+    >
+      <AppIcon
+        name={conv.type === 'announcement' ? 'Megaphone' : 'Users'}
+        size={size * 0.38}
+        className="text-white"
+      />
     </div>
   );
 }
@@ -79,13 +126,13 @@ export default function Chat() {
     })();
   }, [activeUnitId, user]);
 
-  const contactsWithoutDM = contacts.filter(c =>
+  const contactsWithoutDM = useMemo(() => contacts.filter(c =>
     !chat.conversations.some(conv =>
       conv.type === 'direct' && conv.participants?.some(p => p.user_id === c.user_id)
     )
-  );
+  ), [contacts, chat.conversations]);
 
-  const filteredConversations = chat.conversations.filter(c => {
+  const filteredConversations = useMemo(() => chat.conversations.filter(c => {
     if (!search) return true;
     const q = search.toLowerCase();
     if (c.name?.toLowerCase().includes(q)) return true;
@@ -94,11 +141,11 @@ export default function Chat() {
       if (other?.profile?.full_name?.toLowerCase().includes(q)) return true;
     }
     return false;
-  });
+  }), [chat.conversations, search, user?.id]);
 
-  const filteredNewContacts = contactsWithoutDM.filter(c =>
+  const filteredNewContacts = useMemo(() => contactsWithoutDM.filter(c =>
     !search || c.full_name.toLowerCase().includes(search.toLowerCase())
-  );
+  ), [contactsWithoutDM, search]);
 
   const handleSelectConversation = (id: string) => {
     chat.setActiveConversationId(id);
@@ -143,17 +190,17 @@ export default function Chat() {
 
   const renderConversationList = () => (
     <div className="flex flex-col h-full bg-background">
-      {/* Instagram-style header */}
+      {/* Header */}
       <div className="shrink-0 px-5 pt-4 pb-1">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold tracking-tight">Mensagens</h1>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">Mensagens</h1>
           {isAdmin && (
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-1">
               <Button size="icon" variant="ghost" onClick={() => openGroupSheet('group')} className="w-9 h-9 rounded-full" title="Novo grupo">
-                <AppIcon name="Users" size={20} />
+                <AppIcon name="Users" size={18} />
               </Button>
               <Button size="icon" variant="ghost" onClick={() => openGroupSheet('announcement')} className="w-9 h-9 rounded-full" title="Novo canal">
-                <AppIcon name="Megaphone" size={20} />
+                <AppIcon name="Megaphone" size={18} />
               </Button>
             </div>
           )}
@@ -161,40 +208,36 @@ export default function Chat() {
 
         {/* Search */}
         <div className="relative mb-3">
-          <AppIcon name="Search" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+          <AppIcon name="Search" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Pesquisar"
-            className="pl-10 h-9 rounded-xl bg-muted/50 border-0 text-sm placeholder:text-muted-foreground/40 focus-visible:ring-1 focus-visible:ring-primary/30"
+            className="pl-10 h-10 rounded-2xl bg-muted/40 border-0 text-sm placeholder:text-muted-foreground/30 focus-visible:ring-1 focus-visible:ring-primary/20"
           />
         </div>
       </div>
 
-      {/* Stories-style online contacts bar */}
+      {/* Stories-style contacts */}
       {contacts.length > 0 && !search && (
         <div className="shrink-0 px-2 pb-3 relative">
           <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide px-2 py-1">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide px-3 py-1">
             {contacts.slice(0, 12).map(contact => {
-              const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
               const firstName = contact.full_name.split(' ')[0];
               return (
                 <button
                   key={contact.user_id}
                   onClick={() => handleStartDM(contact.user_id)}
-                  className="flex flex-col items-center gap-1 min-w-[60px] active:scale-95 transition-transform"
+                  className="flex flex-col items-center gap-1.5 min-w-[64px] active:scale-95 transition-transform"
                 >
-                  <div className="relative">
-                    <div className="w-[56px] h-[56px] rounded-full p-[2px] bg-gradient-to-br from-primary via-primary/60 to-accent">
-                      <Avatar className="w-full h-full border-2 border-background">
-                        <AvatarImage src={contact.avatar_url || undefined} />
-                        <AvatarFallback className="text-xs bg-muted font-semibold">{initials}</AvatarFallback>
-                      </Avatar>
+                  <div className="p-[2.5px] rounded-full bg-gradient-to-br from-primary via-primary/50 to-accent">
+                    <div className="rounded-full bg-background p-[2px]">
+                      <ContactAvatar contact={contact} size={50} />
                     </div>
                   </div>
-                  <span className="text-[11px] text-muted-foreground truncate w-[60px] text-center">{firstName}</span>
+                  <span className="text-[11px] text-muted-foreground/70 truncate w-[64px] text-center font-medium">{firstName}</span>
                 </button>
               );
             })}
@@ -205,7 +248,7 @@ export default function Chat() {
       {/* Conversation list */}
       <div className="flex-1 overflow-y-auto">
         {chat.isLoadingConversations ? (
-          <div className="px-2">
+          <div>
             {Array.from({ length: 6 }).map((_, i) => <ConversationSkeleton key={i} />)}
           </div>
         ) : (
@@ -217,8 +260,6 @@ export default function Chat() {
               const displayName = conv.type === 'direct'
                 ? otherParticipant?.profile?.full_name || 'Conversa'
                 : conv.name || 'Grupo';
-              const avatarUrl = conv.type === 'direct' ? otherParticipant?.profile?.avatar_url : null;
-              const initials = displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
               const lastMsg = conv.last_message;
               const lastMsgTime = lastMsg?.created_at || conv.updated_at;
               const hasUnread = (conv.unread_count || 0) > 0;
@@ -229,97 +270,87 @@ export default function Chat() {
                   key={conv.id}
                   onClick={() => handleSelectConversation(conv.id)}
                   className={cn(
-                    'w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors active:bg-muted/60',
-                    isActive ? 'bg-muted/40' : 'hover:bg-muted/20'
+                    'w-full flex items-center gap-3 px-4 py-3 text-left transition-all active:bg-muted/50',
+                    isActive ? 'bg-primary/5' : 'hover:bg-muted/20'
                   )}
                 >
                   <div className="relative shrink-0">
-                    {conv.type === 'direct' ? (
-                      <Avatar className="w-14 h-14">
-                        <AvatarImage src={avatarUrl || undefined} />
-                        <AvatarFallback className="text-sm bg-muted font-semibold">{initials}</AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <div
-                        className="w-14 h-14 rounded-full flex items-center justify-center"
-                        style={{
-                          background: conv.type === 'announcement'
-                            ? 'hsl(45 100% 50% / 0.1)'
-                            : 'hsl(var(--primary) / 0.1)',
-                        }}
-                      >
-                        <AppIcon
-                          name={conv.type === 'announcement' ? 'Megaphone' : 'Users'}
-                          size={22}
-                          className={conv.type === 'announcement' ? 'text-amber-400' : 'text-primary'}
-                        />
-                      </div>
-                    )}
+                    <ConvAvatar conv={conv} currentUserId={user?.id} size={52} />
                     {hasUnread && (
-                      <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
-                        {conv.unread_count! > 9 ? '9+' : conv.unread_count}
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1 shadow-sm shadow-primary/20">
+                        {conv.unread_count! > 99 ? '99+' : conv.unread_count}
                       </span>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className={cn('text-[15px] truncate', hasUnread ? 'font-semibold text-foreground' : 'font-medium text-foreground/90')}>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className={cn(
+                        'text-[15px] truncate',
+                        hasUnread ? 'font-bold text-foreground' : 'font-medium text-foreground/85'
+                      )}>
                         {displayName}
                       </span>
-                      <span className={cn('text-xs shrink-0 ml-2', hasUnread ? 'text-primary font-medium' : 'text-muted-foreground/50')}>
+                      <span className={cn(
+                        'text-[11px] shrink-0 ml-2',
+                        hasUnread ? 'text-primary font-semibold' : 'text-muted-foreground/40'
+                      )}>
                         {formatTime(lastMsgTime)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 mt-0.5">
+                    <div className="flex items-center gap-1.5">
+                      {conv.type !== 'direct' && (
+                        <AppIcon
+                          name={conv.type === 'announcement' ? 'Megaphone' : 'Users'}
+                          size={12}
+                          className="text-muted-foreground/30 shrink-0"
+                        />
+                      )}
                       {lastMsg ? (
-                        <p className={cn('text-[13px] truncate', hasUnread ? 'text-foreground/70 font-medium' : 'text-muted-foreground/50')}>
+                        <p className={cn(
+                          'text-[13px] truncate',
+                          hasUnread ? 'text-foreground/60 font-medium' : 'text-muted-foreground/40'
+                        )}>
                           {lastMsg.content}
                         </p>
                       ) : (
-                        <p className="text-[13px] text-muted-foreground/40 italic">Sem mensagens</p>
+                        <p className="text-[13px] text-muted-foreground/30 italic">Sem mensagens</p>
                       )}
                     </div>
                   </div>
-
-                  {hasUnread && (
-                    <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                  )}
                 </button>
               );
             })}
 
-            {/* New contacts section */}
+            {/* New contacts when searching */}
             {filteredNewContacts.length > 0 && search && (
               <div className="px-4 pt-4">
-                <p className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">Iniciar conversa</p>
-                {filteredNewContacts.map(contact => {
-                  const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-                  return (
-                    <button
-                      key={contact.user_id}
-                      onClick={() => handleStartDM(contact.user_id)}
-                      className="w-full flex items-center gap-3 px-1 py-2.5 transition-colors active:bg-muted/60 hover:bg-muted/20"
-                    >
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage src={contact.avatar_url || undefined} />
-                        <AvatarFallback className="text-sm bg-muted font-semibold">{initials}</AvatarFallback>
-                      </Avatar>
-                      <div className="text-left">
-                        <p className="text-[15px] font-medium text-foreground">{contact.full_name}</p>
-                        <p className="text-xs text-muted-foreground/40">Enviar mensagem</p>
-                      </div>
-                    </button>
-                  );
-                })}
+                <p className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest mb-2">Iniciar conversa</p>
+                {filteredNewContacts.map(contact => (
+                  <button
+                    key={contact.user_id}
+                    onClick={() => handleStartDM(contact.user_id)}
+                    className="w-full flex items-center gap-3 px-1 py-2.5 transition-colors active:bg-muted/50 hover:bg-muted/20 rounded-xl"
+                  >
+                    <ContactAvatar contact={contact} size={44} />
+                    <div className="text-left">
+                      <p className="text-[14px] font-medium text-foreground">{contact.full_name}</p>
+                      <p className="text-[11px] text-muted-foreground/35">Enviar mensagem</p>
+                    </div>
+                  </button>
+                ))}
               </div>
             )}
 
             {/* Empty */}
             {filteredConversations.length === 0 && filteredNewContacts.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/30">
-                <AppIcon name="MessageCircle" size={48} className="mb-3 opacity-40" />
-                <p className="text-sm font-medium">{search ? 'Nenhum resultado' : 'Nenhuma conversa'}</p>
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mb-4">
+                  <AppIcon name="MessageCircle" size={28} className="text-muted-foreground/20" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground/40">
+                  {search ? 'Nenhum resultado' : 'Nenhuma conversa'}
+                </p>
               </div>
             )}
           </>
@@ -399,7 +430,6 @@ export default function Chat() {
             )}
             <div className="flex-1 overflow-y-auto space-y-0.5">
               {filteredGroupContacts.map(contact => {
-                const initials = contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
                 const isSelected = selectedIds.includes(contact.user_id);
                 return (
                   <button
@@ -413,10 +443,7 @@ export default function Chat() {
                     )}
                   >
                     <Checkbox checked={isSelected} className="pointer-events-none" />
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={contact.avatar_url || undefined} />
-                      <AvatarFallback className="text-xs bg-muted">{initials}</AvatarFallback>
-                    </Avatar>
+                    <ContactAvatar contact={contact} size={40} />
                     <span className="text-sm font-medium text-foreground">{contact.full_name}</span>
                   </button>
                 );
