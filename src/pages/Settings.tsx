@@ -13,6 +13,7 @@ import { RecipeCostSettings } from '@/components/settings/RecipeCostSettings';
 import { UnitManagement } from '@/components/settings/UnitManagement';
 import { TimeAlertSettings } from '@/components/settings/TimeAlertSettings';
 import { AccessLevelSettings } from '@/components/settings/AccessLevelSettings';
+import { MedalSettings } from '@/components/settings/MedalSettings';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'green', section: 'Operação' },
   { value: 'costs', icon: 'Calculator', label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'red', section: 'Operação' },
   { value: 'rewards', icon: 'Gift', label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'amber', section: 'Sistema' },
+  { value: 'medals', icon: 'Award', label: 'Medalhas', description: 'Conceder medalhas de prestígio', variant: 'amber', section: 'Sistema' },
   { value: 'units', icon: 'Building2', label: 'Unidades', description: 'Gerenciar filiais e lojas', variant: 'purple', section: 'Sistema' },
   { value: 'alerts', icon: 'Bell', label: 'Alertas e Sinalização', description: 'Horários de notificação por módulo', variant: 'red', section: 'Sistema' },
 ];
@@ -55,6 +57,7 @@ export default function SettingsPage() {
     if (item.value === 'units') return isSuperAdmin;
     if (item.value === 'alerts') return isAdmin;
     if (item.value === 'access-levels') return isAdmin;
+    if (item.value === 'medals') return isAdmin;
     if (item.value === 'profile') return true;
     return isAdmin;
   });
@@ -99,6 +102,7 @@ export default function SettingsPage() {
               {activeSection === 'units' && <UnitManagement />}
               {activeSection === 'alerts' && <TimeAlertSettings />}
               {activeSection === 'access-levels' && <AccessLevelSettings />}
+              {activeSection === 'medals' && <MedalSettings />}
             </div>
           </div>
         </div>
