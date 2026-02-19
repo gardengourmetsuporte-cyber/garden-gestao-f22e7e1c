@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
+import { FinanceChartWidget } from './FinanceChartWidget';
 
 import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
@@ -21,7 +22,7 @@ import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, profile, isSuperAdmin } = useAuth();
   const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
@@ -99,6 +100,32 @@ export function AdminDashboard() {
 
         {/* PERSONAL EXPENSE CHART */}
         <PersonalFinanceChartWidget />
+
+        {/* === BUSINESS FINANCE (SUPER ADMIN ONLY) === */}
+        {isSuperAdmin && (
+          <>
+            <button
+              onClick={() => navigate('/finance')}
+              className="finance-hero-card col-span-2 text-left animate-slide-up stagger-3"
+            >
+              <div className="finance-hero-inner p-5 pb-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+                    Saldo da empresa
+                  </span>
+                  <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+                </div>
+                <p className={cn(
+                  "text-[2rem] font-extrabold tracking-tight leading-tight",
+                  stats.monthBalance >= 0 ? "text-white" : "text-red-300"
+                )}>
+                  {statsLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(stats.monthBalance)}
+                </p>
+              </div>
+            </button>
+            <FinanceChartWidget />
+          </>
+        )}
 
         {/* WEEKLY CASH SUMMARY - full width */}
         <div className="col-span-2 animate-slide-up stagger-3">
