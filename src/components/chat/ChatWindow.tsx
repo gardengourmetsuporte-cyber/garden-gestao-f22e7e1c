@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { ChatMessage, ChatConversation } from '@/hooks/useChat';
 import { ChatMessageComponent } from './ChatMessage';
-import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
 import { DefaultAvatar } from '@/components/profile/DefaultAvatar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -29,11 +27,13 @@ function getDateLabel(dateStr: string) {
 
 function MessagesSkeleton() {
   return (
-    <div className="flex-1 p-4 space-y-4">
+    <div className="flex-1 p-4 space-y-3">
       {[false, true, false, true, false].map((isMine, i) => (
-        <div key={i} className={cn('flex gap-2', isMine ? 'justify-end' : 'justify-start')}>
-          {!isMine && <Skeleton className="w-8 h-8 rounded-full shrink-0" />}
-          <Skeleton className={cn('h-12 rounded-2xl', isMine ? 'w-44' : 'w-56')} />
+        <div key={i} className={cn('flex', isMine ? 'justify-end' : 'justify-start')}>
+          <div className={cn(
+            'h-10 rounded-2xl bg-secondary/40 animate-pulse',
+            isMine ? 'w-44 rounded-tr-md' : 'w-56 rounded-tl-md'
+          )} />
         </div>
       ))}
     </div>
@@ -102,45 +102,47 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
 
   return (
     <div className="flex-1 flex flex-col h-full bg-background">
-      {/* Header */}
-      <div className="shrink-0 flex items-center gap-3 px-3 h-[60px] border-b border-border/10 bg-background/80 backdrop-blur-sm">
-        <button onClick={onBack} className="lg:hidden p-2 -ml-1 rounded-xl hover:bg-muted/50 transition-colors active:scale-95">
-          <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
-        </button>
-        
-        {/* Avatar */}
-        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-border/20">
-          {conversation.type === 'direct' && otherParticipant ? (
-            avatarUrl ? (
-              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+      {/* Header - copilot style */}
+      <div className="shrink-0 border-b border-border/30 bg-card">
+        <div className="flex items-center gap-3 h-14 px-4">
+          <button onClick={onBack} className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors active:scale-95">
+            <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
+          </button>
+
+          {/* Avatar */}
+          <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-border/20">
+            {conversation.type === 'direct' && otherParticipant ? (
+              avatarUrl ? (
+                <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <DefaultAvatar name={displayName} size={36} userId={otherParticipant.user_id} />
+              )
             ) : (
-              <DefaultAvatar name={displayName} size={40} userId={otherParticipant.user_id} />
-            )
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{
-                background: conversation.type === 'announcement'
-                  ? 'linear-gradient(135deg, hsl(45 90% 55%), hsl(35 90% 45%))'
-                  : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))',
-              }}
-            >
-              <AppIcon
-                name={conversation.type === 'announcement' ? 'Megaphone' : 'Users'}
-                size={18}
-                className="text-white"
-              />
-            </div>
-          )}
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-foreground truncate">{displayName}</p>
-          <p className="text-[11px] text-muted-foreground/50">
-            {conversation.type === 'announcement' ? 'Canal de comunicados' :
-             conversation.type === 'group' ? `${conversation.participants?.length || 0} membros` :
-             'Online'}
-          </p>
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{
+                  background: conversation.type === 'announcement'
+                    ? 'linear-gradient(135deg, hsl(45 90% 55%), hsl(35 90% 45%))'
+                    : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))',
+                }}
+              >
+                <AppIcon
+                  name={conversation.type === 'announcement' ? 'Megaphone' : 'Users'}
+                  size={16}
+                  className="text-white"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-sm text-foreground truncate leading-none">{displayName}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {conversation.type === 'announcement' ? 'Canal de comunicados' :
+               conversation.type === 'group' ? `${conversation.participants?.length || 0} membros` :
+               'Online'}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -152,13 +154,10 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
         </div>
       )}
 
-      {/* Messages */}
+      {/* Messages - copilot style */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto py-3"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.02), transparent 70%)',
-        }}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
       >
         {isLoading ? (
           <MessagesSkeleton />
@@ -204,11 +203,14 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
         )}
       </div>
 
-      {/* Input */}
+      {/* Input - copilot style */}
       {canSend ? (
-        <div className="shrink-0 px-3 py-2.5 border-t border-border/10 bg-background/80 backdrop-blur-sm">
+        <div
+          className="shrink-0 border-t border-border/30 bg-card px-4 py-3"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
+        >
           <div className="flex items-end gap-2">
-            <div className="flex-1 flex items-end rounded-2xl px-4 py-2 bg-muted/40 border border-border/10 focus-within:border-primary/20 transition-colors">
+            <div className="flex-1 flex items-end rounded-full px-4 py-2 bg-secondary/50 border border-border/30 focus-within:border-primary/30 transition-colors">
               <textarea
                 ref={inputRef}
                 value={input}
@@ -224,18 +226,18 @@ export const ChatWindow = memo(function ChatWindow({ conversation, messages, isL
               onClick={handleSend}
               disabled={!input.trim() || isSending}
               className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all active:scale-90',
+                'w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all active:scale-90',
                 input.trim()
                   ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
                   : 'bg-muted/50 text-muted-foreground/30'
               )}
             >
-              <AppIcon name="Send" size={18} />
+              <AppIcon name="Send" size={16} />
             </button>
           </div>
         </div>
       ) : (
-        <div className="shrink-0 px-4 py-3 text-center border-t border-border/10 bg-muted/20">
+        <div className="shrink-0 px-4 py-3 text-center border-t border-border/30 bg-muted/20">
           <p className="text-xs text-muted-foreground/40">Apenas administradores podem enviar comunicados</p>
         </div>
       )}
