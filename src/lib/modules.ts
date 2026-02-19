@@ -25,6 +25,8 @@ export const ALL_MODULES: ModuleDef[] = [
   { key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing'], group: 'Em Produção' },
   { key: 'menu-admin', label: 'Cardápio', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio'], group: 'Em Produção' },
   { key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Em Produção' },
+  { key: 'ranking', label: 'Ranking', icon: 'Trophy', route: '/ranking', routes: ['/ranking'], group: 'Pessoas' },
+  { key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Principal' },
   { key: 'personal-finance', label: 'Finanças Pessoais', icon: 'Wallet', route: '/personal-finance', routes: ['/personal-finance'], group: 'Pessoal' },
   { key: 'settings', label: 'Configurações', icon: 'Settings', route: '/settings', routes: ['/settings'], group: 'Sistema' },
 ];
