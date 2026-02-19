@@ -14,6 +14,7 @@ import { UnitManagement } from '@/components/settings/UnitManagement';
 import { TimeAlertSettings } from '@/components/settings/TimeAlertSettings';
 import { AccessLevelSettings } from '@/components/settings/AccessLevelSettings';
 import { MedalSettings } from '@/components/settings/MedalSettings';
+import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +29,7 @@ interface MenuItem {
 
 const allMenuItems: MenuItem[] = [
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
+  { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta' },
   { value: 'users', icon: 'Users', label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
   { value: 'access-levels', icon: 'Shield', label: 'Níveis de Acesso', description: 'Controlar permissões por módulo', variant: 'cyan', section: 'Conta' },
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
@@ -58,7 +60,7 @@ export default function SettingsPage() {
     if (item.value === 'alerts') return isAdmin;
     if (item.value === 'access-levels') return isAdmin;
     if (item.value === 'medals') return isAdmin;
-    if (item.value === 'profile') return true;
+    if (item.value === 'profile' || item.value === 'notifications') return true;
     return isAdmin;
   });
 
@@ -103,6 +105,7 @@ export default function SettingsPage() {
               {activeSection === 'alerts' && <TimeAlertSettings />}
               {activeSection === 'access-levels' && <AccessLevelSettings />}
               {activeSection === 'medals' && <MedalSettings />}
+              {activeSection === 'notifications' && <NotificationSettings />}
             </div>
           </div>
         </div>

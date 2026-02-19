@@ -235,6 +235,31 @@ Deno.serve(async (req) => {
         console.error('[send-push] Missing user_id or title');
         return new Response(JSON.stringify({ error: 'user_id and title required' }), { status: 400, headers: corsHeaders });
       }
+
+      // Determine notification category from tag
+      let category = 'sistema';
+      if (tag?.startsWith('chat-')) category = 'chat';
+      else if (tag === 'zero-stock' || tag === 'low-stock') category = 'estoque';
+      else if (tag === 'bills-due' || tag === 'bills-overdue' || tag === 'neg-balance') category = 'financeiro';
+      else if (tag === 'checklist-pending') category = 'checklist';
+      else if (tag === 'cash-closing') category = 'caixa';
+      else if (tag === 'inv-due') category = 'estoque';
+
+      // Check if user has this category disabled
+      const { data: pref } = await supabaseAdmin
+        .from('notification_preferences')
+        .select('enabled')
+        .eq('user_id', user_id)
+        .eq('category', category)
+        .maybeSingle();
+
+      if (pref && pref.enabled === false) {
+        console.log('[send-push] User', user_id, 'has category', category, 'disabled. Skipping.');
+        return new Response(JSON.stringify({ sent: 0, failed: 0, skipped: true, reason: 'category_disabled' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const config = await getConfig();
       console.log('[send-push] VAPID config loaded, public key:', config.vapid_public_key?.substring(0, 20) + '...');
       const { data: subs, error: subsError } = await supabaseAdmin.from('push_subscriptions').select('*').eq('user_id', user_id);
