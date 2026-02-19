@@ -287,8 +287,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             }}
           >
             {/* ===== Unit Selector (top-left corner) ===== */}
-            {units.length > 1 && (
-              <div className="absolute left-4 launcher-item" style={{ top: 'calc(env(safe-area-inset-top) + 20px)', animationDelay: '0ms' }}>
+            {units.length > 0 && (
+              <div className="absolute left-4 launcher-item" style={{ top: 'calc(env(safe-area-inset-top) + 20px)', animationDelay: '0ms', zIndex: 10000 }}>
                 <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
                   <PopoverTrigger asChild>
                     <button className="relative p-2 rounded-xl hover:bg-white/10 transition-all">
@@ -304,7 +304,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent align="start" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
+                  <PopoverContent align="start" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card shadow-xl" sideOffset={8} style={{ zIndex: 10001 }}>
                     <div className="px-3 py-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
                     </div>
