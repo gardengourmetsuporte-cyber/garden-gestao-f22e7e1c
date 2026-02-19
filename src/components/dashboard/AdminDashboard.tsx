@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { FinanceChartWidget } from './FinanceChartWidget';
+import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
 
 import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
@@ -137,8 +138,9 @@ export function AdminDashboard() {
           </div>
         </button>
 
-        {/* FINANCE CHART + WEEKLY SUMMARY */}
+        {/* FINANCE CHART (business) + PERSONAL CHART */}
         <FinanceChartWidget />
+        <PersonalFinanceChartWidget />
 
         {/* WEEKLY CASH SUMMARY - full width */}
         <div className="col-span-2 animate-slide-up stagger-3">
