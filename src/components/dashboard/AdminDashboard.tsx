@@ -5,13 +5,11 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePoints } from '@/hooks/usePoints';
 import { cn } from '@/lib/utils';
-import { useCountUpCurrency } from '@/hooks/useCountUp';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Leaderboard } from '@/components/dashboard/Leaderboard';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
-import { FinanceChartWidget } from './FinanceChartWidget';
 import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
 
 import { AutoOrderWidget } from './AutoOrderWidget';
@@ -29,7 +27,6 @@ export function AdminDashboard() {
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
   const { closings } = useCashClosing();
   const { totalBalance: personalBalance, monthExpenses: personalExpenses, pendingExpenses: personalPending, isLoading: personalLoading } = usePersonalFinanceStats();
-  const animatedBalance = useCountUpCurrency(stats.monthBalance);
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -65,52 +62,14 @@ export function AdminDashboard() {
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
 
-        {/* === FINANCIAL BLOCK - grouped together === */}
-
-        {/* FINANCE WIDGET - large (full width) */}
-        <button
-          onClick={() => navigate('/finance')}
-          className="finance-hero-card col-span-2 text-left animate-slide-up stagger-2"
-        >
-          <div className="finance-hero-inner p-5 pb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
-                Saldo do mês
-              </span>
-              <AppIcon name="ChevronRight" size={18} className="text-white/50" />
-            </div>
-            <p className={cn(
-              "text-[2rem] font-extrabold tracking-tight leading-tight",
-              stats.monthBalance >= 0 ? "text-white" : "text-red-300"
-            )}>
-              {statsLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(animatedBalance)}
-            </p>
-            <div className="flex gap-2 mt-3">
-              <div className="finance-hero-chip finance-hero-chip--success">
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
-                <span className={cn(
-                  "text-sm font-bold",
-                  stats.pendingExpenses > 0 ? "text-red-300" : "text-emerald-300"
-                )}>
-                  {statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}
-                </span>
-              </div>
-              {stats.pendingClosings > 0 && (
-                <div className="finance-hero-chip finance-hero-chip--neutral">
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Fechamentos</span>
-                  <span className="text-sm font-bold text-amber-300">{stats.pendingClosings}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </button>
+        {/* === PERSONAL FINANCIAL BLOCK === */}
 
         {/* PERSONAL FINANCE CARD */}
         <button
           onClick={() => navigate('/personal-finance')}
           className="finance-hero-card finance-hero-card--personal col-span-2 text-left animate-slide-up stagger-2"
         >
-          <div className="finance-hero-inner p-4">
+          <div className="finance-hero-inner p-5 pb-4">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
                 Meu saldo pessoal
@@ -118,14 +77,14 @@ export function AdminDashboard() {
               <AppIcon name="ChevronRight" size={18} className="text-white/50" />
             </div>
             <p className={cn(
-              "text-2xl font-extrabold tracking-tight leading-tight",
+              "text-[2rem] font-extrabold tracking-tight leading-tight",
               personalBalance >= 0 ? "text-white" : "text-red-300"
             )}>
-              {personalLoading ? <Skeleton className="h-7 w-32 bg-white/10" /> : formatCurrency(personalBalance)}
+              {personalLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(personalBalance)}
             </p>
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-3">
               <div className="finance-hero-chip finance-hero-chip--success">
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas do mês</span>
                 <span className="text-sm font-bold text-white">{personalLoading ? '...' : formatCurrency(personalExpenses)}</span>
               </div>
               {personalPending > 0 && (
@@ -138,8 +97,7 @@ export function AdminDashboard() {
           </div>
         </button>
 
-        {/* FINANCE CHART (business) + PERSONAL CHART */}
-        <FinanceChartWidget />
+        {/* PERSONAL EXPENSE CHART */}
         <PersonalFinanceChartWidget />
 
         {/* WEEKLY CASH SUMMARY - full width */}
