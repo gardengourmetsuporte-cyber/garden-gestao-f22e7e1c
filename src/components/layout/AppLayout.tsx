@@ -105,7 +105,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { user, profile, isAdmin, signOut } = useAuth();
+  const { user, profile, isAdmin, isSuperAdmin, signOut } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
@@ -298,8 +298,51 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               paddingBottom: 'calc(env(safe-area-inset-bottom) + 120px)',
             }}
           >
+            {/* ===== Super Admin Unit Switcher (top-left) ===== */}
+            {isSuperAdmin && units.length > 1 && (
+              <div className="launcher-item mb-2" style={{ animationDelay: '0ms' }}>
+                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-card/60 border border-border/20 active:bg-secondary/40 transition-all">
+                      <AppIcon name="Building2" size={16} style={{ color: 'hsl(220 20% 75%)' }} />
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{
+                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--muted))',
+                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}60` : 'none',
+                        }}
+                      />
+                      <span className="text-sm font-medium truncate max-w-[120px]" style={{ color: 'hsl(220 20% 75%)' }}>
+                        {activeUnit?.name || 'Unidade'}
+                      </span>
+                      <AppIcon name="ChevronDown" size={14} style={{ color: 'hsl(220 20% 55%)' }} />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
+                    <div className="px-3 py-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
+                    </div>
+                    {units.map(unit => (
+                      <button
+                        key={unit.id}
+                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
+                        className={cn(
+                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
+                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
+                        <span className="truncate font-medium">{unit.name}</span>
+                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+
             {/* ===== User Profile Card (top) ===== */}
-            <div className="launcher-item mb-6" style={{ animationDelay: '0ms' }}>
+            <div className="launcher-item mb-6" style={{ animationDelay: '30ms' }}>
               <button
                 onClick={() => { navigate('/profile/me'); setLauncherOpen(false); }}
                 className="flex flex-col items-center gap-3 w-full py-4 active:scale-95 transition-transform"
@@ -327,47 +370,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
 
-            {/* ===== Quick Settings (Theme + Unit) ===== */}
-            <div className="launcher-item flex items-center justify-center gap-3 mb-6" style={{ animationDelay: '30ms' }}>
+            {/* ===== Quick Settings (Theme only) ===== */}
+            <div className="launcher-item flex items-center justify-center gap-3 mb-6" style={{ animationDelay: '60ms' }}>
               <ThemeToggle className="p-2" />
-              {units.length > 1 && (
-                <Popover open={unitDropdownOpen} onOpenChange={setUnitDropdownOpen}>
-                  <PopoverTrigger asChild>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-card/60 border border-border/20 active:bg-secondary/40 transition-all">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{
-                          background: activeUnit ? getThemeColor(activeUnit.slug) : 'hsl(var(--muted))',
-                          boxShadow: activeUnit ? `0 0 6px ${getThemeColor(activeUnit.slug)}60` : 'none',
-                        }}
-                      />
-                      <span className="text-sm font-medium truncate max-w-[120px]" style={{ color: 'hsl(220 20% 75%)' }}>
-                        {activeUnit?.name || 'Unidade'}
-                      </span>
-                      <AppIcon name="ChevronDown" size={14} style={{ color: 'hsl(220 20% 55%)' }} />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="center" className="w-[220px] p-1 rounded-2xl border-border/50 bg-card" sideOffset={8}>
-                    <div className="px-3 py-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/50">Unidade</span>
-                    </div>
-                    {units.map(unit => (
-                      <button
-                        key={unit.id}
-                        onClick={() => { setActiveUnitId(unit.id); setUnitDropdownOpen(false); }}
-                        className={cn(
-                          "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
-                          unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                        )}
-                      >
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
-                        <span className="truncate font-medium">{unit.name}</span>
-                        {unit.id === activeUnit?.id && <AppIcon name="Check" size={16} className="text-primary ml-auto shrink-0" />}
-                      </button>
-                    ))}
-                  </PopoverContent>
-                </Popover>
-              )}
             </div>
 
             {/* ===== App Grid by Group ===== */}
