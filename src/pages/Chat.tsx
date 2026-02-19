@@ -232,11 +232,7 @@ export default function Chat() {
                   onClick={() => handleStartDM(contact.user_id)}
                   className="flex flex-col items-center gap-1.5 min-w-[64px] active:scale-95 transition-transform"
                 >
-                  <div className="p-[2.5px] rounded-full bg-gradient-to-br from-primary via-primary/50 to-accent">
-                    <div className="rounded-full bg-background p-[2px]">
-                      <ContactAvatar contact={contact} size={50} />
-                    </div>
-                  </div>
+                  <ContactAvatar contact={contact} size={52} />
                   <span className="text-[11px] text-muted-foreground/70 truncate w-[64px] text-center font-medium">{firstName}</span>
                 </button>
               );
