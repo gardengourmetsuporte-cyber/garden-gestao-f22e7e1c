@@ -4,26 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { AppIcon } from '@/components/ui/app-icon';
+import { Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Check, ChevronRight } from 'lucide-react';
 
-type ChecklistType = 'abertura' | 'fechamento' | 'bonus';
+type ChecklistType = 'abertura' | 'fechamento';
 
-const iconMap: Record<string, string> = {
-  ChefHat: 'ChefHat',
-  UtensilsCrossed: 'UtensilsCrossed',
-  Wallet: 'Wallet',
-  Bath: 'Bath',
-  Folder: 'Folder',
-};
-
-function getCurrentChecklistType(): { type: ChecklistType; label: string; icon: string; emoji: string } {
+function getCurrentChecklistType(): ChecklistType {
   const h = new Date().getHours();
-  // Empresa abre às 19h, funcionários chegam às 17h
-  // Abertura: 17h até hora de fechar (~23h), Fechamento: 23h até 17h do dia seguinte
-  if (h >= 17 && h < 23) return { type: 'abertura', label: 'Abertura', icon: 'Sun', emoji: '☀️' };
-  return { type: 'fechamento', label: 'Fechamento', icon: 'Moon', emoji: '🌙' };
+  if (h >= 17 && h < 23) return 'abertura';
+  return 'fechamento';
 }
 
 export function ChecklistDashboardWidget() {
@@ -31,7 +20,7 @@ export function ChecklistDashboardWidget() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const today = new Date().toISOString().slice(0, 10);
-  const current = getCurrentChecklistType();
+  const activeType = getCurrentChecklistType();
 
   const { data: sectors = [] } = useQuery({
     queryKey: ['dashboard-checklist-sectors', activeUnitId],
@@ -40,9 +29,7 @@ export function ChecklistDashboardWidget() {
         .from('checklist_sectors')
         .select(`*, subcategories:checklist_subcategories(*, items:checklist_items(*))`)
         .eq('scope', 'standard')
-        .order('sort_order')
-        .order('sort_order', { referencedTable: 'subcategories' })
-        .order('sort_order', { referencedTable: 'subcategories.items' });
+        .order('sort_order');
       if (activeUnitId) query = query.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
       const { data } = await query;
       return (data || []).map((s: any) => ({
@@ -57,14 +44,10 @@ export function ChecklistDashboardWidget() {
     staleTime: 2 * 60 * 1000,
   });
 
-  const { data: completions = [] } = useQuery({
-    queryKey: ['dashboard-checklist-completions', today, current.type, activeUnitId],
+  const { data: aberturaCompletions = [] } = useQuery({
+    queryKey: ['dashboard-checklist-completions', today, 'abertura', activeUnitId],
     queryFn: async () => {
-      let query = supabase
-        .from('checklist_completions')
-        .select('item_id')
-        .eq('date', today)
-        .eq('checklist_type', current.type);
+      let query = supabase.from('checklist_completions').select('item_id').eq('date', today).eq('checklist_type', 'abertura');
       if (activeUnitId) query = query.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
       const { data } = await query;
       return data || [];
@@ -73,141 +56,132 @@ export function ChecklistDashboardWidget() {
     staleTime: 30 * 1000,
   });
 
-  const completedIds = useMemo(() => new Set(completions.map((c: any) => c.item_id)), [completions]);
+  const { data: fechamentoCompletions = [] } = useQuery({
+    queryKey: ['dashboard-checklist-completions', today, 'fechamento', activeUnitId],
+    queryFn: async () => {
+      let query = supabase.from('checklist_completions').select('item_id').eq('date', today).eq('checklist_type', 'fechamento');
+      if (activeUnitId) query = query.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
+      const { data } = await query;
+      return data || [];
+    },
+    enabled: !!user && !!activeUnitId,
+    staleTime: 30 * 1000,
+  });
 
-  // Build sector progress data
-  const sectorData = useMemo(() => {
-    return sectors
-      .filter((sector: any) =>
-        sector.subcategories?.some((sub: any) =>
-          sub.items?.some((i: any) => i.is_active && i.checklist_type === current.type)
-        )
-      )
-      .map((sector: any) => {
-        let total = 0;
-        let completed = 0;
-        sector.subcategories?.forEach((sub: any) => {
+  const getProgress = useMemo(() => {
+    return (type: ChecklistType, completions: any[]) => {
+      const completedIds = new Set(completions.map((c: any) => c.item_id));
+      let total = 0;
+      let completed = 0;
+      sectors.forEach((s: any) => {
+        s.subcategories?.forEach((sub: any) => {
           sub.items?.forEach((item: any) => {
-            if (item.is_active && item.checklist_type === current.type) {
+            if (item.is_active && item.checklist_type === type) {
               total++;
               if (completedIds.has(item.id)) completed++;
             }
           });
         });
-        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-        return { id: sector.id, name: sector.name, icon: sector.icon, color: sector.color, completed, total, percent };
       });
-  }, [sectors, completedIds, current.type]);
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return { completed, total, percent };
+    };
+  }, [sectors]);
 
-  const globalTotal = sectorData.reduce((acc, s) => acc + s.total, 0);
-  const globalCompleted = sectorData.reduce((acc, s) => acc + s.completed, 0);
-  const globalPercent = globalTotal > 0 ? Math.round((globalCompleted / globalTotal) * 100) : 0;
-  const isComplete = globalPercent === 100;
+  const abertura = getProgress('abertura', aberturaCompletions);
+  const fechamento = getProgress('fechamento', fechamentoCompletions);
+
+  const cards: { type: ChecklistType; label: string; icon: typeof Sun; progress: typeof abertura; accentColor: string; accentBg: string; textColor: string }[] = [
+    {
+      type: 'abertura',
+      label: 'Abertura',
+      icon: Sun,
+      progress: abertura,
+      accentColor: 'text-amber-400',
+      accentBg: 'bg-amber-600/80',
+      textColor: 'text-amber-400',
+    },
+    {
+      type: 'fechamento',
+      label: 'Fechamento',
+      icon: Moon,
+      progress: fechamento,
+      accentColor: 'text-violet-400',
+      accentBg: 'bg-violet-600/40',
+      textColor: 'text-violet-400',
+    },
+  ];
 
   return (
-    <button
-      onClick={() => navigate('/checklists')}
-      className="col-span-2 text-left animate-slide-up stagger-3 group"
-    >
-      <div className={cn(
-        "rounded-xl border p-4 space-y-3 transition-all duration-200 group-hover:scale-[1.01] group-active:scale-[0.98]",
-        isComplete
-          ? "bg-success/5 border-success/30"
-          : "bg-card border-border/50"
-      )}>
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className={cn(
-              "w-9 h-9 rounded-xl flex items-center justify-center",
-              isComplete ? "bg-success/20" : "bg-primary/15"
-            )}>
-              {isComplete
-                ? <Check className="w-5 h-5 text-success" />
-                : <AppIcon name={current.icon as any} size={18} className="text-primary" />
-              }
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-foreground">{current.label}</h3>
-              <p className="text-[10px] text-muted-foreground">
-                {isComplete ? 'Tudo concluído! 🎉' : `${globalCompleted} de ${globalTotal} tarefas`}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={cn(
-              "text-xl font-black",
-              isComplete ? "text-success" : globalPercent > 0 ? "text-primary" : "text-muted-foreground"
-            )}>
-              {globalPercent}%
-            </span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </div>
-        </div>
+    <div className="col-span-2 grid grid-cols-2 gap-3 animate-slide-up stagger-3">
+      {cards.map((card) => {
+        const isActive = card.type === activeType;
+        const Icon = card.icon;
+        const isComplete = card.progress.percent === 100;
 
-        {/* Global progress bar */}
-        <div className="w-full h-2 rounded-full bg-secondary/60 overflow-hidden">
-          <div
+        return (
+          <button
+            key={card.type}
+            onClick={() => navigate('/checklists')}
             className={cn(
-              "h-full rounded-full transition-all duration-700 ease-out",
-              isComplete
-                ? "bg-success"
-                : globalPercent > 0
-                  ? "bg-gradient-to-r from-primary to-primary/70"
-                  : "bg-muted-foreground/20"
+              "relative text-left rounded-2xl p-4 transition-all duration-200 active:scale-[0.97]",
+              "bg-card border",
+              isActive
+                ? "border-primary/50 ring-1 ring-primary/30 shadow-lg shadow-primary/10"
+                : "border-border/40"
             )}
-            style={{ width: `${globalPercent}%` }}
-          />
-        </div>
+          >
+            {/* Active dot indicator */}
+            {isActive && (
+              <div className={cn("absolute top-3 right-3 w-2.5 h-2.5 rounded-full", card.accentBg, "animate-pulse")} />
+            )}
 
-        {/* Sector list — compact like the checklist module */}
-        {sectorData.length > 0 && (
-          <div className="space-y-2 pt-1">
-            {sectorData.map((sector) => {
-              const sectorComplete = sector.percent === 100;
-              return (
-                <div key={sector.id} className="flex items-center gap-2.5">
-                  <div
-                    className={cn(
-                      "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300",
-                      sectorComplete ? "bg-success/20" : ""
-                    )}
-                    style={{ backgroundColor: sectorComplete ? undefined : sector.color }}
-                  >
-                    {sectorComplete ? (
-                      <Check className="w-3.5 h-3.5 text-success" />
-                    ) : (
-                      <AppIcon name={(iconMap[sector.icon] || 'Folder') as any} size={14} className="text-white" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className={cn(
-                        "text-xs font-medium truncate",
-                        sectorComplete ? "text-success" : "text-foreground"
-                      )}>
-                        {sector.name}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground ml-2 shrink-0">
-                        {sector.completed}/{sector.total}
-                      </span>
-                    </div>
-                    <div className="w-full h-1 rounded-full bg-secondary/50 overflow-hidden">
-                      <div
-                        className={cn(
-                          "h-full rounded-full transition-all duration-500",
-                          sectorComplete ? "bg-success" : "bg-primary"
-                        )}
-                        style={{ width: `${sector.percent}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </button>
+            {/* Icon + Label */}
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center",
+                isComplete ? "bg-success/20" : card.accentBg
+              )}>
+                <Icon className={cn("w-5 h-5", isComplete ? "text-success" : "text-white")} />
+              </div>
+              <span className={cn(
+                "text-base font-bold",
+                isComplete ? "text-success" : "text-foreground"
+              )}>
+                {card.label}
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full h-1.5 rounded-full bg-secondary/50 overflow-hidden mb-3">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-700 ease-out",
+                  isComplete
+                    ? "bg-success"
+                    : card.type === 'abertura'
+                      ? "bg-amber-500"
+                      : "bg-violet-500"
+                )}
+                style={{ width: `${card.progress.percent}%` }}
+              />
+            </div>
+
+            {/* Stats row */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {card.progress.completed}/{card.progress.total}
+              </span>
+              <span className={cn(
+                "text-lg font-black",
+                isComplete ? "text-success" : card.textColor
+              )}>
+                {card.progress.percent}%
+              </span>
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 }
