@@ -11,32 +11,50 @@ import { useUserModules } from "@/hooks/useAccessLevels";
 import { getModuleKeyFromRoute } from "@/lib/modules";
 import { ThemeProvider } from "next-themes";
 
-// Lazy load all pages for code splitting
-const Auth = lazy(() => import("./pages/Auth"));
-const DashboardNew = lazy(() => import("./pages/DashboardNew"));
-const Agenda = lazy(() => import("./pages/Agenda"));
-const Finance = lazy(() => import("./pages/Finance"));
-const Inventory = lazy(() => import("./pages/Inventory"));
-const Checklists = lazy(() => import("./pages/Checklists"));
-const Rewards = lazy(() => import("./pages/Rewards"));
-const Settings = lazy(() => import("./pages/Settings"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const CashClosing = lazy(() => import("./pages/CashClosing"));
-const Recipes = lazy(() => import("./pages/Recipes"));
-const Employees = lazy(() => import("./pages/Employees"));
-const Chat = lazy(() => import("./pages/Chat"));
-const TabletSelect = lazy(() => import("./pages/TabletSelect"));
-const TabletMenu = lazy(() => import("./pages/TabletMenu"));
-const TabletConfirm = lazy(() => import("./pages/TabletConfirm"));
-const TabletAdmin = lazy(() => import("./pages/TabletAdmin"));
-const WhatsApp = lazy(() => import("./pages/WhatsApp"));
-const MenuAdmin = lazy(() => import("./pages/MenuAdmin"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Orders = lazy(() => import("./pages/Orders"));
-const Marketing = lazy(() => import("./pages/Marketing"));
-const Ranking = lazy(() => import("./pages/Ranking"));
-const PersonalFinance = lazy(() => import("./pages/PersonalFinance"));
-const Landing = lazy(() => import("./pages/Landing"));
+// Retry wrapper for lazy imports to handle transient fetch failures
+function lazyRetry(importFn: () => Promise<any>, retries = 3): Promise<any> {
+  return new Promise((resolve, reject) => {
+    importFn()
+      .then(resolve)
+      .catch((err: Error) => {
+        if (retries > 0) {
+          setTimeout(() => {
+            lazyRetry(importFn, retries - 1).then(resolve, reject);
+          }, 500);
+        } else {
+          // Force reload as last resort to clear stale cache
+          window.location.reload();
+        }
+      });
+  });
+}
+
+// Lazy load all pages for code splitting with retry
+const Auth = lazy(() => lazyRetry(() => import("./pages/Auth")));
+const DashboardNew = lazy(() => lazyRetry(() => import("./pages/DashboardNew")));
+const Agenda = lazy(() => lazyRetry(() => import("./pages/Agenda")));
+const Finance = lazy(() => lazyRetry(() => import("./pages/Finance")));
+const Inventory = lazy(() => lazyRetry(() => import("./pages/Inventory")));
+const Checklists = lazy(() => lazyRetry(() => import("./pages/Checklists")));
+const Rewards = lazy(() => lazyRetry(() => import("./pages/Rewards")));
+const Settings = lazy(() => lazyRetry(() => import("./pages/Settings")));
+const NotFound = lazy(() => lazyRetry(() => import("./pages/NotFound")));
+const CashClosing = lazy(() => lazyRetry(() => import("./pages/CashClosing")));
+const Recipes = lazy(() => lazyRetry(() => import("./pages/Recipes")));
+const Employees = lazy(() => lazyRetry(() => import("./pages/Employees")));
+const Chat = lazy(() => lazyRetry(() => import("./pages/Chat")));
+const TabletSelect = lazy(() => lazyRetry(() => import("./pages/TabletSelect")));
+const TabletMenu = lazy(() => lazyRetry(() => import("./pages/TabletMenu")));
+const TabletConfirm = lazy(() => lazyRetry(() => import("./pages/TabletConfirm")));
+const TabletAdmin = lazy(() => lazyRetry(() => import("./pages/TabletAdmin")));
+const WhatsApp = lazy(() => lazyRetry(() => import("./pages/WhatsApp")));
+const MenuAdmin = lazy(() => lazyRetry(() => import("./pages/MenuAdmin")));
+const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
+const Orders = lazy(() => lazyRetry(() => import("./pages/Orders")));
+const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
+const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
+const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
+const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
