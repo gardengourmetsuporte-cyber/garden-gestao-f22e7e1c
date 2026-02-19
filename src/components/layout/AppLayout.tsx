@@ -65,7 +65,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
   const mainRef = useRef<HTMLElement>(null);
-  const PULL_THRESHOLD = 80;
+  const PULL_THRESHOLD = 60;
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (isRefreshing) return;
@@ -80,7 +80,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     if (!isPulling.current || isRefreshing) return;
     const diff = e.touches[0].clientY - touchStartY.current;
     if (diff > 0) {
-      setPullDistance(Math.min(diff * 0.4, 120));
+      // Direct DOM update for 60fps fluidity — skip React state during drag
+      const distance = Math.min(diff * 0.5, 100);
+      const indicator = mainRef.current?.querySelector('[data-pull-indicator]') as HTMLElement;
+      if (indicator) {
+        indicator.style.height = `${distance}px`;
+        indicator.style.opacity = `${Math.min(distance / PULL_THRESHOLD, 1)}`;
+        const spinner = indicator.firstElementChild as HTMLElement;
+        if (spinner) spinner.style.transform = `rotate(${(distance / PULL_THRESHOLD) * 360}deg)`;
+      }
+      setPullDistance(distance);
     } else {
       isPulling.current = false;
       setPullDistance(0);
@@ -92,11 +101,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     isPulling.current = false;
     if (pullDistance >= PULL_THRESHOLD) {
       setIsRefreshing(true);
-      setPullDistance(PULL_THRESHOLD * 0.5);
-      // Reload after a brief visual delay
-      setTimeout(() => {
-        window.location.reload();
-      }, 400);
+      setPullDistance(PULL_THRESHOLD * 0.6);
+      window.location.reload();
     } else {
       setPullDistance(0);
     }
@@ -598,20 +604,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         {/* Pull-to-refresh indicator */}
         <div
-          className="flex items-center justify-center overflow-hidden transition-all duration-200 ease-out"
+          data-pull-indicator
+          className="flex items-center justify-center overflow-hidden"
           style={{
-            height: pullDistance > 0 ? `${pullDistance}px` : '0px',
-            opacity: Math.min(pullDistance / PULL_THRESHOLD, 1),
+            height: isRefreshing ? `${PULL_THRESHOLD * 0.6}px` : pullDistance > 0 ? `${pullDistance}px` : '0px',
+            opacity: isRefreshing ? 1 : Math.min(pullDistance / PULL_THRESHOLD, 1),
+            transition: isPulling.current ? 'none' : 'height 0.15s ease-out, opacity 0.15s ease-out',
           }}
         >
           <div
             className={cn(
-              "w-8 h-8 rounded-full border-2 border-primary border-t-transparent",
+              "w-7 h-7 rounded-full border-2 border-primary border-t-transparent",
               isRefreshing ? "animate-spin" : ""
             )}
             style={{
               transform: isRefreshing ? 'none' : `rotate(${(pullDistance / PULL_THRESHOLD) * 360}deg)`,
-              transition: isRefreshing ? 'none' : 'transform 0s',
             }}
           />
         </div>
