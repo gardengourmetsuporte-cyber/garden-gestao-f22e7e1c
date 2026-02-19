@@ -172,6 +172,8 @@ export function useLeaderboard() {
     queryKey: ['leaderboard', activeUnitId, format(selectedMonth, 'yyyy-MM')],
     queryFn: () => fetchLeaderboardData(activeUnitId!, selectedMonth),
     enabled: !!user && !!activeUnitId,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
   });
 
   const { data: sectorPoints = [], isLoading: isLoadingSectors } = useQuery({
