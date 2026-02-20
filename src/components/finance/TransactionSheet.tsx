@@ -549,8 +549,31 @@ export function TransactionSheet({
                 </span>
               </button>
 
-              {/* Card Categoria */}
-              {type !== 'transfer' && (
+              {/* Card Categoria (non-transfer) or Conta Destino (transfer) */}
+              {type === 'transfer' ? (
+                <button
+                  type="button"
+                  onClick={() => setShowToAccountPicker(true)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
+                    toAccountId
+                      ? "bg-primary/5 ring-1 ring-primary/20"
+                      : "bg-secondary/50"
+                  )}
+                >
+                  <AppIcon
+                    name="arrow_forward"
+                    size={22}
+                    className={toAccountId ? "text-primary" : "text-muted-foreground"}
+                  />
+                  <span className={cn(
+                    "text-sm font-medium truncate max-w-full",
+                    toAccountId ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {accounts.find(a => a.id === toAccountId)?.name || 'Destino'}
+                  </span>
+                </button>
+              ) : (
                 <button
                   type="button"
                   onClick={() => setShowCategoryPicker(true)}
@@ -629,20 +652,6 @@ export function TransactionSheet({
               )}
             </div>
 
-            {/* To Account (for transfers) */}
-            {type === 'transfer' && (
-              <div className="space-y-2">
-                <Label>Conta de destino</Label>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between h-12"
-                  onClick={() => setShowToAccountPicker(true)}
-                >
-                  <span>{accounts.find(a => a.id === toAccountId)?.name || 'Selecionar conta'}</span>
-                  <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
-                </Button>
-              </div>
-            )}
 
             {/* Advanced options */}
               <div className="space-y-4 pt-4 border-t">
