@@ -63,7 +63,7 @@ export function TaskSheet({
       setTitle(editingTask.title);
       setNotes(editingTask.notes || '');
       setHasDate(!!editingTask.due_date);
-      setDueDate(editingTask.due_date ? new Date(editingTask.due_date) : new Date());
+      setDueDate(editingTask.due_date ? new Date(editingTask.due_date + 'T12:00:00') : new Date());
       setHasTime(!!editingTask.due_time);
       setDueTime(editingTask.due_time || '09:00');
       setCategoryId(editingTask.category_id || null);
