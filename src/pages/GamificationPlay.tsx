@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { SpinWheel } from '@/components/gamification/SpinWheel';
+import { SlotMachine } from '@/components/gamification/SlotMachine';
 import { PrizeResult } from '@/components/gamification/PrizeResult';
 import { useGamification, type GamificationPrize } from '@/hooks/useGamification';
 import { Input } from '@/components/ui/input';
@@ -138,11 +138,8 @@ export default function GamificationPlay() {
 
       {/* WHEEL Phase */}
       {phase === 'wheel' && (
-        <div className="flex flex-col items-center gap-6">
-          <SpinWheel prizes={prizes} onResult={handleResult} />
-          <p className="text-muted-foreground text-sm animate-pulse">
-            Toque na roleta para girar!
-          </p>
+        <div className="flex flex-col items-center gap-4">
+          <SlotMachine prizes={prizes} onResult={handleResult} />
         </div>
       )}
 
