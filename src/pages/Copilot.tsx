@@ -76,7 +76,7 @@ export default function CopilotPage() {
       >
         <div className="flex items-center gap-3 h-14 px-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors"
           >
             <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
