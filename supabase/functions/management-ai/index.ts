@@ -167,6 +167,107 @@ const TOOLS = [
       },
     },
   },
+  // ── NEW TOOLS (Level 3) ──
+  {
+    type: "function",
+    function: {
+      name: "update_transaction",
+      description: "Editar uma transação financeira existente. Use quando o usuário pedir para alterar, mudar, corrigir ou atualizar valor, descrição, data ou categoria de uma transação.",
+      parameters: {
+        type: "object",
+        properties: {
+          search_description: { type: "string", description: "Descrição ou parte do nome da transação a buscar" },
+          search_date: { type: "string", description: "Data da transação para desambiguar (YYYY-MM-DD), opcional" },
+          new_amount: { type: "number", description: "Novo valor em reais" },
+          new_description: { type: "string", description: "Nova descrição" },
+          new_date: { type: "string", description: "Nova data (YYYY-MM-DD)" },
+          new_category_name: { type: "string", description: "Novo nome da categoria" },
+          new_is_paid: { type: "boolean", description: "Novo status de pagamento" },
+        },
+        required: ["search_description"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_supplier_invoice",
+      description: "Registrar boleto ou fatura de fornecedor. Use quando o usuário pedir para registrar, criar ou lançar um boleto, fatura ou conta de fornecedor.",
+      parameters: {
+        type: "object",
+        properties: {
+          supplier_name: { type: "string", description: "Nome do fornecedor" },
+          description: { type: "string", description: "Descrição do boleto/fatura" },
+          amount: { type: "number", description: "Valor em reais" },
+          due_date: { type: "string", description: "Data de vencimento (YYYY-MM-DD)" },
+          invoice_number: { type: "string", description: "Número da nota/boleto (opcional)" },
+          notes: { type: "string", description: "Observações" },
+        },
+        required: ["supplier_name", "description", "amount", "due_date"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "mark_invoice_paid",
+      description: "Marcar boleto/fatura de fornecedor como pago. Use quando o usuário pedir para pagar, quitar ou marcar como pago um boleto de fornecedor.",
+      parameters: {
+        type: "object",
+        properties: {
+          supplier_name: { type: "string", description: "Nome do fornecedor (opcional, para filtrar)" },
+          description: { type: "string", description: "Descrição ou parte do nome do boleto" },
+        },
+        required: ["description"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "complete_checklist_item",
+      description: "Marcar um item do checklist como concluído. Use quando o usuário pedir para marcar, completar ou concluir um item do checklist de abertura ou fechamento.",
+      parameters: {
+        type: "object",
+        properties: {
+          item_name: { type: "string", description: "Nome ou parte do nome do item do checklist" },
+          checklist_type: { type: "string", enum: ["abertura", "fechamento"], description: "Tipo do checklist: abertura ou fechamento" },
+        },
+        required: ["item_name"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "send_order",
+      description: "Enviar um pedido de compra para o fornecedor (mudar status de rascunho para enviado). Use quando o usuário pedir para enviar, despachar ou confirmar envio de um pedido.",
+      parameters: {
+        type: "object",
+        properties: {
+          supplier_name: { type: "string", description: "Nome do fornecedor do pedido" },
+        },
+        required: ["supplier_name"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_appointment",
+      description: "Criar um compromisso com horário específico na agenda. Use quando o usuário pedir para agendar reunião, compromisso ou evento com horário definido.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título do compromisso" },
+          date: { type: "string", description: "Data (YYYY-MM-DD). Default: hoje" },
+          time: { type: "string", description: "Horário no formato HH:MM (ex: 14:30)" },
+          notes: { type: "string", description: "Observações" },
+        },
+        required: ["title", "time"],
+      },
+    },
+  },
 ];
 
 function getSupabaseAdmin() {
@@ -470,7 +571,6 @@ async function executeCreateOrder(
 ): Promise<{ success: boolean; message: string }> {
   const sb = getSupabaseAdmin();
 
-  // Find supplier
   const sq = sb.from("suppliers").select("id, name").ilike("name", `%${String(args.supplier_name)}%`).limit(1);
   if (unitId) sq.eq("unit_id", unitId);
   const { data: supplier } = await sq.maybeSingle();
@@ -479,7 +579,6 @@ async function executeCreateOrder(
     return { success: false, message: `❌ Fornecedor "${args.supplier_name}" não encontrado.` };
   }
 
-  // Create order
   const { data: order, error: orderError } = await sb.from("orders").insert({
     supplier_id: supplier.id,
     unit_id: unitId,
@@ -492,7 +591,6 @@ async function executeCreateOrder(
     return { success: false, message: `❌ Erro ao criar pedido: ${orderError?.message}` };
   }
 
-  // Add items
   const items = args.items as Array<{ item_name: string; quantity: number }>;
   const addedItems: string[] = [];
   const failedItems: string[] = [];
@@ -610,6 +708,335 @@ async function executeMarkClosingValidated(
 }
 
 // ──────────────────────────────────────────────
+// NEW Tool: update_transaction
+// ──────────────────────────────────────────────
+async function executeUpdateTransaction(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("finance_transactions")
+    .select("id, description, amount, date, type, is_paid")
+    .eq("user_id", userId)
+    .ilike("description", `%${String(args.search_description)}%`)
+    .limit(5);
+  if (unitId) query = query.eq("unit_id", unitId);
+  if (args.search_date) query = query.eq("date", String(args.search_date));
+
+  const { data: transactions } = await query;
+
+  if (!transactions || transactions.length === 0) {
+    return { success: false, message: `❌ Nenhuma transação encontrada com "${args.search_description}".` };
+  }
+
+  if (transactions.length > 1) {
+    const list = transactions.map((t: any) => `• ${t.description} - R$${Number(t.amount).toFixed(2)} (${t.date})`).join("\n");
+    return { success: false, message: `⚠️ Encontrei ${transactions.length} transações:\n${list}\n\nEspecifique melhor qual deseja editar (inclua a data).` };
+  }
+
+  const tx = transactions[0];
+  const updates: Record<string, unknown> = {};
+  const changes: string[] = [];
+
+  if (args.new_amount !== undefined) {
+    updates.amount = Number(args.new_amount);
+    changes.push(`💰 Valor: R$${Number(tx.amount).toFixed(2)} → R$${Number(args.new_amount).toFixed(2)}`);
+  }
+  if (args.new_description) {
+    updates.description = String(args.new_description);
+    changes.push(`📝 Descrição: ${tx.description} → ${args.new_description}`);
+  }
+  if (args.new_date) {
+    updates.date = String(args.new_date);
+    changes.push(`📅 Data: ${tx.date} → ${args.new_date}`);
+  }
+  if (args.new_is_paid !== undefined) {
+    updates.is_paid = args.new_is_paid;
+    changes.push(`✅ Status: ${tx.is_paid ? 'Pago' : 'Pendente'} → ${args.new_is_paid ? 'Pago' : 'Pendente'}`);
+  }
+  if (args.new_category_name) {
+    const { data: cat } = await sb.from("finance_categories").select("id").ilike("name", String(args.new_category_name)).eq("user_id", userId).limit(1).maybeSingle();
+    if (cat) {
+      updates.category_id = cat.id;
+      changes.push(`📂 Categoria: ${args.new_category_name}`);
+    }
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return { success: false, message: `⚠️ Nenhuma alteração especificada. Diga o que deseja mudar (valor, descrição, data, etc).` };
+  }
+
+  const { error } = await sb.from("finance_transactions").update(updates).eq("id", tx.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao atualizar: ${error.message}` };
+  }
+
+  return { success: true, message: `[ACTION] ✅ Transação atualizada!\n\n📝 ${tx.description}\n${changes.join("\n")}` };
+}
+
+// ──────────────────────────────────────────────
+// NEW Tool: create_supplier_invoice
+// ──────────────────────────────────────────────
+async function executeCreateSupplierInvoice(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  const sq = sb.from("suppliers").select("id, name").ilike("name", `%${String(args.supplier_name)}%`).limit(1);
+  if (unitId) sq.eq("unit_id", unitId);
+  const { data: supplier } = await sq.maybeSingle();
+
+  if (!supplier) {
+    return { success: false, message: `❌ Fornecedor "${args.supplier_name}" não encontrado.` };
+  }
+
+  const { error } = await sb.from("supplier_invoices").insert({
+    user_id: userId,
+    unit_id: unitId,
+    supplier_id: supplier.id,
+    description: String(args.description),
+    amount: Number(args.amount),
+    issue_date: getToday(),
+    due_date: String(args.due_date),
+    invoice_number: args.invoice_number ? String(args.invoice_number) : null,
+    notes: args.notes ? String(args.notes) : null,
+    is_paid: false,
+  });
+
+  if (error) {
+    console.error("Insert supplier invoice error:", error);
+    return { success: false, message: `❌ Erro ao registrar boleto: ${error.message}` };
+  }
+
+  const lines = [
+    `[ACTION] ✅ Boleto registrado!`,
+    "",
+    `🚚 Fornecedor: ${supplier.name}`,
+    `📝 ${args.description}`,
+    `💰 R$ ${Number(args.amount).toFixed(2)}`,
+    `📅 Vencimento: ${args.due_date}`,
+  ];
+  if (args.invoice_number) lines.push(`🔢 Nº: ${args.invoice_number}`);
+  if (args.notes) lines.push(`📋 Obs: ${args.notes}`);
+
+  return { success: true, message: lines.join("\n") };
+}
+
+// ──────────────────────────────────────────────
+// NEW Tool: mark_invoice_paid
+// ──────────────────────────────────────────────
+async function executeMarkInvoicePaid(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("supplier_invoices")
+    .select("id, description, amount, due_date, supplier:suppliers(name)")
+    .eq("is_paid", false)
+    .ilike("description", `%${String(args.description)}%`)
+    .limit(5);
+  if (unitId) query = query.eq("unit_id", unitId);
+
+  const { data: invoices } = await query;
+
+  if (!invoices || invoices.length === 0) {
+    return { success: false, message: `❌ Nenhum boleto pendente encontrado com "${args.description}".` };
+  }
+
+  // Filter by supplier if provided
+  let filtered = invoices;
+  if (args.supplier_name) {
+    filtered = invoices.filter((inv: any) =>
+      (inv.supplier as any)?.name?.toLowerCase().includes(String(args.supplier_name).toLowerCase())
+    );
+    if (filtered.length === 0) filtered = invoices;
+  }
+
+  if (filtered.length > 1) {
+    const list = filtered.map((inv: any) => `• ${(inv.supplier as any)?.name || '?'}: ${inv.description} - R$${Number(inv.amount).toFixed(2)} (vence ${inv.due_date})`).join("\n");
+    return { success: false, message: `⚠️ Encontrei ${filtered.length} boletos pendentes:\n${list}\n\nEspecifique melhor qual deseja pagar.` };
+  }
+
+  const inv = filtered[0];
+  const { error } = await sb.from("supplier_invoices").update({
+    is_paid: true,
+    paid_at: new Date().toISOString(),
+  }).eq("id", inv.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao pagar boleto: ${error.message}` };
+  }
+
+  return {
+    success: true,
+    message: `[ACTION] ✅ Boleto pago!\n\n🚚 ${(inv.supplier as any)?.name || '?'}\n📝 ${inv.description}\n💰 R$ ${Number(inv.amount).toFixed(2)}\n📅 Vencimento: ${inv.due_date}`,
+  };
+}
+
+// ──────────────────────────────────────────────
+// NEW Tool: complete_checklist_item
+// ──────────────────────────────────────────────
+async function executeCompleteChecklistItem(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("checklist_items")
+    .select("id, name, checklist_type, points")
+    .eq("is_active", true)
+    .is("deleted_at", null)
+    .ilike("name", `%${String(args.item_name)}%`)
+    .limit(5);
+  if (unitId) query = query.eq("unit_id", unitId);
+  if (args.checklist_type) query = query.eq("checklist_type", String(args.checklist_type));
+
+  const { data: items } = await query;
+
+  if (!items || items.length === 0) {
+    return { success: false, message: `❌ Item "${args.item_name}" não encontrado no checklist.` };
+  }
+
+  if (items.length > 1) {
+    const list = items.map((i: any) => `• ${i.name} (${i.checklist_type})`).join("\n");
+    return { success: false, message: `⚠️ Encontrei ${items.length} itens:\n${list}\n\nEspecifique melhor qual deseja marcar.` };
+  }
+
+  const item = items[0];
+  const today = getToday();
+
+  // Check if already completed today
+  const { data: existing } = await sb.from("checklist_completions")
+    .select("id")
+    .eq("item_id", item.id)
+    .eq("date", today)
+    .limit(1)
+    .maybeSingle();
+
+  if (existing) {
+    return { success: false, message: `⚠️ Item "${item.name}" já foi marcado hoje.` };
+  }
+
+  const { error } = await sb.from("checklist_completions").insert({
+    item_id: item.id,
+    checklist_type: item.checklist_type,
+    completed_by: userId,
+    date: today,
+    unit_id: unitId,
+    points_awarded: item.points || 1,
+    awarded_points: true,
+    is_skipped: false,
+  });
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao marcar item: ${error.message}` };
+  }
+
+  const typeLabel = item.checklist_type === "abertura" ? "Abertura" : "Fechamento";
+
+  return {
+    success: true,
+    message: `[ACTION] ✅ Item do checklist marcado!\n\n📋 ${item.name}\n📂 Tipo: ${typeLabel}\n⭐ Pontos: ${item.points || 1}`,
+  };
+}
+
+// ──────────────────────────────────────────────
+// NEW Tool: send_order
+// ──────────────────────────────────────────────
+async function executeSendOrder(
+  args: Record<string, unknown>,
+  _userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  // Find supplier
+  const sq = sb.from("suppliers").select("id, name").ilike("name", `%${String(args.supplier_name)}%`).limit(1);
+  if (unitId) sq.eq("unit_id", unitId);
+  const { data: supplier } = await sq.maybeSingle();
+
+  if (!supplier) {
+    return { success: false, message: `❌ Fornecedor "${args.supplier_name}" não encontrado.` };
+  }
+
+  // Find draft order for this supplier
+  let query = sb.from("orders")
+    .select("id, status, created_at")
+    .eq("supplier_id", supplier.id)
+    .eq("status", "draft")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (unitId) query = query.eq("unit_id", unitId);
+
+  const { data: order } = await query.maybeSingle();
+
+  if (!order) {
+    return { success: false, message: `❌ Nenhum pedido em rascunho encontrado para ${supplier.name}.` };
+  }
+
+  const { error } = await sb.from("orders").update({
+    status: "sent",
+    sent_at: new Date().toISOString(),
+  }).eq("id", order.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao enviar pedido: ${error.message}` };
+  }
+
+  return {
+    success: true,
+    message: `[ACTION] ✅ Pedido enviado!\n\n🚚 Fornecedor: ${supplier.name}\n📦 Status: Rascunho → Enviado\n📅 Enviado em: ${new Date().toLocaleDateString('pt-BR')}`,
+  };
+}
+
+// ──────────────────────────────────────────────
+// NEW Tool: create_appointment
+// ──────────────────────────────────────────────
+async function executeCreateAppointment(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  const date = (args.date as string) || getToday();
+  const time = String(args.time);
+
+  const { error } = await sb.from("manager_appointments").insert({
+    user_id: userId,
+    unit_id: unitId,
+    title: String(args.title),
+    date,
+    scheduled_time: time,
+    notes: args.notes ? String(args.notes) : null,
+  });
+
+  if (error) {
+    console.error("Insert appointment error:", error);
+    return { success: false, message: `❌ Erro ao criar compromisso: ${error.message}` };
+  }
+
+  const lines = [
+    `[ACTION] ✅ Compromisso agendado!`,
+    "",
+    `📝 ${args.title}`,
+    `📅 Data: ${date}`,
+    `🕐 Horário: ${time}`,
+  ];
+  if (args.notes) lines.push(`📋 Obs: ${args.notes}`);
+
+  return { success: true, message: lines.join("\n") };
+}
+
+// ──────────────────────────────────────────────
 // Tool dispatcher
 // ──────────────────────────────────────────────
 async function executeTool(
@@ -637,6 +1064,19 @@ async function executeTool(
       return executeRegisterEmployeePayment(args, userId, unitId);
     case "mark_closing_validated":
       return executeMarkClosingValidated(args, userId, unitId);
+    // New tools
+    case "update_transaction":
+      return executeUpdateTransaction(args, userId, unitId);
+    case "create_supplier_invoice":
+      return executeCreateSupplierInvoice(args, userId, unitId);
+    case "mark_invoice_paid":
+      return executeMarkInvoicePaid(args, userId, unitId);
+    case "complete_checklist_item":
+      return executeCompleteChecklistItem(args, userId, unitId);
+    case "send_order":
+      return executeSendOrder(args, userId, unitId);
+    case "create_appointment":
+      return executeCreateAppointment(args, userId, unitId);
     default:
       return { success: false, message: `Função "${name}" não reconhecida.` };
   }
@@ -738,6 +1178,14 @@ AÇÕES EXECUTÁVEIS (use tool calling):
 7. create_order - Criar pedido de compra para fornecedor
 8. register_employee_payment - Registrar pagamento/adiantamento de funcionário
 9. mark_closing_validated - Validar fechamento de caixa pendente
+10. update_transaction - Editar transação existente (valor, descrição, data, categoria)
+11. create_supplier_invoice - Registrar boleto/fatura de fornecedor
+12. mark_invoice_paid - Marcar boleto de fornecedor como pago
+13. complete_checklist_item - Marcar item do checklist como concluído
+14. send_order - Enviar pedido de compra para fornecedor (rascunho → enviado)
+15. create_appointment - Criar compromisso com horário específico
+
+MULTI-AÇÃO: Você pode chamar MÚLTIPLAS tools em uma única resposta quando o usuário pedir várias ações (ex: "registra a nota, dá entrada no estoque e cria o boleto"). Use várias tool_calls na mesma resposta.
 
 REGRAS PARA AÇÕES:
 - Se faltar info obrigatória, pergunte antes de executar
@@ -776,68 +1224,104 @@ ${dataSnapshot}`;
       });
     }
 
-    // AI call with tools
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: aiMessages,
-        max_tokens: 1200,
-        tools: TOOLS,
-      }),
-    });
+    // ── Multi-tool chaining loop ──
+    const MAX_TOOL_ROUNDS = 5;
+    let currentMessages = [...aiMessages];
+    const allToolResults: string[] = [];
+    let finalTextResponse = "";
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: currentMessages,
+          max_tokens: 1200,
+          tools: TOOLS,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (response.status === 402) {
+          return new Response(
+            JSON.stringify({ error: "Créditos de IA esgotados. Entre em contato com o administrador." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const errorText = await response.text();
+        console.error("AI Gateway error:", response.status, errorText);
+        throw new Error(`AI Gateway error: ${response.status}`);
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Créditos de IA esgotados. Entre em contato com o administrador." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+
+      const data = await response.json();
+      const choice = data.choices?.[0]?.message;
+
+      // If no tool calls, we have the final text response
+      if (!choice?.tool_calls || choice.tool_calls.length === 0) {
+        finalTextResponse = choice?.content || "";
+        break;
       }
-      const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
+
+      // Execute ALL tool calls in this round
+      // Add assistant message with tool_calls to conversation
+      currentMessages.push({
+        role: "assistant",
+        content: choice.content || "",
+        ...({ tool_calls: choice.tool_calls } as any),
+      });
+
+      for (const toolCall of choice.tool_calls) {
+        let args: Record<string, unknown>;
+        try {
+          args = typeof toolCall.function.arguments === "string"
+            ? JSON.parse(toolCall.function.arguments)
+            : toolCall.function.arguments;
+        } catch {
+          const errMsg = `Não consegui interpretar os parâmetros de ${toolCall.function.name}.`;
+          allToolResults.push(errMsg);
+          currentMessages.push({
+            role: "tool",
+            content: errMsg,
+            ...({ tool_call_id: toolCall.id } as any),
+          });
+          continue;
+        }
+
+        const result = await executeTool(toolCall.function.name, args, user_id, unit_id || null);
+        allToolResults.push(result.message);
+
+        currentMessages.push({
+          role: "tool",
+          content: result.message,
+          ...({ tool_call_id: toolCall.id } as any),
+        });
+      }
     }
 
-    const data = await response.json();
-    const choice = data.choices?.[0]?.message;
+    // Build final response
+    const actionExecuted = allToolResults.length > 0;
 
-    // Handle tool calls
-    if (choice?.tool_calls && choice.tool_calls.length > 0) {
-      const toolCall = choice.tool_calls[0];
-
-      let args: Record<string, unknown>;
-      try {
-        args = typeof toolCall.function.arguments === "string"
-          ? JSON.parse(toolCall.function.arguments)
-          : toolCall.function.arguments;
-      } catch {
-        return new Response(
-          JSON.stringify({ suggestion: "Não consegui interpretar os dados. Pode repetir?", action_executed: false }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const result = await executeTool(toolCall.function.name, args, user_id, unit_id || null);
-
+    if (actionExecuted) {
+      // Combine tool results + any final AI commentary
+      const combined = allToolResults.join("\n\n---\n\n") + (finalTextResponse ? `\n\n${finalTextResponse}` : "");
       return new Response(
-        JSON.stringify({ suggestion: result.message, action_executed: result.success }),
+        JSON.stringify({ suggestion: combined, action_executed: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // No tool call - return normal text
-    const suggestion = choice?.content || "Não foi possível gerar sugestões no momento.";
+    // No tool calls at all - pure text response
+    const suggestion = finalTextResponse || "Não foi possível gerar sugestões no momento.";
 
     return new Response(
       JSON.stringify({ suggestion, action_executed: false }),
