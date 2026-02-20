@@ -107,7 +107,7 @@ interface ChecklistSettingsProps {
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
 
-// Sortable Item Component - touch-friendly, no grip handle
+// Sortable Item Component - drag via dedicated handle
 function SortableItem({ 
   id, 
   children, 
@@ -121,6 +121,7 @@ function SortableItem({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -128,7 +129,7 @@ function SortableItem({
 
   const style: React.CSSProperties = {
     transform: CSS.Translate.toString(transform),
-    transition,
+    transition: isDragging ? 'none' : transition,
     zIndex: isDragging ? 50 : 'auto',
     position: 'relative' as const,
     ...(isDragging && {
@@ -143,11 +144,20 @@ function SortableItem({
     <div 
       ref={setNodeRef} 
       style={style} 
-      className={className}
+      className={cn(className, "flex items-center")}
       {...attributes}
-      {...listeners}
     >
-      {children}
+      {/* Drag handle */}
+      <div
+        ref={setActivatorNodeRef}
+        {...listeners}
+        className="shrink-0 p-1.5 mr-1 cursor-grab active:cursor-grabbing touch-none text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
+      <div className="flex-1 min-w-0 flex items-center gap-3">
+        {children}
+      </div>
     </div>
   );
 }
@@ -199,10 +209,10 @@ export function ChecklistSettings({
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
+      activationConstraint: { delay: 150, tolerance: 8 },
     }),
     useSensor(MouseSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
+      activationConstraint: { distance: 5 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
