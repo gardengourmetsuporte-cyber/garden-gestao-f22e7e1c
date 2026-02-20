@@ -278,7 +278,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { messages: conversationHistory, context, user_id, unit_id } = body;
+    const { messages: conversationHistory, context, user_id, unit_id, image } = body;
 
     // Build data snapshot
     const dataLines: string[] = [];
@@ -331,6 +331,13 @@ REGRAS DE RESPOSTA:
 - Use emojis com moderação (máximo 3 por resposta)
 - Nunca invente valores - use os dados abaixo
 
+ANÁLISE DE IMAGENS:
+- Quando receber uma imagem, analise e extraia TODAS as informações relevantes
+- Para notas fiscais/recibos: extraia itens, quantidades, valores unitários, total, data, fornecedor
+- Para fotos de estoque: identifique produtos e estime quantidades
+- Para qualquer documento: extraia texto e dados estruturados
+- Apresente os dados de forma organizada e ofereça ações (ex: "Quer que eu lance essas despesas?")
+
 AÇÕES EXECUTÁVEIS (use tool calling):
 1. create_transaction - Registrar receita/despesa. Obrigatório: type, amount, description
 2. create_task - Criar tarefa/lembrete. Obrigatório: title
@@ -344,13 +351,24 @@ CONTEXTO (use sob demanda, NÃO despeje tudo na resposta):
 - Dia: ${context?.dayOfWeek || '?'} (${context?.timeOfDay || ''})
 ${dataSnapshot}`;
 
-    const aiMessages: { role: string; content: string }[] = [
+    const aiMessages: { role: string; content: any }[] = [
       { role: "system", content: systemPrompt },
     ];
 
     if (conversationHistory && Array.isArray(conversationHistory)) {
       for (const msg of conversationHistory) {
-        aiMessages.push({ role: msg.role, content: msg.content });
+        // If last user message has an image, build multimodal content
+        if (msg.imageUrl && msg.role === "user") {
+          aiMessages.push({
+            role: "user",
+            content: [
+              { type: "text", text: msg.content },
+              { type: "image_url", image_url: { url: msg.imageUrl } },
+            ],
+          });
+        } else {
+          aiMessages.push({ role: msg.role, content: msg.content });
+        }
       }
     }
 
