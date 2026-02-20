@@ -1,36 +1,118 @@
 
 
-## Criar transacoes direto na Edge Function (sem n8n)
+# Evolucao do Copiloto Garden - Plano de Autonomia Total
 
-A edge function `management-ai` sera modificada para inserir transacoes financeiras diretamente no banco de dados, eliminando a dependencia do webhook n8n.
+## Estado Atual
 
-### O que muda
+O Copiloto hoje possui:
+- 3 acoes executaveis: criar transacao, criar tarefa, registrar movimentacao de estoque
+- Analise de imagens (notas fiscais, recibos)
+- Contexto financeiro, estoque, tarefas, equipe e fornecedores
+- Historico de chat em localStorage (maximo 20 mensagens)
 
-1. Remover a chamada ao webhook n8n
-2. Criar um client Supabase dentro da edge function usando a Service Role Key (ja disponivel automaticamente)
-3. Quando a IA chamar a tool `create_transaction`, a edge function vai:
-   - Resolver nomes de categoria, conta, fornecedor e funcionario para seus UUIDs
-   - Inserir diretamente na tabela `finance_transactions`
-   - O trigger existente do banco atualiza automaticamente o saldo da conta
+## Gaps Identificados
 
-### Detalhes tecnicos
+O Copiloto tem acesso SOMENTE LEITURA a muitos dados mas NAO consegue executar acoes sobre eles. Ele ve despesas pendentes mas nao pode marca-las como pagas. Ele ve tarefas do dia mas nao pode completa-las. Ele conhece os fornecedores mas nao pode criar pedidos de compra.
 
-**Arquivo modificado:** `supabase/functions/management-ai/index.ts`
+---
 
-Mudancas principais:
-- Importar `createClient` do Supabase
-- Remover constante `N8N_WEBHOOK_URL` e todo o bloco de dispatch para n8n
-- Adicionar funcao `executeCreateTransaction` que:
-  - Cria client Supabase com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (variaveis ja disponiveis automaticamente em edge functions)
-  - Faz lookup por nome para resolver `category_name` -> `category_id` na tabela `finance_categories`
-  - Faz lookup por nome para resolver `account_name` -> `account_id` na tabela `finance_accounts`
-  - Faz lookup por nome para resolver `supplier_name` -> `supplier_id` na tabela `suppliers`
-  - Faz lookup por nome para resolver `employee_name` -> `employee_id` na tabela `employees`
-  - Insere o registro em `finance_transactions` com todos os campos obrigatorios (`user_id`, `unit_id`, `type`, `amount`, `description`, `date`, `is_paid`, `category_id`, `account_id`, `supplier_id`, `employee_id`)
-  - Retorna sucesso ou erro
+## Novas Funcoes a Adicionar (7 novas tools)
 
-**Nenhuma mudanca no frontend** -- o hook `useManagementAI.ts` continua funcionando igual, so recebe a resposta da edge function.
+### Grupo 1 - Acoes Rapidas (alta frequencia de uso)
 
-### Resultado esperado
+**1. `mark_transaction_paid`** - Marcar despesa como paga
+- O gestor pergunta "quais despesas estao pendentes?" e depois diz "paga a conta de energia"
+- Busca a transacao por descricao (ILIKE) + is_paid=false, atualiza para is_paid=true
+- Parametros: description (busca), date (opcional para desambiguar)
 
-Quando voce pedir ao Copiloto para criar uma transacao, ela sera inserida diretamente no banco e aparecera imediatamente na lista de transacoes financeiras.
+**2. `complete_task`** - Marcar tarefa como concluida
+- "Conclui a tarefa de ligar pro fornecedor"
+- Busca por titulo (ILIKE) + is_completed=false, atualiza is_completed=true + completed_at
+- Parametros: title (busca)
+
+**3. `delete_task`** - Excluir uma tarefa
+- "Remove a tarefa X da agenda"
+- Busca por titulo e deleta
+- Parametros: title (busca)
+
+### Grupo 2 - Operacoes de Compra
+
+**4. `create_order`** - Criar pedido de compra para fornecedor
+- "Faz um pedido de 20kg de frango pro fornecedor X"
+- Cria registro em `orders` + `order_items` vinculando ao fornecedor e item do inventario
+- Parametros: supplier_name, items (array com item_name + quantity), notes
+
+### Grupo 3 - Gestao de Equipe
+
+**5. `register_employee_payment`** - Registrar pagamento de funcionario
+- "Registra adiantamento de R$500 pro Joao"
+- Insere em `employee_payments` com tipo (salary, advance, bonus, commission)
+- Parametros: employee_name, amount, type, payment_date, notes
+
+### Grupo 4 - Inteligencia e Relatorios
+
+**6. `generate_summary`** - Gerar resumo executivo do periodo
+- "Me da um resumo da semana" ou "Como foi o mes?"
+- NAO e uma acao de escrita - instrui a IA a formatar um relatorio estruturado com os dados do contexto
+- Parametros: period (today, week, month)
+
+**7. `mark_closing_validated`** - Validar fechamento de caixa pendente
+- "Valida o fechamento de caixa de ontem"
+- Atualiza status do cash_closing para 'validated' + validated_by + validated_at
+- Parametros: date (busca)
+
+---
+
+## Melhorias na Interface (Copilot.tsx)
+
+### Chips de Sugestao Rapida
+Adicionar chips clicaveis abaixo do input com acoes frequentes:
+- "Resumo do dia"
+- "Despesas pendentes"
+- "Estoque baixo"
+- "Criar tarefa"
+
+### Markdown nas respostas
+Usar formatacao basica para tabelas e listas nas respostas da IA (negrito, listas).
+
+### Feedback visual de acao
+Apos executar uma acao, mostrar um mini-toast dentro do chat confirmando e oferecendo "Desfazer" quando possivel.
+
+---
+
+## Melhorias no Prompt/Contexto
+
+### Contexto mais inteligente
+- Adicionar **checklists do dia** (abertura/fechamento - % completo)
+- Adicionar **boletos/faturas vencendo** (supplier_invoices com due_date proxima)
+- Adicionar **metas de orcamento** (finance_budgets vs realizado)
+
+### Prompt refinado
+- Instruir a IA a sugerir acoes proativamente (ex: "Voce tem 3 despesas pendentes, quer que eu marque alguma como paga?")
+- Adicionar regras de confirmacao para acoes destrutivas (delete)
+
+---
+
+## Detalhes Tecnicos
+
+### Arquivos a modificar:
+1. **`supabase/functions/management-ai/index.ts`** - Adicionar 7 novas definicoes de tools + funcoes executoras
+2. **`src/hooks/useManagementAI.ts`** - Adicionar dados de checklists, boletos e orcamentos ao contexto
+3. **`src/pages/Copilot.tsx`** - Adicionar chips de sugestao, suporte a markdown nas respostas
+
+### Tabelas envolvidas (somente leitura/update, sem schema changes):
+- `finance_transactions` (update is_paid)
+- `manager_tasks` (update is_completed, delete)
+- `orders` + `order_items` (insert)
+- `employee_payments` (insert)
+- `cash_closings` (update status)
+- `checklist_completions` + `checklist_items` (leitura para contexto)
+- `supplier_invoices` (leitura para contexto)
+- `finance_budgets` (leitura para contexto)
+
+### Sequencia de implementacao:
+1. Adicionar novas tools na edge function (todas de uma vez)
+2. Expandir contexto no hook
+3. Atualizar UI com chips e markdown
+4. Deploy e teste
+
