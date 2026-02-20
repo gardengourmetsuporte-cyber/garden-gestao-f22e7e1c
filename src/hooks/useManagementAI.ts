@@ -32,6 +32,7 @@ function saveHistory(messages: AIMessage[]) {
 export function useManagementAI() {
   const [messages, setMessages] = useState<AIMessage[]>(loadHistory);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const { stats } = useDashboardStats();
   const { user } = useAuth();
@@ -55,7 +56,6 @@ export function useManagementAI() {
   const fetchFullContext = useCallback(async () => {
     if (!user || !activeUnitId) return {};
 
-    // Return cached context if still fresh
     const now = Date.now();
     if (contextCacheRef.current && (now - contextCacheRef.current.timestamp) < CONTEXT_TTL) {
       return contextCacheRef.current.data;
@@ -68,61 +68,36 @@ export function useManagementAI() {
 
     try {
       const [
-        accountsRes,
-        incomeRes,
-        expenseRes,
-        pendingExpRes,
-        lowStockRes,
-        ordersRes,
-        closingsRes,
-        employeesRes,
-        suppliersRes,
-        recentTxRes,
-        tasksRes,
-        employeePaymentsRes,
+        accountsRes, incomeRes, expenseRes, pendingExpRes,
+        lowStockRes, ordersRes, closingsRes, employeesRes,
+        suppliersRes, recentTxRes, tasksRes, employeePaymentsRes,
         allMonthTxRes,
       ] = await Promise.all([
-        // Finance accounts with balances
         supabase.from('finance_accounts').select('name, type, balance').eq('unit_id', activeUnitId).eq('is_active', true),
-        // Monthly income total
         supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).eq('type', 'income').eq('is_paid', true).gte('date', startDate).lte('date', endDate),
-        // Monthly expense total
         supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
-        // Pending expenses (increased limit)
         supabase.from('finance_transactions').select('amount, description, date, employee_id').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', false).gte('date', startDate).lte('date', endDate).order('date').limit(30),
-        // Low stock items
         supabase.from('inventory_items').select('name, current_stock, min_stock, supplier:suppliers(name)').eq('unit_id', activeUnitId).order('current_stock'),
-        // Recent orders
         supabase.from('orders').select('status, supplier:suppliers(name), created_at').eq('unit_id', activeUnitId).in('status', ['draft', 'sent']).order('created_at', { ascending: false }).limit(10),
-        // Pending cash closings
         supabase.from('cash_closings').select('date, total_amount, status, unit_name').eq('unit_id', activeUnitId).eq('status', 'pending').order('date', { ascending: false }).limit(5),
-        // Active employees
         supabase.from('employees').select('full_name, role, is_active, base_salary').eq('unit_id', activeUnitId).eq('is_active', true),
-        // Suppliers
         supabase.from('suppliers').select('name, delivery_frequency').eq('unit_id', activeUnitId),
-        // Recent transactions (last 30 days, increased limit)
         supabase.from('finance_transactions').select('description, amount, type, date, is_paid, category:finance_categories(name), employee:employees(full_name), supplier:suppliers(name)').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', last7days).order('date', { ascending: false }).limit(50),
-        // Today's tasks
         supabase.from('manager_tasks').select('title, is_completed, priority, period').eq('user_id', user.id).eq('date', format(nowDate, 'yyyy-MM-dd')),
-        // Employee payments this month
         supabase.from('employee_payments').select('amount, type, is_paid, payment_date, employee:employees(full_name)').eq('unit_id', activeUnitId).eq('reference_month', nowDate.getMonth() + 1).eq('reference_year', nowDate.getFullYear()).order('payment_date', { ascending: false }).limit(30),
-        // All month transactions (bigger picture)
         supabase.from('finance_transactions').select('description, amount, type, date, is_paid').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', startDate).lte('date', endDate).order('date', { ascending: false }).limit(100),
       ]);
 
       const totalIncome = (incomeRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
       const totalExpense = (expenseRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
       const totalPending = (pendingExpRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
-
       const lowStockItems = (lowStockRes.data || []).filter((i: any) => i.current_stock <= i.min_stock);
 
       const contextData = {
-        // Basic
         criticalStockCount: stats.criticalItems,
         pendingRedemptions: stats.pendingRedemptions,
         dayOfWeek,
         timeOfDay,
-        // Finance
         accounts: (accountsRes.data || []).map((a: any) => `${a.name} (${a.type}): R$${Number(a.balance).toFixed(2)}`),
         monthlyIncome: totalIncome,
         monthlyExpense: totalExpense,
@@ -131,23 +106,15 @@ export function useManagementAI() {
         pendingExpenses: (pendingExpRes.data || []).map((e: any) => `${e.description}: R$${Number(e.amount).toFixed(2)} (${e.date})`),
         recentTransactions: (recentTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'} | cat: ${(t.category as any)?.name || 'sem'} | func: ${(t.employee as any)?.full_name || '-'} | forn: ${(t.supplier as any)?.name || '-'}`),
         allMonthTransactions: (allMonthTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'}`),
-        // Stock
         lowStockItems: lowStockItems.slice(0, 10).map((i: any) => `${i.name}: ${i.current_stock}/${i.min_stock} (forn: ${(i.supplier as any)?.name || 'nenhum'})`),
-        // Orders
         pendingOrders: (ordersRes.data || []).map((o: any) => `${(o.supplier as any)?.name || '?'}: ${o.status}`),
-        // Closings
         pendingClosings: (closingsRes.data || []).map((c: any) => `${c.date}: R$${Number(c.total_amount || 0).toFixed(2)} (${c.unit_name})`),
-        // Team
         employees: (employeesRes.data || []).map((e: any) => `${e.full_name} (${e.role || 'sem cargo'}) - Salário base: R$${Number(e.base_salary || 0).toFixed(2)}`),
-        // Employee payments
         employeePayments: (employeePaymentsRes.data || []).map((p: any) => `${(p.employee as any)?.full_name || '?'}: R$${Number(p.amount).toFixed(2)} (${p.type}) - ${p.is_paid ? 'pago' : 'pendente'} - ${p.payment_date}`),
-        // Suppliers
         suppliers: (suppliersRes.data || []).map((s: any) => `${s.name} [${s.delivery_frequency || 'weekly'}]`),
-        // Tasks
         todayTasks: (tasksRes.data || []).map((t: any) => `${t.is_completed ? '✅' : '⬜'} ${t.title} (${t.priority}, ${t.period})`),
       };
 
-      // Cache the context
       contextCacheRef.current = { data: contextData, timestamp: Date.now() };
       return contextData;
     } catch (err) {
@@ -175,10 +142,14 @@ export function useManagementAI() {
     try {
       const context = await fetchFullContext();
 
+      setIsExecuting(true);
+
       const { data, error } = await supabase.functions.invoke('management-ai', {
         body: {
           messages: question ? updatedMessages : [],
           context,
+          user_id: user?.id || null,
+          unit_id: activeUnitId || null,
         },
       });
 
@@ -187,6 +158,12 @@ export function useManagementAI() {
       const response = data?.suggestion || 'Não consegui gerar uma resposta no momento.';
       const assistantMsg: AIMessage = { role: 'assistant', content: response };
       setMessages(prev => [...prev, assistantMsg]);
+
+      // Invalidate context cache if an action was executed
+      if (data?.action_executed) {
+        contextCacheRef.current = null;
+      }
+
       if (!question) {
         setHasGreeted(true);
         greetedRef.current = true;
@@ -198,8 +175,9 @@ export function useManagementAI() {
       setMessages(prev => [...prev, { role: 'assistant', content: errorMsg }]);
     } finally {
       setIsLoading(false);
+      setIsExecuting(false);
     }
-  }, [messages, fetchFullContext]);
+  }, [messages, fetchFullContext, user, activeUnitId]);
 
   const clearHistory = useCallback(() => {
     setMessages([]);
@@ -211,6 +189,7 @@ export function useManagementAI() {
   return {
     messages,
     isLoading,
+    isExecuting,
     hasGreeted,
     sendMessage,
     clearHistory,

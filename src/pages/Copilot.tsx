@@ -7,20 +7,26 @@ import { useManagementAI } from '@/hooks/useManagementAI';
 import { cn } from '@/lib/utils';
 import mascotImg from '@/assets/garden-mascot.png';
 
+function isActionMessage(content: string) {
+  return content.startsWith('[ACTION]');
+}
+
+function stripActionMarker(content: string) {
+  return content.replace(/^\[ACTION\]\s*/, '');
+}
+
 export default function CopilotPage() {
   const navigate = useNavigate();
-  const { messages, isLoading, hasGreeted, sendMessage, clearHistory } = useManagementAI();
+  const { messages, isLoading, isExecuting, hasGreeted, sendMessage, clearHistory } = useManagementAI();
   const [question, setQuestion] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-greet on mount
   useEffect(() => {
     if (!hasGreeted && messages.length === 0) {
       sendMessage();
     }
   }, []);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -68,33 +74,53 @@ export default function CopilotPage() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex",
-              msg.role === 'user' ? "justify-end" : "justify-start"
-            )}
-          >
+        {messages.map((msg, i) => {
+          const isAction = msg.role === 'assistant' && isActionMessage(msg.content);
+          const displayContent = isAction ? stripActionMarker(msg.content) : msg.content;
+
+          return (
             <div
+              key={i}
               className={cn(
-                "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                msg.role === 'assistant'
-                  ? "bg-secondary/60 text-foreground rounded-tl-md"
-                  : "bg-primary text-primary-foreground rounded-tr-md"
+                "flex",
+                msg.role === 'user' ? "justify-end" : "justify-start"
               )}
             >
-              {msg.content}
+              {isAction ? (
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
+                  <div className="whitespace-pre-line">{displayContent}</div>
+                </div>
+              ) : (
+                <div
+                  className={cn(
+                    "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                    msg.role === 'assistant'
+                      ? "bg-secondary/60 text-foreground rounded-tl-md"
+                      : "bg-primary text-primary-foreground rounded-tr-md"
+                  )}
+                >
+                  {displayContent}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-secondary/60 rounded-2xl rounded-tl-md px-4 py-3 flex gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="bg-secondary/60 rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-2">
+              {isExecuting ? (
+                <>
+                  <AppIcon name="Loader2" size={14} className="text-primary animate-spin" />
+                  <span className="text-xs text-muted-foreground">Executando ação...</span>
+                </>
+              ) : (
+                <div className="flex gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              )}
             </div>
           </div>
         )}
