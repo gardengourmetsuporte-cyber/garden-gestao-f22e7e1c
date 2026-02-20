@@ -162,7 +162,7 @@ export default function Auth() {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto">
       {/* Theme Toggle */}
       <div className="absolute top-8 right-4 z-20">
         <ThemeToggle />
@@ -196,8 +196,8 @@ export default function Auth() {
         }}
       />
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 relative z-10">
-        <div className="w-full max-w-sm space-y-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 py-10 relative z-10">
+        <div className="w-full max-w-sm space-y-6">
           {/* Logo */}
           <div className="flex flex-col items-center space-y-5 animate-slide-up">
             <div
