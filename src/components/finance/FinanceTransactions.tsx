@@ -275,6 +275,7 @@ export function FinanceTransactions({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            onDragStart={() => { try { navigator.vibrate?.(50); } catch {} }}
             onDragEnd={handleDragEnd}
           >
             <div className="px-4 pb-24 space-y-4">
