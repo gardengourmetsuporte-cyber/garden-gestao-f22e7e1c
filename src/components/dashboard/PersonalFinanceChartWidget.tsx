@@ -133,7 +133,6 @@ export function PersonalFinanceChartWidget() {
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
                 background: 'hsl(160 60% 30% / 0.15)',
-                border: '1px solid hsl(160 60% 30% / 0.25)',
               }}
             >
               <AppIcon name="PieChart" size={18} style={{ color: 'hsl(160 60% 40%)' }} />
