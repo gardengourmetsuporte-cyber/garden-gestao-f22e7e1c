@@ -1157,8 +1157,29 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // ── JWT Authentication ──
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const sbAuth = getSupabaseAdmin();
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await sbAuth.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const user_id = claimsData.claims.sub as string;
+
     const body = await req.json();
-    const { messages: conversationHistory, context, user_id, unit_id, image } = body;
+    const { messages: conversationHistory, context, unit_id, image } = body;
 
     // Load user preferences for context injection
     let preferencesBlock = "";
