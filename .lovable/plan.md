@@ -1,64 +1,73 @@
 
-# 4 Cards Visuais -- Categoria, Conta, Fornecedor e Funcionario
 
-## O que muda
+# Padronizacao de Headers em Todos os Modulos
 
-Os campos Categoria, Conta, Fornecedor e Funcionario deixam de ser botoes full-width empilhados e passam a ser **4 cards compactos em grid 2x2**, com icone centralizado, label curto e visual premium.
+## Problema Identificado
 
-## Como vai ficar
+Os modulos **Financeiro** (`/finance`) e **Financas Pessoais** (`/personal-finance`) nao possuem a barra superior com titulo do modulo (`page-header-bar`) que todos os outros modulos utilizam. Isso quebra a consistencia visual da plataforma.
 
-```text
-+-------------------+  +-------------------+
-|   [icone wallet]  |  |  [icone category] |
-|      Nubank       |  |   Materia-prima   |
-+-------------------+  +-------------------+
-+-------------------+  +-------------------+
-|   [icone truck]   |  |  [icone person]   |
-|    Fornecedor     |  |   Funcionario     |
-+-------------------+  +-------------------+
-```
+## Modulos Auditados
 
-- **Sem selecao:** Card com icone + label generico (ex: "Conta", "Categoria"), fundo `bg-secondary/50`, texto `text-muted-foreground`
-- **Com selecao:** Card com icone colorido + nome selecionado, fundo sutil `bg-primary/5`, borda fina `ring-1 ring-primary/20`
-- Ao tocar em qualquer card, abre o picker correspondente (ListPicker ou CategoryPicker) -- mesma logica de hoje
+| Modulo | Tem `page-header-bar`? | Acao |
+|--------|----------------------|------|
+| Agenda | Sim | Nenhuma |
+| Estoque | Sim | Nenhuma |
+| Pedidos | Sim | Nenhuma |
+| Checklists | Sim | Nenhuma |
+| Fechamento | Sim | Nenhuma |
+| Fichas Tecnicas | Sim | Nenhuma |
+| Funcionarios | Sim | Nenhuma |
+| Recompensas | Sim | Nenhuma |
+| Ranking | Sim | Nenhuma |
+| Marketing | Sim | Nenhuma |
+| Configuracoes | Sim | Nenhuma |
+| Alertas | Sim | Nenhuma |
+| WhatsApp | Sim | Nenhuma |
+| Cardapio | Sim | Nenhuma |
+| Tablets | Sim | Nenhuma |
+| **Financeiro** | **Nao** | **Adicionar** |
+| **Financas Pessoais** | **Nao** | **Adicionar** |
+| Dashboard | Nao (e a home, nao precisa) | Nenhuma |
+| Chat | Header customizado (full-screen) | Nenhuma |
+| Copilot | Header customizado (full-screen) | Nenhuma |
+
+## O que Muda
+
+Adicionar `page-header-bar` com o titulo do modulo em **Finance.tsx** e **PersonalFinance.tsx**, usando exatamente o mesmo padrao que todos os outros modulos ja utilizam.
 
 ## Detalhes Tecnicos
 
-**Arquivo:** `src/components/finance/TransactionSheet.tsx`
+### 1. `src/pages/Finance.tsx`
 
-1. **Remover** os blocos individuais de Categoria (linhas 526-544), Conta (linhas 546-557), Fornecedor (linhas 577-587) e Funcionario (linhas 589-599), incluindo seus `<Label>` e `<Button variant="outline">`
+Adicionar o header sticky dentro do `<AppLayout>`, antes do conteudo das tabs:
 
-2. **Substituir** por um unico bloco `<div className="grid grid-cols-2 gap-3">` contendo 4 cards:
+```
+<header className="page-header-bar">
+  <div className="page-header-content">
+    <h1 className="page-title">Financeiro</h1>
+  </div>
+</header>
+```
 
-   - **Card Conta** (sempre visivel):
-     - Icone: `account_balance_wallet` via AppIcon, tamanho 22
-     - Label: nome da conta selecionada ou "Conta"
-   
-   - **Card Categoria** (visivel quando `type !== 'transfer'`):
-     - Icone: icone da categoria selecionada ou `category` (fallback)
-     - Cor do icone: cor da categoria quando selecionada
-     - Label: nome da categoria ou "Categoria"
-   
-   - **Card Fornecedor** (visivel quando `type === 'expense' || type === 'credit_card'`):
-     - Icone: `local_shipping` via AppIcon, tamanho 22
-     - Label: nome do fornecedor ou "Fornecedor"
-   
-   - **Card Funcionario** (mesma condicao do fornecedor):
-     - Icone: `person` via AppIcon, tamanho 22
-     - Label: nome do funcionario ou "Funcionario"
+Posicao: logo apos `<AppLayout>`, envolvido pelo div principal. O header fica sticky no topo enquanto o usuario navega pelas sub-tabs (home, transacoes, graficos, etc).
 
-3. **Estilo de cada card:**
-   ```
-   button com classes:
-   - flex flex-col items-center justify-center gap-1.5
-   - p-4 rounded-2xl min-h-[80px]
-   - bg-secondary/50 (sem selecao) ou bg-primary/5 ring-1 ring-primary/20 (com selecao)
-   - transition-all duration-200
-   - text-sm font-medium truncate max-w-full
-   ```
+### 2. `src/pages/PersonalFinance.tsx`
 
-4. **Conta de destino** (transferencias) permanece como campo separado abaixo do grid, pois e contextual
+Mesmo padrao:
 
-5. Quando o grid tiver menos de 4 cards (ex: receita so tem Conta + Categoria), os 2 cards ocupam as 2 colunas normalmente
+```
+<header className="page-header-bar">
+  <div className="page-header-content">
+    <h1 className="page-title">Financas Pessoais</h1>
+  </div>
+</header>
+```
 
-6. Nenhuma alteracao nos pickers, estados ou logica de dados
+### 3. Nenhuma alteracao de CSS
+
+As classes `page-header-bar`, `page-header-content` e `page-title` ja existem no `index.css` e sao usadas por todos os outros modulos. Nao precisa criar nada novo.
+
+### 4. Nenhum outro modulo precisa de alteracao
+
+Todos os demais modulos ja seguem o padrao corretamente. Chat e Copilot usam headers customizados por serem telas full-screen com layout diferente (chat com lista/janela, copilot com interface de IA), o que e aceitavel.
+
