@@ -53,9 +53,14 @@ export function getPointsColors(points: number): PointsColors {
 }
 
 /**
- * Cores para pontos de bônus (5, 10, 15, 20)
+ * Cores para pontos de bônus.
+ * 1-4: usa o mesmo esquema de cores das moedas (--coin-1 a --coin-4)
+ * 5+: usa os tiers de bônus (--bonus-5, --bonus-10, etc.)
  */
 export function getBonusPointsColors(points: number): PointsColors {
+  if (points >= 1 && points <= 4) {
+    return getPointsColors(points);
+  }
   const tier = points <= 5 ? 5 : points <= 10 ? 10 : points <= 15 ? 15 : 20;
   return {
     color: `hsl(var(--bonus-${tier}))`,
