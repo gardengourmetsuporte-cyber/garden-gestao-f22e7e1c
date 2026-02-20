@@ -194,6 +194,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
         className={cn(
           'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
           !is_paid && 'opacity-70',
+          'transition-[border-color,box-shadow] duration-500 ease-out',
           isNew && 'border-[hsl(var(--neon-cyan)/0.6)] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.3),0_0_4px_hsl(var(--neon-cyan)/0.2)]',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}

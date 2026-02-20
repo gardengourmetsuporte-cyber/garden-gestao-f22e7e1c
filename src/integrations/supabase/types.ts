@@ -3798,6 +3798,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      batch_reorder_transactions: {
+        Args: { p_ids: string[]; p_orders: number[] }
+        Returns: undefined
+      }
       delete_unit_cascade: { Args: { p_unit_id: string }; Returns: undefined }
       get_chat_conversation_type: {
         Args: { _conversation_id: string }
