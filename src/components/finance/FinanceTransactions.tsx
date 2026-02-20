@@ -123,20 +123,21 @@ export function FinanceTransactions({
     return {};
   };
   const seenRef = useRef<Record<string, number>>(getInitialSeen());
-  const [seenVersion, setSeenVersion] = useState(0);
+  const [, forceUpdate] = useState(0);
 
   const markSeen = useCallback((id: string) => {
+    if (id in seenRef.current) return; // already seen
     seenRef.current = { ...seenRef.current, [id]: Date.now() };
     try { localStorage.setItem(SEEN_KEY, JSON.stringify(seenRef.current)); } catch {}
-    setSeenVersion(v => v + 1);
+    forceUpdate(v => v + 1);
   }, []);
 
-  const isNewTransaction = useCallback((t: FinanceTransaction) => {
+  // Not memoized — always reads fresh from the ref so dismissed items never come back
+  const isNewTransaction = (t: FinanceTransaction): boolean => {
     if (t.id in seenRef.current) return false;
     const hoursAgo = differenceInHours(new Date(), new Date(t.created_at));
     return hoursAgo < 48;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seenVersion]);
+  };
 
   // Apply initialFilters when they change from parent (reset to defaults when empty)
   useEffect(() => {
