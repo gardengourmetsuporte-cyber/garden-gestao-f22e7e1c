@@ -318,12 +318,17 @@ export function FinanceTransactions({
                                   onClick={() => {
                                     if (isNewTransaction(transaction)) {
                                       markSeen(transaction.id);
-                                      return;
                                     }
                                     onTransactionClick(transaction);
                                   }}
-                                  onTogglePaid={onTogglePaid}
-                                  onDelete={onDeleteTransaction}
+                                  onTogglePaid={async (id, isPaid) => {
+                                    markSeen(id);
+                                    await onTogglePaid(id, isPaid);
+                                  }}
+                                  onDelete={async (id) => {
+                                    markSeen(id);
+                                    await onDeleteTransaction(id);
+                                  }}
                                   disableSwipe={isDragging}
                                 />
                               </div>
