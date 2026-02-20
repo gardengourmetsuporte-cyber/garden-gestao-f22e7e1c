@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -242,14 +243,16 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
           </div>
 
           <div className="flex gap-2 pt-2">
-            <Button
+            <LoadingButton
               variant="outline"
               className="flex-1"
               onClick={() => { onSave(buildData()); onOpenChange(false); }}
-              disabled={isSaving || !title.trim()}
+              disabled={!title.trim()}
+              loading={isSaving}
+              loadingText="Salvando..."
             >
               <Save className="w-4 h-4 mr-2" /> Salvar
-            </Button>
+            </LoadingButton>
             {post && post.media_urls.length > 0 && channels.length > 0 && (
               <Button
                 className="flex-1"

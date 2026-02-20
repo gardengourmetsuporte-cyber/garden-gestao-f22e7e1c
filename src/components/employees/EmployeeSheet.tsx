@@ -10,7 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -255,9 +255,9 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
           </div>
 
           {/* Submit */}
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Salvando...' : employee ? 'Salvar alterações' : 'Cadastrar'}
-          </Button>
+          <LoadingButton type="submit" className="w-full" loading={isSubmitting} loadingText="Salvando...">
+            {employee ? 'Salvar alterações' : 'Cadastrar'}
+          </LoadingButton>
         </form>
       </SheetContent>
     </Sheet>
