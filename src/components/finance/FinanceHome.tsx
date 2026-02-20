@@ -1,4 +1,5 @@
 import { AppIcon } from '@/components/ui/app-icon';
+import { EmptyState } from '@/components/ui/empty-state';
 import { MonthSelector } from './MonthSelector';
 import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
@@ -55,7 +56,7 @@ export function FinanceHome({
           {/* Balance */}
           <p className={cn(
             "text-[2rem] font-extrabold tracking-tight leading-tight",
-            totalBalance >= 0 ? "text-white" : "text-red-300"
+            totalBalance >= 0 ? "text-white" : "text-destructive-foreground"
           )}>
             {formatCurrency(totalBalance)}
           </p>
@@ -67,15 +68,15 @@ export function FinanceHome({
               <div className="flex items-center gap-1.5">
                 <span className={cn(
                   "text-sm font-bold",
-                  profit >= 0 ? "text-emerald-300" : "text-red-300"
+                  profit >= 0 ? "text-success" : "text-destructive"
                 )}>
                   {formatCurrency(Math.abs(profit))}
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold px-1 py-0.5 rounded",
                   profit >= 0 
-                    ? "text-emerald-300 bg-emerald-400/15" 
-                    : "text-red-300 bg-red-400/15"
+                    ? "text-success bg-success/15" 
+                    : "text-destructive bg-destructive/15"
                 )}>
                   {profit >= 0 ? '+' : '-'}{Math.abs(Number(profitPercent))}%
                 </span>
@@ -84,7 +85,7 @@ export function FinanceHome({
             <div className="finance-hero-chip finance-hero-chip--neutral">
               <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold text-red-300">
+                <span className="text-sm font-bold text-destructive">
                   {formatCurrency(monthStats.totalExpense)}
                 </span>
               </div>
@@ -182,9 +183,11 @@ export function FinanceHome({
             <AccountCard key={account.id} account={account} onClick={() => onAccountClick?.(account)} />
           ))}
           {accounts.length === 0 && (
-            <p className="text-center text-muted-foreground py-8 text-sm">
-              Nenhuma conta cadastrada
-            </p>
+            <EmptyState
+              icon="Wallet"
+              title="Nenhuma conta cadastrada"
+              subtitle="Adicione suas contas bancárias para acompanhar seus saldos."
+            />
           )}
         </div>
       </div>

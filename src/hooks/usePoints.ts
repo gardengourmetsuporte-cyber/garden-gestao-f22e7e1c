@@ -84,10 +84,9 @@ export function usePoints() {
     queryKey: ['points', user?.id, activeUnitId],
     queryFn: () => fetchPointsData(user!.id, activeUnitId),
     enabled: !!user,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: 'always',
+    staleTime: 30_000,
+    gcTime: 60_000,
+    refetchOnWindowFocus: true,
   });
 
   return {

@@ -255,8 +255,8 @@ export function PayslipSheet({
           {/* Earnings Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Plus className="w-4 h-4 text-emerald-500" />
-              <h3 className="font-semibold text-emerald-600">Proventos</h3>
+              <Plus className="w-4 h-4 text-success" />
+              <h3 className="font-semibold text-success">Proventos</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -363,9 +363,9 @@ export function PayslipSheet({
               </div>
             </div>
 
-            <div className="p-3 bg-emerald-500/10 rounded-lg flex justify-between items-center">
-              <span className="font-medium text-emerald-600">Total Proventos</span>
-              <span className="font-bold text-emerald-600">{formatCurrency(totalEarnings)}</span>
+            <div className="p-3 bg-success/10 rounded-lg flex justify-between items-center">
+              <span className="font-medium text-success">Total Proventos</span>
+              <span className="font-bold text-success">{formatCurrency(totalEarnings)}</span>
             </div>
           </div>
 
