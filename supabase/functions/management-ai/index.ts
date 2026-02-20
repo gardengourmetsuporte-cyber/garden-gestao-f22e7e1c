@@ -212,8 +212,9 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar 
             );
           }
 
-          const n8nResult = await n8nResponse.json();
-          console.log("n8n result:", JSON.stringify(n8nResult));
+          // n8n may return empty body, text, or JSON
+          const n8nText = await n8nResponse.text();
+          console.log("n8n result:", n8nText);
 
           // Build confirmation message
           const typeLabel = args.type === 'income' ? 'Receita' : 'Despesa';
