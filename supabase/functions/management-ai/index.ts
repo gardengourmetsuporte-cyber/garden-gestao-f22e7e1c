@@ -29,75 +29,92 @@ const TOOLS = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "create_task",
+      description: "Criar uma tarefa na agenda do gestor. Use quando o usuário pedir para criar, adicionar, lembrar ou agendar uma tarefa, compromisso ou lembrete.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título da tarefa" },
+          date: { type: "string", description: "Data no formato YYYY-MM-DD. Se não informado, usa hoje" },
+          period: { type: "string", enum: ["manha", "tarde", "noite"], description: "Período do dia: manha, tarde ou noite. Default: manha" },
+          priority: { type: "string", enum: ["low", "medium", "high", "urgent"], description: "Prioridade: low, medium, high ou urgent. Default: medium" },
+          notes: { type: "string", description: "Observações adicionais da tarefa" },
+          due_time: { type: "string", description: "Horário de vencimento no formato HH:MM (ex: 14:30)" },
+        },
+        required: ["title"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "register_stock_movement",
+      description: "Registrar entrada ou saída de estoque de um item do inventário. Use quando o usuário pedir para dar entrada, baixa, saída, registrar movimentação ou atualizar estoque de um produto.",
+      parameters: {
+        type: "object",
+        properties: {
+          item_name: { type: "string", description: "Nome do item do inventário" },
+          type: { type: "string", enum: ["entrada", "saida"], description: "Tipo: entrada para adicionar, saida para remover estoque" },
+          quantity: { type: "number", description: "Quantidade a movimentar" },
+          notes: { type: "string", description: "Observação sobre a movimentação" },
+        },
+        required: ["item_name", "type", "quantity"],
+      },
+    },
+  },
 ];
 
-// Resolve name lookups to UUIDs and insert transaction directly
+function getSupabaseAdmin() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+}
+
+function getToday(): string {
+  return new Date().toISOString().split("T")[0];
+}
+
+// ──────────────────────────────────────────────
+// Tool: create_transaction
+// ──────────────────────────────────────────────
 async function executeCreateTransaction(
   args: Record<string, unknown>,
   userId: string,
   unitId: string | null
 ): Promise<{ success: boolean; message: string }> {
-  const supabaseAdmin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
+  const sb = getSupabaseAdmin();
 
   let categoryId: string | null = null;
   let accountId: string | null = null;
   let supplierId: string | null = null;
   let employeeId: string | null = null;
 
-  // Resolve category_name -> category_id
   if (args.category_name) {
-    const { data } = await supabaseAdmin
-      .from("finance_categories")
-      .select("id")
-      .ilike("name", String(args.category_name))
-      .eq("user_id", userId)
-      .limit(1)
-      .maybeSingle();
+    const { data } = await sb.from("finance_categories").select("id").ilike("name", String(args.category_name)).eq("user_id", userId).limit(1).maybeSingle();
     if (data) categoryId = data.id;
   }
-
-  // Resolve account_name -> account_id
   if (args.account_name) {
-    const { data } = await supabaseAdmin
-      .from("finance_accounts")
-      .select("id")
-      .ilike("name", String(args.account_name))
-      .eq("user_id", userId)
-      .limit(1)
-      .maybeSingle();
+    const { data } = await sb.from("finance_accounts").select("id").ilike("name", String(args.account_name)).eq("user_id", userId).limit(1).maybeSingle();
     if (data) accountId = data.id;
   }
-
-  // Resolve supplier_name -> supplier_id
   if (args.supplier_name) {
-    const query = supabaseAdmin
-      .from("suppliers")
-      .select("id")
-      .ilike("name", String(args.supplier_name))
-      .limit(1);
-    if (unitId) query.eq("unit_id", unitId);
-    const { data } = await query.maybeSingle();
+    const q = sb.from("suppliers").select("id").ilike("name", String(args.supplier_name)).limit(1);
+    if (unitId) q.eq("unit_id", unitId);
+    const { data } = await q.maybeSingle();
     if (data) supplierId = data.id;
   }
-
-  // Resolve employee_name -> employee_id
   if (args.employee_name) {
-    const query = supabaseAdmin
-      .from("employees")
-      .select("id")
-      .ilike("full_name", String(args.employee_name))
-      .limit(1);
-    if (unitId) query.eq("unit_id", unitId);
-    const { data } = await query.maybeSingle();
+    const q = sb.from("employees").select("id").ilike("full_name", String(args.employee_name)).limit(1);
+    if (unitId) q.eq("unit_id", unitId);
+    const { data } = await q.maybeSingle();
     if (data) employeeId = data.id;
   }
 
-  const today = new Date().toISOString().split("T")[0];
-
-  const { error } = await supabaseAdmin.from("finance_transactions").insert({
+  const { error } = await sb.from("finance_transactions").insert({
     user_id: userId,
     unit_id: unitId,
     type: args.type as string,
@@ -107,22 +124,17 @@ async function executeCreateTransaction(
     account_id: accountId,
     supplier_id: supplierId,
     employee_id: employeeId,
-    date: (args.date as string) || today,
+    date: (args.date as string) || getToday(),
     is_paid: args.is_paid !== false,
   });
 
   if (error) {
-    console.error("Insert error:", error);
-    return { success: false, message: `Erro ao criar transação: ${error.message}` };
+    console.error("Insert transaction error:", error);
+    return { success: false, message: `❌ Erro ao criar transação: ${error.message}` };
   }
 
   const typeLabel = args.type === "income" ? "Receita" : "Despesa";
-  const lines = [
-    `[ACTION] ✅ ${typeLabel} criada com sucesso!`,
-    "",
-    `📝 ${args.description}`,
-    `💰 R$ ${Number(args.amount).toFixed(2)}`,
-  ];
+  const lines = [`[ACTION] ✅ ${typeLabel} criada com sucesso!`, "", `📝 ${args.description}`, `💰 R$ ${Number(args.amount).toFixed(2)}`];
   if (args.category_name) lines.push(`📂 Categoria: ${args.category_name}`);
   if (args.account_name) lines.push(`🏦 Conta: ${args.account_name}`);
   if (args.supplier_name) lines.push(`🚚 Fornecedor: ${args.supplier_name}`);
@@ -132,6 +144,126 @@ async function executeCreateTransaction(
   return { success: true, message: lines.join("\n") };
 }
 
+// ──────────────────────────────────────────────
+// Tool: create_task
+// ──────────────────────────────────────────────
+async function executeCreateTask(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  const date = (args.date as string) || getToday();
+  const period = (args.period as string) || "manha";
+  const priority = (args.priority as string) || "medium";
+
+  const { error } = await sb.from("manager_tasks").insert({
+    user_id: userId,
+    unit_id: unitId,
+    title: String(args.title),
+    date,
+    period,
+    priority,
+    notes: args.notes ? String(args.notes) : null,
+    due_time: args.due_time ? String(args.due_time) : null,
+  });
+
+  if (error) {
+    console.error("Insert task error:", error);
+    return { success: false, message: `❌ Erro ao criar tarefa: ${error.message}` };
+  }
+
+  const periodLabel: Record<string, string> = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
+  const priorityLabel: Record<string, string> = { low: "Baixa", medium: "Média", high: "Alta", urgent: "Urgente" };
+
+  const lines = [`[ACTION] ✅ Tarefa criada com sucesso!`, "", `📝 ${args.title}`, `📅 Data: ${date}`, `🕐 Período: ${periodLabel[period] || period}`, `⚡ Prioridade: ${priorityLabel[priority] || priority}`];
+  if (args.due_time) lines.push(`⏰ Horário: ${args.due_time}`);
+  if (args.notes) lines.push(`📋 Obs: ${args.notes}`);
+
+  return { success: true, message: lines.join("\n") };
+}
+
+// ──────────────────────────────────────────────
+// Tool: register_stock_movement
+// ──────────────────────────────────────────────
+async function executeStockMovement(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  // Resolve item_name -> item_id
+  const q = sb.from("inventory_items").select("id, name, current_stock, unit_type").ilike("name", String(args.item_name)).limit(1);
+  if (unitId) q.eq("unit_id", unitId);
+  const { data: item } = await q.maybeSingle();
+
+  if (!item) {
+    return { success: false, message: `❌ Item "${args.item_name}" não encontrado no inventário.` };
+  }
+
+  const movType = args.type as string;
+  const quantity = Number(args.quantity);
+
+  if (movType === "saida" && item.current_stock < quantity) {
+    return { success: false, message: `⚠️ Estoque insuficiente de "${item.name}". Atual: ${item.current_stock} ${item.unit_type}` };
+  }
+
+  const { error } = await sb.from("stock_movements").insert({
+    item_id: item.id,
+    type: movType,
+    quantity,
+    user_id: userId,
+    unit_id: unitId,
+    notes: args.notes ? String(args.notes) : null,
+  });
+
+  if (error) {
+    console.error("Insert stock movement error:", error);
+    return { success: false, message: `❌ Erro ao registrar movimentação: ${error.message}` };
+  }
+
+  const typeLabel = movType === "entrada" ? "📥 Entrada" : "📤 Saída";
+  const newStock = movType === "entrada" ? item.current_stock + quantity : item.current_stock - quantity;
+
+  const lines = [
+    `[ACTION] ✅ Movimentação registrada!`,
+    "",
+    `${typeLabel} de estoque`,
+    `📦 Item: ${item.name}`,
+    `🔢 Quantidade: ${quantity} ${item.unit_type}`,
+    `📊 Estoque anterior: ${item.current_stock} → Novo: ${newStock}`,
+  ];
+  if (args.notes) lines.push(`📋 Obs: ${args.notes}`);
+
+  return { success: true, message: lines.join("\n") };
+}
+
+// ──────────────────────────────────────────────
+// Tool dispatcher
+// ──────────────────────────────────────────────
+async function executeTool(
+  name: string,
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  switch (name) {
+    case "create_transaction":
+      return executeCreateTransaction(args, userId, unitId);
+    case "create_task":
+      return executeCreateTask(args, userId, unitId);
+    case "register_stock_movement":
+      return executeStockMovement(args, userId, unitId);
+    default:
+      return { success: false, message: `Função "${name}" não reconhecida.` };
+  }
+}
+
+// ──────────────────────────────────────────────
+// Main handler
+// ──────────────────────────────────────────────
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -199,12 +331,29 @@ REGRAS:
 - Quando não souber algo específico, diga que não tem essa informação ainda
 
 AÇÕES EXECUTÁVEIS:
-- Quando o usuário pedir para CRIAR, REGISTRAR, LANÇAR, ADICIONAR ou CADASTRAR uma transação financeira (receita ou despesa), use a função create_transaction
-- Use os dados do contexto para resolver nomes de categorias, contas, fornecedores e funcionários
-- Sempre confirme os valores extraídos antes de executar a ação
-- Se faltar informação obrigatória (tipo, valor ou descrição), pergunte ao usuário
-- Para o campo date, se o usuário não especificar, use a data de hoje
-- Para is_paid, assuma true se o usuário não disser que é pendente
+Você pode executar 3 tipos de ação:
+
+1. **create_transaction** - Criar transação financeira (receita/despesa)
+   - Use quando o usuário pedir para registrar, lançar, criar ou adicionar uma transação
+   - Campos obrigatórios: type, amount, description
+   - Use os dados do contexto para resolver nomes de categorias, contas, fornecedores e funcionários
+   - Para date, se não informado, use hoje. Para is_paid, assuma true se não disser pendente
+
+2. **create_task** - Criar tarefa na agenda do gestor
+   - Use quando o usuário pedir para criar, adicionar, lembrar ou agendar tarefa/compromisso/lembrete
+   - Campo obrigatório: title
+   - Infira o período (manha/tarde/noite) e prioridade baseado no contexto da conversa
+   - Se o usuário mencionar um horário, coloque em due_time
+
+3. **register_stock_movement** - Registrar movimentação de estoque
+   - Use quando o usuário pedir para dar entrada, baixa, saída ou movimentar estoque
+   - Campos obrigatórios: item_name, type (entrada/saida), quantity
+   - Use os nomes dos itens que aparecem nos dados de estoque do contexto
+
+REGRAS PARA AÇÕES:
+- Sempre confirme os valores extraídos antes de executar
+- Se faltar informação obrigatória, pergunte ao usuário
+- Nunca invente nomes de itens, categorias ou contas - use os que estão no contexto
 
 DADOS ATUAIS DO ESTABELECIMENTO:
 - Dia: ${context?.dayOfWeek || 'não informado'} (${context?.timeOfDay || ''})
@@ -270,26 +419,24 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar 
     if (choice?.tool_calls && choice.tool_calls.length > 0) {
       const toolCall = choice.tool_calls[0];
 
-      if (toolCall.function.name === "create_transaction") {
-        let args: Record<string, unknown>;
-        try {
-          args = typeof toolCall.function.arguments === "string"
-            ? JSON.parse(toolCall.function.arguments)
-            : toolCall.function.arguments;
-        } catch {
-          return new Response(
-            JSON.stringify({ suggestion: "Não consegui interpretar os dados da transação. Pode repetir?", action_executed: false }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        const result = await executeCreateTransaction(args, user_id, unit_id || null);
-
+      let args: Record<string, unknown>;
+      try {
+        args = typeof toolCall.function.arguments === "string"
+          ? JSON.parse(toolCall.function.arguments)
+          : toolCall.function.arguments;
+      } catch {
         return new Response(
-          JSON.stringify({ suggestion: result.message, action_executed: result.success }),
+          JSON.stringify({ suggestion: "Não consegui interpretar os dados. Pode repetir?", action_executed: false }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      const result = await executeTool(toolCall.function.name, args, user_id, unit_id || null);
+
+      return new Response(
+        JSON.stringify({ suggestion: result.message, action_executed: result.success }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // No tool call - return normal text
