@@ -523,37 +523,110 @@ export function TransactionSheet({
               </div>
             </div>
 
-            {/* Category */}
-            {type !== 'transfer' && (
-              <div className="space-y-2">
-                <Label>Categoria</Label>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between h-12"
-                  onClick={() => setShowCategoryPicker(true)}
-                >
-                  <div className="flex items-center gap-2">
-                    {categoryIconName && (
-                      <AppIcon name={categoryIconName} size={16} style={{ color: selectedCategory?.color }} />
-                    )}
-                    <span>{selectedCategory?.name || 'Selecionar categoria'}</span>
-                  </div>
-                   <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
-                </Button>
-              </div>
-            )}
-
-            {/* Account */}
-            <div className="space-y-2">
-              <Label>{type === 'transfer' ? 'Conta de origem' : type === 'credit_card' ? 'Cartão' : 'Conta'}</Label>
-              <Button
-                variant="outline"
-                className="w-full justify-between h-12"
+            {/* Visual Cards Grid - Conta, Categoria, Fornecedor, Funcionário */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Card Conta */}
+              <button
+                type="button"
                 onClick={() => setShowAccountPicker(true)}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
+                  accountId
+                    ? "bg-primary/5 ring-1 ring-primary/20"
+                    : "bg-secondary/50"
+                )}
               >
-                <span>{availableAccounts.find(a => a.id === accountId)?.name || `Selecionar ${type === 'credit_card' ? 'cartão' : 'conta'}`}</span>
-                <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
-              </Button>
+                <AppIcon
+                  name="account_balance_wallet"
+                  size={22}
+                  className={accountId ? "text-primary" : "text-muted-foreground"}
+                />
+                <span className={cn(
+                  "text-sm font-medium truncate max-w-full",
+                  accountId ? "text-foreground" : "text-muted-foreground"
+                )}>
+                  {availableAccounts.find(a => a.id === accountId)?.name || (type === 'credit_card' ? 'Cartão' : 'Conta')}
+                </span>
+              </button>
+
+              {/* Card Categoria */}
+              {type !== 'transfer' && (
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryPicker(true)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
+                    categoryId
+                      ? "bg-primary/5 ring-1 ring-primary/20"
+                      : "bg-secondary/50"
+                  )}
+                >
+                  <AppIcon
+                    name={categoryIconName || 'category'}
+                    size={22}
+                    style={selectedCategory?.color ? { color: selectedCategory.color } : undefined}
+                    className={!selectedCategory?.color ? "text-muted-foreground" : undefined}
+                  />
+                  <span className={cn(
+                    "text-sm font-medium truncate max-w-full",
+                    categoryId ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {selectedCategory?.name || 'Categoria'}
+                  </span>
+                </button>
+              )}
+
+              {/* Card Fornecedor */}
+              {(type === 'expense' || type === 'credit_card') && (
+                <button
+                  type="button"
+                  onClick={() => setShowSupplierPicker(true)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
+                    supplierId
+                      ? "bg-primary/5 ring-1 ring-primary/20"
+                      : "bg-secondary/50"
+                  )}
+                >
+                  <AppIcon
+                    name="local_shipping"
+                    size={22}
+                    className={supplierId ? "text-primary" : "text-muted-foreground"}
+                  />
+                  <span className={cn(
+                    "text-sm font-medium truncate max-w-full",
+                    supplierId ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {suppliers.find(s => s.id === supplierId)?.name || 'Fornecedor'}
+                  </span>
+                </button>
+              )}
+
+              {/* Card Funcionário */}
+              {(type === 'expense' || type === 'credit_card') && (
+                <button
+                  type="button"
+                  onClick={() => setShowEmployeePicker(true)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
+                    employeeId
+                      ? "bg-primary/5 ring-1 ring-primary/20"
+                      : "bg-secondary/50"
+                  )}
+                >
+                  <AppIcon
+                    name="person"
+                    size={22}
+                    className={employeeId ? "text-primary" : "text-muted-foreground"}
+                  />
+                  <span className={cn(
+                    "text-sm font-medium truncate max-w-full",
+                    employeeId ? "text-foreground" : "text-muted-foreground"
+                  )}>
+                    {employees.find(e => e.id === employeeId)?.full_name || 'Funcionário'}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* To Account (for transfers) */}
@@ -569,35 +642,6 @@ export function TransactionSheet({
                   <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
                 </Button>
               </div>
-            )}
-
-            {/* Supplier & Employee - only for expenses */}
-            {(type === 'expense' || type === 'credit_card') && (
-              <>
-                <div className="space-y-2">
-                  <Label>Fornecedor</Label>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between h-12"
-                    onClick={() => setShowSupplierPicker(true)}
-                  >
-                    <span>{suppliers.find(s => s.id === supplierId)?.name || 'Nenhum'}</span>
-                     <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
-                   </Button>
-                 </div>
-
-                 <div className="space-y-2">
-                   <Label>Funcionário</Label>
-                   <Button
-                     variant="outline"
-                     className="w-full justify-between h-12"
-                     onClick={() => setShowEmployeePicker(true)}
-                   >
-                     <span>{employees.find(e => e.id === employeeId)?.full_name || 'Nenhum'}</span>
-                     <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
-                  </Button>
-                </div>
-              </>
             )}
 
             {/* Advanced options */}
