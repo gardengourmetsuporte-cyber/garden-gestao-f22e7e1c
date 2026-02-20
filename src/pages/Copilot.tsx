@@ -20,6 +20,7 @@ export default function CopilotPage() {
   const { messages, isLoading, isExecuting, hasGreeted, sendMessage, clearHistory } = useManagementAI();
   const [question, setQuestion] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!hasGreeted && messages.length === 0) {
@@ -38,6 +39,34 @@ export default function CopilotPage() {
     setQuestion('');
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || isLoading) return;
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      sendMessage('Envie apenas imagens (JPG, PNG, etc.)');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      sendMessage('A imagem deve ter no máximo 10MB.');
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const prompt = question.trim() || 'Analise esta imagem e extraia todas as informações relevantes (valores, itens, datas, etc.)';
+      sendMessage(prompt, base64);
+      setQuestion('');
+    };
+    reader.readAsDataURL(file);
+
+    // Reset input
+    e.target.value = '';
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-background">
       {/* Header */}
@@ -47,7 +76,7 @@ export default function CopilotPage() {
       >
         <div className="flex items-center gap-3 h-14 px-4">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
             className="p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors"
           >
             <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
@@ -82,10 +111,18 @@ export default function CopilotPage() {
             <div
               key={i}
               className={cn(
-                "flex",
-                msg.role === 'user' ? "justify-end" : "justify-start"
+                "flex flex-col",
+                msg.role === 'user' ? "items-end" : "items-start"
               )}
             >
+              {/* Show image thumbnail if message has one */}
+              {msg.imageUrl && (
+                <img
+                  src={msg.imageUrl}
+                  alt="Imagem enviada"
+                  className="max-w-[200px] max-h-[200px] rounded-xl mb-1 object-cover border border-border/30"
+                />
+              )}
               {isAction ? (
                 <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
                   <div className="whitespace-pre-line">{displayContent}</div>
@@ -127,12 +164,31 @@ export default function CopilotPage() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleImageUpload}
+      />
+
       {/* Input */}
       <div
         className="shrink-0 border-t border-border/30 bg-card px-4 py-3"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
       >
         <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-11 w-11 p-0 rounded-full shrink-0"
+            disabled={isLoading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <AppIcon name="Camera" size={18} className="text-muted-foreground" />
+          </Button>
           <Input
             value={question}
             onChange={e => setQuestion(e.target.value)}

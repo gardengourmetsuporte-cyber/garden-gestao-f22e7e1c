@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale';
 interface AIMessage {
   role: 'user' | 'assistant';
   content: string;
+  imageUrl?: string;
 }
 
 const HISTORY_KEY = 'garden_copilot_history';
@@ -128,13 +129,13 @@ export function useManagementAI() {
     }
   }, [user, activeUnitId, stats, dayOfWeek, timeOfDay]);
 
-  const sendMessage = useCallback(async (question?: string) => {
+  const sendMessage = useCallback(async (question?: string, imageBase64?: string) => {
     setIsLoading(true);
 
     let updatedMessages = [...messages];
 
     if (question) {
-      const userMsg: AIMessage = { role: 'user', content: question };
+      const userMsg: AIMessage = { role: 'user', content: question, imageUrl: imageBase64 };
       updatedMessages = [...updatedMessages, userMsg];
       setMessages(updatedMessages);
     }
@@ -144,10 +145,11 @@ export function useManagementAI() {
 
       const { data, error } = await supabase.functions.invoke('management-ai', {
         body: {
-          messages: question ? updatedMessages : [],
+          messages: question ? updatedMessages.map(m => ({ role: m.role, content: m.content, imageUrl: m.imageUrl })) : [],
           context,
           user_id: user?.id || null,
           unit_id: activeUnitId || null,
+          image: imageBase64 || null,
         },
       });
 
