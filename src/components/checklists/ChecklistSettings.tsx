@@ -71,6 +71,10 @@ const pointsOptions = [
 ];
 
 const bonusPointsOptions = [
+  { value: 1, label: '1 ponto' },
+  { value: 2, label: '2 pontos' },
+  { value: 3, label: '3 pontos' },
+  { value: 4, label: '4 pontos' },
   { value: 5, label: '5 pontos' },
   { value: 10, label: '10 pontos' },
   { value: 15, label: '15 pontos' },
