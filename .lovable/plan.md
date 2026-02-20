@@ -1,82 +1,183 @@
 
-# Fase 2 — Auditoria Completa de UX
+
+# Modulo Gamificacao & Fidelizacao — Roleta de Premios
 
 ## Visao Geral
 
-Auditoria sistematica de todo o app para corrigir bugs, inconsistencias visuais, cores hardcoded e problemas de usabilidade.
+Criar um modulo completo de gamificacao com dois lados:
+1. **Tela publica (tablet)** — roleta de premios acessivel via URL `/gamification/:unitId`
+2. **Painel administrativo (BOSST)** — rota protegida `/gamification` para gestores configurarem premios, probabilidades e verem metricas
+
+O modulo segue os mesmos padroes do sistema de Tablet existente (rotas publicas em `/tablet/:unitId`) e do painel admin (`/tablet-admin`).
 
 ---
 
-## 1. Bug Critico: Loop Infinito de Re-renders ✅
+## Banco de Dados (3 tabelas + RLS)
 
-**Problema:** `usePoints` com `staleTime: 0` e `gcTime: 0` causa re-fetches agressivos que triggeram loop de medicao no Popover de notificacoes (Maximum update depth exceeded).
+### Tabela `gamification_prizes`
+Armazena os premios configuraveis pelo gestor.
 
-**Solucao:** Aumentar `staleTime` para 30s e `gcTime` para 60s.
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid PK | |
+| unit_id | uuid FK units | Unidade |
+| name | text | Nome do premio (ex: "Item pequeno gratis") |
+| type | text | `item`, `discount`, `empty` |
+| probability | numeric | Peso relativo (0-100) |
+| estimated_cost | numeric | Custo estimado em R$ |
+| is_active | boolean | Ativo/inativo |
+| icon | text | Emoji ou icone |
+| color | text | Cor do segmento na roleta |
+| created_at / updated_at | timestamptz | |
 
-**Status:** CORRIGIDO
+### Tabela `gamification_plays`
+Registra cada jogada realizada.
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid PK | |
+| unit_id | uuid FK units | Unidade |
+| order_id | text | ID do pedido (referencia textual) |
+| customer_name | text nullable | Nome do cliente (opcional) |
+| prize_id | uuid FK gamification_prizes nullable | Premio ganho (null = sem premio) |
+| prize_name | text | Nome snapshot do premio |
+| played_at | timestamptz | Data/hora da jogada |
+
+### Tabela `gamification_settings`
+Configuracoes globais por unidade (1 row por unit).
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | uuid PK | |
+| unit_id | uuid FK units UNIQUE | |
+| is_enabled | boolean | Jogo ativo/inativo |
+| max_daily_cost | numeric | Teto de custo diario |
+| points_per_play | integer | Pontos consumidos por jogada |
+| cooldown_minutes | integer | Intervalo minimo entre jogadas |
+| updated_at | timestamptz | |
+
+### RLS
+- `gamification_prizes`: SELECT publico (anon para tablet), INSERT/UPDATE/DELETE restrito a admins da unidade
+- `gamification_plays`: INSERT publico (anon para tablet registrar jogada), SELECT restrito a admins
+- `gamification_settings`: SELECT publico, UPDATE restrito a admins
 
 ---
 
-## 2. Cores Hardcoded no Design System
+## Frontend — Tela do Tablet (publica)
 
-**Problema:** 39 arquivos usam classes Tailwind diretas (text-red-300, bg-amber-500, text-emerald-600, etc.) e 11 arquivos usam cores hex inline (#ef4444, #22c55e, etc.) em vez de tokens semanticos do design system.
+### Arquivos novos
+- `src/pages/GamificationPlay.tsx` — pagina principal
+- `src/components/gamification/SpinWheel.tsx` — componente da roleta animada (Canvas ou CSS)
+- `src/components/gamification/PrizeResult.tsx` — tela de resultado do premio
+- `src/hooks/useGamification.ts` — hook para fetch de premios e registro de jogadas
 
-**Prioridade Alta (componentes visiveis em todas as telas):**
-- `src/components/finance/FinanceHome.tsx` — text-emerald-300, text-red-300 → usar tokens success/destructive
-- `src/components/layout/AppLayout.tsx` — color: '#fff', hsl hardcoded no launcher
-- `src/components/rewards/PointsDisplay.tsx` — bg-amber-500/20 → usar neon-amber token
+### Rota
+`/gamification/:unitId` (publica, sem auth — igual ao tablet)
 
-**Prioridade Media (sheets e modais):**
-- `src/components/employees/PayslipSheet.tsx` — text-emerald-500/600, bg-emerald-500/10
-- `src/components/employees/EmployeePayments.tsx` — color: '#ef4444'
-- `src/components/employees/MyPayslips.tsx` — color: '#ef4444'
-- `src/components/cashClosing/CashClosingForm.tsx` — color: '#22c55e', backgroundColor: '#22c55e20'
-- `src/components/recipes/RecipeSheet.tsx` — text-blue-500, bg-amber-50, text-amber-700
-- `src/components/inventory/OrdersTab.tsx` — bg-green-600 hover:bg-green-700
+### Fluxo
+```text
+[Tela Inicial]
+  Garden Gourmet
+  "Enquanto seu pedido fica pronto, gire a roleta"
+  Input: Numero do pedido (ou QR)
+  Botao: GIRAR ROLETA
+        |
+        v
+[Validacao]
+  - Verificar se jogo esta ativo (settings.is_enabled)
+  - Verificar cooldown (ultima jogada deste pedido)
+  - Verificar teto de custo diario
+        |
+        v
+[Animacao da Roleta]
+  - Sortear premio com base em probabilidades (weighted random)
+  - Animar giro por ~3-4 segundos
+  - Parar no segmento sorteado
+        |
+        v
+[Resultado]
+  - Exibir premio com animacao de confete
+  - Mensagem: "Mostre esta tela no caixa"
+  - Botao: Finalizar (volta pra tela inicial)
+```
 
-**Prioridade Baixa (dados de config/seed):**
-- `src/components/onboarding/OnboardingWizard.tsx` — hex colors em templates (aceitavel)
-- `src/components/dashboard/PersonalFinanceChartWidget.tsx` — cor fallback '#64748b' (aceitavel)
+### Roleta (SpinWheel)
+- Componente CSS com `conic-gradient` e rotacao via `transform: rotate()`
+- Segmentos proporcionais as probabilidades
+- Animacao com `transition` e `cubic-bezier` para efeito de desaceleracao
+- Indicador/seta fixa no topo
 
 ---
 
-## 3. Empty States Faltantes
+## Frontend — Painel Administrativo (BOSST)
 
-**Problema:** FinanceHome.tsx (linha 184-188) usa texto inline em vez do componente EmptyState padronizado para "Nenhuma conta cadastrada".
+### Arquivos novos
+- `src/pages/Gamification.tsx` — pagina admin
+- `src/components/gamification/PrizeSheet.tsx` — criar/editar premios
+- `src/components/gamification/GamificationMetrics.tsx` — metricas (jogadas/dia, custo, premios)
+- `src/components/gamification/GamificationSettings.tsx` — on/off, teto diario, cooldown
+- `src/hooks/useGamificationAdmin.ts` — hook admin com CRUD de premios + metricas
 
-**Arquivos:**
-- `src/components/finance/FinanceHome.tsx`
+### Rota
+`/gamification` (protegida, dentro do AppLayout)
+
+### Interface
+3 secoes na pagina:
+1. **Cabecalho** — toggle ativar/desativar jogo + configuracoes
+2. **Premios** — lista com drag para reordenar, sheet para criar/editar, toggle ativo/inativo inline
+3. **Metricas** — cards com jogadas hoje, premios distribuidos, custo estimado acumulado
 
 ---
 
-## 4. Launcher com Cores Light-Mode Hardcoded
+## Integracao no BOSST
 
-**Problema:** O grid de icones no launcher (AppLayout linhas 488-498) usa `hsl(0 0% 95%)` e `hsl(0 0% 88%)` que sao cores light-mode. Em dark mode, os icones ficam invisíveis.
-
-**Solucao:** Usar tokens semanticos (bg-secondary, bg-muted) ou CSS variables.
+### Arquivos a editar
+- `src/lib/modules.ts` — adicionar modulo `gamification`
+- `src/App.tsx` — adicionar rotas `/gamification` (protegida) e `/gamification/:unitId` (publica)
+- `src/components/layout/AppLayout.tsx` — adicionar item no menu lateral (grupo "Engajamento" ou "Em Producao")
 
 ---
 
-## 5. Consistencia de Feedback Visual
+## Logica de Sorteio (client-side para MVP)
 
-**Problema:** Alguns botoes de acao usam cores de WhatsApp hardcoded (bg-[hsl(142,70%,35%)]) e cores de status inconsistentes entre modulos.
+```text
+1. Buscar premios ativos da unidade
+2. Calcular soma total de probabilidades
+3. Gerar numero aleatorio 0..soma
+4. Iterar premios acumulando probabilidades ate encontrar o sorteado
+5. Registrar jogada no banco com prize_id
+```
 
-**Arquivos:**
-- `src/pages/Orders.tsx` — WhatsApp button hardcoded green
-- `src/components/inventory/OrdersTab.tsx` — bg-green-600
-- `src/components/cashClosing/CashClosingList.tsx` — bg-amber-500/10
+Para versao futura, o sorteio pode ser movido para Edge Function para evitar manipulacao.
 
 ---
 
 ## Prioridade de Implementacao
 
-1. ✅ Fix infinite render loop (item 1)
-2. Cores hardcoded nos componentes principais (item 2 - alta prioridade)
-3. Launcher dark mode fix (item 4)
-4. Empty states faltantes (item 3)
-5. Cores hardcoded em sheets (item 2 - media prioridade)
-6. Feedback visual consistente (item 5)
+1. Migracoes de banco (tabelas + RLS + realtime)
+2. Hook `useGamification` + `useGamificationAdmin`
+3. Componente `SpinWheel` (roleta animada)
+4. Pagina do tablet `GamificationPlay`
+5. Pagina admin `Gamification`
+6. Integracao no roteamento e menu do BOSST
 
 ---
 
-## Estimativa: ~15-20 arquivos modificados
+## Detalhes Tecnicos
+
+### Animacao da roleta
+- CSS puro com `conic-gradient` para os segmentos coloridos
+- Rotacao via state React + `transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)`
+- Angulo final calculado para parar no segmento sorteado
+- Sem dependencias externas
+
+### Cooldown
+- Verificado client-side consultando `gamification_plays` pelo `order_id`
+- Se ja existe jogada para aquele pedido, bloqueia
+
+### Teto de custo diario
+- Soma `estimated_cost` dos premios distribuidos hoje
+- Se ultrapassa `max_daily_cost`, desativa temporariamente
+
+### Estimativa: ~12 arquivos novos, ~3 arquivos editados
+
