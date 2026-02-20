@@ -1,11 +1,10 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
-import { differenceInHours } from 'date-fns';
-import { format, parseISO } from 'date-fns';
+import { differenceInHours, format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
 import { TransactionItem } from './TransactionItem';
 import { FinanceTransaction, MonthlyStats } from '@/types/finance';
-import { Loader2, Repeat } from 'lucide-react';
+import { Repeat } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +27,36 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Sortable transaction wrapper (reordering within same day only)
+// Module-level constants & helpers (avoid re-creation on every render)
+const FINANCE_SEEN_KEY = 'finance_seen_txns';
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const formatCurrency = (value: number) => currencyFormatter.format(value);
+
+function getInitialSeen(): Record<string, number> {
+  try {
+    const stored = localStorage.getItem(FINANCE_SEEN_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      let data: Record<string, number>;
+      if (Array.isArray(parsed)) {
+        data = {};
+        parsed.forEach((id: string) => { data[id] = Date.now(); });
+      } else {
+        data = parsed;
+      }
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const cleaned: Record<string, number> = {};
+      Object.entries(data).forEach(([id, ts]) => {
+        if ((ts as number) > cutoff) cleaned[id] = ts as number;
+      });
+      localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(cleaned));
+      return cleaned;
+    }
+  } catch {}
+  return {};
+}
+
 function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
   const {
     attributes,
@@ -95,40 +123,13 @@ export function FinanceTransactions({
     ...initialFilters
   });
 
-  // Track "seen" new transactions — persisted in localStorage
-  const SEEN_KEY = 'finance_seen_txns';
-
-  // Load seen state synchronously to avoid flash of glow on remount
-  const getInitialSeen = (): Record<string, number> => {
-    try {
-      const stored = localStorage.getItem(SEEN_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        let data: Record<string, number>;
-        if (Array.isArray(parsed)) {
-          data = {};
-          parsed.forEach((id: string) => { data[id] = Date.now(); });
-        } else {
-          data = parsed;
-        }
-        const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        const cleaned: Record<string, number> = {};
-        Object.entries(data).forEach(([id, ts]) => {
-          if ((ts as number) > cutoff) cleaned[id] = ts as number;
-        });
-        localStorage.setItem(SEEN_KEY, JSON.stringify(cleaned));
-        return cleaned;
-      }
-    } catch {}
-    return {};
-  };
   const seenRef = useRef<Record<string, number>>(getInitialSeen());
   const [, forceUpdate] = useState(0);
 
   const markSeen = useCallback((id: string) => {
-    if (id in seenRef.current) return; // already seen
+    if (id in seenRef.current) return;
     seenRef.current = { ...seenRef.current, [id]: Date.now() };
-    try { localStorage.setItem(SEEN_KEY, JSON.stringify(seenRef.current)); } catch {}
+    try { localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(seenRef.current)); } catch {}
     forceUpdate(v => v + 1);
   }, []);
 
@@ -159,8 +160,7 @@ export function FinanceTransactions({
     })
   );
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  
 
   const filteredTransactionsByDate = useMemo(() => {
     const result: Record<string, FinanceTransaction[]> = {};

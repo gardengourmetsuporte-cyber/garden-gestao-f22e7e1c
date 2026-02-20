@@ -9,13 +9,14 @@ import {
   FinanceTransaction, 
   TransactionFormData,
   MonthlyStats,
+  RecurringEditMode,
   DEFAULT_EXPENSE_CATEGORIES,
   DEFAULT_INCOME_CATEGORIES
 } from '@/types/finance';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { toast } from 'sonner';
 
-export type RecurringEditMode = 'single' | 'pending' | 'all';
+export type { RecurringEditMode };
 
 // ---- Fetch helpers ----
 
@@ -175,7 +176,7 @@ export function useFinance(selectedMonth: Date) {
   useEffect(() => {
     if (userId && !defaultsInitializedRef.current) {
       defaultsInitializedRef.current = true;
-      initializeDefaults(userId, activeUnitId);
+      initializeDefaults(userId, activeUnitId).catch(console.error);
     }
   }, [userId]);
 

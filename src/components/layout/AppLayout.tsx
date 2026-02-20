@@ -315,7 +315,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-[calc(100vw-32px)] max-w-[340px] p-0 rounded-2xl border-border/50 bg-card max-h-[70vh] overflow-y-auto" sideOffset={8}>
-                  <NotificationCard />
+                  {notifOpen && <NotificationCard />}
                 </PopoverContent>
               </Popover>
             </div>

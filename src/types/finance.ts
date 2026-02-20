@@ -144,6 +144,8 @@ export const DEFAULT_PERSONAL_INCOME_CATEGORIES = [
 
 export type FinanceTab = 'home' | 'transactions' | 'charts' | 'planning' | 'more' | 'cards';
 
+export type RecurringEditMode = 'single' | 'pending' | 'all';
+
 // Credit card invoices
 export interface CreditCardInvoice {
   id: string;

@@ -108,8 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(p);
       setRole(r);
       setCachedAuth(p, r);
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      console.error('Failed to fetch user data:', err);
     } finally {
       setIsLoading(false);
     }
