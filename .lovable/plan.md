@@ -1,144 +1,150 @@
 
+# Fase 1 — Polimento Visual, UX e Consistencia
 
-# Analise Completa: Melhorias e Correcoes
+## Visao Geral
 
-## BUGS CRITICOS
-
-### 1. Loop infinito de re-renders no Dashboard (Maximum update depth exceeded)
-O console mostra um erro critico: "Maximum update depth exceeded" originando do `AppLayout.tsx` via Popover/Popper. Isso causa degradacao de performance na pagina inicial e pode travar o app em dispositivos mais fracos.
-
-**Causa provavel:** O componente de notificacoes (`NotificationCard`) ou o `Popover` de notificacoes esta disparando `setState` dentro de um `useEffect` sem dependencias corretas, criando um loop.
-
-**Correcao:** Investigar o `NotificationCard` e o hook `useNotifications` para encontrar o setState ciclico. Provavelmente adicionar guards ou memoizar dependencias.
-
-### 2. Sinalizacao de transacoes "novas" volta apos refetch
-Problema reportado pelo usuario - ja corrigido parcialmente, mas o mecanismo usa `differenceInHours` com `created_at` que pode gerar falsos positivos se o relogio do dispositivo estiver diferente do servidor.
-
-**Correcao:** Alem do `seenRef`, usar timestamp do servidor (`created_at`) de forma mais robusta e considerar mover o tracking para o banco de dados (coluna `seen_at` na tabela de transacoes) para persistencia real entre dispositivos.
+Aplicar melhorias sistematicas em 4 frentes: animacoes/loading, responsividade mobile, fluxos/usabilidade e consistencia do design system. Foco em impacto maximo com mudancas cirurgicas.
 
 ---
 
-## MELHORIAS DE PERFORMANCE
+## 1. Skeleton Loaders Padronizados
 
-### 3. `SEEN_KEY` definido dentro do componente (recriado a cada render)
-A constante `SEEN_KEY = 'finance_seen_txns'` esta dentro do corpo do componente `FinanceTransactions`, sendo recriada a cada render.
+**Problema:** Varios modulos usam `<Skeleton>` de forma inconsistente. O Dashboard mostra apenas "Carregando..." com animate-pulse em texto. Algumas paginas nao tem loading state nenhum (Employees, Chat).
 
-**Correcao:** Mover para fora do componente como constante de modulo.
+**Solucao:** Criar um componente `PageSkeleton` reutilizavel com variantes por tipo de pagina (lista, grid, dashboard), e aplicar em todas as paginas que ainda usam texto simples ou nao tem loading.
 
-### 4. `getInitialSeen()` executada a cada render
-A funcao `getInitialSeen` e declarada dentro do componente e chamada no `useRef` - mas nao e memoizada. Se o componente re-renderizar (o que acontece frequentemente), ela e recriada desnecessariamente.
-
-**Correcao:** Mover para fora do componente ou usar `useMemo` para a inicializacao.
-
-### 5. `formatCurrency` recriado a cada render
-A funcao `formatCurrency` em `FinanceTransactions` e recriada a cada render. O `Intl.NumberFormat` e relativamente custoso.
-
-**Correcao:** Mover para fora do componente ou usar `useMemo`/`useCallback`. Melhor: criar um formatter compartilhado em `utils.ts`.
-
-### 6. `sensors` de DnD recriados a cada render
-Os sensores de drag-and-drop (`useSensors`) sao recriados a cada render sem memoizacao.
-
-**Correcao:** Ja usam `useSensor/useSensors` que sao hooks, entao estao corretos. Sem acao necessaria.
-
-### 7. Multiplas chamadas individuais de UPDATE no reorder
-O `reorderTransactions` faz `Promise.all` com N chamadas `UPDATE` individuais (uma por transacao). Para dias com muitas transacoes, isso gera muitas requisicoes.
-
-**Correcao:** Usar uma funcao RPC no banco que aceita um array de IDs e faz o update em batch com uma unica query.
+**Arquivos:**
+- Criar `src/components/ui/page-skeleton.tsx` — componente com variantes: `list`, `grid`, `dashboard`, `detail`
+- Editar `src/pages/DashboardNew.tsx` — substituir "Carregando..." por skeleton de dashboard
+- Editar `src/pages/Employees.tsx` — adicionar loading state com skeleton
+- Editar `src/pages/Chat.tsx` — adicionar loading skeleton
+- Editar `src/pages/Rewards.tsx` — adicionar loading skeleton
+- Editar `src/pages/Marketing.tsx` — adicionar loading skeleton
 
 ---
 
-## MELHORIAS DE UX
+## 2. Transicoes de Pagina
 
-### 8. Primeiro clique em transacao nova nao abre detalhes
-Conforme solicitado pelo usuario, o primeiro clique apenas remove a sinalizacao. Isso esta correto e implementado. Porem, nao ha feedback visual (como uma animacao de "fade-out" do glow) para confirmar que a acao foi registrada.
+**Problema:** Ao navegar entre paginas, o conteudo aparece abruptamente. Ja existe `animate-page-enter` definido no CSS mas nao e usado sistematicamente.
 
-**Correcao:** Adicionar uma transicao CSS suave no glow para que ele desapareca gradualmente ao inves de sumir instantaneamente.
+**Solucao:** Aplicar `animate-page-enter` no wrapper de conteudo de todas as paginas via AppLayout.
 
-### 9. Falta de feedback haptico no drag-and-drop
-O reorder de transacoes nao fornece feedback tatil no celular.
-
-**Correcao:** Adicionar `navigator.vibrate(50)` no `onDragStart` para dar feedback haptico ao usuario.
-
-### 10. Auto-scroll para "hoje" nem sempre funciona
-O `todayRef` so faz scroll se a data de hoje existir na lista filtrada. Se o usuario estiver em um mes sem transacoes hoje, nao ha scroll nenhum.
-
-**Correcao:** Fazer scroll para a data mais proxima de hoje (ou a primeira data do mes) como fallback.
+**Arquivos:**
+- Editar `src/components/layout/AppLayout.tsx` — envolver `{children}` com classe `animate-page-enter` usando key baseada no pathname para re-triggerar a animacao a cada navegacao
 
 ---
 
-## MELHORIAS DE CODIGO
+## 3. Botoes com Loading State Inline
 
-### 11. Import nao utilizado: `Loader2`
-O import `Loader2` em `FinanceTransactions.tsx` nao e usado no componente.
+**Problema:** Apenas o Auth tem spinner inline nos botoes. Outros modulos (TransactionSheet, ItemFormSheet, etc.) nao mostram feedback visual ao submeter.
 
-**Correcao:** Remover o import.
+**Solucao:** Criar um componente `LoadingButton` que estende `Button` com prop `loading`, mostrando spinner + texto "Aguarde..." automaticamente.
 
-### 12. Duplicacao de `RecurringEditMode` type
-O tipo `RecurringEditMode` e exportado tanto de `TransactionSheet.tsx` quanto de `useFinance.ts` e `usePersonalFinance.ts`. Tres definicoes duplicadas.
-
-**Correcao:** Mover para `types/finance.ts` e importar de la em todos os lugares.
-
-### 13. Duplicacao de logica entre `useFinance` e `usePersonalFinance`
-Os dois hooks sao quase identicos (~90% do codigo duplicado), diferindo apenas no filtro `unit_id IS NULL` vs `unit_id = activeUnitId`.
-
-**Correcao:** Extrair um hook base `useFinanceCore` parametrizado e fazer os dois hooks serem wrappers finos.
-
-### 14. `initializeDefaults` roda sem await no useEffect
-Tanto em `useFinance` quanto em `usePersonalFinance`, o `initializeDefaults` e chamado sem `await` dentro de um `useEffect`. Se falhar, nao ha tratamento de erro.
-
-**Correcao:** Adicionar `.catch()` ou envolver em try/catch com feedback ao usuario.
+**Arquivos:**
+- Criar `src/components/ui/loading-button.tsx`
+- Aplicar nos sheets principais: `TransactionSheet`, `ItemFormSheetNew`, `EmployeeSheet`, `RecipeSheet`, `PostSheet`
 
 ---
 
-## SEGURANCA
+## 4. Empty States Aprimorados
 
-### 15. RLS policy "always true" detectada pelo linter
-O linter do Supabase detectou uma policy permissiva com `USING (true)` ou `WITH CHECK (true)` em operacoes INSERT/UPDATE/DELETE (provavelmente nas tabelas tablet).
+**Problema:** Alguns modulos usam o componente `EmptyState` (Inventario, Receitas, Recompensas), mas outros usam classes CSS cruas (`empty-state`, `empty-state-icon`) com markup manual e inconsistente (TabletAdmin, WhatsApp, MenuAdmin).
 
-**Correcao:** Ja parcialmente mitigada. Revisar e ajustar as policies restantes para serem mais restritivas onde possivel.
+**Solucao:** Migrar todos os empty states manuais para usar o componente `EmptyState` padronizado, e adicionar subtitulos mais descritivos.
 
-### 16. Erro silencioso no fetchUserData
-No `AuthContext`, o `catch` do `fetchUserData` nao loga nem notifica o erro. Se o perfil falhar ao carregar, o usuario ve a app sem dados de perfil sem saber o motivo.
-
-**Correcao:** Adicionar ao menos um `console.error` e considerar um toast de aviso.
+**Arquivos:**
+- Editar `src/pages/TabletAdmin.tsx` — usar componente `EmptyState`
+- Editar `src/components/whatsapp/ConversationList.tsx` — usar componente `EmptyState`
+- Editar `src/components/menu/MenuGroupContent.tsx` — usar componente `EmptyState`
+- Editar `src/components/menu/OptionGroupList.tsx` — usar componente `EmptyState`
 
 ---
 
-## DETALHES TECNICOS DA IMPLEMENTACAO
+## 5. Touch Targets e Responsividade Mobile
 
-### Arquivos a modificar:
+**Problema:** Ja existe a classe `.touch-target` (min 48px) definida no design system mas nao e aplicada consistentemente. Botoes do header mobile (ranking, chat, bell) tem apenas `p-2` (~36px efetivo).
 
-1. **`src/components/finance/FinanceTransactions.tsx`**
-   - Remover import `Loader2` nao usado
-   - Mover `SEEN_KEY` e `getInitialSeen` para fora do componente
-   - Mover `formatCurrency` para fora ou usar formatter compartilhado
-   - Adicionar transicao CSS suave no glow das transacoes novas
+**Solucao:** Auditar e ajustar touch targets nos pontos criticos:
+- Botoes do header mobile no AppLayout
+- Itens de lista interativos
+- Tabs e filtros
 
-2. **`src/hooks/useFinance.ts`** e **`src/hooks/usePersonalFinance.ts`**
-   - Adicionar `.catch()` no `initializeDefaults`
-   - (Opcional) Extrair hook base compartilhado
+**Arquivos:**
+- Editar `src/components/layout/AppLayout.tsx` — aumentar padding dos botoes do header para min 44px
+- Editar `src/components/ui/animated-tabs.tsx` — garantir min-height 44px nos tabs
 
-3. **`src/types/finance.ts`**
-   - Adicionar export de `RecurringEditMode`
+---
 
-4. **`src/components/finance/TransactionSheet.tsx`**
-   - Importar `RecurringEditMode` de `types/finance.ts`
+## 6. Consistencia Tipografica e Espacamento
 
-5. **`src/contexts/AuthContext.tsx`**
-   - Adicionar `console.error` no catch do `fetchUserData`
+**Problema:** Headers de pagina usam inconsistentemente `page-title` vs `text-lg font-bold` vs `text-xl font-bold`. Espacamentos de conteudo variam entre `px-4 py-4` e `p-4`.
 
-6. **`src/components/layout/AppLayout.tsx`** ou **`src/hooks/useNotifications.ts`**
-   - Investigar e corrigir o loop infinito de re-renders
+**Solucao:** Padronizar todas as paginas para seguir a estrutura:
+```text
+<AppLayout>
+  <div className="min-h-screen bg-background pb-24">
+    <header className="page-header-bar">
+      <div className="page-header-content">
+        <h1 className="page-title">Titulo</h1>
+      </div>
+    </header>
+    <div className="px-4 py-4 lg:px-6 space-y-4">
+      {conteudo}
+    </div>
+  </div>
+</AppLayout>
+```
 
-7. **(Opcional) Nova migracao SQL**
-   - Funcao RPC para reorder em batch
+**Arquivos a revisar/ajustar:**
+- `src/pages/Rewards.tsx`
+- `src/pages/Orders.tsx`
+- `src/pages/Marketing.tsx`
+- `src/pages/Ranking.tsx`
 
-### Prioridade de implementacao:
-1. Bug critico: Loop infinito no Dashboard (item 1)
-2. Limpeza de codigo: imports, constantes, formatCurrency (itens 3-5, 11)
-3. Tipo duplicado: RecurringEditMode (item 12)
-4. Error handling: initializeDefaults e fetchUserData (itens 14, 16)
-5. UX: transicao suave no glow (item 8)
-6. (Futuro) Refatoracao: hook base compartilhado (item 13)
-7. (Futuro) Performance: reorder em batch (item 7)
+---
 
+## 7. Feedback Haptico Global
+
+**Problema:** Apenas o drag-and-drop de financas tem vibrate. Outros pontos de interacao (FAB, tabs, botoes criticos) nao tem.
+
+**Solucao:** Adicionar `navigator.vibrate(10)` em:
+- Clique no FAB (launcher)
+- Troca de tabs no AnimatedTabs
+- Toggle de checkbox em checklists
+
+**Arquivos:**
+- Editar `src/components/layout/AppLayout.tsx` — vibrate no FAB
+- Editar `src/components/ui/animated-tabs.tsx` — vibrate na troca de tab
+
+---
+
+## Prioridade de Implementacao
+
+1. Transicoes de pagina (item 2) — impacto global imediato
+2. PageSkeleton + aplicacao (item 1) — melhora percepcao de velocidade
+3. LoadingButton (item 3) — feedback em acoes criticas
+4. Empty states padronizados (item 4) — consistencia visual
+5. Touch targets (item 5) — usabilidade mobile
+6. Consistencia tipografica (item 6) — polimento fino
+7. Feedback haptico (item 7) — toque final premium
+
+---
+
+## Detalhes Tecnicos
+
+### PageSkeleton (novo componente)
+```tsx
+// Variantes: 'list' | 'grid' | 'dashboard' | 'detail'
+// Aceita titulo opcional para skeleton do header
+<PageSkeleton variant="list" rows={5} />
+<PageSkeleton variant="grid" cols={2} rows={3} />
+<PageSkeleton variant="dashboard" />
+```
+
+### Transicao de pagina via AppLayout
+Envolver children com um div que usa `key={location.pathname}` para re-montar e re-triggerar `animate-page-enter` a cada navegacao.
+
+### LoadingButton
+Estende Button com `loading?: boolean` e `loadingText?: string`. Quando loading=true, desabilita o botao e mostra spinner inline.
+
+### Estimativa: ~15-20 arquivos modificados/criados
