@@ -1,4 +1,5 @@
-import { MessageCircle, Bot, User, XCircle, Phone } from 'lucide-react';
+import { Bot, User, XCircle, Phone } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -52,11 +53,11 @@ export function ConversationList({ conversations, selectedId, onSelect, statusFi
         {isLoading ? (
           <div className="text-center py-10 text-muted-foreground text-sm">Carregando...</div>
         ) : conversations.length === 0 ? (
-          <div className="empty-state">
-            <MessageCircle className="empty-state-icon" />
-            <p className="empty-state-title">Nenhuma conversa</p>
-            <p className="empty-state-text">As conversas aparecerão aqui quando clientes enviarem mensagens.</p>
-          </div>
+          <EmptyState
+            icon="MessageCircle"
+            title="Nenhuma conversa"
+            subtitle="As conversas aparecerão aqui quando clientes enviarem mensagens."
+          />
         ) : (
           conversations.map(conv => {
             const cfg = statusConfig[conv.status] || statusConfig.ai_active;

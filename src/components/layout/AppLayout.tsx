@@ -279,7 +279,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => navigate('/ranking')}
-                className="relative p-2 rounded-lg hover:bg-secondary transition-all"
+                className="relative p-2.5 rounded-lg hover:bg-secondary transition-all"
               >
                 <AppIcon name="Trophy" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(var(--neon-amber) / 0.4))' }} />
                 {myPosition && myPosition <= 3 && (
@@ -294,7 +294,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
               <button
                 onClick={() => navigate('/chat')}
-                className="relative p-2 rounded-lg hover:bg-secondary transition-all"
+                className="relative p-2.5 rounded-lg hover:bg-secondary transition-all"
               >
                 <AppIcon name="MessageCircle" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                 {chatUnreadCount > 0 && (
@@ -305,7 +305,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
               <Popover open={notifOpen} onOpenChange={setNotifOpen}>
                 <PopoverTrigger asChild>
-                  <button className="relative p-2 rounded-lg hover:bg-secondary transition-all">
+                  <button className="relative p-2.5 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
@@ -342,7 +342,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= FAB (Launcher Trigger) ======= */}
       <button
-        onClick={() => setLauncherOpen(!launcherOpen)}
+        onClick={() => { navigator.vibrate?.(10); setLauncherOpen(!launcherOpen); }}
         className={cn(
           "lg:hidden fixed z-[9999] rounded-full flex items-center justify-center transition-all duration-300",
           launcherOpen
@@ -686,6 +686,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
+        key={location.pathname}
         ref={mainRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
