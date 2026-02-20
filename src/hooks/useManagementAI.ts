@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useDashboardStats } from './useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { format, startOfMonth, endOfMonth, subDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, subDays, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface AIMessage {
@@ -66,6 +66,8 @@ export function useManagementAI() {
     const startDate = format(startOfMonth(nowDate), 'yyyy-MM-dd');
     const endDate = format(endOfMonth(nowDate), 'yyyy-MM-dd');
     const last7days = format(subDays(nowDate, 7), 'yyyy-MM-dd');
+    const todayStr = format(nowDate, 'yyyy-MM-dd');
+    const next7days = format(addDays(nowDate, 7), 'yyyy-MM-dd');
 
     try {
       const [
@@ -73,6 +75,9 @@ export function useManagementAI() {
         lowStockRes, ordersRes, closingsRes, employeesRes,
         suppliersRes, recentTxRes, tasksRes, employeePaymentsRes,
         allMonthTxRes,
+        // New context queries
+        checklistItemsRes, checklistCompletionsRes,
+        supplierInvoicesRes, budgetsRes, budgetSpentRes,
       ] = await Promise.all([
         supabase.from('finance_accounts').select('name, type, balance').eq('unit_id', activeUnitId).eq('is_active', true),
         supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).eq('type', 'income').eq('is_paid', true).gte('date', startDate).lte('date', endDate),
@@ -84,15 +89,52 @@ export function useManagementAI() {
         supabase.from('employees').select('full_name, role, is_active, base_salary').eq('unit_id', activeUnitId).eq('is_active', true),
         supabase.from('suppliers').select('name, delivery_frequency').eq('unit_id', activeUnitId),
         supabase.from('finance_transactions').select('description, amount, type, date, is_paid, category:finance_categories(name), employee:employees(full_name), supplier:suppliers(name)').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', last7days).order('date', { ascending: false }).limit(50),
-        supabase.from('manager_tasks').select('title, is_completed, priority, period').eq('user_id', user.id).eq('date', format(nowDate, 'yyyy-MM-dd')),
+        supabase.from('manager_tasks').select('title, is_completed, priority, period').eq('user_id', user.id).eq('date', todayStr),
         supabase.from('employee_payments').select('amount, type, is_paid, payment_date, employee:employees(full_name)').eq('unit_id', activeUnitId).eq('reference_month', nowDate.getMonth() + 1).eq('reference_year', nowDate.getFullYear()).order('payment_date', { ascending: false }).limit(30),
         supabase.from('finance_transactions').select('description, amount, type, date, is_paid').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', startDate).lte('date', endDate).order('date', { ascending: false }).limit(100),
+        // Checklists: total items for today
+        supabase.from('checklist_items').select('id, checklist_type').eq('unit_id', activeUnitId).eq('is_active', true).is('deleted_at', null),
+        supabase.from('checklist_completions').select('id, checklist_type, is_skipped').eq('unit_id', activeUnitId).eq('date', todayStr),
+        // Supplier invoices due soon
+        supabase.from('supplier_invoices').select('description, amount, due_date, is_paid, supplier:suppliers(name)').eq('unit_id', activeUnitId).eq('is_paid', false).gte('due_date', todayStr).lte('due_date', next7days).order('due_date').limit(10),
+        // Budgets
+        supabase.from('finance_budgets').select('planned_amount, category:finance_categories(name)').eq('unit_id', activeUnitId).eq('user_id', user.id).eq('month', nowDate.getMonth() + 1).eq('year', nowDate.getFullYear()),
+        supabase.from('finance_transactions').select('amount, category_id').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
       ]);
 
       const totalIncome = (incomeRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
       const totalExpense = (expenseRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
       const totalPending = (pendingExpRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
       const lowStockItems = (lowStockRes.data || []).filter((i: any) => i.current_stock <= i.min_stock);
+
+      // Checklist progress
+      const checklistItems = checklistItemsRes.data || [];
+      const checklistCompletions = checklistCompletionsRes.data || [];
+      const abertura = checklistItems.filter((i: any) => i.checklist_type === 'abertura');
+      const fechamento = checklistItems.filter((i: any) => i.checklist_type === 'fechamento');
+      const aberturaCompleted = checklistCompletions.filter((c: any) => c.checklist_type === 'abertura').length;
+      const fechamentoCompleted = checklistCompletions.filter((c: any) => c.checklist_type === 'fechamento').length;
+      const checklistProgress = `Abertura: ${aberturaCompleted}/${abertura.length} (${abertura.length > 0 ? Math.round((aberturaCompleted / abertura.length) * 100) : 0}%) | Fechamento: ${fechamentoCompleted}/${fechamento.length} (${fechamento.length > 0 ? Math.round((fechamentoCompleted / fechamento.length) * 100) : 0}%)`;
+
+      // Upcoming invoices
+      const upcomingInvoices = (supplierInvoicesRes.data || []).map((inv: any) =>
+        `${(inv.supplier as any)?.name || '?'}: ${inv.description} - R$${Number(inv.amount).toFixed(2)} (vence ${inv.due_date})`
+      );
+
+      // Budget vs actual
+      const budgetData = budgetsRes.data || [];
+      const spentByCat: Record<string, number> = {};
+      (budgetSpentRes.data || []).forEach((t: any) => {
+        if (t.category_id) {
+          spentByCat[t.category_id] = (spentByCat[t.category_id] || 0) + Number(t.amount);
+        }
+      });
+      const budgetStatus = budgetData.map((b: any) => {
+        const catName = (b.category as any)?.name || 'Sem categoria';
+        const spent = spentByCat[(b.category as any)?.id] || 0;
+        const pct = b.planned_amount > 0 ? Math.round((spent / b.planned_amount) * 100) : 0;
+        return `${catName}: R$${spent.toFixed(2)} / R$${Number(b.planned_amount).toFixed(2)} (${pct}%)`;
+      });
 
       const contextData = {
         criticalStockCount: stats.criticalItems,
@@ -114,6 +156,10 @@ export function useManagementAI() {
         employeePayments: (employeePaymentsRes.data || []).map((p: any) => `${(p.employee as any)?.full_name || '?'}: R$${Number(p.amount).toFixed(2)} (${p.type}) - ${p.is_paid ? 'pago' : 'pendente'} - ${p.payment_date}`),
         suppliers: (suppliersRes.data || []).map((s: any) => `${s.name} [${s.delivery_frequency || 'weekly'}]`),
         todayTasks: (tasksRes.data || []).map((t: any) => `${t.is_completed ? '✅' : '⬜'} ${t.title} (${t.priority}, ${t.period})`),
+        // New context
+        checklistProgress,
+        upcomingInvoices,
+        budgetStatus,
       };
 
       contextCacheRef.current = { data: contextData, timestamp: Date.now() };
@@ -157,7 +203,6 @@ export function useManagementAI() {
 
       const response = data?.suggestion || 'Não consegui gerar uma resposta no momento.';
 
-      // Show executing indicator only when an action was actually executed
       if (data?.action_executed) {
         setIsExecuting(true);
         contextCacheRef.current = null;

@@ -65,6 +65,108 @@ const TOOLS = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "mark_transaction_paid",
+      description: "Marcar uma despesa/transação pendente como paga. Use quando o usuário pedir para pagar, quitar, marcar como pago uma conta ou despesa.",
+      parameters: {
+        type: "object",
+        properties: {
+          description: { type: "string", description: "Descrição ou parte do nome da transação a buscar" },
+          date: { type: "string", description: "Data para desambiguar (YYYY-MM-DD), opcional" },
+        },
+        required: ["description"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "complete_task",
+      description: "Marcar uma tarefa da agenda como concluída. Use quando o usuário pedir para concluir, finalizar, completar ou marcar como feita uma tarefa.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título ou parte do título da tarefa" },
+        },
+        required: ["title"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_task",
+      description: "Excluir uma tarefa da agenda. Use quando o usuário pedir para remover, apagar ou deletar uma tarefa.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título ou parte do título da tarefa a excluir" },
+        },
+        required: ["title"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_order",
+      description: "Criar um pedido de compra para um fornecedor. Use quando o usuário pedir para fazer pedido, encomendar, comprar itens de um fornecedor.",
+      parameters: {
+        type: "object",
+        properties: {
+          supplier_name: { type: "string", description: "Nome do fornecedor" },
+          items: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                item_name: { type: "string", description: "Nome do item" },
+                quantity: { type: "number", description: "Quantidade" },
+              },
+              required: ["item_name", "quantity"],
+            },
+            description: "Lista de itens e quantidades",
+          },
+          notes: { type: "string", description: "Observações do pedido" },
+        },
+        required: ["supplier_name", "items"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "register_employee_payment",
+      description: "Registrar pagamento ou adiantamento para um funcionário. Use quando o usuário pedir para registrar salário, adiantamento, bônus ou comissão de um funcionário.",
+      parameters: {
+        type: "object",
+        properties: {
+          employee_name: { type: "string", description: "Nome do funcionário" },
+          amount: { type: "number", description: "Valor em reais" },
+          type: { type: "string", enum: ["salary", "advance", "bonus", "commission"], description: "Tipo: salary, advance, bonus ou commission" },
+          payment_date: { type: "string", description: "Data do pagamento (YYYY-MM-DD). Default: hoje" },
+          notes: { type: "string", description: "Observações" },
+        },
+        required: ["employee_name", "amount", "type"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "mark_closing_validated",
+      description: "Validar/aprovar um fechamento de caixa pendente. Use quando o usuário pedir para validar, aprovar ou confirmar um fechamento de caixa.",
+      parameters: {
+        type: "object",
+        properties: {
+          date: { type: "string", description: "Data do fechamento a validar (YYYY-MM-DD)" },
+        },
+        required: ["date"],
+      },
+    },
+  },
 ];
 
 function getSupabaseAdmin() {
@@ -176,7 +278,7 @@ async function executeCreateTask(
     return { success: false, message: `❌ Erro ao criar tarefa: ${error.message}` };
   }
 
-  const periodLabel: Record<string, string> = { manha: "Manhã", tarde: "Tarde", noite: "Noite" };
+  const periodLabel: Record<string, string> = { morning: "Manhã", afternoon: "Tarde", evening: "Noite" };
   const priorityLabel: Record<string, string> = { low: "Baixa", medium: "Média", high: "Alta", urgent: "Urgente" };
 
   const lines = [`[ACTION] ✅ Tarefa criada com sucesso!`, "", `📝 ${args.title}`, `📅 Data: ${date}`, `🕐 Período: ${periodLabel[period] || period}`, `⚡ Prioridade: ${priorityLabel[priority] || priority}`];
@@ -196,7 +298,6 @@ async function executeStockMovement(
 ): Promise<{ success: boolean; message: string }> {
   const sb = getSupabaseAdmin();
 
-  // Resolve item_name -> item_id
   const q = sb.from("inventory_items").select("id, name, current_stock, unit_type").ilike("name", String(args.item_name)).limit(1);
   if (unitId) q.eq("unit_id", unitId);
   const { data: item } = await q.maybeSingle();
@@ -243,6 +344,272 @@ async function executeStockMovement(
 }
 
 // ──────────────────────────────────────────────
+// Tool: mark_transaction_paid
+// ──────────────────────────────────────────────
+async function executeMarkTransactionPaid(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("finance_transactions")
+    .select("id, description, amount, date, type")
+    .eq("user_id", userId)
+    .eq("is_paid", false)
+    .ilike("description", `%${String(args.description)}%`)
+    .limit(5);
+  if (unitId) query = query.eq("unit_id", unitId);
+  if (args.date) query = query.eq("date", String(args.date));
+
+  const { data: transactions } = await query;
+
+  if (!transactions || transactions.length === 0) {
+    return { success: false, message: `❌ Nenhuma transação pendente encontrada com "${args.description}".` };
+  }
+
+  if (transactions.length > 1) {
+    const list = transactions.map((t: any) => `• ${t.description} - R$${Number(t.amount).toFixed(2)} (${t.date})`).join("\n");
+    return { success: false, message: `⚠️ Encontrei ${transactions.length} transações pendentes:\n${list}\n\nEspecifique melhor qual deseja marcar como paga (inclua a data se necessário).` };
+  }
+
+  const tx = transactions[0];
+  const { error } = await sb.from("finance_transactions").update({ is_paid: true }).eq("id", tx.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao atualizar: ${error.message}` };
+  }
+
+  return { success: true, message: `[ACTION] ✅ Transação marcada como paga!\n\n📝 ${tx.description}\n💰 R$ ${Number(tx.amount).toFixed(2)}\n📅 Data: ${tx.date}` };
+}
+
+// ──────────────────────────────────────────────
+// Tool: complete_task
+// ──────────────────────────────────────────────
+async function executeCompleteTask(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("manager_tasks")
+    .select("id, title, date, period")
+    .eq("user_id", userId)
+    .eq("is_completed", false)
+    .ilike("title", `%${String(args.title)}%`)
+    .limit(5);
+  if (unitId) query = query.eq("unit_id", unitId);
+
+  const { data: tasks } = await query;
+
+  if (!tasks || tasks.length === 0) {
+    return { success: false, message: `❌ Nenhuma tarefa pendente encontrada com "${args.title}".` };
+  }
+
+  if (tasks.length > 1) {
+    const list = tasks.map((t: any) => `• ${t.title} (${t.date})`).join("\n");
+    return { success: false, message: `⚠️ Encontrei ${tasks.length} tarefas:\n${list}\n\nEspecifique melhor qual deseja concluir.` };
+  }
+
+  const task = tasks[0];
+  const { error } = await sb.from("manager_tasks").update({ is_completed: true, completed_at: new Date().toISOString() }).eq("id", task.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao concluir tarefa: ${error.message}` };
+  }
+
+  return { success: true, message: `[ACTION] ✅ Tarefa concluída!\n\n📝 ${task.title}\n📅 ${task.date}` };
+}
+
+// ──────────────────────────────────────────────
+// Tool: delete_task
+// ──────────────────────────────────────────────
+async function executeDeleteTask(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("manager_tasks")
+    .select("id, title, date")
+    .eq("user_id", userId)
+    .ilike("title", `%${String(args.title)}%`)
+    .limit(5);
+  if (unitId) query = query.eq("unit_id", unitId);
+
+  const { data: tasks } = await query;
+
+  if (!tasks || tasks.length === 0) {
+    return { success: false, message: `❌ Nenhuma tarefa encontrada com "${args.title}".` };
+  }
+
+  if (tasks.length > 1) {
+    const list = tasks.map((t: any) => `• ${t.title} (${t.date})`).join("\n");
+    return { success: false, message: `⚠️ Encontrei ${tasks.length} tarefas:\n${list}\n\nEspecifique melhor qual deseja excluir.` };
+  }
+
+  const task = tasks[0];
+  const { error } = await sb.from("manager_tasks").delete().eq("id", task.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao excluir tarefa: ${error.message}` };
+  }
+
+  return { success: true, message: `[ACTION] 🗑️ Tarefa excluída!\n\n📝 ${task.title}\n📅 ${task.date}` };
+}
+
+// ──────────────────────────────────────────────
+// Tool: create_order
+// ──────────────────────────────────────────────
+async function executeCreateOrder(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  // Find supplier
+  const sq = sb.from("suppliers").select("id, name").ilike("name", `%${String(args.supplier_name)}%`).limit(1);
+  if (unitId) sq.eq("unit_id", unitId);
+  const { data: supplier } = await sq.maybeSingle();
+
+  if (!supplier) {
+    return { success: false, message: `❌ Fornecedor "${args.supplier_name}" não encontrado.` };
+  }
+
+  // Create order
+  const { data: order, error: orderError } = await sb.from("orders").insert({
+    supplier_id: supplier.id,
+    unit_id: unitId,
+    status: "draft",
+    notes: args.notes ? String(args.notes) : null,
+    created_by: userId,
+  }).select("id").single();
+
+  if (orderError || !order) {
+    return { success: false, message: `❌ Erro ao criar pedido: ${orderError?.message}` };
+  }
+
+  // Add items
+  const items = args.items as Array<{ item_name: string; quantity: number }>;
+  const addedItems: string[] = [];
+  const failedItems: string[] = [];
+
+  for (const item of items) {
+    const iq = sb.from("inventory_items").select("id, name, unit_type").ilike("name", `%${item.item_name}%`).limit(1);
+    if (unitId) iq.eq("unit_id", unitId);
+    const { data: invItem } = await iq.maybeSingle();
+
+    if (invItem) {
+      await sb.from("order_items").insert({
+        order_id: order.id,
+        item_id: invItem.id,
+        quantity: item.quantity,
+        unit_id: unitId,
+      });
+      addedItems.push(`${invItem.name}: ${item.quantity} ${invItem.unit_type}`);
+    } else {
+      failedItems.push(item.item_name);
+    }
+  }
+
+  const lines = [`[ACTION] ✅ Pedido criado para ${supplier.name}!`, ""];
+  if (addedItems.length) lines.push(`📦 Itens:\n${addedItems.map(i => `  • ${i}`).join("\n")}`);
+  if (failedItems.length) lines.push(`⚠️ Não encontrados: ${failedItems.join(", ")}`);
+  if (args.notes) lines.push(`📋 Obs: ${args.notes}`);
+
+  return { success: true, message: lines.join("\n") };
+}
+
+// ──────────────────────────────────────────────
+// Tool: register_employee_payment
+// ──────────────────────────────────────────────
+async function executeRegisterEmployeePayment(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  const eq = sb.from("employees").select("id, full_name").ilike("full_name", `%${String(args.employee_name)}%`).eq("is_active", true).limit(1);
+  if (unitId) eq.eq("unit_id", unitId);
+  const { data: employee } = await eq.maybeSingle();
+
+  if (!employee) {
+    return { success: false, message: `❌ Funcionário "${args.employee_name}" não encontrado.` };
+  }
+
+  const now = new Date();
+  const paymentDate = (args.payment_date as string) || getToday();
+
+  const { error } = await sb.from("employee_payments").insert({
+    employee_id: employee.id,
+    unit_id: unitId,
+    amount: Number(args.amount),
+    type: String(args.type),
+    payment_date: paymentDate,
+    reference_month: now.getMonth() + 1,
+    reference_year: now.getFullYear(),
+    is_paid: true,
+    paid_at: new Date().toISOString(),
+    notes: args.notes ? String(args.notes) : null,
+    created_by: userId,
+  });
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao registrar pagamento: ${error.message}` };
+  }
+
+  const typeLabels: Record<string, string> = { salary: "Salário", advance: "Adiantamento", bonus: "Bônus", commission: "Comissão" };
+
+  return {
+    success: true,
+    message: `[ACTION] ✅ Pagamento registrado!\n\n👤 ${employee.full_name}\n💰 R$ ${Number(args.amount).toFixed(2)}\n📋 Tipo: ${typeLabels[String(args.type)] || args.type}\n📅 Data: ${paymentDate}`,
+  };
+}
+
+// ──────────────────────────────────────────────
+// Tool: mark_closing_validated
+// ──────────────────────────────────────────────
+async function executeMarkClosingValidated(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  let query = sb.from("cash_closings")
+    .select("id, date, total_amount, unit_name, status")
+    .eq("date", String(args.date))
+    .eq("status", "pending")
+    .limit(1);
+  if (unitId) query = query.eq("unit_id", unitId);
+
+  const { data: closing } = await query.maybeSingle();
+
+  if (!closing) {
+    return { success: false, message: `❌ Nenhum fechamento pendente encontrado para ${args.date}.` };
+  }
+
+  const { error } = await sb.from("cash_closings").update({
+    status: "validated",
+    validated_by: userId,
+    validated_at: new Date().toISOString(),
+  }).eq("id", closing.id);
+
+  if (error) {
+    return { success: false, message: `❌ Erro ao validar fechamento: ${error.message}` };
+  }
+
+  return {
+    success: true,
+    message: `[ACTION] ✅ Fechamento validado!\n\n📅 Data: ${closing.date}\n💰 Total: R$ ${Number(closing.total_amount || 0).toFixed(2)}\n🏪 ${closing.unit_name}`,
+  };
+}
+
+// ──────────────────────────────────────────────
 // Tool dispatcher
 // ──────────────────────────────────────────────
 async function executeTool(
@@ -258,6 +625,18 @@ async function executeTool(
       return executeCreateTask(args, userId, unitId);
     case "register_stock_movement":
       return executeStockMovement(args, userId, unitId);
+    case "mark_transaction_paid":
+      return executeMarkTransactionPaid(args, userId, unitId);
+    case "complete_task":
+      return executeCompleteTask(args, userId, unitId);
+    case "delete_task":
+      return executeDeleteTask(args, userId, unitId);
+    case "create_order":
+      return executeCreateOrder(args, userId, unitId);
+    case "register_employee_payment":
+      return executeRegisterEmployeePayment(args, userId, unitId);
+    case "mark_closing_validated":
+      return executeMarkClosingValidated(args, userId, unitId);
     default:
       return { success: false, message: `Função "${name}" não reconhecida.` };
   }
@@ -319,6 +698,15 @@ serve(async (req) => {
     if (context?.allMonthTransactions?.length) {
       dataLines.push(`\n📑 TODAS TRANSAÇÕES DO MÊS (${context.allMonthTransactions.length}):\n${context.allMonthTransactions.join('\n')}`);
     }
+    if (context?.checklistProgress) {
+      dataLines.push(`\n📋 CHECKLISTS DE HOJE:\n${context.checklistProgress}`);
+    }
+    if (context?.upcomingInvoices?.length) {
+      dataLines.push(`\n📄 BOLETOS/FATURAS PRÓXIMOS:\n${context.upcomingInvoices.join('\n')}`);
+    }
+    if (context?.budgetStatus?.length) {
+      dataLines.push(`\n🎯 ORÇAMENTO vs REALIZADO:\n${context.budgetStatus.join('\n')}`);
+    }
 
     const dataSnapshot = dataLines.length > 0 ? dataLines.join('\n') : 'Dados ainda carregando...';
 
@@ -330,6 +718,8 @@ REGRAS DE RESPOSTA:
 - Na saudação: dê APENAS saldo total, saldo do mês e 1 alerta mais urgente (se houver)
 - Use emojis com moderação (máximo 3 por resposta)
 - Nunca invente valores - use os dados abaixo
+- Use **negrito** para valores e nomes importantes
+- Use listas com • quando listar itens
 
 ANÁLISE DE IMAGENS:
 - Quando receber uma imagem, analise e extraia TODAS as informações relevantes
@@ -339,13 +729,21 @@ ANÁLISE DE IMAGENS:
 - Apresente os dados de forma organizada e ofereça ações (ex: "Quer que eu lance essas despesas?")
 
 AÇÕES EXECUTÁVEIS (use tool calling):
-1. create_transaction - Registrar receita/despesa. Obrigatório: type, amount, description
-2. create_task - Criar tarefa/lembrete. Obrigatório: title
-3. register_stock_movement - Entrada/saída de estoque. Obrigatório: item_name, type, quantity
+1. create_transaction - Registrar receita/despesa
+2. create_task - Criar tarefa/lembrete
+3. register_stock_movement - Entrada/saída de estoque
+4. mark_transaction_paid - Marcar despesa pendente como paga
+5. complete_task - Concluir tarefa da agenda
+6. delete_task - Excluir tarefa da agenda
+7. create_order - Criar pedido de compra para fornecedor
+8. register_employee_payment - Registrar pagamento/adiantamento de funcionário
+9. mark_closing_validated - Validar fechamento de caixa pendente
 
 REGRAS PARA AÇÕES:
 - Se faltar info obrigatória, pergunte antes de executar
 - Use nomes de itens/categorias/contas do contexto abaixo
+- Para ações destrutivas (delete_task), confirme com o usuário antes
+- Seja PROATIVO: sugira ações quando detectar oportunidades (ex: "Vejo 3 despesas pendentes, quer que eu marque alguma como paga?")
 
 CONTEXTO (use sob demanda, NÃO despeje tudo na resposta):
 - Dia: ${context?.dayOfWeek || '?'} (${context?.timeOfDay || ''})
@@ -357,7 +755,6 @@ ${dataSnapshot}`;
 
     if (conversationHistory && Array.isArray(conversationHistory)) {
       for (const msg of conversationHistory) {
-        // If last user message has an image, build multimodal content
         if (msg.imageUrl && msg.role === "user") {
           aiMessages.push({
             role: "user",
@@ -389,7 +786,7 @@ ${dataSnapshot}`;
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: aiMessages,
-        max_tokens: 800,
+        max_tokens: 1200,
         tools: TOOLS,
       }),
     });

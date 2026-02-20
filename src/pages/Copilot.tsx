@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useManagementAI } from '@/hooks/useManagementAI';
 import { cn } from '@/lib/utils';
 import mascotImg from '@/assets/garden-mascot.png';
+import CopilotMessageContent from '@/components/copilot/CopilotMessageContent';
+import CopilotSuggestionChips from '@/components/copilot/CopilotSuggestionChips';
 
 function isActionMessage(content: string) {
   return content.startsWith('[ACTION]');
@@ -43,7 +45,6 @@ export default function CopilotPage() {
     const file = e.target.files?.[0];
     if (!file || isLoading) return;
 
-    // Validate file
     if (!file.type.startsWith('image/')) {
       sendMessage('Envie apenas imagens (JPG, PNG, etc.)');
       return;
@@ -53,7 +54,6 @@ export default function CopilotPage() {
       return;
     }
 
-    // Convert to base64
     const reader = new FileReader();
     reader.onload = () => {
       const base64 = reader.result as string;
@@ -62,10 +62,15 @@ export default function CopilotPage() {
       setQuestion('');
     };
     reader.readAsDataURL(file);
-
-    // Reset input
     e.target.value = '';
   };
+
+  const handleChipClick = (text: string) => {
+    if (isLoading) return;
+    sendMessage(text);
+  };
+
+  const showChips = messages.length <= 2 && !isLoading;
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-background">
@@ -115,7 +120,6 @@ export default function CopilotPage() {
                 msg.role === 'user' ? "items-end" : "items-start"
               )}
             >
-              {/* Show image thumbnail if message has one */}
               {msg.imageUrl && (
                 <img
                   src={msg.imageUrl}
@@ -125,7 +129,7 @@ export default function CopilotPage() {
               )}
               {isAction ? (
                 <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
-                  <div className="whitespace-pre-line">{displayContent}</div>
+                  <CopilotMessageContent content={displayContent} />
                 </div>
               ) : (
                 <div
@@ -136,7 +140,11 @@ export default function CopilotPage() {
                       : "bg-primary text-primary-foreground rounded-tr-md"
                   )}
                 >
-                  {displayContent}
+                  {msg.role === 'assistant' ? (
+                    <CopilotMessageContent content={displayContent} />
+                  ) : (
+                    displayContent
+                  )}
                 </div>
               )}
             </div>
@@ -161,6 +169,11 @@ export default function CopilotPage() {
             </div>
           </div>
         )}
+
+        {showChips && (
+          <CopilotSuggestionChips onChipClick={handleChipClick} />
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
