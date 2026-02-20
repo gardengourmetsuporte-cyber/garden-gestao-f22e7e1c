@@ -29,10 +29,10 @@ export function AutoOrderWidget() {
   };
 
   return (
-    <div className="col-span-2 rounded-2xl border border-border bg-card overflow-hidden animate-slide-up">
+    <div className="col-span-2 rounded-2xl bg-card overflow-hidden animate-slide-up">
       <div className="p-4 pb-3">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-accent/50 border border-border">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-accent/50">
             <AppIcon name="ShoppingCart" size={18} className="text-primary" />
           </div>
           <div className="flex-1">

@@ -119,13 +119,13 @@ export function AgendaDashboardWidget() {
 
   return (
     <>
-      <div className="col-span-2 rounded-2xl border border-border bg-card overflow-hidden animate-slide-up stagger-3 relative">
+      <div className="col-span-2 rounded-2xl bg-card overflow-hidden animate-slide-up stagger-3 relative">
         <div className="absolute -top-10 right-0 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none bg-primary" />
 
         {/* Header */}
         <div className="flex items-center justify-between p-4 pb-2">
           <button onClick={() => navigate('/agenda')} className="flex items-center gap-2 text-left">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-primary/15 border border-primary/25">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-primary/15">
               <AppIcon name="CalendarDays" size={18} className="text-primary" />
             </div>
             <div>

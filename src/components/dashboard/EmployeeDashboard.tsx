@@ -24,7 +24,7 @@ export function EmployeeDashboard() {
     <div className="space-y-5 p-4 lg:p-6">
       {/* Welcome Header */}
       <div className="animate-slide-up stagger-1">
-        <div className="card-surface p-5">
+        <div className="card-surface p-5" style={{ border: 'none' }}>
           <h2 className="text-xl font-bold text-foreground">
             Olá, {profile?.full_name?.split(' ')[0] || 'Colaborador'}!
           </h2>

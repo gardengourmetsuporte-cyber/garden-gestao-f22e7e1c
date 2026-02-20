@@ -62,7 +62,6 @@ export function FinanceChartWidget() {
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
                 background: 'hsl(var(--destructive) / 0.15)',
-                border: '1px solid hsl(var(--destructive) / 0.25)',
               }}
             >
               <AppIcon name="PieChart" size={18} className="text-destructive" />

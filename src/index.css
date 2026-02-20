@@ -194,17 +194,17 @@
   
   .card-base,
   .card-surface {
-    @apply bg-card rounded-2xl border border-border/50 transition-all duration-200;
+    @apply bg-card rounded-2xl transition-all duration-200;
     box-shadow: var(--shadow-card);
   }
 
   .card-elevated {
-    @apply bg-card rounded-2xl border border-border/50 transition-all duration-200;
+    @apply bg-card rounded-2xl transition-all duration-200;
     box-shadow: var(--shadow-elevated);
   }
 
   .card-interactive {
-    @apply bg-card rounded-2xl border border-border/50
+    @apply bg-card rounded-2xl
            cursor-pointer transition-all duration-200
            hover:border-primary/25 active:scale-[0.97];
     box-shadow: var(--shadow-card);
@@ -216,13 +216,12 @@
 
   .card-gradient {
     @apply rounded-2xl p-5 text-white transition-all duration-200
-           border border-white/10
            hover:scale-[1.01] active:scale-[0.98];
     box-shadow: var(--shadow-elevated);
   }
 
   .card-glow {
-    @apply bg-card rounded-2xl border border-border/40 transition-all duration-300;
+    @apply bg-card rounded-2xl transition-all duration-300;
     box-shadow: var(--shadow-card), var(--glow-primary);
   }
 
@@ -309,32 +308,27 @@
 
   .card-command {
     @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-cyan) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-cyan);
+    box-shadow: var(--shadow-card);
   }
 
   .card-command-success {
     @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-green) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-success);
+    box-shadow: var(--shadow-card);
   }
 
   .card-command-danger {
     @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-red) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-destructive);
+    box-shadow: var(--shadow-card);
   }
 
   .card-command-warning {
     @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-amber) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-warning);
+    box-shadow: var(--shadow-card);
   }
 
   .card-command-info {
     @apply bg-card/80 backdrop-blur-xl rounded-2xl transition-all duration-300;
-    border: 1px solid hsl(var(--neon-cyan) / 0.25);
-    box-shadow: var(--shadow-card), var(--glow-cyan);
+    box-shadow: var(--shadow-card);
   }
 
   /* ========== PAGE HEADERS ========== */

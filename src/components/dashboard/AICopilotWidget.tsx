@@ -38,7 +38,7 @@ export function AICopilotWidget() {
   const lastAssistantMsg = messages.filter(m => m.role === 'assistant').at(-1);
 
   return (
-    <div className="col-span-2 rounded-2xl border border-border bg-card overflow-hidden animate-slide-up stagger-2 relative">
+    <div className="col-span-2 rounded-2xl bg-card overflow-hidden animate-slide-up stagger-2 relative">
       {/* Subtle glow */}
       <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-10 blur-2xl pointer-events-none bg-primary" />
 
@@ -48,7 +48,7 @@ export function AICopilotWidget() {
         className="w-full px-4 py-3 flex items-center justify-between text-left"
       >
         <div className="flex items-center gap-3">
-          <img src={mascotImg} alt="Garden Copiloto" className="w-9 h-9 rounded-xl object-cover border border-primary/20" />
+          <img src={mascotImg} alt="Garden Copiloto" className="w-9 h-9 rounded-xl object-cover" />
           <div>
             <span className="text-sm font-bold text-foreground leading-none">Copiloto IA</span>
             <span className="text-[10px] text-muted-foreground block mt-0.5">Seu assistente de gestão</span>
