@@ -179,7 +179,7 @@ export default function Recipes() {
           </div>
         </header>
 
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="stat-command stat-command-purple">

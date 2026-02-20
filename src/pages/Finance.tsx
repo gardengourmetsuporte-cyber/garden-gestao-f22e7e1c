@@ -152,12 +152,13 @@ export default function Finance() {
 
   return (
     <AppLayout>
+      <div className="min-h-screen bg-background pb-24">
       <header className="page-header-bar">
         <div className="page-header-content">
           <h1 className="page-title">Financeiro</h1>
         </div>
       </header>
-      <div className="pb-20 lg:pb-20">
+      <div>
         {activeTab === 'home' && (
           <FinanceHome
             selectedMonth={selectedMonth}
@@ -224,6 +225,7 @@ export default function Finance() {
             onRefreshAll={handleRefreshAll}
           />
         )}
+      </div>
       </div>
 
       {/* Bottom Navigation */}

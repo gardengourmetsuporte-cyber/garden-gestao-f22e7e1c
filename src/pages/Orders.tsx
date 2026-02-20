@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InventoryItem, Supplier, Order } from '@/types/database';
@@ -159,7 +160,7 @@ export default function OrdersPage() {
           </div>
         </header>
 
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Animated Tabs */}
           <AnimatedTabs
             tabs={[
@@ -173,13 +174,11 @@ export default function OrdersPage() {
           <div className="animate-fade-in" key={orderTab}>
           {orderTab === 'to-order' && (
             Object.keys(itemsBySupplier).length === 0 ? (
-              <div className="text-center py-16 animate-fade-in">
-                <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center mx-auto mb-4">
-                  <PackageCheck className="w-8 h-8 text-success" />
-                </div>
-                <p className="font-semibold text-foreground">Estoque em dia!</p>
-                <p className="text-sm text-muted-foreground mt-1">Todos os itens estão acima do mínimo</p>
-              </div>
+              <EmptyState
+                icon="PackageCheck"
+                title="Estoque em dia!"
+                subtitle="Todos os itens estão acima do mínimo"
+              />
             ) : (
               <div className="space-y-3">
                 {Object.entries(itemsBySupplier).map(([supplierId, supplierItems], index) => {
@@ -266,13 +265,11 @@ export default function OrdersPage() {
           {/* Histórico Tab */}
           {orderTab === 'orders' && (
             orders.length === 0 ? (
-              <div className="text-center py-16 animate-fade-in">
-                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <p className="font-semibold text-foreground">Nenhum pedido</p>
-                <p className="text-sm text-muted-foreground mt-1">Crie um pedido a partir das sugestões</p>
-              </div>
+              <EmptyState
+                icon="Clock"
+                title="Nenhum pedido"
+                subtitle="Crie um pedido a partir das sugestões"
+              />
             ) : (
               <div className="space-y-6 animate-fade-in">
                 {/* Pending orders */}

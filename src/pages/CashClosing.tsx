@@ -32,7 +32,7 @@ export default function CashClosing() {
           </div>
         </header>
 
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => (
