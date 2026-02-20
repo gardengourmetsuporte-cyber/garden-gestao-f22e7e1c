@@ -1,120 +1,36 @@
 
-# Copiloto Executor - Integracacao com n8n via Tool Calling
 
-## Resumo
+## Criar transacoes direto na Edge Function (sem n8n)
 
-Transformar o Copiloto de consultivo para executor, usando **Gemini Tool Calling** na edge function para detectar intencoes de acao e despachar para o webhook n8n que cria transacoes financeiras.
+A edge function `management-ai` sera modificada para inserir transacoes financeiras diretamente no banco de dados, eliminando a dependencia do webhook n8n.
 
-## Adaptacao de Seguranca (sem Enterprise n8n)
+### O que muda
 
-Como voce nao tem o plano Enterprise do n8n para variaveis de ambiente, a seguranca sera garantida assim:
-- A **edge function valida o JWT do usuario** antes de qualquer acao (camada principal)
-- O webhook n8n recebera o `user_id` e `unit_id` ja validados pela edge function
-- Sem secret compartilhado no n8n por enquanto (a protecao e que so a edge function chama o webhook)
+1. Remover a chamada ao webhook n8n
+2. Criar um client Supabase dentro da edge function usando a Service Role Key (ja disponivel automaticamente)
+3. Quando a IA chamar a tool `create_transaction`, a edge function vai:
+   - Resolver nomes de categoria, conta, fornecedor e funcionario para seus UUIDs
+   - Inserir diretamente na tabela `finance_transactions`
+   - O trigger existente do banco atualiza automaticamente o saldo da conta
 
-**Importante**: Troque a URL de `webhook-test` para `webhook` quando ativar o workflow em producao no n8n.
+### Detalhes tecnicos
 
-## Arquitetura do Fluxo
+**Arquivo modificado:** `supabase/functions/management-ai/index.ts`
 
-```text
-Usuario digita: "Registra despesa de R$200 com agua"
-        |
-        v
-Frontend (useManagementAI) --> Edge Function (management-ai)
-        |
-        v
-Gemini com tools definidas --> Retorna tool_call: create_transaction
-        |
-        v
-Edge Function extrai parametros e chama webhook n8n
-        |
-        v
-n8n cria a transacao no Supabase
-        |
-        v
-Edge Function gera mensagem de confirmacao --> Frontend exibe
-```
+Mudancas principais:
+- Importar `createClient` do Supabase
+- Remover constante `N8N_WEBHOOK_URL` e todo o bloco de dispatch para n8n
+- Adicionar funcao `executeCreateTransaction` que:
+  - Cria client Supabase com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (variaveis ja disponiveis automaticamente em edge functions)
+  - Faz lookup por nome para resolver `category_name` -> `category_id` na tabela `finance_categories`
+  - Faz lookup por nome para resolver `account_name` -> `account_id` na tabela `finance_accounts`
+  - Faz lookup por nome para resolver `supplier_name` -> `supplier_id` na tabela `suppliers`
+  - Faz lookup por nome para resolver `employee_name` -> `employee_id` na tabela `employees`
+  - Insere o registro em `finance_transactions` com todos os campos obrigatorios (`user_id`, `unit_id`, `type`, `amount`, `description`, `date`, `is_paid`, `category_id`, `account_id`, `supplier_id`, `employee_id`)
+  - Retorna sucesso ou erro
 
-## Arquivos Modificados
+**Nenhuma mudanca no frontend** -- o hook `useManagementAI.ts` continua funcionando igual, so recebe a resposta da edge function.
 
-### 1. `supabase/functions/management-ai/index.ts` (reescrita major)
+### Resultado esperado
 
-Mudancas:
-- Adicionar definicoes de `tools` no payload da IA com a funcao `create_transaction`
-- Parametros da tool: `type` (income/expense), `amount`, `description`, `category_name`, `account_name`, `supplier_name`, `employee_name`, `date`, `is_paid`
-- Apos receber resposta da IA, verificar se ha `tool_calls` no response
-- Se houver tool_call: extrair argumentos, chamar webhook n8n via fetch, retornar confirmacao formatada
-- Se nao houver tool_call: retornar texto normal (comportamento atual)
-- Adicionar `user_id` e `unit_id` do contexto ao payload do n8n
-- URL do webhook n8n configurada como constante (pode migrar para secret futuramente)
-
-### 2. `src/hooks/useManagementAI.ts` (mudancas minimas)
-
-Mudancas:
-- Enviar `user_id` e `unit_id` no body da chamada da edge function (necessario para o n8n)
-- Adicionar estado `isExecuting` separado do `isLoading` para diferenciar "pensando" de "executando acao"
-- Tratar novo campo `action_executed` na resposta para invalidar cache de contexto apos acao
-
-### 3. `src/pages/Copilot.tsx` (mudancas visuais)
-
-Mudancas:
-- Renderizar mensagens de acao executada com estilo diferenciado (card verde com icone de check)
-- Mostrar indicador "Executando acao..." quando `isExecuting` estiver ativo (diferente dos dots de loading)
-- Detectar mensagens que contem marcador `[ACTION]` para aplicar estilo especial
-
-## Detalhes Tecnicos
-
-### Tool Definition para o Gemini
-
-```text
-tools: [{
-  type: "function",
-  function: {
-    name: "create_transaction",
-    description: "Criar transacao financeira no sistema",
-    parameters: {
-      type: "object",
-      properties: {
-        type: { type: "string", enum: ["income", "expense"] },
-        amount: { type: "number" },
-        description: { type: "string" },
-        category_name: { type: "string" },
-        account_name: { type: "string" },
-        supplier_name: { type: "string" },
-        employee_name: { type: "string" },
-        date: { type: "string", format: "YYYY-MM-DD" },
-        is_paid: { type: "boolean" }
-      },
-      required: ["type", "amount", "description"]
-    }
-  }
-}]
-```
-
-### Fluxo na Edge Function
-
-1. Enviar mensagens + tools para Gemini
-2. Verificar `response.choices[0].message.tool_calls`
-3. Se presente: extrair `function.arguments`, adicionar `user_id`/`unit_id`, fazer POST para webhook n8n
-4. Aguardar resposta do n8n (sucesso/erro)
-5. Retornar ao frontend: `{ suggestion: "Transacao criada...", action_executed: true }`
-
-### Prompt do Sistema (adicao)
-
-Adicionar ao system prompt:
-- "Quando o usuario pedir para CRIAR, REGISTRAR, LANÇAR ou ADICIONAR uma transacao financeira, use a funcao create_transaction"
-- "Sempre confirme os valores antes de executar"
-- "Use os dados do contexto para resolver nomes de categorias, contas e fornecedores"
-
-## Sequencia de Implementacao
-
-1. Atualizar a edge function com tool calling e dispatch para n8n
-2. Atualizar o hook para enviar user_id/unit_id e tratar resposta de acao
-3. Atualizar o frontend com estilos visuais para acoes executadas
-4. Deploy e teste
-
-## Limitacoes Conhecidas
-
-- URL do webhook hardcoded na edge function (pode migrar para secret quando tiver Enterprise n8n)
-- Apenas 1 acao disponivel inicialmente (criar transacao) - expandivel adicionando mais tools
-- Sem botao "desfazer" nesta primeira versao (complexidade adicional)
+Quando voce pedir ao Copiloto para criar uma transacao, ela sera inserida diretamente no banco e aparecera imediatamente na lista de transacoes financeiras.
