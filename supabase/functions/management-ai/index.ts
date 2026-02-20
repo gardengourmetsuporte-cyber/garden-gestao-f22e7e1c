@@ -155,7 +155,9 @@ async function executeCreateTask(
   const sb = getSupabaseAdmin();
 
   const date = (args.date as string) || getToday();
-  const period = (args.period as string) || "manha";
+  const periodRaw = (args.period as string) || "manha";
+  const periodMap: Record<string, string> = { manha: "morning", tarde: "afternoon", noite: "evening", morning: "morning", afternoon: "afternoon", evening: "evening" };
+  const period = periodMap[periodRaw] || "morning";
   const priority = (args.priority as string) || "medium";
 
   const { error } = await sb.from("manager_tasks").insert({
