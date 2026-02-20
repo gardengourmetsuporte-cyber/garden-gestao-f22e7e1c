@@ -57,6 +57,8 @@ const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinan
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
 const Alerts = lazy(() => lazyRetry(() => import("./pages/Alerts")));
+const Gamification = lazy(() => lazyRetry(() => import("./pages/Gamification")));
+const GamificationPlay = lazy(() => lazyRetry(() => import("./pages/GamificationPlay")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -201,6 +203,8 @@ function AppRoutes() {
         <Route path="/tablet/:unitId" element={<TabletSelect />} />
         <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
         <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
+        {/* Gamification tablet (public, no auth) */}
+        <Route path="/gamification/:unitId" element={<GamificationPlay />} />
         {/* Tablet admin (protected) */}
         <Route
           path="/tablet-admin"
@@ -271,6 +275,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Alerts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/gamification"
+          element={
+            <ProtectedRoute>
+              <Gamification />
             </ProtectedRoute>
           }
         />

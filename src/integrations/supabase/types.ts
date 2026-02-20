@@ -1375,6 +1375,142 @@ export type Database = {
           },
         ]
       }
+      gamification_plays: {
+        Row: {
+          customer_name: string | null
+          id: string
+          order_id: string
+          played_at: string
+          prize_id: string | null
+          prize_name: string
+          unit_id: string
+        }
+        Insert: {
+          customer_name?: string | null
+          id?: string
+          order_id: string
+          played_at?: string
+          prize_id?: string | null
+          prize_name?: string
+          unit_id: string
+        }
+        Update: {
+          customer_name?: string | null
+          id?: string
+          order_id?: string
+          played_at?: string
+          prize_id?: string | null
+          prize_name?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_plays_prize_id_fkey"
+            columns: ["prize_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_prizes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_plays_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_prizes: {
+        Row: {
+          color: string
+          created_at: string
+          estimated_cost: number
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          probability: number
+          sort_order: number
+          type: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          estimated_cost?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          probability?: number
+          sort_order?: number
+          type?: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          estimated_cost?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          probability?: number
+          sort_order?: number
+          type?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_prizes_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_settings: {
+        Row: {
+          cooldown_minutes: number
+          id: string
+          is_enabled: boolean
+          max_daily_cost: number
+          points_per_play: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          cooldown_minutes?: number
+          id?: string
+          is_enabled?: boolean
+          max_daily_cost?: number
+          points_per_play?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          cooldown_minutes?: number
+          id?: string
+          is_enabled?: boolean
+          max_daily_cost?: number
+          points_per_play?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_items: {
         Row: {
           category_id: string | null
