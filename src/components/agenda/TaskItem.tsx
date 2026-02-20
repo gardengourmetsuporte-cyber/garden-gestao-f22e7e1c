@@ -207,6 +207,8 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             onClick={() => {
               if (hasSubtasks) {
                 setExpanded(!expanded);
+              } else {
+                onClick?.();
               }
             }}
           >
@@ -224,6 +226,13 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                 )} />
               )}
             </div>
+
+            {/* Notes preview */}
+            {task.notes && !task.is_completed && (
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
+                {task.notes}
+              </p>
+            )}
 
             {/* Subtask counter badge */}
             {hasSubtasks && !expanded && (
