@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import mascotImg from '@/assets/garden-mascot.png';
 
 export function AICopilotWidget() {
-  const { messages, isLoading, hasGreeted, sendMessage, clearHistory } = useManagementAI();
+  const { messages, isLoading, isExecuting, hasGreeted, sendMessage, clearHistory } = useManagementAI();
   const [question, setQuestion] = useState('');
   const [expanded, setExpanded] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
