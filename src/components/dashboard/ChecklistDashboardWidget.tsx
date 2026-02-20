@@ -125,10 +125,7 @@ export function ChecklistDashboardWidget() {
             onClick={() => navigate('/checklists')}
             className={cn(
               "relative text-left rounded-2xl p-4 transition-all duration-200 active:scale-[0.97]",
-              "bg-card border",
-              isActive
-                ? "border-primary/50 ring-1 ring-primary/30 shadow-lg shadow-primary/10"
-                : "border-border/40"
+              "bg-card border-0"
             )}
           >
             {/* Active dot indicator */}
@@ -137,23 +134,39 @@ export function ChecklistDashboardWidget() {
             )}
 
             {/* Icon + Label */}
-            <div className="flex items-center gap-2.5 mb-4">
+            <div className="flex items-center gap-2.5 mb-1">
               <div className={cn(
                 "w-10 h-10 rounded-xl flex items-center justify-center",
                 isComplete ? "bg-success/20" : card.accentBg
               )}>
                 <Icon className={cn("w-5 h-5", isComplete ? "text-success" : "text-white")} />
               </div>
-              <span className={cn(
-                "text-base font-bold",
-                isComplete ? "text-success" : "text-foreground"
-              )}>
-                {card.label}
-              </span>
+              <div>
+                <span className={cn(
+                  "text-base font-bold block",
+                  isComplete ? "text-success" : "text-foreground"
+                )}>
+                  {card.label}
+                </span>
+                <span className={cn(
+                  "text-[11px] font-medium",
+                  isComplete
+                    ? "text-success"
+                    : card.progress.percent > 0
+                      ? card.textColor
+                      : "text-muted-foreground"
+                )}>
+                  {isComplete
+                    ? "✓ Concluído"
+                    : card.progress.percent > 0
+                      ? "Em andamento"
+                      : "Pendente"}
+                </span>
+              </div>
             </div>
 
             {/* Progress bar */}
-            <div className="w-full h-1.5 rounded-full bg-secondary/50 overflow-hidden mb-3">
+            <div className="w-full h-1.5 rounded-full bg-secondary/50 overflow-hidden mb-3 mt-3">
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-700 ease-out",
