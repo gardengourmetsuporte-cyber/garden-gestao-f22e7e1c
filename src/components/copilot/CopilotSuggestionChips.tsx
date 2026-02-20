@@ -4,7 +4,7 @@ const SUGGESTIONS = [
   { label: 'Resumo do dia', icon: 'BarChart3' as const },
   { label: 'Despesas pendentes', icon: 'Clock' as const },
   { label: 'Estoque baixo', icon: 'AlertTriangle' as const },
-  { label: 'Tarefas de hoje', icon: 'CheckSquare' as const },
+  { label: 'Tarefas de hoje', icon: 'ListChecks' as const },
   { label: 'Boletos vencendo', icon: 'FileText' as const },
   { label: 'Criar tarefa', icon: 'Plus' as const },
 ];
