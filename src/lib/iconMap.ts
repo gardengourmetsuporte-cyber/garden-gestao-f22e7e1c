@@ -185,6 +185,7 @@ export const ICON_MAP: Record<string, string> = {
   Music: 'music_note',
   Film: 'movie',
   Gamepad2: 'sports_esports',
+  Dices: 'casino',
   Ticket: 'confirmation_number',
   Coffee: 'coffee',
   Wine: 'wine_bar',
