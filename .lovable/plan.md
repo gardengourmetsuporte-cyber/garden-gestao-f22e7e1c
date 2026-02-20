@@ -1,104 +1,64 @@
 
+# 4 Cards Visuais -- Categoria, Conta, Fornecedor e Funcionario
 
-# Redesign do Modulo de Marketing -- Gestor de Conteudo Inteligente
+## O que muda
 
-Inspirado no calendário de conteúdo do Canva, o módulo será reconstruído com um calendário mensal visual como peça central, sugestões inteligentes de datas comemorativas e conteúdos via IA, e uma experiência mobile-first.
+Os campos Categoria, Conta, Fornecedor e Funcionario deixam de ser botoes full-width empilhados e passam a ser **4 cards compactos em grid 2x2**, com icone centralizado, label curto e visual premium.
 
----
+## Como vai ficar
 
-## Visao Geral
+```text
++-------------------+  +-------------------+
+|   [icone wallet]  |  |  [icone category] |
+|      Nubank       |  |   Materia-prima   |
++-------------------+  +-------------------+
++-------------------+  +-------------------+
+|   [icone truck]   |  |  [icone person]   |
+|    Fornecedor     |  |   Funcionario     |
++-------------------+  +-------------------+
+```
 
-O módulo terá 3 abas: **Calendário** (visão mensal tipo Canva), **Feed** (lista filtrada) e **Ideias IA** (sugestões inteligentes). O calendário deixa de usar o componente `react-day-picker` e passa a ser um grid customizado que mostra mini-cards dos posts em cada dia.
-
----
-
-## 1. Calendário Mensal Visual (estilo Canva)
-
-**Componente:** `MarketingCalendarGrid.tsx` (substitui `MarketingCalendar.tsx`)
-
-- Header com navegação de mês (setas esquerda/direita + "Hoje")
-- Grid 7 colunas (seg-dom) com células clicáveis
-- Cada célula mostra:
-  - Número do dia
-  - Mini-chips coloridos dos posts agendados (max 2-3 visíveis + "+N")
-  - Indicador de data comemorativa (badge especial)
-- Ao clicar numa célula, abre uma bottom sheet com os posts daquele dia + botão "Novo post"
-- Posts podem ser arrastados entre dias (drag-and-drop com dnd-kit) para reagendar
-- Cores por status: rascunho (cinza), agendado (primary/cyan), publicado (verde)
-
-## 2. Datas Comemorativas e Sugestões Inteligentes
-
-**Componente:** `MarketingSmartSuggestions.tsx`
-
-- Carrossel horizontal no topo (igual ao Canva) com sugestões contextuais:
-  - Datas comemorativas do mês (hardcoded + IA para relevância do nicho)
-  - "Crie um post para o Dia das Mães", "Promoção de Carnaval"
-- Ao clicar numa sugestão, abre o PostSheet pre-preenchido com a data e título sugerido
-
-**Backend:** Edge function `marketing-suggestions` usando Lovable AI para gerar:
-- Sugestões de conteúdo baseadas no tipo de negócio
-- Legendas prontas para copiar
-- Melhores horários para postar
-
-**Tabela de datas comemorativas:** Lista estática em `src/lib/marketingDates.ts` com as principais datas do calendário brasileiro, organizadas por mês.
-
-## 3. Aba Ideias IA (refeita)
-
-**Componente:** `MarketingIdeasAI.tsx` (substitui `MarketingIdeas.tsx`)
-
-- Campo de input: "Sobre o que você quer postar?"
-- IA gera 3-5 sugestões de posts completos (título + legenda + hashtags + melhor horário)
-- Botão "Agendar" em cada sugestão para criar o post direto
-- Histórico das últimas sugestões geradas
-
-## 4. PostSheet melhorado
-
-- Adiciona seletor de horário (não só data)
-- Preview visual do post (como ficaria no Instagram)
-- Sugestão de hashtags via IA
-- Indicador de "melhor horário para postar"
-
-## 5. Feed (melhoria incremental)
-
-- Mantém a estrutura atual do `MarketingFeed.tsx`
-- Adiciona contadores por status no header dos filtros
-- Adiciona busca por texto
-
----
+- **Sem selecao:** Card com icone + label generico (ex: "Conta", "Categoria"), fundo `bg-secondary/50`, texto `text-muted-foreground`
+- **Com selecao:** Card com icone colorido + nome selecionado, fundo sutil `bg-primary/5`, borda fina `ring-1 ring-primary/20`
+- Ao tocar em qualquer card, abre o picker correspondente (ListPicker ou CategoryPicker) -- mesma logica de hoje
 
 ## Detalhes Tecnicos
 
-### Arquivos novos
-- `src/components/marketing/MarketingCalendarGrid.tsx` -- Grid mensal customizado
-- `src/components/marketing/MarketingSmartSuggestions.tsx` -- Carrossel de sugestões
-- `src/components/marketing/MarketingIdeasAI.tsx` -- Geração de ideias via IA
-- `src/components/marketing/DayPostsSheet.tsx` -- Sheet dos posts de um dia específico
-- `src/lib/marketingDates.ts` -- Datas comemorativas brasileiras
-- `supabase/functions/marketing-suggestions/index.ts` -- Edge function para IA
+**Arquivo:** `src/components/finance/TransactionSheet.tsx`
 
-### Arquivos modificados
-- `src/pages/Marketing.tsx` -- Reestruturar com novos componentes
-- `src/components/marketing/PostSheet.tsx` -- Adicionar seletor de hora e preview
-- `src/components/marketing/MarketingFeed.tsx` -- Adicionar busca e contadores
-- `src/types/marketing.ts` -- Sem alterações na tabela (schema atual é suficiente)
+1. **Remover** os blocos individuais de Categoria (linhas 526-544), Conta (linhas 546-557), Fornecedor (linhas 577-587) e Funcionario (linhas 589-599), incluindo seus `<Label>` e `<Button variant="outline">`
 
-### Arquivos removidos
-- `src/components/marketing/MarketingCalendar.tsx` (substituído pelo Grid)
-- `src/components/marketing/MarketingIdeas.tsx` (substituído pela versão IA)
+2. **Substituir** por um unico bloco `<div className="grid grid-cols-2 gap-3">` contendo 4 cards:
 
-### Banco de dados
-- Nenhuma migração necessária -- a tabela `marketing_posts` já tem todos os campos necessários (scheduled_at com timestamp, status, channels, media_urls, tags)
+   - **Card Conta** (sempre visivel):
+     - Icone: `account_balance_wallet` via AppIcon, tamanho 22
+     - Label: nome da conta selecionada ou "Conta"
+   
+   - **Card Categoria** (visivel quando `type !== 'transfer'`):
+     - Icone: icone da categoria selecionada ou `category` (fallback)
+     - Cor do icone: cor da categoria quando selecionada
+     - Label: nome da categoria ou "Categoria"
+   
+   - **Card Fornecedor** (visivel quando `type === 'expense' || type === 'credit_card'`):
+     - Icone: `local_shipping` via AppIcon, tamanho 22
+     - Label: nome do fornecedor ou "Fornecedor"
+   
+   - **Card Funcionario** (mesma condicao do fornecedor):
+     - Icone: `person` via AppIcon, tamanho 22
+     - Label: nome do funcionario ou "Funcionario"
 
-### Edge Function: `marketing-suggestions`
-- Usa Lovable AI (google/gemini-3-flash-preview)
-- Recebe: mês/ano, tipo de negócio (opcional), tema desejado
-- Retorna: array de sugestões com título, legenda, hashtags, data sugerida, horário ideal
-- Sem streaming (resposta direta via tool calling para JSON estruturado)
+3. **Estilo de cada card:**
+   ```
+   button com classes:
+   - flex flex-col items-center justify-center gap-1.5
+   - p-4 rounded-2xl min-h-[80px]
+   - bg-secondary/50 (sem selecao) ou bg-primary/5 ring-1 ring-primary/20 (com selecao)
+   - transition-all duration-200
+   - text-sm font-medium truncate max-w-full
+   ```
 
-### Fluxo do calendário
-1. Usuário navega entre meses com setas
-2. Vê grid com posts posicionados nos dias
-3. Carrossel no topo mostra datas importantes do mês + sugestões
-4. Clica num dia -> abre sheet com posts do dia + opção de criar novo
-5. Pode arrastar post de um dia para outro para reagendar
+4. **Conta de destino** (transferencias) permanece como campo separado abaixo do grid, pois e contextual
 
+5. Quando o grid tiver menos de 4 cards (ex: receita so tem Conta + Categoria), os 2 cards ocupam as 2 colunas normalmente
+
+6. Nenhuma alteracao nos pickers, estados ou logica de dados
