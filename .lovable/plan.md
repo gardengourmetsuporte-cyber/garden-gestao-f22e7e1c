@@ -2,9 +2,23 @@
 
 # Proximo Nivel de Automacao - Copiloto Autonomo
 
-## O que ja existe hoje (10 tools)
+## O que ja existe hoje (16 tools) ✅
 
-O Copiloto ja executa 10 acoes: criar transacao, criar tarefa, movimentar estoque, marcar transacao como paga, concluir tarefa, excluir tarefa, criar pedido de compra, registrar pagamento de funcionario, validar fechamento de caixa e gerar resumo. Alem disso, analisa imagens e tem contexto rico de todo o negocio.
+O Copiloto executa 16 acoes com suporte a multi-tool chaining (multiplas acoes por mensagem):
+
+**Tools originais (10):** criar transacao, criar tarefa, movimentar estoque, marcar transacao como paga, concluir tarefa, excluir tarefa, criar pedido de compra, registrar pagamento de funcionario, validar fechamento de caixa e gerar resumo.
+
+**Tools novas (6 - Fase 1 concluida):**
+- ✅ `update_transaction` - Editar transacao existente
+- ✅ `create_supplier_invoice` - Registrar boleto/fatura de fornecedor
+- ✅ `mark_invoice_paid` - Pagar boleto de fornecedor
+- ✅ `complete_checklist_item` - Marcar item do checklist
+- ✅ `send_order` - Enviar pedido para fornecedor
+- ✅ `create_appointment` - Criar compromisso com horario
+
+**Multi-Tool Chaining (Nivel 4 concluido):**
+- ✅ Loop de ate 5 rounds de tool_calls por mensagem
+- ✅ Suporte a multiplas tool_calls paralelas por round
 
 ---
 
@@ -33,47 +47,6 @@ Hoje o Copiloto so age quando o usuario manda uma mensagem. O proximo nivel e el
 
 ---
 
-## Nivel 3: Novas Tools do Copiloto (6 novas acoes)
-
-### 3.1 - `update_transaction` - Editar transacao existente
-- "Muda o valor da conta de energia para R$350"
-- Atualiza descricao, valor, data ou categoria de uma transacao existente
-
-### 3.2 - `create_supplier_invoice` - Registrar boleto/fatura de fornecedor
-- "Registra boleto do fornecedor X, R$1500, vence dia 15"
-- Insere em `supplier_invoices`
-
-### 3.3 - `mark_invoice_paid` - Pagar boleto de fornecedor
-- "Paga o boleto da distribuidora"
-- Atualiza `is_paid` em `supplier_invoices`
-
-### 3.4 - `complete_checklist_item` - Marcar item do checklist
-- "Marca o item 'limpar balcao' do checklist de abertura"
-- Insere em `checklist_completions`
-
-### 3.5 - `send_order` - Enviar pedido para fornecedor
-- "Envia o pedido pendente pro fornecedor X"
-- Atualiza status do pedido de `draft` para `sent` + `sent_at`
-
-### 3.6 - `create_appointment` - Criar compromisso com horario
-- "Agenda reuniao com fornecedor amanha as 14h"
-- Insere em `manager_appointments`
-
----
-
-## Nivel 4: Multi-Tool Chaining (Acoes em Cadeia)
-
-Hoje o Copiloto executa apenas 1 tool por mensagem. O proximo passo e permitir encadeamento:
-
-- "Registra a nota fiscal da imagem, da entrada no estoque e cria o boleto"
-  - Tool 1: `register_stock_movement` (entrada dos itens)
-  - Tool 2: `create_supplier_invoice` (boleto extraido da NF)
-  - Tool 3: `create_transaction` (despesa vinculada)
-
-Isso requer modificar o loop principal da edge function para processar multiplos tool_calls do modelo em sequencia.
-
----
-
 ## Nivel 5: Persistencia e Inteligencia de Longo Prazo
 
 ### 5.1 - Historico de Chat no Banco de Dados
@@ -89,30 +62,22 @@ Isso requer modificar o loop principal da edge function para processar multiplos
 
 ## Detalhes Tecnicos
 
-### Sequencia recomendada de implementacao:
+### Status de implementacao:
 
-**Fase 1 (impacto imediato):** 6 novas tools (3.1 a 3.6) + Multi-tool chaining (Nivel 4)
-- Modifica: `supabase/functions/management-ai/index.ts`
-- Adiciona loop de multiplos tool_calls na resposta da IA
+**Fase 1 (CONCLUÍDA ✅):** 6 novas tools + Multi-tool chaining
+- Modificado: `supabase/functions/management-ai/index.ts`
+- 16 tools totais com loop de multi-tool chaining (ate 5 rounds)
 
-**Fase 2 (automacao proativa):** Daily Digest + alertas inteligentes
+**Fase 2 (pendente):** Daily Digest + alertas inteligentes
 - Cria: `supabase/functions/daily-digest/index.ts`
 - Modifica: sistema de notificacoes existente
 
-**Fase 3 (persistencia):** Chat no banco + auto-rules
+**Fase 3 (pendente):** Chat no banco + auto-rules
 - Cria: migracoes para novas tabelas
 - Modifica: `src/hooks/useManagementAI.ts` para usar banco em vez de localStorage
 
-### Tabelas novas necessarias:
+### Tabelas novas necessarias (Fase 3):
 - `copilot_conversations` (id, user_id, unit_id, created_at)
 - `copilot_messages` (id, conversation_id, role, content, image_url, tool_calls, created_at)
 - `automation_rules` (id, unit_id, trigger_type, trigger_config, action_type, action_config, is_active)
 - `copilot_preferences` (id, user_id, key, value)
-
-### Tabelas existentes usadas (sem alteracao de schema):
-- `supplier_invoices` (insert, update)
-- `checklist_completions` (insert)
-- `orders` (update status)
-- `manager_appointments` (insert)
-- `finance_transactions` (update)
-
