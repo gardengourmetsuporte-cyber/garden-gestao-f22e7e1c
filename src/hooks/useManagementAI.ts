@@ -142,8 +142,6 @@ export function useManagementAI() {
     try {
       const context = await fetchFullContext();
 
-      setIsExecuting(true);
-
       const { data, error } = await supabase.functions.invoke('management-ai', {
         body: {
           messages: question ? updatedMessages : [],
@@ -156,13 +154,15 @@ export function useManagementAI() {
       if (error) throw error;
 
       const response = data?.suggestion || 'Não consegui gerar uma resposta no momento.';
-      const assistantMsg: AIMessage = { role: 'assistant', content: response };
-      setMessages(prev => [...prev, assistantMsg]);
 
-      // Invalidate context cache if an action was executed
+      // Show executing indicator only when an action was actually executed
       if (data?.action_executed) {
+        setIsExecuting(true);
         contextCacheRef.current = null;
       }
+
+      const assistantMsg: AIMessage = { role: 'assistant', content: response };
+      setMessages(prev => [...prev, assistantMsg]);
 
       if (!question) {
         setHasGreeted(true);
