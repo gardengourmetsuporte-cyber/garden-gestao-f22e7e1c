@@ -1,118 +1,118 @@
 
 
-# Evolucao do Copiloto Garden - Plano de Autonomia Total
+# Proximo Nivel de Automacao - Copiloto Autonomo
 
-## Estado Atual
+## O que ja existe hoje (10 tools)
 
-O Copiloto hoje possui:
-- 3 acoes executaveis: criar transacao, criar tarefa, registrar movimentacao de estoque
-- Analise de imagens (notas fiscais, recibos)
-- Contexto financeiro, estoque, tarefas, equipe e fornecedores
-- Historico de chat em localStorage (maximo 20 mensagens)
-
-## Gaps Identificados
-
-O Copiloto tem acesso SOMENTE LEITURA a muitos dados mas NAO consegue executar acoes sobre eles. Ele ve despesas pendentes mas nao pode marca-las como pagas. Ele ve tarefas do dia mas nao pode completa-las. Ele conhece os fornecedores mas nao pode criar pedidos de compra.
+O Copiloto ja executa 10 acoes: criar transacao, criar tarefa, movimentar estoque, marcar transacao como paga, concluir tarefa, excluir tarefa, criar pedido de compra, registrar pagamento de funcionario, validar fechamento de caixa e gerar resumo. Alem disso, analisa imagens e tem contexto rico de todo o negocio.
 
 ---
 
-## Novas Funcoes a Adicionar (7 novas tools)
+## Nivel 2: Automacao Proativa (o sistema age SEM o usuario pedir)
 
-### Grupo 1 - Acoes Rapidas (alta frequencia de uso)
+Hoje o Copiloto so age quando o usuario manda uma mensagem. O proximo nivel e ele agir automaticamente.
 
-**1. `mark_transaction_paid`** - Marcar despesa como paga
-- O gestor pergunta "quais despesas estao pendentes?" e depois diz "paga a conta de energia"
-- Busca a transacao por descricao (ILIKE) + is_paid=false, atualiza para is_paid=true
-- Parametros: description (busca), date (opcional para desambiguar)
+### 2.1 - Daily Digest Automatico
+- Uma funcao backend que roda todo dia de manha (via cron/webhook externo ou chamada agendada)
+- Gera um resumo automatico: contas vencendo hoje, estoque critico, tarefas pendentes, fechamento de caixa nao validado
+- Envia como notificacao push para o gestor
+- Arquivo: nova edge function `daily-digest/index.ts`
 
-**2. `complete_task`** - Marcar tarefa como concluida
-- "Conclui a tarefa de ligar pro fornecedor"
-- Busca por titulo (ILIKE) + is_completed=false, atualiza is_completed=true + completed_at
-- Parametros: title (busca)
+### 2.2 - Alertas Inteligentes com Acao
+- Quando estoque chegar a zero, o Copiloto automaticamente sugere criar pedido de compra
+- Quando boleto vence em 2 dias, notifica e oferece "marcar como pago"
+- Quando checklist de abertura nao foi feito ate 10h, alerta o admin
+- Integra com o sistema de push notifications ja existente (`push-notifier`)
 
-**3. `delete_task`** - Excluir uma tarefa
-- "Remove a tarefa X da agenda"
-- Busca por titulo e deleta
-- Parametros: title (busca)
-
-### Grupo 2 - Operacoes de Compra
-
-**4. `create_order`** - Criar pedido de compra para fornecedor
-- "Faz um pedido de 20kg de frango pro fornecedor X"
-- Cria registro em `orders` + `order_items` vinculando ao fornecedor e item do inventario
-- Parametros: supplier_name, items (array com item_name + quantity), notes
-
-### Grupo 3 - Gestao de Equipe
-
-**5. `register_employee_payment`** - Registrar pagamento de funcionario
-- "Registra adiantamento de R$500 pro Joao"
-- Insere em `employee_payments` com tipo (salary, advance, bonus, commission)
-- Parametros: employee_name, amount, type, payment_date, notes
-
-### Grupo 4 - Inteligencia e Relatorios
-
-**6. `generate_summary`** - Gerar resumo executivo do periodo
-- "Me da um resumo da semana" ou "Como foi o mes?"
-- NAO e uma acao de escrita - instrui a IA a formatar um relatorio estruturado com os dados do contexto
-- Parametros: period (today, week, month)
-
-**7. `mark_closing_validated`** - Validar fechamento de caixa pendente
-- "Valida o fechamento de caixa de ontem"
-- Atualiza status do cash_closing para 'validated' + validated_by + validated_at
-- Parametros: date (busca)
+### 2.3 - Regras Automaticas (Auto-Rules)
+- Nova tabela `automation_rules` onde o gestor define regras tipo:
+  - "Quando estoque de [item] chegar abaixo de [X], criar pedido automaticamente para [fornecedor]"
+  - "Todo dia 5, registrar pagamento de salario para todos os funcionarios"
+  - "Quando fechamento de caixa tiver diferenca > R$50, enviar alerta"
+- A edge function processa essas regras periodicamente
 
 ---
 
-## Melhorias na Interface (Copilot.tsx)
+## Nivel 3: Novas Tools do Copiloto (6 novas acoes)
 
-### Chips de Sugestao Rapida
-Adicionar chips clicaveis abaixo do input com acoes frequentes:
-- "Resumo do dia"
-- "Despesas pendentes"
-- "Estoque baixo"
-- "Criar tarefa"
+### 3.1 - `update_transaction` - Editar transacao existente
+- "Muda o valor da conta de energia para R$350"
+- Atualiza descricao, valor, data ou categoria de uma transacao existente
 
-### Markdown nas respostas
-Usar formatacao basica para tabelas e listas nas respostas da IA (negrito, listas).
+### 3.2 - `create_supplier_invoice` - Registrar boleto/fatura de fornecedor
+- "Registra boleto do fornecedor X, R$1500, vence dia 15"
+- Insere em `supplier_invoices`
 
-### Feedback visual de acao
-Apos executar uma acao, mostrar um mini-toast dentro do chat confirmando e oferecendo "Desfazer" quando possivel.
+### 3.3 - `mark_invoice_paid` - Pagar boleto de fornecedor
+- "Paga o boleto da distribuidora"
+- Atualiza `is_paid` em `supplier_invoices`
+
+### 3.4 - `complete_checklist_item` - Marcar item do checklist
+- "Marca o item 'limpar balcao' do checklist de abertura"
+- Insere em `checklist_completions`
+
+### 3.5 - `send_order` - Enviar pedido para fornecedor
+- "Envia o pedido pendente pro fornecedor X"
+- Atualiza status do pedido de `draft` para `sent` + `sent_at`
+
+### 3.6 - `create_appointment` - Criar compromisso com horario
+- "Agenda reuniao com fornecedor amanha as 14h"
+- Insere em `manager_appointments`
 
 ---
 
-## Melhorias no Prompt/Contexto
+## Nivel 4: Multi-Tool Chaining (Acoes em Cadeia)
 
-### Contexto mais inteligente
-- Adicionar **checklists do dia** (abertura/fechamento - % completo)
-- Adicionar **boletos/faturas vencendo** (supplier_invoices com due_date proxima)
-- Adicionar **metas de orcamento** (finance_budgets vs realizado)
+Hoje o Copiloto executa apenas 1 tool por mensagem. O proximo passo e permitir encadeamento:
 
-### Prompt refinado
-- Instruir a IA a sugerir acoes proativamente (ex: "Voce tem 3 despesas pendentes, quer que eu marque alguma como paga?")
-- Adicionar regras de confirmacao para acoes destrutivas (delete)
+- "Registra a nota fiscal da imagem, da entrada no estoque e cria o boleto"
+  - Tool 1: `register_stock_movement` (entrada dos itens)
+  - Tool 2: `create_supplier_invoice` (boleto extraido da NF)
+  - Tool 3: `create_transaction` (despesa vinculada)
+
+Isso requer modificar o loop principal da edge function para processar multiplos tool_calls do modelo em sequencia.
+
+---
+
+## Nivel 5: Persistencia e Inteligencia de Longo Prazo
+
+### 5.1 - Historico de Chat no Banco de Dados
+- Mover de localStorage para tabela `copilot_messages`
+- Permite historico entre dispositivos e analise de padrao de uso
+- Nova tabela: `copilot_conversations` e `copilot_messages`
+
+### 5.2 - Memoria de Preferencias
+- O Copiloto aprende preferencias: "quando falo 'luz', se refere a 'conta de energia eletrica'"
+- Tabela `copilot_preferences` com mapeamentos personalizados
 
 ---
 
 ## Detalhes Tecnicos
 
-### Arquivos a modificar:
-1. **`supabase/functions/management-ai/index.ts`** - Adicionar 7 novas definicoes de tools + funcoes executoras
-2. **`src/hooks/useManagementAI.ts`** - Adicionar dados de checklists, boletos e orcamentos ao contexto
-3. **`src/pages/Copilot.tsx`** - Adicionar chips de sugestao, suporte a markdown nas respostas
+### Sequencia recomendada de implementacao:
 
-### Tabelas envolvidas (somente leitura/update, sem schema changes):
-- `finance_transactions` (update is_paid)
-- `manager_tasks` (update is_completed, delete)
-- `orders` + `order_items` (insert)
-- `employee_payments` (insert)
-- `cash_closings` (update status)
-- `checklist_completions` + `checklist_items` (leitura para contexto)
-- `supplier_invoices` (leitura para contexto)
-- `finance_budgets` (leitura para contexto)
+**Fase 1 (impacto imediato):** 6 novas tools (3.1 a 3.6) + Multi-tool chaining (Nivel 4)
+- Modifica: `supabase/functions/management-ai/index.ts`
+- Adiciona loop de multiplos tool_calls na resposta da IA
 
-### Sequencia de implementacao:
-1. Adicionar novas tools na edge function (todas de uma vez)
-2. Expandir contexto no hook
-3. Atualizar UI com chips e markdown
-4. Deploy e teste
+**Fase 2 (automacao proativa):** Daily Digest + alertas inteligentes
+- Cria: `supabase/functions/daily-digest/index.ts`
+- Modifica: sistema de notificacoes existente
+
+**Fase 3 (persistencia):** Chat no banco + auto-rules
+- Cria: migracoes para novas tabelas
+- Modifica: `src/hooks/useManagementAI.ts` para usar banco em vez de localStorage
+
+### Tabelas novas necessarias:
+- `copilot_conversations` (id, user_id, unit_id, created_at)
+- `copilot_messages` (id, conversation_id, role, content, image_url, tool_calls, created_at)
+- `automation_rules` (id, unit_id, trigger_type, trigger_config, action_type, action_config, is_active)
+- `copilot_preferences` (id, user_id, key, value)
+
+### Tabelas existentes usadas (sem alteracao de schema):
+- `supplier_invoices` (insert, update)
+- `checklist_completions` (insert)
+- `orders` (update status)
+- `manager_appointments` (insert)
+- `finance_transactions` (update)
 
