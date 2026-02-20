@@ -1,83 +1,66 @@
 
 
-# Proximo Nivel de Automacao - Copiloto Autonomo
+# Memoria de Preferencias do Copiloto
 
-## O que ja existe hoje (16 tools) ✅
+## O que sera feito
 
-O Copiloto executa 16 acoes com suporte a multi-tool chaining (multiplas acoes por mensagem):
+O Copiloto vai aprender atalhos e mapeamentos personalizados do usuario. Por exemplo, quando o gestor diz "luz", o sistema entende automaticamente como "conta de energia eletrica, categoria Energia".
 
-**Tools originais (10):** criar transacao, criar tarefa, movimentar estoque, marcar transacao como paga, concluir tarefa, excluir tarefa, criar pedido de compra, registrar pagamento de funcionario, validar fechamento de caixa e gerar resumo.
+## Implementacao
 
-**Tools novas (6 - Fase 1 concluida):**
-- ✅ `update_transaction` - Editar transacao existente
-- ✅ `create_supplier_invoice` - Registrar boleto/fatura de fornecedor
-- ✅ `mark_invoice_paid` - Pagar boleto de fornecedor
-- ✅ `complete_checklist_item` - Marcar item do checklist
-- ✅ `send_order` - Enviar pedido para fornecedor
-- ✅ `create_appointment` - Criar compromisso com horario
+### 1. Nova tabela `copilot_preferences`
 
-**Multi-Tool Chaining (Nivel 4 concluido):**
-- ✅ Loop de ate 5 rounds de tool_calls por mensagem
-- ✅ Suporte a multiplas tool_calls paralelas por round
+Migracao SQL criando a tabela com os campos:
+- `id` (uuid, PK)
+- `user_id` (uuid, NOT NULL)
+- `unit_id` (uuid, nullable)
+- `key` (text) - o atalho/apelido (ex: "luz")
+- `value` (text) - o significado completo (ex: "conta de energia eletrica, categoria: Energia, tipo: expense")
+- `category` (text) - tipo da preferencia: 'alias', 'default_account', 'default_category'
+- `created_at` / `updated_at`
 
----
+RLS: usuarios gerenciam apenas suas proprias preferencias (`auth.uid() = user_id`).
+Indice unico em `(user_id, key)` para evitar duplicatas.
 
-## Nivel 2: Automacao Proativa (o sistema age SEM o usuario pedir)
+### 2. Nova tool `save_preference` na edge function
 
-Hoje o Copiloto so age quando o usuario manda uma mensagem. O proximo nivel e ele agir automaticamente.
+Adicionar ao `management-ai/index.ts`:
+- Nova tool definition no array TOOLS
+- Funcao `executeSavePreference` que faz upsert na tabela
+- O modelo chama automaticamente quando detecta que o usuario esta definindo um atalho
 
-### 2.1 - Daily Digest Automatico
-- Uma funcao backend que roda todo dia de manha (via cron/webhook externo ou chamada agendada)
-- Gera um resumo automatico: contas vencendo hoje, estoque critico, tarefas pendentes, fechamento de caixa nao validado
-- Envia como notificacao push para o gestor
-- Arquivo: nova edge function `daily-digest/index.ts`
+Exemplos de uso:
+- "Quando eu falar 'luz', entenda como conta de energia" -> `save_preference(key: "luz", value: "conta de energia eletrica, categoria: Energia")`
+- "Minha conta padrao e Nubank" -> `save_preference(key: "conta_padrao", value: "Nubank", category: "default_account")`
 
-### 2.2 - Alertas Inteligentes com Acao
-- Quando estoque chegar a zero, o Copiloto automaticamente sugere criar pedido de compra
-- Quando boleto vence em 2 dias, notifica e oferece "marcar como pago"
-- Quando checklist de abertura nao foi feito ate 10h, alerta o admin
-- Integra com o sistema de push notifications ja existente (`push-notifier`)
+### 3. Carregar preferencias no contexto da IA
 
-### 2.3 - Regras Automaticas (Auto-Rules)
-- Nova tabela `automation_rules` onde o gestor define regras tipo:
-  - "Quando estoque de [item] chegar abaixo de [X], criar pedido automaticamente para [fornecedor]"
-  - "Todo dia 5, registrar pagamento de salario para todos os funcionarios"
-  - "Quando fechamento de caixa tiver diferenca > R$50, enviar alerta"
-- A edge function processa essas regras periodicamente
+No handler principal do `management-ai`:
+- Buscar todas as preferencias do usuario antes de montar o system prompt
+- Injetar como bloco no prompt: `PREFERENCIAS DO USUARIO: 'luz' = 'conta de energia...'`
+- O modelo usa essas preferencias para interpretar comandos ambiguos
 
----
+### 4. Carregar preferencias no frontend (hook)
 
-## Nivel 5: Persistencia e Inteligencia de Longo Prazo
-
-### 5.1 - Historico de Chat no Banco de Dados
-- Mover de localStorage para tabela `copilot_messages`
-- Permite historico entre dispositivos e analise de padrao de uso
-- Nova tabela: `copilot_conversations` e `copilot_messages`
-
-### 5.2 - Memoria de Preferencias
-- O Copiloto aprende preferencias: "quando falo 'luz', se refere a 'conta de energia eletrica'"
-- Tabela `copilot_preferences` com mapeamentos personalizados
+No `useManagementAI.ts`:
+- Adicionar fetch de preferencias ao `fetchFullContext`
+- Enviar no campo `context.preferences` para a edge function
 
 ---
 
 ## Detalhes Tecnicos
 
-### Status de implementacao:
+### Arquivos modificados:
+1. **Nova migracao SQL** - tabela `copilot_preferences` + RLS + indice unico
+2. **`supabase/functions/management-ai/index.ts`** - nova tool `save_preference` + carregar preferencias no prompt
+3. **`src/hooks/useManagementAI.ts`** - buscar preferencias no contexto
+4. **`.lovable/plan.md`** - atualizar status
 
-**Fase 1 (CONCLUÍDA ✅):** 6 novas tools + Multi-tool chaining
-- Modificado: `supabase/functions/management-ai/index.ts`
-- 16 tools totais com loop de multi-tool chaining (ate 5 rounds)
+### Fluxo:
+1. Usuario diz: "quando eu falar luz, entenda como conta de energia"
+2. Modelo detecta intencao e chama `save_preference(key: "luz", value: "conta de energia eletrica, categoria: Energia, tipo: expense")`
+3. Funcao faz upsert na tabela
+4. Nas proximas mensagens, as preferencias sao carregadas no prompt
+5. Usuario diz: "registra a luz desse mes, R$280"
+6. Modelo le preferencia e cria transacao com categoria correta automaticamente
 
-**Fase 2 (pendente):** Daily Digest + alertas inteligentes
-- Cria: `supabase/functions/daily-digest/index.ts`
-- Modifica: sistema de notificacoes existente
-
-**Fase 3 (pendente):** Chat no banco + auto-rules
-- Cria: migracoes para novas tabelas
-- Modifica: `src/hooks/useManagementAI.ts` para usar banco em vez de localStorage
-
-### Tabelas novas necessarias (Fase 3):
-- `copilot_conversations` (id, user_id, unit_id, created_at)
-- `copilot_messages` (id, conversation_id, role, content, image_url, tool_calls, created_at)
-- `automation_rules` (id, unit_id, trigger_type, trigger_config, action_type, action_config, is_active)
-- `copilot_preferences` (id, user_id, key, value)
