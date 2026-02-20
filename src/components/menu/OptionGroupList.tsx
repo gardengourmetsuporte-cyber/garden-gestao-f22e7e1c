@@ -1,5 +1,6 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { MenuOptionGroup } from '@/hooks/useMenuAdmin';
 
@@ -33,18 +34,13 @@ export function OptionGroupList({ optionGroups, onNew, onEdit, onDelete, onLinkP
       </div>
 
       {optionGroups.length === 0 ? (
-        <div className="card-base p-6">
-          <div className="empty-state py-8">
-            <div className="icon-glow icon-glow-lg icon-glow-muted mx-auto mb-3">
-              <AppIcon name="Settings" size={24} />
-            </div>
-            <p className="empty-state-title">Nenhum grupo de opcionais</p>
-            <p className="empty-state-text mb-4">Crie grupos como "Molhos" ou "Acompanhamentos"</p>
-            <Button size="sm" onClick={onNew}>
-              <AppIcon name="Plus" size={14} className="mr-1.5" /> Criar Grupo
-            </Button>
-          </div>
-        </div>
+        <EmptyState
+          icon="Settings"
+          title="Nenhum grupo de opcionais"
+          subtitle='Crie grupos como "Molhos" ou "Acompanhamentos"'
+          actionLabel="Criar Grupo"
+          onAction={onNew}
+        />
       ) : (
         <div className="space-y-3">
           {optionGroups.map(og => {

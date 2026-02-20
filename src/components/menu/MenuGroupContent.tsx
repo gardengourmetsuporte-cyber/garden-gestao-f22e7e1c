@@ -1,5 +1,6 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { ProductCard } from './ProductCard';
 import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 
@@ -19,15 +20,11 @@ export function MenuGroupContent({
 }: Props) {
   if (!group) {
     return (
-      <div className="card-base p-6">
-        <div className="empty-state py-8">
-          <div className="icon-glow icon-glow-lg icon-glow-muted mx-auto mb-3">
-            <AppIcon name="Package" size={24} />
-          </div>
-          <p className="empty-state-title">Selecione um grupo</p>
-          <p className="empty-state-text">Escolha um grupo acima para ver seus produtos</p>
-        </div>
-      </div>
+      <EmptyState
+        icon="Package"
+        title="Selecione um grupo"
+        subtitle="Escolha um grupo acima para ver seus produtos"
+      />
     );
   }
 
@@ -69,18 +66,13 @@ export function MenuGroupContent({
 
       {/* Products */}
       {products.length === 0 ? (
-        <div className="card-base p-6">
-          <div className="empty-state py-6">
-            <div className="icon-glow icon-glow-lg icon-glow-muted mx-auto mb-3">
-              <AppIcon name="ShoppingBag" size={24} />
-            </div>
-            <p className="empty-state-title">Nenhum produto</p>
-            <p className="empty-state-text mb-4">Adicione produtos a este grupo</p>
-            <Button size="sm" onClick={onNewProduct}>
-              <AppIcon name="Plus" size={14} className="mr-1.5" /> Adicionar Produto
-            </Button>
-          </div>
-        </div>
+        <EmptyState
+          icon="ShoppingBag"
+          title="Nenhum produto"
+          subtitle="Adicione produtos a este grupo"
+          actionLabel="Adicionar Produto"
+          onAction={onNewProduct}
+        />
       ) : (
         <div className="space-y-2">
           {products.map(p => (

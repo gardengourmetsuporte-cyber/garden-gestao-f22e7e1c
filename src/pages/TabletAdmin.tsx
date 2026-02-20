@@ -14,6 +14,7 @@ import {
   Package, Plus, Trash2, RefreshCw, Monitor, Settings2, LayoutGrid,
   AlertCircle, CheckCircle2, Clock, Send, QrCode, ExternalLink,
 } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useUnit } from '@/contexts/UnitContext';
 
 export default function TabletAdmin() {
@@ -98,7 +99,7 @@ export default function TabletAdmin() {
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="px-4 py-4 lg:px-6 space-y-4">
         <Tabs defaultValue="orders">
           <TabsList className="w-full">
             <TabsTrigger value="orders" className="flex-1">Pedidos</TabsTrigger>
@@ -110,11 +111,11 @@ export default function TabletAdmin() {
           {/* ORDERS TAB */}
           <TabsContent value="orders" className="space-y-3 mt-4">
             {orders.length === 0 ? (
-              <div className="empty-state">
-                <QrCode className="empty-state-icon" />
-                <p className="empty-state-title">Nenhum pedido ainda</p>
-                <p className="empty-state-text">Os pedidos feitos no tablet aparecerão aqui em tempo real</p>
-              </div>
+              <EmptyState
+                icon="QrCode"
+                title="Nenhum pedido ainda"
+                subtitle="Os pedidos feitos no tablet aparecerão aqui em tempo real"
+              />
             ) : (
               orders.map(order => (
                 <div key={order.id} className="list-command">
