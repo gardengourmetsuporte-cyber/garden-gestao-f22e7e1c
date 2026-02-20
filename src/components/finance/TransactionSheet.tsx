@@ -704,7 +704,7 @@ export function TransactionSheet({
           </div>
 
           {/* Sticky bottom actions */}
-          <div className="shrink-0 border-t border-border/50 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] bg-background">
+          <div className="shrink-0 sticky bottom-0 border-t border-border/50 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] bg-background z-20">
             {/* Save and Continue - only for new transactions */}
             {!editingTransaction && (
               <Button
