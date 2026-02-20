@@ -19,7 +19,8 @@ import {
   FinanceCategory, 
   FinanceAccount, 
   TransactionFormData,
-  FinanceTransaction
+  FinanceTransaction,
+  RecurringEditMode
 } from '@/types/finance';
 import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -28,7 +29,7 @@ import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 
-export type RecurringEditMode = 'single' | 'pending' | 'all';
+export type { RecurringEditMode };
 
 interface TransactionSheetProps {
   open: boolean;
