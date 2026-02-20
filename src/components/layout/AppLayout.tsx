@@ -487,14 +487,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             style={{
                               background: isActive
                                 ? undefined
-                                : 'linear-gradient(145deg, hsl(0 0% 95%), hsl(0 0% 88%))',
+                                : 'hsl(var(--muted))',
                               boxShadow: isActive
                                 ? '0 4px 16px hsl(var(--primary) / 0.4)'
                                 : 'none',
                               opacity: isEmProducao && !isActive ? 0.7 : 1,
                               border: isEmProducao && !isActive
                                 ? '1px dashed hsl(var(--neon-amber) / 0.4)'
-                                : isActive ? 'none' : '1px solid hsl(0 0% 100% / 0.5)',
+                                : isActive ? 'none' : '1px solid hsl(var(--border) / 0.3)',
                             }}
                           >
                             <AppIcon

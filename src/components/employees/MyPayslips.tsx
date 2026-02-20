@@ -372,7 +372,7 @@ export function MyPayslips() {
                 
                 <span 
                   className="font-semibold text-lg"
-                  style={{ color: payment.type === 'discount' ? '#ef4444' : undefined }}
+                  style={{ color: payment.type === 'discount' ? 'hsl(var(--destructive))' : undefined }}
                 >
                   {payment.type === 'discount' ? '-' : ''}
                   {formatCurrency(payment.amount)}

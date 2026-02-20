@@ -25,10 +25,10 @@ export function PointsDisplay({ className, showLabel = true, isPulsing = false }
   return (
     <div id="points-counter" className={cn("flex items-center gap-2", className)}>
       <div className={cn(
-        "flex items-center justify-center w-8 h-8 rounded-full bg-amber-500/20",
+        "flex items-center justify-center w-8 h-8 rounded-full",
         isPulsing && "animate-coin-pulse"
-      )}>
-        <AppIcon name="Star" size={16} style={{ color: 'hsl(38 92% 50%)' }} />
+      )} style={{ backgroundColor: 'hsl(var(--neon-amber) / 0.2)' }}>
+        <AppIcon name="Star" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
       </div>
       <div className="flex flex-col">
         <span className={cn("font-bold text-foreground", isPulsing && "animate-coin-pulse")}>{animatedBalance}</span>

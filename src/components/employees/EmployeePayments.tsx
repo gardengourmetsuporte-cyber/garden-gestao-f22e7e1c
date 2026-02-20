@@ -240,7 +240,7 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
                 <div className="flex items-center gap-2">
                   <span 
                     className="font-semibold"
-                    style={{ color: payment.type === 'discount' ? '#ef4444' : undefined }}
+                    style={{ color: payment.type === 'discount' ? 'hsl(var(--destructive))' : undefined }}
                   >
                     {payment.type === 'discount' ? '-' : ''}
                     {formatCurrency(payment.amount)}
