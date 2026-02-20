@@ -8,6 +8,9 @@ import { cn } from '@/lib/utils';
 import mascotImg from '@/assets/garden-mascot.png';
 import CopilotMessageContent from '@/components/copilot/CopilotMessageContent';
 import CopilotSuggestionChips from '@/components/copilot/CopilotSuggestionChips';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 function isActionMessage(content: string) {
   return content.startsWith('[ACTION]');
@@ -19,8 +22,12 @@ function stripActionMarker(content: string) {
 
 export default function CopilotPage() {
   const navigate = useNavigate();
-  const { messages, isLoading, isExecuting, hasGreeted, sendMessage, clearHistory } = useManagementAI();
+  const {
+    messages, isLoading, isExecuting, hasGreeted, sendMessage, clearHistory,
+    conversations, conversationId, switchConversation, newConversation,
+  } = useManagementAI();
   const [question, setQuestion] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -95,14 +102,61 @@ export default function CopilotPage() {
             <h1 className="text-sm font-bold text-foreground leading-none">Copiloto IA</h1>
             <p className="text-[10px] text-muted-foreground mt-0.5">Seu assistente de gestão</p>
           </div>
-          {messages.length > 2 && (
+          <div className="flex items-center gap-1">
+            {messages.length > 2 && (
+              <button
+                onClick={clearHistory}
+                className="text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
+              >
+                Limpar
+              </button>
+            )}
             <button
-              onClick={clearHistory}
-              className="text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
+              onClick={() => {
+                newConversation();
+              }}
+              className="p-2 rounded-xl hover:bg-secondary transition-colors"
+              title="Nova conversa"
             >
-              Limpar
+              <AppIcon name="Plus" size={18} className="text-muted-foreground" />
             </button>
-          )}
+            <Sheet open={showHistory} onOpenChange={setShowHistory}>
+              <SheetTrigger asChild>
+                <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
+                  <AppIcon name="Clock" size={18} className="text-muted-foreground" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] p-0">
+                <SheetHeader className="p-4 border-b border-border/30">
+                  <SheetTitle className="text-sm">Conversas</SheetTitle>
+                </SheetHeader>
+                <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
+                  {conversations.length === 0 ? (
+                    <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
+                  ) : (
+                    conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => {
+                          switchConversation(conv.id);
+                          setShowHistory(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
+                          conv.id === conversationId && "bg-primary/10"
+                        )}
+                      >
+                        <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
+                        </p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
