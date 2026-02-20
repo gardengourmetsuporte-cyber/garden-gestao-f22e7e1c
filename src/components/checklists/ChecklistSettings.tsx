@@ -14,7 +14,9 @@ import {
   Sun,
   Moon,
   Star,
-  Zap
+  Zap,
+  Check,
+  X
 } from 'lucide-react';
 import {
   DndContext,
@@ -493,53 +495,68 @@ export function ChecklistSettings({
                               if (subcatId) handleItemDragEnd(subcatId, allBonusItems, e);
                             }}>
                               <SortableContext items={allBonusItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                                <div className="space-y-1">
-                                  {allBonusItems.map(item => (
-                                    <SortableItem key={item.id} id={item.id} className={cn("p-3 rounded-lg bg-card", !item.is_active && "opacity-50")}>
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-start gap-2">
-                                          <FileText className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-                                          <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium">{item.name}</p>
-                                            {item.description && <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>}
-                                            <div className="flex items-center gap-1.5 flex-wrap mt-2">
-                                              <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
-                                                {getFrequencyLabel(item.frequency || 'daily')}
-                                              </span>
-                                              <span className={cn(
-                                                "text-xs px-1.5 py-0.5 rounded flex items-center gap-1",
-                                                item.points === 0 ? "bg-muted text-muted-foreground" : "bg-emerald-500/10 text-emerald-500"
-                                              )}>
-                                                <Zap className="w-3 h-3" />
-                                                {item.points === 0 ? 'Sem pts' : `${item.points} pt${item.points > 1 ? 's' : ''}`}
-                                              </span>
-                                            </div>
-                                          </div>
+                                <div className="space-y-1.5">
+                                  {allBonusItems.map(item => {
+                                    const pointsColors = getBonusPointsColors(item.points);
+                                    return (
+                                      <SortableItem key={item.id} id={item.id} className={cn(
+                                        "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                                        item.is_active 
+                                          ? "bg-card/80 border-border/50 hover:border-border" 
+                                          : "bg-muted/30 border-border/30 opacity-60"
+                                      )}>
+                                        {/* Points badge */}
+                                        <div 
+                                          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold border"
+                                          style={{
+                                            backgroundColor: item.points > 0 ? pointsColors.bg : undefined,
+                                            color: item.points > 0 ? pointsColors.color : undefined,
+                                            borderColor: item.points > 0 ? pointsColors.border : undefined,
+                                          }}
+                                        >
+                                          {item.points > 0 ? (
+                                            <span className="flex items-center gap-0.5"><Zap className="w-3 h-3" />{item.points}</span>
+                                          ) : (
+                                            <span className="text-muted-foreground">—</span>
+                                          )}
                                         </div>
-                                        <div className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-border/50">
+
+                                        {/* Name + freq */}
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                                          <p className="text-[11px] text-muted-foreground">{getFrequencyLabel(item.frequency || 'daily')}</p>
+                                        </div>
+
+                                        {/* Compact actions */}
+                                        <div className="flex items-center gap-1 shrink-0">
                                           <button
                                             onClick={() => onUpdateItem(item.id, { is_active: !item.is_active })}
-                                            className={cn("text-xs px-3 py-1.5 rounded-lg font-medium transition-colors",
-                                              item.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")}
+                                            className={cn(
+                                              "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                                              item.is_active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
+                                            )}
+                                            title={item.is_active ? 'Desativar' : 'Ativar'}
                                           >
-                                            {item.is_active ? 'Ativo' : 'Inativo'}
+                                            {item.is_active ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                                           </button>
                                           <button
                                             onClick={() => handleOpenItemSheet((item as any)._subcategoryId, item)}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-xs font-medium"
+                                            className="w-7 h-7 rounded-lg flex items-center justify-center bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                                            title="Editar"
                                           >
-                                            <Edit2 className="w-3.5 h-3.5" /> Editar
+                                            <Edit2 className="w-3.5 h-3.5" />
                                           </button>
                                           <button
                                             onClick={() => onDeleteItem(item.id)}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs font-medium"
+                                            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                            title="Excluir"
                                           >
-                                            <Trash2 className="w-3.5 h-3.5" /> Excluir
+                                            <Trash2 className="w-3.5 h-3.5" />
                                           </button>
                                         </div>
-                                      </div>
-                                    </SortableItem>
-                                  ))}
+                                      </SortableItem>
+                                    );
+                                  })}
                                 </div>
                               </SortableContext>
                             </DndContext>
