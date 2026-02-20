@@ -1,12 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-// n8n webhook URL - trocar webhook-test para webhook em produção
-const N8N_WEBHOOK_URL = "https://gardengourmet.app.n8n.cloud/webhook/garden-create-transaction";
 
 const TOOLS = [
   {
@@ -32,6 +30,107 @@ const TOOLS = [
     },
   },
 ];
+
+// Resolve name lookups to UUIDs and insert transaction directly
+async function executeCreateTransaction(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const supabaseAdmin = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  let categoryId: string | null = null;
+  let accountId: string | null = null;
+  let supplierId: string | null = null;
+  let employeeId: string | null = null;
+
+  // Resolve category_name -> category_id
+  if (args.category_name) {
+    const { data } = await supabaseAdmin
+      .from("finance_categories")
+      .select("id")
+      .ilike("name", String(args.category_name))
+      .eq("user_id", userId)
+      .limit(1)
+      .maybeSingle();
+    if (data) categoryId = data.id;
+  }
+
+  // Resolve account_name -> account_id
+  if (args.account_name) {
+    const { data } = await supabaseAdmin
+      .from("finance_accounts")
+      .select("id")
+      .ilike("name", String(args.account_name))
+      .eq("user_id", userId)
+      .limit(1)
+      .maybeSingle();
+    if (data) accountId = data.id;
+  }
+
+  // Resolve supplier_name -> supplier_id
+  if (args.supplier_name) {
+    const query = supabaseAdmin
+      .from("suppliers")
+      .select("id")
+      .ilike("name", String(args.supplier_name))
+      .limit(1);
+    if (unitId) query.eq("unit_id", unitId);
+    const { data } = await query.maybeSingle();
+    if (data) supplierId = data.id;
+  }
+
+  // Resolve employee_name -> employee_id
+  if (args.employee_name) {
+    const query = supabaseAdmin
+      .from("employees")
+      .select("id")
+      .ilike("full_name", String(args.employee_name))
+      .limit(1);
+    if (unitId) query.eq("unit_id", unitId);
+    const { data } = await query.maybeSingle();
+    if (data) employeeId = data.id;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const { error } = await supabaseAdmin.from("finance_transactions").insert({
+    user_id: userId,
+    unit_id: unitId,
+    type: args.type as string,
+    amount: Number(args.amount),
+    description: String(args.description),
+    category_id: categoryId,
+    account_id: accountId,
+    supplier_id: supplierId,
+    employee_id: employeeId,
+    date: (args.date as string) || today,
+    is_paid: args.is_paid !== false,
+  });
+
+  if (error) {
+    console.error("Insert error:", error);
+    return { success: false, message: `Erro ao criar transação: ${error.message}` };
+  }
+
+  const typeLabel = args.type === "income" ? "Receita" : "Despesa";
+  const lines = [
+    `[ACTION] ✅ ${typeLabel} criada com sucesso!`,
+    "",
+    `📝 ${args.description}`,
+    `💰 R$ ${Number(args.amount).toFixed(2)}`,
+  ];
+  if (args.category_name) lines.push(`📂 Categoria: ${args.category_name}`);
+  if (args.account_name) lines.push(`🏦 Conta: ${args.account_name}`);
+  if (args.supplier_name) lines.push(`🚚 Fornecedor: ${args.supplier_name}`);
+  if (args.date) lines.push(`📅 Data: ${args.date}`);
+  lines.push(args.is_paid === false ? `⏳ Status: Pendente` : `✅ Status: Pago`);
+
+  return { success: true, message: lines.join("\n") };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -131,7 +230,7 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar 
       });
     }
 
-    // First AI call - with tools
+    // AI call with tools
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -167,15 +266,15 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar 
     const data = await response.json();
     const choice = data.choices?.[0]?.message;
 
-    // Check for tool calls
+    // Handle tool calls
     if (choice?.tool_calls && choice.tool_calls.length > 0) {
       const toolCall = choice.tool_calls[0];
-      
+
       if (toolCall.function.name === "create_transaction") {
-        let args: any;
+        let args: Record<string, unknown>;
         try {
-          args = typeof toolCall.function.arguments === 'string' 
-            ? JSON.parse(toolCall.function.arguments) 
+          args = typeof toolCall.function.arguments === "string"
+            ? JSON.parse(toolCall.function.arguments)
             : toolCall.function.arguments;
         } catch {
           return new Response(
@@ -184,67 +283,16 @@ Você tem acesso ao histórico de conversa. Use-o para manter contexto, lembrar 
           );
         }
 
-        // Dispatch to n8n webhook
-        try {
-          const n8nPayload = {
-            ...args,
-            user_id: user_id || null,
-            unit_id: unit_id || null,
-          };
+        const result = await executeCreateTransaction(args, user_id, unit_id || null);
 
-          console.log("Dispatching to n8n:", JSON.stringify(n8nPayload));
-
-          const n8nResponse = await fetch(N8N_WEBHOOK_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(n8nPayload),
-          });
-
-          if (!n8nResponse.ok) {
-            const errText = await n8nResponse.text();
-            console.error("n8n error:", n8nResponse.status, errText);
-            return new Response(
-              JSON.stringify({ 
-                suggestion: `❌ Erro ao criar transação: ${errText || 'Erro no servidor de automação'}`, 
-                action_executed: false 
-              }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-
-          // n8n may return empty body, text, or JSON
-          const n8nText = await n8nResponse.text();
-          console.log("n8n result:", n8nText);
-
-          // Build confirmation message
-          const typeLabel = args.type === 'income' ? 'Receita' : 'Despesa';
-          const confirmationMsg = `[ACTION] ✅ ${typeLabel} criada com sucesso!\n\n` +
-            `📝 ${args.description}\n` +
-            `💰 R$ ${Number(args.amount).toFixed(2)}\n` +
-            (args.category_name ? `📂 Categoria: ${args.category_name}\n` : '') +
-            (args.account_name ? `🏦 Conta: ${args.account_name}\n` : '') +
-            (args.supplier_name ? `🚚 Fornecedor: ${args.supplier_name}\n` : '') +
-            (args.date ? `📅 Data: ${args.date}\n` : '') +
-            (args.is_paid === false ? `⏳ Status: Pendente` : `✅ Status: Pago`);
-
-          return new Response(
-            JSON.stringify({ suggestion: confirmationMsg, action_executed: true }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        } catch (n8nErr) {
-          console.error("n8n dispatch error:", n8nErr);
-          return new Response(
-            JSON.stringify({ 
-              suggestion: "❌ Erro ao conectar com o sistema de automação. Tente novamente.", 
-              action_executed: false 
-            }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+        return new Response(
+          JSON.stringify({ suggestion: result.message, action_executed: result.success }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
-    // No tool call - return normal text response
+    // No tool call - return normal text
     const suggestion = choice?.content || "Não foi possível gerar sugestões no momento.";
 
     return new Response(
