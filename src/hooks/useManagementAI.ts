@@ -191,6 +191,7 @@ export function useManagementAI() {
         allMonthTxRes,
         checklistItemsRes, checklistCompletionsRes,
         supplierInvoicesRes, budgetsRes, budgetSpentRes,
+        preferencesRes,
       ] = await Promise.all([
         supabase.from('finance_accounts').select('name, type, balance').eq('unit_id', activeUnitId).eq('is_active', true),
         supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).eq('type', 'income').eq('is_paid', true).gte('date', startDate).lte('date', endDate),
@@ -210,6 +211,7 @@ export function useManagementAI() {
         supabase.from('supplier_invoices').select('description, amount, due_date, is_paid, supplier:suppliers(name)').eq('unit_id', activeUnitId).eq('is_paid', false).gte('due_date', todayStr).lte('due_date', next7days).order('due_date').limit(10),
         supabase.from('finance_budgets').select('planned_amount, category:finance_categories(name)').eq('unit_id', activeUnitId).eq('user_id', user.id).eq('month', nowDate.getMonth() + 1).eq('year', nowDate.getFullYear()),
         supabase.from('finance_transactions').select('amount, category_id').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
+        supabase.from('copilot_preferences').select('key, value, category').eq('user_id', user.id).limit(50),
       ]);
 
       const totalIncome = (incomeRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
@@ -266,6 +268,7 @@ export function useManagementAI() {
         checklistProgress,
         upcomingInvoices,
         budgetStatus,
+        preferences: (preferencesRes.data || []).map((p: any) => `${p.key} = ${p.value} (${p.category})`),
       };
 
       contextCacheRef.current = { data: contextData, timestamp: Date.now() };

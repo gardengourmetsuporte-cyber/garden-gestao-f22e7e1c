@@ -678,6 +678,47 @@ export type Database = {
           },
         ]
       }
+      copilot_preferences: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          key: string
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+          value: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          key: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+          value: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          key?: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_preferences_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_card_invoices: {
         Row: {
           account_id: string
