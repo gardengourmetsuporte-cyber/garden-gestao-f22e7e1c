@@ -98,34 +98,32 @@ export function FinanceTransactions({
   // Track "seen" new transactions — persisted in localStorage
   const SEEN_KEY = 'finance_seen_txns';
 
-  const seenRef = useRef<Record<string, number>>({});
-  const [seenVersion, setSeenVersion] = useState(0);
-
-  // Load from localStorage once on mount
-  useEffect(() => {
+  // Load seen state synchronously to avoid flash of glow on remount
+  const getInitialSeen = (): Record<string, number> => {
     try {
       const stored = localStorage.getItem(SEEN_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        let data: Record<string, number>;
         if (Array.isArray(parsed)) {
-          const migrated: Record<string, number> = {};
-          parsed.forEach((id: string) => { migrated[id] = Date.now(); });
-          seenRef.current = migrated;
+          data = {};
+          parsed.forEach((id: string) => { data[id] = Date.now(); });
         } else {
-          seenRef.current = parsed;
+          data = parsed;
         }
-        // Clean entries older than 7 days
         const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
         const cleaned: Record<string, number> = {};
-        Object.entries(seenRef.current).forEach(([id, ts]) => {
+        Object.entries(data).forEach(([id, ts]) => {
           if ((ts as number) > cutoff) cleaned[id] = ts as number;
         });
-        seenRef.current = cleaned;
         localStorage.setItem(SEEN_KEY, JSON.stringify(cleaned));
+        return cleaned;
       }
     } catch {}
-    setSeenVersion(v => v + 1);
-  }, []);
+    return {};
+  };
+  const seenRef = useRef<Record<string, number>>(getInitialSeen());
+  const [seenVersion, setSeenVersion] = useState(0);
 
   const markSeen = useCallback((id: string) => {
     seenRef.current = { ...seenRef.current, [id]: Date.now() };
