@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -320,13 +321,13 @@ export function ItemFormSheetNew({
 
           {/* Actions */}
           <div className="space-y-3 pt-4">
-            <Button
+            <LoadingButton
               onClick={handleSave}
               disabled={!isValid}
               className="w-full h-14 text-lg font-semibold rounded-xl"
             >
               {item ? 'Salvar Alterações' : 'Adicionar Item'}
-            </Button>
+            </LoadingButton>
 
             {item && onDelete && isAdmin && (
               <Button

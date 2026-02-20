@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Plus, AlertTriangle, TrendingUp, Package, Percent, Building2, ArrowLeft } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -290,9 +291,9 @@ export function RecipeSheet({
                 </Button>
                 <SheetTitle className="text-base">{recipe ? 'Editar Ficha' : 'Nova Ficha Técnica'}</SheetTitle>
               </div>
-              <Button size="sm" onClick={handleSubmit} disabled={isSaving || !name.trim()}>
-                {isSaving ? 'Salvando...' : 'Salvar'}
-              </Button>
+              <LoadingButton size="sm" onClick={handleSubmit} loading={isSaving} loadingText="Salvando...">
+                Salvar
+              </LoadingButton>
             </div>
           </SheetHeader>
 

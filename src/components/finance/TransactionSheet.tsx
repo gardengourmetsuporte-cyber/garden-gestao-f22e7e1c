@@ -25,6 +25,7 @@ import {
 import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Loader2 } from 'lucide-react';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
@@ -782,13 +783,15 @@ export function TransactionSheet({
                   <AppIcon name="Trash2" size={20} />
                 </Button>
               )}
-              <Button
+              <LoadingButton
                 onClick={handleSave}
-                disabled={isLoading || !amount || parseFloat(amount) <= 0 || !description.trim()}
+                disabled={!amount || parseFloat(amount) <= 0 || !description.trim()}
+                loading={isLoading}
+                loadingText="Salvando..."
                 className="flex-1 h-12"
               >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
-              </Button>
+                Salvar
+              </LoadingButton>
             </div>
           </div>
         </SheetContent>
