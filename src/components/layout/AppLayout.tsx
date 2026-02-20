@@ -54,6 +54,7 @@ const navItems: NavItem[] = [
   { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
   { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
   { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
+  { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'engajamento', groupLabel: 'Engajamento' },
 ];
 
 function AppLayoutContent({ children }: AppLayoutProps) {
