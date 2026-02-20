@@ -175,8 +175,19 @@ export function useFinanceCore({
       const { error } = await supabase.from('finance_transactions').update({ is_paid: isPaid }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => invalidateTransactionsAndAccounts(),
-    onError: () => toast.error('Erro ao atualizar transação'),
+    onMutate: async ({ id, isPaid }) => {
+      await queryClient.cancelQueries({ queryKey: transactionsKey });
+      const previous = queryClient.getQueryData<FinanceTransaction[]>(transactionsKey);
+      queryClient.setQueryData<FinanceTransaction[]>(transactionsKey, (old) =>
+        old?.map(t => (t.id === id ? { ...t, is_paid: isPaid } : t))
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(transactionsKey, context.previous);
+      toast.error('Erro ao atualizar transação');
+    },
+    onSettled: () => invalidateTransactionsAndAccounts(),
   });
 
   const addAccountMut = useMutation({
