@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 // n8n webhook URL - trocar webhook-test para webhook em produção
-const N8N_WEBHOOK_URL = "https://gardengourmet.app.n8n.cloud/webhook-test/garden-create-transaction";
+const N8N_WEBHOOK_URL = "https://gardengourmet.app.n8n.cloud/webhook/garden-create-transaction";
 
 const TOOLS = [
   {
