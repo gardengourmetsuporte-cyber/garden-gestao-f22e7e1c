@@ -167,6 +167,22 @@ const TOOLS = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "save_preference",
+      description: "Salvar uma preferência ou atalho do usuário. Use quando o usuário pedir para lembrar, associar ou mapear um apelido/atalho a um significado. Ex: 'quando eu falar luz, entenda como conta de energia'.",
+      parameters: {
+        type: "object",
+        properties: {
+          key: { type: "string", description: "O atalho ou apelido (ex: 'luz', 'conta_padrao')" },
+          value: { type: "string", description: "O significado completo (ex: 'conta de energia elétrica, categoria: Energia, tipo: expense')" },
+          category: { type: "string", enum: ["alias", "default_account", "default_category"], description: "Tipo da preferência. Default: alias" },
+        },
+        required: ["key", "value"],
+      },
+    },
+  },
   // ── NEW TOOLS (Level 3) ──
   {
     type: "function",
@@ -1037,6 +1053,49 @@ async function executeCreateAppointment(
 }
 
 // ──────────────────────────────────────────────
+// Tool: save_preference
+// ──────────────────────────────────────────────
+async function executeSavePreference(
+  args: Record<string, unknown>,
+  userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const sb = getSupabaseAdmin();
+
+  const key = String(args.key).toLowerCase().trim();
+  const value = String(args.value).trim();
+  const category = (args.category as string) || "alias";
+
+  const { error } = await sb.from("copilot_preferences").upsert(
+    {
+      user_id: userId,
+      unit_id: unitId,
+      key,
+      value,
+      category,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id,key" }
+  );
+
+  if (error) {
+    console.error("Save preference error:", error);
+    return { success: false, message: `❌ Erro ao salvar preferência: ${error.message}` };
+  }
+
+  const categoryLabels: Record<string, string> = {
+    alias: "Atalho",
+    default_account: "Conta padrão",
+    default_category: "Categoria padrão",
+  };
+
+  return {
+    success: true,
+    message: `[ACTION] ✅ Preferência salva!\n\n🏷️ Tipo: ${categoryLabels[category] || category}\n🔑 "${key}" → "${value}"\n\nNas próximas vezes que você usar "${key}", vou entender automaticamente como "${value}".`,
+  };
+}
+
+// ──────────────────────────────────────────────
 // Tool dispatcher
 // ──────────────────────────────────────────────
 async function executeTool(
@@ -1077,6 +1136,8 @@ async function executeTool(
       return executeSendOrder(args, userId, unitId);
     case "create_appointment":
       return executeCreateAppointment(args, userId, unitId);
+    case "save_preference":
+      return executeSavePreference(args, userId, unitId);
     default:
       return { success: false, message: `Função "${name}" não reconhecida.` };
   }
@@ -1098,6 +1159,21 @@ serve(async (req) => {
 
     const body = await req.json();
     const { messages: conversationHistory, context, user_id, unit_id, image } = body;
+
+    // Load user preferences for context injection
+    let preferencesBlock = "";
+    if (user_id) {
+      const sb = getSupabaseAdmin();
+      const { data: prefs } = await sb
+        .from("copilot_preferences")
+        .select("key, value, category")
+        .eq("user_id", user_id)
+        .limit(50);
+      if (prefs && prefs.length > 0) {
+        const prefLines = prefs.map((p: any) => `• "${p.key}" = "${p.value}" (${p.category})`);
+        preferencesBlock = `\n\nPREFERÊNCIAS DO USUÁRIO (use para interpretar comandos ambíguos):\n${prefLines.join("\n")}`;
+      }
+    }
 
     // Build data snapshot
     const dataLines: string[] = [];
@@ -1184,6 +1260,7 @@ AÇÕES EXECUTÁVEIS (use tool calling):
 13. complete_checklist_item - Marcar item do checklist como concluído
 14. send_order - Enviar pedido de compra para fornecedor (rascunho → enviado)
 15. create_appointment - Criar compromisso com horário específico
+16. save_preference - Salvar atalho/preferência do usuário (ex: "luz" = "conta de energia")
 
 MULTI-AÇÃO: Você pode chamar MÚLTIPLAS tools em uma única resposta quando o usuário pedir várias ações (ex: "registra a nota, dá entrada no estoque e cria o boleto"). Use várias tool_calls na mesma resposta.
 
@@ -1195,7 +1272,7 @@ REGRAS PARA AÇÕES:
 
 CONTEXTO (use sob demanda, NÃO despeje tudo na resposta):
 - Dia: ${context?.dayOfWeek || '?'} (${context?.timeOfDay || ''})
-${dataSnapshot}`;
+${dataSnapshot}${preferencesBlock}`;
 
     const aiMessages: { role: string; content: any }[] = [
       { role: "system", content: systemPrompt },
