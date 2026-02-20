@@ -327,7 +327,7 @@ export default function Agenda() {
           </div>
         </header>
 
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* View mode tabs with animated indicator */}
           <div className="relative flex bg-muted/50 rounded-2xl p-1 border border-border">
             <div

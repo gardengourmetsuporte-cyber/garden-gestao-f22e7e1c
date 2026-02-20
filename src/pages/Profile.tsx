@@ -49,6 +49,7 @@ export default function Profile() {
 
   return (
     <AppLayout>
+      <div className="min-h-screen bg-background pb-24">
       <header className="page-header-bar">
         <div className="page-header-content flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-2 rounded-xl hover:bg-secondary transition-all">
@@ -179,7 +180,7 @@ export default function Profile() {
         {/* Medals */}
         <MedalList medals={profile.medals} />
       </div>
-
+      </div>
 
 
     </AppLayout>
