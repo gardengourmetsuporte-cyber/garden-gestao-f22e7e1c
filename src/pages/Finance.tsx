@@ -152,6 +152,11 @@ export default function Finance() {
 
   return (
     <AppLayout>
+      <header className="page-header-bar">
+        <div className="page-header-content">
+          <h1 className="page-title">Financeiro</h1>
+        </div>
+      </header>
       <div className="pb-20 lg:pb-20">
         {activeTab === 'home' && (
           <FinanceHome
