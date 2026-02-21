@@ -33,29 +33,47 @@ const FINANCE_SEEN_KEY = 'finance_seen_txns';
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const formatCurrency = (value: number) => currencyFormatter.format(value);
 
-function getInitialSeen(): Record<string, number> {
+// Module-level seen set — survives all mount/unmount cycles within the session
+const _seenIds: Set<string> = new Set();
+let _seenInitialised = false;
+
+function _initSeen() {
+  if (_seenInitialised) return;
+  _seenInitialised = true;
   try {
-    const stored = localStorage.getItem(FINANCE_SEEN_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      let data: Record<string, number>;
-      if (Array.isArray(parsed)) {
-        data = {};
-        parsed.forEach((id: string) => { data[id] = Date.now(); });
-      } else {
-        data = parsed;
-      }
-      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      const cleaned: Record<string, number> = {};
-      Object.entries(data).forEach(([id, ts]) => {
-        if ((ts as number) > cutoff) cleaned[id] = ts as number;
-      });
-      localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(cleaned));
-      return cleaned;
+    const raw = localStorage.getItem(FINANCE_SEEN_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const entries: [string, number][] = Array.isArray(parsed)
+        ? parsed.map((id: string) => [id, Date.now()] as [string, number])
+        : Object.entries(parsed);
+      const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days
+      entries.forEach(([id, ts]) => { if ((ts as number) > cutoff) _seenIds.add(id); });
     }
   } catch {}
-  return {};
 }
+
+function _persistSeen() {
+  try {
+    const data: Record<string, number> = {};
+    _seenIds.forEach(id => { data[id] = Date.now(); });
+    localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(data));
+  } catch {}
+}
+
+function markSeenGlobal(id: string): boolean {
+  if (_seenIds.has(id)) return false;
+  _seenIds.add(id);
+  _persistSeen();
+  return true; // changed
+}
+
+function isSeenGlobal(id: string): boolean {
+  return _seenIds.has(id);
+}
+
+// Run once at module load
+_initSeen();
 
 function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
   const {
@@ -123,19 +141,15 @@ export function FinanceTransactions({
     ...initialFilters
   });
 
-  const seenRef = useRef<Record<string, number>>(getInitialSeen());
   const [, forceUpdate] = useState(0);
 
   const markSeen = useCallback((id: string) => {
-    if (id in seenRef.current) return;
-    seenRef.current = { ...seenRef.current, [id]: Date.now() };
-    try { localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(seenRef.current)); } catch {}
+    if (!markSeenGlobal(id)) return;
     forceUpdate(v => v + 1);
   }, []);
 
-  // Not memoized — always reads fresh from the ref so dismissed items never come back
   const isNewTransaction = (t: FinanceTransaction): boolean => {
-    if (t.id in seenRef.current) return false;
+    if (isSeenGlobal(t.id)) return false;
     const hoursAgo = differenceInHours(new Date(), new Date(t.created_at));
     return hoursAgo < 48;
   };
