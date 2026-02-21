@@ -304,10 +304,15 @@ export function FinanceTransactions({
                 return (
                   <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
                     {/* Date Header */}
-                    <div className="flex items-center justify-between py-2 px-1">
-                      <span className="text-sm font-medium text-muted-foreground capitalize">
-                        {format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR })}
-                      </span>
+                    <div className={`flex items-center justify-between py-2 px-2 rounded-lg ${dateStr === todayStr ? 'bg-primary/10 border border-primary/30' : ''}`}>
+                      <div className="flex items-center gap-2">
+                        {dateStr === todayStr && (
+                          <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
+                        )}
+                        <span className={`text-sm font-medium capitalize ${dateStr === todayStr ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
+                          {dateStr === todayStr ? 'Hoje' : format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                        </span>
+                      </div>
                       <span className={`text-sm font-semibold ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
                         {formatCurrency(dayTotal)}
                       </span>
