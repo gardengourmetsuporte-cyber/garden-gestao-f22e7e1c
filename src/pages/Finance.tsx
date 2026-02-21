@@ -17,6 +17,8 @@ import { TransactionFiltersState } from '@/components/finance/TransactionFilters
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
+import { Undo2, Redo2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Finance() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
@@ -64,24 +66,12 @@ export default function Finance() {
   }, []);
 
   const {
-    accounts,
-    categories,
-    transactions,
-    transactionsByDate,
-    monthStats,
-    totalBalance,
-    isLoading,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    toggleTransactionPaid,
-    addAccount,
-    updateAccount,
-    deleteAccount,
-    updateRecurringTransaction,
-    reorderTransactions,
-    updateTransactionDate,
-    refetch
+    accounts, categories, transactions, transactionsByDate,
+    monthStats, totalBalance, isLoading,
+    addTransaction, updateTransaction, deleteTransaction,
+    toggleTransactionPaid, addAccount, updateAccount, deleteAccount,
+    updateRecurringTransaction, reorderTransactions, updateTransactionDate,
+    refetch, undo, redo, canUndo, canRedo
   } = useFinance(selectedMonth);
 
   const {
@@ -155,6 +145,14 @@ export default function Finance() {
       <div className="min-h-screen bg-background pb-24">
       <header className="page-header-bar">
         <div className="page-header-content">
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canUndo} onClick={undo}>
+              <Undo2 className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canRedo} onClick={redo}>
+              <Redo2 className="h-5 w-5" />
+            </Button>
+          </div>
           <h1 className="page-title">Financeiro</h1>
         </div>
       </header>
