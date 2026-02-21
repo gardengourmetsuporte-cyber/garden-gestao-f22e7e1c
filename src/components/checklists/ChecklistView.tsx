@@ -350,7 +350,7 @@ export function ChecklistView({
                     }
 
                     return (
-                      <Popover key={item.id} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
+                      <Popover key={item.id} modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
                         <PopoverTrigger asChild>
                           <button
                             disabled={!canToggle}
@@ -383,7 +383,7 @@ export function ChecklistView({
                             )}
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-72 p-3 animate-scale-in" align="end">
+                        <PopoverContent className="w-72 p-3 animate-scale-in" align="end" sideOffset={8} collisionPadding={16} avoidCollisions={false}>
                           <div className="space-y-3">
                             {isAdmin && profiles.length > 0 && (
                               <>
@@ -572,7 +572,7 @@ export function ChecklistView({
                             }
 
                             return (
-                              <Popover key={item.id} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
+                              <Popover key={item.id} modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
                                 <PopoverTrigger asChild>
                                   <button
                                     disabled={!canToggle}
@@ -605,7 +605,7 @@ export function ChecklistView({
                                     )}
                                   </button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-72 p-3 animate-scale-in" align="end">
+                                <PopoverContent className="w-72 p-3 animate-scale-in" align="end" sideOffset={8} collisionPadding={16} avoidCollisions={false}>
                                   <div className="space-y-3">
                                     {isAdmin && profiles.length > 0 && (
                                       <>
