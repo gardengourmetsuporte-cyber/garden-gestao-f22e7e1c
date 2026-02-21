@@ -609,10 +609,12 @@
   }
 
   .fab {
-    @apply fixed bottom-6 right-6 w-14 h-14 
+    @apply fixed w-14 h-14 
            rounded-2xl bg-primary text-primary-foreground 
            flex items-center justify-center 
-           z-50 active:scale-95 transition-transform;
+           z-[9990] active:scale-95 transition-transform;
+    right: 20px;
+    bottom: calc(env(safe-area-inset-bottom) + 100px);
     box-shadow: 0 8px 24px hsl(217 91% 60% / 0.35);
   }
 
