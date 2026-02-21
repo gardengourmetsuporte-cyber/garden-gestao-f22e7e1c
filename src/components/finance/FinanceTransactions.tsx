@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { Undo2, Redo2 } from 'lucide-react';
 import { differenceInHours, format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
@@ -117,6 +118,10 @@ interface FinanceTransactionsProps {
   categories: FinanceCategory[];
   accounts: FinanceAccount[];
   initialFilters?: Partial<TransactionFiltersState>;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
 export function FinanceTransactions({
@@ -130,7 +135,11 @@ export function FinanceTransactions({
   onReorderTransactions,
   categories,
   accounts,
-  initialFilters
+  initialFilters,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
 }: FinanceTransactionsProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<TransactionFiltersState>({
@@ -259,15 +268,27 @@ export function FinanceTransactions({
         {/* Month Selector */}
         <div className="px-4 pt-4 flex items-center justify-between gap-2">
           <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
-          <Button 
-            variant={hasActiveFilters ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowFilters(true)}
-            className="gap-1"
-          >
-            <AppIcon name="Filter" size={16} />
-            {hasActiveFilters && <span className="text-xs">•</span>}
-          </Button>
+          <div className="flex items-center gap-1">
+            {(canUndo || canRedo) && (
+              <>
+                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canUndo} onClick={onUndo}>
+                  <Undo2 className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canRedo} onClick={onRedo}>
+                  <Redo2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+            <Button 
+              variant={hasActiveFilters ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFilters(true)}
+              className="gap-1"
+            >
+              <AppIcon name="Filter" size={16} />
+              {hasActiveFilters && <span className="text-xs">•</span>}
+            </Button>
+          </div>
         </div>
 
         {/* Summary Header */}
