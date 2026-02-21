@@ -4,7 +4,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { CashClosingForm } from '@/components/cashClosing/CashClosingForm';
+import { CashClosingForm, clearCashClosingDraft } from '@/components/cashClosing/CashClosingForm';
 import { CashClosingList } from '@/components/cashClosing/CashClosingList';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
@@ -57,11 +57,7 @@ export default function CashClosing() {
         </div>
 
         {/* FAB */}
-        <Sheet open={isFormOpen} onOpenChange={(open) => {
-          // Prevent accidental close — only allow programmatic close via onSuccess
-          if (!open) return;
-          setIsFormOpen(open);
-        }}>
+        <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
           <SheetTrigger asChild>
             <button 
               className="fab"
@@ -70,7 +66,7 @@ export default function CashClosing() {
               <AppIcon name="Plus" size={28} />
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
             <SheetHeader className="flex flex-row items-center justify-between">
               <SheetTitle>Novo Fechamento de Caixa</SheetTitle>
               <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="text-muted-foreground">

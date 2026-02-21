@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
@@ -31,6 +31,48 @@ import { PAYMENT_METHODS } from '@/types/cashClosing';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
+const DRAFT_KEY = 'cash_closing_draft';
+
+interface DraftData {
+  selectedDate: string;
+  initialCash: number;
+  cashCounted: number;
+  debitAmount: number;
+  creditAmount: number;
+  pixAmount: number;
+  mealVoucherAmount: number;
+  deliveryAmount: number;
+  signedAccountAmount: number;
+  cashDifference: number;
+  notes: string;
+  expenses: ExpenseItem[];
+  savedAt: number;
+}
+
+function loadDraft(): DraftData | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const draft: DraftData = JSON.parse(raw);
+    // Expire drafts older than 24h
+    if (Date.now() - draft.savedAt > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(DRAFT_KEY);
+      return null;
+    }
+    return draft;
+  } catch { return null; }
+}
+
+function saveDraft(data: Omit<DraftData, 'savedAt'>) {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
+  } catch {}
+}
+
+export function clearCashClosingDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+}
+
 interface Props {
   onSuccess: () => void;
 }
@@ -46,36 +88,63 @@ export function CashClosingForm({ onSuccess }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   
-  // Use LOCAL date to match the operational day (not UTC which may be next day after midnight)
-  // Allow selecting up to 3 days back for late closings (after midnight or delayed submissions)
   const now = new Date();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const minAllowedDate = subDays(todayDate, 3); // Allow up to 3 days back
-  
-  // Default to yesterday if it's past midnight and before 6 AM (likely closing previous day)
+  const minAllowedDate = subDays(todayDate, 3);
   const currentHour = now.getHours();
   const defaultDate = currentHour < 6 ? subDays(todayDate, 1) : todayDate;
+
+  const draft = useRef(loadDraft()).current;
   
-  const [selectedDate, setSelectedDate] = useState<Date>(defaultDate);
+  const [selectedDate, setSelectedDate] = useState<Date>(
+    draft ? new Date(draft.selectedDate + 'T12:00:00') : defaultDate
+  );
   const operationalDate = format(selectedDate, 'yyyy-MM-dd');
   
-  const [initialCash, setInitialCash] = useState(0);
-  const [cashCounted, setCashCounted] = useState(0);
-  const [debitAmount, setDebitAmount] = useState(0);
-  const [creditAmount, setCreditAmount] = useState(0);
-  const [pixAmount, setPixAmount] = useState(0);
-  const [mealVoucherAmount, setMealVoucherAmount] = useState(0);
-  const [deliveryAmount, setDeliveryAmount] = useState(0);
-  const [signedAccountAmount, setSignedAccountAmount] = useState(0);
-  const [cashDifference, setCashDifference] = useState(0);
-  const [notes, setNotes] = useState('');
+  const [initialCash, setInitialCash] = useState(draft?.initialCash ?? 0);
+  const [cashCounted, setCashCounted] = useState(draft?.cashCounted ?? 0);
+  const [debitAmount, setDebitAmount] = useState(draft?.debitAmount ?? 0);
+  const [creditAmount, setCreditAmount] = useState(draft?.creditAmount ?? 0);
+  const [pixAmount, setPixAmount] = useState(draft?.pixAmount ?? 0);
+  const [mealVoucherAmount, setMealVoucherAmount] = useState(draft?.mealVoucherAmount ?? 0);
+  const [deliveryAmount, setDeliveryAmount] = useState(draft?.deliveryAmount ?? 0);
+  const [signedAccountAmount, setSignedAccountAmount] = useState(draft?.signedAccountAmount ?? 0);
+  const [cashDifference, setCashDifference] = useState(draft?.cashDifference ?? 0);
+  const [notes, setNotes] = useState(draft?.notes ?? '');
   
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checklistStatus, setChecklistStatus] = useState<'checking' | 'completed' | 'incomplete' | null>(null);
-  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(draft?.expenses ?? []);
   const [newExpense, setNewExpense] = useState<ExpenseItem>({ description: '', amount: 0 });
+
+  // Show toast if draft was restored
+  const draftNotified = useRef(false);
+  useEffect(() => {
+    if (draft && !draftNotified.current) {
+      draftNotified.current = true;
+      toast.info('Rascunho restaurado', { description: 'Seu fechamento anterior foi recuperado.' });
+    }
+  }, [draft]);
+
+  // Auto-save draft on every change
+  useEffect(() => {
+    saveDraft({
+      selectedDate: operationalDate,
+      initialCash,
+      cashCounted,
+      debitAmount,
+      creditAmount,
+      pixAmount,
+      mealVoucherAmount,
+      deliveryAmount,
+      signedAccountAmount,
+      cashDifference,
+      notes,
+      expenses,
+    });
+  }, [operationalDate, initialCash, cashCounted, debitAmount, creditAmount, pixAmount, mealVoucherAmount, deliveryAmount, signedAccountAmount, cashDifference, notes, expenses]);
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
@@ -190,6 +259,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       });
 
       if (success) {
+        clearCashClosingDraft();
         onSuccess();
       } else {
         toast.error('Não foi possível salvar o fechamento. Seus dados estão preservados, tente novamente.');
