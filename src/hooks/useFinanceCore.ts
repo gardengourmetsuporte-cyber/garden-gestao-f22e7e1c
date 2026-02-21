@@ -12,6 +12,7 @@ import {
 } from '@/types/finance';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
 import { toast } from 'sonner';
+import { useUndoRedo, UndoAction } from './useUndoRedo';
 
 // ---- Shared fetch helpers ----
 
@@ -97,6 +98,7 @@ export function useFinanceCore({
   const monthKey = format(selectedMonth, 'yyyy-MM');
 
   const effectiveUnitId = isPersonal ? null : unitId;
+  const undoRedo = useUndoRedo();
   const accountsKey = [queryKeyPrefix + '-accounts', userId, effectiveUnitId];
   const categoriesKey = [queryKeyPrefix + '-categories', userId, effectiveUnitId];
   const transactionsKey = [queryKeyPrefix + '-transactions', userId, effectiveUnitId, monthKey];
@@ -317,6 +319,117 @@ export function useFinanceCore({
     return grouped;
   }, [transactions]);
 
+  // ---- Undo / Redo executors ----
+
+  const executeUndoAction = useCallback(async (action: UndoAction, isRedo: boolean) => {
+    try {
+      switch (action.type) {
+        case 'create': {
+          if (isRedo) {
+            // Redo create = re-insert
+            const { error } = await supabase.from('finance_transactions').insert({
+              ...action.data, user_id: userId!, unit_id: effectiveUnitId,
+            });
+            if (error) throw error;
+          } else {
+            // Undo create = delete
+            const { error } = await supabase.from('finance_transactions').delete().eq('id', action.transactionId);
+            if (error) throw error;
+          }
+          break;
+        }
+        case 'delete': {
+          if (isRedo) {
+            // Redo delete = delete again
+            const { error } = await supabase.from('finance_transactions').delete().eq('id', action.transactionId);
+            if (error) throw error;
+          } else {
+            // Undo delete = re-insert from snapshot
+            const { id, category, account, to_account, supplier, employee, ...rest } = action.snapshot;
+            const { error } = await supabase.from('finance_transactions').insert({ ...rest, id });
+            if (error) throw error;
+          }
+          break;
+        }
+        case 'update': {
+          const dataToApply = isRedo ? action.after : action.before;
+          const { error } = await supabase.from('finance_transactions').update(dataToApply).eq('id', action.transactionId);
+          if (error) throw error;
+          break;
+        }
+        case 'toggle_paid': {
+          const newPaid = isRedo ? !action.wasPaid : action.wasPaid;
+          const { error } = await supabase.from('finance_transactions').update({ is_paid: newPaid }).eq('id', action.transactionId);
+          if (error) throw error;
+          break;
+        }
+      }
+      invalidateTransactionsAndAccounts();
+    } catch {
+      toast.error('Erro ao desfazer/refazer');
+      invalidateTransactionsAndAccounts();
+    }
+  }, [userId, effectiveUnitId, invalidateTransactionsAndAccounts]);
+
+  const handleUndo = useCallback(async () => {
+    const action = undoRedo.popUndo();
+    if (!action) return;
+    undoRedo.pushToRedo(action);
+    await executeUndoAction(action, false);
+    toast.success('Lançamento desfeito');
+  }, [undoRedo, executeUndoAction]);
+
+  const handleRedo = useCallback(async () => {
+    const action = undoRedo.popRedo();
+    if (!action) return;
+    undoRedo.pushToUndo(action);
+    await executeUndoAction(action, true);
+    toast.success('Lançamento refeito');
+  }, [undoRedo, executeUndoAction]);
+
+  // Wrapped mutation helpers that push to undo stack
+  const addTransactionWithUndo = useCallback(async (data: TransactionFormData) => {
+    const { data: inserted, error } = await supabase.from('finance_transactions').insert({
+      ...data, user_id: userId!, unit_id: effectiveUnitId,
+    }).select('id').single();
+    if (error) { toast.error('Erro ao salvar transação'); throw error; }
+    undoRedo.pushAction({ type: 'create', transactionId: inserted.id, data });
+    invalidateTransactionsAndAccounts();
+  }, [userId, effectiveUnitId, undoRedo, invalidateTransactionsAndAccounts]);
+
+  const updateTransactionWithUndo = useCallback(async (id: string, data: Partial<TransactionFormData>) => {
+    // Fetch current state for "before" snapshot
+    const current = transactions.find(t => t.id === id);
+    const before: Partial<TransactionFormData> = {};
+    if (current) {
+      for (const key of Object.keys(data) as (keyof TransactionFormData)[]) {
+        (before as any)[key] = (current as any)[key];
+      }
+    }
+    const { error } = await supabase.from('finance_transactions').update(data).eq('id', id);
+    if (error) { toast.error('Erro ao atualizar transação'); throw error; }
+    if (current) {
+      undoRedo.pushAction({ type: 'update', transactionId: id, before, after: data });
+    }
+    invalidateTransactionsAndAccounts();
+  }, [transactions, undoRedo, invalidateTransactionsAndAccounts]);
+
+  const deleteTransactionWithUndo = useCallback(async (id: string) => {
+    const snapshot = transactions.find(t => t.id === id);
+    const { error } = await supabase.from('finance_transactions').delete().eq('id', id);
+    if (error) { toast.error('Erro ao excluir transação'); throw error; }
+    if (snapshot) {
+      undoRedo.pushAction({ type: 'delete', transactionId: id, snapshot });
+    }
+    invalidateTransactionsAndAccounts();
+  }, [transactions, undoRedo, invalidateTransactionsAndAccounts]);
+
+  const togglePaidWithUndo = useCallback(async (id: string, isPaid: boolean) => {
+    const current = transactions.find(t => t.id === id);
+    undoRedo.pushAction({ type: 'toggle_paid', transactionId: id, wasPaid: current?.is_paid ?? !isPaid });
+    await togglePaidMut.mutateAsync({ id, isPaid });
+  }, [transactions, undoRedo, togglePaidMut]);
+
   return {
     accounts,
     categories,
@@ -325,10 +438,10 @@ export function useFinanceCore({
     monthStats,
     totalBalance,
     isLoading,
-    addTransaction: (data: TransactionFormData) => addTransactionMut.mutateAsync(data),
-    updateTransaction: (id: string, data: Partial<TransactionFormData>) => updateTransactionMut.mutateAsync({ id, data }),
-    deleteTransaction: (id: string) => deleteTransactionMut.mutateAsync(id),
-    toggleTransactionPaid: (id: string, isPaid: boolean) => togglePaidMut.mutateAsync({ id, isPaid }),
+    addTransaction: addTransactionWithUndo,
+    updateTransaction: updateTransactionWithUndo,
+    deleteTransaction: deleteTransactionWithUndo,
+    toggleTransactionPaid: togglePaidWithUndo,
     addAccount: (data: Omit<FinanceAccount, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => addAccountMut.mutateAsync(data),
     updateAccount: (id: string, data: Partial<FinanceAccount>) => updateAccountMut.mutateAsync({ id, data }),
     deleteAccount: (id: string) => deleteAccountMut.mutateAsync(id),
@@ -336,6 +449,11 @@ export function useFinanceCore({
     reorderTransactions,
     updateTransactionDate,
     refetch: invalidateAll,
+    // Undo/Redo
+    undo: handleUndo,
+    redo: handleRedo,
+    canUndo: undoRedo.canUndo,
+    canRedo: undoRedo.canRedo,
   };
 }
 
