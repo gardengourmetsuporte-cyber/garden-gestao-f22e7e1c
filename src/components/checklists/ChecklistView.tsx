@@ -23,7 +23,7 @@ import {
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+// Inline expandable options — no Popover/Portal to avoid scroll issues
 import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -350,42 +350,41 @@ export function ChecklistView({
                     }
 
                     return (
-                      <Popover modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
-                        <PopoverTrigger asChild>
-                          <button
-                            disabled={!canToggle}
-                            className={cn(
-                              "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
-                              !canToggle && "cursor-not-allowed opacity-80",
-                              canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
-                              "card-base border-2"
-                            )}
-                            style={{ animationDelay: `${itemIndex * 40}ms` }}
-                          >
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
-                            <div className="flex-1 text-left">
-                              <p className="font-medium text-foreground">{item.name}</p>
-                              {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                      <div key={item.id}>
+                        <button
+                          disabled={!canToggle}
+                          onClick={() => canToggle && setOpenPopover(openPopover === item.id ? null : item.id)}
+                          className={cn(
+                            "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
+                            !canToggle && "cursor-not-allowed opacity-80",
+                            canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
+                            "card-base border-2",
+                            openPopover === item.id && "border-primary/50 shadow-md"
+                          )}
+                          style={{ animationDelay: `${itemIndex * 40}ms` }}
+                        >
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
+                          <div className="flex-1 text-left">
+                            <p className="font-medium text-foreground">{item.name}</p>
+                            {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                          </div>
+                          {configuredPoints > 0 ? (
+                            <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200 animate-pulse")}
+                              style={{
+                                backgroundColor: getItemPointsColors(configuredPoints).bg,
+                                color: getItemPointsColors(configuredPoints).color,
+                                borderColor: getItemPointsColors(configuredPoints).border,
+                                boxShadow: `0 0 12px ${getItemPointsColors(configuredPoints).glow}`,
+                              }}>
+                              <Zap className="w-3 h-3" />
+                              <span>+{configuredPoints}</span>
                             </div>
-                            {configuredPoints > 0 ? (
-                              <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200 animate-pulse")}
-                                style={{
-                                  backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                  color: getItemPointsColors(configuredPoints).color,
-                                  borderColor: getItemPointsColors(configuredPoints).border,
-                                  boxShadow: `0 0 12px ${getItemPointsColors(configuredPoints).glow}`,
-                                }}>
-                                <Zap className="w-3 h-3" />
-                                <span>+{configuredPoints}</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
-                            )}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-72 p-4" align="end" side="bottom" avoidCollisions={false}>
-                          <p className="font-semibold text-foreground text-center mb-4">{item.name}</p>
-                          <div className="space-y-3">
+                          ) : (
+                            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
+                          )}
+                        </button>
+                        {openPopover === item.id && (
+                          <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                             {isAdmin && profiles.length > 0 && (
                               <>
                                 <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Users className="w-4 h-4" /><span>Quem realizou?</span></div>
@@ -450,8 +449,8 @@ export function ChecklistView({
                               </>
                             )}
                           </div>
-                        </PopoverContent>
-                      </Popover>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
@@ -573,42 +572,41 @@ export function ChecklistView({
                             }
 
                             return (
-                              <Popover modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
-                                <PopoverTrigger asChild>
-                                  <button
-                                    disabled={!canToggle}
-                                    className={cn(
-                                      "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
-                                      !canToggle && "cursor-not-allowed opacity-80",
-                                      canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
-                                      "card-base border-2"
-                                    )}
-                                    style={{ animationDelay: `${itemIndex * 40}ms` }}
-                                  >
-                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
-                                    <div className="flex-1 text-left">
-                                      <p className="font-medium text-foreground">{item.name}</p>
-                                      {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                              <div key={item.id}>
+                                <button
+                                  disabled={!canToggle}
+                                  onClick={() => canToggle && setOpenPopover(openPopover === item.id ? null : item.id)}
+                                  className={cn(
+                                    "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
+                                    !canToggle && "cursor-not-allowed opacity-80",
+                                    canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
+                                    "card-base border-2",
+                                    openPopover === item.id && "border-primary/50 shadow-md"
+                                  )}
+                                  style={{ animationDelay: `${itemIndex * 40}ms` }}
+                                >
+                                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
+                                  <div className="flex-1 text-left">
+                                    <p className="font-medium text-foreground">{item.name}</p>
+                                    {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                                  </div>
+                                  {configuredPoints > 0 ? (
+                                    <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
+                                      style={{
+                                        backgroundColor: getItemPointsColors(configuredPoints).bg,
+                                        color: getItemPointsColors(configuredPoints).color,
+                                        borderColor: getItemPointsColors(configuredPoints).border,
+                                        boxShadow: isBonus ? `0 0 12px ${getItemPointsColors(configuredPoints).glow}` : undefined,
+                                      }}>
+                                      {isBonus ? <Zap className="w-3 h-3" /> : <Star className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
+                                      <span>+{configuredPoints}</span>
                                     </div>
-                                    {configuredPoints > 0 ? (
-                                      <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
-                                        style={{
-                                          backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                          color: getItemPointsColors(configuredPoints).color,
-                                          borderColor: getItemPointsColors(configuredPoints).border,
-                                          boxShadow: isBonus ? `0 0 12px ${getItemPointsColors(configuredPoints).glow}` : undefined,
-                                        }}>
-                                        {isBonus ? <Zap className="w-3 h-3" /> : <Star className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
-                                        <span>+{configuredPoints}</span>
-                                      </div>
-                                    ) : (
-                                      <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
-                                    )}
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-72 p-4" align="end" side="bottom" avoidCollisions={false}>
-                                  <p className="font-semibold text-foreground text-center mb-4">{item.name}</p>
-                                  <div className="space-y-3">
+                                  ) : (
+                                    <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
+                                  )}
+                                </button>
+                                {openPopover === item.id && (
+                                  <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                                     {isAdmin && profiles.length > 0 && (
                                       <>
                                         <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Users className="w-4 h-4" /><span>Quem realizou?</span></div>
@@ -679,8 +677,8 @@ export function ChecklistView({
                                       </>
                                     )}
                                   </div>
-                                </PopoverContent>
-                              </Popover>
+                                )}
+                              </div>
                             );
                           })}
                         </div>
