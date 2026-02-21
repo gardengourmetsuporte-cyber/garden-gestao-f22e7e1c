@@ -118,7 +118,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     if (isRefreshing) return;
     // Skip pull-to-refresh when touch originates from a Radix portal (Popover, Dialog, Drawer, etc.)
     const target = e.target as HTMLElement;
-    if (target.closest('[data-radix-popper-content-wrapper], [data-radix-portal], [role="dialog"], [data-vaul-drawer]')) return;
+    if (target.closest('[data-radix-popper-content-wrapper], [data-radix-portal], [role="dialog"], [data-vaul-drawer], [data-radix-select-content], [data-vaul-no-drag]')) return;
     if (!isAtTop()) return;
     touchStartY.current = e.touches[0].clientY;
     touchStartX.current = e.touches[0].clientX;
@@ -129,6 +129,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isPulling.current || isRefreshing) return;
+    // Also guard move: if finger is now over a portal/overlay, abort
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-radix-popper-content-wrapper], [data-radix-portal], [role="dialog"], [data-vaul-drawer], [data-radix-select-content], [data-vaul-no-drag]')) {
+      resetPull();
+      return;
+    }
 
     const dy = e.touches[0].clientY - touchStartY.current;
     const dx = e.touches[0].clientX - touchStartX.current;
