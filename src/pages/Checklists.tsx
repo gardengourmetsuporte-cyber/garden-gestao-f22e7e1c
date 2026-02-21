@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type TabView = 'checklist' | 'settings';
 
@@ -207,8 +207,8 @@ export default function ChecklistsPage() {
           <div className="animate-fade-in space-y-6" key={currentTab}>
           {currentTab === 'checklist' ? (
             <div className="space-y-6">
-              <Drawer>
-                <DrawerTrigger asChild>
+              <Popover modal={false}>
+                <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className="w-full justify-start text-left font-medium h-12 rounded-xl bg-card border"
@@ -216,19 +216,18 @@ export default function ChecklistsPage() {
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
                   </Button>
-                </DrawerTrigger>
-                <DrawerContent className="px-4 pb-8 pt-4">
-                  <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start" avoidCollisions={false}>
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && setSelectedDate(date)}
                     initialFocus
-                    className="p-3 pointer-events-auto mx-auto"
+                    className="p-3 pointer-events-auto"
                     locale={ptBR}
                   />
-                </DrawerContent>
-              </Drawer>
+                </PopoverContent>
+              </Popover>
 
               {/* Checklist Type Cards */}
               <div className="grid grid-cols-2 gap-4">

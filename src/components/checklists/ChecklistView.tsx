@@ -23,7 +23,7 @@ import {
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -350,8 +350,8 @@ export function ChecklistView({
                     }
 
                     return (
-                      <Drawer open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
-                        <DrawerTrigger asChild>
+                      <Popover modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
+                        <PopoverTrigger asChild>
                           <button
                             disabled={!canToggle}
                             className={cn(
@@ -382,9 +382,8 @@ export function ChecklistView({
                               <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
                             )}
                           </button>
-                        </DrawerTrigger>
-                        <DrawerContent className="px-4 pb-8 pt-4">
-                          <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-72 p-4" align="end" side="bottom" avoidCollisions={false}>
                           <p className="font-semibold text-foreground text-center mb-4">{item.name}</p>
                           <div className="space-y-3">
                             {isAdmin && profiles.length > 0 && (
@@ -451,8 +450,8 @@ export function ChecklistView({
                               </>
                             )}
                           </div>
-                        </DrawerContent>
-                      </Drawer>
+                        </PopoverContent>
+                      </Popover>
                     );
                   })}
                 </div>
@@ -574,8 +573,8 @@ export function ChecklistView({
                             }
 
                             return (
-                              <Drawer open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
-                                <DrawerTrigger asChild>
+                              <Popover modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
+                                <PopoverTrigger asChild>
                                   <button
                                     disabled={!canToggle}
                                     className={cn(
@@ -606,9 +605,8 @@ export function ChecklistView({
                                       <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
                                     )}
                                   </button>
-                                </DrawerTrigger>
-                                <DrawerContent className="px-4 pb-8 pt-4">
-                                  <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
+                                </PopoverTrigger>
+                                <PopoverContent className="w-72 p-4" align="end" side="bottom" avoidCollisions={false}>
                                   <p className="font-semibold text-foreground text-center mb-4">{item.name}</p>
                                   <div className="space-y-3">
                                     {isAdmin && profiles.length > 0 && (
@@ -681,8 +679,8 @@ export function ChecklistView({
                                       </>
                                     )}
                                   </div>
-                                </DrawerContent>
-                              </Drawer>
+                                </PopoverContent>
+                              </Popover>
                             );
                           })}
                         </div>
