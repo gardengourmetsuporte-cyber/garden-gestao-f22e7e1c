@@ -145,14 +145,6 @@ export default function Finance() {
       <div className="min-h-screen bg-background pb-24">
       <header className="page-header-bar">
         <div className="page-header-content">
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canUndo} onClick={undo}>
-              <Undo2 className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canRedo} onClick={redo}>
-              <Redo2 className="h-5 w-5" />
-            </Button>
-          </div>
           <h1 className="page-title">Financeiro</h1>
         </div>
       </header>
@@ -170,7 +162,7 @@ export default function Finance() {
         )}
 
         {activeTab === 'transactions' && (
-          <FinanceTransactions
+           <FinanceTransactions
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
             transactionsByDate={transactionsByDate}
@@ -182,6 +174,10 @@ export default function Finance() {
              categories={categories}
               accounts={accounts}
               initialFilters={transactionInitialFilters}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onUndo={undo}
+              onRedo={redo}
            />
         )}
 
