@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -52,20 +53,23 @@ export function useTimeAlertSettings() {
     staleTime: 5 * 60_000,
   });
 
-  // Build effective settings map
-  const settings: Record<string, EffectiveAlertSetting> = {};
-  for (const [key, def] of Object.entries(DEFAULTS)) {
-    const row = rows?.find(r => r.module_key === key);
-    if (row) {
-      settings[key] = {
-        enabled: row.enabled,
-        warningHour: row.warning_hour ?? def.warningHour,
-        criticalHour: row.critical_hour ?? def.criticalHour,
-      };
-    } else {
-      settings[key] = { ...def };
+  // Build effective settings map — memoized to prevent infinite re-render loops
+  const settings: Record<string, EffectiveAlertSetting> = useMemo(() => {
+    const result: Record<string, EffectiveAlertSetting> = {};
+    for (const [key, def] of Object.entries(DEFAULTS)) {
+      const row = rows?.find(r => r.module_key === key);
+      if (row) {
+        result[key] = {
+          enabled: row.enabled,
+          warningHour: row.warning_hour ?? def.warningHour,
+          criticalHour: row.critical_hour ?? def.criticalHour,
+        };
+      } else {
+        result[key] = { ...def };
+      }
     }
-  }
+    return result;
+  }, [rows]);
 
   const mutation = useMutation({
     mutationFn: async (params: { moduleKey: string; field: string; value: any }) => {
