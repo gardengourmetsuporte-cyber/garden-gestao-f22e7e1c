@@ -23,7 +23,7 @@ import {
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -350,8 +350,8 @@ export function ChecklistView({
                     }
 
                     return (
-                      <Popover key={item.id} modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
-                        <PopoverTrigger asChild>
+                      <Drawer open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
+                        <DrawerTrigger asChild>
                           <button
                             disabled={!canToggle}
                             className={cn(
@@ -382,13 +382,15 @@ export function ChecklistView({
                               <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
                             )}
                           </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-72 p-3 animate-scale-in" align="end" sideOffset={8} collisionPadding={16} avoidCollisions={false}>
+                        </DrawerTrigger>
+                        <DrawerContent className="px-4 pb-8 pt-4">
+                          <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
+                          <p className="font-semibold text-foreground text-center mb-4">{item.name}</p>
                           <div className="space-y-3">
                             {isAdmin && profiles.length > 0 && (
                               <>
                                 <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Users className="w-4 h-4" /><span>Quem realizou?</span></div>
-                                <div className="max-h-32 overflow-y-auto space-y-1">
+                                <div className="max-h-48 overflow-y-auto space-y-1">
                                   {profiles.map((profile) => (
                                     <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
                                       className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
@@ -449,8 +451,8 @@ export function ChecklistView({
                               </>
                             )}
                           </div>
-                        </PopoverContent>
-                      </Popover>
+                        </DrawerContent>
+                      </Drawer>
                     );
                   })}
                 </div>
@@ -572,8 +574,8 @@ export function ChecklistView({
                             }
 
                             return (
-                              <Popover key={item.id} modal={false} open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
-                                <PopoverTrigger asChild>
+                              <Drawer open={openPopover === item.id} onOpenChange={(open) => setOpenPopover(open ? item.id : null)}>
+                                <DrawerTrigger asChild>
                                   <button
                                     disabled={!canToggle}
                                     className={cn(
@@ -604,13 +606,15 @@ export function ChecklistView({
                                       <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
                                     )}
                                   </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-72 p-3 animate-scale-in" align="end" sideOffset={8} collisionPadding={16} avoidCollisions={false}>
+                                </DrawerTrigger>
+                                <DrawerContent className="px-4 pb-8 pt-4">
+                                  <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
+                                  <p className="font-semibold text-foreground text-center mb-4">{item.name}</p>
                                   <div className="space-y-3">
                                     {isAdmin && profiles.length > 0 && (
                                       <>
                                         <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Users className="w-4 h-4" /><span>Quem realizou?</span></div>
-                                        <div className="max-h-32 overflow-y-auto space-y-1">
+                                        <div className="max-h-48 overflow-y-auto space-y-1">
                                           {profiles.map((profile) => (
                                             <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
                                               className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
@@ -677,8 +681,8 @@ export function ChecklistView({
                                       </>
                                     )}
                                   </div>
-                                </PopoverContent>
-                              </Popover>
+                                </DrawerContent>
+                              </Drawer>
                             );
                           })}
                         </div>
