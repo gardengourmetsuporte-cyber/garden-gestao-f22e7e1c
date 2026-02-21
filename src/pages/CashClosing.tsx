@@ -57,7 +57,10 @@ export default function CashClosing() {
         </div>
 
         {/* FAB */}
-        <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Sheet open={isFormOpen} onOpenChange={(open) => {
+          // Only allow opening — closing is done exclusively via the "Fechar" button
+          if (open) setIsFormOpen(true);
+        }}>
           <SheetTrigger asChild>
             <button 
               className="fab"
@@ -66,7 +69,7 @@ export default function CashClosing() {
               <AppIcon name="Plus" size={28} />
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
+          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()} onPointerDownOutside={(e) => e.preventDefault()}>
             <SheetHeader className="flex flex-row items-center justify-between">
               <SheetTitle>Novo Fechamento de Caixa</SheetTitle>
               <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="text-muted-foreground">
