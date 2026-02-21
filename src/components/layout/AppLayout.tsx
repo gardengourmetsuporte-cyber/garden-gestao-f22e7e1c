@@ -116,6 +116,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (isRefreshing) return;
+    // Skip pull-to-refresh when touch originates from a Radix portal (Popover, Dialog, Drawer, etc.)
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-radix-popper-content-wrapper], [data-radix-portal], [role="dialog"], [data-vaul-drawer]')) return;
     if (!isAtTop()) return;
     touchStartY.current = e.touches[0].clientY;
     touchStartX.current = e.touches[0].clientX;
