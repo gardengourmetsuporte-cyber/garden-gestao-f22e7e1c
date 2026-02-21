@@ -61,9 +61,6 @@ export function AdminDashboard() {
         </p>
       </div>
 
-      {/* Setup Guide for new admins */}
-      <SetupGuide />
-
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
 
