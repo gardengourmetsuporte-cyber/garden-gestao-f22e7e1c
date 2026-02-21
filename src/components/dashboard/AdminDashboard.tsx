@@ -19,7 +19,7 @@ import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { ChecklistDashboardWidget } from './ChecklistDashboardWidget';
 import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
-import { SetupGuide } from './SetupGuide';
+
 
 export function AdminDashboard() {
   const navigate = useNavigate();
