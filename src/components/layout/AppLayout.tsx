@@ -360,14 +360,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             style={{
                               background: isActive
                                 ? undefined
-                                : 'hsl(var(--muted))',
+                                : 'hsl(0 0% 92%)',
                               boxShadow: isActive
                                 ? '0 4px 16px hsl(var(--primary) / 0.4)'
-                                : 'none',
-                              opacity: isEmProducao && !isActive ? 0.7 : 1,
+                                : '0 2px 8px hsl(0 0% 0% / 0.08)',
+                              opacity: isEmProducao && !isActive ? 0.8 : 1,
                               border: isEmProducao && !isActive
-                                ? '1px dashed hsl(var(--neon-amber) / 0.4)'
-                                : isActive ? 'none' : '1px solid hsl(var(--border) / 0.3)',
+                                ? '1px dashed hsl(var(--neon-amber) / 0.5)'
+                                : isActive ? 'none' : '1px solid hsl(0 0% 85%)',
                             }}
                           >
                             <AppIcon
@@ -378,8 +378,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                 color: isActive
                                   ? undefined
                                   : isEmProducao
-                                    ? 'hsl(var(--neon-amber) / 0.7)'
-                                    : 'hsl(220 20% 75%)',
+                                    ? 'hsl(35 80% 40%)'
+                                    : 'hsl(220 15% 30%)',
                                 filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
@@ -423,8 +423,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )}
                         </div>
                         <span
-                          className="text-[11px] font-medium leading-tight max-w-full truncate transition-colors"
-                          style={{ color: isActive ? '#fff' : 'hsl(220 20% 75%)' }}
+                          className="text-[11px] font-semibold leading-tight max-w-full truncate transition-colors"
+                          style={{ color: isActive ? '#fff' : 'hsl(0 0% 90%)' }}
                         >{item.label}</span>
                       </Link>
                     );
