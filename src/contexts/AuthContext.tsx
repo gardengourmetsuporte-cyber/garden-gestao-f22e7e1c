@@ -56,6 +56,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Skip INITIAL_SESSION if we already handled it via getSession
         if (event === 'INITIAL_SESSION' && initialSessionHandled) return;
 
+        // If token was refreshed, just update silently
+        if (event === 'TOKEN_REFRESHED') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -63,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTimeout(() => {
             fetchUserData(session.user.id);
           }, 0);
-        } else {
+        } else if (event === 'SIGNED_OUT') {
           setProfile(null);
           setRole(null);
           setIsLoading(false);
