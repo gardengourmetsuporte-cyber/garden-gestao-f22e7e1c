@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useRef, useSyncExternalStore } from 'react';
 import { parseISO, isToday } from 'date-fns';
 import { useTimeAlertSettings, type EffectiveAlertSetting } from '@/hooks/useTimeAlertSettings';
 
@@ -44,29 +44,40 @@ function computeModuleUrgency(
   };
 }
 
+// Minute-level clock that ticks every 60s — no setState loops
+let _listeners: Array<() => void> = [];
+let _minuteSnap = Math.floor(Date.now() / 60_000);
+
+function subscribe(cb: () => void) {
+  _listeners.push(cb);
+  if (_listeners.length === 1) {
+    const id = setInterval(() => {
+      const next = Math.floor(Date.now() / 60_000);
+      if (next !== _minuteSnap) {
+        _minuteSnap = next;
+        _listeners.forEach(l => l());
+      }
+    }, 10_000);
+    (subscribe as any)._interval = id;
+  }
+  return () => {
+    _listeners = _listeners.filter(l => l !== cb);
+    if (_listeners.length === 0) clearInterval((subscribe as any)._interval);
+  };
+}
+function getMinuteSnapshot() { return _minuteSnap; }
+
 export function useTimeBasedUrgency() {
   const { settings } = useTimeAlertSettings();
+
+  // Re-render at most once per minute via external store (no setState in useEffect)
+  useSyncExternalStore(subscribe, getMinuteSnapshot);
+
   const now = new Date();
   const currentHour = now.getHours() + now.getMinutes() / 60;
-  const [urgencyBucket, setUrgencyBucket] = useState(() => getUrgencyBucket(currentHour));
-  const [moduleUrgency, setModuleUrgency] = useState<ModuleUrgency>(() =>
-    computeModuleUrgency(currentHour, settings)
-  );
 
-  useEffect(() => {
-    const update = () => {
-      const n = new Date();
-      const h = n.getHours() + n.getMinutes() / 60;
-      setUrgencyBucket(getUrgencyBucket(h));
-      setModuleUrgency(computeModuleUrgency(h, settings));
-    };
-
-    // Recalculate immediately when settings change
-    update();
-
-    const interval = setInterval(update, 60_000);
-    return () => clearInterval(interval);
-  }, [settings]);
+  const urgencyBucket = useMemo(() => getUrgencyBucket(currentHour), [currentHour]);
+  const moduleUrgency = useMemo(() => computeModuleUrgency(currentHour, settings), [currentHour, settings]);
 
   return { moduleUrgency, urgencyBucket };
 }
