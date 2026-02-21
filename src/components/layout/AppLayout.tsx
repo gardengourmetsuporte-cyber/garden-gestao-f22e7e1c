@@ -378,7 +378,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                   ? undefined
                                   : isEmProducao
                                     ? 'hsl(var(--neon-amber) / 0.7)'
-                                    : 'hsl(220 15% 35%)',
+                                    : 'hsl(220 20% 75%)',
                                 filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
                               }}
                             />
