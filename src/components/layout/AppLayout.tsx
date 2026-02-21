@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
@@ -175,8 +175,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </span>
                 )}
               </button>
-              <Popover open={notifOpen} onOpenChange={setNotifOpen}>
-                <PopoverTrigger asChild>
+              <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
+                <DrawerTrigger asChild>
                   <button className="relative p-2.5 rounded-lg hover:bg-secondary transition-all">
                     <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
                     {unreadCount > 0 && (
@@ -185,11 +185,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       </span>
                     )}
                   </button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-[calc(100vw-32px)] max-w-[340px] p-0 rounded-2xl border-border/50 bg-card max-h-[70vh] overflow-y-auto" sideOffset={8}>
+                </DrawerTrigger>
+                <DrawerContent className="px-4 pb-8 pt-4 max-h-[70vh] overflow-y-auto">
+                  <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
                   {notifOpen && <NotificationCard />}
-                </PopoverContent>
-              </Popover>
+                </DrawerContent>
+              </Drawer>
             </div>
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
