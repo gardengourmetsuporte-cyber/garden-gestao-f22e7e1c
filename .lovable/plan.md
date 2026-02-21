@@ -1,93 +1,93 @@
 
 
-# Slot Machine -- Substituir Roleta por Caca-Niqueis
+# Desfazer / Refazer Lancamentos Financeiros
 
-## O que muda
+## O que sera feito
 
-Trocar o componente `SpinWheel` (roleta circular) por um **SlotMachine** no estilo caca-niqueis com 3 colunas de rolos girando verticalmente, igual a imagem de referencia.
-
-A logica de negocio (hook `useGamification`, banco, validacoes, resultado) **nao muda** -- apenas o componente visual e substituido.
+Adicionar botoes de **Desfazer** e **Refazer** no modulo financeiro (empresarial e pessoal), funcionando como no Photoshop: cada acao (criar, editar, excluir transacao) pode ser revertida ou reaplicada.
 
 ---
 
-## Mecanica do Slot Machine
+## Como funciona
 
-### Visual
-- 3 colunas (reels) lado a lado, cada uma mostrando 3 linhas visiveis de simbolos (emojis dos premios)
-- Moldura estilizada com gradiente dourado/vermelho inspirado no visual da referencia
-- Linha central destacada (payline) onde o resultado aparece
-- Botao grande verde centralizado abaixo para "GIRAR"
+### Pilha de acoes (Undo Stack / Redo Stack)
 
-### Animacao
-1. Ao clicar, os 3 rolos comecam a girar (translateY animado em loop)
-2. Cada rolo para sequencialmente com delay (rolo 1 para em ~1.5s, rolo 2 em ~2.5s, rolo 3 em ~3.5s)
-3. O resultado final e pre-calculado via `weightedRandom` antes do giro comecar
-4. Os rolos param nos simbolos corretos com efeito de desaceleracao (ease-out)
+Cada operacao no financeiro gera um registro na pilha de undo:
 
-### Logica de Resultado
-- O premio e sorteado normalmente via `weightedRandom(prizes)`
-- Se o premio **ganhou** (type != 'empty'): os 3 rolos param no **mesmo emoji** do premio (3 iguais = vitoria visual clara)
-- Se **nao ganhou** (type == 'empty'): os 3 rolos param em emojis **diferentes** (mistura visual = "quase la")
+- **Criar transacao**: salva o ID criado. Desfazer = deletar. Refazer = reinserir.
+- **Excluir transacao**: salva os dados completos da transacao. Desfazer = reinserir. Refazer = deletar novamente.
+- **Editar transacao**: salva os dados anteriores (before) e novos (after). Desfazer = restaurar before. Refazer = aplicar after.
+- **Marcar como pago/nao pago**: salva o estado anterior. Desfazer = reverter estado.
+
+A pilha e mantida **em memoria** (estado React, sem banco), com limite de 20 acoes para nao consumir muita RAM.
+
+### Interface
+
+- Dois botoes pequenos no **header da pagina financeira** (ao lado do titulo): seta para esquerda (desfazer) e seta para direita (refazer)
+- Botoes ficam desabilitados (cinza) quando nao ha acoes para desfazer/refazer
+- Ao desfazer, aparece um toast discreto: "Lancamento desfeito" com opcao de refazer inline
+- A pilha de redo e limpa quando o usuario faz uma nova acao (comportamento padrao de undo/redo)
 
 ---
 
-## Arquivos Afetados
+## Arquivos afetados
 
 ### Novo
-- `src/components/gamification/SlotMachine.tsx` -- componente principal com 3 rolos animados
+- `src/hooks/useUndoRedo.ts` -- hook generico que gerencia as pilhas de undo/redo com tipos de acao
 
 ### Editados
-- `src/pages/GamificationPlay.tsx` -- trocar `<SpinWheel>` por `<SlotMachine>`, atualizar texto "Toque para girar" para "Toque GIRAR para jogar"
-- `src/components/gamification/SpinWheel.tsx` -- mantido no projeto mas nao mais usado (pode ser removido)
-
-### Sem alteracao
-- `useGamification.ts` -- mesma interface, mesmo `weightedRandom`
-- `PrizeResult.tsx` -- mesma tela de resultado
-- Banco de dados -- nenhuma mudanca
-- Painel admin -- nenhuma mudanca
+- `src/hooks/useFinanceCore.ts` -- integrar o hook de undo/redo nas mutacoes (addTransaction, updateTransaction, deleteTransaction, togglePaid). Cada mutacao registra a acao na pilha antes de executar.
+- `src/pages/Finance.tsx` -- adicionar botoes de desfazer/refazer no header
+- `src/pages/PersonalFinance.tsx` -- mesmo tratamento para financas pessoais
 
 ---
 
-## Detalhes Tecnicos
+## Detalhes tecnicos
 
-### Estrutura do SlotMachine
+### Hook useUndoRedo
+
 ```text
-+----------------------------------+
-|   [Moldura dourada/vermelha]     |
-|  +--------+--------+--------+   |
-|  | Rolo 1 | Rolo 2 | Rolo 3 |   |
-|  |  icon   |  icon   |  icon  |  |  <- linha superior
-|  |  ICON   |  ICON   |  ICON  |  |  <- PAYLINE (destacada)
-|  |  icon   |  icon   |  icon  |  |  <- linha inferior
-|  +--------+--------+--------+   |
-|                                  |
-|         [ GIRAR 🎰 ]            |
-+----------------------------------+
+Tipos de acao:
+- { type: 'create', transactionId: string, data: TransactionFormData }
+- { type: 'delete', transactionId: string, snapshot: FinanceTransaction }
+- { type: 'update', transactionId: string, before: Partial<TransactionFormData>, after: Partial<TransactionFormData> }
+- { type: 'toggle_paid', transactionId: string, wasPaid: boolean }
+
+Interface retornada:
+- pushAction(action) -- registra nova acao
+- undo() -- desfaz a ultima acao
+- redo() -- refaz a acao desfeita
+- canUndo: boolean
+- canRedo: boolean
 ```
 
-### Animacao dos Rolos
-- Cada rolo e um container com `overflow: hidden` contendo uma strip vertical de emojis
-- A strip e composta por todos os emojis dos premios repetidos varias vezes
-- O giro e feito via `translateY` animado com CSS transition
-- O offset final e calculado para que o emoji do premio sorteado fique na posicao central (payline)
-- Desaceleracao com `cubic-bezier(0.15, 0.80, 0.20, 1.00)`
+### Integracao com useFinanceCore
 
-### Estilo Visual
-- Fundo: gradiente vermelho escuro com bordas douradas (inspirado na referencia)
-- Payline: linha horizontal com glow dourado
-- Separadores entre rolos com borda dourada sutil
-- Botao de girar: grande, verde, circular com icone de play
-- Reflexo/brilho sutil na parte inferior dos rolos
+O hook `useFinanceCore` recebera as funcoes do `useUndoRedo` e passara a retornar:
+- `undo()`, `redo()`, `canUndo`, `canRedo`
 
-### Props (mesma interface do SpinWheel)
+Cada mutacao existente sera envolvida para registrar a acao na pilha antes de executar no banco.
+
+Para o **undo de create**: busca o ID da transacao criada e faz delete.
+Para o **undo de delete**: reinsere a transacao com os dados do snapshot.
+Para o **undo de update**: aplica os dados "before" via update.
+
+### Botoes no header
+
 ```text
-prizes: GamificationPrize[]
-onResult: (prize: GamificationPrize) => void
-disabled?: boolean
+[<-] [->]  Financeiro
+ ^    ^
+ |    refazer (disabled se redoStack vazio)
+ desfazer (disabled se undoStack vazio)
 ```
+
+Icones: `Undo2` e `Redo2` do Lucide, tamanho 20px, posicionados a esquerda do titulo.
 
 ---
 
-## Resultado Esperado
+## Limitacoes conhecidas
 
-Um jogo de caca-niqueis visualmente rico e animado, com a mesma logica de sorteio por pesos e as mesmas regras de negocio, mas com uma experiencia muito mais envolvente e premium para o cliente no tablet.
+- O undo/redo e por sessao: recarregar a pagina limpa o historico (comportamento esperado, igual Photoshop)
+- Transferencias contam como uma unica acao (desfazer reverte ambos os lados)
+- Limite de 20 acoes na pilha para performance
+- Nao se aplica a contas ou categorias, apenas transacoes
