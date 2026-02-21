@@ -470,7 +470,7 @@ async function initializeDefaultsCore(
   const { data: existingAccounts } = await accQuery;
 
   if (!existingAccounts || existingAccounts.length === 0) {
-    await supabase.from('finance_accounts').insert({
+    await supabase.from('finance_accounts').upsert({
       user_id: userId,
       name: unitId ? 'Carteira' : 'Carteira Pessoal',
       type: 'wallet',
@@ -478,7 +478,7 @@ async function initializeDefaultsCore(
       color: unitId ? '#3b82f6' : '#8b5cf6',
       icon: 'Wallet',
       unit_id: unitId,
-    });
+    }, { onConflict: 'user_id,unit_id,name,type', ignoreDuplicates: true });
   }
 
   let catQuery = supabase.from('finance_categories').select('id').eq('user_id', userId).limit(1);
