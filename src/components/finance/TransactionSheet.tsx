@@ -134,6 +134,28 @@ export function TransactionSheet({
   const descriptionInputRef = useRef<HTMLInputElement>(null);
   const draftRestoredRef = useRef(false);
 
+  // Prevent browser back gesture from navigating away while sheet is open
+  useEffect(() => {
+    if (!open) return;
+    // Push a dummy history entry so that "back" closes the sheet instead of navigating away
+    const state = { transactionSheet: true };
+    window.history.pushState(state, '');
+
+    const onPopState = (e: PopStateEvent) => {
+      // Back was pressed while sheet is open — close the sheet instead
+      onOpenChange(false);
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      // Clean up the dummy entry if sheet closed programmatically (not via back)
+      if (window.history.state?.transactionSheet) {
+        window.history.back();
+      }
+    };
+  }, [open, onOpenChange]);
+
   // Save draft whenever form fields change (only for new transactions)
   useEffect(() => {
     if (open && !editingTransaction && (amount || description)) {
