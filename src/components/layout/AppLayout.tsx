@@ -559,9 +559,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
-        key={location.pathname}
         className={cn(
-          "min-h-screen animate-page-enter transition-all duration-300 lg:ml-[260px] lg:pt-0",
+          "min-h-screen transition-all duration-300 lg:ml-[260px] lg:pt-0",
           launcherOpen && "pointer-events-none"
         )}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 5.5rem)' }}

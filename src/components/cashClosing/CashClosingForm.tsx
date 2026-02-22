@@ -25,7 +25,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { PAYMENT_METHODS } from '@/types/cashClosing';
 import { useAuth } from '@/contexts/AuthContext';
@@ -80,6 +79,26 @@ interface Props {
 interface ExpenseItem {
   description: string;
   amount: number;
+}
+
+function DateInline({ selectedDate, onSelect, todayDate, minAllowedDate }: {
+  selectedDate: Date; onSelect: (d: Date) => void; todayDate: Date; minAllowedDate: Date;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <Button variant="outline" size="sm" className="gap-2 font-medium" onClick={() => setOpen(!open)}>
+        <CalendarIcon className="w-4 h-4" />
+        {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
+      </Button>
+      {open && (
+        <div className="mt-2 rounded-xl border bg-card p-2">
+          <Calendar mode="single" selected={selectedDate} onSelect={(d) => { if (d) { onSelect(d); setOpen(false); } }} locale={ptBR} disabled={(date) => date > todayDate || date < minAllowedDate} className="p-3 pointer-events-auto" />
+          <p className="text-xs text-muted-foreground px-3 pb-2">Disponível até 3 dias anteriores.</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function CashClosingForm({ onSuccess }: Props) {
@@ -273,34 +292,12 @@ export function CashClosingForm({ onSuccess }: Props) {
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center text-sm">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">Data operacional:</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 font-medium"
-                  >
-                    <CalendarIcon className="w-4 h-4" />
-                    {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(date) => date && setSelectedDate(date)}
-                    initialFocus
-                    locale={ptBR}
-                    disabled={(date) => date > todayDate || date < minAllowedDate}
-                    className="p-3 pointer-events-auto"
-                  />
-                  <div className="px-3 pb-3">
-                    <p className="text-xs text-muted-foreground">
-                      Selecione a data operacional correta. Disponível até 3 dias anteriores.
-                    </p>
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <DateInline
+                selectedDate={selectedDate}
+                onSelect={setSelectedDate}
+                todayDate={todayDate}
+                minAllowedDate={minAllowedDate}
+              />
             </div>
             <div>
               <span className="text-muted-foreground">Responsável:</span>

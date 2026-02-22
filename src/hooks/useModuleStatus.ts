@@ -240,7 +240,8 @@ export function useModuleStatus() {
     queryKey: ['module-status', user?.id, activeUnitId],
     queryFn: () => fetchModuleStatuses(user!.id, activeUnitId!, isAdmin),
     enabled: !!user && !!activeUnitId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
   });
 

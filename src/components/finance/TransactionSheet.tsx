@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,6 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -29,6 +28,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
+import { useBackGuard } from '@/hooks/useBackGuard';
 
 export type { RecurringEditMode };
 
@@ -135,26 +135,7 @@ export function TransactionSheet({
   const draftRestoredRef = useRef(false);
 
   // Prevent browser back gesture from navigating away while sheet is open
-  useEffect(() => {
-    if (!open) return;
-    // Push a dummy history entry so that "back" closes the sheet instead of navigating away
-    const state = { transactionSheet: true };
-    window.history.pushState(state, '');
-
-    const onPopState = (e: PopStateEvent) => {
-      // Back was pressed while sheet is open — close the sheet instead
-      onOpenChange(false);
-    };
-
-    window.addEventListener('popstate', onPopState);
-    return () => {
-      window.removeEventListener('popstate', onPopState);
-      // Clean up the dummy entry if sheet closed programmatically (not via back)
-      if (window.history.state?.transactionSheet) {
-        window.history.back();
-      }
-    };
-  }, [open, onOpenChange]);
+  useBackGuard(open, () => onOpenChange(false));
 
   // Save draft whenever form fields change (only for new transactions)
   useEffect(() => {
@@ -531,27 +512,32 @@ export function TransactionSheet({
                 >
                   Ontem
                 </Button>
-                <Popover open={showCalendar} onOpenChange={setShowCalendar}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <AppIcon name="Calendar" size={16} className="mr-1" />
-                      {!isToday(date) && !isYesterday(date) ? getDateLabel() : 'Outros'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={(d) => {
-                        if (d) handleDateChange(d);
-                        setShowCalendar(false);
-                      }}
-                      locale={ptBR}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCalendar(!showCalendar)}
+                >
+                  <AppIcon name="Calendar" size={16} className="mr-1" />
+                  {!isToday(date) && !isYesterday(date) ? getDateLabel() : 'Outros'}
+                </Button>
               </div>
             </div>
+
+            {/* Inline calendar (no Popover/Portal) */}
+            {showCalendar && (
+              <div className="rounded-xl border bg-card p-2">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => {
+                    if (d) handleDateChange(d);
+                    setShowCalendar(false);
+                  }}
+                  locale={ptBR}
+                />
+              </div>
+            )}
+
 
             {/* Visual Cards Grid - Conta, Categoria, Fornecedor, Funcionário */}
             <div className="grid grid-cols-2 gap-3">
