@@ -131,16 +131,22 @@ export function useFinanceCore({
 
   const isLoading = loadingAccounts || loadingCategories || loadingTransactions;
 
+  const accountsKeyStr = accountsKey.join('|');
+  const categoriesKeyStr = categoriesKey.join('|');
+  const transactionsKeyStr = transactionsKey.join('|');
+
   const invalidateAll = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: accountsKey });
     queryClient.invalidateQueries({ queryKey: categoriesKey });
     queryClient.invalidateQueries({ queryKey: transactionsKey });
-  }, [queryClient, ...accountsKey, ...categoriesKey, ...transactionsKey]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryClient, accountsKeyStr, categoriesKeyStr, transactionsKeyStr]);
 
   const invalidateTransactionsAndAccounts = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: accountsKey });
     queryClient.invalidateQueries({ queryKey: transactionsKey });
-  }, [queryClient, ...accountsKey, ...transactionsKey]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryClient, accountsKeyStr, transactionsKeyStr]);
 
   // -- Mutations --
   const addTransactionMut = useMutation({
@@ -278,7 +284,8 @@ export function useFinanceCore({
       toast.error('Erro ao salvar ordem');
       invalidateTransactionsAndAccounts();
     }
-  }, [queryClient, ...transactionsKey, invalidateTransactionsAndAccounts]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryClient, transactionsKeyStr, invalidateTransactionsAndAccounts]);
 
   const updateTransactionDate = useCallback(async (id: string, newDate: string) => {
     queryClient.setQueryData<FinanceTransaction[]>(transactionsKey, (old) =>
@@ -290,7 +297,8 @@ export function useFinanceCore({
       toast.error('Erro ao mover transação');
       invalidateTransactionsAndAccounts();
     }
-  }, [queryClient, ...transactionsKey, invalidateTransactionsAndAccounts]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryClient, transactionsKeyStr, invalidateTransactionsAndAccounts]);
 
   // Computed
   const monthStats: MonthlyStats = useMemo(() => {
