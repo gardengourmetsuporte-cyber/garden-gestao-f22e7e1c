@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +10,8 @@ import { PageLoader } from "@/components/PageLoader";
 import { useUserModules } from "@/hooks/useAccessLevels";
 import { getModuleKeyFromRoute } from "@/lib/modules";
 import { ThemeProvider } from "next-themes";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { toast } from "sonner";
 
 // Retry wrapper for lazy imports to handle transient fetch failures
 function lazyRetry(importFn: () => Promise<any>, retries = 3): Promise<any> {
@@ -97,10 +99,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    const handler = (e: PromiseRejectionEvent) => {
+      console.error("[Unhandled rejection]", e.reason);
+      toast.error("Ocorreu um erro inesperado.");
+      e.preventDefault();
+    };
+    window.addEventListener("unhandledrejection", handler);
+    return () => window.removeEventListener("unhandledrejection", handler);
+  }, []);
+  return <>{children}</>;
+}
+
 function AppRoutes() {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/landing" element={<Landing />} />
         <Route
@@ -287,8 +303,9 @@ function AppRoutes() {
           }
         />
         <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
@@ -301,7 +318,9 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <UnitProvider>
-              <AppRoutes />
+              <UnhandledRejectionGuard>
+                <AppRoutes />
+              </UnhandledRejectionGuard>
             </UnitProvider>
           </AuthProvider>
         </BrowserRouter>
