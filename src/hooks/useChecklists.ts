@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   ChecklistSector, 
@@ -82,8 +82,8 @@ export function useChecklists() {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [currentType, setCurrentType] = useState<ChecklistType>('abertura');
 
-  const sectorsKey = ['checklist-sectors', activeUnitId];
-  const completionsKey = ['checklist-completions', currentDate, currentType, activeUnitId];
+  const sectorsKey = useMemo(() => ['checklist-sectors', activeUnitId], [activeUnitId]);
+  const completionsKey = useMemo(() => ['checklist-completions', currentDate, currentType, activeUnitId], [currentDate, currentType, activeUnitId]);
 
   const { data: sectors = [], isLoading: sectorsLoading } = useQuery({
     queryKey: sectorsKey,

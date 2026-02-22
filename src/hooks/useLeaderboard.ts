@@ -32,19 +32,26 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
 
-  // Use server-side RPC to avoid the 1000-row default limit
+  // First fetch user IDs, then parallel-fetch RPC + profiles (avoids nested await in Promise.all)
+  const { data: userUnitsData } = await supabase
+    .from('user_units')
+    .select('user_id')
+    .eq('unit_id', unitId);
+
+  const userIds = (userUnitsData || []).map(u => u.user_id);
+
   const [{ data: rpcData }, { data: profilesData }] = await Promise.all([
     supabase.rpc('get_leaderboard_data', {
       p_unit_id: unitId,
       p_month_start: monthStart,
       p_month_end: monthEnd,
     }),
-    supabase
-      .from('profiles')
-      .select('user_id, full_name, avatar_url')
-      .in('user_id', (
-        await supabase.from('user_units').select('user_id').eq('unit_id', unitId)
-      ).data?.map(u => u.user_id) || []),
+    userIds.length > 0
+      ? supabase
+          .from('profiles')
+          .select('user_id, full_name, avatar_url')
+          .in('user_id', userIds)
+      : Promise.resolve({ data: [] as any[] }),
   ]);
 
   const profileMap = new Map<string, { full_name: string; avatar_url: string | null }>();
@@ -130,10 +137,8 @@ export function useLeaderboard() {
     queryKey: ['leaderboard', activeUnitId, format(selectedMonth, 'yyyy-MM')],
     queryFn: () => fetchLeaderboardData(activeUnitId!, selectedMonth),
     enabled: !!user && !!activeUnitId,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: 'always',
+    staleTime: 30_000,
+    gcTime: 60_000,
   });
 
   const { data: sectorPoints = [], isLoading: isLoadingSectors } = useQuery({
