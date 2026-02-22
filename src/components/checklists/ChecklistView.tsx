@@ -40,9 +40,17 @@ interface ChecklistViewProps {
 }
 
 const isToday = (dateStr: string): boolean => {
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  return dateStr === todayStr;
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (dateStr === todayStr) return true;
+  // Between midnight and 2 AM, also allow yesterday's checklist
+  if (now.getHours() < 2) {
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+    return dateStr === yesterdayStr;
+  }
+  return false;
 };
 
 const iconMap: Record<string, React.ReactNode> = {

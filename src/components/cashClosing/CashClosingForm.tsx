@@ -201,27 +201,8 @@ export function CashClosingForm({ onSuccess }: Props) {
   };
 
   const handleSubmit = async () => {
-    // Admin can bypass checklist requirement when needed
-    if (isAdmin) {
-      setChecklistStatus('completed');
-    } else {
-    // Check checklist first
-    setChecklistStatus('checking');
-    try {
-      const checklistOk = await checkChecklistCompleted(operationalDate);
-      
-      if (!checklistOk) {
-        setChecklistStatus('incomplete');
-        toast.error('Complete o checklist de fechamento antes de enviar!');
-        return;
-      }
-      setChecklistStatus('completed');
-    } catch (err) {
-      // If checklist check fails, allow submission
-      console.warn('Checklist check failed, allowing submission:', err);
-      setChecklistStatus('completed');
-    }
-    }
+    // Checklist check removed — allow submission regardless of checklist status
+    setChecklistStatus('completed');
 
     if (totalPayments <= 0) {
       toast.error('Informe pelo menos um valor de pagamento');
@@ -692,15 +673,6 @@ export function CashClosingForm({ onSuccess }: Props) {
         </CardContent>
       </Card>
 
-      {/* Checklist Alert */}
-      {checklistStatus === 'incomplete' && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Complete o checklist de fechamento antes de enviar o caixa!
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Submit Button */}
       <Button
