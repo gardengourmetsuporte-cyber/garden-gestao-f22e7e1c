@@ -15,6 +15,7 @@ import { FinanceChartWidget } from './FinanceChartWidget';
 
 import { AutoOrderWidget } from './AutoOrderWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
+import { UnifiedCalendarWidget } from './UnifiedCalendarWidget';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { ChecklistDashboardWidget } from './ChecklistDashboardWidget';
@@ -149,6 +150,9 @@ export function AdminDashboard() {
 
         {/* AGENDA WIDGET */}
         <AgendaDashboardWidget />
+
+        {/* UNIFIED CALENDAR */}
+        <UnifiedCalendarWidget />
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (
