@@ -459,6 +459,12 @@ export function TransactionSheet({
                       if (suggestion.account) {
                         setAccountId(suggestion.account.id);
                       }
+                      if (suggestion.supplierId) {
+                        setSupplierId(suggestion.supplierId);
+                      }
+                      if (suggestion.employeeId) {
+                        setEmployeeId(suggestion.employeeId);
+                      }
                       setShowSuggestions(false);
                     }}
                   />

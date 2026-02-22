@@ -7,6 +7,8 @@ interface TransactionSuggestion {
   description: string;
   category?: FinanceCategory;
   account?: FinanceAccount;
+  supplierId?: string | null;
+  employeeId?: string | null;
   isFromHistory: boolean;
 }
 
@@ -59,6 +61,8 @@ export function TransactionSuggestions({
           description: cleanDesc,
           category,
           account,
+          supplierId: tx.supplier_id || null,
+          employeeId: tx.employee_id || null,
           isFromHistory: true
         });
       }
