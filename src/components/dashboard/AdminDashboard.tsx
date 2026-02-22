@@ -65,6 +65,9 @@ export function AdminDashboard() {
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
 
+        {/* UNIFIED CALENDAR - first */}
+        <UnifiedCalendarWidget />
+
         {/* === FINANCE BLOCK === */}
         {isSuperAdmin ? (
           <>
@@ -150,9 +153,6 @@ export function AdminDashboard() {
 
         {/* AGENDA WIDGET */}
         <AgendaDashboardWidget />
-
-        {/* UNIFIED CALENDAR */}
-        <UnifiedCalendarWidget />
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (
