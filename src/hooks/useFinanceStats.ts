@@ -23,10 +23,15 @@ export function useFinanceStats(
 ) {
   // Stats by category (for pie chart)
   // Build a flat lookup map for finding parents (categories array only has parents with nested subs)
+  // Also index by subcategory parent_id from transactions to handle cross-unit category references
   const parentLookup = useMemo(() => {
     const map: Record<string, FinanceCategory> = {};
     categories.forEach(c => {
       map[c.id] = c;
+      // Also index subcategories so we can resolve their parent_id
+      c.subcategories?.forEach(sub => {
+        map[sub.id] = sub;
+      });
     });
     return map;
   }, [categories]);
@@ -49,7 +54,18 @@ export function useFinanceStats(
       // If subcategory, find parent from lookup or use parent_id from the joined category
       if (categoryData?.parent_id) {
         const parent = parentLookup[categoryData.parent_id];
-        if (parent) categoryData = parent;
+        if (parent) {
+          categoryData = parent;
+        } else {
+          // Cross-unit category: parent not in lookup. Find a matching parent by name from categories array.
+          const parentName = categoryData.parent_id;
+          const matchByName = categories.find(c => !c.parent_id && c.type === 'expense' && 
+            c.subcategories?.some(sub => sub.name === categoryData!.name));
+          if (matchByName) {
+            categoryData = matchByName;
+          }
+          // If still not found, skip grouping under parent — it'll show as its own entry
+        }
       }
       
       if (categoryData) {
@@ -196,7 +212,15 @@ export function useFinanceStats(
       
       if (categoryData?.parent_id) {
         const parent = parentLookup[categoryData.parent_id];
-        if (parent) categoryData = parent;
+        if (parent) {
+          categoryData = parent;
+        } else {
+          const matchByName = categories.find(c => !c.parent_id && c.type === 'income' && 
+            c.subcategories?.some(sub => sub.name === categoryData!.name));
+          if (matchByName) {
+            categoryData = matchByName;
+          }
+        }
       }
       
       if (categoryData) {
