@@ -122,7 +122,7 @@ export const ICON_MAP: Record<string, string> = {
   Gift: 'card_giftcard',
   Star: 'grade',
   Trophy: 'emoji_events',
-  Crown: 'workspace_premium',
+  Crown: 'auto_awesome',
   Medal: 'military_tech',
   Award: 'military_tech',
   PartyPopper: 'celebration',
