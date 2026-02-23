@@ -114,7 +114,7 @@ export function ChecklistDashboardWidget() {
   ];
 
   return (
-    <div className="col-span-2 grid grid-cols-2 gap-3 animate-slide-up stagger-3">
+    <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-3">
       {cards.map((card) => {
         const isActive = card.type === activeType;
         const Icon = card.icon;

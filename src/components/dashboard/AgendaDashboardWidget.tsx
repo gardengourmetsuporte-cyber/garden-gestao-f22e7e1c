@@ -119,7 +119,7 @@ export function AgendaDashboardWidget() {
 
   return (
     <>
-      <div className="col-span-2 rounded-2xl bg-card overflow-hidden animate-slide-up stagger-3 relative">
+      <div className="rounded-2xl bg-card overflow-hidden animate-slide-up stagger-3 relative">
         <div className="absolute -top-10 right-0 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none bg-primary" />
 
         {/* Header */}
