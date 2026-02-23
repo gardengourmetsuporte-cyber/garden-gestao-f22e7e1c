@@ -66,6 +66,7 @@ export const ICON_MAP: Record<string, string> = {
 
   // People & Communication
   User: 'person',
+  UserPlus: 'person_add',
   Users: 'group',
   MessageCircle: 'chat_bubble',
   MessageSquare: 'forum',
