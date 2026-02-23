@@ -10,13 +10,15 @@ interface MyRankCardProps {
   avatarUrl?: string | null;
   earnedPoints: number;
   monthlyScore: number;
+  accumulatedBalance: number;
   leaderboardPosition?: number;
 }
 
-export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, leaderboardPosition }: MyRankCardProps) {
+export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, accumulatedBalance, leaderboardPosition }: MyRankCardProps) {
   const rank = getRank(earnedPoints);
   const next = getNextRank(earnedPoints);
   const animatedMonthly = useCountUp(monthlyScore);
+  const animatedBalance = useCountUp(accumulatedBalance);
 
   return (
     <div className="card-surface p-5">
@@ -27,10 +29,14 @@ export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, le
           <p className="text-xs font-semibold mt-0.5" style={{ color: rank.color }}>
             {rank.title}
           </p>
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
             <div className="flex items-center gap-1">
-              <AppIcon name="Star" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
+              <AppIcon name="Flame" size={14} style={{ color: 'hsl(var(--neon-amber))' }} />
               <span className="text-xs font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{animatedMonthly} pts/mês</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <AppIcon name="Wallet" size={14} className="text-primary" />
+              <span className="text-xs font-bold text-primary">{animatedBalance} saldo</span>
             </div>
             {leaderboardPosition && (
               <div className="flex items-center gap-1">

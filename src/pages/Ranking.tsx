@@ -13,8 +13,9 @@ import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePoints } from '@/hooks/usePoints';
-import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { useLeaderboard, LeaderboardScope } from '@/hooks/useLeaderboard';
 import { calculateMedals } from '@/lib/medals';
+import { cn } from '@/lib/utils';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
 
@@ -30,10 +31,7 @@ function useGlobalMedals(unitId: string | null) {
       ]);
 
       const admissionDates = (employees || []).map(e => e.admission_date).filter(Boolean) as string[];
-      // Find the earliest admission date to check 6mo/1yr milestones
-      const earliest = admissionDates.length > 0
-        ? admissionDates.sort()[0]
-        : null;
+      const earliest = admissionDates.length > 0 ? admissionDates.sort()[0] : null;
 
       return calculateMedals({
         hasEmployeeOfMonth: (empOfMonth || []).length > 0,
@@ -48,13 +46,13 @@ function useGlobalMedals(unitId: string | null) {
 export default function Ranking() {
   const { user, profile } = useAuth();
   const { activeUnitId } = useUnit();
-  const { earned, monthlyScore, refetch: refetchPoints } = usePoints();
-  const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard();
+  const { earned, balance, monthlyScore, refetch: refetchPoints } = usePoints();
+  const [rankingScope, setRankingScope] = useState<LeaderboardScope>('unit');
+  const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard(rankingScope);
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
   const [mountRefreshed, setMountRefreshed] = useState(false);
 
-  // Force fresh data on mount to avoid stale cache discrepancies
   useEffect(() => {
     const forceRefresh = async () => {
       await Promise.all([refetchPoints(), refetchLeaderboard()]);
@@ -89,6 +87,7 @@ export default function Ranking() {
             avatarUrl={profile?.avatar_url}
             earnedPoints={earned}
             monthlyScore={monthlyScore}
+            accumulatedBalance={balance}
             leaderboardPosition={myPosition}
           />
 
@@ -104,15 +103,46 @@ export default function Ranking() {
 
           <div className="animate-fade-in" key={activeTab}>
             {activeTab === 'ranking' && (
-              <Leaderboard
-                entries={leaderboard}
-                currentUserId={user?.id}
-                isLoading={isLoading}
-                selectedMonth={selectedMonth}
-                onMonthChange={setSelectedMonth}
-                onRefresh={handleSync}
-                isSyncing={syncing}
-              />
+              <div className="space-y-3">
+                {/* Sub-tabs: Minha Casa / Global */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setRankingScope('unit')}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
+                      rankingScope === 'unit'
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                    )}
+                  >
+                    <AppIcon name="Home" size={12} />
+                    Minha Casa
+                  </button>
+                  <button
+                    onClick={() => setRankingScope('global')}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
+                      rankingScope === 'global'
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                    )}
+                  >
+                    <AppIcon name="Globe" size={12} />
+                    Global
+                  </button>
+                </div>
+
+                <Leaderboard
+                  entries={leaderboard}
+                  currentUserId={user?.id}
+                  isLoading={isLoading}
+                  selectedMonth={selectedMonth}
+                  onMonthChange={setSelectedMonth}
+                  onRefresh={handleSync}
+                  isSyncing={syncing}
+                  showUnitBadge={rankingScope === 'global'}
+                />
+              </div>
             )}
             {activeTab === 'elos' && <EloList earnedPoints={earned} />}
             {activeTab === 'medalhas' && globalMedals && (

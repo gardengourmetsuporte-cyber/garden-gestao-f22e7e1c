@@ -7,6 +7,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Podium } from '@/components/ranking/Podium';
 import { format, addMonths, subMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -18,6 +19,7 @@ interface LeaderboardProps {
   showPodium?: boolean;
   onRefresh?: () => Promise<void>;
   isSyncing?: boolean;
+  showUnitBadge?: boolean;
 }
 
 function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) => void }) {
@@ -41,7 +43,7 @@ function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) =
   );
 }
 
-export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, selectedMonth, onMonthChange, showPodium = true, onRefresh, isSyncing }: LeaderboardProps) {
+export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, selectedMonth, onMonthChange, showPodium = true, onRefresh, isSyncing, showUnitBadge = false }: LeaderboardProps) {
   const displayEntries = maxEntries ? entries.slice(0, maxEntries) : entries;
   const restEntries = showPodium ? displayEntries.slice(3) : displayEntries;
 
@@ -89,12 +91,10 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
         </div>
       ) : (
         <>
-          {/* Podium for top 3 */}
           {showPodium && displayEntries.length >= 2 && (
             <Podium entries={displayEntries} currentUserId={currentUserId} />
           )}
 
-          {/* Rest of leaderboard */}
           {restEntries.length > 0 && (
             <div className={cn("space-y-1.5", showPodium && "mt-3 pt-3 border-t border-border/30")}>
               {restEntries.map((entry, idx) => {
@@ -123,15 +123,20 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
                         {entry.full_name}
                         {isCurrentUser && <span className="text-xs ml-1 text-muted-foreground">(você)</span>}
                       </p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <span style={{ color: entryRank.color }}>{entryRank.title}</span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs" style={{ color: entryRank.color }}>{entryRank.title}</span>
                         {entry.bonus_points > 0 && (
                           <>
-                            <span>·</span>
-                            <span style={{ color: 'hsl(var(--neon-amber))' }}>+{entry.bonus_points} bônus</span>
+                            <span className="text-xs text-muted-foreground">·</span>
+                            <span className="text-xs" style={{ color: 'hsl(var(--neon-amber))' }}>+{entry.bonus_points} bônus</span>
                           </>
                         )}
-                      </p>
+                        {showUnitBadge && entry.unit_name && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 ml-0.5">
+                            {entry.unit_name}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-1 px-2.5 py-1 rounded-full shrink-0" style={{ background: 'hsl(var(--neon-amber) / 0.1)' }}>
