@@ -1,32 +1,36 @@
 import { Check } from "lucide-react";
+import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
+import screenshotChecklist from "@/assets/screenshot-checklist.png";
+import screenshotEstoque from "@/assets/screenshot-estoque.png";
+import screenshotRelatorios from "@/assets/screenshot-relatorios.png";
 
 const blocks = [
   {
     title: "Saiba exatamente quanto você lucrou",
     text: "Receitas, despesas, lucro líquido e pendências em tempo real. Veja para onde vai cada real do seu restaurante, com gráficos por categoria.",
     tag: "Fechamento de caixa integrado",
-    image: "/lovable-uploads/ca447a51-f07f-4e35-bd89-a1efb7fbcd9c.png",
+    image: screenshotFinanceiro,
     alt: "Tela financeira com saldo e gráficos",
   },
   {
     title: "Abertura e fechamento sem esquecimentos",
     text: "Checklists digitais para sua equipe. Cada setor, cada tarefa, com progresso em tempo real. Você vê tudo pelo celular, de onde estiver.",
     tag: "Cozinha, salão, limpeza — tudo monitorado",
-    image: "/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg",
+    image: screenshotChecklist,
     alt: "Checklist com progresso de abertura e fechamento",
   },
   {
     title: "Nunca mais falte ingrediente",
     text: "Alertas automáticos de estoque baixo. Movimentações rastreadas. Saiba o que comprar antes que acabe.",
     tag: "Alerta de estoque mínimo automático",
-    image: "/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg",
+    image: screenshotEstoque,
     alt: "Tela de estoque com alertas",
   },
   {
     title: "Entenda seus custos sem ser contador",
     text: "Matéria-prima, folha de pagamento, despesas administrativas — tudo categorizado automaticamente. Resumo semanal com total de vendas em cada canal.",
     tag: "iFood, delivery e cartão separados",
-    image: "/lovable-uploads/f33aaa21-284f-4287-9fbe-9f15768b7d65.jpg",
+    image: screenshotRelatorios,
     alt: "Gráfico de despesas por categoria e resumo semanal",
   },
 ];
@@ -52,21 +56,23 @@ export function SolutionSection() {
                 key={b.title}
                 className={`grid md:grid-cols-2 gap-10 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
               >
-                {/* Image */}
-                <div className="md:[direction:ltr]">
+                {/* Image - phone mockup */}
+                <div className="md:[direction:ltr] flex justify-center">
                   <div
-                    className="relative rounded-2xl overflow-hidden"
+                    className="relative w-[240px] sm:w-[260px] rounded-[2.5rem] overflow-hidden p-2"
                     style={{
-                      border: "1px solid hsl(var(--border) / 0.4)",
-                      boxShadow: "0 0 30px hsl(var(--neon-green) / 0.1), var(--shadow-elevated)",
+                      background: "linear-gradient(145deg, hsl(var(--border) / 0.6), hsl(var(--border) / 0.2))",
+                      boxShadow: "0 0 30px hsl(var(--neon-green) / 0.1), 0 20px 50px rgba(0,0,0,0.4)",
                     }}
                   >
-                    <img
-                      src={b.image}
-                      alt={b.alt}
-                      className="w-full"
-                      loading="lazy"
-                    />
+                    <div className="rounded-[2rem] overflow-hidden bg-background">
+                      <img
+                        src={b.image}
+                        alt={b.alt}
+                        className="w-full"
+                        loading="lazy"
+                      />
+                    </div>
                   </div>
                 </div>
 

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
+import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
 
 export function HeroSection() {
   return (
@@ -71,25 +72,27 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right — real screenshot */}
-          <div className="relative">
+          {/* Right — phone mockup with real screenshot */}
+          <div className="relative flex justify-center">
             <div
               className="absolute -inset-4 rounded-3xl blur-2xl"
               style={{ background: "radial-gradient(circle, hsl(var(--neon-green) / 0.15), transparent 70%)" }}
             />
             <div
-              className="relative rounded-2xl overflow-hidden"
+              className="relative w-[280px] sm:w-[300px] rounded-[2.5rem] overflow-hidden p-2"
               style={{
-                border: "1px solid hsl(var(--neon-green) / 0.25)",
-                boxShadow: "0 0 40px hsl(var(--neon-green) / 0.15), var(--shadow-elevated)",
+                background: "linear-gradient(145deg, hsl(var(--border) / 0.6), hsl(var(--border) / 0.2))",
+                boxShadow: "0 0 40px hsl(var(--neon-green) / 0.15), 0 25px 60px rgba(0,0,0,0.5)",
               }}
             >
-              <img
-                src="/lovable-uploads/ca447a51-f07f-4e35-bd89-a1efb7fbcd9c.png"
-                alt="Tela financeira do Atlas"
-                className="w-full"
-                loading="lazy"
-              />
+              <div className="rounded-[2rem] overflow-hidden bg-background">
+                <img
+                  src={screenshotFinanceiro}
+                  alt="Tela financeira do Atlas"
+                  className="w-full"
+                  loading="lazy"
+                />
+              </div>
             </div>
           </div>
         </div>
