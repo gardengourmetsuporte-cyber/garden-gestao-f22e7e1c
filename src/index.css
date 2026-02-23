@@ -1191,7 +1191,7 @@
 
   /* Page transition - slide + fade */
   .animate-page-slide-up {
-    animation: pageSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: pageSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes pageSlideUp {
@@ -1201,7 +1201,7 @@
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: none;
     }
   }
 
