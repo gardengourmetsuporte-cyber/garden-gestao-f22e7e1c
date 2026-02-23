@@ -271,7 +271,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   className="relative p-2 rounded-xl hover:bg-white/10 transition-all"
                   onClick={() => setUnitDropdownOpen(prev => !prev)}
                 >
-                  <AppIcon name="Building2" size={24} className="text-white/80" style={{ filter: 'drop-shadow(0 0 6px hsl(215 20% 50% / 0.4))' }} />
+                  <AppIcon name="Building2" size={24} className="text-foreground/80" style={{ filter: 'drop-shadow(0 0 6px hsl(215 20% 50% / 0.4))' }} />
                   <span
                     className="absolute top-1 right-1 w-3 h-3 rounded-full"
                     style={{
@@ -442,7 +442,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <div className="launcher-item mt-2 mb-4" style={{ animationDelay: `${(groupedNav.length + 1) * 60}ms` }}>
               <button
                 onClick={handleSignOut}
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/20 text-sm text-muted-foreground active:bg-secondary/40 transition-all"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-2xl bg-secondary/80 backdrop-blur-xl border border-border/30 text-sm text-muted-foreground active:bg-secondary transition-all"
               >
                 <AppIcon name="LogOut" size={18} />
                 <span className="font-medium">Sair da conta</span>
