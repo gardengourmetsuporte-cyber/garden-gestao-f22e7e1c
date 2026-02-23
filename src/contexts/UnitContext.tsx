@@ -28,7 +28,7 @@ const UnitContext = createContext<UnitContextType | undefined>(undefined);
 const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,22 +50,26 @@ export function UnitProvider({ children }: { children: ReactNode }) {
         .eq('user_id', user.id);
 
       if (!userUnitsData || userUnitsData.length === 0) {
-        // Super admin or user with no assignments - fetch all active units
-        const { data: allUnits } = await supabase
-          .from('units')
-          .select('*')
-          .eq('is_active', true)
-          .order('name');
+        if (isSuperAdmin) {
+          // Super admin with no specific assignments - fetch all active units
+          const { data: allUnits } = await supabase
+            .from('units')
+            .select('*')
+            .eq('is_active', true)
+            .order('name');
 
-        setUnits((allUnits as Unit[]) || []);
+          setUnits((allUnits as Unit[]) || []);
 
-        // Try to restore from localStorage or use first unit
-        const stored = localStorage.getItem(ACTIVE_UNIT_KEY);
-        const validUnit = (allUnits || []).find(u => u.id === stored);
-        if (validUnit) {
-          setActiveUnitIdState(validUnit.id);
-        } else if (allUnits && allUnits.length > 0) {
-          setActiveUnitIdState(allUnits[0].id);
+          const stored = localStorage.getItem(ACTIVE_UNIT_KEY);
+          const validUnit = (allUnits || []).find(u => u.id === stored);
+          if (validUnit) {
+            setActiveUnitIdState(validUnit.id);
+          } else if (allUnits && allUnits.length > 0) {
+            setActiveUnitIdState(allUnits[0].id);
+          }
+        } else {
+          // Regular user with no units - will trigger onboarding redirect
+          setUnits([]);
         }
       } else {
         const unitIds = userUnitsData.map(u => u.unit_id);
@@ -98,7 +102,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, isSuperAdmin]);
 
   useEffect(() => {
     fetchUnits();
