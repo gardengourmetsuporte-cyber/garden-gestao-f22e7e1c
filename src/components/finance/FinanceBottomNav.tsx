@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
@@ -29,7 +30,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
     onAddTransaction(type);
   };
 
-  return (
+  return createPortal(
     <>
       {/* Overlay */}
       {menuOpen && (
@@ -167,6 +168,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
           ))}
         </div>
       </nav>
-    </>
+    </>,
+    document.body
   );
 }
