@@ -5,18 +5,7 @@ import { Employee } from '@/types/employee';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Plus, 
-  Search, 
-  User, 
-  Briefcase, 
-  DollarSign, 
-  MoreVertical,
-  Pencil,
-  Trash2,
-  UserCheck,
-  UserX
-} from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { EmployeeSheet } from './EmployeeSheet';
 import {
   DropdownMenu,
@@ -82,7 +71,6 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
     });
   };
 
-  // Get users not yet linked to employees
   const availableUsers = users.filter(
     u => !employees.some(e => e.user_id === u.user_id)
   );
@@ -97,10 +85,9 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar funcionário..."
             value={search}
@@ -109,12 +96,11 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
           />
         </div>
         <Button onClick={() => { setEditingEmployee(null); setSheetOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" />
+          <AppIcon name="Plus" size={16} className="mr-2" />
           Novo
         </Button>
       </div>
 
-      {/* Filter */}
       <div className="flex items-center gap-2">
         <Button
           variant={showInactive ? 'secondary' : 'outline'}
@@ -128,7 +114,6 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
         </span>
       </div>
 
-      {/* List */}
       <div className="space-y-2">
         {filteredEmployees.map((employee) => (
           <div
@@ -139,7 +124,7 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary" />
+                  <AppIcon name="User" size={20} className="text-primary" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -149,7 +134,7 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                     )}
                     {employee.user_id && (
                       <Badge variant="outline" className="text-xs">
-                        <UserCheck className="w-3 h-3 mr-1" />
+                        <AppIcon name="UserCheck" size={12} className="mr-1" />
                         Vinculado
                       </Badge>
                     )}
@@ -157,12 +142,12 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     {employee.role && (
                       <span className="flex items-center gap-1">
-                        <Briefcase className="w-3 h-3" />
+                        <AppIcon name="Briefcase" size={12} />
                         {employee.role}
                       </span>
                     )}
                     <span className="flex items-center gap-1">
-                      <DollarSign className="w-3 h-3" />
+                      <AppIcon name="DollarSign" size={12} />
                       {formatCurrency(employee.base_salary)}
                     </span>
                   </div>
@@ -172,23 +157,23 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" size="icon">
-                    <MoreVertical className="w-4 h-4" />
+                    <AppIcon name="MoreVertical" size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(employee); }}>
-                    <Pencil className="w-4 h-4 mr-2" />
+                    <AppIcon name="Pencil" size={16} className="mr-2" />
                     Editar
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); toggleActive(employee); }}>
                     {employee.is_active ? (
                       <>
-                        <UserX className="w-4 h-4 mr-2" />
+                        <AppIcon name="person_off" size={16} className="mr-2" />
                         Desativar
                       </>
                     ) : (
                       <>
-                        <UserCheck className="w-4 h-4 mr-2" />
+                        <AppIcon name="UserCheck" size={16} className="mr-2" />
                         Ativar
                       </>
                     )}
@@ -197,7 +182,7 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                     onClick={(e) => { e.stopPropagation(); setDeleteId(employee.id); }}
                     className="text-destructive"
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <AppIcon name="Trash2" size={16} className="mr-2" />
                     Excluir
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -208,13 +193,12 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
 
         {filteredEmployees.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
-            <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <AppIcon name="User" size={48} className="mx-auto mb-3 opacity-50" />
             <p>Nenhum funcionário encontrado</p>
           </div>
         )}
       </div>
 
-      {/* Sheet */}
       <EmployeeSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}
@@ -222,7 +206,6 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
         availableUsers={availableUsers}
       />
 
-      {/* Delete Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

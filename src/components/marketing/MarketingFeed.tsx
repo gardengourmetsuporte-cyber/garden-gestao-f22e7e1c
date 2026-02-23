@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Input } from '@/components/ui/input';
 import { PostCard } from './PostCard';
 import type { MarketingPost, MarketingPostStatus, MarketingChannel } from '@/types/marketing';
@@ -53,7 +53,7 @@ export function MarketingFeed({ posts, onEdit, onDelete, onPublish }: Props) {
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={search}
           onChange={e => setSearch(e.target.value)}

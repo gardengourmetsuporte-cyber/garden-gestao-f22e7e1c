@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -71,7 +71,7 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
       {/* Month Navigation */}
       <div className="flex items-center justify-between px-1">
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
-          <ChevronLeft className="w-4 h-4" />
+          <AppIcon name="ChevronLeft" size={16} />
         </Button>
         <div className="text-center">
           <h2 className="text-sm font-semibold text-foreground capitalize">
@@ -88,7 +88,7 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
             Hoje
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
-            <ChevronRight className="w-4 h-4" />
+            <AppIcon name="ChevronRight" size={16} />
           </Button>
         </div>
       </div>

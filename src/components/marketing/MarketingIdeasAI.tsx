@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, Send, Loader2, CalendarPlus, Copy, Check } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,7 +77,7 @@ export function MarketingIdeasAI({ onSchedule }: Props) {
       {/* Input */}
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 px-1">
-          <Sparkles className="w-4 h-4 text-primary" />
+          <AppIcon name="Sparkles" size={16} className="text-primary" />
           <span className="text-sm font-medium text-foreground">Gerador de conteúdo</span>
         </div>
         <Textarea
@@ -92,7 +92,7 @@ export function MarketingIdeasAI({ onSchedule }: Props) {
           disabled={loading || !prompt.trim()}
           className="w-full gap-2"
         >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {loading ? <AppIcon name="progress_activity" size={16} className="animate-spin" /> : <AppIcon name="Sparkles" size={16} />}
           {loading ? 'Gerando ideias...' : 'Gerar sugestões com IA'}
         </Button>
       </div>
@@ -131,7 +131,7 @@ export function MarketingIdeasAI({ onSchedule }: Props) {
                   className="flex-1 text-xs gap-1.5"
                   onClick={() => handleCopy(s.caption + '\n\n' + s.hashtags.map(h => `#${h}`).join(' '), i)}
                 >
-                  {copiedIdx === i ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  {copiedIdx === i ? <AppIcon name="Check" size={12} /> : <AppIcon name="Copy" size={12} />}
                   {copiedIdx === i ? 'Copiado' : 'Copiar'}
                 </Button>
                 <Button
@@ -139,7 +139,7 @@ export function MarketingIdeasAI({ onSchedule }: Props) {
                   className="flex-1 text-xs gap-1.5"
                   onClick={() => handleSchedule(s)}
                 >
-                  <CalendarPlus className="w-3 h-3" /> Criar post
+                  <AppIcon name="calendar_add_on" size={12} /> Criar post
                 </Button>
               </div>
             </div>
@@ -149,7 +149,7 @@ export function MarketingIdeasAI({ onSchedule }: Props) {
 
       {!loading && suggestions.length === 0 && (
         <div className="text-center py-8">
-          <Sparkles className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+          <AppIcon name="Sparkles" size={32} className="text-muted-foreground/30 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
             Descreva o que você quer publicar e a IA criará sugestões completas com legenda, hashtags e melhor horário.
           </p>

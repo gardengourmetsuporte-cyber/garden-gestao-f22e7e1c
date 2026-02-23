@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, X, CheckCircle2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
@@ -51,7 +51,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
           className="rounded-xl"
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
         >
-          <ChevronLeft className="w-5 h-5" />
+          <AppIcon name="ChevronLeft" size={20} />
         </Button>
         <h2 className="text-lg font-semibold capitalize">
           {format(currentMonth, "MMMM 'de' yyyy", { locale: ptBR })}
@@ -62,7 +62,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
           className="rounded-xl"
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
         >
-          <ChevronRight className="w-5 h-5" />
+          <AppIcon name="ChevronRight" size={20} />
         </Button>
       </div>
 
@@ -142,7 +142,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
               className="w-7 h-7 rounded-lg"
               onClick={() => setSelectedDate(null)}
             >
-              <X className="w-4 h-4" />
+              <AppIcon name="X" size={16} />
             </Button>
           </div>
           

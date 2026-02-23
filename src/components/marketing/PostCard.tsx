@@ -1,4 +1,4 @@
-import { Instagram, MessageCircle, Calendar, MoreVertical, Trash2, Edit, Send, Share2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -22,7 +22,6 @@ interface PostCardProps {
 }
 
 async function handleShare(post: MarketingPost) {
-  // Try Web Share API with image file (works on mobile)
   if (navigator.share && post.media_urls.length > 0) {
     try {
       const response = await fetch(post.media_urls[0]);
@@ -39,11 +38,9 @@ async function handleShare(post: MarketingPost) {
         return;
       }
     } catch {
-      // fallback below
+      /* fallback */
     }
   }
-
-  // Fallback: download image + copy caption
   if (post.media_urls.length > 0) {
     try {
       const response = await fetch(post.media_urls[0]);
@@ -57,11 +54,8 @@ async function handleShare(post: MarketingPost) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch {
-      // silent
-    }
+    } catch {}
   }
-
   if (post.caption) {
     try {
       await navigator.clipboard.writeText(post.caption);
@@ -104,20 +98,20 @@ export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="p-1 rounded-lg hover:bg-secondary shrink-0">
-                <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                <AppIcon name="MoreVertical" size={16} className="text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(post)}>
-                <Edit className="w-4 h-4 mr-2" /> Editar
+                <AppIcon name="Pencil" size={16} className="mr-2" /> Editar
               </DropdownMenuItem>
               {post.status !== 'published' && (
                 <DropdownMenuItem onClick={() => onPublish(post)}>
-                  <Send className="w-4 h-4 mr-2" /> Publicar
+                  <AppIcon name="Send" size={16} className="mr-2" /> Publicar
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => onDelete(post.id)} className="text-destructive">
-                <Trash2 className="w-4 h-4 mr-2" /> Excluir
+                <AppIcon name="Trash2" size={16} className="mr-2" /> Excluir
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -128,14 +122,14 @@ export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
             {status.label}
           </Badge>
           {post.channels.includes('instagram') && (
-            <Instagram className="w-3.5 h-3.5 text-pink-400" />
+            <AppIcon name="photo_camera" size={14} className="text-pink-400" />
           )}
           {post.channels.includes('whatsapp_status') && (
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <AppIcon name="MessageCircle" size={14} className="text-emerald-400" />
           )}
           {post.scheduled_at && (
             <span className="text-[10px] text-muted-foreground flex items-center gap-0.5 ml-auto">
-              <Calendar className="w-3 h-3" />
+              <AppIcon name="Calendar" size={12} />
               {format(new Date(post.scheduled_at), "dd/MM HH:mm", { locale: ptBR })}
             </span>
           )}
@@ -158,9 +152,9 @@ export function PostCard({ post, onEdit, onDelete, onPublish }: PostCardProps) {
           className="w-full gap-2 text-xs border-pink-500/30 hover:bg-pink-500/10 text-pink-400"
           onClick={() => handleShare(post)}
         >
-          <Share2 className="w-3.5 h-3.5" />
+          <AppIcon name="share" size={14} />
           Compartilhar
-          <Instagram className="w-3 h-3 ml-auto" />
+          <AppIcon name="photo_camera" size={12} className="ml-auto" />
         </Button>
       </div>
     </div>

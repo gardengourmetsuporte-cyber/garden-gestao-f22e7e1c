@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, MessageCircle, Users, Megaphone } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -49,7 +49,6 @@ export function NewConversationSheet({ open, onOpenChange, onCreateDirect, onCre
   const fetchContacts = async () => {
     if (!activeUnitId || !user) return;
 
-    // Get users in same unit
     const { data: unitUsers } = await supabase
       .from('user_units')
       .select('user_id')
@@ -118,7 +117,7 @@ export function NewConversationSheet({ open, onOpenChange, onCreateDirect, onCre
               style={{ border: '1px solid hsl(var(--border) / 0.2)' }}
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10">
-                <MessageCircle className="w-5 h-5 text-primary" />
+                <AppIcon name="MessageCircle" size={20} className="text-primary" />
               </div>
               <div className="text-left">
                 <p className="text-sm font-medium text-foreground">Conversa Direta</p>
@@ -134,7 +133,7 @@ export function NewConversationSheet({ open, onOpenChange, onCreateDirect, onCre
                   style={{ border: '1px solid hsl(var(--border) / 0.2)' }}
                 >
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10">
-                    <Users className="w-5 h-5 text-primary" />
+                    <AppIcon name="Users" size={20} className="text-primary" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium text-foreground">Grupo</p>
@@ -148,7 +147,7 @@ export function NewConversationSheet({ open, onOpenChange, onCreateDirect, onCre
                   style={{ border: '1px solid hsl(var(--border) / 0.2)' }}
                 >
                   <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'hsl(45 100% 50% / 0.1)' }}>
-                    <Megaphone className="w-5 h-5 text-amber-400" />
+                    <AppIcon name="Megaphone" size={20} className="text-amber-400" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium text-foreground">Canal de Comunicados</p>
@@ -172,7 +171,7 @@ export function NewConversationSheet({ open, onOpenChange, onCreateDirect, onCre
             )}
 
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+              <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
               <Input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
