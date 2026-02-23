@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
 import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 import { cn } from '@/lib/utils';
+import { UnifiedCalendarWidget } from './UnifiedCalendarWidget';
 
 export function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -71,6 +72,11 @@ export function EmployeeDashboard() {
             </div>
           </div>
         </button>
+      </div>
+
+      {/* Unified Calendar */}
+      <div className="grid grid-cols-2 gap-3">
+        <UnifiedCalendarWidget />
       </div>
 
       {/* Personal Expense Chart */}

@@ -32,7 +32,11 @@ export function useBackGuard(isOpen: boolean, onClose: () => void) {
       // If sheet was closed programmatically (not via back), clean up the dummy entry
       if (guardActive.current) {
         guardActive.current = false;
-        window.history.back();
+        // Only go back if the current history state is our guard entry
+        const state = window.history.state;
+        if (state && typeof state === 'object' && '__backGuard' in state) {
+          window.history.back();
+        }
       }
     };
   }, [isOpen, onClose]);

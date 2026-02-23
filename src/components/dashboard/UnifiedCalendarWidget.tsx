@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, CalendarDays, CheckCircle2, DollarSign, Megaphone, Coffee } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, CheckCircle2, DollarSign, Megaphone, Coffee, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useDashboardCalendar } from '@/hooks/useDashboardCalendar';
@@ -13,7 +14,7 @@ const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 export function UnifiedCalendarWidget() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const { eventsMap } = useDashboardCalendar(currentMonth);
+  const { eventsMap, isLoading } = useDashboardCalendar(currentMonth);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -45,7 +46,11 @@ export function UnifiedCalendarWidget() {
     const doneTasks = ev.tasks.filter(t => t.type === 'task_done');
     if (pendingTasks.length > 0) chips.push({ type: 'task_pending', color: calendarEventColors.task_pending });
     if (doneTasks.length > 0) chips.push({ type: 'task_done', color: calendarEventColors.task_done });
-    if (ev.finance.length > 0) chips.push({ type: 'finance_peak', color: calendarEventColors.finance_peak });
+    // Only show chip for peak days, not all finance days
+    const hasPeak = ev.finance.some(f => f.type === 'finance_peak' && f.subtitle === 'Acima da média');
+    if (hasPeak) chips.push({ type: 'finance_peak', color: calendarEventColors.finance_peak });
+    const hasIncome = ev.finance.some(f => f.type === 'finance_income');
+    if (hasIncome) chips.push({ type: 'finance_income', color: calendarEventColors.finance_income });
     if (ev.marketing.length > 0) chips.push({ type: 'marketing', color: calendarEventColors.marketing });
     if (ev.schedules.length > 0) chips.push({ type: 'schedule', color: calendarEventColors.schedule });
     return chips;
@@ -87,7 +92,16 @@ export function UnifiedCalendarWidget() {
 
         {/* Day cells */}
         <div className="grid grid-cols-7">
-          {calendarDays.map((day, i) => {
+          {isLoading ? (
+            Array.from({ length: 35 }).map((_, i) => (
+              <div key={i} className="min-h-[3.5rem] p-1 border-b border-r border-border/15">
+                <Skeleton className="h-3 w-4 mb-1" />
+                <div className="flex gap-[2px]">
+                  <Skeleton className="w-[6px] h-[6px] rounded-full" />
+                </div>
+              </div>
+            ))
+          ) : calendarDays.map((day, i) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const inMonth = isSameMonth(day, currentMonth);
             const today = isToday(day);
@@ -129,6 +143,7 @@ export function UnifiedCalendarWidget() {
             { label: 'Pendente', color: calendarEventColors.task_pending },
             { label: 'Concluída', color: calendarEventColors.task_done },
             { label: 'Despesa', color: calendarEventColors.finance_peak },
+            { label: 'Receita', color: calendarEventColors.finance_income },
             { label: 'Marketing', color: calendarEventColors.marketing },
             { label: 'Folga', color: calendarEventColors.schedule },
           ].map(s => (
@@ -157,7 +172,7 @@ export function UnifiedCalendarWidget() {
 
             {/* Finance */}
             {selectedEvents.finance.length > 0 && (
-              <EventSection icon={<DollarSign className="w-3.5 h-3.5 text-orange-500" />} title="Despesas">
+              <EventSection icon={<DollarSign className="w-3.5 h-3.5 text-orange-500" />} title="Financeiro">
                 {selectedEvents.finance.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}

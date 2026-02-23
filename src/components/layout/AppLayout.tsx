@@ -21,6 +21,8 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+// NOTE: useLeaderboard is kept here only for the header trophy badge (myPosition).
+// It's a lightweight read that benefits from global caching across dashboard/ranking pages.
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface AppLayoutProps {
