@@ -63,6 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        // PASSWORD_RECOVERY: let the session through so Auth page can detect it
+        if (event === 'PASSWORD_RECOVERY') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         

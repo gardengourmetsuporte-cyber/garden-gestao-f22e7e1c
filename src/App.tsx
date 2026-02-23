@@ -1,5 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
-import { Toaster } from "@/components/ui/toaster";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,19 +12,31 @@ import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
 
-// Retry wrapper for lazy imports to handle transient fetch failures
+const LAZY_RELOAD_KEY = 'lazy_reload_count';
+
 function lazyRetry(importFn: () => Promise<any>, retries = 3): Promise<any> {
   return new Promise((resolve, reject) => {
     importFn()
-      .then(resolve)
+      .then((module) => {
+        // Reset reload counter on success
+        sessionStorage.removeItem(LAZY_RELOAD_KEY);
+        resolve(module);
+      })
       .catch((err: Error) => {
         if (retries > 0) {
           setTimeout(() => {
             lazyRetry(importFn, retries - 1).then(resolve, reject);
           }, 500);
         } else {
-          // Force reload as last resort to clear stale cache
-          window.location.reload();
+          // Prevent infinite reload loop: max 2 reloads per session
+          const reloadCount = parseInt(sessionStorage.getItem(LAZY_RELOAD_KEY) || '0', 10);
+          if (reloadCount < 2) {
+            sessionStorage.setItem(LAZY_RELOAD_KEY, String(reloadCount + 1));
+            window.location.reload();
+          } else {
+            sessionStorage.removeItem(LAZY_RELOAD_KEY);
+            reject(err);
+          }
         }
       });
   });
@@ -313,7 +324,6 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
         <Sonner />
         <BrowserRouter>
           <AuthProvider>

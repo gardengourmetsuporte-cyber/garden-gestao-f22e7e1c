@@ -34,16 +34,15 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const planFromUrl = searchParams.get('plan');
 
-  // Listen for PASSWORD_RECOVERY event
+  // Listen for PASSWORD_RECOVERY event from AuthContext's session
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setIsNewPassword(true);
-        setIsResetPassword(false);
-        setIsLogin(true);
-      }
-    });
-    return () => subscription.unsubscribe();
+    // Check URL hash for recovery token (handles redirect from email link)
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      setIsNewPassword(true);
+      setIsResetPassword(false);
+      setIsLogin(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -596,7 +595,7 @@ export default function Auth() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => { setIsLogin(!isLogin); setErrors({}); }}
+                  onClick={() => { setIsLogin(!isLogin); setErrors({}); setPassword(''); setFullName(''); }}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {isLogin ? (
