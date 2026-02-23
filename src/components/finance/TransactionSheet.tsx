@@ -23,7 +23,7 @@ import {
 } from '@/types/finance';
 import { format, isToday, isYesterday, isFuture, subDays, addMonths, addWeeks, startOfDay, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Loader2 } from 'lucide-react';
+
 import { LoadingButton } from '@/components/ui/loading-button';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -912,7 +912,7 @@ export function TransactionSheet({
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirmar'}
+              {isLoading ? <AppIcon name="Progress_activity" size={16} className="animate-spin" /> : 'Confirmar'}
             </Button>
           </DialogFooter>
         </DialogContent>

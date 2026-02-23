@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FinanceCategory } from '@/types/finance';
-import { Loader2 } from 'lucide-react';
+
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -398,7 +398,7 @@ export function CategoryManagement({
                   onClick={handleSave}
                   disabled={isLoading || !name.trim()}
                 >
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
+                  {isLoading ? <AppIcon name="Progress_activity" size={20} className="animate-spin" /> : 'Salvar'}
                 </Button>
               </div>
             </div>
@@ -480,7 +480,7 @@ export function CategoryManagement({
               onClick={executeDelete}
               disabled={isLoading || (deleteAction === 'transfer' && !transferTargetId)}
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+              {isLoading ? <AppIcon name="Progress_activity" size={16} className="animate-spin mr-1" /> : null}
               Excluir
             </Button>
           </DialogFooter>

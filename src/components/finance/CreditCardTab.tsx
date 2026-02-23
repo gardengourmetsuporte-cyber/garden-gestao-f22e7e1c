@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+
 import { format, isBefore, isAfter, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -254,7 +254,7 @@ export function CreditCardTab({
                 
                 {isLoadingTransactions ? (
                   <div className="flex justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    <AppIcon name="Progress_activity" size={24} className="animate-spin text-muted-foreground" />
                   </div>
                 ) : invoiceTransactions.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
@@ -334,7 +334,7 @@ export function CreditCardTab({
               disabled={!selectedPayAccount || isPayingInvoice}
             >
               {isPayingInvoice ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <AppIcon name="Progress_activity" size={20} className="animate-spin" />
               ) : (
                 <>
                   <AppIcon name="Check" size={16} className="mr-2" />

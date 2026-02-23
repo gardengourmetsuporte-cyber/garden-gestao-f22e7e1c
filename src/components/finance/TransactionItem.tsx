@@ -1,4 +1,3 @@
-import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceTransaction } from '@/types/finance';
 import { cn } from '@/lib/utils';
@@ -171,7 +170,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
           )}
         >
           {isToggling ? (
-            <Loader2 className="w-5 h-5 text-white animate-spin" />
+             <AppIcon name="Progress_activity" size={20} className="text-white animate-spin" />
           ) : (
             <span className="text-white text-sm font-medium">{is_paid ? 'Desfazer' : 'Pagar'}</span>
           )}
@@ -182,7 +181,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
           className="w-[70px] bg-destructive hover:bg-destructive/90 flex items-center justify-center transition-colors"
         >
           {isDeleting ? (
-            <Loader2 className="w-5 h-5 text-white animate-spin" />
+            <AppIcon name="Progress_activity" size={20} className="text-white animate-spin" />
           ) : (
             <span className="text-white text-sm font-medium">Apagar</span>
           )}
@@ -216,7 +215,7 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
           )}
         >
           {isToggling ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <AppIcon name="Progress_activity" size={16} className="animate-spin" />
           ) : is_paid ? (
             <AppIcon name="Check" size={16} />
           ) : null}

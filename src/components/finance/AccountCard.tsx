@@ -47,7 +47,7 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
       onClick={onClick}
       className={cn(
         "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all duration-200 w-full text-left",
-        onClick && "hover:bg-secondary/50 hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
+        onClick && "hover:bg-secondary/50 cursor-pointer"
       )}
     >
       <BankAvatar account={account} />
