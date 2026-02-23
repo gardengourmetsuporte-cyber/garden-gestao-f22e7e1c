@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { AppRole } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -17,8 +18,15 @@ const ROLES: { value: AppRole; label: string; icon: string }[] = [
   { value: 'funcionario', label: 'Funcionário', icon: 'User' },
 ];
 
+const UNIT_ROLE_LABELS: Record<string, string> = {
+  owner: 'Dono',
+  admin: 'Gerente',
+  member: 'Funcionário',
+};
+
 export function UserManagement() {
   const { users, isLoading, updateUserRole } = useUsers();
+  const { activeUnit } = useUnit();
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
   const [roleDialogUser, setRoleDialogUser] = useState<UserWithRole | null>(null);
 
@@ -48,11 +56,19 @@ export function UserManagement() {
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <AppIcon name="Users" size={20} className="text-primary" />
-        <h3 className="font-semibold text-foreground">Gerenciar Usuários</h3>
+        <div>
+          <h3 className="font-semibold text-foreground">Gerenciar Usuários</h3>
+          {activeUnit && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <AppIcon name="Building2" size={12} />
+              {activeUnit.name}
+            </p>
+          )}
+        </div>
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Altere as funções dos usuários entre Administrador e Funcionário.
+        Usuários vinculados a esta unidade. Altere as funções entre Administrador e Funcionário.
       </p>
 
       <div className="space-y-2">
@@ -68,9 +84,16 @@ export function UserManagement() {
               </div>
               <div>
                 <span className="font-medium block">{user.full_name}</span>
-                {user.job_title && (
-                  <span className="text-xs text-muted-foreground">{user.job_title}</span>
-                )}
+                <div className="flex items-center gap-2">
+                  {user.unitRole && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                      {UNIT_ROLE_LABELS[user.unitRole] || user.unitRole}
+                    </span>
+                  )}
+                  {user.job_title && (
+                    <span className="text-xs text-muted-foreground">{user.job_title}</span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -89,9 +112,12 @@ export function UserManagement() {
           </div>
         ))}
         {users.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Nenhum usuário cadastrado
-          </p>
+          <div className="text-center py-8 space-y-2">
+            <AppIcon name="Users" size={32} className="mx-auto text-muted-foreground/40" />
+            <p className="text-sm text-muted-foreground">
+              Nenhum usuário vinculado a esta unidade
+            </p>
+          </div>
         )}
       </div>
 
