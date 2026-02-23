@@ -98,9 +98,9 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
           {/* Animated pill indicator */}
           <div
             className="absolute bottom-1 h-[3px] rounded-full nav-pill-indicator"
-            style={{
+              style={{
               background: accentColor,
-              boxShadow: `0 0 10px ${accentGlow}, 0 0 20px ${accentGlow2}`,
+              boxShadow: `0 0 14px ${accentGlow}, 0 0 28px ${accentGlow2}`,
               width: '24px',
               left: `calc(${
                 activeTab === 'home' ? '12.5%' :

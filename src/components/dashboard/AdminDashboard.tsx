@@ -149,10 +149,14 @@ export function AdminDashboard() {
         {/* === OPERATIONAL BLOCK === */}
 
         {/* CHECKLIST PROGRESS WIDGET */}
-        <ChecklistDashboardWidget />
+        <div className="card-press">
+          <ChecklistDashboardWidget />
+        </div>
 
         {/* AGENDA WIDGET */}
-        <AgendaDashboardWidget />
+        <div className="card-press">
+          <AgendaDashboardWidget />
+        </div>
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (

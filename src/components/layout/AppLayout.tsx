@@ -130,7 +130,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="bg-card/80 backdrop-blur-2xl border-b border-border/20 transition-all duration-300">
+        <div className="bg-card/60 backdrop-blur-2xl border-b border-border/15 transition-all duration-300" style={{ boxShadow: '0 1px 0 hsl(var(--primary) / 0.05), 0 4px 20px hsl(var(--background) / 0.4)' }}>
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-1">
               <ThemeToggle className="p-1.5" />
@@ -564,8 +564,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
+        key={location.pathname}
         className={cn(
-          "min-h-screen transition-all duration-300 lg:ml-[260px] lg:pt-0",
+          "min-h-screen animate-page-slide-up lg:ml-[260px] lg:pt-0",
           launcherOpen && "pointer-events-none"
         )}
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 5.5rem)' }}

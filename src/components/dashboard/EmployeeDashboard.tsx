@@ -75,14 +75,20 @@ export function EmployeeDashboard() {
       </div>
 
       {/* Unified Calendar */}
-      <div className="grid grid-cols-2 gap-3">
-        <UnifiedCalendarWidget />
+      <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-3">
+        <div className="card-press">
+          <UnifiedCalendarWidget />
+        </div>
       </div>
 
       {/* Personal Expense Chart */}
-      <div className="grid grid-cols-2 gap-3">
-        <PersonalFinanceChartWidget />
-        <AgendaDashboardWidget />
+      <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-4">
+        <div className="card-press">
+          <PersonalFinanceChartWidget />
+        </div>
+        <div className="card-press">
+          <AgendaDashboardWidget />
+        </div>
       </div>
 
       {/* Leaderboard */}
