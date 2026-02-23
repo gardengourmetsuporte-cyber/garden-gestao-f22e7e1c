@@ -67,7 +67,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { user, profile, isAdmin, signOut } = useAuth();
+  const { user, profile, isAdmin, isSuperAdmin, signOut } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
@@ -89,6 +89,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const { hasAccess } = useUserModules();
   const filteredNavItems = navItems.filter(item => {
+    // "Em Produção" modules are only visible to super_admins
+    if (item.group === 'em_producao' && !isSuperAdmin) return false;
     const moduleKey = getModuleKeyFromRoute(item.href);
     // If module is explicitly granted by access level, show it regardless of adminOnly
     if (moduleKey && hasAccess(moduleKey)) return true;
