@@ -1,10 +1,11 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-// Points calculation now happens server-side via RPC
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { startOfMonth, endOfMonth, format } from 'date-fns';
+
+export type LeaderboardScope = 'unit' | 'global';
 
 export interface LeaderboardEntry {
   user_id: string;
@@ -18,6 +19,8 @@ export interface LeaderboardEntry {
   rank: number;
   /** All-time earned points (for rank/frame calculation) */
   earned_all_time: number;
+  /** Unit name — only populated in global scope */
+  unit_name?: string;
 }
 
 export interface SectorPointsSummary {
@@ -32,7 +35,6 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
 
-  // First fetch user IDs, then parallel-fetch RPC + profiles (avoids nested await in Promise.all)
   const { data: userUnitsData } = await supabase
     .from('user_units')
     .select('user_id')
@@ -47,13 +49,50 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
       p_month_end: monthEnd,
     }),
     userIds.length > 0
-      ? supabase
-          .from('profiles')
-          .select('user_id, full_name, avatar_url')
-          .in('user_id', userIds)
+      ? supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', userIds)
       : Promise.resolve({ data: [] as any[] }),
   ]);
 
+  return buildEntries(rpcData, profilesData);
+}
+
+async function fetchGlobalLeaderboardData(month: Date): Promise<LeaderboardEntry[]> {
+  const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
+  const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
+
+  const { data: rpcData } = await supabase.rpc('get_global_leaderboard_data', {
+    p_month_start: monthStart,
+    p_month_end: monthEnd,
+  });
+
+  const userIds = (rpcData || []).map((r: any) => r.user_id);
+  const unitIds = [...new Set((rpcData || []).map((r: any) => r.unit_id).filter(Boolean))];
+
+  const [{ data: profilesData }, { data: unitsData }] = await Promise.all([
+    userIds.length > 0
+      ? supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', userIds)
+      : Promise.resolve({ data: [] as any[] }),
+    unitIds.length > 0
+      ? supabase.from('units').select('id, name').in('id', unitIds as string[])
+      : Promise.resolve({ data: [] as any[] }),
+  ]);
+
+  const unitMap = new Map<string, string>();
+  (unitsData || []).forEach((u: any) => unitMap.set(u.id, u.name));
+
+  const entries = buildEntries(rpcData, profilesData);
+  // Attach unit_name from RPC unit_id
+  const rpcMap = new Map<string, string>();
+  (rpcData || []).forEach((r: any) => { if (r.unit_id) rpcMap.set(r.user_id, r.unit_id); });
+  entries.forEach(e => {
+    const uid = rpcMap.get(e.user_id);
+    if (uid) e.unit_name = unitMap.get(uid) || '';
+  });
+
+  return entries;
+}
+
+function buildEntries(rpcData: any, profilesData: any): LeaderboardEntry[] {
   const profileMap = new Map<string, { full_name: string; avatar_url: string | null }>();
   (profilesData || []).forEach((p: any) => profileMap.set(p.user_id, p));
 
@@ -127,16 +166,21 @@ async function fetchSectorPointsData(unitId: string): Promise<SectorPointsSummar
   }));
 }
 
-export function useLeaderboard() {
+export function useLeaderboard(scope: LeaderboardScope = 'unit') {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const [selectedMonth, setSelectedMonth] = useState(() => startOfMonth(new Date()));
 
   const { data: leaderboard = [], isLoading: isLoadingLeaderboard, refetch: refetchLeaderboard } = useQuery({
-    queryKey: ['leaderboard', activeUnitId, format(selectedMonth, 'yyyy-MM')],
-    queryFn: () => fetchLeaderboardData(activeUnitId!, selectedMonth),
-    enabled: !!user && !!activeUnitId,
+    queryKey: scope === 'unit'
+      ? ['leaderboard', activeUnitId, format(selectedMonth, 'yyyy-MM')]
+      : ['leaderboard-global', format(selectedMonth, 'yyyy-MM')],
+    queryFn: () =>
+      scope === 'unit'
+        ? fetchLeaderboardData(activeUnitId!, selectedMonth)
+        : fetchGlobalLeaderboardData(selectedMonth),
+    enabled: scope === 'unit' ? (!!user && !!activeUnitId) : !!user,
     staleTime: 30_000,
     gcTime: 60_000,
   });
