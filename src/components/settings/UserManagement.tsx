@@ -4,12 +4,17 @@ import { AppRole } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const ROLES: { value: AppRole; label: string; icon: string }[] = [
@@ -29,6 +34,10 @@ export function UserManagement() {
   const { activeUnit } = useUnit();
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
   const [roleDialogUser, setRoleDialogUser] = useState<UserWithRole | null>(null);
+  const [passwordDialogUser, setPasswordDialogUser] = useState<UserWithRole | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   const handleRoleChange = async (userId: string, newRole: AppRole) => {
     setRoleDialogUser(null);
@@ -39,6 +48,30 @@ export function UserManagement() {
       toast.error('Erro ao atualizar função');
     } finally {
       setUpdatingUser(null);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!passwordDialogUser || !newPassword) return;
+    if (newPassword.length < 6) {
+      toast.error('Senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-reset-password', {
+        body: { target_user_id: passwordDialogUser.user_id, new_password: newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Senha de ${passwordDialogUser.full_name} alterada com sucesso`);
+      setPasswordDialogUser(null);
+      setNewPassword('');
+      setShowPassword(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'Erro ao redefinir senha');
+    } finally {
+      setResettingPassword(false);
     }
   };
 
@@ -68,7 +101,7 @@ export function UserManagement() {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Usuários vinculados a esta unidade. Altere as funções entre Administrador e Funcionário.
+        Usuários vinculados a esta unidade. Altere funções ou redefina senhas.
       </p>
 
       <div className="space-y-2">
@@ -96,7 +129,15 @@ export function UserManagement() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              {/* Reset Password Button */}
+              <button
+                onClick={() => { setPasswordDialogUser(user); setNewPassword(''); setShowPassword(false); }}
+                className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                title="Redefinir senha"
+              >
+                <AppIcon name="KeyRound" size={16} className="text-muted-foreground" />
+              </button>
               {updatingUser === user.user_id ? (
                 <AppIcon name="progress_activity" size={16} className="animate-spin" />
               ) : (
@@ -121,6 +162,7 @@ export function UserManagement() {
         )}
       </div>
 
+      {/* Role Dialog */}
       <Dialog open={!!roleDialogUser} onOpenChange={(open) => !open && setRoleDialogUser(null)}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -146,6 +188,45 @@ export function UserManagement() {
               );
             })}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Reset Dialog */}
+      <Dialog open={!!passwordDialogUser} onOpenChange={(open) => { if (!open) { setPasswordDialogUser(null); setNewPassword(''); setShowPassword(false); } }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Redefinir senha</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              Definir nova senha para <strong>{passwordDialogUser?.full_name}</strong>
+            </p>
+            <div className="space-y-2">
+              <Label>Nova senha</Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <AppIcon name={showPassword ? 'EyeOff' : 'Eye'} size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPasswordDialogUser(null)}>Cancelar</Button>
+            <Button onClick={handleResetPassword} disabled={resettingPassword || newPassword.length < 6}>
+              {resettingPassword ? 'Salvando...' : 'Salvar senha'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
