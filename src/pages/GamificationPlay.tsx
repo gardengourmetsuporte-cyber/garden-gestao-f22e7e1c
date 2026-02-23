@@ -1,3 +1,4 @@
+import atlasIcon from '@/assets/atlas-icon.png';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
@@ -83,9 +84,9 @@ export default function GamificationPlay() {
       {/* Header */}
       <div className="text-center mb-6">
         <img
-          src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
+           src={atlasIcon}
           alt="Atlas"
-          className="w-16 h-16 rounded-xl mx-auto mb-3 object-contain border border-border/20"
+          className="w-16 h-16 rounded-full mx-auto mb-3 object-contain border border-border/20"
         />
         <h1 className="text-2xl font-bold text-foreground">Atlas</h1>
         {phase === 'input' && (
