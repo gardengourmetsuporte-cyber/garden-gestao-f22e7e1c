@@ -33,6 +33,17 @@ export default function Auth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const planFromUrl = searchParams.get('plan');
+  const tokenFromUrl = searchParams.get('token');
+  const paymentSuccess = searchParams.get('payment');
+
+  // Redirect to landing if accessed without plan, token, or recovery hash
+  useEffect(() => {
+    const hash = window.location.hash;
+    const hasRecovery = hash.includes('type=recovery');
+    if (!planFromUrl && !tokenFromUrl && !paymentSuccess && !hasRecovery && !user) {
+      // Allow login but hide signup toggle (handled below)
+    }
+  }, []);
 
   // Listen for PASSWORD_RECOVERY event from AuthContext's session
   useEffect(() => {
@@ -50,6 +61,9 @@ export default function Auth() {
       navigate('/', { replace: true });
     }
   }, [user, isLoading, navigate, isNewPassword]);
+
+  // Determine if signup should be shown (only with plan or token)
+  const canSignUp = !!planFromUrl || !!tokenFromUrl;
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -592,7 +606,7 @@ export default function Auth() {
                 >
                   ← Voltar para o login
                 </button>
-              ) : (
+              ) : canSignUp ? (
                 <button
                   type="button"
                   onClick={() => { setIsLogin(!isLogin); setErrors({}); setPassword(''); setFullName(''); }}
@@ -603,6 +617,14 @@ export default function Auth() {
                   ) : (
                     <>Já tem conta? <span className="text-primary font-medium">Entrar</span></>
                   )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  ← Voltar para o site
                 </button>
               )}
             </div>

@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { UnitProvider } from "@/contexts/UnitContext";
+import { UnitProvider, useUnit } from "@/contexts/UnitContext";
 import { PageLoader } from "@/components/PageLoader";
 import { useUserModules } from "@/hooks/useAccessLevels";
 import { getModuleKeyFromRoute } from "@/lib/modules";
@@ -72,6 +72,8 @@ const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
 const Alerts = lazy(() => lazyRetry(() => import("./pages/Alerts")));
 const Gamification = lazy(() => lazyRetry(() => import("./pages/Gamification")));
 const GamificationPlay = lazy(() => lazyRetry(() => import("./pages/GamificationPlay")));
+const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
+const Onboarding = lazy(() => lazyRetry(() => import("./pages/Onboarding")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -86,10 +88,11 @@ const queryClient = new QueryClient({
 
 // PageLoader imported from @/components/PageLoader
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNode; skipOnboarding?: boolean }) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const { hasAccess, isLoading: modulesLoading } = useUserModules();
+  const { units, isLoading: unitsLoading } = useUnit();
 
   if (isLoading) {
     return <PageLoader />;
@@ -97,6 +100,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Check if user needs onboarding (no units = new owner)
+  if (!skipOnboarding && !unitsLoading && units.length === 0) {
+    return <Navigate to="/onboarding" replace />;
   }
 
   // Check module access (skip during loading to avoid flash)
@@ -130,6 +138,12 @@ function AppRoutes() {
         <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/landing" element={<Landing />} />
+        <Route path="/invite" element={<Invite />} />
+        <Route path="/onboarding" element={
+          <ProtectedRoute skipOnboarding>
+            <Onboarding />
+          </ProtectedRoute>
+        } />
         <Route
           path="/"
           element={

@@ -16,6 +16,7 @@ import { AccessLevelSettings } from '@/components/settings/AccessLevelSettings';
 import { MedalSettings } from '@/components/settings/MedalSettings';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { AuditLogSettings } from '@/components/settings/AuditLogSettings';
+import { TeamManagement } from '@/components/settings/TeamManagement';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
   { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta' },
   { value: 'users', icon: 'Users', label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
+  { value: 'team', icon: 'UserPlus', label: 'Equipe & Convites', description: 'Convidar funcionários por email', variant: 'green', section: 'Conta' },
   { value: 'access-levels', icon: 'Shield', label: 'Níveis de Acesso', description: 'Controlar permissões por módulo', variant: 'cyan', section: 'Conta' },
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
   { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'green', section: 'Operação' },
@@ -59,6 +61,7 @@ export default function SettingsPage() {
 
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'units') return isSuperAdmin;
+    if (item.value === 'team') return isAdmin;
     if (item.value === 'alerts') return isAdmin;
     if (item.value === 'audit-log') return isAdmin;
     if (item.value === 'access-levels') return isAdmin;
@@ -110,6 +113,7 @@ export default function SettingsPage() {
               {activeSection === 'medals' && <MedalSettings />}
               {activeSection === 'notifications' && <NotificationSettings />}
               {activeSection === 'audit-log' && <AuditLogSettings />}
+              {activeSection === 'team' && <TeamManagement />}
             </div>
           </div>
         </div>

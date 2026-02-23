@@ -81,11 +81,12 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
       const unitId = unitData.id;
 
-      // Assign user to unit
+      // Assign user to unit as owner
       await supabase.from('user_units').insert({
         user_id: user.id,
         unit_id: unitId,
         is_default: true,
+        role: 'owner',
       });
 
       // 2. Create stock categories
