@@ -42,6 +42,9 @@ export function UnitProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Reset loading state so ProtectedRoute waits for fresh data
+    setIsLoading(true);
+
     try {
       // Fetch units the user has access to
       const { data: userUnitsData } = await supabase
