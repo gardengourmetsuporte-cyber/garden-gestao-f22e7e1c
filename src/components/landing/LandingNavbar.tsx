@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/atlas-logo.png";
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -29,8 +29,8 @@ export function LandingNavbar() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src={logoImg} alt="Garden Gourmet" className="h-8 w-8 rounded-lg" />
-          <span className="font-bold text-lg text-foreground">Garden Gourmet</span>
+          <img src={logoImg} alt="Atlas" className="h-8 w-8 rounded-lg object-contain" />
+          <span className="font-bold text-lg text-foreground">Atlas</span>
         </div>
 
         <div className="hidden md:flex items-center gap-8">

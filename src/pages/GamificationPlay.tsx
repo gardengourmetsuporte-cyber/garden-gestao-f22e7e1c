@@ -84,10 +84,10 @@ export default function GamificationPlay() {
       <div className="text-center mb-6">
         <img
           src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
-          alt="Garden Gourmet"
+          alt="Atlas"
           className="w-16 h-16 rounded-xl mx-auto mb-3 object-contain border border-border/20"
         />
-        <h1 className="text-2xl font-bold text-foreground">Garden Gourmet</h1>
+        <h1 className="text-2xl font-bold text-foreground">Atlas</h1>
         {phase === 'input' && (
           <p className="text-muted-foreground mt-1">
             Enquanto seu pedido fica pronto, gire a roleta 🎉
