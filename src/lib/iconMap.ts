@@ -218,4 +218,18 @@ export const ICON_MAP: Record<string, string> = {
   Bookmark: 'bookmark',
   Tag: 'label',
   Tags: 'sell',
+
+  // Additional
+  Bot: 'smart_toy',
+  Vault: 'lock',
+  CircleAlert: 'error',
+  CalendarRange: 'date_range',
+  CalendarIcon2: 'calendar_today',
+  Bath: 'bathtub',
+  WifiOff: 'wifi_off',
+  ToggleLeft: 'toggle_off',
+  ToggleRight: 'toggle_on',
+  Edit2: 'edit',
+  FileImage: 'image',
+  ImageIcon: 'image',
 };

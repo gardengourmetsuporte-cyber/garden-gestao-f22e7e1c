@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { AppRole } from '@/types/database';
-import { Users, Shield, User, Loader2, ChevronDown } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
-const ROLES: { value: AppRole; label: string; icon: React.ElementType }[] = [
-  { value: 'super_admin', label: 'Super Admin', icon: Shield },
-  { value: 'admin', label: 'Admin', icon: Shield },
-  { value: 'funcionario', label: 'Funcionário', icon: User },
+const ROLES: { value: AppRole; label: string; icon: string }[] = [
+  { value: 'super_admin', label: 'Super Admin', icon: 'Shield' },
+  { value: 'admin', label: 'Admin', icon: 'Shield' },
+  { value: 'funcionario', label: 'Funcionário', icon: 'User' },
 ];
 
 export function UserManagement() {
@@ -39,7 +39,7 @@ export function UserManagement() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <AppIcon name="progress_activity" size={24} className="animate-spin text-primary" />
       </div>
     );
   }
@@ -47,7 +47,7 @@ export function UserManagement() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <Users className="w-5 h-5 text-primary" />
+        <AppIcon name="Users" size={20} className="text-primary" />
         <h3 className="font-semibold text-foreground">Gerenciar Usuários</h3>
       </div>
 
@@ -57,16 +57,13 @@ export function UserManagement() {
 
       <div className="space-y-2">
         {users.map((user) => (
-          <div
-            key={user.id}
-            className="flex items-center justify-between p-3 rounded-xl bg-secondary/50"
-          >
+          <div key={user.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                 {user.role === 'admin' || user.role === 'super_admin' ? (
-                  <Shield className="w-5 h-5 text-primary" />
+                  <AppIcon name="Shield" size={20} className="text-primary" />
                 ) : (
-                  <User className="w-5 h-5 text-muted-foreground" />
+                  <AppIcon name="User" size={20} className="text-muted-foreground" />
                 )}
               </div>
               <div>
@@ -78,14 +75,14 @@ export function UserManagement() {
             </div>
             <div className="flex items-center gap-2">
               {updatingUser === user.user_id ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <AppIcon name="progress_activity" size={16} className="animate-spin" />
               ) : (
                 <button
                   onClick={() => setRoleDialogUser(user)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-border text-sm font-medium hover:bg-secondary transition-colors"
                 >
                   {getRoleLabel(user.role)}
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
                 </button>
               )}
             </div>
@@ -105,7 +102,6 @@ export function UserManagement() {
           </DialogHeader>
           <div className="space-y-2 pt-2">
             {ROLES.map((role) => {
-              const Icon = role.icon;
               const isActive = roleDialogUser?.role === role.value;
               return (
                 <button
@@ -118,7 +114,7 @@ export function UserManagement() {
                       : "bg-secondary/50 hover:bg-secondary border border-transparent"
                   )}
                 >
-                  <Icon className="w-5 h-5" />
+                  <AppIcon name={role.icon} size={20} />
                   <span className="font-medium text-sm">{role.label}</span>
                 </button>
               );

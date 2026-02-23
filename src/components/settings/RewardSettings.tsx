@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Plus, Pencil, Trash2, Check, X, Star, Package, Upload, ImageIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -256,11 +256,11 @@ export function RewardSettings() {
       <Tabs defaultValue="products" className="space-y-4">
         <TabsList>
           <TabsTrigger value="products" className="gap-2">
-            <Package className="w-4 h-4" />
+            <AppIcon name="Package" size={16} />
             Produtos
           </TabsTrigger>
           <TabsTrigger value="pending" className="gap-2">
-            <Star className="w-4 h-4" />
+            <AppIcon name="Star" size={16} />
             Pendentes
             {pendingRedemptions.length > 0 && (
               <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
@@ -273,7 +273,7 @@ export function RewardSettings() {
         <TabsContent value="products" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={openCreateDialog} className="gap-2">
-              <Plus className="w-4 h-4" />
+              <AppIcon name="Plus" size={16} />
               Novo Produto
             </Button>
           </div>
@@ -304,7 +304,7 @@ export function RewardSettings() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
-                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                        <AppIcon name="Star" size={16} className="text-amber-500" fill={1} />
                         {product.points_cost}
                       </div>
                     </TableCell>
@@ -323,7 +323,7 @@ export function RewardSettings() {
                           size="icon"
                           onClick={() => openEditDialog(product)}
                         >
-                          <Pencil className="w-4 h-4" />
+                          <AppIcon name="Pencil" size={16} />
                         </Button>
                         <Button
                           variant="ghost"
@@ -331,7 +331,7 @@ export function RewardSettings() {
                           onClick={() => handleDelete(product.id)}
                           className="text-destructive hover:text-destructive"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <AppIcon name="Trash2" size={16} />
                         </Button>
                       </div>
                     </TableCell>
@@ -375,7 +375,7 @@ export function RewardSettings() {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
-                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                        <AppIcon name="Star" size={16} className="text-amber-500" fill={1} />
                         {redemption.points_spent}
                       </div>
                     </TableCell>
@@ -413,7 +413,7 @@ export function RewardSettings() {
                               onClick={() => handleApprove(redemption)}
                               className="text-green-600 hover:text-green-700 hover:bg-green-50"
                             >
-                              <Check className="w-4 h-4" />
+                              <AppIcon name="Check" size={16} />
                             </Button>
                             <Button
                               variant="ghost"
@@ -421,7 +421,7 @@ export function RewardSettings() {
                               onClick={() => handleReject(redemption)}
                               className="text-destructive hover:text-destructive"
                             >
-                              <X className="w-4 h-4" />
+                              <AppIcon name="X" size={16} />
                             </Button>
                           </>
                         )}
@@ -442,7 +442,7 @@ export function RewardSettings() {
                           className="text-muted-foreground hover:text-destructive"
                           title="Excluir resgate"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <AppIcon name="Trash2" size={16} />
                         </Button>
                       </div>
                     </TableCell>
@@ -545,7 +545,7 @@ export function RewardSettings() {
                     onClick={handleRemoveImage}
                     className="absolute top-2 right-2"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <AppIcon name="Trash2" size={16} />
                   </Button>
                 </div>
               ) : (
@@ -562,7 +562,7 @@ export function RewardSettings() {
                     </>
                   ) : (
                     <>
-                      <Upload className="w-8 h-8 text-muted-foreground" />
+                      <AppIcon name="Upload" size={32} className="text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Clique para adicionar imagem</span>
                       <span className="text-xs text-muted-foreground/70">PNG, JPG até 5MB</span>
                     </>

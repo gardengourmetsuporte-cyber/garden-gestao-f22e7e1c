@@ -3,23 +3,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTimeAlertSettings, getDefaultSettings } from '@/hooks/useTimeAlertSettings';
-import { DollarSign, ClipboardCheck, Vault, AlertTriangle, CircleAlert } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { useCallback } from 'react';
 
 interface ModuleConfig {
   key: string;
   label: string;
-  icon: React.ElementType;
+  icon: string;
   hasWarning: boolean;
   warningLabel: string;
   criticalLabel: string;
 }
 
 const MODULES: ModuleConfig[] = [
-  { key: 'finance', label: 'Financeiro', icon: DollarSign, hasWarning: true, warningLabel: 'Aviso (laranja)', criticalLabel: 'Crítico (vermelho)' },
-  { key: 'checklist_abertura', label: 'Checklist Abertura', icon: ClipboardCheck, hasWarning: true, warningLabel: 'Aviso', criticalLabel: 'Crítico' },
-  { key: 'checklist_fechamento', label: 'Checklist Fechamento', icon: ClipboardCheck, hasWarning: true, warningLabel: 'Aviso', criticalLabel: 'Crítico' },
-  { key: 'cash_closing', label: 'Fechamento de Caixa', icon: Vault, hasWarning: false, warningLabel: '', criticalLabel: 'Crítico' },
+  { key: 'finance', label: 'Financeiro', icon: 'DollarSign', hasWarning: true, warningLabel: 'Aviso (laranja)', criticalLabel: 'Crítico (vermelho)' },
+  { key: 'checklist_abertura', label: 'Checklist Abertura', icon: 'ClipboardCheck', hasWarning: true, warningLabel: 'Aviso', criticalLabel: 'Crítico' },
+  { key: 'checklist_fechamento', label: 'Checklist Fechamento', icon: 'ClipboardCheck', hasWarning: true, warningLabel: 'Aviso', criticalLabel: 'Crítico' },
+  { key: 'cash_closing', label: 'Fechamento de Caixa', icon: 'Vault', hasWarning: false, warningLabel: '', criticalLabel: 'Crítico' },
 ];
 
 function hourToTime(hour: number | null): string {
@@ -59,14 +59,13 @@ export function TimeAlertSettings() {
       {MODULES.map((mod) => {
         const setting = settings[mod.key];
         const def = defaults[mod.key];
-        const Icon = mod.icon;
 
         return (
           <Card key={mod.key} className="border-border/50">
             <CardHeader className="pb-3 pt-4 px-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
+                  <AppIcon name={mod.icon} size={16} className="text-muted-foreground" />
                   <CardTitle className="text-sm font-medium">{mod.label}</CardTitle>
                 </div>
                 <Switch
@@ -80,7 +79,7 @@ export function TimeAlertSettings() {
               <CardContent className="px-4 pb-4 pt-0 space-y-3">
                 {mod.hasWarning && (
                   <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-4 h-4 text-warning shrink-0" />
+                    <AppIcon name="AlertTriangle" size={16} className="text-warning shrink-0" />
                     <Label className="text-xs text-muted-foreground w-24 shrink-0">{mod.warningLabel}</Label>
                     <Input
                       type="time"
@@ -92,7 +91,7 @@ export function TimeAlertSettings() {
                   </div>
                 )}
                 <div className="flex items-center gap-3">
-                  <CircleAlert className="w-4 h-4 text-destructive shrink-0" />
+                  <AppIcon name="CircleAlert" size={16} className="text-destructive shrink-0" />
                   <Label className="text-xs text-muted-foreground w-24 shrink-0">{mod.criticalLabel}</Label>
                   <Input
                     type="time"

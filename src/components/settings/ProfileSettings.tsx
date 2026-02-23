@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Camera, Save, Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 
 export function ProfileSettings() {
@@ -110,18 +110,13 @@ export function ProfileSettings() {
 
   return (
     <div className="space-y-6">
-      {/* Avatar Section */}
       <div className="flex items-center gap-4">
         <div className="relative">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border-2 border-primary/20">
             {displayAvatar ? (
-              <img 
-                src={displayAvatar} 
-                alt="Avatar" 
-                className="w-full h-full object-cover"
-              />
+              <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <User className="w-10 h-10 text-primary" />
+              <AppIcon name="User" size={40} className="text-primary" />
             )}
           </div>
           <button
@@ -130,26 +125,17 @@ export function ProfileSettings() {
             disabled={isUploading}
           >
             {isUploading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <AppIcon name="progress_activity" size={16} className="animate-spin" />
             ) : (
-              <Camera className="w-4 h-4" />
+              <AppIcon name="Camera" size={16} />
             )}
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
         </div>
         <div>
           <h3 className="font-semibold text-foreground">{profile?.full_name}</h3>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="text-xs text-primary hover:underline mt-1"
-          >
+          <button onClick={() => fileInputRef.current?.click()} className="text-xs text-primary hover:underline mt-1">
             Alterar foto
           </button>
         </div>
@@ -158,26 +144,17 @@ export function ProfileSettings() {
       <div className="space-y-4">
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
-            <User className="w-4 h-4" />
+            <AppIcon name="User" size={16} />
             Nome Completo
           </Label>
-          <Input
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Seu nome completo"
-            className="h-12"
-          />
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Seu nome completo" className="h-12" />
         </div>
 
-        <Button
-          onClick={handleSave}
-          disabled={!fullName.trim() || isSaving || isUploading}
-          className="w-full h-12 gap-2"
-        >
+        <Button onClick={handleSave} disabled={!fullName.trim() || isSaving || isUploading} className="w-full h-12 gap-2">
           {isSaving ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <AppIcon name="progress_activity" size={16} className="animate-spin" />
           ) : (
-            <Save className="w-4 h-4" />
+            <AppIcon name="Save" size={16} />
           )}
           {isSaving ? 'Salvando...' : 'Salvar Alterações'}
         </Button>
