@@ -44,18 +44,30 @@ export default function Plans() {
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
       if (error) {
-        // Manual override accounts don't have a Stripe customer
-        if (String(error).includes('No Stripe customer')) {
+        // Try to read error body for manual override accounts
+        const errorText = typeof error === 'object' && error.context?.body
+          ? await new Response(error.context.body).text()
+          : String(error);
+        if (errorText.includes('No Stripe customer')) {
           toast.info('Seu plano foi ativado manualmente. Entre em contato com o suporte para alterações.');
           return;
         }
         throw error;
       }
+      if (data?.error && String(data.error).includes('No Stripe customer')) {
+        toast.info('Seu plano foi ativado manualmente. Entre em contato com o suporte para alterações.');
+        return;
+      }
       if (!data?.url) throw new Error('URL do portal não retornada');
       window.open(data.url, '_blank');
     } catch (err: any) {
       console.error('Portal error:', err);
-      toast.error('Erro ao abrir gerenciamento.');
+      const msg = err?.message || String(err);
+      if (msg.includes('No Stripe customer') || msg.includes('non-2xx')) {
+        toast.info('Seu plano foi ativado manualmente. Entre em contato com o suporte para alterações.');
+      } else {
+        toast.error('Erro ao abrir gerenciamento.');
+      }
     } finally {
       setPortalLoading(false);
     }
