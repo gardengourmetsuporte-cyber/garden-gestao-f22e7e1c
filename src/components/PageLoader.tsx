@@ -19,7 +19,7 @@ export function PageLoader() {
         <div className="absolute inset-2 rounded-full overflow-hidden bg-card border border-border/30 flex items-center justify-center">
           <img
             alt="Atlas"
-            className="w-full h-full object-contain p-1"
+            className="w-full h-full object-contain rounded-full p-1"
             src={atlasIcon}
           />
         </div>
