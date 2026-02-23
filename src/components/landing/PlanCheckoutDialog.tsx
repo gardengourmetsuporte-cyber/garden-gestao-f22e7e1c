@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Check, ArrowRight } from "lucide-react";
+import { X, Check, ArrowRight, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface PlanCheckoutDialogProps {
   plan: {
@@ -19,11 +21,36 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const price = yearly ? plan.yearly : plan.monthly;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(`/auth?plan=${plan.id}&billing=${yearly ? "yearly" : "monthly"}`);
+
+    if (plan.id === "free") {
+      navigate(`/auth?plan=${plan.id}&billing=${yearly ? "yearly" : "monthly"}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
+        body: {
+          planId: plan.id,
+          billing: yearly ? "yearly" : "monthly",
+          email,
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.url) throw new Error("URL de checkout não retornada");
+
+      window.location.href = data.url;
+    } catch (err: any) {
+      console.error("Stripe checkout error:", err);
+      toast.error("Erro ao iniciar pagamento. Tente novamente.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,15 +111,25 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
           </div>
           <button
             type="submit"
-            className="w-full h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
+            disabled={loading}
+            className="w-full h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none"
             style={{
               background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
               color: "white",
               boxShadow: "0 0 20px hsl(var(--neon-cyan) / 0.3)",
             }}
           >
-            {plan.id === "free" ? "Criar conta grátis" : "Ir para cadastro"}
-            <ArrowRight className="w-4 h-4" />
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Redirecionando...
+              </>
+            ) : (
+              <>
+                {plan.id === "free" ? "Criar conta grátis" : "Ir para pagamento"}
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </form>
       </div>
