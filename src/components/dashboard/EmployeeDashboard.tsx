@@ -6,9 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
-import { AgendaDashboardWidget } from './AgendaDashboardWidget';
 import { cn } from '@/lib/utils';
-import { UnifiedCalendarWidget } from './UnifiedCalendarWidget';
+
 
 export function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -74,20 +73,10 @@ export function EmployeeDashboard() {
         </button>
       </div>
 
-      {/* Unified Calendar */}
-      <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-3">
-        <div className="card-press min-w-0 overflow-hidden">
-          <UnifiedCalendarWidget />
-        </div>
-      </div>
-
       {/* Personal Expense Chart */}
-      <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-4">
+      <div className="animate-spring-in spring-stagger-3">
         <div className="card-press min-w-0 overflow-hidden">
           <PersonalFinanceChartWidget />
-        </div>
-        <div className="card-press min-w-0 overflow-hidden">
-          <AgendaDashboardWidget />
         </div>
       </div>
 
