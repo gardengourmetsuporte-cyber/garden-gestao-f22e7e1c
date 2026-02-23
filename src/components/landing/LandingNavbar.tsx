@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import logoImg from "@/assets/atlas-icon.png";
 
 export function LandingNavbar() {
@@ -45,7 +46,8 @@ export function LandingNavbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
           <Link
             to="/auth"
             className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold border border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
