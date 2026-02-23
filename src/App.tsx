@@ -74,6 +74,7 @@ const Gamification = lazy(() => lazyRetry(() => import("./pages/Gamification")))
 const GamificationPlay = lazy(() => lazyRetry(() => import("./pages/GamificationPlay")));
 const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 const Onboarding = lazy(() => lazyRetry(() => import("./pages/Onboarding")));
+const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -324,6 +325,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Gamification />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/plans"
+          element={
+            <ProtectedRoute>
+              <Plans />
             </ProtectedRoute>
           }
         />

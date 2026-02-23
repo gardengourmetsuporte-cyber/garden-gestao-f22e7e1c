@@ -1,5 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
@@ -30,6 +31,7 @@ interface MenuItem {
 }
 
 const allMenuItems: MenuItem[] = [
+  { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta' },
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
   { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta' },
   { value: 'users', icon: 'Users', label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
@@ -57,9 +59,11 @@ const variantBorderColors: Record<string, string> = {
 
 export default function SettingsPage() {
   const { isAdmin, isSuperAdmin } = useAuth();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const menuItems = allMenuItems.filter(item => {
+    if (item.value === 'plan') return true; // always visible
     if (item.value === 'units') return isSuperAdmin;
     if (item.value === 'team') return isAdmin;
     if (item.value === 'alerts') return isAdmin;
@@ -69,6 +73,14 @@ export default function SettingsPage() {
     if (item.value === 'profile' || item.value === 'notifications') return true;
     return isAdmin;
   });
+
+  const handleSectionClick = (value: string) => {
+    if (value === 'plan') {
+      navigate('/plans');
+      return;
+    }
+    setActiveSection(value);
+  };
 
   // Group by section
   const sections: { label: string; items: MenuItem[] }[] = [];
@@ -140,7 +152,7 @@ export default function SettingsPage() {
                   return (
                     <button
                       key={item.value}
-                      onClick={() => setActiveSection(item.value)}
+                      onClick={() => handleSectionClick(item.value)}
                       className={cn(
                         "list-command w-full flex items-center gap-3 p-4 text-left",
                         `animate-slide-up stagger-${index + 1}`

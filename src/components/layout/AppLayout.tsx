@@ -17,6 +17,8 @@ import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
 import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { getModuleKeyFromRoute } from '@/lib/modules';
+import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
+import type { PlanTier } from '@/lib/plans';
 import { useTimeAlerts } from '@/hooks/useTimeAlerts';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
@@ -47,17 +49,18 @@ const navItems: NavItem[] = [
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
+  { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Users', label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
-  
+  { icon: 'Trophy', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', group: 'premium', groupLabel: 'Premium' },
+  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Bell', label: 'Central de Alertas', href: '/alerts', group: 'config', groupLabel: 'Sistema' },
   { icon: 'Settings', label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
-  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
-  { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
-  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
-  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
-  { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'em_producao', groupLabel: 'Em Produção' },
 ];
 
 function AppLayoutContent({ children }: AppLayoutProps) {
@@ -68,7 +71,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { user, profile, isAdmin, isSuperAdmin, signOut } = useAuth();
+  const { user, profile, isAdmin, isSuperAdmin, signOut, plan } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
@@ -89,15 +92,25 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   };
 
   const { hasAccess } = useUserModules();
+
+  // Check if a module is locked by plan
+  const isModuleLocked = (href: string): boolean => {
+    const moduleKey = getModuleKeyFromRoute(href);
+    if (!moduleKey) return false;
+    const required = MODULE_REQUIRED_PLAN[moduleKey];
+    if (!required) return false;
+    return !planSatisfies(plan, required);
+  };
+
   const filteredNavItems = navItems.filter(item => {
-    // "Em Produção" modules are only visible to super_admins
-    if (item.group === 'em_producao' && !isSuperAdmin) return false;
+    // Premium modules visible to admins (with lock if needed)
+    if (item.group === 'premium') {
+      if (!isAdmin && !isSuperAdmin) return false;
+      return true; // Show with lock icon if plan doesn't match
+    }
     const moduleKey = getModuleKeyFromRoute(item.href);
-    // If module is explicitly granted by access level, show it regardless of adminOnly
     if (moduleKey && hasAccess(moduleKey)) return true;
-    // If adminOnly and user is not admin, hide it
     if (item.adminOnly && !isAdmin) return false;
-    // If module key exists but user doesn't have access, hide it
     if (moduleKey && !hasAccess(moduleKey)) return false;
     return true;
   });
@@ -347,12 +360,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     const showBadge = (item.href === '/' && unreadCount > 0) || (item.href === '/chat' && chatUnreadCount > 0);
                     const badgeCount = item.href === '/chat' ? chatUnreadCount : unreadCount;
                     const moduleStatus = moduleStatuses[item.href];
-                    const isEmProducao = item.group === 'em_producao';
+                    const locked = isModuleLocked(item.href);
 
                     return (
                       <Link
                         key={item.href}
-                        to={item.href}
+                        to={locked ? '/plans' : item.href}
                         onClick={() => setLauncherOpen(false)}
                         className="flex flex-col items-center gap-1.5 active:scale-90 transition-all duration-150 w-16"
                       >
@@ -369,9 +382,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                boxShadow: isActive
                                  ? '0 4px 16px hsl(var(--primary) / 0.4)'
                                  : 'var(--shadow-card)',
-                               opacity: isEmProducao && !isActive ? 0.8 : 1,
-                               border: isEmProducao && !isActive
-                                 ? '1px dashed hsl(var(--neon-amber) / 0.5)'
+                               opacity: locked ? 0.6 : 1,
+                               border: locked
+                                 ? '1px dashed hsl(var(--primary) / 0.4)'
                                  : isActive ? 'none' : '1px solid hsl(var(--border))',
                              }}
                            >
@@ -382,18 +395,24 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                                style={{
                                  color: isActive
                                    ? undefined
-                                   : isEmProducao
-                                     ? 'hsl(var(--neon-amber))'
+                                   : locked
+                                     ? 'hsl(var(--muted-foreground))'
                                      : undefined,
                                  filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
                                }}
                              />
                           </div>
 
-                          {/* Em Produção indicator */}
-                          {isEmProducao && !isActive && (
-                            <span className="absolute -top-1.5 -right-1.5 text-[10px] leading-none">
-                              🚧
+                          {/* Lock indicator for premium modules */}
+                          {locked && (
+                            <span
+                              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
+                              style={{
+                                background: 'hsl(var(--primary) / 0.15)',
+                                border: '1.5px solid hsl(var(--primary) / 0.4)',
+                              }}
+                            >
+                              <AppIcon name="Lock" size={10} className="text-primary" />
                             </span>
                           )}
 
@@ -404,7 +423,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               {badgeCount > 9 ? '9+' : badgeCount}
                             </span>
                           )}
-                          {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
+                          {!locked && moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
                             <span
                               className={cn(
                                 "absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center",
@@ -419,7 +438,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
                             </span>
                           )}
-                          {moduleStatus && moduleStatus.level === 'ok' && (
+                          {!locked && moduleStatus && moduleStatus.level === 'ok' && (
                             <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{
                               background: 'hsl(var(--neon-green))',
                               boxShadow: '0 0 6px hsl(var(--neon-green) / 0.5)',
@@ -428,8 +447,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                           )}
                         </div>
                          <span
-                           className="text-[11px] font-semibold leading-tight max-w-full truncate transition-colors text-foreground/80"
-                           style={isActive ? { color: 'hsl(var(--primary))' } : undefined}
+                           className="text-[11px] font-semibold leading-tight max-w-full truncate transition-colors"
+                           style={{
+                             color: isActive ? 'hsl(var(--primary))' : locked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground) / 0.8)',
+                           }}
                          >{item.label}</span>
                       </Link>
                     );
@@ -506,30 +527,30 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 const showBadge = (item.href === '/chat' && chatUnreadCount > 0);
                 const badgeCount = chatUnreadCount;
                 const moduleStatus = moduleStatuses[item.href];
-                const isEmProducao = item.group === 'em_producao';
+                const locked = isModuleLocked(item.href);
 
                 return (
                   <Link
                     key={item.href}
-                    to={item.href}
+                    to={locked ? '/plans' : item.href}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all relative",
                       isActive
                         ? "bg-primary/15 text-primary"
-                        : isEmProducao
-                          ? "text-muted-foreground/60 hover:text-foreground hover:bg-secondary/30"
+                        : locked
+                          ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-secondary/30"
                           : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                     )}
                   >
-                    <AppIcon name={item.icon} size={20} />
+                    <AppIcon name={item.icon} size={20} style={{ opacity: locked ? 0.5 : 1 }} />
                     <span className="truncate flex-1">{item.label}</span>
-                    {isEmProducao && !isActive && <span className="text-[10px]">🚧</span>}
+                    {locked && <AppIcon name="Lock" size={14} className="text-primary/60 shrink-0" />}
                     {showBadge && (
                       <span className="min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center bg-destructive text-destructive-foreground">
                         {badgeCount > 9 ? '9+' : badgeCount}
                       </span>
                     )}
-                    {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
+                    {!locked && moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
                       <span
                         className="min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center"
                         style={{

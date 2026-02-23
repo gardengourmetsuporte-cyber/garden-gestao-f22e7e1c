@@ -9,9 +9,12 @@ import { MarketingFeed } from '@/components/marketing/MarketingFeed';
 import { MarketingIdeasAI } from '@/components/marketing/MarketingIdeasAI';
 import { PostSheet } from '@/components/marketing/PostSheet';
 import { PublishActions } from '@/components/marketing/PublishActions';
+import { UpgradeWall } from '@/components/paywall/UpgradeWall';
+import { useAuth } from '@/contexts/AuthContext';
 import type { MarketingPost } from '@/types/marketing';
 
 export default function Marketing() {
+  const { hasPlan } = useAuth();
   const { posts, isLoading, createPost, updatePost, deletePost, markPublished, uploadMedia } = useMarketing();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<MarketingPost | null>(null);
@@ -20,6 +23,21 @@ export default function Marketing() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [prefillDate, setPrefillDate] = useState<Date | null>(null);
   const [prefillTitle, setPrefillTitle] = useState('');
+
+  if (!hasPlan('business')) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background pb-24">
+          <header className="page-header-bar">
+            <div className="page-header-content">
+              <h1 className="page-title">Marketing</h1>
+            </div>
+          </header>
+          <UpgradeWall moduleKey="marketing" moduleLabel="Marketing" />
+        </div>
+      </AppLayout>
+    );
+  }
 
   const handleEdit = (post: MarketingPost) => {
     setEditingPost(post);
