@@ -1,88 +1,124 @@
 
-# Melhorias de Estabilidade e Profissionalizacao - Fase 2
+# Ranking com Reset Mensal + Ranking Global vs Casa
 
-## Problemas Identificados na Inspecao
+## Resumo
 
-### 1. AppLayout carrega hooks pesados em TODAS as paginas (Impacto Alto)
-O `AppLayout` executa `useLeaderboard()`, `usePoints()`, `useModuleStatus()`, e `useTimeAlerts()` em toda pagina, mesmo quando o usuario esta em modulos como Financeiro ou Estoque. Isso gera 9+ queries simultaneas ao backend em cada navegacao.
-
-**Solucao:** Mover `useLeaderboard` para dentro dos componentes que realmente precisam dele (AdminDashboard, EmployeeDashboard, Ranking). No AppLayout, manter apenas o que e usado no header/launcher (points, moduleStatus).
-
-### 2. useBackGuard com bug de cleanup (Impacto Medio)
-O hook `useBackGuard` faz `window.history.back()` no cleanup quando o sheet fecha programaticamente. Isso pode causar navegacao indesejada se multiplos sheets usarem o hook simultaneamente ou se o usuario fechar rapido.
-
-**Solucao:** Usar um counter global ou verificar se o history state contem a tag `__backGuard` antes de chamar `back()`.
-
-### 3. Calendario Unificado nao mostra despesas de dias normais (Impacto Medio)
-O `useDashboardCalendar` so mostra dias com despesas acima de 2x a media. Dias com despesas normais (mas relevantes) ficam invisiveis. Alem disso, nao mostra receitas.
-
-**Solucao:** Mostrar TODAS as despesas no detalhe do dia (ao clicar), mas manter os chips coloridos apenas para picos. Adicionar receitas como tipo de evento tambem.
-
-### 4. EmployeeDashboard sem Calendario Unificado (Impacto Baixo)
-O calendario so aparece no AdminDashboard. Funcionarios nao veem suas tarefas/folgas no calendario.
-
-**Solucao:** Adicionar o `UnifiedCalendarWidget` tambem ao `EmployeeDashboard`.
-
-### 5. CSS com 1200+ linhas sem organizacao (Impacto Baixo, Manutencao)
-O arquivo `index.css` tem 1200+ linhas em um unico arquivo. Dificil de manter e pode causar conflitos.
-
-**Solucao:** Nao dividir agora (risco de regressao), mas adicionar comentarios de secao mais claros e remover classes duplicadas/nao usadas.
-
-### 6. Queries do useDashboardCalendar com filtros OR incorretos (Impacto Alto - Bug)
-A query de marketing_posts usa `.or()` encadeado de forma que pode retornar posts fora do mes selecionado. A logica de filtro `or(scheduled_at.gte, published_at.gte)` seguida de outro `or(scheduled_at.lte, published_at.lte)` nao garante intersecao correta.
-
-**Solucao:** Corrigir para usar um filtro combinado que busca posts onde `scheduled_at` OU `published_at` estejam dentro do range do mes.
-
-### 7. Falta loading state no UnifiedCalendarWidget (Impacto Baixo)
-O calendario nao mostra skeleton/loading enquanto os dados estao sendo carregados, causando um "salto" visual quando os chips aparecem.
-
-**Solucao:** Adicionar skeleton state baseado nos isLoading dos hooks internos.
+O sistema de ranking passa a ter dois modos de visualizacao e uma separacao clara entre **pontos de competicao** (mensais, resetam todo mes) e **pontos acumulados** (persistem para gastar na loja de recompensas).
 
 ---
 
-## Plano de Implementacao
+## Como vai funcionar
 
-### Fase 1: Corrigir bug de query do marketing no calendario
-- Editar `src/hooks/useDashboardCalendar.ts`
-- Substituir os `.or()` encadeados por um filtro unico que cobre ambas as datas dentro do range
+### Separacao de conceitos
 
-### Fase 2: Remover useLeaderboard do AppLayout
-- Editar `src/components/layout/AppLayout.tsx` -- remover import e uso de `useLeaderboard`
-- A posicao no ranking (`myPosition`) no header do trophy pode ser obtida de forma mais leve com uma query dedicada so para o user, ou removendo o badge de posicao do header
+| Conceito | Descricao | Reseta? |
+|----------|-----------|---------|
+| **Score mensal** | Pontos de tarefas + bonus do mes atual. Usado para definir o ranking e o Funcionario do Mes. | Sim, todo mes |
+| **Pontos acumulados** | Total historico de pontos ganhos menos pontos gastos. Usado para trocar por recompensas na loja. | Nao |
 
-### Fase 3: Melhorar useBackGuard
-- Editar `src/hooks/useBackGuard.ts`
-- Verificar `history.state.__backGuard` antes de fazer `back()` no cleanup para evitar navegacao acidental
+Isso ja funciona assim no sistema atual -- o `get_leaderboard_data` RPC ja filtra por mes. A mudanca principal e visual e de nomenclatura.
 
-### Fase 4: Mostrar todas despesas no detalhe do calendario
-- Editar `src/hooks/useDashboardCalendar.ts`
-- No detalhe do dia (ao clicar), listar todas as despesas daquele dia, nao so picos
-- Manter chips coloridos apenas para picos (comportamento atual)
+### Duas abas de Ranking
 
-### Fase 5: Adicionar calendario ao EmployeeDashboard
-- Editar `src/components/dashboard/EmployeeDashboard.tsx`
-- Adicionar `UnifiedCalendarWidget` no topo
+1. **Ranking da Casa** (padrao) -- mostra apenas funcionarios da unidade ativa (`activeUnitId`). E o comportamento atual.
+2. **Ranking Global** -- mostra funcionarios de TODAS as unidades do sistema, competindo entre si. Permite ver quem e o melhor entre todas as lojas.
 
-### Fase 6: Loading state no calendario
-- Editar `src/hooks/useDashboardCalendar.ts` -- retornar `isLoading`
-- Editar `src/components/dashboard/UnifiedCalendarWidget.tsx` -- mostrar skeleton durante carregamento
+### Funcionario do Mes
+
+O primeiro colocado no "Ranking da Casa" ao final do mes e o candidato ao titulo. O gestor pode conceder a medalha via `BonusPointSheet` com `badge_id: 'employee_of_month'`. Os pontos da premiacao se somam ao acumulado permanente.
 
 ---
 
-## Arquivos que serao editados
+## Plano de implementacao
+
+### 1. Criar funcao RPC `get_global_leaderboard_data`
+
+Uma nova funcao SQL que faz o mesmo que `get_leaderboard_data` mas sem filtrar por `unit_id`. Busca dados de completions, bonus e spent de TODAS as unidades.
+
+Parametros: `p_month_start date, p_month_end date` (sem `p_unit_id`).
+
+Retorna os mesmos campos: `user_id, earned_points, bonus_points, spent_points, earned_all_time`.
+
+### 2. Atualizar `useLeaderboard` com modo global
+
+Adicionar um parametro `scope: 'unit' | 'global'` ao hook. Quando `scope = 'global'`:
+- Chama `get_global_leaderboard_data` em vez de `get_leaderboard_data`
+- Busca perfis de todos os user_ids retornados (sem filtrar por `user_units` de uma unidade especifica)
+- Adiciona campo `unit_name` ao `LeaderboardEntry` para identificar de qual unidade o funcionario e
+
+**Arquivo:** `src/hooks/useLeaderboard.ts`
+
+### 3. Atualizar `Leaderboard` para mostrar unidade no modo global
+
+No modo global, cada entrada do ranking mostra um badge com o nome da unidade abaixo do nome do funcionario.
+
+**Arquivo:** `src/components/dashboard/Leaderboard.tsx`
+
+### 4. Atualizar `Ranking.tsx` com sub-abas no ranking
+
+Dentro da aba "Ranking", adicionar dois botoes de filtro: "Minha Casa" e "Global". Ao trocar, o leaderboard busca os dados do escopo correspondente.
+
+**Arquivo:** `src/pages/Ranking.tsx`
+
+### 5. Atualizar `MyRankCard` com labels claros
+
+Mostrar separadamente:
+- **Score do mes**: pontos de competicao (reseta)
+- **Saldo acumulado**: pontos disponiveis para gastar
+
+**Arquivo:** `src/components/ranking/MyRankCard.tsx`
+
+---
+
+## Detalhes tecnicos
+
+### Nova RPC: `get_global_leaderboard_data`
+
+```text
+Parametros: p_month_start date, p_month_end date
+Retorno: user_id uuid, earned_points bigint, bonus_points bigint, spent_points bigint, earned_all_time bigint, unit_id uuid
+
+Logica:
+- monthly_earned: SUM de checklist_completions WHERE date BETWEEN p_month_start AND p_month_end (sem filtro de unit_id)
+- all_time_earned: SUM de todas completions do usuario
+- bonus: SUM de bonus_points WHERE month = p_month_start
+- spent: SUM de reward_redemptions com status approved/delivered
+- Retorna tambem o unit_id principal do usuario (da tabela user_units WHERE is_default = true)
+```
+
+### Fetch global no hook
+
+O fetch global precisa:
+1. Chamar a RPC sem unit_id
+2. Buscar perfis de TODOS os user_ids retornados
+3. Buscar nomes das unidades para exibir badges
+4. Cache separado: queryKey `['leaderboard-global', month]`
+
+### Nao precisa mudar no banco
+
+- A tabela `bonus_points` ja armazena `badge_id = 'employee_of_month'` corretamente
+- O campo `month` ja isola os bonus por mes
+- A RPC existente ja calcula `earned_all_time` separado do mensal
+- O sistema de `reward_redemptions` ja desconta do saldo historico
+
+---
+
+## Arquivos
 
 | Arquivo | Acao |
 |---------|------|
-| `src/hooks/useDashboardCalendar.ts` | Editar -- corrigir query marketing, retornar despesas completas, expor isLoading |
-| `src/components/layout/AppLayout.tsx` | Editar -- remover useLeaderboard |
-| `src/hooks/useBackGuard.ts` | Editar -- verificar history state no cleanup |
-| `src/components/dashboard/EmployeeDashboard.tsx` | Editar -- adicionar calendario |
-| `src/components/dashboard/UnifiedCalendarWidget.tsx` | Editar -- skeleton loading |
+| Migracao SQL | Criar -- RPC `get_global_leaderboard_data` |
+| `src/hooks/useLeaderboard.ts` | Editar -- adicionar scope global, fetch de unidades, novo tipo com unit_name |
+| `src/components/dashboard/Leaderboard.tsx` | Editar -- mostrar badge de unidade no modo global |
+| `src/pages/Ranking.tsx` | Editar -- adicionar sub-abas "Minha Casa" / "Global" |
+| `src/components/ranking/MyRankCard.tsx` | Editar -- mostrar score mensal vs saldo acumulado separados |
 
-## Resultado Esperado
+---
 
-- Reducao de ~30% nas queries simultaneas ao navegar entre paginas
-- Zero navegacoes acidentais ao fechar sheets
-- Calendario mostrando dados financeiros completos ao detalhar o dia
-- Funcionarios com acesso ao calendario unificado
-- Transicao visual suave no carregamento do calendario
+## Resultado esperado
+
+- Ranking mensal reseta automaticamente (ja funcionava, agora fica explicito na UI)
+- Funcionarios veem claramente "score do mes" vs "saldo para gastar"
+- Aba "Global" permite competicao entre unidades com badge da casa de cada funcionario
+- Aba "Minha Casa" mantem o ranking interno da unidade (comportamento atual)
+- Funcionario do Mes continua sendo concedido pelo gestor via bonus com medalha
