@@ -1581,6 +1581,50 @@ export type Database = {
           },
         ]
       }
+      invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          email: string
+          expires_at: string | null
+          id: string
+          invited_by: string
+          role: string
+          token: string
+          unit_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          email: string
+          expires_at?: string | null
+          id?: string
+          invited_by: string
+          role?: string
+          token?: string
+          unit_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invited_by?: string
+          role?: string
+          token?: string
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manager_appointments: {
         Row: {
           created_at: string
@@ -3506,6 +3550,7 @@ export type Database = {
           created_at: string
           id: string
           is_default: boolean
+          role: string
           unit_id: string
           user_id: string
         }
@@ -3514,6 +3559,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_default?: boolean
+          role?: string
           unit_id: string
           user_id: string
         }
@@ -3522,6 +3568,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_default?: boolean
+          role?: string
           unit_id?: string
           user_id?: string
         }
@@ -3961,6 +4008,19 @@ export type Database = {
           spent_points: number
           unit_id: string
           user_id: string
+        }[]
+      }
+      get_invite_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          accepted_at: string
+          email: string
+          expires_at: string
+          id: string
+          role: string
+          token: string
+          unit_id: string
+          unit_name: string
         }[]
       }
       get_leaderboard_data: {
