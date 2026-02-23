@@ -99,7 +99,8 @@ export default function Invite() {
 
     setIsSubmitting(true);
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      console.log('[Invite] Attempting signUp for:', invite.email);
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: invite.email,
         password,
         options: {
@@ -108,18 +109,29 @@ export default function Invite() {
         },
       });
 
+      console.log('[Invite] signUp result:', { signUpData, signUpError });
+
       if (signUpError) {
         if (signUpError.message.includes('already registered')) {
           toast.error('Este email já possui conta. Faça login para aceitar o convite.');
           navigate(`/auth?token=${token}`);
           return;
         }
-        throw signUpError;
+        toast.error(`Erro: ${signUpError.message}`);
+        return;
+      }
+
+      // Check if user was actually created or if it's a fake success (user already exists with unconfirmed email)
+      if (signUpData?.user?.identities?.length === 0) {
+        toast.error('Este email já possui conta. Faça login para aceitar o convite.');
+        navigate(`/auth?token=${token}`);
+        return;
       }
 
       setSignupDone(true);
       toast.success('Conta criada! Verifique seu email para confirmar.');
     } catch (err: any) {
+      console.error('[Invite] signUp catch error:', err);
       toast.error(err.message || 'Erro ao criar conta.');
     } finally {
       setIsSubmitting(false);
