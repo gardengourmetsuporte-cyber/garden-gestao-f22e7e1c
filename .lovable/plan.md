@@ -1,137 +1,63 @@
 
-# Estrutura Completa SaaS - Planos, Paywall e Gerenciamento
+
+# Modernizacao Visual Completa do Atlas
 
 ## Resumo
-Transformar o Atlas em um SaaS completo com: verificacao de assinatura via Stripe, paywall nos modulos premium, pagina de planos dentro do app, gerenciamento de assinatura (portal Stripe), e Marketing visivel mas bloqueado para usuarios FREE.
+Vamos fazer uma reformulacao visual em 4 frentes: trocar a biblioteca de icones para **Material Symbols Rounded** (versao moderna e variavel do Google), refinar cards e componentes, ajustar cores/gradientes e melhorar tipografia. O resultado sera um visual mais limpo, leve e premium em todo o sistema.
 
-## O que muda
+## O que muda na pratica
 
-### 1. Edge Function: check-subscription
-Nova funcao que consulta o Stripe para verificar se o usuario tem assinatura ativa. Retorna o plano (pro/business), status e data de expiracao. Chamada no login, ao abrir o app e periodicamente.
+### 1. Icones - Material Symbols Rounded (variavel)
+Os icones atuais usam "Material Icons Round" (versao antiga, pesada e sem variacao). Vamos trocar para **Material Symbols Rounded**, que sao a versao moderna com controle de peso (weight), preenchimento (fill) e grade -- icones muito mais finos, elegantes e contemporaneos.
 
-### 2. Edge Function: customer-portal
-Nova funcao que cria uma sessao do Stripe Customer Portal para o usuario gerenciar sua assinatura (cancelar, trocar cartao, mudar plano).
+- Trocar o link do Google Fonts no `index.html` para Material Symbols Rounded com eixos variaveis (weight 300-500, optical size 24, fill 0)
+- Atualizar o componente `AppIcon` para usar a classe `material-symbols-rounded` com `font-variation-settings` configuravel
+- Atualizar o `iconMap.ts` com nomes corretos para Material Symbols (a maioria e compativel, alguns precisam de ajuste)
+- Migrar os ~99 arquivos que importam Lucide diretamente para usar `AppIcon` (em lotes progressivos, priorizando dashboard, layout e paginas principais)
 
-### 3. AuthContext - Subscription State
-Adicionar campos `plan`, `planStatus` e `subscriptionEnd` ao AuthContext. Apos o login e a cada 60s, chamar `check-subscription` e atualizar o estado global. Helpers: `isPro`, `isBusiness`, `isFree`.
+### 2. Cards e Componentes
+- Aumentar o `border-radius` base de `0.875rem` para `1rem`
+- Cards com borda sutil (`border: 1px solid hsl(var(--border) / 0.5)`) em vez de depender so de sombra
+- Hover mais suave nos cards interativos (sem translateY, apenas sombra e borda)
+- Botoes com border-radius maior e transicao de escala mais sutil
+- Inputs com fundo mais neutro e borda mais visivel
 
-### 4. Pagina /plans - Planos dentro do App
-Nova pagina acessivel de dentro do sistema (protegida por auth) que mostra os planos Pro e Business com o mesmo visual da landing page. Se o usuario ja tem plano, destaca o atual. Botao "Gerenciar Assinatura" abre o portal Stripe.
+### 3. Cores e Gradientes
+- Dark mode: fundo ligeiramente mais quente (`226 15% 6%`) para menos "apagado"
+- Cards dark: elevar levemente (`226 14% 10%`) para mais contraste com o fundo
+- Reduzir intensidade dos glows neon (de 0.25 para 0.15 de opacidade) para visual mais sofisticado
+- FAB e gradientes: manter mas com transicoes mais suaves
+- Light mode: card com sombra mais presente para dar profundidade
 
-### 5. Paywall no Marketing (e modulos premium)
-- Remover Marketing do grupo `em_producao` (que e exclusivo super_admin) e mover para um grupo visivel como `premium`
-- No menu do App Launcher, Marketing aparece para todos com um icone de cadeado se o usuario for FREE
-- Ao clicar no Marketing sendo FREE, redireciona para /plans em vez de abrir o modulo
-- Na rota /marketing, verificar o plano e mostrar tela de upgrade se FREE
-
-### 6. Componente UpgradeWall
-Componente reutilizavel que exibe uma tela bonita de "Desbloqueie este recurso" com botao para ir aos planos. Sera usado no Marketing e pode ser reaproveitado em outros modulos futuramente.
-
-### 7. Link para Planos nas Configuracoes
-Adicionar item "Meu Plano" na secao Conta das configuracoes, mostrando o plano atual e link para a pagina de planos/gerenciamento.
+### 4. Tipografia e Espacamento
+- Titulos de pagina: de `text-lg` para `text-xl` com `font-extrabold` (mais impacto)
+- Subtitulos: letter-spacing levemente negativo para visual mais moderno
+- Espacamento entre secoes: padronizar em `space-y-5` (um pouco mais respiro)
+- Labels de secao: tracking mais estreito e cor ligeiramente mais forte
 
 ---
 
-## Detalhes Tecnicos
+## Detalhes tecnicos
 
-### Novos Arquivos
+### Arquivos principais afetados
 
-**supabase/functions/check-subscription/index.ts**
-- Recebe JWT do usuario, busca email, consulta Stripe customers e subscriptions
-- Retorna: `{ subscribed, plan, subscription_end }`
-- Atualiza `profiles.plan` e `profiles.plan_status` no banco
+| Arquivo | Mudanca |
+|---|---|
+| `index.html` | Trocar link Google Fonts para Material Symbols Rounded |
+| `src/components/ui/app-icon.tsx` | Classe CSS e font-variation-settings |
+| `src/lib/iconMap.ts` | Revisar ~10 nomes que mudaram entre versoes |
+| `src/index.css` | Tokens de cor, radius, sombras, glow, tipografia |
+| `tailwind.config.ts` | Atualizar radius base |
+| ~99 arquivos com `lucide-react` | Migrar para `AppIcon` (em lotes) |
 
-**supabase/functions/customer-portal/index.ts**
-- Recebe JWT, busca customer no Stripe pelo email
-- Cria sessao do billing portal, retorna URL
+### Estrategia de migracao dos icones Lucide
+Como sao 99 arquivos, a migracao sera feita em 3 lotes:
+1. **Lote 1**: Layout, Dashboard, Pages principais (~20 arquivos)
+2. **Lote 2**: Components de modulos (finance, inventory, employees) (~40 arquivos)
+3. **Lote 3**: Settings, UI components, restante (~39 arquivos)
 
-**src/pages/Plans.tsx**
-- Pagina com os planos (reutiliza logica do PricingSection)
-- Mostra plano atual do usuario com badge "Seu Plano"
-- Botao "Gerenciar Assinatura" para quem ja e premium
-- Botao "Assinar" para FREE (abre checkout Stripe)
+### Compatibilidade
+- Material Symbols Rounded usa os mesmos nomes que Material Icons Round na maioria dos casos
+- O `iconMap.ts` ja mapeia Lucide -> Material, entao a migracao de Lucide para AppIcon e direta
+- Nenhuma dependencia nova precisa ser instalada (fonte via CDN)
 
-**src/components/paywall/UpgradeWall.tsx**
-- Componente fullscreen com icone de cadeado, titulo do modulo, beneficios e CTA
-- Botao leva para /plans
-
-### Arquivos Modificados
-
-**src/contexts/AuthContext.tsx**
-- Adicionar `plan`, `planStatus`, `isPro`, `isBusiness`, `isFree` ao contexto
-- Ler plan do profile inicialmente (cache rapido)
-- Chamar check-subscription apos login e a cada 60 segundos
-- Expor funcao `refreshSubscription` para forcar re-check
-
-**src/App.tsx**
-- Adicionar rota `/plans` (protegida)
-
-**src/components/layout/AppLayout.tsx**
-- Mudar Marketing de `em_producao` para grupo visivel (ex: `gestao` ou novo grupo `marketing`)
-- Remover `adminOnly` do Marketing
-- Adicionar logica: se `isFree` e clica em modulo premium, navega para /plans
-- Exibir icone de cadeado (Lock) ao lado de modulos bloqueados
-
-**src/pages/Marketing.tsx**
-- Antes de renderizar conteudo, verificar se `isFree`
-- Se FREE, renderizar `<UpgradeWall module="Marketing" />`
-
-**src/pages/Settings.tsx**
-- Adicionar item "Meu Plano" na secao Conta com variant 'cyan'
-
-**src/lib/modules.ts**
-- Adicionar campo `requiredPlan` opcional aos modulos (ex: marketing requer 'business')
-
-### Fluxo do Usuario
-
-```text
-Usuario FREE abre o app
-  -> Ve Marketing no menu com cadeado
-  -> Clica em Marketing
-  -> Ve tela de UpgradeWall
-  -> Clica "Ver Planos"
-  -> Pagina /plans com Pro e Business
-  -> Clica "Assinar Pro"
-  -> Stripe Checkout (nova aba)
-  -> Paga e volta
-  -> check-subscription atualiza o plano
-  -> Marketing desbloqueado
-
-Usuario Premium
-  -> Ve Marketing sem cadeado
-  -> Acessa normalmente
-  -> Em Configuracoes > Meu Plano > "Gerenciar"
-  -> Abre Stripe Customer Portal
-  -> Pode cancelar, trocar cartao, etc.
-```
-
-### Mapeamento de Planos x Modulos
-
-```text
-+--------------------+--------+---------+----------+
-| Modulo             | Free   | Pro     | Business |
-+--------------------+--------+---------+----------+
-| Dashboard          | Sim    | Sim     | Sim      |
-| Estoque            | Sim    | Sim     | Sim      |
-| Checklists         | Sim    | Sim     | Sim      |
-| Fechamento Caixa   | Sim    | Sim     | Sim      |
-| Financeiro         | Sim    | Sim     | Sim      |
-| Funcionarios       | Sim    | Sim     | Sim      |
-| Recompensas        | Sim    | Sim     | Sim      |
-| Ranking            | Sim    | Sim     | Sim      |
-| Fichas Tecnicas    | Nao    | Sim     | Sim      |
-| Marketing          | Nao    | Nao     | Sim      |
-| Copilot IA         | Nao    | Nao     | Sim      |
-| WhatsApp Bot       | Nao    | Nao     | Sim      |
-| Cardapio Digital   | Nao    | Nao     | Sim      |
-| Tablets (Pedidos)  | Nao    | Nao     | Sim      |
-| Gamificacao        | Nao    | Nao     | Sim      |
-| Financas Pessoais  | Nao    | Sim     | Sim      |
-+--------------------+--------+---------+----------+
-```
-
-### Seguranca
-- check-subscription usa SUPABASE_SERVICE_ROLE_KEY para atualizar profiles
-- Verificacao de plano no frontend (UX) + backend (RLS futuro se necessario)
-- Customer portal so funciona para usuarios com stripe_customer_id
-- Stripe webhook ja atualiza plan/plan_status (existente)
