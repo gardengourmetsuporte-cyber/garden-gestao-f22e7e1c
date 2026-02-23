@@ -65,9 +65,6 @@ export function AdminDashboard() {
       {/* === WIDGET GRID - iOS style mixed === */}
       <div className="grid grid-cols-2 gap-3">
 
-        {/* UNIFIED CALENDAR - first */}
-        <UnifiedCalendarWidget />
-
         {/* === FINANCE BLOCK === */}
         {isSuperAdmin ? (
           <>
@@ -145,6 +142,9 @@ export function AdminDashboard() {
         <div className="col-span-2 animate-slide-up stagger-3">
           <WeeklySummary closings={closings} />
         </div>
+
+        {/* UNIFIED CALENDAR - after weekly summary */}
+        <UnifiedCalendarWidget />
 
         {/* === OPERATIONAL BLOCK === */}
 
