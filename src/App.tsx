@@ -94,7 +94,7 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
   const { hasAccess, isLoading: modulesLoading } = useUserModules();
   const { units, isLoading: unitsLoading } = useUnit();
 
-  if (isLoading) {
+  if (isLoading || unitsLoading) {
     return <PageLoader />;
   }
 
@@ -103,7 +103,7 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
   }
 
   // Check if user needs onboarding (no units = new owner)
-  if (!skipOnboarding && !unitsLoading && units.length === 0) {
+  if (!skipOnboarding && units.length === 0) {
     return <Navigate to="/onboarding" replace />;
   }
 
