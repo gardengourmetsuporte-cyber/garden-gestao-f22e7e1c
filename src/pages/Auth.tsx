@@ -182,6 +182,13 @@ export default function Auth() {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto">
+      {/* Back to Landing */}
+      <div className="absolute top-8 left-4 z-20">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          Voltar
+        </Button>
+      </div>
       {/* Theme Toggle */}
       <div className="absolute top-8 right-4 z-20">
         <ThemeToggle />
