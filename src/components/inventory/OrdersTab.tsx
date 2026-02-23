@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -174,7 +174,7 @@ export function OrdersTab({
               : "text-muted-foreground hover:text-foreground"
           )}
         >
-          <Package className="w-4 h-4" />
+          <AppIcon name="Package" size={16} />
           Itens para Pedido
           {lowStockItems.length > 0 && (
             <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-warning/10 text-warning">
@@ -191,7 +191,7 @@ export function OrdersTab({
               : "text-muted-foreground hover:text-foreground"
           )}
         >
-          <Clock className="w-4 h-4" />
+          <AppIcon name="Schedule" size={16} />
           Pedidos Feitos
           {orders.length > 0 && (
             <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary">
@@ -205,7 +205,7 @@ export function OrdersTab({
       {orderTab === 'to-order' && (
         Object.keys(itemsBySupplier).length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <AppIcon name="Package" size={48} className="mx-auto mb-3 opacity-50" />
             <p className="font-medium">Nenhum item precisa de reposição</p>
             <p className="text-sm mt-1">Todos os itens estão acima do estoque mínimo</p>
           </div>
@@ -232,7 +232,7 @@ export function OrdersTab({
                         onClick={() => handleOpenOrder(supplier)}
                         className="gap-2"
                       >
-                        <Plus className="w-4 h-4" />
+                        <AppIcon name="Add" size={16} />
                         Criar Pedido
                       </Button>
                     )}
@@ -270,7 +270,7 @@ export function OrdersTab({
       {orderTab === 'orders' && (
         orders.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <AppIcon name="Schedule" size={48} className="mx-auto mb-3 opacity-50" />
             <p className="font-medium">Nenhum pedido feito</p>
             <p className="text-sm mt-1">Crie um pedido a partir dos itens para pedido</p>
           </div>
@@ -305,12 +305,12 @@ export function OrdersTab({
                           onClick={() => handleSendWhatsApp(order)}
                           className="gap-2 bg-green-600 hover:bg-green-700"
                         >
-                          <MessageCircle className="w-4 h-4" />
+                          <AppIcon name="Chat" size={16} />
                           Enviar WhatsApp
                         </Button>
                       ) : (
                         <span className="text-xs text-warning flex items-center gap-1">
-                          <MessageCircle className="w-4 h-4" />
+                          <AppIcon name="Chat" size={16} />
                           Sem WhatsApp
                         </span>
                       )}
@@ -326,7 +326,7 @@ export function OrdersTab({
                       }}
                       className="gap-2 bg-success/10 hover:bg-success/20 text-success border-success/30"
                     >
-                      <PackageCheck className="w-4 h-4" />
+                      <AppIcon name="PackageCheck" size={16} />
                       Receber Pedido
                     </Button>
                   )}
@@ -340,13 +340,13 @@ export function OrdersTab({
                       }}
                       className="gap-2 bg-primary/10 hover:bg-primary/20 text-primary border-primary/30"
                     >
-                      <FileText className="w-4 h-4" />
+                      <AppIcon name="Description" size={16} />
                       Cadastrar Despesa
                     </Button>
                   )}
                   {order.status === 'received' && order.supplier_invoice_id && (
                     <span className="text-xs text-success flex items-center gap-1">
-                      <FileText className="w-4 h-4" />
+                      <AppIcon name="Description" size={16} />
                       Despesa cadastrada
                     </span>
                   )}
@@ -357,7 +357,7 @@ export function OrdersTab({
                       onClick={() => onDeleteOrder(order.id)}
                       className="gap-2 text-destructive hover:text-destructive"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <AppIcon name="Delete" size={16} />
                     </Button>
                   )}
                 </div>

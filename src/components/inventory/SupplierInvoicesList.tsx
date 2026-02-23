@@ -11,16 +11,7 @@ import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { 
-  Plus, 
-  FileText, 
-  Calendar, 
-  Building2,
-  AlertTriangle,
-  Check,
-  Wallet,
-  Clock,
-} from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
 export function SupplierInvoicesList() {
@@ -92,7 +83,7 @@ export function SupplierInvoicesList() {
       <div className="grid grid-cols-2 gap-3">
         <Card className="p-4">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Clock className="w-4 h-4" />
+            <AppIcon name="Schedule" size={16} />
             <span className="text-sm">A pagar</span>
           </div>
           <p className="text-xl font-semibold">
@@ -104,7 +95,7 @@ export function SupplierInvoicesList() {
         {overdueInvoices.length > 0 && (
           <Card className="p-4 border-destructive/50 bg-destructive/5">
             <div className="flex items-center gap-2 text-destructive mb-1">
-              <AlertTriangle className="w-4 h-4" />
+              <AppIcon name="Warning" size={16} />
               <span className="text-sm">Vencidos</span>
             </div>
             <p className="text-xl font-semibold text-destructive">
@@ -117,7 +108,7 @@ export function SupplierInvoicesList() {
 
       {/* Add Button */}
       <Button onClick={() => { setEditingInvoice(null); setShowSheet(true); }} className="w-full">
-        <Plus className="w-4 h-4 mr-2" />
+        <AppIcon name="Add" size={16} className="mr-2" />
         Cadastrar Boleto
       </Button>
 
@@ -125,7 +116,7 @@ export function SupplierInvoicesList() {
       {overdueList.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-destructive flex items-center gap-1">
-            <AlertTriangle className="w-4 h-4" />
+            <AppIcon name="Warning" size={16} />
             Vencidos
           </h3>
           {overdueList.map(invoice => (
@@ -137,12 +128,12 @@ export function SupplierInvoicesList() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <AppIcon name="Business" size={16} className="text-muted-foreground shrink-0" />
                     <span className="font-medium truncate">{invoice.supplier?.name}</span>
                   </div>
                   <p className="text-sm text-muted-foreground truncate mt-1">{invoice.description}</p>
                   <div className="flex items-center gap-2 mt-2 text-xs text-destructive">
-                    <Calendar className="w-3 h-3" />
+                    <AppIcon name="CalendarMonth" size={12} />
                     Venceu em {format(new Date(invoice.due_date), "dd/MM", { locale: ptBR })}
                   </div>
                 </div>
@@ -157,7 +148,7 @@ export function SupplierInvoicesList() {
                       handlePayClick(invoice);
                     }}
                   >
-                    <Wallet className="w-3 h-3 mr-1" />
+                    <AppIcon name="Wallet" size={12} className="mr-1" />
                     Pagar
                   </Button>
                 </div>
@@ -180,12 +171,12 @@ export function SupplierInvoicesList() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <AppIcon name="Business" size={16} className="text-muted-foreground shrink-0" />
                     <span className="font-medium truncate">{invoice.supplier?.name}</span>
                   </div>
                   <p className="text-sm text-muted-foreground truncate mt-1">{invoice.description}</p>
                   <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
+                    <AppIcon name="CalendarMonth" size={12} />
                     Vence em {format(new Date(invoice.due_date), "dd/MM", { locale: ptBR })}
                   </div>
                 </div>
@@ -200,7 +191,7 @@ export function SupplierInvoicesList() {
                       handlePayClick(invoice);
                     }}
                   >
-                    <Wallet className="w-3 h-3 mr-1" />
+                    <AppIcon name="Wallet" size={12} className="mr-1" />
                     Pagar
                   </Button>
                 </div>
@@ -223,10 +214,10 @@ export function SupplierInvoicesList() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <AppIcon name="Business" size={16} className="text-muted-foreground shrink-0" />
                     <span className="font-medium truncate">{invoice.supplier?.name}</span>
                     <Badge variant="secondary" className="shrink-0">
-                      <Check className="w-3 h-3 mr-1" />
+                      <AppIcon name="Check" size={12} className="mr-1" />
                       Pago
                     </Badge>
                   </div>
@@ -241,7 +232,7 @@ export function SupplierInvoicesList() {
 
       {invoices.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <AppIcon name="Description" size={48} className="mx-auto mb-3 opacity-50" />
           <p>Nenhum boleto cadastrado</p>
         </div>
       )}

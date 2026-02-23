@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Minus, X } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,14 +60,14 @@ export function QuickMovementSheet({ item, open, onOpenChange, onConfirm }: Quic
             onClick={() => setType('entrada')}
             className={`action-button h-14 ${type === 'entrada' ? 'action-button-entry' : 'bg-secondary text-secondary-foreground'}`}
           >
-            <Plus className="w-5 h-5" />
+            <AppIcon name="Add" size={20} />
             Entrada
           </button>
           <button
             onClick={() => setType('saida')}
             className={`action-button h-14 ${type === 'saida' ? 'action-button-exit' : 'bg-secondary text-secondary-foreground'}`}
           >
-            <Minus className="w-5 h-5" />
+            <AppIcon name="Remove" size={20} />
             Saída
           </button>
         </div>

@@ -5,7 +5,7 @@
 ## Status
 - [x] **Fundação**: index.html (Material Symbols Rounded), AppIcon (font-variation-settings), index.css (tokens, cores, tipografia, cards), tailwind.config.ts (radius)
 - [x] **Lote 1**: Dashboard widgets (ChecklistDashboardWidget, QuickStats, SectorPointsSummary, UnifiedCalendarWidget), Pages (NotFound, Settings)
-- [x] **Lote 2 parcial**: Finance module completo (12 arquivos migrados). Efeito card-press/active:scale removido globalmente.
+- [x] **Lote 2 parcial**: Finance + Inventory modules completos (27 arquivos migrados). Efeito card-press/active:scale removido globalmente.
 - [ ] **Lote 2 restante**: inventory, employees, chat, agenda, marketing, recipes (~30 arquivos)
 - [ ] **Lote 3**: Settings, UI components, landing, restante (~60+ arquivos com lucide-react)
 

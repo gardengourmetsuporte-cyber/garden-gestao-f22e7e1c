@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowDownCircle, ArrowUpCircle, Trash2, Loader2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { StockMovement, InventoryItem } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -95,11 +95,11 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
                       "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
                       movement.type === 'entrada' ? "bg-success/10" : "bg-destructive/10"
                     )}>
-                      {movement.type === 'entrada' ? (
-                        <ArrowDownCircle className="w-5 h-5 text-success" />
-                      ) : (
-                        <ArrowUpCircle className="w-5 h-5 text-destructive" />
-                      )}
+                      <AppIcon
+                        name={movement.type === 'entrada' ? 'ArrowCircleDown' : 'ArrowCircleUp'}
+                        size={20}
+                        className={movement.type === 'entrada' ? 'text-success' : 'text-destructive'}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -136,9 +136,9 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
                               disabled={deletingId === movement.id}
                             >
                               {deletingId === movement.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <AppIcon name="Progress_activity" size={16} className="animate-spin" />
                               ) : (
-                                <Trash2 className="w-4 h-4" />
+                                <AppIcon name="Delete" size={16} />
                               )}
                             </Button>
                           </AlertDialogTrigger>

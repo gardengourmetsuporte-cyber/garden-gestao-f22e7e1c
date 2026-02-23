@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera, Loader2, Check, X, Package, FileText, AlertTriangle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -216,7 +216,7 @@ export function SmartReceivingSheet({
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
+            <AppIcon name="AutoAwesome" size={20} className="text-primary" />
             Recebimento Inteligente
             {order?.supplier?.name && (
               <span className="text-sm font-normal text-muted-foreground">
@@ -245,7 +245,7 @@ export function SmartReceivingSheet({
                     className="absolute top-2 right-2 h-8 w-8"
                     onClick={() => { setInvoiceFile(null); setInvoicePreview(null); }}
                   >
-                    <X className="w-4 h-4" />
+                    <AppIcon name="Close" size={16} />
                   </Button>
                 </div>
               ) : (
@@ -254,7 +254,7 @@ export function SmartReceivingSheet({
                   className="w-full h-24 border-dashed flex flex-col gap-2"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Camera className="w-6 h-6 text-muted-foreground" />
+                  <AppIcon name="PhotoCamera" size={24} className="text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Tirar foto da nota</span>
                 </Button>
               )}
@@ -284,7 +284,7 @@ export function SmartReceivingSheet({
                     className="absolute top-2 right-2 h-8 w-8"
                     onClick={() => { setBoletoFile(null); setBoletoPreview(null); }}
                   >
-                    <X className="w-4 h-4" />
+                    <AppIcon name="Close" size={16} />
                   </Button>
                 </div>
               ) : (
@@ -293,7 +293,7 @@ export function SmartReceivingSheet({
                   className="w-full h-16 border-dashed flex flex-col gap-1"
                   onClick={() => boletoInputRef.current?.click()}
                 >
-                  <Camera className="w-5 h-5 text-muted-foreground" />
+                  <AppIcon name="PhotoCamera" size={20} className="text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Tirar foto do boleto</span>
                 </Button>
               )}
@@ -316,7 +316,7 @@ export function SmartReceivingSheet({
               disabled={!invoiceFile && !boletoFile}
               className="w-full h-12 gap-2"
             >
-              <Sparkles className="w-4 h-4" />
+              <AppIcon name="AutoAwesome" size={16} />
               Processar com IA
             </Button>
           </div>
@@ -326,8 +326,8 @@ export function SmartReceivingSheet({
         {step === 'processing' && (
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <div className="relative">
-              <Loader2 className="w-12 h-12 text-primary animate-spin" />
-              <Sparkles className="w-5 h-5 text-primary absolute -top-1 -right-1 animate-pulse" />
+              <AppIcon name="Progress_activity" size={48} className="text-primary animate-spin" />
+              <AppIcon name="AutoAwesome" size={20} className="text-primary absolute -top-1 -right-1 animate-pulse" />
             </div>
             <p className="text-lg font-semibold">Processando...</p>
             <p className="text-sm text-muted-foreground text-center">
@@ -375,12 +375,12 @@ export function SmartReceivingSheet({
                 onClick={() => setExpandedItems(!expandedItems)}
               >
                 <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-primary" />
+                  <AppIcon name="Package" size={16} className="text-primary" />
                   <span className="font-semibold">
                     Itens ({confirmedCount}/{editedItems.length})
                   </span>
                 </div>
-                {expandedItems ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {expandedItems ? <AppIcon name="ExpandLess" size={16} /> : <AppIcon name="ExpandMore" size={16} />}
               </button>
 
               {expandedItems && editedItems.map((item, idx) => (
@@ -409,7 +409,7 @@ export function SmartReceivingSheet({
                         </p>
                       ) : (
                         <p className="text-xs text-warning flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
+                          <AppIcon name="Warning" size={12} />
                           Produto não encontrado no estoque
                         </p>
                       )}
@@ -497,9 +497,9 @@ export function SmartReceivingSheet({
                 className="w-full h-12 gap-2"
               >
                 {isConfirming ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <AppIcon name="Progress_activity" size={16} className="animate-spin" />
                 ) : (
-                  <Check className="w-4 h-4" />
+                  <AppIcon name="Check" size={16} />
                 )}
                 {isConfirming ? 'Confirmando...' : 'Confirmar Recebimento'}
               </Button>
@@ -520,7 +520,7 @@ export function SmartReceivingSheet({
         {step === 'confirm' && (
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center">
-              <Check className="w-8 h-8 text-success" />
+              <AppIcon name="Check" size={32} className="text-success" />
             </div>
             <p className="text-lg font-semibold">Recebimento Confirmado!</p>
             <div className="text-sm text-muted-foreground text-center space-y-1">
