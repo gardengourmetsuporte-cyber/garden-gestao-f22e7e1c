@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 
@@ -275,14 +276,15 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* FAB */}
-        {isAdmin && (
+        {/* FAB via portal to escape main animation */}
+        {isAdmin && createPortal(
           <button
             onClick={handleAddItem}
             className="fab"
           >
             <AppIcon name="Plus" size={24} />
-          </button>
+          </button>,
+          document.body
         )}
 
         <QuickMovementSheetNew
