@@ -149,12 +149,12 @@ export function AdminDashboard() {
         {/* === OPERATIONAL BLOCK === */}
 
         {/* CHECKLIST PROGRESS WIDGET */}
-        <div className="card-press">
+        <div className="card-press min-w-0 overflow-hidden">
           <ChecklistDashboardWidget />
         </div>
 
         {/* AGENDA WIDGET */}
-        <div className="card-press">
+        <div className="card-press min-w-0 overflow-hidden">
           <AgendaDashboardWidget />
         </div>
 
