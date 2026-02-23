@@ -319,6 +319,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </div>
             )}
 
+            {/* ===== Plans Crown (top-right corner) ===== */}
+            <div className="absolute right-4 launcher-item" style={{ top: 'calc(env(safe-area-inset-top) + 20px)', animationDelay: '0ms', zIndex: 10000 }}>
+              <button
+                className="relative p-2 rounded-xl hover:bg-white/10 transition-all"
+                onClick={() => { navigate('/plans'); setLauncherOpen(false); }}
+              >
+                <AppIcon name="Crown" size={24} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 8px hsl(45 90% 55% / 0.5))' }} />
+              </button>
+            </div>
+
             {/* ===== User Profile Card (top) ===== */}
             <div className="launcher-item mb-6" style={{ animationDelay: '0ms' }}>
               <button
