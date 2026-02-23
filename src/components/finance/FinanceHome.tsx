@@ -98,7 +98,7 @@ export function FinanceHome({
       <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-2">
         <button
           onClick={() => onNavigate?.('transactions', { type: 'income' })}
-          className="card-command-success p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+          className="card-command-success p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
             <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
@@ -112,7 +112,7 @@ export function FinanceHome({
         </button>
         <button
           onClick={() => onNavigate?.('transactions', { type: 'expense' })}
-          className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+          className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
             <div className="w-7 h-7 rounded-full bg-destructive/20 flex items-center justify-center">
@@ -129,7 +129,7 @@ export function FinanceHome({
       {/* Planning Quick Access */}
       <button
         onClick={() => onNavigate?.('planning')}
-        className="w-full p-4 rounded-xl bg-card border border-border/50 text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] animate-slide-up stagger-3"
+        className="w-full p-4 rounded-xl bg-card border border-border/50 text-left cursor-pointer transition-all duration-200 animate-slide-up stagger-3"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
@@ -147,7 +147,7 @@ export function FinanceHome({
       {(monthStats.pendingExpenses > 0 || monthStats.pendingIncome > 0) && (
         <button
           onClick={() => onNavigate?.('transactions', { status: 'pending' })}
-          className="card-command-warning p-4 space-y-2 animate-slide-up stagger-3 w-full text-left cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+          className="card-command-warning p-4 space-y-2 animate-slide-up stagger-3 w-full text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

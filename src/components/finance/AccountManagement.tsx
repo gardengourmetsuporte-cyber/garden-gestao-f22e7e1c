@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FinanceAccount, AccountType } from '@/types/finance';
-import { Loader2 } from 'lucide-react';
+
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
@@ -234,7 +234,7 @@ export function AccountManagement({
                 onClick={handleSave}
                 disabled={isLoading || !name.trim()}
               >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
+                {isLoading ? <AppIcon name="Progress_activity" size={20} className="animate-spin" /> : 'Salvar'}
               </Button>
             </div>
           </div>

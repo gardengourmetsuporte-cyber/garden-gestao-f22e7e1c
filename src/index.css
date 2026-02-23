@@ -1154,14 +1154,9 @@
     100% { background-position: -200% 0; }
   }
 
-  /* Card press effect (touch feedback) */
+  /* Card press wrapper (no scale effect, just smooth transitions) */
   .card-press {
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                box-shadow 0.2s ease;
-  }
-
-  .card-press:active {
-    transform: scale(0.96);
+    transition: box-shadow 0.2s ease;
   }
 
   /* Gradient shift for finance hero card */
@@ -1238,9 +1233,6 @@
     .animate-page-slide-up,
     .nav-icon-active {
       animation: none !important;
-    }
-    .card-press:active {
-      transform: none !important;
     }
   }
 }

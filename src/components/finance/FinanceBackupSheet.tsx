@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Loader2 } from 'lucide-react';
+
 import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceSnapshot, AccountComparison } from '@/hooks/useFinanceBackup';
 import { format } from 'date-fns';
@@ -88,14 +88,14 @@ export function FinanceBackupSheet({
                 className="flex-1"
               />
               <Button onClick={handleCreate} disabled={isCreating} size="sm">
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppIcon name="Plus" size={16} />}
+                {isCreating ? <AppIcon name="Progress_activity" size={16} className="animate-spin" /> : <AppIcon name="Plus" size={16} />}
                 <span className="ml-1 hidden sm:inline">Criar</span>
               </Button>
             </div>
 
             {isLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                <AppIcon name="Progress_activity" size={24} className="animate-spin text-muted-foreground" />
               </div>
             ) : snapshots.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -166,7 +166,7 @@ export function FinanceBackupSheet({
                               onClick={() => setRestoreTarget(snapshot)}
                               disabled={isRestoring}
                             >
-                              {isRestoring ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <AppIcon name="RefreshCw" size={16} className="mr-1" />}
+                              {isRestoring ? <AppIcon name="Progress_activity" size={16} className="animate-spin mr-1" /> : <AppIcon name="RefreshCw" size={16} className="mr-1" />}
                               Restaurar
                             </Button>
                             <Button

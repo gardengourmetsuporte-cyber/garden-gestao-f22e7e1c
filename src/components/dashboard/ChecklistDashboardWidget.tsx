@@ -124,7 +124,7 @@ export function ChecklistDashboardWidget() {
             key={card.type}
             onClick={() => navigate('/checklists')}
             className={cn(
-              "relative text-left rounded-2xl p-4 transition-all duration-200 active:scale-[0.97]",
+              "relative text-left rounded-2xl p-4 transition-all duration-200",
               "bg-card border-0"
             )}
           >

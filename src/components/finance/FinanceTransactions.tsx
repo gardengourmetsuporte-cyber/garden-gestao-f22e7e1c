@@ -1,11 +1,9 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
-import { Undo2, Redo2 } from 'lucide-react';
 import { differenceInHours, format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
 import { TransactionItem } from './TransactionItem';
 import { FinanceTransaction, MonthlyStats } from '@/types/finance';
-import { Repeat } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -272,10 +270,10 @@ export function FinanceTransactions({
             {(canUndo || canRedo) && (
               <>
                 <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canUndo} onClick={onUndo}>
-                  <Undo2 className="h-4 w-4" />
+                  <AppIcon name="Undo" size={16} />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!canRedo} onClick={onRedo}>
-                  <Redo2 className="h-4 w-4" />
+                  <AppIcon name="Redo" size={16} />
                 </Button>
               </>
             )}
@@ -350,7 +348,7 @@ export function FinanceTransactions({
                               >
                                 {transaction.is_recurring && transaction.installment_group_id && (
                                   <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
-                                    <Repeat className="w-2.5 h-2.5 mr-0.5" />
+                                    <AppIcon name="Repeat" size={10} className="mr-0.5" />
                                     {transaction.installment_number}/{transaction.total_installments}
                                   </Badge>
                                 )}
