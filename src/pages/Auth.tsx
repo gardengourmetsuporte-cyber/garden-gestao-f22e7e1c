@@ -141,7 +141,13 @@ export default function Auth() {
         }
         toast.success('Bem-vindo de volta!');
       } else {
-        const { error } = await signUp(email, password, fullName);
+        // Build redirect URL preserving plan context for post-confirmation
+        const redirectUrl = planFromUrl 
+          ? `${window.location.origin}/auth?plan=${planFromUrl}&payment=success`
+          : tokenFromUrl
+          ? `${window.location.origin}/invite?token=${tokenFromUrl}`
+          : `${window.location.origin}/`;
+        const { error } = await signUp(email, password, fullName, redirectUrl);
         if (error) {
           if (error.message.includes('already registered')) {
             toast.error('Este email já está cadastrado');
