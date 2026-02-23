@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CalendarDays, Info, Trash2, ChevronRight, Plus } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
 import { getTaskUrgencyColor } from '@/hooks/useTimeBasedUrgency';
@@ -155,19 +155,19 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           onClick={(e) => { e.stopPropagation(); closeSwipe(); setExpanded(true); setAddingSubtask(true); setTimeout(() => subtaskInputRef.current?.focus(), 100); }}
           className="w-20 flex items-center justify-center bg-primary text-primary-foreground text-xs font-semibold"
         >
-          <Plus className="w-5 h-5" />
+          <AppIcon name="Plus" size={20} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); closeSwipe(); onClick?.(); }}
           className="w-20 flex items-center justify-center bg-muted-foreground/60 text-white text-xs font-semibold"
         >
-          <Info className="w-5 h-5" />
+          <AppIcon name="Info" size={20} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); closeSwipe(); onDelete(task.id); }}
           className="w-20 flex items-center justify-center bg-destructive text-white text-xs font-semibold"
         >
-          <Trash2 className="w-5 h-5" />
+          <AppIcon name="Trash2" size={20} />
         </button>
       </div>
 
@@ -220,8 +220,8 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                 {task.title}
               </p>
               {hasSubtasks && (
-                <ChevronRight className={cn(
-                  'w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0',
+                <AppIcon name="ChevronRight" size={16} className={cn(
+                  'text-muted-foreground transition-transform duration-200 shrink-0',
                   expanded && 'rotate-90'
                 )} />
               )}
@@ -254,8 +254,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                       ? 'bg-primary/10 text-primary'
                       : 'bg-muted text-muted-foreground'
               )}>
-                <CalendarDays className={cn(
-                  'w-3 h-3',
+                <AppIcon name="CalendarDays" size={12} className={cn(
                   clockUrgency.colorClass,
                   clockUrgency.pulse && 'animate-pulse'
                 )} />
@@ -325,7 +324,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                   onClick={(e) => { e.stopPropagation(); onDelete(sub.id); }}
                   className="p-1 rounded-lg text-muted-foreground/40 hover:text-destructive transition-colors"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <AppIcon name="Trash2" size={14} />
                 </button>
               </div>
             ))}
@@ -333,7 +332,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             {/* Add subtask inline */}
             <div className="flex items-center gap-3 px-4 py-2.5">
               <div className="w-4" />
-              <Plus className="w-4 h-4 text-primary shrink-0" />
+              <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
               <input
                 ref={subtaskInputRef}
                 value={newSubtaskTitle}

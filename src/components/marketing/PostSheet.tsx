@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Instagram, MessageCircle, CalendarIcon, ImagePlus, X, Save, Send, Clock } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MarketingPost, MarketingChannel } from '@/types/marketing';
@@ -160,7 +160,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
                     onClick={() => removeMedia(i)}
                     className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center"
                   >
-                    <X className="w-2.5 h-2.5 text-white" />
+                    <AppIcon name="X" size={10} style={{ color: 'white' }} />
                   </button>
                 </div>
               ))}
@@ -169,7 +169,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
                 disabled={uploading}
                 className="w-16 h-16 rounded-lg border-2 border-dashed border-border/60 flex items-center justify-center hover:bg-secondary transition-colors"
               >
-                <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                <AppIcon name="add_photo_alternate" size={20} className="text-muted-foreground" />
               </button>
             </div>
             <input
@@ -188,12 +188,12 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
             <div className="flex gap-3 mt-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <Checkbox checked={channels.includes('instagram')} onCheckedChange={() => toggleChannel('instagram')} />
-                <Instagram className="w-4 h-4 text-pink-400" />
+                <AppIcon name="photo_camera" size={16} className="text-pink-400" />
                 <span className="text-sm">Instagram</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <Checkbox checked={channels.includes('whatsapp_status')} onCheckedChange={() => toggleChannel('whatsapp_status')} />
-                <MessageCircle className="w-4 h-4 text-emerald-400" />
+                <AppIcon name="MessageCircle" size={16} className="text-emerald-400" />
                 <span className="text-sm">WhatsApp</span>
               </label>
             </div>
@@ -206,7 +206,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="flex-1 justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <AppIcon name="CalendarDays" size={16} className="mr-2" />
                     {scheduledAt ? format(scheduledAt, "dd/MM/yyyy", { locale: ptBR }) : 'Sem agendamento'}
                   </Button>
                 </PopoverTrigger>
@@ -217,7 +217,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
               {scheduledAt && (
                 <Select value={scheduledTime} onValueChange={setScheduledTime}>
                   <SelectTrigger className="w-[100px]">
-                    <Clock className="w-3.5 h-3.5 mr-1 text-muted-foreground" />
+                    <AppIcon name="Clock" size={14} className="mr-1 text-muted-foreground" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="max-h-[200px]">
@@ -251,7 +251,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
               loading={isSaving}
               loadingText="Salvando..."
             >
-              <Save className="w-4 h-4 mr-2" /> Salvar
+              <AppIcon name="Save" size={16} className="mr-2" /> Salvar
             </LoadingButton>
             {post && post.media_urls.length > 0 && channels.length > 0 && (
               <Button
@@ -259,7 +259,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
                 onClick={() => { onSave(buildData()); onPublish({ ...post, ...buildData() } as MarketingPost); }}
                 disabled={isSaving}
               >
-                <Send className="w-4 h-4 mr-2" /> Publicar
+                <AppIcon name="Send" size={16} className="mr-2" /> Publicar
               </Button>
             )}
           </div>

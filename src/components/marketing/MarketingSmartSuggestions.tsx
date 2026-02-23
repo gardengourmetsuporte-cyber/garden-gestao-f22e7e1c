@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Sparkles, TrendingUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { getUpcomingDates } from '@/lib/marketingDates';
@@ -16,7 +16,7 @@ export function MarketingSmartSuggestions({ onSuggestionClick }: Props) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 px-1">
-        <Sparkles className="w-3.5 h-3.5 text-primary" />
+        <AppIcon name="Sparkles" size={14} className="text-primary" />
         <span className="text-xs font-medium text-muted-foreground">Próximas oportunidades</span>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -38,7 +38,7 @@ export function MarketingSmartSuggestions({ onSuggestionClick }: Props) {
               </div>
               <p className="text-[10px] text-muted-foreground line-clamp-1">{s.suggestion}</p>
               <div className="flex items-center gap-1 mt-0.5">
-                {isCommercial && <TrendingUp className="w-2.5 h-2.5 text-warning" />}
+                {isCommercial && <AppIcon name="TrendingUp" size={10} className="text-warning" />}
                 <p className={`text-[10px] font-medium ${isCommercial ? 'text-warning' : 'text-primary'}`}>
                   {format(s.fullDate, "dd/MM", { locale: ptBR })}
                 </p>

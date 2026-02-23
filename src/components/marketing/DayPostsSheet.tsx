@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { PostCard } from './PostCard';
@@ -55,7 +55,7 @@ export function DayPostsSheet({ date, posts, open, onOpenChange, onEdit, onDelet
               onOpenChange(false);
             }}
           >
-            <Plus className="w-4 h-4" /> Novo post para este dia
+            <AppIcon name="Plus" size={16} /> Novo post para este dia
           </Button>
         </div>
       </SheetContent>
