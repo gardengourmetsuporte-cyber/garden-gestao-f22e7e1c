@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, CalendarDays, CheckCircle2, DollarSign, Megaphone, Coffee, TrendingUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, addMonths, subMonths } from 'date-fns';
@@ -46,7 +46,6 @@ export function UnifiedCalendarWidget() {
     const doneTasks = ev.tasks.filter(t => t.type === 'task_done');
     if (pendingTasks.length > 0) chips.push({ type: 'task_pending', color: calendarEventColors.task_pending });
     if (doneTasks.length > 0) chips.push({ type: 'task_done', color: calendarEventColors.task_done });
-    // Only show chip for peak days, not all finance days
     const hasPeak = ev.finance.some(f => f.type === 'finance_peak' && f.subtitle === 'Acima da média');
     if (hasPeak) chips.push({ type: 'finance_peak', color: calendarEventColors.finance_peak });
     const hasIncome = ev.finance.some(f => f.type === 'finance_income');
@@ -62,12 +61,12 @@ export function UnifiedCalendarWidget() {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
           <div className="flex items-center gap-2">
-            <CalendarDays className="w-4 h-4 text-primary" />
+            <AppIcon name="CalendarDays" size={16} className="text-primary" />
             <span className="text-xs font-semibold text-foreground">Calendário</span>
           </div>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <AppIcon name="ChevronLeft" size={14} />
             </Button>
             <button
               className="text-xs font-medium text-foreground capitalize px-2 py-1 rounded-md hover:bg-secondary/50 transition-colors"
@@ -76,7 +75,7 @@ export function UnifiedCalendarWidget() {
               {format(currentMonth, 'MMM yyyy', { locale: ptBR })}
             </button>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <AppIcon name="ChevronRight" size={14} />
             </Button>
           </div>
         </div>
@@ -163,7 +162,7 @@ export function UnifiedCalendarWidget() {
 
             {/* Tasks */}
             {selectedEvents.tasks.length > 0 && (
-              <EventSection icon={<CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />} title="Tarefas">
+              <EventSection icon={<AppIcon name="CheckCircle2" size={14} className="text-blue-500" />} title="Tarefas">
                 {selectedEvents.tasks.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
@@ -172,7 +171,7 @@ export function UnifiedCalendarWidget() {
 
             {/* Finance */}
             {selectedEvents.finance.length > 0 && (
-              <EventSection icon={<DollarSign className="w-3.5 h-3.5 text-orange-500" />} title="Financeiro">
+              <EventSection icon={<AppIcon name="DollarSign" size={14} className="text-orange-500" />} title="Financeiro">
                 {selectedEvents.finance.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
@@ -181,7 +180,7 @@ export function UnifiedCalendarWidget() {
 
             {/* Marketing */}
             {selectedEvents.marketing.length > 0 && (
-              <EventSection icon={<Megaphone className="w-3.5 h-3.5 text-violet-500" />} title="Marketing">
+              <EventSection icon={<AppIcon name="Megaphone" size={14} className="text-violet-500" />} title="Marketing">
                 {selectedEvents.marketing.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
@@ -190,7 +189,7 @@ export function UnifiedCalendarWidget() {
 
             {/* Schedules */}
             {selectedEvents.schedules.length > 0 && (
-              <EventSection icon={<Coffee className="w-3.5 h-3.5 text-amber-500" />} title="Folgas">
+              <EventSection icon={<AppIcon name="Coffee" size={14} className="text-amber-500" />} title="Folgas">
                 {selectedEvents.schedules.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}

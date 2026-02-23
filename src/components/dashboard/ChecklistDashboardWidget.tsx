@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { Sun, Moon } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
 type ChecklistType = 'abertura' | 'fechamento';
@@ -92,11 +92,11 @@ export function ChecklistDashboardWidget() {
   const abertura = getProgress('abertura', aberturaCompletions);
   const fechamento = getProgress('fechamento', fechamentoCompletions);
 
-  const cards: { type: ChecklistType; label: string; icon: typeof Sun; progress: typeof abertura; accentColor: string; accentBg: string; textColor: string }[] = [
+  const cards: { type: ChecklistType; label: string; iconName: string; progress: typeof abertura; accentColor: string; accentBg: string; textColor: string }[] = [
     {
       type: 'abertura',
       label: 'Abertura',
-      icon: Sun,
+      iconName: 'Sun',
       progress: abertura,
       accentColor: 'text-amber-400',
       accentBg: 'bg-amber-600/80',
@@ -105,7 +105,7 @@ export function ChecklistDashboardWidget() {
     {
       type: 'fechamento',
       label: 'Fechamento',
-      icon: Moon,
+      iconName: 'Moon',
       progress: fechamento,
       accentColor: 'text-violet-400',
       accentBg: 'bg-violet-600/40',
@@ -117,7 +117,6 @@ export function ChecklistDashboardWidget() {
     <div className="grid grid-cols-2 gap-3 animate-slide-up stagger-3">
       {cards.map((card) => {
         const isActive = card.type === activeType;
-        const Icon = card.icon;
         const isComplete = card.progress.percent === 100;
 
         return (
@@ -140,7 +139,7 @@ export function ChecklistDashboardWidget() {
                 "w-10 h-10 rounded-xl flex items-center justify-center",
                 isComplete ? "bg-success/20" : card.accentBg
               )}>
-                <Icon className={cn("w-5 h-5", isComplete ? "text-success" : "text-white")} />
+                <AppIcon name={card.iconName} size={20} className={cn(isComplete ? "text-success" : "text-white")} />
               </div>
               <div>
                 <span className={cn(

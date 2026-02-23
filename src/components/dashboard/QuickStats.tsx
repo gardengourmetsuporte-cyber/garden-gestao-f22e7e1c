@@ -1,13 +1,4 @@
-import { 
-  Package, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Clock, 
-  Users,
-  ShoppingCart,
-  Gift,
-  Star
-} from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
@@ -15,7 +6,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 interface StatItem {
   title: string;
   value: number | string;
-  icon: React.ElementType;
+  icon: string;
   variant?: 'default' | 'warning' | 'destructive' | 'success' | 'primary';
   subtitle?: string;
 }
@@ -48,7 +39,6 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
       columns === 4 && "grid-cols-2 lg:grid-cols-4"
     )}>
       {stats.map((stat, index) => {
-        const Icon = stat.icon;
         const variant = stat.variant || 'default';
 
         return (
@@ -66,7 +56,7 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
                   "w-10 h-10 rounded-xl flex items-center justify-center",
                   variantStyles[variant]
                 )}>
-                  <Icon className="w-5 h-5" />
+                  <AppIcon name={stat.icon} size={20} />
                 </div>
               </div>
             </CardContent>
@@ -84,10 +74,10 @@ export const createInventoryStats = (data: {
   outOfStock: number;
   recentMovements: number;
 }): StatItem[] => [
-  { title: 'Total de Itens', value: data.totalItems, icon: Package },
-  { title: 'Estoque Baixo', value: data.lowStock, icon: AlertTriangle, variant: data.lowStock > 0 ? 'warning' : 'default' },
-  { title: 'Zerados', value: data.outOfStock, icon: Package, variant: data.outOfStock > 0 ? 'destructive' : 'default' },
-  { title: 'Movimentações', value: data.recentMovements, icon: Clock, variant: 'success', subtitle: 'últimos 7 dias' },
+  { title: 'Total de Itens', value: data.totalItems, icon: 'Package' },
+  { title: 'Estoque Baixo', value: data.lowStock, icon: 'AlertTriangle', variant: data.lowStock > 0 ? 'warning' : 'default' },
+  { title: 'Zerados', value: data.outOfStock, icon: 'Package', variant: data.outOfStock > 0 ? 'destructive' : 'default' },
+  { title: 'Movimentações', value: data.recentMovements, icon: 'Clock', variant: 'success', subtitle: 'últimos 7 dias' },
 ];
 
 export const createChecklistStats = (data: {
@@ -95,9 +85,9 @@ export const createChecklistStats = (data: {
   total: number;
   percentage: number;
 }): StatItem[] => [
-  { title: 'Concluídos', value: data.completed, icon: CheckCircle2, variant: 'success' },
-  { title: 'Total', value: data.total, icon: Clock },
-  { title: 'Progresso', value: `${data.percentage}%`, icon: Star, variant: 'primary' },
+  { title: 'Concluídos', value: data.completed, icon: 'CheckCircle2', variant: 'success' },
+  { title: 'Total', value: data.total, icon: 'Clock' },
+  { title: 'Progresso', value: `${data.percentage}%`, icon: 'Star', variant: 'primary' },
 ];
 
 export const createAdminStats = (data: {
@@ -106,8 +96,8 @@ export const createAdminStats = (data: {
   pendingRedemptions: number;
   totalPoints: number;
 }): StatItem[] => [
-  { title: 'Usuários', value: data.totalUsers, icon: Users },
-  { title: 'Pedidos Pendentes', value: data.pendingOrders, icon: ShoppingCart, variant: data.pendingOrders > 0 ? 'warning' : 'default' },
-  { title: 'Resgates Pendentes', value: data.pendingRedemptions, icon: Gift, variant: data.pendingRedemptions > 0 ? 'warning' : 'default' },
-  { title: 'Pontos Totais', value: data.totalPoints, icon: Star, variant: 'primary' },
+  { title: 'Usuários', value: data.totalUsers, icon: 'Users' },
+  { title: 'Pedidos Pendentes', value: data.pendingOrders, icon: 'ShoppingCart', variant: data.pendingOrders > 0 ? 'warning' : 'default' },
+  { title: 'Resgates Pendentes', value: data.pendingRedemptions, icon: 'Gift', variant: data.pendingRedemptions > 0 ? 'warning' : 'default' },
+  { title: 'Pontos Totais', value: data.totalPoints, icon: 'Star', variant: 'primary' },
 ];
