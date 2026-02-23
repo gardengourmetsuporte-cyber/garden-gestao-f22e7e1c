@@ -206,13 +206,15 @@
   .card-interactive {
     @apply bg-card rounded-2xl
            cursor-pointer transition-all duration-200
-           hover:border-primary/25 active:scale-[0.97];
+           hover:border-primary/25 active:scale-[0.96];
     box-shadow: var(--shadow-card);
   }
 
   .card-interactive:hover {
     box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
   }
+
 
   .card-gradient {
     @apply rounded-2xl p-5 text-white transition-all duration-200
@@ -235,6 +237,8 @@
       hsl(260 50% 25%) 70%, 
       hsl(330 40% 28%) 100%
     );
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
       0 4px 24px hsl(217 80% 28% / 0.4),
       0 8px 48px hsl(260 50% 25% / 0.2),
@@ -263,6 +267,8 @@
       hsl(150 45% 25%) 70%, 
       hsl(140 40% 20%) 100%
     );
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
       0 4px 24px hsl(160 60% 22% / 0.4),
       0 8px 48px hsl(150 45% 25% / 0.2),
@@ -1103,6 +1109,137 @@
   @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+  }
+
+  /* ========== MODERN ANIMATIONS (Mobills-style) ========== */
+
+  /* Spring-in entrance for cards/widgets */
+  .animate-spring-in {
+    animation: springIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  @keyframes springIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.88) translateY(14px);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.02) translateY(-2px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Shimmer wave for skeleton loading */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.08) 40%,
+      hsl(var(--muted-foreground) / 0.15) 50%,
+      hsl(var(--muted-foreground) / 0.08) 60%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 300% 100%;
+    animation: shimmerWave 1.8s ease-in-out infinite;
+  }
+
+  @keyframes shimmerWave {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Card press effect (touch feedback) */
+  .card-press {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.2s ease;
+  }
+
+  .card-press:active {
+    transform: scale(0.96);
+  }
+
+  /* Gradient shift for finance hero card */
+  .finance-gradient-shift {
+    animation: gradientShift 8s ease-in-out infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Check pop animation */
+  .animate-check-pop {
+    animation: checkPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  @keyframes checkPop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  /* Nav pill indicator */
+  .nav-pill-indicator {
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Page transition - slide + fade */
+  .animate-page-slide-up {
+    animation: pageSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes pageSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Spring stagger delays */
+  .spring-stagger-1 { animation-delay: 0ms; }
+  .spring-stagger-2 { animation-delay: 80ms; }
+  .spring-stagger-3 { animation-delay: 160ms; }
+  .spring-stagger-4 { animation-delay: 240ms; }
+  .spring-stagger-5 { animation-delay: 320ms; }
+  .spring-stagger-6 { animation-delay: 400ms; }
+
+  /* Active nav icon bounce */
+  .nav-icon-active {
+    animation: navIconBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  @keyframes navIconBounce {
+    0% { transform: translateY(0); }
+    40% { transform: translateY(-3px); }
+    100% { transform: translateY(-2px); }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-spring-in,
+    .skeleton-shimmer,
+    .finance-gradient-shift,
+    .animate-check-pop,
+    .animate-page-slide-up,
+    .nav-icon-active {
+      animation: none !important;
+    }
+    .card-press:active {
+      transform: none !important;
+    }
   }
 }
 

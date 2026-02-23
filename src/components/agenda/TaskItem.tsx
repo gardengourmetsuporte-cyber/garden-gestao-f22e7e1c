@@ -198,7 +198,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             className={cn(
               "w-6 h-6 rounded-full border-2 mt-0.5 shrink-0 transition-all duration-300",
               "data-[state=checked]:bg-success data-[state=checked]:border-success",
-              completing && "scale-125"
+              completing && "animate-check-pop"
             )}
           />
 

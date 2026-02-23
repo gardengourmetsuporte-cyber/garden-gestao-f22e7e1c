@@ -53,7 +53,7 @@ export function AdminDashboard() {
   return (
     <div className="space-y-4 p-4 lg:p-6">
       {/* Welcome - minimal */}
-      <div className="animate-slide-up stagger-1">
+      <div className="animate-spring-in spring-stagger-1">
         <h2 className="text-xl font-bold text-foreground">
           {greeting}, {firstName} 👋
         </h2>
@@ -63,7 +63,7 @@ export function AdminDashboard() {
       </div>
 
       {/* === WIDGET GRID - iOS style mixed === */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-2">
 
         {/* === FINANCE BLOCK === */}
         {isSuperAdmin ? (
@@ -71,7 +71,7 @@ export function AdminDashboard() {
             {/* BUSINESS FINANCE CARD (super admin only) */}
             <button
               onClick={() => navigate('/finance')}
-              className="finance-hero-card col-span-2 text-left animate-slide-up stagger-2"
+              className="finance-hero-card col-span-2 text-left card-press"
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
@@ -104,7 +104,7 @@ export function AdminDashboard() {
             {/* PERSONAL FINANCE CARD (admin/gerente) */}
             <button
               onClick={() => navigate('/personal-finance')}
-              className="finance-hero-card finance-hero-card--personal col-span-2 text-left animate-slide-up stagger-2"
+              className="finance-hero-card finance-hero-card--personal col-span-2 text-left card-press"
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
@@ -139,7 +139,7 @@ export function AdminDashboard() {
         )}
 
         {/* WEEKLY CASH SUMMARY - full width */}
-        <div className="col-span-2 animate-slide-up stagger-3">
+        <div className="col-span-2 animate-spring-in spring-stagger-3">
           <WeeklySummary closings={closings} />
         </div>
 
@@ -156,7 +156,7 @@ export function AdminDashboard() {
 
         {/* ALERTS */}
         {(stats.pendingRedemptions > 0) && (
-          <div className="card-command-info col-span-2 p-4 animate-slide-up stagger-4">
+          <div className="card-command-info col-span-2 p-4 animate-spring-in spring-stagger-4">
             <div className="flex items-center gap-2 mb-2">
               <AppIcon name="Bell" size={16} className="text-primary" />
               <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
@@ -172,7 +172,7 @@ export function AdminDashboard() {
         )}
 
         {/* RANKING WIDGET - Full leaderboard */}
-        <div className="col-span-2 animate-slide-up stagger-5">
+        <div className="col-span-2 animate-spring-in spring-stagger-5">
           <Leaderboard
             entries={leaderboard}
             currentUserId={user?.id}

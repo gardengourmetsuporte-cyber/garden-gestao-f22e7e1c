@@ -95,6 +95,21 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
         {/* Top glow line */}
         <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
+          {/* Animated pill indicator */}
+          <div
+            className="absolute bottom-1 h-[3px] rounded-full nav-pill-indicator"
+            style={{
+              background: accentColor,
+              boxShadow: `0 0 10px ${accentGlow}, 0 0 20px ${accentGlow2}`,
+              width: '24px',
+              left: `calc(${
+                activeTab === 'home' ? '12.5%' :
+                activeTab === 'transactions' ? '31.25%' :
+                activeTab === 'charts' ? '68.75%' :
+                '87.5%'
+              } - 12px)`,
+            }}
+          />
           {/* Left tabs */}
           {tabs.slice(0, 2).map(tab => (
             <button
@@ -107,11 +122,10 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
+              <div className={cn(activeTab === tab.id && "nav-icon-active")}>
+                <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
+              </div>
               <span className="text-[10px] font-medium">{tab.label}</span>
-              {activeTab === tab.id && (
-                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: accentColor, boxShadow: `0 0 10px ${accentGlow}, 0 0 20px ${accentGlow2}` }} />
-              )}
             </button>
           ))}
 
@@ -145,11 +159,10 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
+              <div className={cn(activeTab === tab.id && "nav-icon-active")}>
+                <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
+              </div>
               <span className="text-[10px] font-medium">{tab.label}</span>
-              {activeTab === tab.id && (
-                <div className="absolute bottom-1 w-6 h-[3px] rounded-full" style={{ background: accentColor, boxShadow: `0 0 10px ${accentGlow}, 0 0 20px ${accentGlow2}` }} />
-              )}
             </button>
           ))}
         </div>
