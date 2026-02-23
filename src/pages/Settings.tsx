@@ -108,8 +108,7 @@ export default function SettingsPage() {
             </div>
           </header>
 
-          <div className="px-4 py-6 lg:px-6">
-            <div className="card-command p-4 lg:p-6">
+          <div className="px-4 py-4 lg:px-6 pb-24">
               {activeSection === 'profile' && <ProfileSettings />}
               {activeSection === 'categories' && <CategorySettings />}
               {activeSection === 'suppliers' && <SupplierSettings />}
@@ -125,7 +124,6 @@ export default function SettingsPage() {
               {activeSection === 'notifications' && <NotificationSettings />}
               {activeSection === 'audit-log' && <AuditLogSettings />}
               {activeSection === 'team' && <TeamManagement />}
-            </div>
           </div>
         </div>
       </AppLayout>
