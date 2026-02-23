@@ -46,7 +46,7 @@ export function HeroSection() {
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
               Financeiro, estoque, equipe e IA — tudo em um app.
               <br />
-              Enquanto você serve, o Garden Gourmet cuida dos números.
+              Enquanto você serve, o Atlas cuida dos números.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start gap-3">
@@ -86,7 +86,7 @@ export function HeroSection() {
             >
               <img
                 src="/lovable-uploads/ca447a51-f07f-4e35-bd89-a1efb7fbcd9c.png"
-                alt="Tela financeira do Garden Gourmet"
+                alt="Tela financeira do Atlas"
                 className="w-full"
                 loading="lazy"
               />
