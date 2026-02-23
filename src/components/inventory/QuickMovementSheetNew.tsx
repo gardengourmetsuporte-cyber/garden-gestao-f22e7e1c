@@ -59,7 +59,7 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
                   : 'bg-secondary text-secondary-foreground'
               }`}
             >
-              <AppIcon name="ArrowCircleDown" size={20} />
+              <AppIcon name="ArrowDownCircle" size={20} />
               Entrada
             </button>
             <button
@@ -70,7 +70,7 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
                   : 'bg-secondary text-secondary-foreground'
               }`}
             >
-              <AppIcon name="ArrowCircleUp" size={20} />
+              <AppIcon name="ArrowUpCircle" size={20} />
               Saída
             </button>
           </div>
@@ -94,7 +94,7 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
               onClick={() => incrementQuantity(-1)}
               className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center hover:bg-secondary/80"
             >
-              <AppIcon name="Remove" size={24} />
+              <AppIcon name="Minus" size={24} />
             </button>
             <div className="flex-1 relative">
               <Input
@@ -113,7 +113,7 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
               onClick={() => incrementQuantity(1)}
               className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center hover:bg-secondary/80"
             >
-              <AppIcon name="Add" size={24} />
+              <AppIcon name="Plus" size={24} />
             </button>
           </div>
 
