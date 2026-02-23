@@ -109,19 +109,26 @@ export default function Invite() {
         },
       });
 
-      console.log('[Invite] signUp result:', { signUpData, signUpError });
+      console.log('[Invite] signUp result:', JSON.stringify({ signUpData, signUpError }));
 
       if (signUpError) {
+        console.error('[Invite] signUp error:', signUpError.message, signUpError.status);
         if (signUpError.message.includes('already registered')) {
           toast.error('Este email já possui conta. Faça login para aceitar o convite.');
           navigate(`/auth?token=${token}`);
           return;
         }
-        toast.error(`Erro: ${signUpError.message}`);
+        // Show the actual error to the user
+        const friendlyMsg = signUpError.message.includes('weak') || signUpError.message.includes('pwned') || signUpError.message.includes('leaked')
+          ? 'Senha muito fraca ou comum. Use uma senha mais forte com letras, números e símbolos.'
+          : signUpError.message.includes('rate')
+          ? 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
+          : `Erro ao criar conta: ${signUpError.message}`;
+        toast.error(friendlyMsg, { duration: 8000 });
         return;
       }
 
-      // Check if user was actually created or if it's a fake success (user already exists with unconfirmed email)
+      // Check if user was actually created or if it's a fake success
       if (signUpData?.user?.identities?.length === 0) {
         toast.error('Este email já possui conta. Faça login para aceitar o convite.');
         navigate(`/auth?token=${token}`);
@@ -132,7 +139,7 @@ export default function Invite() {
       toast.success('Conta criada! Verifique seu email para confirmar.');
     } catch (err: any) {
       console.error('[Invite] signUp catch error:', err);
-      toast.error(err.message || 'Erro ao criar conta.');
+      toast.error(err.message || 'Erro ao criar conta.', { duration: 8000 });
     } finally {
       setIsSubmitting(false);
     }
