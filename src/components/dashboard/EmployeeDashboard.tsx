@@ -76,17 +76,17 @@ export function EmployeeDashboard() {
 
       {/* Unified Calendar */}
       <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-3">
-        <div className="card-press">
+        <div className="card-press min-w-0 overflow-hidden">
           <UnifiedCalendarWidget />
         </div>
       </div>
 
       {/* Personal Expense Chart */}
       <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-4">
-        <div className="card-press">
+        <div className="card-press min-w-0 overflow-hidden">
           <PersonalFinanceChartWidget />
         </div>
-        <div className="card-press">
+        <div className="card-press min-w-0 overflow-hidden">
           <AgendaDashboardWidget />
         </div>
       </div>
