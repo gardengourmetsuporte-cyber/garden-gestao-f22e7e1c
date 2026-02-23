@@ -6,12 +6,11 @@ import {
 } from "@/components/ui/accordion";
 
 const faqs = [
-  { q: "Posso testar grátis?", a: "Sim! O plano Grátis é permanente e inclui Dashboard, Agenda, 1 Checklist e Chat interno. Você pode usar o tempo que quiser sem precisar de cartão de crédito." },
-  { q: "Como funciona o plano grátis?", a: "O plano grátis dá acesso aos módulos essenciais para até 3 usuários. Quando seu negócio crescer, basta fazer upgrade para o Pro ou Business." },
-  { q: "Preciso de cartão de crédito para começar?", a: "Não. Você cria sua conta e começa a usar o plano Grátis imediatamente, sem nenhuma cobrança." },
-  { q: "Posso mudar de plano depois?", a: "Claro! Você pode fazer upgrade ou downgrade a qualquer momento. A mudança é instantânea e proporcional ao período restante." },
-  { q: "Meus dados estão seguros?", a: "Sim. Utilizamos criptografia de ponta a ponta, backups automáticos diários e infraestrutura em nuvem com certificação ISO 27001. Seus dados são 100% seus." },
-  { q: "Funciona no celular?", a: "Sim! O Garden é um PWA (Progressive Web App) que funciona perfeitamente no navegador do celular, como se fosse um app nativo. Basta adicionar à tela inicial." },
+  { q: "Preciso instalar alguma coisa?", a: "Não. O Garden Gourmet funciona no navegador e no celular como um app (PWA). Basta acessar e adicionar à tela inicial." },
+  { q: "Quantos usuários posso ter?", a: "Pro: até 15 usuários. Business: ilimitado. Cada membro da equipe tem seu login e permissões." },
+  { q: "Funciona com iFood e delivery?", a: "Sim! O módulo financeiro separa automaticamente os canais de venda — iFood, delivery, cartão, Pix, dinheiro." },
+  { q: "Meus dados ficam seguros?", a: "Sim. Infraestrutura em nuvem com criptografia e backup diário automático. Seus dados são 100% seus." },
+  { q: "Posso cancelar quando quiser?", a: "Sim, sem fidelidade. Cancele a qualquer momento sem taxas. Seus dados permanecem acessíveis por 30 dias após o cancelamento." },
 ];
 
 export function FAQSection() {
@@ -25,9 +24,6 @@ export function FAQSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             Perguntas frequentes
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Tire suas dúvidas antes de começar.
-          </p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">

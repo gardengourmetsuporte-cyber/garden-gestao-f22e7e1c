@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logoImg from "@/assets/logo.png";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,8 +14,7 @@ export function LandingNavbar() {
   }, []);
 
   const links = [
-    { label: "Benefícios", href: "#beneficios" },
-    { label: "Como funciona", href: "#como-funciona" },
+    { label: "Funcionalidades", href: "#como-funciona" },
     { label: "Planos", href: "#planos" },
     { label: "FAQ", href: "#faq" },
   ];
@@ -31,8 +29,8 @@ export function LandingNavbar() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src={logoImg} alt="Garden" className="h-8 w-8 rounded-lg" />
-          <span className="font-bold text-lg text-foreground">Garden</span>
+          <img src={logoImg} alt="Garden Gourmet" className="h-8 w-8 rounded-lg" />
+          <span className="font-bold text-lg text-foreground">Garden Gourmet</span>
         </div>
 
         <div className="hidden md:flex items-center gap-8">
@@ -48,20 +46,24 @@ export function LandingNavbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <Link
             to="/auth"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold transition-all"
-            style={{
-              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
-              color: "hsl(var(--primary-foreground))",
-              boxShadow: "0 0 20px hsl(var(--neon-cyan) / 0.3)",
-            }}
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold border border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
           >
             Entrar
           </Link>
+          <Link
+            to="/auth?plan=free"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold transition-all"
+            style={{
+              background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
+              color: "hsl(var(--primary-foreground))",
+              boxShadow: "0 0 20px hsl(var(--neon-green) / 0.3)",
+            }}
+          >
+            Teste grátis
+          </Link>
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setOpen(!open)}
             className="md:hidden p-2 text-muted-foreground hover:text-foreground"
@@ -71,7 +73,6 @@ export function LandingNavbar() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
       {open && (
         <div className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border/40 px-4 pb-6 pt-2 space-y-1">
           {links.map((l) => (
@@ -87,13 +88,20 @@ export function LandingNavbar() {
           <Link
             to="/auth"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-lg text-sm font-semibold"
+            className="block w-full text-center py-3 mt-2 rounded-lg text-sm font-semibold border border-border/60 text-muted-foreground"
+          >
+            Entrar
+          </Link>
+          <Link
+            to="/auth?plan=free"
+            onClick={() => setOpen(false)}
+            className="block w-full text-center py-3 mt-1 rounded-lg text-sm font-semibold"
             style={{
-              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
+              background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
               color: "hsl(var(--primary-foreground))",
             }}
           >
-            Entrar
+            Teste grátis
           </Link>
         </div>
       )}

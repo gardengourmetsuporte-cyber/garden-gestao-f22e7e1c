@@ -5,39 +5,23 @@ import { PlanCheckoutDialog } from "@/components/landing/PlanCheckoutDialog";
 
 const plans = [
   {
-    id: "free",
-    name: "Grátis",
-    description: "Para quem está começando",
-    monthly: 0,
-    yearly: 0,
-    highlight: false,
-    features: [
-      "Dashboard básico",
-      "Agenda",
-      "1 Checklist",
-      "Chat interno",
-      "Até 3 usuários",
-    ],
-    cta: "Comece grátis",
-  },
-  {
     id: "pro",
     name: "Pro",
-    description: "O mais escolhido",
+    description: "Para restaurantes em crescimento",
     monthly: 97,
     yearly: 77,
     highlight: true,
     features: [
-      "Tudo do Grátis",
       "Financeiro completo",
       "Estoque inteligente",
       "Gestão de equipe",
+      "Checklists ilimitados",
       "Fichas técnicas",
       "Gamificação e ranking",
       "Fechamento de caixa",
       "Até 15 usuários",
     ],
-    cta: "Assinar Pro",
+    cta: "Começar 14 dias grátis",
   },
   {
     id: "business",
@@ -57,7 +41,7 @@ const plans = [
       "Usuários ilimitados",
       "Suporte prioritário",
     ],
-    cta: "Assinar Business",
+    cta: "Começar 14 dias grátis",
   },
 ];
 
@@ -67,34 +51,44 @@ export function PricingSection() {
 
   return (
     <section id="planos" className="py-20 md:py-28">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-4">
           <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--neon-cyan))" }}>
             Planos
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Planos para cada fase do seu negócio
+            Planos para cada fase do seu restaurante
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Comece grátis e escale conforme cresce. Sem surpresas.
-          </p>
-
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Mensal</span>
-            <Switch checked={yearly} onCheckedChange={setYearly} />
-            <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
-              Anual{" "}
-              <span
-                className="inline-block ml-1 px-2 py-0.5 rounded-full text-xs font-bold"
-                style={{ background: "hsl(var(--neon-green) / 0.15)", color: "hsl(var(--neon-green))" }}
-              >
-                -20%
-              </span>
-            </span>
-          </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 items-start">
+        <p
+          className="text-center text-sm font-semibold mb-10 py-2 px-4 rounded-full inline-flex mx-auto"
+          style={{
+            background: "hsl(var(--neon-green) / 0.1)",
+            border: "1px solid hsl(var(--neon-green) / 0.25)",
+            color: "hsl(var(--neon-green))",
+            display: "table",
+            margin: "0 auto 2.5rem",
+          }}
+        >
+          14 dias grátis em qualquer plano. Sem cartão de crédito.
+        </p>
+
+        <div className="flex items-center justify-center gap-3 mb-10">
+          <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Mensal</span>
+          <Switch checked={yearly} onCheckedChange={setYearly} />
+          <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
+            Anual{" "}
+            <span
+              className="inline-block ml-1 px-2 py-0.5 rounded-full text-xs font-bold"
+              style={{ background: "hsl(var(--neon-green) / 0.15)", color: "hsl(var(--neon-green))" }}
+            >
+              -20%
+            </span>
+          </span>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -117,9 +111,9 @@ export function PricingSection() {
                 <div
                   className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
                   style={{
-                    background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
+                    background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
                     color: "white",
-                    boxShadow: "0 0 15px hsl(var(--neon-cyan) / 0.4)",
+                    boxShadow: "0 0 15px hsl(var(--neon-green) / 0.4)",
                   }}
                 >
                   <Star className="w-3 h-3" /> Mais popular
@@ -140,9 +134,9 @@ export function PricingSection() {
                 onClick={() => setSelectedPlan(plan)}
                 className="block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-all hover:scale-[1.01] active:scale-[0.98]"
                 style={plan.highlight ? {
-                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan)))",
+                  background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
                   color: "white",
-                  boxShadow: "0 0 20px hsl(var(--neon-cyan) / 0.3)",
+                  boxShadow: "0 0 20px hsl(var(--neon-green) / 0.3)",
                 } : {
                   background: "hsl(var(--secondary))",
                   color: "hsl(var(--foreground))",
