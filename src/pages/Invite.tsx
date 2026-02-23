@@ -269,14 +269,35 @@ export default function Invite() {
                     onChange={e => setPassword(e.target.value)}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder="Ex: Mesa@2026!"
                     required
-                    minLength={6}
+                    minLength={8}
                     className={cn(inputClasses('password'), "pr-11")}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors">
                     {showPassword ? <AppIcon name="EyeOff" size={20} /> : <AppIcon name="Eye" size={20} />}
                   </button>
+                </div>
+                <div className="space-y-1 px-1">
+                  <p className="text-xs font-medium text-muted-foreground">A senha deve ter:</p>
+                  <ul className="text-xs text-muted-foreground/80 space-y-0.5">
+                    <li className={cn("flex items-center gap-1.5", password.length >= 8 && "text-primary")}>
+                      {password.length >= 8 ? <AppIcon name="Check" size={12} /> : <AppIcon name="Circle" size={12} />}
+                      Mínimo 8 caracteres
+                    </li>
+                    <li className={cn("flex items-center gap-1.5", /[A-Z]/.test(password) && "text-primary")}>
+                      {/[A-Z]/.test(password) ? <AppIcon name="Check" size={12} /> : <AppIcon name="Circle" size={12} />}
+                      Uma letra maiúscula
+                    </li>
+                    <li className={cn("flex items-center gap-1.5", /[0-9]/.test(password) && "text-primary")}>
+                      {/[0-9]/.test(password) ? <AppIcon name="Check" size={12} /> : <AppIcon name="Circle" size={12} />}
+                      Um número
+                    </li>
+                    <li className={cn("flex items-center gap-1.5", /[^A-Za-z0-9]/.test(password) && "text-primary")}>
+                      {/[^A-Za-z0-9]/.test(password) ? <AppIcon name="Check" size={12} /> : <AppIcon name="Circle" size={12} />}
+                      Um símbolo (@, !, #, etc.)
+                    </li>
+                  </ul>
                 </div>
               </div>
 
