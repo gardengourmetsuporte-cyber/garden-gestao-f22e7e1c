@@ -91,7 +91,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-40 bg-card/90 backdrop-blur-2xl border-t border-border/15" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60] bg-card/95 backdrop-blur-2xl border-t border-border/15" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* Top glow line */}
         <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">

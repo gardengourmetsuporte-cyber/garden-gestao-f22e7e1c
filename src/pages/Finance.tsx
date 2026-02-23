@@ -142,7 +142,7 @@ export default function Finance() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-32">
       <header className="page-header-bar">
         <div className="page-header-content">
           <h1 className="page-title">Financeiro</h1>
