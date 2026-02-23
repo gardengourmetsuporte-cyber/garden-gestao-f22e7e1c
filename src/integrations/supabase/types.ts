@@ -2263,7 +2263,10 @@ export type Database = {
           full_name: string
           id: string
           job_title: string | null
+          plan: string
+          plan_status: string
           selected_frame: string | null
+          stripe_customer_id: string | null
           updated_at: string
           user_id: string
         }
@@ -2274,7 +2277,10 @@ export type Database = {
           full_name: string
           id?: string
           job_title?: string | null
+          plan?: string
+          plan_status?: string
           selected_frame?: string | null
+          stripe_customer_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2285,7 +2291,10 @@ export type Database = {
           full_name?: string
           id?: string
           job_title?: string | null
+          plan?: string
+          plan_status?: string
           selected_frame?: string | null
+          stripe_customer_id?: string | null
           updated_at?: string
           user_id?: string
         }
