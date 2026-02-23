@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, CalendarIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,7 +88,7 @@ export function RegisterInvoiceAfterReceive({
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
+            <AppIcon name="Description" size={20} className="text-primary" />
             Cadastrar Despesa - {order?.supplier?.name}
           </SheetTitle>
         </SheetHeader>
@@ -124,13 +124,13 @@ export function RegisterInvoiceAfterReceive({
           {/* Due Date */}
           <div className="space-y-2">
             <Label className="text-foreground flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4" />
+              <AppIcon name="CalendarMonth" size={16} />
               Data de Vencimento
             </Label>
             <Popover open={showDueCalendar} onOpenChange={setShowDueCalendar}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full h-12 justify-start">
-                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  <AppIcon name="CalendarMonth" size={16} className="mr-2" />
                   {format(dueDate, "dd/MM/yyyy", { locale: ptBR })}
                 </Button>
               </PopoverTrigger>
@@ -172,7 +172,7 @@ export function RegisterInvoiceAfterReceive({
               disabled={isSubmitting || !amount}
               className="w-full h-12 gap-2"
             >
-              <FileText className="w-4 h-4" />
+              <AppIcon name="Description" size={16} />
               {isSubmitting ? 'Cadastrando...' : 'Cadastrar Boleto'}
             </Button>
             

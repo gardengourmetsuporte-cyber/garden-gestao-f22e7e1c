@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ListPicker } from '@/components/ui/list-picker';
 import { InventoryItem, Category, Supplier } from '@/types/database';
-import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface ItemFormSheetProps {
@@ -159,7 +159,7 @@ export function ItemFormSheetNew({
                   ? categories.find(c => c.id === categoryId)?.name || 'Selecione a categoria'
                   : 'Selecione a categoria'}
               </span>
-              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              <AppIcon name="ExpandMore" size={20} className="text-muted-foreground" />
             </button>
           </div>
 
@@ -177,7 +177,7 @@ export function ItemFormSheetNew({
                     ? suppliers.find(s => s.id === supplierId)?.name || 'Selecione o fornecedor'
                     : 'Selecione o fornecedor'}
                 </span>
-                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                <AppIcon name="ExpandMore" size={20} className="text-muted-foreground" />
               </button>
             </div>
           )}
@@ -270,7 +270,7 @@ export function ItemFormSheetNew({
                 className="w-full h-12 justify-between text-base font-medium"
               >
                 <span>⚙️ Configurar para Fichas Técnicas</span>
-                {showRecipeSection ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                {showRecipeSection ? <AppIcon name="ExpandLess" size={20} /> : <AppIcon name="ExpandMore" size={20} />}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4 space-y-4">
@@ -335,7 +335,7 @@ export function ItemFormSheetNew({
                 onClick={handleDelete}
                 className="w-full h-12 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                <Trash2 className="w-5 h-5 mr-2" />
+                <AppIcon name="Delete" size={20} className="mr-2" />
                 Excluir Item
               </Button>
             )}

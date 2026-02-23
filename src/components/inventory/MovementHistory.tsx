@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { StockMovement, InventoryItem, UnitType } from '@/types/inventory';
 import { cn } from '@/lib/utils';
 
@@ -61,11 +61,11 @@ export function MovementHistory({ movements, items, showItemName = false }: Move
                       "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
                       movement.type === 'entrada' ? "bg-success/10" : "bg-destructive/10"
                     )}>
-                      {movement.type === 'entrada' ? (
-                        <ArrowUpCircle className="w-5 h-5 text-success" />
-                      ) : (
-                        <ArrowDownCircle className="w-5 h-5 text-destructive" />
-                      )}
+                      <AppIcon
+                        name={movement.type === 'entrada' ? 'ArrowCircleUp' : 'ArrowCircleDown'}
+                        size={20}
+                        className={movement.type === 'entrada' ? 'text-success' : 'text-destructive'}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-0">

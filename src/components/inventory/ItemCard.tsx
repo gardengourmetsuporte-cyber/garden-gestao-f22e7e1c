@@ -1,4 +1,4 @@
-import { Package, ChevronRight } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { InventoryItem, UnitType } from '@/types/inventory';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
   return (
     <button
       onClick={onClick}
-      className="stock-card w-full text-left transition-all hover:shadow-md active:scale-[0.98] animate-slide-up"
+      className="stock-card w-full text-left transition-all hover:shadow-md animate-slide-up"
     >
       <div className="flex items-center gap-3">
         <div className={cn(
@@ -37,8 +37,7 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
           status === 'low' && "bg-warning/10",
           status === 'out' && "bg-destructive/10"
         )}>
-          <Package className={cn(
-            "w-6 h-6",
+          <AppIcon name="Package" size={24} className={cn(
             status === 'ok' && "text-success",
             status === 'low' && "text-warning",
             status === 'out' && "text-destructive"
@@ -71,7 +70,7 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
           </span>
         </div>
 
-        <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+        <AppIcon name="ChevronRight" size={20} className="text-muted-foreground shrink-0" />
       </div>
     </button>
   );

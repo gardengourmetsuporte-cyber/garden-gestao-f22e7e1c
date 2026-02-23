@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Check, AlertTriangle, Sparkles } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Order, OrderItem } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,7 +115,7 @@ export function ReceiveOrderSheet({
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-primary" />
+            <AppIcon name="Package" size={20} className="text-primary" />
             Receber Pedido - {order?.supplier?.name}
           </SheetTitle>
         </SheetHeader>
@@ -135,7 +135,7 @@ export function ReceiveOrderSheet({
               }}
               className="w-full h-12 gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary"
             >
-              <Sparkles className="w-5 h-5" />
+              <AppIcon name="AutoAwesome" size={20} />
               Escanear Nota Fiscal com IA
             </Button>
           )}
@@ -177,7 +177,7 @@ export function ReceiveOrderSheet({
                       </span>
                       
                       {item.receivedQuantity !== item.orderedQuantity && (
-                        <AlertTriangle className="w-4 h-4 text-warning ml-2" />
+                        <AppIcon name="Warning" size={16} className="text-warning ml-2" />
                       )}
                     </div>
                   )}
@@ -188,7 +188,7 @@ export function ReceiveOrderSheet({
 
           {hasDiscrepancies && (
             <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/10 text-warning">
-              <AlertTriangle className="w-4 h-4" />
+              <AppIcon name="Warning" size={16} />
               <span className="text-sm">Algumas quantidades foram ajustadas</span>
             </div>
           )}
@@ -198,7 +198,7 @@ export function ReceiveOrderSheet({
             disabled={isSubmitting || receivedItems.every(i => !i.received)}
             className="w-full h-12 gap-2"
           >
-            <Check className="w-4 h-4" />
+            <AppIcon name="Check" size={16} />
             {isSubmitting ? 'Processando...' : 'Confirmar Recebimento e Adicionar ao Estoque'}
           </Button>
         </div>

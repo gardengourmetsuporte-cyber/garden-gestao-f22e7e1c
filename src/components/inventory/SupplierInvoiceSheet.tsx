@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SupplierInvoice } from '@/types/supplier';
 import { format, addDays, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, Loader2, Trash2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
 interface Supplier {
@@ -200,7 +200,7 @@ export function SupplierInvoiceSheet({
             <Popover open={showIssueCalendar} onOpenChange={setShowIssueCalendar}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start">
-                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  <AppIcon name="CalendarMonth" size={16} className="mr-2" />
                   {format(issueDate, "dd/MM/yyyy", { locale: ptBR })}
                 </Button>
               </PopoverTrigger>
@@ -243,7 +243,7 @@ export function SupplierInvoiceSheet({
                     dueDate < new Date() && "border-destructive text-destructive"
                   )}
                 >
-                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  <AppIcon name="CalendarMonth" size={16} className="mr-2" />
                   {format(dueDate, "dd/MM/yyyy", { locale: ptBR })}
                 </Button>
               </PopoverTrigger>
@@ -281,7 +281,7 @@ export function SupplierInvoiceSheet({
                 disabled={isLoading}
                 className="w-14"
               >
-                <Trash2 className="w-5 h-5" />
+                <AppIcon name="Delete" size={20} />
               </Button>
             )}
             <Button
@@ -289,7 +289,7 @@ export function SupplierInvoiceSheet({
               disabled={isLoading || !supplierId || !description.trim() || !amount}
               className="flex-1 h-12"
             >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
+              {isLoading ? <AppIcon name="Progress_activity" size={20} className="animate-spin" /> : 'Salvar'}
             </Button>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { ChevronRight, Edit2 } from 'lucide-react';
 import { InventoryItem } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -31,7 +30,7 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
 
   return (
     <div
-      className="bg-card/60 backdrop-blur-sm rounded-xl p-3 transition-all duration-200 cursor-pointer hover:bg-card/90 active:scale-[0.98] border border-border/30"
+      className="bg-card/60 backdrop-blur-sm rounded-xl p-3 transition-all duration-200 cursor-pointer hover:bg-card/90 border border-border/30"
       style={{ borderLeftWidth: 3, borderLeftColor: categoryColor }}
     >
       <div className="flex items-center gap-3">
@@ -79,11 +78,11 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
               onClick={(e) => { e.stopPropagation(); onEdit(); }}
               className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors shrink-0"
             >
-              <Edit2 className="w-3.5 h-3.5" />
+              <AppIcon name="Edit" size={14} />
             </button>
           )}
 
-          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
         </div>
       </div>
     </div>

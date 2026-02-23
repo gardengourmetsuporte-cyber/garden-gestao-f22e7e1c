@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InventoryItem, UnitType } from '@/types/inventory';
-import { Trash2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface ItemFormSheetProps {
   item?: InventoryItem | null;
@@ -187,7 +187,7 @@ export function ItemFormSheet({ item, open, onOpenChange, onSave, onDelete }: It
                 onClick={handleDelete}
                 className="w-full h-12 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                <Trash2 className="w-5 h-5 mr-2" />
+                <AppIcon name="Delete" size={20} className="mr-2" />
                 Excluir Item
               </Button>
             )}
