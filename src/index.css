@@ -799,7 +799,7 @@
   /* ========== APP LAUNCHER ========== */
 
   .launcher-overlay {
-    background: hsl(222 70% 4% / 0.85);
+    background: hsl(var(--background) / 0.92);
     backdrop-filter: blur(24px) saturate(1.4);
     -webkit-backdrop-filter: blur(24px) saturate(1.4);
     animation: launcherOverlayIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;

@@ -325,8 +325,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   />
                 </div>
                 <div className="text-center">
-                  <p className="text-base font-bold" style={{ color: '#fff' }}>
-                    {profile?.full_name || 'Usuário'}
+                   <p className="text-base font-bold text-foreground">
+                     {profile?.full_name || 'Usuário'}
                   </p>
                   <p className="text-xs font-semibold mt-0.5" style={{ color: rank.color }}>
                     {rank.title} · {earnedPoints} pts
@@ -338,7 +338,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             {/* ===== App Grid by Group ===== */}
             {groupedNav.map((group, gi) => (
               <div key={group.label} className="mb-6 launcher-item" style={{ animationDelay: `${(gi + 1) * 60}ms` }}>
-                <span className="text-xs font-bold uppercase tracking-[0.15em] px-1 mb-3 block text-center" style={{ color: 'hsl(220 20% 65%)' }}>
+                <span className="text-xs font-bold uppercase tracking-[0.15em] px-1 mb-3 block text-center text-muted-foreground">
                   {group.label}
                 </span>
                 <div className="flex flex-wrap justify-center gap-x-6 gap-y-6">
@@ -362,32 +362,32 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                               "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 relative",
                               isActive ? "bg-primary" : ""
                             )}
-                            style={{
-                              background: isActive
-                                ? undefined
-                                : 'hsl(0 0% 92%)',
-                              boxShadow: isActive
-                                ? '0 4px 16px hsl(var(--primary) / 0.4)'
-                                : '0 2px 8px hsl(0 0% 0% / 0.08)',
-                              opacity: isEmProducao && !isActive ? 0.8 : 1,
-                              border: isEmProducao && !isActive
-                                ? '1px dashed hsl(var(--neon-amber) / 0.5)'
-                                : isActive ? 'none' : '1px solid hsl(0 0% 85%)',
-                            }}
-                          >
-                            <AppIcon
-                              name={item.icon}
-                              size={22}
-                              className={isActive ? "text-primary-foreground" : ""}
-                              style={{
-                                color: isActive
-                                  ? undefined
-                                  : isEmProducao
-                                    ? 'hsl(35 80% 40%)'
-                                    : 'hsl(220 15% 30%)',
-                                filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
-                              }}
-                            />
+                             style={{
+                               background: isActive
+                                 ? undefined
+                                 : 'hsl(var(--secondary))',
+                               boxShadow: isActive
+                                 ? '0 4px 16px hsl(var(--primary) / 0.4)'
+                                 : 'var(--shadow-card)',
+                               opacity: isEmProducao && !isActive ? 0.8 : 1,
+                               border: isEmProducao && !isActive
+                                 ? '1px dashed hsl(var(--neon-amber) / 0.5)'
+                                 : isActive ? 'none' : '1px solid hsl(var(--border))',
+                             }}
+                           >
+                             <AppIcon
+                               name={item.icon}
+                               size={22}
+                               className={isActive ? "text-primary-foreground" : "text-foreground/70"}
+                               style={{
+                                 color: isActive
+                                   ? undefined
+                                   : isEmProducao
+                                     ? 'hsl(var(--neon-amber))'
+                                     : undefined,
+                                 filter: isActive ? 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' : 'none',
+                               }}
+                             />
                           </div>
 
                           {/* Em Produção indicator */}
@@ -427,10 +427,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                             }} />
                           )}
                         </div>
-                        <span
-                          className="text-[11px] font-semibold leading-tight max-w-full truncate transition-colors"
-                          style={{ color: isActive ? '#fff' : 'hsl(0 0% 90%)' }}
-                        >{item.label}</span>
+                         <span
+                           className="text-[11px] font-semibold leading-tight max-w-full truncate transition-colors text-foreground/80"
+                           style={isActive ? { color: 'hsl(var(--primary))' } : undefined}
+                         >{item.label}</span>
                       </Link>
                     );
                   })}
