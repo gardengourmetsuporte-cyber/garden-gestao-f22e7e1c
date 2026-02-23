@@ -1,3 +1,5 @@
+import atlasIcon from "@/assets/atlas-icon.png";
+
 export function PageLoader() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-5">
@@ -14,11 +16,11 @@ export function PageLoader() {
           }}
         />
         {/* Logo */}
-        <div className="absolute inset-2 rounded-full overflow-hidden bg-card border border-border/30">
+        <div className="absolute inset-2 rounded-full overflow-hidden bg-card border border-border/30 flex items-center justify-center">
           <img
-            alt="Logo"
-            className="w-full h-full object-contain"
-            src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg"
+            alt="Atlas"
+            className="w-full h-full object-contain p-1"
+            src={atlasIcon}
           />
         </div>
       </div>

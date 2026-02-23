@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { lovable } from '@/integrations/lovable/index';
+import atlasIcon from '@/assets/atlas-icon.png';
 
 const emailSchema = z.string().email('Email inválido');
 const passwordSchema = z.string().min(6, 'Senha deve ter no mínimo 6 caracteres');
@@ -227,7 +228,7 @@ export default function Auth() {
           {/* Logo */}
           <div className="flex flex-col items-center space-y-5 animate-slide-up">
             <div
-              className="relative w-28 h-28 rounded-full overflow-hidden animate-float"
+              className="relative w-24 h-24 rounded-full overflow-hidden animate-float flex items-center justify-center"
               style={{
                 border: '2px solid hsl(var(--neon-cyan) / 0.3)',
                 boxShadow: '0 0 40px hsl(var(--neon-cyan) / 0.2), 0 0 80px hsl(var(--neon-cyan) / 0.08), 0 8px 32px hsl(222 47% 3% / 0.5)',
@@ -242,17 +243,17 @@ export default function Auth() {
                   filter: 'blur(3px)',
                 }}
               />
-              <div className="absolute inset-[1px] rounded-full overflow-hidden bg-white">
+              <div className="absolute inset-[1px] rounded-full overflow-hidden bg-white flex items-center justify-center">
                 <img
-                  alt="Garden Logo"
-                  className="w-full h-full object-cover"
-                  src="/lovable-uploads/dc8e43da-017d-406f-9b66-d1984478c7e6.jpg"
+                  alt="Atlas"
+                  className="w-[70%] h-[70%] object-contain"
+                  src={atlasIcon}
                 />
               </div>
             </div>
             <div className="text-center space-y-1">
               <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-                Garden
+                Atlas
               </h1>
               <p className="text-sm text-muted-foreground tracking-widest uppercase">
                 Gestão Inteligente
