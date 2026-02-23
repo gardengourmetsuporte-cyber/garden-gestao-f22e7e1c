@@ -100,17 +100,17 @@ export default function Plans() {
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
                     style={{ background: 'hsl(var(--neon-green) / 0.12)' }}
                   >
-                    <AppIcon name="Crown" size={22} style={{ color: 'hsl(var(--neon-green))' }} />
+                    <AppIcon name="Crown" size={24} style={{ color: 'hsl(var(--neon-green))' }} />
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-foreground">
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-lg font-bold text-foreground leading-tight">
                       Plano {userPlan === 'pro' ? 'Pro' : 'Business'}
                     </h2>
                     <span
-                      className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full"
+                      className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full w-fit"
                       style={{ background: 'hsl(var(--neon-green) / 0.15)', color: 'hsl(var(--neon-green))' }}
                     >
                       <AppIcon name="Check" size={10} /> Ativo
