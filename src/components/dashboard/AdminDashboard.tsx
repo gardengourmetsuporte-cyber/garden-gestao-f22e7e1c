@@ -144,7 +144,9 @@ export function AdminDashboard() {
         </div>
 
         {/* UNIFIED CALENDAR - after weekly summary */}
-        <UnifiedCalendarWidget />
+        <div className="col-span-2 card-press min-w-0 overflow-hidden">
+          <UnifiedCalendarWidget />
+        </div>
 
         {/* === OPERATIONAL BLOCK === */}
 
