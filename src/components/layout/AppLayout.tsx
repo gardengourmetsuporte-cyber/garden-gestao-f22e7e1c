@@ -130,7 +130,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="bg-card backdrop-blur-xl border-b border-border/20">
+        <div className="bg-card/80 backdrop-blur-2xl border-b border-border/20 transition-all duration-300">
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-1">
               <ThemeToggle className="p-1.5" />

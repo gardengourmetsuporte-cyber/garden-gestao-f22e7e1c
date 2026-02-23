@@ -24,7 +24,7 @@ export function EmployeeDashboard() {
   return (
     <div className="space-y-5 p-4 lg:p-6">
       {/* Welcome Header */}
-      <div className="animate-slide-up stagger-1">
+      <div className="animate-spring-in spring-stagger-1">
         <div className="card-surface p-5" style={{ border: 'none' }}>
           <h2 className="text-xl font-bold text-foreground">
             Olá, {profile?.full_name?.split(' ')[0] || 'Colaborador'}!
@@ -40,10 +40,10 @@ export function EmployeeDashboard() {
       </div>
 
       {/* Personal Finance Card */}
-      <div className="animate-slide-up stagger-2">
+      <div className="animate-spring-in spring-stagger-2">
         <button
           onClick={() => navigate('/personal-finance')}
-          className="finance-hero-card finance-hero-card--personal w-full text-left"
+          className="finance-hero-card finance-hero-card--personal w-full text-left card-press"
         >
           <div className="finance-hero-inner p-5 pb-4">
             <div className="flex items-center justify-between mb-1">
@@ -86,7 +86,7 @@ export function EmployeeDashboard() {
       </div>
 
       {/* Leaderboard */}
-      <div className="animate-slide-up stagger-3">
+      <div className="animate-spring-in spring-stagger-3">
         <Leaderboard 
           entries={leaderboard}
           currentUserId={user?.id}
