@@ -1,105 +1,88 @@
 
-# Calendario Unificado no Dashboard
+# Melhorias de Estabilidade e Profissionalizacao - Fase 2
 
-## Resumo
+## Problemas Identificados na Inspecao
 
-Criar um widget de calendario mensal no Dashboard que consolida visualmente todos os eventos do sistema: tarefas da Agenda, transacoes financeiras relevantes (dias de pico de gastos), posts de marketing agendados, e escalas de trabalho. O usuario consegue ver a programacao completa do mes em um unico lugar.
+### 1. AppLayout carrega hooks pesados em TODAS as paginas (Impacto Alto)
+O `AppLayout` executa `useLeaderboard()`, `usePoints()`, `useModuleStatus()`, e `useTimeAlerts()` em toda pagina, mesmo quando o usuario esta em modulos como Financeiro ou Estoque. Isso gera 9+ queries simultaneas ao backend em cada navegacao.
 
----
+**Solucao:** Mover `useLeaderboard` para dentro dos componentes que realmente precisam dele (AdminDashboard, EmployeeDashboard, Ranking). No AppLayout, manter apenas o que e usado no header/launcher (points, moduleStatus).
 
-## Como vai funcionar
+### 2. useBackGuard com bug de cleanup (Impacto Medio)
+O hook `useBackGuard` faz `window.history.back()` no cleanup quando o sheet fecha programaticamente. Isso pode causar navegacao indesejada se multiplos sheets usarem o hook simultaneamente ou se o usuario fechar rapido.
 
-O calendario fica no Dashboard entre o bloco de Checklist/Agenda e o Leaderboard. Cada dia mostra pequenos chips coloridos indicando o tipo de evento:
+**Solucao:** Usar um counter global ou verificar se o history state contem a tag `__backGuard` antes de chamar `back()`.
 
-- **Azul** -- Tarefas da Agenda pendentes
-- **Verde** -- Tarefas concluidas
-- **Vermelho/Laranja** -- Dias com despesas financeiras significativas (ex: folha de pagamento, impostos)
-- **Roxo** -- Posts de marketing agendados/publicados
-- **Amarelo** -- Escalas de trabalho / folgas programadas
+### 3. Calendario Unificado nao mostra despesas de dias normais (Impacto Medio)
+O `useDashboardCalendar` so mostra dias com despesas acima de 2x a media. Dias com despesas normais (mas relevantes) ficam invisiveis. Alem disso, nao mostra receitas.
 
-Ao clicar em um dia, um painel inline expande abaixo do calendario mostrando os detalhes daquele dia, agrupados por tipo.
+**Solucao:** Mostrar TODAS as despesas no detalhe do dia (ao clicar), mas manter os chips coloridos apenas para picos. Adicionar receitas como tipo de evento tambem.
 
----
+### 4. EmployeeDashboard sem Calendario Unificado (Impacto Baixo)
+O calendario so aparece no AdminDashboard. Funcionarios nao veem suas tarefas/folgas no calendario.
 
-## Fontes de dados
+**Solucao:** Adicionar o `UnifiedCalendarWidget` tambem ao `EmployeeDashboard`.
 
-| Fonte | Hook existente | Dados usados |
-|-------|---------------|-------------|
-| Agenda | `useAgenda` | Tarefas com `due_date` |
-| Financeiro | Query direta `finance_transactions` | Despesas pagas agrupadas por dia (top dias de gasto) |
-| Marketing | `useMarketing` | Posts com `scheduled_at` ou `published_at` |
-| Escalas | `useSchedule` | Folgas programadas (`day_off`) |
+### 5. CSS com 1200+ linhas sem organizacao (Impacto Baixo, Manutencao)
+O arquivo `index.css` tem 1200+ linhas em um unico arquivo. Dificil de manter e pode causar conflitos.
 
----
+**Solucao:** Nao dividir agora (risco de regressao), mas adicionar comentarios de secao mais claros e remover classes duplicadas/nao usadas.
 
-## Plano de implementacao
+### 6. Queries do useDashboardCalendar com filtros OR incorretos (Impacto Alto - Bug)
+A query de marketing_posts usa `.or()` encadeado de forma que pode retornar posts fora do mes selecionado. A logica de filtro `or(scheduled_at.gte, published_at.gte)` seguida de outro `or(scheduled_at.lte, published_at.lte)` nao garante intersecao correta.
 
-### 1. Criar hook `useDashboardCalendar`
+**Solucao:** Corrigir para usar um filtro combinado que busca posts onde `scheduled_at` OU `published_at` estejam dentro do range do mes.
 
-Um hook dedicado que busca e consolida dados de multiplas fontes para o mes selecionado:
+### 7. Falta loading state no UnifiedCalendarWidget (Impacto Baixo)
+O calendario nao mostra skeleton/loading enquanto os dados estao sendo carregados, causando um "salto" visual quando os chips aparecem.
 
-- Reutiliza dados de `useAgenda` (ja carregado no dashboard)
-- Faz query leve para transacoes financeiras do mes (apenas `date`, `amount`, `type`, agrupando por dia)
-- Busca posts de marketing do mes
-- Busca escalas do mes
-
-Retorna um `Map<string, CalendarDayEvents>` onde cada dia contem arrays de eventos tipados.
-
-**Arquivo:** `src/hooks/useDashboardCalendar.ts`
-
-### 2. Criar componente `UnifiedCalendarWidget`
-
-Estrutura visual inspirada no `MarketingCalendarGrid`:
-
-- Navegacao de mes (setas esquerda/direita + botao "Hoje")
-- Grid 7 colunas com headers dos dias da semana
-- Cada celula mostra o numero do dia + chips coloridos por tipo de evento
-- Destaque no dia atual
-- Ao clicar, expande um painel inline (como no `AgendaCalendarView`) com detalhes
-
-O painel de detalhes agrupa por secao:
-- **Tarefas** -- titulo, horario, categoria (clicavel para abrir TaskSheet)
-- **Financeiro** -- total de despesas do dia, principais categorias
-- **Marketing** -- posts agendados com status
-- **Escalas** -- quem esta de folga
-
-**Arquivo:** `src/components/dashboard/UnifiedCalendarWidget.tsx`
-
-### 3. Criar tipo `CalendarEvent`
-
-Tipo union para representar eventos de diferentes fontes com cores e icones padronizados.
-
-**Arquivo:** `src/types/calendar.ts`
-
-### 4. Integrar no AdminDashboard
-
-Adicionar o widget entre o bloco operacional (Checklist + Agenda) e o Leaderboard, ocupando `col-span-2`.
-
-**Arquivo editado:** `src/components/dashboard/AdminDashboard.tsx`
+**Solucao:** Adicionar skeleton state baseado nos isLoading dos hooks internos.
 
 ---
 
-## Detalhes tecnicos
+## Plano de Implementacao
 
-### Otimizacao de queries
+### Fase 1: Corrigir bug de query do marketing no calendario
+- Editar `src/hooks/useDashboardCalendar.ts`
+- Substituir os `.or()` encadeados por um filtro unico que cobre ambas as datas dentro do range
 
-As queries financeiras e de marketing para o calendario serao independentes com `staleTime: 5min` para nao sobrecarregar o dashboard. A query de transacoes busca apenas `date` e `amount` (sem dados pesados como `description` ou `notes`).
+### Fase 2: Remover useLeaderboard do AppLayout
+- Editar `src/components/layout/AppLayout.tsx` -- remover import e uso de `useLeaderboard`
+- A posicao no ranking (`myPosition`) no header do trophy pode ser obtida de forma mais leve com uma query dedicada so para o user, ou removendo o badge de posicao do header
 
-### Thresholds financeiros
+### Fase 3: Melhorar useBackGuard
+- Editar `src/hooks/useBackGuard.ts`
+- Verificar `history.state.__backGuard` antes de fazer `back()` no cleanup para evitar navegacao acidental
 
-Para marcar dias com "pico de gasto", o sistema calcula a media diaria de despesas do mes e destaca dias que excedem 2x a media. Isso faz com que dias como 5 (folha) e 20 (impostos/vale) aparecam automaticamente sem precisar de configuracao manual.
+### Fase 4: Mostrar todas despesas no detalhe do calendario
+- Editar `src/hooks/useDashboardCalendar.ts`
+- No detalhe do dia (ao clicar), listar todas as despesas daquele dia, nao so picos
+- Manter chips coloridos apenas para picos (comportamento atual)
 
-### Responsividade
+### Fase 5: Adicionar calendario ao EmployeeDashboard
+- Editar `src/components/dashboard/EmployeeDashboard.tsx`
+- Adicionar `UnifiedCalendarWidget` no topo
 
-O calendario usa o mesmo grid compacto do marketing (`min-h-[4.5rem]` por celula) com chips de 14px de altura para manter legibilidade em telas mobile.
+### Fase 6: Loading state no calendario
+- Editar `src/hooks/useDashboardCalendar.ts` -- retornar `isLoading`
+- Editar `src/components/dashboard/UnifiedCalendarWidget.tsx` -- mostrar skeleton durante carregamento
 
 ---
 
-## Arquivos
+## Arquivos que serao editados
 
 | Arquivo | Acao |
 |---------|------|
-| `src/types/calendar.ts` | Criar -- tipos CalendarEvent e CalendarDayEvents |
-| `src/hooks/useDashboardCalendar.ts` | Criar -- hook que consolida dados de multiplas fontes |
-| `src/components/dashboard/UnifiedCalendarWidget.tsx` | Criar -- componente visual do calendario |
-| `src/components/dashboard/AdminDashboard.tsx` | Editar -- adicionar o widget no grid |
+| `src/hooks/useDashboardCalendar.ts` | Editar -- corrigir query marketing, retornar despesas completas, expor isLoading |
+| `src/components/layout/AppLayout.tsx` | Editar -- remover useLeaderboard |
+| `src/hooks/useBackGuard.ts` | Editar -- verificar history state no cleanup |
+| `src/components/dashboard/EmployeeDashboard.tsx` | Editar -- adicionar calendario |
+| `src/components/dashboard/UnifiedCalendarWidget.tsx` | Editar -- skeleton loading |
+
+## Resultado Esperado
+
+- Reducao de ~30% nas queries simultaneas ao navegar entre paginas
+- Zero navegacoes acidentais ao fechar sheets
+- Calendario mostrando dados financeiros completos ao detalhar o dia
+- Funcionarios com acesso ao calendario unificado
+- Transicao visual suave no carregamento do calendario
