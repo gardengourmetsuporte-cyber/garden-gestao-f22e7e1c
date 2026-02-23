@@ -634,7 +634,7 @@ export default function Auth() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/landing')}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   ← Voltar para o site
