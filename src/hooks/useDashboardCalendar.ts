@@ -25,34 +25,32 @@ export function useDashboardCalendar(currentMonth: Date) {
   const yearNum = currentMonth.getFullYear();
 
   // Finance transactions for the month (lightweight query)
-  const { data: financeRows = [] } = useQuery({
+  const { data: financeRows = [], isLoading: financeLoading } = useQuery({
     queryKey: ['dashboard-calendar-finance', monthStart, activeUnitId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('finance_transactions')
-        .select('date, amount, type')
+        .select('date, amount, type, description')
         .eq('unit_id', activeUnitId!)
-        .eq('type', 'expense')
         .eq('is_paid', true)
         .gte('date', monthStart)
         .lte('date', monthEnd);
       if (error) throw error;
-      return (data || []) as FinanceDayRow[];
+      return (data || []) as (FinanceDayRow & { description?: string })[];
     },
     enabled: !!user && !!activeUnitId,
     staleTime: 5 * 60 * 1000,
   });
 
-  // Marketing posts for the month
-  const { data: marketingPosts = [] } = useQuery({
+  // Marketing posts for the month (fixed filter)
+  const { data: marketingPosts = [], isLoading: marketingLoading } = useQuery({
     queryKey: ['dashboard-calendar-marketing', monthStart, activeUnitId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('marketing_posts' as any)
         .select('id, title, status, scheduled_at, published_at')
         .eq('unit_id', activeUnitId!)
-        .or(`scheduled_at.gte.${monthStart},published_at.gte.${monthStart}`)
-        .or(`scheduled_at.lte.${monthEnd}T23:59:59,published_at.lte.${monthEnd}T23:59:59`);
+        .or(`and(scheduled_at.gte.${monthStart},scheduled_at.lte.${monthEnd}T23:59:59),and(published_at.gte.${monthStart},published_at.lte.${monthEnd}T23:59:59)`);
       if (error) throw error;
       return (data || []) as unknown as Pick<MarketingPost, 'id' | 'title' | 'status' | 'scheduled_at' | 'published_at'>[];
     },
@@ -61,7 +59,7 @@ export function useDashboardCalendar(currentMonth: Date) {
   });
 
   // Schedules (day_off) for the month
-  const { data: scheduleRows = [] } = useQuery({
+  const { data: scheduleRows = [], isLoading: scheduleLoading } = useQuery({
     queryKey: ['dashboard-calendar-schedules', monthNum, yearNum, activeUnitId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -87,22 +85,24 @@ export function useDashboardCalendar(currentMonth: Date) {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Calculate finance peak threshold (2x daily average)
-  const financeByDay = useMemo(() => {
+  const isLoading = financeLoading || marketingLoading || scheduleLoading;
+
+  // Calculate finance peak threshold (2x daily average) - only expenses
+  const expensesByDay = useMemo(() => {
     const map = new Map<string, number>();
-    financeRows.forEach(r => {
+    financeRows.filter(r => r.type === 'expense').forEach(r => {
       map.set(r.date, (map.get(r.date) || 0) + Math.abs(r.amount));
     });
     return map;
   }, [financeRows]);
 
   const financePeakThreshold = useMemo(() => {
-    if (financeByDay.size === 0) return Infinity;
-    const totalExpense = Array.from(financeByDay.values()).reduce((a, b) => a + b, 0);
+    if (expensesByDay.size === 0) return Infinity;
+    const totalExpense = Array.from(expensesByDay.values()).reduce((a, b) => a + b, 0);
     const daysInMonth = endOfMonth(currentMonth).getDate();
     const dailyAvg = totalExpense / daysInMonth;
     return dailyAvg * 2;
-  }, [financeByDay, currentMonth]);
+  }, [expensesByDay, currentMonth]);
 
   // Build consolidated events map
   const eventsMap = useMemo(() => {
@@ -130,15 +130,27 @@ export function useDashboardCalendar(currentMonth: Date) {
       });
     });
 
-    // Finance peaks
-    financeByDay.forEach((total, dateStr) => {
+    // Finance: all transactions grouped by day for detail view
+    financeRows.forEach(r => {
+      const day = getDay(r.date);
+      day.finance.push({
+        id: `fin-${r.date}-${day.finance.length}`,
+        type: r.type === 'expense' ? 'finance_peak' : 'finance_income',
+        title: r.description || (r.type === 'expense' ? 'Despesa' : 'Receita'),
+        amount: Math.abs(r.amount),
+      });
+    });
+
+    // Mark peak days with a summary entry at the beginning
+    expensesByDay.forEach((total, dateStr) => {
       if (total >= financePeakThreshold) {
         const day = getDay(dateStr);
-        day.finance.push({
-          id: `fin-${dateStr}`,
+        day.finance.unshift({
+          id: `fin-peak-${dateStr}`,
           type: 'finance_peak',
-          title: `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+          title: `Pico: R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
           amount: total,
+          subtitle: 'Acima da média',
         });
       }
     });
@@ -170,7 +182,7 @@ export function useDashboardCalendar(currentMonth: Date) {
     });
 
     return map;
-  }, [allTasks, financeByDay, financePeakThreshold, marketingPosts, scheduleRows, monthNum, yearNum]);
+  }, [allTasks, financeRows, expensesByDay, financePeakThreshold, marketingPosts, scheduleRows, monthNum, yearNum]);
 
-  return { eventsMap };
+  return { eventsMap, isLoading };
 }
