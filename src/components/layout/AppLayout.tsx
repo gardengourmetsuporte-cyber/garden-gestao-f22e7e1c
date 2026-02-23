@@ -1,3 +1,4 @@
+import atlasIcon from '@/assets/atlas-icon.png';
 import { ReactNode, useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -149,7 +150,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               className="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-xl overflow-hidden bg-white/10 backdrop-blur-sm border border-border/20 active:scale-95 transition-transform"
               style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.15)' }}
             >
-              <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+              <img alt="Atlas" className="w-full h-full object-contain rounded-full p-0.5" src={atlasIcon} />
             </button>
 
             <div className="flex items-center gap-1">
@@ -459,7 +460,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             onClick={() => navigate('/')}
             className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 border border-border/20 active:scale-95 transition-transform shrink-0"
           >
-            <img alt="Logo" className="w-full h-full object-contain" src="/lovable-uploads/de20fd02-0c1c-4431-a4da-9c4611d2eb0e.jpg" />
+            <img alt="Atlas" className="w-full h-full object-contain rounded-full p-0.5" src={atlasIcon} />
           </button>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
