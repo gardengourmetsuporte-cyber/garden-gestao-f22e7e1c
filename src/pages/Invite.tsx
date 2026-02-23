@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface InviteData {
   id: string;
@@ -26,6 +27,7 @@ export default function Invite() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refetchUnits } = useUnit();
   const token = searchParams.get('token');
 
   const [invite, setInvite] = useState<InviteData | null>(null);
@@ -84,6 +86,9 @@ export default function Invite() {
 
       // Mark invite as accepted
       await supabase.from('invites').update({ accepted_at: new Date().toISOString() }).eq('id', invite!.id);
+
+      // Refresh units so ProtectedRoute won't redirect to onboarding
+      await refetchUnits();
 
       toast.success(`Bem-vindo ao ${invite!.unit_name}!`);
       navigate('/', { replace: true });
