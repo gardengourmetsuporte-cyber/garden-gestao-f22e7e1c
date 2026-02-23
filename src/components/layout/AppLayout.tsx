@@ -43,24 +43,24 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
-  { icon: 'Wallet', label: 'Finanças Pessoais', href: '/personal-finance', group: 'principal', groupLabel: 'Principal' },
+  { icon: 'Wallet', label: 'Finanças Pessoais', href: '/personal-finance', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Users', label: 'Funcionários', href: '/employees', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'Users', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Trophy', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'Trophy', label: 'Ranking', href: '/ranking', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Bell', label: 'Central de Alertas', href: '/alerts', group: 'config', groupLabel: 'Sistema' },
-  { icon: 'Settings', label: 'Configurações', href: '/settings', group: 'config', groupLabel: 'Sistema' },
+  { icon: 'Bell', label: 'Central de Alertas', href: '/alerts', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
+  { icon: 'Settings', label: 'Configurações', href: '/settings', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
 ];
 
 function AppLayoutContent({ children }: AppLayoutProps) {
@@ -147,7 +147,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-1">
               <ThemeToggle className="p-1.5" />
-              {hasAccess('copilot') && (
+              {isAdmin && hasAccess('copilot') && (
                 <button
                   onClick={() => navigate('/copilot')}
                   className="relative p-1.5 rounded-lg hover:bg-secondary transition-all"
@@ -319,7 +319,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </div>
             )}
 
-            {/* ===== Plans Crown (top-right corner) ===== */}
+            {/* ===== Plans Crown (top-right corner, admin only) ===== */}
+            {isAdmin && (
             <div className="absolute right-4 launcher-item" style={{ top: 'calc(env(safe-area-inset-top) + 20px)', animationDelay: '0ms', zIndex: 10000 }}>
               <button
                 className="relative p-2 rounded-xl hover:bg-white/10 transition-all"
@@ -328,6 +329,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 <AppIcon name="Crown" size={24} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 8px hsl(45 90% 55% / 0.5))' }} />
               </button>
             </div>
+            )}
 
             {/* ===== User Profile Card (top) ===== */}
             <div className="launcher-item mb-6" style={{ animationDelay: '0ms' }}>
