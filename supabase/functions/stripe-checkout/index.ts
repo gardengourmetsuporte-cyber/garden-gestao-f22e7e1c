@@ -46,6 +46,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
+      payment_method_types: ["card"],
       success_url: `${origin}/auth?plan=${planId}&payment=success`,
       cancel_url: `${origin}/#planos`,
       metadata: { planId, billing },
