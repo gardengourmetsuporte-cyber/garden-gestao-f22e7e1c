@@ -32,11 +32,21 @@ const BUSINESS_TEMPLATES = [
 
 const DEFAULT_CATEGORIES = [
   { name: 'Carnes', color: '#ef4444', icon: 'Beef' },
+  { name: 'Aves', color: '#f97316', icon: 'Drumstick' },
+  { name: 'Frios e Embutidos', color: '#e11d48', icon: 'Sandwich' },
   { name: 'Bebidas', color: '#3b82f6', icon: 'Wine' },
+  { name: 'Bebidas Alcoólicas', color: '#6366f1', icon: 'Beer' },
   { name: 'Hortifruti', color: '#22c55e', icon: 'Salad' },
   { name: 'Laticínios', color: '#f59e0b', icon: 'Milk' },
+  { name: 'Mercearia', color: '#a855f7', icon: 'ShoppingBasket' },
+  { name: 'Pães e Massas', color: '#d97706', icon: 'Croissant' },
+  { name: 'Congelados', color: '#0ea5e9', icon: 'Snowflake' },
+  { name: 'Molhos e Temperos', color: '#84cc16', icon: 'Flame' },
   { name: 'Descartáveis', color: '#8b5cf6', icon: 'Package' },
+  { name: 'Embalagens', color: '#7c3aed', icon: 'Box' },
   { name: 'Limpeza', color: '#06b6d4', icon: 'SprayCan' },
+  { name: 'Utensílios', color: '#14b8a6', icon: 'UtensilsCrossed' },
+  { name: 'Gás e Combustível', color: '#f43f5e', icon: 'Fuel' },
 ];
 
 interface OnboardingWizardProps {
@@ -53,9 +63,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
-    { icon: Building2, title: 'Sua Unidade', desc: 'Dê um nome ao seu negócio' },
-    { icon: Package, title: 'Categorias de Estoque', desc: 'Selecione as categorias iniciais' },
-    { icon: Wallet, title: 'Pagamentos', desc: 'Meios de pagamento configurados' },
+    { icon: Building2, title: 'Nome do Negócio', desc: 'Como se chama o seu estabelecimento?' },
+    { icon: Package, title: 'Categorias de Estoque', desc: 'Selecione as categorias do seu estoque' },
+    { icon: Wallet, title: 'Pagamentos', desc: 'Meios de pagamento pré-configurados' },
     { icon: ClipboardCheck, title: 'Checklist Modelo', desc: 'Escolha um template do seu segmento' },
   ];
 
@@ -201,37 +211,44 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           )}
 
           {step === 1 && (
-            <div className="grid grid-cols-2 gap-2">
-              {DEFAULT_CATEGORIES.map(cat => (
-                <button
-                  key={cat.name}
-                  onClick={() => toggleCategory(cat.name)}
-                  className={cn(
-                    'flex items-center gap-2 p-3 rounded-xl border-2 text-sm font-medium transition-all',
-                    selectedCategories.includes(cat.name)
-                      ? 'border-primary bg-primary/10 text-foreground'
-                      : 'border-border bg-card text-muted-foreground'
-                  )}
-                >
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                  {cat.name}
-                  {selectedCategories.includes(cat.name) && <Check className="w-3 h-3 ml-auto text-primary" />}
-                </button>
-              ))}
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 max-h-[340px] overflow-y-auto pr-1">
+                {DEFAULT_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.name}
+                    onClick={() => toggleCategory(cat.name)}
+                    className={cn(
+                      'flex items-center gap-2 p-2.5 rounded-xl border-2 text-xs font-medium transition-all',
+                      selectedCategories.includes(cat.name)
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border bg-card text-muted-foreground'
+                    )}
+                  >
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
+                    <span className="truncate">{cat.name}</span>
+                    {selectedCategories.includes(cat.name) && <Check className="w-3 h-3 ml-auto shrink-0 text-primary" />}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                {selectedCategories.length} de {DEFAULT_CATEGORIES.length} selecionadas
+              </p>
             </div>
           )}
 
           {step === 2 && (
-            <div className="space-y-3 text-center">
+            <div className="space-y-4 text-center">
               <div className="flex flex-wrap gap-2 justify-center">
                 {DEFAULT_PAYMENT_SETTINGS.map(pm => (
-                  <span key={pm.method_key} className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground">
+                  <span key={pm.method_key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-foreground">
+                    <Check className="w-3 h-3 text-primary" />
                     {pm.method_name}
                   </span>
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">
-                Taxas e prazos padrão serão aplicados. Personalize depois em Configurações.
+                Todos os meios já estão ativados com taxas padrão.<br />
+                Você pode ajustar depois em <strong>Configurações → Pagamentos</strong>.
               </p>
             </div>
           )}
