@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Trash2, Edit2, Tag, GripVertical } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 import { SortableList, DragHandle } from '@/components/ui/sortable-list';
 import { cn } from '@/lib/utils';
@@ -24,7 +24,6 @@ export function CategorySettings() {
 
   const handleSave = async () => {
     if (!name.trim()) return;
-
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.id, { name: name.trim(), color });
@@ -43,11 +42,7 @@ export function CategorySettings() {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await deleteCategory(id);
-    } catch (error) {
-      toast.error('Erro ao excluir categoria');
-    }
+    try { await deleteCategory(id); } catch (error) { toast.error('Erro ao excluir categoria'); }
   };
 
   const handleEdit = (category: { id: string; name: string; color: string }) => {
@@ -57,26 +52,19 @@ export function CategorySettings() {
     setSheetOpen(true);
   };
 
-  const handleAdd = () => {
-    resetForm();
-    setSheetOpen(true);
-  };
+  const handleAdd = () => { resetForm(); setSheetOpen(true); };
 
-  const resetForm = () => {
-    setEditingCategory(null);
-    setName('');
-    setColor('#6366f1');
-  };
+  const resetForm = () => { setEditingCategory(null); setName(''); setColor('#6366f1'); };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Tag className="w-5 h-5 text-primary" />
+          <AppIcon name="Tag" size={20} className="text-primary" />
           <h3 className="font-semibold text-foreground">Categorias de Estoque</h3>
         </div>
         <Button variant="outline" size="sm" onClick={handleAdd} className="gap-2">
-          <Plus className="w-4 h-4" />
+          <AppIcon name="Plus" size={16} />
           Nova
         </Button>
       </div>
@@ -87,83 +75,49 @@ export function CategorySettings() {
         onReorder={reorderCategories}
         className="space-y-2"
         renderItem={(category, { isDragging, dragHandleProps }) => (
-          <div
-            className={cn(
-              "flex items-center justify-between p-3 rounded-xl bg-secondary/50 transition-all",
-              isDragging && "shadow-lg ring-2 ring-primary/30 bg-card"
-            )}
-          >
+          <div className={cn(
+            "flex items-center justify-between p-3 rounded-xl bg-secondary/50 transition-all",
+            isDragging && "shadow-lg ring-2 ring-primary/30 bg-card"
+          )}>
             <div className="flex items-center gap-3">
               <DragHandle dragHandleProps={dragHandleProps} />
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: category.color }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: category.color }} />
               <span className="font-medium">{category.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleEdit(category)}
-                className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground"
-              >
-                <Edit2 className="w-4 h-4" />
+              <button onClick={() => handleEdit(category)} className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground">
+                <AppIcon name="Edit2" size={16} />
               </button>
-              <button
-                onClick={() => handleDelete(category.id)}
-                className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-              >
-                <Trash2 className="w-4 h-4" />
+              <button onClick={() => handleDelete(category.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive">
+                <AppIcon name="Trash2" size={16} />
               </button>
             </div>
           </div>
         )}
       />
       {categories.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-4">
-          Nenhuma categoria cadastrada
-        </p>
+        <p className="text-sm text-muted-foreground text-center py-4">Nenhuma categoria cadastrada</p>
       )}
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
-            <SheetTitle>
-              {editingCategory ? 'Editar Categoria' : 'Nova Categoria'}
-            </SheetTitle>
+            <SheetTitle>{editingCategory ? 'Editar Categoria' : 'Nova Categoria'}</SheetTitle>
           </SheetHeader>
-
           <div className="space-y-5">
             <div className="space-y-2">
               <Label>Nome da Categoria</Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Carnes"
-                className="h-12"
-              />
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Carnes" className="h-12" />
             </div>
-
             <div className="space-y-2">
               <Label>Cor</Label>
               <div className="grid grid-cols-5 gap-2">
                 {colorOptions.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setColor(c)}
-                    className={`w-full aspect-square rounded-xl transition-all ${
-                      color === c ? 'ring-2 ring-primary ring-offset-2' : ''
-                    }`}
-                    style={{ backgroundColor: c }}
-                  />
+                  <button key={c} onClick={() => setColor(c)} className={`w-full aspect-square rounded-xl transition-all ${color === c ? 'ring-2 ring-primary ring-offset-2' : ''}`} style={{ backgroundColor: c }} />
                 ))}
               </div>
             </div>
-
-            <Button
-              onClick={handleSave}
-              disabled={!name.trim()}
-              className="w-full h-12"
-            >
+            <Button onClick={handleSave} disabled={!name.trim()} className="w-full h-12">
               {editingCategory ? 'Salvar' : 'Criar Categoria'}
             </Button>
           </div>

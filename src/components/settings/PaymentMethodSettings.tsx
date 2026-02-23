@@ -6,15 +6,15 @@
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
  import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
- import { Loader2, Banknote, CreditCard, Smartphone, Utensils, Truck, Save } from 'lucide-react';
+ import { AppIcon } from '@/components/ui/app-icon';
  
- const ICONS: Record<string, React.ElementType> = {
-   cash_amount: Banknote,
-   debit_amount: CreditCard,
-   credit_amount: CreditCard,
-   pix_amount: Smartphone,
-   meal_voucher_amount: Utensils,
-   delivery_amount: Truck,
+ const ICON_MAP: Record<string, string> = {
+   cash_amount: 'Banknote',
+   debit_amount: 'CreditCard',
+   credit_amount: 'CreditCard',
+   pix_amount: 'Smartphone',
+   meal_voucher_amount: 'Utensils',
+   delivery_amount: 'Truck',
  };
  
  const COLORS: Record<string, string> = {
@@ -44,7 +44,7 @@ import { Switch } from '@/components/ui/switch';
  function PaymentCard({ setting, onSave }: PaymentCardProps) {
    const [localSetting, setLocalSetting] = useState(setting);
    const [isSaving, setIsSaving] = useState(false);
-   const Icon = ICONS[setting.method_key] || Banknote;
+   const iconName = ICON_MAP[setting.method_key] || 'Banknote';
    const color = COLORS[setting.method_key] || '#6366f1';
  
    const handleSave = async () => {
@@ -75,7 +75,7 @@ import { Switch } from '@/components/ui/switch';
              className="w-10 h-10 rounded-full flex items-center justify-center"
              style={{ backgroundColor: `${color}20` }}
            >
-             <Icon className="w-5 h-5" style={{ color }} />
+             <AppIcon name={iconName} size={20} style={{ color }} />
            </div>
            <CardTitle className="text-base">{setting.method_name}</CardTitle>
          </div>
@@ -93,9 +93,7 @@ import { Switch } from '@/components/ui/switch';
                  settlement_day_of_week: v === 'weekly_day' ? 3 : null,
                }))}
              >
-               <SelectTrigger className="h-9">
-                 <SelectValue />
-               </SelectTrigger>
+               <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                <SelectContent>
                  <SelectItem value="immediate">Na hora</SelectItem>
                  <SelectItem value="business_days">Dias úteis</SelectItem>
@@ -107,38 +105,21 @@ import { Switch } from '@/components/ui/switch';
            {localSetting.settlement_type === 'business_days' && (
              <div className="space-y-2">
                <Label className="text-xs text-muted-foreground">Dias úteis</Label>
-               <Input
-                 type="number"
-                 min={0}
-                 max={60}
-                 value={localSetting.settlement_days}
-                 onChange={(e) => setLocalSetting(prev => ({
-                   ...prev,
-                   settlement_days: parseInt(e.target.value) || 0,
-                 }))}
-                 className="h-9"
-               />
+               <Input type="number" min={0} max={60} value={localSetting.settlement_days}
+                 onChange={(e) => setLocalSetting(prev => ({ ...prev, settlement_days: parseInt(e.target.value) || 0 }))}
+                 className="h-9" />
              </div>
            )}
  
            {localSetting.settlement_type === 'weekly_day' && (
              <div className="space-y-2">
                <Label className="text-xs text-muted-foreground">Dia</Label>
-               <Select
-                 value={String(localSetting.settlement_day_of_week ?? 3)}
-                 onValueChange={(v) => setLocalSetting(prev => ({
-                   ...prev,
-                   settlement_day_of_week: parseInt(v),
-                 }))}
-               >
-                 <SelectTrigger className="h-9">
-                   <SelectValue />
-                 </SelectTrigger>
+               <Select value={String(localSetting.settlement_day_of_week ?? 3)}
+                 onValueChange={(v) => setLocalSetting(prev => ({ ...prev, settlement_day_of_week: parseInt(v) }))}>
+                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                  <SelectContent>
                    {DAYS_OF_WEEK.map(day => (
-                     <SelectItem key={day.value} value={String(day.value)}>
-                       {day.label}
-                     </SelectItem>
+                     <SelectItem key={day.value} value={String(day.value)}>{day.label}</SelectItem>
                    ))}
                  </SelectContent>
                </Select>
@@ -149,18 +130,9 @@ import { Switch } from '@/components/ui/switch';
          <div className="space-y-2">
            <Label className="text-xs text-muted-foreground">Taxa de desconto (%)</Label>
            <div className="flex items-center gap-2">
-             <Input
-               type="number"
-               step="0.01"
-               min={0}
-               max={100}
-               value={localSetting.fee_percentage}
-               onChange={(e) => setLocalSetting(prev => ({
-                 ...prev,
-                 fee_percentage: parseFloat(e.target.value) || 0,
-               }))}
-               className="h-9"
-             />
+             <Input type="number" step="0.01" min={0} max={100} value={localSetting.fee_percentage}
+               onChange={(e) => setLocalSetting(prev => ({ ...prev, fee_percentage: parseFloat(e.target.value) || 0 }))}
+               className="h-9" />
              <span className="text-sm text-muted-foreground">%</span>
            </div>
            {localSetting.fee_percentage > 0 && (
@@ -175,18 +147,13 @@ import { Switch } from '@/components/ui/switch';
             <Label className="text-sm">Lançar no financeiro</Label>
             <p className="text-xs text-muted-foreground">Criar transação ao aprovar fechamento</p>
           </div>
-          <Switch
-            checked={localSetting.create_transaction}
-            onCheckedChange={(checked) => setLocalSetting(prev => ({
-              ...prev,
-              create_transaction: checked,
-            }))}
-          />
+          <Switch checked={localSetting.create_transaction}
+            onCheckedChange={(checked) => setLocalSetting(prev => ({ ...prev, create_transaction: checked }))} />
         </div>
 
          {hasChanges && (
            <Button onClick={handleSave} disabled={isSaving} className="w-full" size="sm">
-             {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+             {isSaving ? <AppIcon name="progress_activity" size={16} className="animate-spin mr-2" /> : <AppIcon name="Save" size={16} className="mr-2" />}
              Salvar
            </Button>
          )}
@@ -201,7 +168,7 @@ import { Switch } from '@/components/ui/switch';
    if (isLoading) {
      return (
        <div className="flex items-center justify-center py-12">
-         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+         <AppIcon name="progress_activity" size={32} className="animate-spin text-muted-foreground" />
        </div>
      );
    }
