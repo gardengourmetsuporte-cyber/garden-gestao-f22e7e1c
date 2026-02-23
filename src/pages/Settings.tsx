@@ -1,7 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
@@ -103,7 +102,7 @@ export default function SettingsPage() {
           <header className="page-header-bar">
             <div className="page-header-content flex items-center gap-3">
               <button onClick={() => setActiveSection(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                <ChevronRight className="w-5 h-5 rotate-180" />
+                <AppIcon name="ChevronRight" size={20} className="rotate-180 text-muted-foreground hover:text-foreground transition-colors" />
               </button>
               <h1 className="text-lg font-bold">{activeItem?.label}</h1>
             </div>
@@ -173,7 +172,7 @@ export default function SettingsPage() {
                         <span className="font-medium text-sm block">{item.label}</span>
                         <span className="text-[11px] text-muted-foreground">{item.description}</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
                     </button>
                   );
                 })}

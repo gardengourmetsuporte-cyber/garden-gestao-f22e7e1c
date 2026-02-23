@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Progress } from '@/components/ui/progress';
 import { SectorPointsSummary as SectorData } from '@/hooks/useLeaderboard';
 
@@ -12,7 +12,7 @@ export function SectorPointsSummary({ sectors, isLoading }: SectorPointsSummaryP
     return (
       <div className="card-base p-4">
         <div className="flex items-center gap-2 mb-4">
-          <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+          <AppIcon name="Star" size={20} className="text-amber-500" fill={1} />
           <h3 className="font-semibold text-foreground">Pontos por Setor</h3>
         </div>
         <div className="space-y-4">
@@ -30,7 +30,7 @@ export function SectorPointsSummary({ sectors, isLoading }: SectorPointsSummaryP
     <div className="card-base p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+          <AppIcon name="Star" size={20} className="text-amber-500" fill={1} />
           <h3 className="font-semibold text-foreground">Pontos por Setor</h3>
         </div>
         <span className="text-sm text-muted-foreground">

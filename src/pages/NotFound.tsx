@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AppIcon } from "@/components/ui/app-icon";
 
 const NotFound = () => {
   const location = useLocation();
@@ -20,7 +20,7 @@ const NotFound = () => {
             boxShadow: '0 0 30px hsl(var(--neon-amber) / 0.1)',
           }}
         >
-          <AlertTriangle className="w-9 h-9" style={{ color: 'hsl(var(--neon-amber))' }} />
+          <AppIcon name="AlertTriangle" size={36} style={{ color: 'hsl(var(--neon-amber))' }} />
         </div>
         <h1
           className="text-6xl font-black tracking-tighter mb-2"
