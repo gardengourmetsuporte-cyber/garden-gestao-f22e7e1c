@@ -43,7 +43,14 @@ export default function Plans() {
     setPortalLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
-      if (error) throw error;
+      if (error) {
+        // Manual override accounts don't have a Stripe customer
+        if (String(error).includes('No Stripe customer')) {
+          toast.info('Seu plano foi ativado manualmente. Entre em contato com o suporte para alterações.');
+          return;
+        }
+        throw error;
+      }
       if (!data?.url) throw new Error('URL do portal não retornada');
       window.open(data.url, '_blank');
     } catch (err: any) {
