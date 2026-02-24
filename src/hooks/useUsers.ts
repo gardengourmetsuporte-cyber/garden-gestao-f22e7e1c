@@ -55,13 +55,15 @@ export function useUsers() {
 
       if (profilesResult.error) throw profilesResult.error;
 
-      // 3. Combine
+      // 3. Combine — pick highest role if duplicates exist
+      const rolePriority: Record<string, number> = { super_admin: 3, admin: 2, funcionario: 1 };
       const usersWithRoles: UserWithRole[] = (profilesResult.data || []).map(profile => {
-        const globalRole = rolesResult.data?.find(r => r.user_id === profile.user_id);
+        const userRoles = rolesResult.data?.filter(r => r.user_id === profile.user_id) || [];
+        const bestRole = userRoles.sort((a, b) => (rolePriority[b.role] || 0) - (rolePriority[a.role] || 0))[0];
         const unitMember = unitMembers.find(m => m.user_id === profile.user_id);
         return {
           ...profile,
-          role: (globalRole?.role as AppRole) || 'funcionario',
+          role: (bestRole?.role as AppRole) || 'funcionario',
           unitRole: unitMember?.role || 'member',
         };
       });
@@ -76,24 +78,17 @@ export function useUsers() {
 
   async function updateUserRole(userId: string, newRole: AppRole) {
     try {
-      const { data: existingRole } = await supabase
+      // Delete ALL existing roles first to prevent duplicates
+      await supabase
         .from('user_roles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+        .delete()
+        .eq('user_id', userId);
 
-      if (existingRole) {
-        const { error } = await supabase
-          .from('user_roles')
-          .update({ role: newRole })
-          .eq('user_id', userId);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: newRole });
-        if (error) throw error;
-      }
+      // Insert the single new role
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: newRole });
+      if (error) throw error;
 
       await fetchUsers();
     } catch {
