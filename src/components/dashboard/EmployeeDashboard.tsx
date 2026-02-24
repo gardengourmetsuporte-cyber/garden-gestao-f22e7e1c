@@ -14,8 +14,10 @@ import { useLeaderboard, LeaderboardScope } from '@/hooks/useLeaderboard';
 import { usePoints } from '@/hooks/usePoints';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
+import { useUserModules } from '@/hooks/useAccessLevels';
 import { calculateMedals } from '@/lib/medals';
 import { cn } from '@/lib/utils';
+import { getModuleKeyFromRoute } from '@/lib/modules';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
 
@@ -52,11 +54,18 @@ export function EmployeeDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { activeUnitId } = useUnit();
+  const { hasAccess } = useUserModules();
   const { earned, balance, monthlyScore, refetch: refetchPoints } = usePoints();
   const [rankingScope, setRankingScope] = useState<LeaderboardScope>('unit');
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard(rankingScope);
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
+
+  // Filter quick links by access level
+  const visibleLinks = QUICK_LINKS.filter(link => {
+    const moduleKey = getModuleKeyFromRoute(link.path);
+    return moduleKey ? hasAccess(moduleKey) : true;
+  });
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
 
@@ -86,23 +95,24 @@ export function EmployeeDashboard() {
         </div>
       </div>
 
-      {/* Quick Links */}
-      <div className="animate-spring-in spring-stagger-2">
-        <div className="grid grid-cols-5 gap-2">
-          {QUICK_LINKS.map((link) => (
-            <button
-              key={link.path}
-              onClick={() => navigate(link.path)}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-95 transition-all"
-            >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <AppIcon name={link.icon} size={20} className="text-primary" />
-              </div>
-              <span className="text-[10px] font-medium text-muted-foreground leading-tight text-center">{link.label}</span>
-            </button>
-          ))}
+      {visibleLinks.length > 0 && (
+        <div className="animate-spring-in spring-stagger-2">
+          <div className={cn("grid gap-2", visibleLinks.length <= 4 ? `grid-cols-${visibleLinks.length}` : "grid-cols-5")}>
+            {visibleLinks.map((link) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-95 transition-all"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name={link.icon} size={20} className="text-primary" />
+                </div>
+                <span className="text-[10px] font-medium text-muted-foreground leading-tight text-center">{link.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* My Rank Card */}
       <div className="animate-spring-in spring-stagger-3">
