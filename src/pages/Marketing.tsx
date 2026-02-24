@@ -79,6 +79,9 @@ export default function Marketing() {
         <header className="page-header-bar">
           <div className="page-header-content flex items-center justify-between">
             <h1 className="page-title">Marketing</h1>
+            <button onClick={() => handleNewPost()} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
+              <AppIcon name="Plus" size={20} />
+            </button>
           </div>
         </header>
 
@@ -122,13 +125,6 @@ export default function Marketing() {
           </div>
         </div>
 
-        {/* FAB via Portal */}
-        {createPortal(
-          <button onClick={() => handleNewPost()} className="fab">
-            <AppIcon name="Plus" size={24} />
-          </button>,
-          document.body
-        )}
       </div>
 
       <PostSheet

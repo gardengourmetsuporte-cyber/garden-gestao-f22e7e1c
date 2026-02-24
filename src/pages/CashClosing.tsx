@@ -28,8 +28,11 @@ export default function CashClosing() {
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
         <header className="page-header-bar">
-          <div className="page-header-content">
+          <div className="page-header-content flex items-center justify-between">
             <h1 className="page-title">Fechamento de Caixa</h1>
+            <button onClick={() => setIsFormOpen(true)} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
+              <AppIcon name="Plus" size={20} />
+            </button>
           </div>
         </header>
 
@@ -57,13 +60,8 @@ export default function CashClosing() {
           )}
         </div>
 
-        {/* FAB via Portal */}
-        {createPortal(
-          <button className="fab" onClick={() => setIsFormOpen(true)}>
-            <AppIcon name="Plus" size={28} />
-          </button>,
-          document.body
-        )}
+
+
 
         <Sheet open={isFormOpen} onOpenChange={(open) => {
           if (open) setIsFormOpen(true);
