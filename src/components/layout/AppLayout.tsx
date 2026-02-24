@@ -1,5 +1,5 @@
 import atlasIcon from '@/assets/atlas-icon.png';
-import { ReactNode, useState, useEffect, useMemo } from 'react';
+import { ReactNode, useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
@@ -105,35 +105,31 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { hasAccess, allowedModules, isLoading: accessLoading } = userModules;
   const hasAccessLevel = allowedModules !== null && allowedModules !== undefined;
 
-  const filteredNavItems = navItems.filter(item => {
-    const moduleKey = getModuleKeyFromRoute(item.href);
+  const lastNavRef = useRef<NavItem[]>(navItems);
 
-    // Super admins see everything
-    if (isSuperAdmin) return true;
-
-    // While access levels are loading, only show dashboard & settings
-    if (accessLoading) {
-      return moduleKey === 'dashboard' || moduleKey === 'settings';
+  const filteredNavItems = useMemo(() => {
+    // While loading, return previous items to avoid flash
+    if (accessLoading && lastNavRef.current.length > 0) {
+      return lastNavRef.current;
     }
 
-    // If user has an access level assigned, ONLY show modules in their list
-    if (hasAccessLevel) {
-      // Settings and dashboard are always accessible for admins
-      if (moduleKey === 'settings' || moduleKey === 'dashboard') return isAdmin || !item.adminOnly;
-      if (moduleKey && !allowedModules!.includes(moduleKey)) return false;
-      // For items without a moduleKey, only show if admin
-      if (!moduleKey && item.adminOnly && !isAdmin) return false;
+    const result = navItems.filter(item => {
+      const moduleKey = getModuleKeyFromRoute(item.href);
+      if (isSuperAdmin) return true;
+      if (hasAccessLevel) {
+        if (moduleKey === 'settings' || moduleKey === 'dashboard') return isAdmin || !item.adminOnly;
+        if (moduleKey && !allowedModules!.includes(moduleKey)) return false;
+        if (!moduleKey && item.adminOnly && !isAdmin) return false;
+        return true;
+      }
+      if (item.group === 'premium') return isAdmin;
+      if (item.adminOnly && !isAdmin) return false;
       return true;
-    }
+    });
 
-    // No access level assigned: use default logic
-    // Premium modules visible only to admins
-    if (item.group === 'premium') {
-      return isAdmin;
-    }
-    if (item.adminOnly && !isAdmin) return false;
-    return true;
-  });
+    lastNavRef.current = result;
+    return result;
+  }, [isSuperAdmin, isAdmin, hasAccessLevel, allowedModules, accessLoading]);
 
   const groupedNav: { label: string; items: typeof filteredNavItems }[] = [];
   const seenGroups = new Set<string>();

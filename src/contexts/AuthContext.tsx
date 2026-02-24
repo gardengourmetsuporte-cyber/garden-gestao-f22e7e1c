@@ -59,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(!cached);
   const subIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fetchUserDataRef = useRef<(userId: string) => Promise<void>>();
 
   const refreshSubscription = useCallback(async () => {
     try {
@@ -136,7 +137,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Poll subscription every 60s when logged in
   useEffect(() => {
     if (user) {
-      // Initial check (after a small delay to not block rendering)
       const timeout = setTimeout(() => refreshSubscription(), 2000);
       subIntervalRef.current = setInterval(refreshSubscription, 60_000);
       return () => {
@@ -147,6 +147,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (subIntervalRef.current) clearInterval(subIntervalRef.current);
     }
   }, [user, refreshSubscription]);
+
+  // Re-validate user data when tab regains focus
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && user) {
+        fetchUserDataRef.current?.(user.id);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [user]);
 
   async function fetchUserData(userId: string) {
     try {
@@ -166,7 +177,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const p = profileResult.data as any;
       const r = (roleResult.data?.role as AppRole) ?? 'funcionario';
       
-      // Extract plan from profile (instant, no Stripe call)
       const profilePlan = (p?.plan as PlanTier) || 'free';
       const profilePlanStatus = p?.plan_status || 'active';
       
@@ -181,6 +191,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }
+
+  // Keep ref in sync for visibilitychange handler
+  fetchUserDataRef.current = fetchUserData;
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });

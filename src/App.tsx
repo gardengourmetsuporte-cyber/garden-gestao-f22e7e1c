@@ -79,15 +79,25 @@ const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000, // 2 minutes
-      gcTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 2 * 60 * 1000,
+      gcTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
       retry: 1,
+    },
+    mutations: {
+      onError: (error: Error) => {
+        console.error('[Mutation error]', error);
+        toast.error(error.message || 'Ocorreu um erro ao salvar.');
+      },
     },
   },
 });
 
 // PageLoader imported from @/components/PageLoader
+
+function RouteErrorBoundary({ children }: { children: React.ReactNode }) {
+  return <ErrorBoundary>{children}</ErrorBoundary>;
+}
 
 function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNode; skipOnboarding?: boolean }) {
   const { user, isLoading } = useAuth();
@@ -134,9 +144,8 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   return (
-    <ErrorBoundary>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/invite" element={<Invite />} />
@@ -149,7 +158,7 @@ function AppRoutes() {
           path="/"
           element={
             <ProtectedRoute>
-              <DashboardNew />
+              <RouteErrorBoundary><DashboardNew /></RouteErrorBoundary>
             </ProtectedRoute>
           }
         />
@@ -339,7 +348,6 @@ function AppRoutes() {
         <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-    </ErrorBoundary>
   );
 }
 

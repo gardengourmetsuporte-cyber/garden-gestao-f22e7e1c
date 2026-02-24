@@ -116,7 +116,9 @@ export function useManagementAI() {
             await loadConversations();
           }
         }
-      } catch {}
+      } catch (err) {
+        console.error('Copilot migration failed:', err);
+      }
     };
     init();
   }, [user, activeUnitId, loadConversations, loadConversationMessages]);

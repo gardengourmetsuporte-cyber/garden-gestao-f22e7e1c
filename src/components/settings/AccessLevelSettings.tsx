@@ -110,7 +110,10 @@ export function AccessLevelSettings() {
         await addAccessLevel({ name: formName, description: formDescription, modules: formModules });
       }
       setIsCreating(false);
-    } catch {}
+    } catch (err) {
+      console.error('Failed to save access level:', err);
+      toast.error('Erro ao salvar nível de acesso');
+    }
   };
 
   const handleDelete = async (level: AccessLevel) => {

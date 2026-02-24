@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, ReactNode, useC
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUnitTheme, applyUnitTheme } from '@/lib/unitThemes';
+import { toast } from 'sonner';
 
 export interface Unit {
   id: string;
@@ -121,8 +122,9 @@ export function UnitProvider({ children }: { children: ReactNode }) {
           }
         }
       }
-    } catch {
-      // Silent fail
+    } catch (err) {
+      console.error('Failed to fetch units:', err);
+      toast.error('Erro ao carregar unidades. Tente recarregar a página.');
     } finally {
       fetchedForUserRef.current = user.id;
       setIsLoading(false);
