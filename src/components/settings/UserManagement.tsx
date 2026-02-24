@@ -206,16 +206,21 @@ export function UserManagement() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Mínimo 6 caracteres"
-                  className="pr-10"
+                  className="pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <AppIcon name={showPassword ? 'EyeOff' : 'Eye'} size={16} />
+                  <AppIcon name={showPassword ? 'EyeClosed' : 'Eye'} size={18} />
                 </button>
               </div>
+              {showPassword && newPassword && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Senha: <span className="font-mono font-medium text-foreground">{newPassword}</span>
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>
