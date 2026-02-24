@@ -216,11 +216,9 @@ export function UserManagement() {
                   <AppIcon name={showPassword ? 'EyeOff' : 'Eye'} size={18} />
                 </button>
               </div>
-              {showPassword && newPassword && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Senha: <span className="font-mono font-medium text-foreground">{newPassword}</span>
-                </p>
-              )}
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Use letras maiúsculas, minúsculas, números e caracteres especiais (ex: Garden@2026)
+              </p>
             </div>
           </div>
           <DialogFooter>
