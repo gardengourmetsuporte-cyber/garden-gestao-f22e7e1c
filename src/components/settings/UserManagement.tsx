@@ -213,7 +213,7 @@ export function UserManagement() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <AppIcon name={showPassword ? 'EyeClosed' : 'Eye'} size={18} />
+                  <AppIcon name={showPassword ? 'EyeOff' : 'Eye'} size={18} />
                 </button>
               </div>
               {showPassword && newPassword && (
