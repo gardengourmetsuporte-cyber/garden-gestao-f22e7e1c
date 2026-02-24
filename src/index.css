@@ -621,8 +621,8 @@
            rounded-2xl bg-primary text-primary-foreground 
            flex items-center justify-center 
            z-[9990] active:scale-95 transition-transform;
-    left: 20px;
-    bottom: calc(env(safe-area-inset-bottom) + 24px);
+    right: 20px;
+    bottom: calc(env(safe-area-inset-bottom) + 90px);
     box-shadow: 0 8px 24px hsl(217 91% 60% / 0.35);
   }
 
