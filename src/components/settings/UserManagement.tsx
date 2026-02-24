@@ -129,7 +129,7 @@ export function UserManagement() {
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <button
-                onClick={() => { setPasswordDialogUser(user); setNewPassword(''); setShowPassword(false); }}
+                onClick={() => { setPasswordDialogUser(user); setNewPassword(''); setShowPassword(true); }}
                 className="p-2 rounded-lg hover:bg-secondary transition-colors"
                 title="Redefinir senha"
               >
