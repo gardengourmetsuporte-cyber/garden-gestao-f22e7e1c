@@ -221,7 +221,7 @@ export function AccessLevelSettings() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isCreating} onOpenChange={setIsCreating}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto w-[95vw] sm:w-full">
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto w-[calc(100%-2rem)] sm:w-full rounded-2xl">
           <DialogHeader>
             <DialogTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</DialogTitle>
           </DialogHeader>
