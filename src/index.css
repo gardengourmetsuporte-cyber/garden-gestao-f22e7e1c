@@ -622,7 +622,7 @@
            flex items-center justify-center 
            z-[9990] active:scale-95 transition-transform;
     right: 20px;
-    bottom: calc(env(safe-area-inset-bottom) + 90px);
+    bottom: calc(env(safe-area-inset-bottom) + 104px);
     box-shadow: 0 8px 24px hsl(217 91% 60% / 0.35);
   }
 
