@@ -91,7 +91,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     navigate('/auth');
   };
 
-  const { hasAccess } = useUserModules();
+  const userModules = useUserModules();
 
   // Check if a module is locked by plan
   const isModuleLocked = (href: string): boolean => {
@@ -102,16 +102,29 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     return !planSatisfies(plan, required);
   };
 
+  const { hasAccess, allowedModules } = userModules;
+  const hasAccessLevel = allowedModules !== null && allowedModules !== undefined;
+
   const filteredNavItems = navItems.filter(item => {
-    // Premium modules visible to admins (with lock if needed)
-    if (item.group === 'premium') {
-      if (!isAdmin && !isSuperAdmin) return false;
-      return true; // Show with lock icon if plan doesn't match
-    }
     const moduleKey = getModuleKeyFromRoute(item.href);
-    if (moduleKey && hasAccess(moduleKey)) return true;
+
+    // Super admins see everything
+    if (isSuperAdmin) return true;
+
+    // If user has an access level assigned, ONLY show modules in their list
+    if (hasAccessLevel) {
+      if (moduleKey && !allowedModules.includes(moduleKey)) return false;
+      // For items without a moduleKey, only show if admin
+      if (!moduleKey && item.adminOnly && !isAdmin) return false;
+      return true;
+    }
+
+    // No access level assigned: use default logic
+    // Premium modules visible only to admins
+    if (item.group === 'premium') {
+      return isAdmin;
+    }
     if (item.adminOnly && !isAdmin) return false;
-    if (moduleKey && !hasAccess(moduleKey)) return false;
     return true;
   });
 
@@ -147,7 +160,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-1">
               <ThemeToggle className="p-1.5" />
-              {isAdmin && hasAccess('copilot') && (
+              {isAdmin && userModules.hasAccess('copilot') && (
                 <button
                   onClick={() => navigate('/copilot')}
                   className="relative p-1.5 rounded-lg hover:bg-secondary transition-all"
