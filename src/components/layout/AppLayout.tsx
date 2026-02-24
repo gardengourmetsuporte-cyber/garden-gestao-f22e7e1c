@@ -102,7 +102,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     return !planSatisfies(plan, required);
   };
 
-  const { hasAccess, allowedModules } = userModules;
+  const { hasAccess, allowedModules, isLoading: accessLoading } = userModules;
   const hasAccessLevel = allowedModules !== null && allowedModules !== undefined;
 
   const filteredNavItems = navItems.filter(item => {
@@ -110,6 +110,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
     // Super admins see everything
     if (isSuperAdmin) return true;
+
+    // While access levels are loading, only show dashboard & settings
+    if (accessLoading) {
+      return moduleKey === 'dashboard' || moduleKey === 'settings';
+    }
 
     // If user has an access level assigned, ONLY show modules in their list
     if (hasAccessLevel) {
@@ -180,6 +185,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </button>
 
             <div className="flex items-center gap-1">
+              {hasAccess('ranking') && (
               <button
                 onClick={() => navigate('/ranking')}
                 className="relative p-2.5 rounded-lg hover:bg-secondary transition-all"
@@ -195,6 +201,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </span>
                 )}
               </button>
+              )}
               <button
                 onClick={() => navigate('/chat')}
                 className="relative p-2.5 rounded-lg hover:bg-secondary transition-all"
