@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -56,10 +57,13 @@ export default function CashClosing() {
           )}
         </div>
 
-        {/* FAB */}
-        <button className="fab" onClick={() => setIsFormOpen(true)}>
-          <AppIcon name="Plus" size={28} />
-        </button>
+        {/* FAB via Portal */}
+        {createPortal(
+          <button className="fab" onClick={() => setIsFormOpen(true)}>
+            <AppIcon name="Plus" size={28} />
+          </button>,
+          document.body
+        )}
 
         <Sheet open={isFormOpen} onOpenChange={(open) => {
           if (open) setIsFormOpen(true);

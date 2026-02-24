@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Input } from '@/components/ui/input';
@@ -226,10 +227,13 @@ export default function Recipes() {
           </div>
         </div>
 
-        {/* FAB */}
-        <button onClick={handleCreate} className="fab">
-          <AppIcon name="Plus" size={24} />
-        </button>
+        {/* FAB via Portal */}
+        {createPortal(
+          <button onClick={handleCreate} className="fab">
+            <AppIcon name="Plus" size={24} />
+          </button>,
+          document.body
+        )}
       </div>
 
       <RecipeSheet

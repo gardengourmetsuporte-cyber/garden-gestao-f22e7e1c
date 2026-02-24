@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
@@ -121,10 +122,13 @@ export default function Marketing() {
           </div>
         </div>
 
-        {/* FAB */}
-        <button onClick={() => handleNewPost()} className="fab">
-          <AppIcon name="Plus" size={24} />
-        </button>
+        {/* FAB via Portal */}
+        {createPortal(
+          <button onClick={() => handleNewPost()} className="fab">
+            <AppIcon name="Plus" size={24} />
+          </button>,
+          document.body
+        )}
       </div>
 
       <PostSheet
