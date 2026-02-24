@@ -3990,6 +3990,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_provision_unit: { Args: { p_user_id: string }; Returns: string }
       batch_reorder_transactions: {
         Args: { p_ids: string[]; p_orders: number[] }
         Returns: undefined
