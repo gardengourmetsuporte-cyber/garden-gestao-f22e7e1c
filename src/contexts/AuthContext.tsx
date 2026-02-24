@@ -125,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         fetchUserData(session.user.id);
       } else {
+        clearCachedAuth();
         setIsLoading(false);
       }
     });
