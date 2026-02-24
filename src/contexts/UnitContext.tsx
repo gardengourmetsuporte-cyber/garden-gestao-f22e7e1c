@@ -28,16 +28,18 @@ const UnitContext = createContext<UnitContextType | undefined>(undefined);
 const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
-  const { user, isSuperAdmin } = useAuth();
+  const { user, isSuperAdmin, isLoading: authLoading } = useAuth();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const hasInitialized = useRef(false);
+  const fetchedForUserRef = useRef<string | null>(null);
 
   const fetchUnits = useCallback(async () => {
     if (!user) {
       setUnits([]);
+      fetchedForUserRef.current = null;
       setIsLoading(false);
       return;
     }
@@ -103,6 +105,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
     } catch {
       // Silent fail
     } finally {
+      fetchedForUserRef.current = user.id;
       setIsLoading(false);
     }
   }, [user, isSuperAdmin]);
@@ -110,6 +113,9 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchUnits();
   }, [fetchUnits]);
+
+  // Prevent flash: if user exists but we haven't fetched for them yet, stay loading
+  const effectiveLoading = isLoading || authLoading || (!!user && fetchedForUserRef.current !== user.id);
 
   const activeUnit = units.find(u => u.id === activeUnitId) || null;
 
@@ -140,7 +146,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
         activeUnit,
         activeUnitId,
         setActiveUnitId,
-        isLoading,
+        isLoading: effectiveLoading,
         isTransitioning,
         refetchUnits: fetchUnits,
       }}
