@@ -118,7 +118,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
     // If user has an access level assigned, ONLY show modules in their list
     if (hasAccessLevel) {
-      if (moduleKey && !allowedModules.includes(moduleKey)) return false;
+      // Settings and dashboard are always accessible for admins
+      if (moduleKey === 'settings' || moduleKey === 'dashboard') return isAdmin || !item.adminOnly;
+      if (moduleKey && !allowedModules!.includes(moduleKey)) return false;
       // For items without a moduleKey, only show if admin
       if (!moduleKey && item.adminOnly && !isAdmin) return false;
       return true;
