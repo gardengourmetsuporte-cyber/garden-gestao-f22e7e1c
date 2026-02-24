@@ -74,8 +74,12 @@ Deno.serve(async (req) => {
     );
 
     if (updateError) {
-      return new Response(JSON.stringify({ error: updateError.message }), {
-        status: 500,
+      let msg = updateError.message;
+      if (msg.includes('weak') || msg.includes('easy to guess')) {
+        msg = 'Senha muito fraca. Use letras maiúsculas, minúsculas, números e caracteres especiais (ex: Garden@2026)';
+      }
+      return new Response(JSON.stringify({ error: msg }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
