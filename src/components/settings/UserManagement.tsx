@@ -106,47 +106,44 @@ export function UserManagement() {
 
       <div className="space-y-2">
         {users.map((user) => (
-          <div key={user.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                {user.role === 'admin' || user.role === 'super_admin' ? (
-                  <AppIcon name="Shield" size={20} className="text-primary" />
-                ) : (
-                  <AppIcon name="User" size={20} className="text-muted-foreground" />
+          <div key={user.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              {user.role === 'admin' || user.role === 'super_admin' ? (
+                <AppIcon name="Shield" size={20} className="text-primary" />
+              ) : (
+                <AppIcon name="User" size={20} className="text-muted-foreground" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="font-medium block truncate">{user.full_name}</span>
+              <div className="flex items-center gap-2">
+                {user.unitRole && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                    {UNIT_ROLE_LABELS[user.unitRole] || user.unitRole}
+                  </span>
+                )}
+                {user.job_title && (
+                  <span className="text-xs text-muted-foreground truncate">{user.job_title}</span>
                 )}
               </div>
-              <div>
-                <span className="font-medium block">{user.full_name}</span>
-                <div className="flex items-center gap-2">
-                  {user.unitRole && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                      {UNIT_ROLE_LABELS[user.unitRole] || user.unitRole}
-                    </span>
-                  )}
-                  {user.job_title && (
-                    <span className="text-xs text-muted-foreground">{user.job_title}</span>
-                  )}
-                </div>
-              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              {/* Reset Password Button */}
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => { setPasswordDialogUser(user); setNewPassword(''); setShowPassword(false); }}
                 className="p-2 rounded-lg hover:bg-secondary transition-colors"
                 title="Redefinir senha"
               >
-                <AppIcon name="KeyRound" size={16} className="text-muted-foreground" />
+                <AppIcon name="Lock" size={16} className="text-muted-foreground" />
               </button>
               {updatingUser === user.user_id ? (
                 <AppIcon name="progress_activity" size={16} className="animate-spin" />
               ) : (
                 <button
                   onClick={() => setRoleDialogUser(user)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-border text-sm font-medium hover:bg-secondary transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-background border border-border text-xs font-medium hover:bg-secondary transition-colors"
                 >
                   {getRoleLabel(user.role)}
-                  <AppIcon name="ChevronDown" size={16} className="text-muted-foreground" />
+                  <AppIcon name="ChevronDown" size={14} className="text-muted-foreground" />
                 </button>
               )}
             </div>
