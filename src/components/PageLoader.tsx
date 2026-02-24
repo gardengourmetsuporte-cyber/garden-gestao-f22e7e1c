@@ -24,9 +24,7 @@ export function PageLoader() {
           />
         </div>
       </div>
-      <p className="text-xs text-muted-foreground font-medium tracking-wider uppercase animate-pulse">
-        Carregando...
-      </p>
+      {/* Text removed to prevent FOUT */}
     </div>
   );
 }

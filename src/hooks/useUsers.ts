@@ -69,8 +69,8 @@ export function useUsers() {
       });
 
       setUsers(usersWithRoles);
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
     } finally {
       setIsLoading(false);
     }
