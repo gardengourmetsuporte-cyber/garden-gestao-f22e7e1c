@@ -68,7 +68,7 @@ export function AdminDashboard() {
       <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-2">
 
         {/* === FINANCE BLOCK === */}
-        {hasAccess('finance') && isSuperAdmin ? (
+        {hasAccess('finance') ? (
           <>
             <button
               onClick={() => navigate('/finance')}
