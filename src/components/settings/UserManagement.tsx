@@ -62,7 +62,7 @@ export function UserManagement() {
       const { data, error } = await supabase.functions.invoke('admin-reset-password', {
         body: { target_user_id: passwordDialogUser.user_id, new_password: newPassword },
       });
-      if (error) throw error;
+      if (error) throw new Error(data?.error || 'Erro ao redefinir senha');
       if (data?.error) throw new Error(data.error);
       toast.success(`Senha de ${passwordDialogUser.full_name} alterada com sucesso`);
       setPasswordDialogUser(null);
