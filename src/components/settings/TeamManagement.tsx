@@ -105,7 +105,11 @@ export function TeamManagement() {
   const acceptedInvites = invites.filter((i: any) => i.accepted_at);
 
   const getInviteLink = (token: string) => {
-    return `${window.location.origin}/invite?token=${token}`;
+    // Use published URL if available, fallback to current origin
+    const baseUrl = import.meta.env.PROD 
+      ? (window.location.origin.includes('lovable.app') ? 'https://garden-gestao.lovable.app' : window.location.origin)
+      : window.location.origin;
+    return `${baseUrl}/invite?token=${token}`;
   };
 
   const copyLink = (token: string) => {
@@ -190,7 +194,7 @@ export function TeamManagement() {
                   className="flex-1 gap-2"
                   onClick={() => {
                     const text = encodeURIComponent(`Olá! Você foi convidado para se juntar ao *${activeUnit?.name || 'nosso time'}* no Atlas.\n\nCrie sua conta pelo link:\n${lastInviteLink}`);
-                    window.open(`https://wa.me/${''/* no number = pick contact */}?text=${text}`, '_blank');
+                    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
                   }}
                 >
                   <AppIcon name="MessageCircle" size={16} />
