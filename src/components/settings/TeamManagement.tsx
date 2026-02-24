@@ -60,6 +60,9 @@ export function TeamManagement() {
     enabled: !!activeUnitId,
   });
 
+  const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
+  const [lastInviteEmail, setLastInviteEmail] = useState<string | null>(null);
+
   const sendInvite = useMutation({
     mutationFn: async () => {
       if (!user || !activeUnitId || !email.trim()) throw new Error('Dados inválidos');
@@ -75,8 +78,10 @@ export function TeamManagement() {
     },
     onSuccess: (token: string) => {
       const link = getInviteLink(token);
+      setLastInviteLink(link);
+      setLastInviteEmail(email.trim().toLowerCase());
       navigator.clipboard.writeText(link);
-      toast.success('Link de convite copiado! Envie para o funcionário.', { duration: 5000 });
+      toast.success('Link gerado e copiado!');
       setEmail('');
       queryClient.invalidateQueries({ queryKey: ['invites', activeUnitId] });
     },
@@ -160,9 +165,55 @@ export function TeamManagement() {
             <AppIcon name="Link" size={16} className="mr-2" />
             {sendInvite.isPending ? 'Gerando...' : 'Gerar Link de Convite'}
           </Button>
-          <p className="text-[11px] text-muted-foreground text-center">
-            O link será copiado automaticamente. Envie por WhatsApp ou email.
-          </p>
+
+          {/* Share options after generating */}
+          {lastInviteLink && (
+            <div className="space-y-2 p-3 rounded-xl bg-primary/5 border border-primary/10">
+              <p className="text-xs font-medium text-foreground text-center">Enviar convite para {lastInviteEmail}</p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    const subject = encodeURIComponent(`Convite para ${activeUnit?.name || 'a equipe'}`);
+                    const body = encodeURIComponent(`Olá! Você foi convidado para se juntar ao ${activeUnit?.name || 'nosso time'}.\n\nClique no link para criar sua conta:\n${lastInviteLink}`);
+                    window.open(`mailto:${lastInviteEmail}?subject=${subject}&body=${body}`, '_blank');
+                  }}
+                >
+                  <AppIcon name="Mail" size={16} />
+                  Email
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    const text = encodeURIComponent(`Olá! Você foi convidado para se juntar ao *${activeUnit?.name || 'nosso time'}* no Atlas.\n\nCrie sua conta pelo link:\n${lastInviteLink}`);
+                    window.open(`https://wa.me/${''/* no number = pick contact */}?text=${text}`, '_blank');
+                  }}
+                >
+                  <AppIcon name="MessageCircle" size={16} />
+                  WhatsApp
+                </Button>
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(lastInviteLink);
+                  toast.success('Link copiado!');
+                }}
+                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center py-1"
+              >
+                Copiar link novamente
+              </button>
+            </div>
+          )}
+
+          {!lastInviteLink && (
+            <p className="text-[11px] text-muted-foreground text-center">
+              O link será gerado e você poderá enviar por email ou WhatsApp.
+            </p>
+          )}
         </div>
       </div>
 
