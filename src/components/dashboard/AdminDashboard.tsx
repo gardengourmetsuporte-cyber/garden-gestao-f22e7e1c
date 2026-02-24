@@ -20,11 +20,13 @@ import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { ChecklistDashboardWidget } from './ChecklistDashboardWidget';
 import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
+import { useUserModules } from '@/hooks/useAccessLevels';
 
 
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile, isSuperAdmin } = useAuth();
+  const { hasAccess } = useUserModules();
   const { leaderboard, isLoading: leaderboardLoading, selectedMonth, setSelectedMonth } = useLeaderboard();
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { earnedPoints, balance, isLoading: pointsLoading } = usePoints();
@@ -66,9 +68,8 @@ export function AdminDashboard() {
       <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-2">
 
         {/* === FINANCE BLOCK === */}
-        {isSuperAdmin ? (
+        {hasAccess('finance') && isSuperAdmin ? (
           <>
-            {/* BUSINESS FINANCE CARD (super admin only) */}
             <button
               onClick={() => navigate('/finance')}
               className="finance-hero-card col-span-2 text-left card-press"
@@ -96,12 +97,10 @@ export function AdminDashboard() {
                 )}
               </div>
             </button>
-            {/* BUSINESS EXPENSE CHART */}
             <FinanceChartWidget />
           </>
-        ) : (
+        ) : hasAccess('personal-finance') ? (
           <>
-            {/* PERSONAL FINANCE CARD (admin/gerente) */}
             <button
               onClick={() => navigate('/personal-finance')}
               className="finance-hero-card finance-hero-card--personal col-span-2 text-left card-press"
@@ -133,35 +132,40 @@ export function AdminDashboard() {
                 </div>
               </div>
             </button>
-            {/* PERSONAL EXPENSE CHART */}
             <PersonalFinanceChartWidget />
           </>
+        ) : null}
+
+        {/* WEEKLY CASH SUMMARY */}
+        {hasAccess('cash-closing') && (
+          <div className="col-span-2 animate-spring-in spring-stagger-3">
+            <WeeklySummary closings={closings} />
+          </div>
         )}
 
-        {/* WEEKLY CASH SUMMARY - full width */}
-        <div className="col-span-2 animate-spring-in spring-stagger-3">
-          <WeeklySummary closings={closings} />
-        </div>
+        {/* UNIFIED CALENDAR */}
+        {hasAccess('agenda') && (
+          <div className="col-span-2 card-press min-w-0 overflow-hidden">
+            <UnifiedCalendarWidget />
+          </div>
+        )}
 
-        {/* UNIFIED CALENDAR - after weekly summary */}
-        <div className="col-span-2 card-press min-w-0 overflow-hidden">
-          <UnifiedCalendarWidget />
-        </div>
+        {/* CHECKLIST PROGRESS WIDGET */}
+        {hasAccess('checklists') && (
+          <div className="col-span-2 card-press min-w-0 overflow-hidden">
+            <ChecklistDashboardWidget />
+          </div>
+        )}
 
-        {/* === OPERATIONAL BLOCK === */}
-
-        {/* CHECKLIST PROGRESS WIDGET - full width (internal 2-col grid) */}
-        <div className="col-span-2 card-press min-w-0 overflow-hidden">
-          <ChecklistDashboardWidget />
-        </div>
-
-        {/* AGENDA WIDGET - full width */}
-        <div className="col-span-2 card-press min-w-0 overflow-hidden">
-          <AgendaDashboardWidget />
-        </div>
+        {/* AGENDA WIDGET */}
+        {hasAccess('agenda') && (
+          <div className="col-span-2 card-press min-w-0 overflow-hidden">
+            <AgendaDashboardWidget />
+          </div>
+        )}
 
         {/* ALERTS */}
-        {(stats.pendingRedemptions > 0) && (
+        {hasAccess('rewards') && (stats.pendingRedemptions > 0) && (
           <div className="card-command-info col-span-2 p-4 animate-spring-in spring-stagger-4">
             <div className="flex items-center gap-2 mb-2">
               <AppIcon name="Bell" size={16} className="text-primary" />
@@ -177,16 +181,18 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {/* RANKING WIDGET - Full leaderboard */}
-        <div className="col-span-2 animate-spring-in spring-stagger-5">
-          <Leaderboard
-            entries={leaderboard}
-            currentUserId={user?.id}
-            isLoading={leaderboardLoading}
-            selectedMonth={selectedMonth}
-            onMonthChange={setSelectedMonth}
-          />
-        </div>
+        {/* RANKING WIDGET */}
+        {hasAccess('ranking') && (
+          <div className="col-span-2 animate-spring-in spring-stagger-5">
+            <Leaderboard
+              entries={leaderboard}
+              currentUserId={user?.id}
+              isLoading={leaderboardLoading}
+              selectedMonth={selectedMonth}
+              onMonthChange={setSelectedMonth}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
