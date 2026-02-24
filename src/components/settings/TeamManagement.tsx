@@ -64,21 +64,24 @@ export function TeamManagement() {
     mutationFn: async () => {
       if (!user || !activeUnitId || !email.trim()) throw new Error('Dados inválidos');
 
-      const { error } = await supabase.from('invites').insert({
+      const { data, error } = await supabase.from('invites').insert({
         email: email.trim().toLowerCase(),
         unit_id: activeUnitId,
         role,
         invited_by: user.id,
-      });
+      }).select('token').single();
       if (error) throw error;
+      return data.token;
     },
-    onSuccess: () => {
-      toast.success('Convite enviado!');
+    onSuccess: (token: string) => {
+      const link = getInviteLink(token);
+      navigator.clipboard.writeText(link);
+      toast.success('Link de convite copiado! Envie para o funcionário.', { duration: 5000 });
       setEmail('');
       queryClient.invalidateQueries({ queryKey: ['invites', activeUnitId] });
     },
     onError: (err: any) => {
-      toast.error(err.message || 'Erro ao enviar convite');
+      toast.error(err.message || 'Erro ao criar convite');
     },
   });
 
@@ -154,9 +157,12 @@ export function TeamManagement() {
             disabled={!email.trim() || sendInvite.isPending}
             className="w-full"
           >
-            <AppIcon name="Send" size={16} className="mr-2" />
-            {sendInvite.isPending ? 'Enviando...' : 'Enviar Convite'}
+            <AppIcon name="Link" size={16} className="mr-2" />
+            {sendInvite.isPending ? 'Gerando...' : 'Gerar Link de Convite'}
           </Button>
+          <p className="text-[11px] text-muted-foreground text-center">
+            O link será copiado automaticamente. Envie por WhatsApp ou email.
+          </p>
         </div>
       </div>
 
