@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -56,16 +57,17 @@ export default function CashClosing() {
           )}
         </div>
 
-        {/* FAB */}
+        {/* FAB via portal */}
+        {createPortal(
+          <button className="fab" onClick={() => setIsFormOpen(true)}>
+            <AppIcon name="Plus" size={28} />
+          </button>,
+          document.body
+        )}
+
         <Sheet open={isFormOpen} onOpenChange={(open) => {
-          // Only allow opening — closing is done exclusively via the "Fechar" button
           if (open) setIsFormOpen(true);
         }}>
-          <SheetTrigger asChild>
-            <button className="fab">
-              <AppIcon name="Plus" size={28} />
-            </button>
-          </SheetTrigger>
           <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()} onPointerDownOutside={(e) => e.preventDefault()}>
             <SheetHeader className="flex flex-row items-center justify-between">
               <SheetTitle>Novo Fechamento de Caixa</SheetTitle>
