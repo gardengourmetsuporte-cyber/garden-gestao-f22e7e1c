@@ -103,9 +103,9 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if user needs onboarding (no units = new owner)
+  // Auto-provision: if user has no units, show loader (UnitContext handles auto-creation)
   if (!skipOnboarding && units.length === 0) {
-    return <Navigate to="/onboarding" replace />;
+    return <PageLoader />;
   }
 
   // Check module access (skip during loading to avoid flash)

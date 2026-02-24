@@ -37,14 +37,7 @@ export default function Auth() {
   const tokenFromUrl = searchParams.get('token');
   const paymentSuccess = searchParams.get('payment');
 
-  // Redirect to landing if accessed without plan, token, or recovery hash
-  useEffect(() => {
-    const hash = window.location.hash;
-    const hasRecovery = hash.includes('type=recovery');
-    if (!planFromUrl && !tokenFromUrl && !paymentSuccess && !hasRecovery && !user) {
-      // Allow login but hide signup toggle (handled below)
-    }
-  }, []);
+  // No redirect restrictions - all users can access auth freely
 
   // Listen for PASSWORD_RECOVERY event from AuthContext's session
   useEffect(() => {
@@ -63,8 +56,8 @@ export default function Auth() {
     }
   }, [user, isLoading, navigate, isNewPassword]);
 
-  // Determine if signup should be shown (only with plan or token)
-  const canSignUp = !!planFromUrl || !!tokenFromUrl;
+  // Signup is always available
+  const canSignUp = true;
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
