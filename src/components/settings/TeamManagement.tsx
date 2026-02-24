@@ -105,11 +105,8 @@ export function TeamManagement() {
   const acceptedInvites = invites.filter((i: any) => i.accepted_at);
 
   const getInviteLink = (token: string) => {
-    // Use published URL if available, fallback to current origin
-    const baseUrl = import.meta.env.PROD 
-      ? (window.location.origin.includes('lovable.app') ? 'https://garden-gestao.lovable.app' : window.location.origin)
-      : window.location.origin;
-    return `${baseUrl}/invite?token=${token}`;
+    // Always use published URL so invite links work when shared
+    return `https://garden-gestao.lovable.app/invite?token=${token}`;
   };
 
   const copyLink = (token: string) => {
