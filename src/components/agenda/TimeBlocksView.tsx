@@ -183,13 +183,17 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
   // Save allocations on change
   useEffect(() => { saveAllocations(today, allocations); }, [allocations, today]);
 
-  // Auto-scroll to current hour
+  // Auto-scroll to current hour (once on mount)
+  const hasScrolled = useRef(false);
   useEffect(() => {
+    if (hasScrolled.current) return;
+    hasScrolled.current = true;
     const el = document.getElementById(`block-${currentHour}`);
     if (el) {
       setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
     }
-  }, [currentHour]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Allocated task IDs
   const allocatedIds = useMemo(() => new Set(Object.values(allocations)), [allocations]);
