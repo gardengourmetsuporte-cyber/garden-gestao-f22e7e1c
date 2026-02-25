@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 /**
  * Protects an open Sheet/Drawer against the browser back gesture.
@@ -7,6 +7,8 @@ import { useEffect, useRef } from 'react';
  */
 export function useBackGuard(isOpen: boolean, onClose: () => void) {
   const guardActive = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen) {
@@ -22,7 +24,7 @@ export function useBackGuard(isOpen: boolean, onClose: () => void) {
     const onPopState = () => {
       if (guardActive.current) {
         guardActive.current = false;
-        onClose();
+        onCloseRef.current();
       }
     };
 
@@ -39,5 +41,5 @@ export function useBackGuard(isOpen: boolean, onClose: () => void) {
         }
       }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 }
