@@ -2398,6 +2398,198 @@ export type Database = {
         }
         Relationships: []
       }
+      quotation_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          quantity: number
+          quotation_id: string
+          winner_supplier_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          quantity?: number
+          quotation_id: string
+          winner_supplier_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          quantity?: number
+          quotation_id?: string
+          winner_supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotation_items_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotation_items_winner_supplier_id_fkey"
+            columns: ["winner_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotation_prices: {
+        Row: {
+          brand: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          quotation_item_id: string
+          quotation_supplier_id: string
+          round: number
+          unit_price: number
+        }
+        Insert: {
+          brand?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          quotation_item_id: string
+          quotation_supplier_id: string
+          round?: number
+          unit_price?: number
+        }
+        Update: {
+          brand?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          quotation_item_id?: string
+          quotation_supplier_id?: string
+          round?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_prices_quotation_item_id_fkey"
+            columns: ["quotation_item_id"]
+            isOneToOne: false
+            referencedRelation: "quotation_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotation_prices_quotation_supplier_id_fkey"
+            columns: ["quotation_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "quotation_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotation_suppliers: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          quotation_id: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["quotation_supplier_status"]
+          supplier_id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          quotation_id: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["quotation_supplier_status"]
+          supplier_id: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          quotation_id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["quotation_supplier_status"]
+          supplier_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_suppliers_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotation_suppliers_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotations: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          id: string
+          notes: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["quotation_status"]
+          title: string
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["quotation_status"]
+          title?: string
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["quotation_status"]
+          title?: string
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_categories: {
         Row: {
           color: string
@@ -4075,6 +4267,13 @@ export type Database = {
       day_period: "morning" | "afternoon" | "evening"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
+      quotation_status:
+        | "draft"
+        | "sent"
+        | "comparing"
+        | "contested"
+        | "resolved"
+      quotation_supplier_status: "pending" | "responded" | "contested"
       recipe_unit_type: "unidade" | "kg" | "g" | "litro" | "ml"
       reward_status: "pending" | "approved" | "delivered" | "cancelled"
       schedule_status: "pending" | "approved" | "rejected"
@@ -4215,6 +4414,8 @@ export const Constants = {
       day_period: ["morning", "afternoon", "evening"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
+      quotation_status: ["draft", "sent", "comparing", "contested", "resolved"],
+      quotation_supplier_status: ["pending", "responded", "contested"],
       recipe_unit_type: ["unidade", "kg", "g", "litro", "ml"],
       reward_status: ["pending", "approved", "delivered", "cancelled"],
       schedule_status: ["pending", "approved", "rejected"],

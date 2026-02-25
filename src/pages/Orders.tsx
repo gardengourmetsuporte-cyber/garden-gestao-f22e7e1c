@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown, Scale } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -19,6 +19,7 @@ import { RegisterInvoiceAfterReceive } from '@/components/inventory/RegisterInvo
 import { SmartReceivingSheet } from '@/components/inventory/SmartReceivingSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { QuotationList } from '@/components/orders/QuotationList';
 
 export default function OrdersPage() {
   const { isAdmin } = useAuth();
@@ -37,7 +38,7 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
 
   const lowStockItems = useMemo(() => items.filter(item => item.current_stock <= item.min_stock), [items]);
@@ -165,10 +166,11 @@ export default function OrdersPage() {
           <AnimatedTabs
             tabs={[
               { key: 'to-order', label: 'Sugestões', icon: <Package className="w-4 h-4" />, badge: lowStockItems.length },
+              { key: 'quotations', label: 'Cotações', icon: <Scale className="w-4 h-4" /> },
               { key: 'orders', label: 'Histórico', icon: <Clock className="w-4 h-4" />, badge: pendingOrders.length },
             ]}
             activeTab={orderTab}
-            onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders')}
+            onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders' | 'quotations')}
           />
 
           <div className="animate-fade-in" key={orderTab}>
@@ -261,6 +263,9 @@ export default function OrdersPage() {
               </div>
             )
           )}
+
+          {/* Cotações Tab */}
+          {orderTab === 'quotations' && <QuotationList />}
 
           {/* Histórico Tab */}
           {orderTab === 'orders' && (

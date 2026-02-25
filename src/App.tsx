@@ -75,6 +75,7 @@ const GamificationPlay = lazy(() => lazyRetry(() => import("./pages/Gamification
 const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 const Onboarding = lazy(() => lazyRetry(() => import("./pages/Onboarding")));
 const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
+const QuotationPublic = lazy(() => lazyRetry(() => import("./pages/QuotationPublic")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -250,6 +251,8 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Public quotation route (no auth) */}
+        <Route path="/cotacao/:token" element={<QuotationPublic />} />
         {/* Tablet routes (public, no auth) */}
         <Route path="/tablet/:unitId" element={<TabletSelect />} />
         <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
