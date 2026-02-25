@@ -11,6 +11,7 @@ import { getModuleKeyFromRoute } from "@/lib/modules";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
+import { useRoutePersist, useRouteRestore } from "@/hooks/useRouteRestore";
 
 const LAZY_RELOAD_KEY = 'lazy_reload_count';
 
@@ -144,6 +145,9 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
+  useRoutePersist();
+  useRouteRestore();
+
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
