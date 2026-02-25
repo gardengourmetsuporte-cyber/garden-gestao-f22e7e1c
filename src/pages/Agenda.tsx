@@ -13,6 +13,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
+import { TimeBlocksView } from '@/components/agenda/TimeBlocksView';
 import { CategoryChips } from '@/components/agenda/CategoryChips';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -54,7 +55,7 @@ export default function Agenda() {
   const navigate = useNavigate();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('list');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
@@ -333,8 +334,8 @@ export default function Agenda() {
             <div
               className="absolute top-1 bottom-1 rounded-xl bg-card shadow-sm border border-border transition-all duration-300 ease-out"
               style={{
-                width: 'calc(50% - 4px)',
-                left: viewMode === 'list' ? '4px' : 'calc(50% + 0px)',
+                width: 'calc(33.333% - 4px)',
+                left: viewMode === 'list' ? '4px' : viewMode === 'calendar' ? 'calc(33.333% + 0px)' : 'calc(66.666% + 0px)',
               }}
             />
             <button
@@ -357,6 +358,16 @@ export default function Agenda() {
               <AppIcon name="Calendar" size={16} />
               Calendário
             </button>
+            <button
+              onClick={() => setViewMode('blocks')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
+                viewMode === 'blocks' ? 'text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              <AppIcon name="LayoutGrid" size={16} />
+              Blocos
+            </button>
           </div>
 
           {/* Category filter chips */}
@@ -370,7 +381,15 @@ export default function Agenda() {
 
           {/* Content with fade transition */}
           <div className="animate-fade-in" key={viewMode}>
-            {viewMode === 'list' ? <ListContent /> : <CalendarContent />}
+            {viewMode === 'list' && <ListContent />}
+            {viewMode === 'calendar' && <CalendarContent />}
+            {viewMode === 'blocks' && (
+              <TimeBlocksView
+                tasks={displayTasks}
+                onToggleTask={toggleTask}
+                onTaskClick={handleEditTask}
+              />
+            )}
           </div>
         </div>
 
