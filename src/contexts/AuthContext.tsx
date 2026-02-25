@@ -57,7 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<PlanTier>((cached?.plan as PlanTier) ?? 'free');
   const [planStatus, setPlanStatus] = useState<string>(cached?.planStatus ?? 'active');
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(!cached);
+  // Always start loading until initial session check completes
+  const [isLoading, setIsLoading] = useState(true);
   const subIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchUserDataRef = useRef<(userId: string) => Promise<void>>();
 
@@ -124,6 +125,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        // If we have cached profile data, stop loading immediately (profile fetch is background)
+        if (cached) {
+          setIsLoading(false);
+        }
         fetchUserData(session.user.id);
       } else {
         clearCachedAuth();
