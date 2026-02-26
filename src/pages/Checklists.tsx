@@ -16,28 +16,27 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-function DateStrip({ days, selectedDate, onSelectDate, scrollRef }: {
+function DateStrip({ days, selectedDate, onSelectDate }: {
   days: Date[];
   selectedDate: Date;
   onSelectDate: (d: Date) => void;
-  scrollRef: React.RefObject<HTMLDivElement>;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const container = scrollRef.current;
+    const container = containerRef.current;
     if (!container) return;
-    const innerDiv = container.firstElementChild as HTMLElement;
-    if (!innerDiv) return;
     const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
     if (selectedIdx < 0) return;
-    const btn = innerDiv.children[selectedIdx] as HTMLElement;
-    if (!btn) return;
-    const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
-    container.scrollTo({ left: scrollLeft, behavior: 'instant' });
-  }, [selectedDate, days, scrollRef]);
+    // Each button is 44px wide + 4px gap, plus 16px left padding
+    const btnCenter = 16 + selectedIdx * 48 + 22;
+    const scrollLeft = btnCenter - container.clientWidth / 2;
+    container.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
+  }, [selectedDate, days]);
 
   return (
     <div className="space-y-1.5">
-      <div className="-mx-4 overflow-x-auto scrollbar-hide" ref={scrollRef}>
+      <div className="-mx-4 overflow-x-auto scrollbar-hide" ref={containerRef}>
         <div className="flex gap-1 px-4 py-1">
           {days.map((day) => {
             const isSelected = isSameDay(day, selectedDate);
@@ -102,7 +101,7 @@ export default function ChecklistsPage() {
   const [settingsMode, setSettingsMode] = useState(false);
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const dateStripRef = useRef<HTMLDivElement>(null);
+  
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
 
   // The settings type follows the checklist type
@@ -342,7 +341,6 @@ export default function ChecklistsPage() {
                   days={days}
                   selectedDate={selectedDate}
                   onSelectDate={setSelectedDate}
-                  scrollRef={dateStripRef}
                 />
               );
             })()}
