@@ -13,6 +13,7 @@ import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
 import { useRoutePersist, useRouteRestore } from "@/hooks/useRouteRestore";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const LAZY_RELOAD_KEY = 'lazy_reload_count';
 
@@ -151,212 +152,50 @@ function AppRoutes() {
   useRouteRestore();
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/invite" element={<Invite />} />
-        <Route path="/onboarding" element={
-          <ProtectedRoute skipOnboarding>
-            <Onboarding />
-          </ProtectedRoute>
-        } />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <RouteErrorBoundary><DashboardNew /></RouteErrorBoundary>
+    <>
+      <ScrollToTop />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/invite" element={<Invite />} />
+          <Route path="/onboarding" element={
+            <ProtectedRoute skipOnboarding>
+              <Onboarding />
             </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/agenda"
-          element={
-            <ProtectedRoute>
-              <Agenda />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance"
-          element={
-            <ProtectedRoute>
-              <Finance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/inventory"
-          element={
-            <ProtectedRoute>
-              <Inventory />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/checklists"
-          element={
-            <ProtectedRoute>
-              <Checklists />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/rewards"
-          element={
-            <ProtectedRoute>
-              <Rewards />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cash-closing"
-          element={
-            <ProtectedRoute>
-              <CashClosing />
-            </ProtectedRoute>
-          }
-        />
-         <Route
-           path="/recipes"
-           element={
-             <ProtectedRoute>
-               <Recipes />
-             </ProtectedRoute>
-           }
-         />
-        <Route
-          path="/employees"
-          element={
-            <ProtectedRoute>
-              <Employees />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          }
-        />
-        {/* Public quotation route (no auth) */}
-        <Route path="/cotacao/:token" element={<QuotationPublic />} />
-        {/* Tablet routes (public, no auth) */}
-        <Route path="/tablet/:unitId" element={<TabletSelect />} />
-        <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
-        <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
-        {/* Gamification tablet (public, no auth) */}
-        <Route path="/gamification/:unitId" element={<GamificationPlay />} />
-        {/* Tablet admin (protected) */}
-        <Route
-          path="/tablet-admin"
-          element={
-            <ProtectedRoute>
-              <TabletAdmin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cardapio"
-          element={
-            <ProtectedRoute>
-              <MenuAdmin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketing"
-          element={
-            <ProtectedRoute>
-              <Marketing />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/whatsapp"
-          element={
-            <ProtectedRoute>
-              <WhatsApp />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ranking"
-          element={
-            <ProtectedRoute>
-              <Ranking />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/personal-finance"
-          element={
-            <ProtectedRoute>
-              <PersonalFinance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile/:userId"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/copilot"
-          element={
-            <ProtectedRoute>
-              <Copilot />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/alerts"
-          element={
-            <ProtectedRoute>
-              <Alerts />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/gamification"
-          element={
-            <ProtectedRoute>
-              <Gamification />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/plans"
-          element={
-            <ProtectedRoute>
-              <Plans />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
+          } />
+          <Route path="/" element={<ProtectedRoute><RouteErrorBoundary><DashboardNew /></RouteErrorBoundary></ProtectedRoute>} />
+          <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
+          <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
+          <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/checklists" element={<ProtectedRoute><Checklists /></ProtectedRoute>} />
+          <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/cash-closing" element={<ProtectedRoute><CashClosing /></ProtectedRoute>} />
+          <Route path="/recipes" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
+          <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="/cotacao/:token" element={<QuotationPublic />} />
+          <Route path="/tablet/:unitId" element={<TabletSelect />} />
+          <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
+          <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
+          <Route path="/gamification/:unitId" element={<GamificationPlay />} />
+          <Route path="/tablet-admin" element={<ProtectedRoute><TabletAdmin /></ProtectedRoute>} />
+          <Route path="/cardapio" element={<ProtectedRoute><MenuAdmin /></ProtectedRoute>} />
+          <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
+          <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
+          <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
+          <Route path="/personal-finance" element={<ProtectedRoute><PersonalFinance /></ProtectedRoute>} />
+          <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
+          <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+          <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
+          <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+    </>
   );
 }
 
