@@ -431,7 +431,8 @@ export default function ChecklistsPage() {
                 />
               </button>
 
-              {/* Checklist View */}
+              {/* Spacer + Checklist View */}
+              <div className="pt-3">
               <ChecklistView
                 sectors={sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
                 checklistType={checklistType}
@@ -445,6 +446,7 @@ export default function ChecklistsPage() {
                 deadlinePassed={deadlinePassed}
                 onContestCompletion={contestCompletion}
               />
+              </div>
             </div>
           ) : (
             <>
