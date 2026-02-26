@@ -23,7 +23,6 @@ export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
         className={cn("material-symbols-rounded select-none leading-none", className)}
         style={{
           fontSize: size,
-          color: 'inherit',
           fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' 0, 'opsz' ${size > 32 ? 48 : 24}`,
           ...style,
         }}
