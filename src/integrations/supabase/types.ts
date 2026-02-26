@@ -399,8 +399,12 @@ export type Database = {
           checklist_type: Database["public"]["Enums"]["checklist_type"]
           completed_at: string
           completed_by: string
+          contested_at: string | null
+          contested_by: string | null
+          contested_reason: string | null
           date: string
           id: string
+          is_contested: boolean
           is_skipped: boolean
           item_id: string
           notes: string | null
@@ -412,8 +416,12 @@ export type Database = {
           checklist_type: Database["public"]["Enums"]["checklist_type"]
           completed_at?: string
           completed_by: string
+          contested_at?: string | null
+          contested_by?: string | null
+          contested_reason?: string | null
           date?: string
           id?: string
+          is_contested?: boolean
           is_skipped?: boolean
           item_id: string
           notes?: string | null
@@ -425,8 +433,12 @@ export type Database = {
           checklist_type?: Database["public"]["Enums"]["checklist_type"]
           completed_at?: string
           completed_by?: string
+          contested_at?: string | null
+          contested_by?: string | null
+          contested_reason?: string | null
           date?: string
           id?: string
+          is_contested?: boolean
           is_skipped?: boolean
           item_id?: string
           notes?: string | null

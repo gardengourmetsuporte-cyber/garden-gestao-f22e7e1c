@@ -340,7 +340,43 @@ export function useChecklists() {
     queryClient.invalidateQueries({ queryKey: ['points'] });
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
-  }, [completions, user?.id, queryClient]);
+  }, [completions, user?.id, queryClient, activeUnitId]);
+
+  // ---- Contest a completion (admin only) ----
+  const contestCompletion = useCallback(async (completionId: string, reason: string) => {
+    if (!user?.id) throw new Error('Usuário não autenticado');
+    if (!reason.trim()) throw new Error('Motivo é obrigatório');
+
+    const completion = completions.find(c => c.id === completionId);
+    if (!completion) throw new Error('Conclusão não encontrada');
+
+    const { error } = await supabase
+      .from('checklist_completions')
+      .update({
+        is_contested: true,
+        contested_by: user.id,
+        contested_reason: reason.trim(),
+        contested_at: new Date().toISOString(),
+        awarded_points: false,
+        points_awarded: 0,
+      } as any)
+      .eq('id', completionId);
+    if (error) throw error;
+
+    // Notify the employee
+    await supabase.from('notifications').insert({
+      user_id: completion.completed_by,
+      title: 'Item contestado',
+      body: `Seu item foi contestado: "${reason.trim()}"`,
+      type: 'checklist',
+      unit_id: activeUnitId,
+    } as any);
+
+    queryClient.invalidateQueries({ queryKey: ['checklist-completions'] });
+    queryClient.invalidateQueries({ queryKey: ['points'] });
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+  }, [completions, user?.id, queryClient, activeUnitId]);
 
   const isItemCompleted = useCallback((itemId: string) => {
     return completions.some(c => c.item_id === itemId);
@@ -370,7 +406,7 @@ export function useChecklists() {
     addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
     addItem, updateItem, deleteItem, restoreItem, permanentDeleteItem,
     fetchDeletedItems, emptyTrash, reorderItems,
-    toggleCompletion, isItemCompleted, getCompletionProgress,
+    toggleCompletion, contestCompletion, isItemCompleted, getCompletionProgress,
     fetchCompletions,
     refetch: invalidateSectors,
   };

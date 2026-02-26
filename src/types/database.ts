@@ -156,6 +156,10 @@ export interface ChecklistCompletion {
   awarded_points: boolean;
   points_awarded: number; // 1-4 stars, 0 means "already done"
   is_skipped: boolean; // "Não fiz" — marked but not done
+  is_contested: boolean;
+  contested_by: string | null;
+  contested_reason: string | null;
+  contested_at: string | null;
   // Joined data
   item?: ChecklistItem;
   profile?: Profile;
