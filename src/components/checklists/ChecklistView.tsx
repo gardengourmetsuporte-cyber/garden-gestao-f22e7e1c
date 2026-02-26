@@ -243,7 +243,7 @@ export function ChecklistView({
 
   const deadlineBannerText = deadlinePassed && checklistType !== 'bonus'
     ? checklistType === 'abertura'
-      ? '⏰ Prazo encerrado às 07:30 — itens pendentes marcados como "não fiz"'
+      ? '⏰ Prazo encerrado às 19:30 — itens pendentes marcados como "não fiz"'
       : '⏰ Prazo encerrado às 02:00 — itens pendentes marcados como "não fiz"'
     : null;
 
