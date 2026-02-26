@@ -137,7 +137,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
                       isActive
-                        ? "text-foreground ring-2 ring-primary bg-primary/10"
+                        ? "text-foreground bg-primary/10"
                         : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
                     )}
                   >
