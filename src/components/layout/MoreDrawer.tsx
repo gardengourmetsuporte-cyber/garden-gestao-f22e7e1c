@@ -26,6 +26,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
@@ -166,75 +167,72 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             </button>
           )}
 
-          {/* Agenda — full width card */}
-          {(isSuperAdmin || isAdmin || (!hasAccessLevel || (allowedModules && allowedModules.includes('agenda')))) && (
-            <button
-              onClick={() => { navigate('/agenda'); onOpenChange(false); }}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
-            >
-              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-                <AppIcon name="CalendarDays" size={18} className="text-foreground/70" />
-              </div>
-              <span className="text-sm font-medium text-foreground">Agenda</span>
-              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
-            </button>
-          )}
+          {/* Module grid — adaptive cards */}
+          {groupedNav.map(group => {
+            const count = group.items.length;
+            const gridCols = count <= 2 ? `grid-cols-${count}` : count === 3 ? 'grid-cols-3' : count === 4 ? 'grid-cols-2' : 'grid-cols-3';
 
-          {/* Module grid */}
-          {groupedNav.map(group => (
-            <div key={group.label} className="mb-5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2.5 block text-muted-foreground/50 font-display">
-                {group.label}
-              </span>
-              <div className="grid grid-cols-4 gap-4">
-                {group.items.map(item => {
-                  const active = location.pathname === item.href;
-                  const locked = isModuleLocked(item.href);
+            return (
+              <div key={group.label} className="mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2 block text-muted-foreground/50 font-display">
+                  {group.label}
+                </span>
+                <div className={cn("grid gap-2", gridCols)}>
+                  {group.items.map(item => {
+                    const active = location.pathname === item.href;
+                    const locked = isModuleLocked(item.href);
 
-                  return (
-                    <Link
-                      key={item.href}
-                      to={locked ? '/plans' : item.href}
-                      onClick={() => onOpenChange(false)}
-                      className="flex flex-col items-center gap-1.5 active:scale-90 transition-all duration-150"
-                    >
-                      <div className="relative">
-                        <div
-                          className={cn(
-                            "w-12 h-12 rounded-[18px] flex items-center justify-center transition-all",
-                            active ? "bg-primary" : "bg-secondary"
-                          )}
-                          style={{
-                            boxShadow: active ? '0 4px 16px hsl(var(--primary) / 0.35)' : undefined,
-                            opacity: locked ? 0.5 : 1,
-                            border: locked ? '1px dashed hsl(var(--primary) / 0.4)' : active ? 'none' : '1px solid hsl(var(--border) / 0.3)',
-                          }}
-                        >
-                          <AppIcon
-                            name={item.icon}
-                            size={20}
-                            fill={active ? 1 : 0}
-                            className={active ? "text-primary-foreground" : "text-foreground/70"}
-                          />
-                        </div>
-                        {locked && (
-                          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center bg-primary/15 border border-primary/40">
-                            <AppIcon name="Lock" size={8} className="text-primary" />
-                          </span>
+                    return (
+                      <Link
+                        key={item.href}
+                        to={locked ? '/plans' : item.href}
+                        onClick={() => onOpenChange(false)}
+                        className={cn(
+                          "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95",
+                          active
+                            ? "bg-primary/10"
+                            : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
                         )}
-                      </div>
-                      <span
-                        className="text-[10px] font-medium leading-tight text-center truncate max-w-full"
-                        style={{ color: active ? 'hsl(var(--foreground))' : locked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground) / 0.8)' }}
+                        style={{ opacity: locked ? 0.5 : 1 }}
                       >
-                        {item.label}
-                      </span>
-                    </Link>
-                  );
-                })}
+                        <div className="relative">
+                          <div
+                            className={cn(
+                              "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
+                              active ? "bg-primary" : "bg-muted"
+                            )}
+                            style={{
+                              boxShadow: active ? '0 4px 12px hsl(var(--primary) / 0.3)' : undefined,
+                            }}
+                          >
+                            <AppIcon
+                              name={item.icon}
+                              size={18}
+                              fill={active ? 1 : 0}
+                              className={active ? "text-primary-foreground" : "text-foreground/70"}
+                            />
+                          </div>
+                          {locked && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center bg-primary/15 border border-primary/40">
+                              <AppIcon name="Lock" size={8} className="text-primary" />
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={cn(
+                            "text-[11px] font-medium leading-tight text-center truncate max-w-full",
+                            active ? "text-foreground" : locked ? "text-muted-foreground" : "text-foreground/80"
+                          )}
+                        >
+                          {item.label}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Settings + Logout — Meta style */}
           <div className="space-y-1.5 mt-2">
