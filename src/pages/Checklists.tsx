@@ -407,15 +407,9 @@ export default function ChecklistsPage() {
                 className={cn(
                   "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
                   checklistType === 'bonus'
-                    ? "ring-2 scale-[1.01] shadow-xl"
-                    : "ring-1 hover:ring-emerald-500/40"
+                    ? "finance-hero-card ring-0 scale-[1.01] shadow-xl"
+                    : "ring-1 ring-border/40 bg-card/60 opacity-70 hover:opacity-90 hover:ring-emerald-500/40"
                 )}
-                style={{
-                  background: checklistType === 'bonus'
-                    ? 'linear-gradient(135deg, hsl(160 84% 39% / 0.15), hsl(var(--neon-cyan) / 0.1), hsl(160 84% 39% / 0.05))'
-                    : 'linear-gradient(135deg, hsl(160 84% 39% / 0.05), hsl(var(--neon-cyan) / 0.03))',
-                  borderColor: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.5)' : 'hsl(160 84% 39% / 0.15)',
-                }}
               >
                 <div className="flex items-center gap-4">
                   <div className={cn(
@@ -430,9 +424,9 @@ export default function ChecklistsPage() {
                       : 'hsl(160 84% 39% / 0.08)',
                   }}
                   >
-                    <AppIcon name="Zap" size={28} className={cn(
+                    <AppIcon name="Zap" size={28} style={{ color: checklistType === 'bonus' ? 'hsl(160 84% 35%)' : undefined }} className={cn(
                       "transition-all",
-                      checklistType === 'bonus' ? "text-emerald-400 animate-pulse" : "text-emerald-500/50"
+                      checklistType !== 'bonus' && "text-emerald-500/50"
                     )} />
                     {checklistType === 'bonus' && (
                       <div className="absolute inset-0 rounded-xl animate-ping" style={{ animationDuration: '2s', background: 'hsl(160 84% 39% / 0.08)' }} />
