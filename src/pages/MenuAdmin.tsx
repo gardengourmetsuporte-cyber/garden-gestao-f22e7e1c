@@ -84,12 +84,6 @@ export default function MenuAdmin() {
 
   return (
     <AppLayout>
-      {/* Header */}
-      <div className="page-header-bar">
-        <div className="page-header-content">
-          <h1 className="page-title">Cardápio</h1>
-        </div>
-      </div>
 
       {/* Quick Stats */}
       <div className="px-4 pt-4 grid grid-cols-4 gap-2">

@@ -125,11 +125,6 @@ export default function PersonalFinance() {
   return (
     <AppLayout>
         <div className="min-h-screen bg-background pb-32">
-      <header className="page-header-bar">
-        <div className="page-header-content">
-          <h1 className="page-title">Finanças Pessoais</h1>
-        </div>
-      </header>
       <div>
         {activeTab === 'home' && (
           <FinanceHome

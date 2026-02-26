@@ -109,12 +109,6 @@ export default function InventoryPage() {
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
-          <header className="page-header-bar">
-            <div className="page-header-content flex items-center justify-between">
-              <Skeleton className="h-7 w-24" />
-              <Skeleton className="h-10 w-10 rounded-xl" />
-            </div>
-          </header>
           <div className="px-4 py-4 space-y-4">
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {[1,2,3,4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
@@ -145,17 +139,16 @@ export default function InventoryPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
-        {/* Header */}
-        <header className="page-header-bar">
-          <div className="page-header-content flex items-center justify-between">
-            <h1 className="page-title">Estoque</h1>
-            {isAdmin && (
+        {/* Header actions */}
+        {isAdmin && (
+          <header className="page-header-bar">
+            <div className="page-header-content flex items-center justify-end">
               <button onClick={handleAddItem} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
                 <AppIcon name="Plus" size={20} />
               </button>
-            )}
-          </div>
-        </header>
+            </div>
+          </header>
+        )}
 
         <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Stats */}

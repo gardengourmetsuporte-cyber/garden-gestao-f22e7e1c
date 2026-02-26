@@ -50,12 +50,6 @@ export default function Gamification() {
   return (
     <AppLayout>
       <div className="p-4 pb-24 max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Gamificação</h1>
-            <p className="text-sm text-muted-foreground">Roleta de prêmios para clientes</p>
-          </div>
-        </div>
 
         {/* Settings */}
         <GamificationSettingsPanel
