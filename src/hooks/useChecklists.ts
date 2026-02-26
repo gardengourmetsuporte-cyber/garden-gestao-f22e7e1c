@@ -368,11 +368,13 @@ export function useChecklists() {
     const itemData = sectors.flatMap(s => s.subcategories?.flatMap(sub => sub.items || []) || []).find(i => i.id === itemId);
     const originalPoints = itemData?.points ?? originalCompletion.points_awarded ?? 1;
     const pointsPerPerson = Math.floor(originalPoints / userIds.length);
+    const remainder = originalPoints - (pointsPerPerson * userIds.length);
 
-    // Update existing completion with split points
+    // Update existing completion — original completer gets the remainder extra
+    const originalGets = pointsPerPerson + remainder;
     const { error: updateError } = await supabase
       .from('checklist_completions')
-      .update({ points_awarded: pointsPerPerson, awarded_points: pointsPerPerson > 0 })
+      .update({ points_awarded: originalGets, awarded_points: originalGets > 0 })
       .eq('id', originalCompletion.id);
     if (updateError) throw updateError;
 

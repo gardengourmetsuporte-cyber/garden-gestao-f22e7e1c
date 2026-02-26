@@ -510,11 +510,17 @@ export function ChecklistView({
                                           );
                                         })}
                                       </div>
-                                      {splitSelectedUsers.size >= 2 && (
-                                        <p className="text-xs text-muted-foreground text-center">
-                                          {item.points ?? 1} pts ÷ {splitSelectedUsers.size} = {Math.floor((item.points ?? 1) / splitSelectedUsers.size)} pts cada
-                                        </p>
-                                      )}
+                                      {splitSelectedUsers.size >= 2 && (() => {
+                                        const pts = item.points ?? 1;
+                                        const base = Math.floor(pts / splitSelectedUsers.size);
+                                        const rem = pts - base * splitSelectedUsers.size;
+                                        return (
+                                          <p className="text-xs text-muted-foreground text-center">
+                                            {pts} pts ÷ {splitSelectedUsers.size} = {base} pts cada
+                                            {rem > 0 && <span> (+{rem} pt p/ quem completou)</span>}
+                                          </p>
+                                        );
+                                      })()}
                                       <div className="flex gap-2">
                                         <button
                                           onClick={() => handleSplit(item.id, completion, item.points ?? 1)}
@@ -903,11 +909,17 @@ export function ChecklistView({
                                                   );
                                                 })}
                                               </div>
-                                              {splitSelectedUsers.size >= 2 && (
-                                                <p className="text-xs text-muted-foreground text-center">
-                                                  {item.points ?? 1} pts ÷ {splitSelectedUsers.size} = {Math.floor((item.points ?? 1) / splitSelectedUsers.size)} pts cada
-                                                </p>
-                                              )}
+                                              {splitSelectedUsers.size >= 2 && (() => {
+                                                const pts = item.points ?? 1;
+                                                const base = Math.floor(pts / splitSelectedUsers.size);
+                                                const rem = pts - base * splitSelectedUsers.size;
+                                                return (
+                                                  <p className="text-xs text-muted-foreground text-center">
+                                                    {pts} pts ÷ {splitSelectedUsers.size} = {base} pts cada
+                                                    {rem > 0 && <span> (+{rem} pt p/ quem completou)</span>}
+                                                  </p>
+                                                );
+                                              })()}
                                               <div className="flex gap-2">
                                                 <button
                                                   onClick={() => handleSplit(item.id, completion, item.points ?? 1)}
