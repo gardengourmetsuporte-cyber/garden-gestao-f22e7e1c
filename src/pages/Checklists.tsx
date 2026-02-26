@@ -430,7 +430,7 @@ export default function ChecklistsPage() {
                     opacity: checklistType === 'bonus' ? 0.3 : 0.2,
                     background: 'linear-gradient(105deg, transparent 40%, hsl(160 84% 39% / 0.15) 45%, hsl(var(--neon-cyan) / 0.1) 55%, transparent 60%)',
                     backgroundSize: '200% 100%',
-                    animation: 'shimmer 3s ease-in-out infinite',
+                    animation: 'shimmer 8s ease-in-out infinite',
                   }}
                 />
               </button>

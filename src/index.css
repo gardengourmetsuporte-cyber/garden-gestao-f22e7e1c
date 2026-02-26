@@ -862,11 +862,11 @@
   }
 
   .animate-glow-pulse {
-    animation: glowPulse 2s ease-in-out infinite;
+    animation: glowPulse 6s ease-in-out infinite;
   }
 
   .animate-neon-border {
-    animation: neonBorderPulse 3s ease-in-out infinite;
+    animation: neonBorderPulse 8s ease-in-out infinite;
   }
 
   @keyframes slideUp {
@@ -1237,7 +1237,7 @@
       transparent 75%
     );
     background-size: 250% 100%;
-    animation: achievementShimmer 3s ease-in-out infinite;
+    animation: achievementShimmer 8s ease-in-out infinite;
   }
 
   @keyframes achievementShimmer {
@@ -1264,7 +1264,7 @@
       hsl(0 0% 100% / 0.15) 50%,
       transparent 60%
     );
-    animation: medalShine 4s ease-in-out infinite;
+    animation: medalShine 8s ease-in-out infinite;
   }
 
   @keyframes medalShine {
