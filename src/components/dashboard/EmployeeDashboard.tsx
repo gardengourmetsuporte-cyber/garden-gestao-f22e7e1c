@@ -78,7 +78,7 @@ export function EmployeeDashboard() {
   }, [refetchPoints, refetchLeaderboard]);
 
   return (
-    <div className="space-y-6 p-4 lg:p-6">
+    <div className="space-y-6 px-4 py-3 lg:px-6">
       {/* Welcome Header */}
       <div className="animate-spring-in spring-stagger-1">
         <div className="card-surface p-5" style={{ border: 'none' }}>

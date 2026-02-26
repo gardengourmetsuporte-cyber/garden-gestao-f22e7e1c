@@ -261,7 +261,7 @@ export default function ChecklistsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-4 lg:px-6 space-y-5">
+        <div className="px-4 py-3 lg:px-6 space-y-5">
           <div className="animate-fade-in space-y-5" key={currentTab}>
           {currentTab === 'checklist' ? (
             <div className="space-y-5">

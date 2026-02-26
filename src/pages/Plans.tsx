@@ -85,7 +85,7 @@ export default function Plans() {
           </div>
         </header>
 
-        <div className="px-4 py-6 lg:px-6 max-w-3xl mx-auto space-y-6">
+        <div className="px-4 py-3 lg:px-6 max-w-3xl mx-auto space-y-6">
           {isPaid ? (
             /* ── Active plan management view ── */
             <div className="space-y-6">

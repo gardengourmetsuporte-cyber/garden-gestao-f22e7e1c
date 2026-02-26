@@ -93,7 +93,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
   return (
     <div className="space-y-4">
       {/* Month Selector */}
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-3 lg:px-6">
         <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
       </div>
 
