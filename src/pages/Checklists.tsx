@@ -281,7 +281,7 @@ export default function ChecklistsPage() {
                   className={cn(
                     "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                     checklistType === 'abertura'
-                      ? "finance-hero-card ring-0 scale-[1.02]"
+                      ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
                       : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                   )}
                 >
@@ -332,7 +332,7 @@ export default function ChecklistsPage() {
                   className={cn(
                     "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                     checklistType === 'fechamento'
-                      ? "finance-hero-card ring-0 scale-[1.02]"
+                      ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
                       : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                   )}
                 >
@@ -384,7 +384,7 @@ export default function ChecklistsPage() {
                 className={cn(
                   "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
                   checklistType === 'bonus'
-                    ? "finance-hero-card ring-0 scale-[1.01] shadow-xl"
+                    ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.01] shadow-xl"
                     : "bg-card hover:shadow-lg"
                 )}
                 style={checklistType !== 'bonus' ? {

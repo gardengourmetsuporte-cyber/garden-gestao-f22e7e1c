@@ -273,8 +273,7 @@ export default function Auth() {
 
           {/* Form Card */}
           <div
-            className="animate-slide-up rounded-2xl p-6 space-y-6 backdrop-blur-xl gradient-primary"
-            style={{ animationDelay: '100ms' }}
+            className="rounded-2xl p-6 space-y-6 backdrop-blur-xl gradient-primary"
           >
             {/* Title with icon */}
             <div className="text-center space-y-1.5">
