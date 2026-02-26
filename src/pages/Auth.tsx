@@ -304,7 +304,7 @@ export default function Auth() {
 
           <div className="w-full max-w-sm space-y-6">
             {/* Form Card */}
-            <div className="rounded-2xl p-6 space-y-6 bg-card border border-border/50 shadow-card animate-slide-up">
+            <div className="rounded-2xl p-6 space-y-6 bg-card border border-border/50 shadow-card">
               {/* Title */}
               <div className="text-center space-y-1.5">
                 <div className="flex items-center justify-center gap-2">
