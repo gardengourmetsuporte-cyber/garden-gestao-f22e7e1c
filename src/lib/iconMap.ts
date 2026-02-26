@@ -13,7 +13,7 @@ export const ICON_MAP: Record<string, string> = {
   ArrowRight: 'arrow_forward_ios',
   ArrowUpRight: 'north_east',
   ExternalLink: 'open_in_new',
-  Home: 'cottage',
+  Home: 'home',
   MoreHorizontal: 'more_horiz',
   MoreVertical: 'more_vert',
   LayoutList: 'view_agenda',
