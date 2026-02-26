@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
@@ -55,7 +56,16 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
 ];
 
 export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, variant = 'business' }: FinanceBottomNavProps) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleTabChange = useCallback((tab: FinanceTab) => {
+    if (tab === 'home' && activeTab === 'home') {
+      navigate('/');
+      return;
+    }
+    onTabChange(tab);
+  }, [activeTab, onTabChange, navigate]);
 
   const handleAction = (type: TransactionType) => {
     setMenuOpen(false);
@@ -112,7 +122,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
           <div className="flex items-center h-[68px] max-w-lg mx-auto relative">
             {/* Left tabs */}
             {tabs.slice(0, 2).map(tab => (
-              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={onTabChange} />
+              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
             ))}
 
             {/* Center FAB "+" — matches global bar style */}
@@ -140,7 +150,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
 
             {/* Right tabs */}
             {tabs.slice(2, 4).map(tab => (
-              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={onTabChange} />
+              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
             ))}
           </div>
         </div>
