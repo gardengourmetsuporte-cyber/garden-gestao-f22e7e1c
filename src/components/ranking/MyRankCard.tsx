@@ -25,7 +25,7 @@ export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, ac
       <div className="flex items-center gap-4">
         <RankedAvatar avatarUrl={avatarUrl} earnedPoints={earnedPoints} size={72} showTitle />
         <div className="flex-1 min-w-0">
-          <h2 className="text-base font-bold text-foreground truncate">{fullName}</h2>
+          <h2 className="text-base font-extrabold text-foreground truncate font-display" style={{ letterSpacing: '-0.02em' }}>{fullName}</h2>
           <p className="text-xs font-semibold mt-0.5" style={{ color: rank.color }}>
             {rank.title}
           </p>

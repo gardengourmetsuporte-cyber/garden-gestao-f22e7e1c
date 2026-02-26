@@ -137,7 +137,7 @@ function EmployeeClosingView({
         <div className={`w-16 h-16 mx-auto rounded-full ${config.iconBg} flex items-center justify-center mb-4`}>
           <Icon />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">{config.title}</h3>
+        <h3 className="text-lg font-bold text-foreground mb-2 font-display" style={{ letterSpacing: '-0.02em' }}>{config.title}</h3>
         <p className="text-muted-foreground text-sm capitalize mb-1">{formattedDate}</p>
         <p className={`text-sm ${config.subtitleColor}`}>{config.subtitle}</p>
         {todaysClosing.status === 'divergent' && todaysClosing.validation_notes && (
@@ -154,7 +154,7 @@ function EmployeeClosingView({
       <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
         <AppIcon name="Receipt" size={32} className="text-primary" />
       </div>
-      <h3 className="text-lg font-semibold text-foreground mb-2">Fechamento de Hoje</h3>
+      <h3 className="text-lg font-bold text-foreground mb-2 font-display" style={{ letterSpacing: '-0.02em' }}>Fechamento de Hoje</h3>
       <p className="text-muted-foreground text-sm capitalize mb-4">{formattedDate}</p>
       <p className="text-sm text-muted-foreground mb-4">
         Você ainda não enviou o fechamento de caixa de hoje.

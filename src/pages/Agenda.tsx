@@ -217,7 +217,7 @@ export default function Agenda() {
                 <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl bg-card border border-border hover:border-primary/20 transition-all">
                   <div className="flex items-center gap-3">
                     <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
-                    <span className="font-semibold text-sm">{category.name}</span>
+                    <span className="font-semibold text-sm font-display">{category.name}</span>
                     <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
                       {catTasks.length}
                     </span>

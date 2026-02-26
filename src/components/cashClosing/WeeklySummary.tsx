@@ -69,7 +69,7 @@ export function WeeklySummary({ closings }: Props) {
         </button>
 
         <div className="text-center flex-1">
-          <h3 className="text-sm font-bold text-foreground">Resumo da Semana</h3>
+          <h3 className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Resumo da Semana</h3>
           <span className="text-[10px] text-muted-foreground">
             {summary.weekLabel} • {summary.count} fechamento{summary.count !== 1 ? 's' : ''}
           </span>
@@ -92,7 +92,7 @@ export function WeeklySummary({ closings }: Props) {
         <>
           {/* Total */}
           <div className="text-center py-2">
-            <span className="text-2xl font-black text-foreground">
+            <span className="text-2xl font-black text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
               <AnimatedCurrency value={summary.total} />
             </span>
             <p className="text-[10px] text-muted-foreground mt-0.5">Total em vendas na semana</p>

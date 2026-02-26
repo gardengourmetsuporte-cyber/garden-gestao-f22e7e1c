@@ -193,7 +193,7 @@ export default function Chat() {
       {/* Header */}
       <div className="shrink-0 px-5 pt-4 pb-1">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold tracking-tight text-foreground">Mensagens</h1>
+          <h1 className="text-xl font-extrabold tracking-tight text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>Mensagens</h1>
           {isAdmin && (
             <div className="flex items-center gap-1">
               <Button size="icon" variant="ghost" onClick={() => openGroupSheet('group')} className="w-9 h-9 rounded-full" title="Novo grupo">
