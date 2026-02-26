@@ -51,13 +51,13 @@ export function FinanceMore({
             key={index}
             onClick={item.onClick}
             className="list-command w-full flex items-center gap-3 p-4 text-left animate-slide-up"
-            style={{ borderLeftColor: item.color, animationDelay: `${index * 50}ms` }}
+            style={{ animationDelay: `${index * 50}ms` }}
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ backgroundColor: `${item.color}15` }}
+              style={{ backgroundColor: `${item.color}12`, color: item.color }}
             >
-              <AppIcon name={item.icon} size={20} style={{ color: item.color }} />
+              <AppIcon name={item.icon} size={20} />
             </div>
             <span className="flex-1 font-medium">{item.label}</span>
             <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
