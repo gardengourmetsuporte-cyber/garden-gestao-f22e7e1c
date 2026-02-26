@@ -284,10 +284,10 @@ export function ChecklistView({
                   : "card-command hover:shadow-lg"
               )}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-stretch gap-3">
                 {/* Lateral color bar */}
                 <div
-                  className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-500"
+                  className="w-[3px] rounded-full shrink-0 transition-colors duration-500"
                   style={{ backgroundColor: sectorComplete ? 'hsl(var(--success))' : sector.color }}
                 />
                 {/* Monochrome icon */}
