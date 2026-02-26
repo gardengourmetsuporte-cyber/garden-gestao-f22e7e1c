@@ -309,7 +309,8 @@ export default function ChecklistsPage() {
                       fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
                       className={cn(
                         "transition-colors",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-muted-foreground"
+                        getTypeProgress.abertura.percent === 100 ? "text-success" 
+                          : checklistType === 'abertura' ? "text-slate-600" : "text-muted-foreground"
                       )}
                     />
                     <h3 className={cn(
@@ -363,7 +364,8 @@ export default function ChecklistsPage() {
                       fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
                       className={cn(
                         "transition-colors",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-muted-foreground"
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" 
+                          : checklistType === 'fechamento' ? "text-slate-600" : "text-muted-foreground"
                       )}
                     />
                     <h3 className={cn(
@@ -412,7 +414,7 @@ export default function ChecklistsPage() {
                 )}
               >
                 <div className="flex items-center gap-4">
-                  <AppIcon name="Zap" size={24} fill={0} className="text-muted-foreground shrink-0" />
+                  <AppIcon name="Zap" size={24} fill={0} className={cn("shrink-0 transition-colors", checklistType === 'bonus' ? "text-slate-600" : "text-muted-foreground")} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className={cn(
