@@ -243,7 +243,7 @@
   .gradient-primary {
     background: linear-gradient(135deg, hsl(220 15% 18%) 0%, hsl(225 20% 22%) 40%, hsl(220 25% 25%) 60%, hsl(215 15% 16%) 100%);
     background-size: 200% 200%;
-    animation: darkCardShimmer 20s ease-in-out infinite;
+    animation: darkCardShimmer 40s ease-in-out infinite;
     color: hsl(0 0% 95%);
     border: 1px solid hsl(0 0% 25%);
     box-shadow: 0 4px 20px hsl(0 0% 0% / 0.2);
@@ -350,7 +350,7 @@
     @apply rounded-2xl overflow-hidden transition-all duration-300;
     background: linear-gradient(135deg, hsl(0 0% 3%) 0%, hsl(220 40% 12%) 25%, hsl(225 55% 20%) 50%, hsl(230 45% 16%) 70%, hsl(220 25% 7%) 100%);
     background-size: 200% 200%;
-    animation: darkCardShimmer 20s ease-in-out infinite;
+    animation: darkCardShimmer 40s ease-in-out infinite;
     color: hsl(0 0% 95%);
     box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
     border: 1px solid hsl(0 0% 15%);

@@ -192,7 +192,7 @@ export default function Auth() {
   const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-secondary bg-secondary/50 hover:bg-secondary/80 text-foreground";
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto">
+    <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto animate-fade-in">
       {/* Back to Landing */}
       <div className="absolute top-8 left-4 z-20">
         <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-muted-foreground hover:text-foreground">
