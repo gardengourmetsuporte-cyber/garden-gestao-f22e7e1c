@@ -53,15 +53,21 @@ export const PLANS: PlanDef[] = [
 
 /** Which plan tier is required for each module key */
 export const MODULE_REQUIRED_PLAN: Record<string, PlanTier> = {
+  // PRO modules
+  'finance': 'pro',
+  'cash-closing': 'pro',
   'recipes': 'pro',
+  'employees': 'pro',
+  'ranking': 'pro',
+  'rewards': 'pro',
   'personal-finance': 'pro',
+  // BUSINESS modules
   'marketing': 'business',
   'copilot': 'business',
-  'whatsapp': 'business',
-  'menu-admin': 'business',
-  'tablet-admin': 'business',
-  'gamification': 'business',
 };
+
+/** Modules hidden from navigation (not ready for production) */
+export const HIDDEN_MODULES: string[] = ['menu-admin', 'tablet-admin', 'gamification', 'whatsapp'];
 
 /** Check if a plan satisfies the required plan level */
 export function planSatisfies(userPlan: PlanTier, requiredPlan: PlanTier): boolean {

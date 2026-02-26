@@ -12,7 +12,7 @@ import { getRank } from '@/lib/ranks';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { getThemeColor } from '@/lib/unitThemes';
 import { getModuleKeyFromRoute } from '@/lib/modules';
-import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
+import { MODULE_REQUIRED_PLAN, HIDDEN_MODULES, planSatisfies } from '@/lib/plans';
 import type { PlanTier } from '@/lib/plans';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
@@ -38,10 +38,6 @@ const navItems: NavItem[] = [
   { icon: 'Trophy', label: 'Ranking', href: '/ranking', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
 ];
 
 interface MoreDrawerProps {
@@ -95,6 +91,15 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
     const required = MODULE_REQUIRED_PLAN[moduleKey];
     if (!required) return false;
     return !planSatisfies(plan, required);
+  };
+
+  const getRequiredPlanLabel = (href: string): string | null => {
+    const moduleKey = getModuleKeyFromRoute(href);
+    if (!moduleKey) return null;
+    const required = MODULE_REQUIRED_PLAN[moduleKey];
+    if (!required) return null;
+    if (planSatisfies(plan, required)) return null;
+    return required === 'business' ? 'BUSINESS' : 'PRO';
   };
 
   const handleSignOut = async () => {
@@ -155,8 +160,18 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             </div>
           )}
 
-          {/* Plans button (admin only) */}
-          {isAdmin && (
+          {/* Plans button — visible for all users on free plan */}
+          {(plan === 'free') && (
+            <button
+              onClick={() => { navigate('/plans'); onOpenChange(false); }}
+              className="flex items-center gap-3 w-full px-3 py-2.5 mb-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all"
+            >
+              <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
+              <span className="text-sm font-semibold text-foreground">Upgrade de Plano</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
+            </button>
+          )}
+          {(plan !== 'free' && isAdmin) && (
             <button
               onClick={() => { navigate('/plans'); onOpenChange(false); }}
               className="flex items-center gap-3 w-full px-3 py-2.5 mb-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all"
@@ -181,6 +196,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                   {group.items.map(item => {
                     const active = location.pathname === item.href;
                     const locked = isModuleLocked(item.href);
+                    const planLabel = getRequiredPlanLabel(item.href);
 
                     return (
                       <Link
@@ -193,7 +209,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                             ? "bg-primary/10"
                             : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
                         )}
-                        style={{ opacity: locked ? 0.5 : 1 }}
+                        style={{ opacity: locked ? 0.55 : 1 }}
                       >
                         <div className="relative">
                           <div
@@ -213,8 +229,8 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                             />
                           </div>
                           {locked && (
-                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center bg-primary/15 border border-primary/40">
-                              <AppIcon name="Lock" size={8} className="text-primary" />
+                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'hsl(45 90% 55% / 0.2)', border: '1px solid hsl(45 90% 55% / 0.5)' }}>
+                              <AppIcon name="Gem" size={8} style={{ color: 'hsl(45 90% 55%)' }} />
                             </span>
                           )}
                         </div>
@@ -226,6 +242,11 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         >
                           {item.label}
                         </span>
+                        {locked && planLabel && (
+                          <span className="text-[8px] font-bold uppercase tracking-wider -mt-1" style={{ color: 'hsl(45 90% 55%)' }}>
+                            {planLabel}
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
