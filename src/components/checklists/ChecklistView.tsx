@@ -114,16 +114,14 @@ export function ChecklistView({
   const [splitLoading, setSplitLoading] = useState(false);
 
   useEffect(() => {
-    if (isAdmin) {
-      supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .order('full_name')
-        .then(({ data }) => {
-          if (data) setProfiles(data);
-        });
-    }
-  }, [isAdmin]);
+    supabase
+      .from('profiles')
+      .select('user_id, full_name')
+      .order('full_name')
+      .then(({ data }) => {
+        if (data) setProfiles(data);
+      });
+  }, []);
 
   // Reset collapsed state when sectors change (keep collapsed)
   // No need to auto-expand
@@ -388,18 +386,19 @@ export function ChecklistView({
                           <button
                             onClick={() => {
                               if (isContested) return;
-                              if (isAdmin) {
-                                // Admin: open inline panel instead of direct uncheck
+                              const isOwnCompletion = completion?.completed_by === currentUserId;
+                              if (isAdmin || isOwnCompletion) {
                                 setOpenPopover(openPopover === item.id ? null : item.id);
                                 setContestingItemId(null);
                                 setContestReason('');
+                                setSplittingItemId(null);
                                 return;
                               }
                               if (!canToggle) return;
                               setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                               onToggleItem(item.id, 0);
                             }}
-                            disabled={isContested ? true : isAdmin ? false : !canToggle}
+                            disabled={isContested ? true : (isAdmin || completion?.completed_by === currentUserId) ? false : !canToggle}
                             className={cn(
                               "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
                               isContested
@@ -459,8 +458,8 @@ export function ChecklistView({
                                 : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
                             </div>
                           </button>
-                          {/* Admin inline panel for completed items */}
-                          {isAdmin && openPopover === item.id && !isContested && completion && (
+                          {/* Inline panel for completed items (admin or own completion) */}
+                          {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                             <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                               {/* Desmarcar */}
                               {canToggle && (
@@ -550,8 +549,8 @@ export function ChecklistView({
                                   )}
                                 </>
                               )}
-                              {/* Contestar */}
-                              {!wasSkipped && (
+                              {/* Contestar — admin only */}
+                              {isAdmin && !wasSkipped && (
                                 <>
                                   <div className="border-t border-border" />
                                   {contestingItemId === item.id ? (
@@ -782,17 +781,19 @@ export function ChecklistView({
                                   <button
                                     onClick={() => {
                                       if (isContested) return;
-                                      if (isAdmin) {
+                                      const isOwnCompletion = completion?.completed_by === currentUserId;
+                                      if (isAdmin || isOwnCompletion) {
                                         setOpenPopover(openPopover === item.id ? null : item.id);
                                         setContestingItemId(null);
                                         setContestReason('');
+                                        setSplittingItemId(null);
                                         return;
                                       }
                                       if (!canToggle) return;
                                       setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                       onToggleItem(item.id, 0);
                                     }}
-                                    disabled={isContested ? true : isAdmin ? false : !canToggle}
+                                    disabled={isContested ? true : (isAdmin || completion?.completed_by === currentUserId) ? false : !canToggle}
                                     className={cn(
                                       "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
                                       isContested
@@ -859,8 +860,8 @@ export function ChecklistView({
                                           </div>)}
                                     </div>
                                   </button>
-                                  {/* Admin inline panel for completed items */}
-                                  {isAdmin && openPopover === item.id && !isContested && completion && (
+                                  {/* Inline panel for completed items (admin or own completion) */}
+                                  {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                                     <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                                       {canToggle && (
                                         <button
@@ -949,7 +950,7 @@ export function ChecklistView({
                                           )}
                                         </>
                                       )}
-                                      {!wasSkipped && (
+                                      {isAdmin && !wasSkipped && (
                                         <>
                                           <div className="border-t border-border" />
                                           {contestingItemId === item.id ? (
