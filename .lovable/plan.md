@@ -1,87 +1,55 @@
 
 
-## Plano: Contestação de Checklist
+## Plano: Contestação dinâmica inline (mesmo padrão de execução de tarefa)
 
-### Contexto
-O admin precisa poder contestar um item que um funcionário marcou como feito, registrando que ele verificou e o item não foi realmente concluído. Isso deve penalizar o funcionário (remover os pontos) e manter um registro de auditoria.
+### Problema atual
+A contestação aparece como um botão "Contestar" separado abaixo do card completado, fora do fluxo natural. O admin quer que ao clicar no card concluído, abra o painel expandido inline (mesmo padrão do `openPopover`) com a opção de contestar junto com a opção de desmarcar.
 
-### 1. Nova tabela no banco de dados
+### Solução
+Unificar a interação: quando o admin clica num item **concluído**, o card expande um painel inline (igual ao painel de "Concluí agora / Não fiz / Já pronto") com as opções:
+1. **Desmarcar** (se permitido) — botão para reverter a conclusão
+2. **Contestar** — botão amber que ao clicar revela o campo de motivo inline dentro do mesmo painel
 
-**`checklist_contestations`** — registra cada contestação feita por um admin:
+Isso elimina o botão "Contestar" avulso abaixo do card e torna a experiência consistente.
 
-| Coluna | Tipo | Descrição |
-|---|---|---|
-| `id` | uuid PK | — |
-| `completion_id` | uuid FK → checklist_completions | Conclusão contestada |
-| `item_id` | uuid FK → checklist_items | Referência ao item |
-| `contested_by` | uuid | Admin que contestou |
-| `original_completed_by` | uuid | Funcionário original |
-| `reason` | text NOT NULL | Motivo da contestação |
-| `date` | date | Data do checklist |
-| `points_removed` | integer | Pontos que foram removidos |
-| `unit_id` | uuid FK → units | Unidade |
-| `created_at` | timestamptz | — |
+### Alterações em `ChecklistView.tsx`
 
-RLS: somente usuários com acesso à unidade podem ver/inserir.
+**Comportamento atual dos items concluídos:**
+- Clique no card concluído → tenta desmarcar diretamente (onClick inline)
+- Botão "Contestar" separado aparece abaixo
 
-### 2. Lógica da contestação
-
-Quando o admin contesta:
-1. A `checklist_completion` existente é **atualizada**: `awarded_points = false`, `points_awarded = 0`, `is_skipped = false` e um novo campo `is_contested = true` é adicionado à tabela `checklist_completions`
-2. Um registro é inserido em `checklist_contestations` com o motivo
-3. Uma **notificação** é criada para o funcionário informando que seu item foi contestado
-
-Alternativa mais simples (sem nova tabela): adicionar `is_contested`, `contested_by`, `contested_reason` e `contested_at` diretamente na `checklist_completions`. Isso evita joins e simplifica queries.
-
-**Decisão: usar campos na própria `checklist_completions`** — mais simples, menos joins, e cada completion só pode ter uma contestação.
-
-### 3. Alterações no banco
-
-Migration SQL:
-```sql
-ALTER TABLE checklist_completions 
-  ADD COLUMN is_contested boolean NOT NULL DEFAULT false,
-  ADD COLUMN contested_by uuid,
-  ADD COLUMN contested_reason text,
-  ADD COLUMN contested_at timestamptz;
-```
-
-### 4. Alterações no frontend
-
-**`ChecklistView.tsx`** — Para itens completed, quando `isAdmin`:
-- Adicionar botão "Contestar" (ícone `AlertTriangle`) no painel inline expandido ao clicar no item concluído
-- Ao clicar, abre um mini-form inline com campo de texto para o motivo e botão confirmar
-- Visual: fundo laranja/amber para itens contestados (diferente de "não fiz" que é vermelho)
-
-**`useChecklists.ts`**:
-- Nova função `contestCompletion(completionId, reason)` que:
-  - Faz UPDATE na completion: `is_contested = true`, `awarded_points = false`, `points_awarded = 0`, `contested_by`, `contested_reason`, `contested_at`
-  - Insere notificação para o funcionário
-  - Invalida caches de completions, points, leaderboard
-
-**`types/database.ts`**:
-- Adicionar campos `is_contested`, `contested_by`, `contested_reason`, `contested_at` na interface `ChecklistCompletion`
-
-### 5. Visual do item contestado
-
-- Borda e fundo **amber/warning** (`bg-amber-500/10 border-amber-500/30`)
-- Ícone `AlertTriangle` no badge em vez de check/X
-- Texto "Contestado" + motivo visível
-- Info de quem contestou e quando
-- Funcionário vê destaque visual diferente no seu checklist
-
-### 6. Arquivos a editar
-
-1. **Migration SQL** — adicionar colunas à `checklist_completions`
-2. **`src/types/database.ts`** — atualizar interface `ChecklistCompletion`
-3. **`src/hooks/useChecklists.ts`** — adicionar `contestCompletion()`
-4. **`src/components/checklists/ChecklistView.tsx`** — UI de contestação (botão + form inline + visual contestado)
+**Novo comportamento:**
+- Clique no card concluído (admin) → abre painel expandido inline (`openPopover === item.id`)
+- Dentro do painel:
+  - Opção "Desmarcar item" (ícone undo, se canToggle)
+  - Opção "Contestar" (ícone AlertTriangle, amber) — ao clicar, troca para o input de motivo + botão enviar
+- Para funcionários, clique no card concluído mantém o comportamento atual (desmarcar direto se dentro da janela de 5 min)
 
 ### Detalhes técnicos
 
-- A contestação NÃO remove a completion — ela permanece como registro, mas com `is_contested = true` e pontos zerados
-- Somente admins podem contestar
-- O motivo é obrigatório (campo `reason` NOT NULL via validação no frontend)
-- Items contestados aparecem com visual distinto de "concluído", "não fiz" e "já pronto"
-- O leaderboard é recalculado automaticamente pois os pontos são zerados na completion
+1. **Card concluído (admin)**: Em vez de `onClick → desmarcar`, faz `onClick → setOpenPopover(item.id)` (toggle)
+2. **Painel expandido para item concluído**: Novo bloco renderizado quando `openPopover === item.id && completed`:
+   - Botão "Desmarcar" com ícone de undo
+   - Botão "Contestar" → ao clicar, muda para input inline (mesmo visual amber atual)
+   - Botão "Cancelar" para fechar
+3. **Remove** o botão "Contestar" avulso que fica abaixo do card
+4. **Aplica em ambas as seções**: Bonus (flat list) e Standard (subcategory > items) — o padrão é duplicado então ambos precisam ser atualizados
+
+### Arquivos a editar
+- `src/components/checklists/ChecklistView.tsx` — única alteração necessária
+
+### Visual do painel expandido (item concluído, admin)
+
+```text
+┌─────────────────────────────────────┐
+│ ✓ Limpar balcão    +2 pts          │  ← card concluído (clicável)
+└─────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│  ↩ Desmarcar item                  │  ← reverte a conclusão
+│  ─────────────────────────────────  │
+│  ⚠ Contestar                       │  ← abre input motivo
+│  ─────────────────────────────────  │
+│  [Motivo da contestação...] [➤] [✕]│  ← aparece ao clicar Contestar
+└─────────────────────────────────────┘
+```
 
