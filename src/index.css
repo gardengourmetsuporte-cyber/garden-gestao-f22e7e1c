@@ -1303,7 +1303,7 @@
 
   /* Gradient shift for finance hero card */
   .finance-gradient-shift {
-    animation: gradientShift 8s ease-in-out infinite;
+    animation: gradientShift 20s ease-in-out infinite;
     background-size: 200% 200%;
   }
 
@@ -1337,7 +1337,7 @@
       hsl(234 40% 94%) 100%
     );
     background-size: 400% 400%;
-    animation: fabGradientSpin 5s ease-in-out infinite;
+    animation: fabGradientSpin 16s ease-in-out infinite;
   }
 
   /* Tab icon galaxy fill — gradient as icon/text color */
@@ -1352,7 +1352,7 @@
       hsl(0 0% 95%) 100%
     );
     background-size: 400% 400%;
-    animation: fabGradientSpin 5s ease-in-out infinite;
+    animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1366,7 +1366,7 @@
       hsl(0 0% 93%) 100%
     );
     background-size: 400% 400%;
-    animation: fabGradientSpin 5s ease-in-out infinite;
+    animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1490,7 +1490,7 @@
   .bg-gradient-animated {
     background: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 70% 55%), hsl(234 89% 67%));
     background-size: 300% 300%;
-    animation: gradientFlow 6s ease-in-out infinite;
+    animation: gradientFlow 18s ease-in-out infinite;
   }
 
   /* Indigo shimmer overlay for cards */
