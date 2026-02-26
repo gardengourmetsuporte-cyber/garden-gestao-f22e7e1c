@@ -6,7 +6,7 @@ import {
   Edit2, 
   ChevronDown, 
   ChevronRight,
-  GripVertical,
+  
   Folder,
   FileText,
   Calendar,
@@ -115,7 +115,7 @@ interface ChecklistSettingsProps {
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
 
-// Sortable Item Component - drag via dedicated handle
+// Sortable Item Component - drag via long-press on entire item
 function SortableItem({ 
   id, 
   children, 
@@ -129,7 +129,6 @@ function SortableItem({
     attributes,
     listeners,
     setNodeRef,
-    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -142,7 +141,7 @@ function SortableItem({
     position: 'relative' as const,
     ...(isDragging && {
       scale: '1.02',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px hsl(var(--neon-cyan) / 0.2)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
       borderRadius: '16px',
       opacity: 0.95,
     }),
@@ -152,20 +151,11 @@ function SortableItem({
     <div 
       ref={setNodeRef} 
       style={style} 
-      className={cn(className, "flex items-center")}
+      className={className}
       {...attributes}
+      {...listeners}
     >
-      {/* Drag handle */}
-      <div
-        ref={setActivatorNodeRef}
-        {...listeners}
-        className="shrink-0 p-1.5 mr-1 cursor-grab active:cursor-grabbing touch-none text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-      >
-        <GripVertical className="w-4 h-4" />
-      </div>
-      <div className="flex-1 min-w-0 flex items-center gap-3">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
@@ -218,10 +208,10 @@ export function ChecklistSettings({
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 150, tolerance: 8 },
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
     useSensor(MouseSensor, {
-      activationConstraint: { distance: 5 },
+      activationConstraint: { delay: 200, tolerance: 5 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
