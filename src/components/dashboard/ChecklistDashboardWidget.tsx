@@ -98,9 +98,9 @@ export function ChecklistDashboardWidget() {
       label: 'Abertura',
       iconName: 'Sun',
       progress: abertura,
-      accentColor: 'text-amber-400',
-      accentBg: 'bg-amber-600/80',
-      textColor: 'text-amber-400',
+      accentColor: 'text-orange-400',
+      accentBg: 'bg-orange-500/70',
+      textColor: 'text-orange-400',
     },
     {
       type: 'fechamento',
@@ -170,11 +170,11 @@ export function ChecklistDashboardWidget() {
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-700 ease-out",
-                  isComplete
-                    ? "bg-success"
-                    : card.type === 'abertura'
-                      ? "bg-amber-500"
-                      : "bg-violet-500"
+                    isComplete
+                      ? "bg-success"
+                      : card.type === 'abertura'
+                        ? "bg-orange-500"
+                        : "bg-violet-500"
                 )}
                 style={{ width: `${card.progress.percent}%` }}
               />
