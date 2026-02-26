@@ -804,79 +804,7 @@
     animation: fabActionIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  /* ========== APP LAUNCHER ========== */
-
-  .launcher-overlay {
-    background: hsl(var(--background) / 0.92);
-    backdrop-filter: blur(32px) saturate(1.5);
-    -webkit-backdrop-filter: blur(32px) saturate(1.5);
-    animation: launcherOverlayIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  @keyframes launcherOverlayIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .launcher-item {
-    animation: launcherItemIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  @keyframes launcherItemIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px) scale(0.92);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  /* ========== FAB EFFECTS ========== */
-
-  .fab-idle-glow {
-    /* No scale animation — just a subtle ring pulse via box-shadow */
-    animation: fabRingPulse 3s ease-in-out infinite;
-  }
-
-  @keyframes fabRingPulse {
-    0%, 100% {
-      box-shadow: 0 4px 20px hsl(var(--primary) / 0.35), 0 0 0 0px hsl(var(--neon-cyan) / 0.3);
-    }
-    50% {
-      box-shadow: 0 4px 20px hsl(var(--primary) / 0.35), 0 0 0 8px hsl(var(--neon-cyan) / 0);
-    }
-  }
-
-  .fab-close-spin {
-    animation: fabCloseSpin 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  @keyframes fabCloseSpin {
-    from { transform: rotate(-90deg) scale(0.8); opacity: 0.5; }
-    to { transform: rotate(0deg) scale(1); opacity: 1; }
-  }
-
-  .launcher-home-btn {
-    animation: launcherHomePop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: 80ms;
-  }
-
-  @keyframes launcherHomePop {
-    from {
-      opacity: 0;
-      transform: translateY(30px) scale(0.5);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
+  /* (Launcher styles removed — replaced by BottomTabBar) */
 
   /* ========== RANK FRAME SVG EFFECTS ========== */
 
@@ -1256,7 +1184,7 @@
 .card-glow,
 .page-header,
 .page-header-bar,
-.launcher-overlay {
+.page-header-bar {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
@@ -1271,8 +1199,7 @@
   .card-command-warning,
   .card-command-info,
   .page-header,
-  .page-header-bar,
-  .launcher-overlay {
+  .page-header-bar {
     background-color: hsl(var(--card));
   }
 }
