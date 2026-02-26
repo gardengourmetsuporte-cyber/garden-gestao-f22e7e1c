@@ -222,11 +222,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
           </div>
-          {/* Bottom neon glow — 3-layer animated */}
-          <div className="relative" style={{ height: '12px' }}>
-            <div className="absolute inset-x-[8%] top-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.9) 25%, hsl(var(--accent) / 0.7) 50%, hsl(var(--primary) / 0.9) 75%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-            <div className="absolute inset-x-[3%] top-0 h-[6px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.6) 25%, hsl(var(--accent) / 0.4) 50%, hsl(var(--primary) / 0.6) 75%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-            <div className="absolute inset-x-[12%] top-0 h-[10px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.4) 25%, hsl(var(--accent) / 0.3) 50%, hsl(var(--primary) / 0.4) 75%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+          {/* Bottom neon glow — soft diffused */}
+          <div className="relative" style={{ height: '14px', overflow: 'visible' }}>
+            <div className="absolute inset-x-[15%] top-0 h-[1px] opacity-80" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.7) 30%, hsl(var(--accent) / 0.5) 50%, hsl(var(--primary) / 0.7) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+            <div className="absolute inset-x-[5%] top-[-2px] h-[8px] blur-[8px] opacity-70" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.5) 30%, hsl(var(--accent) / 0.35) 50%, hsl(var(--primary) / 0.5) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+            <div className="absolute inset-x-[10%] top-[-4px] h-[16px] blur-[16px] opacity-50" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.35) 30%, hsl(var(--accent) / 0.2) 50%, hsl(var(--primary) / 0.35) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
           </div>
         </div>
       </header>
