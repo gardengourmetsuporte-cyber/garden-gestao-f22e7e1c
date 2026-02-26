@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,10 +17,8 @@ import { usePoints } from '@/hooks/usePoints';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { useUserModules } from '@/hooks/useAccessLevels';
 import { calculateMedals } from '@/lib/medals';
 import { cn } from '@/lib/utils';
-import { getModuleKeyFromRoute } from '@/lib/modules';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
 
@@ -53,19 +50,11 @@ function getGreeting(): string {
   return 'Boa noite';
 }
 
-const QUICK_LINKS = [
-  { label: 'Checklists', icon: 'CheckSquare', path: '/checklists', color: 'hsl(var(--neon-amber))' },
-  { label: 'Estoque', icon: 'Package', path: '/inventory', color: 'hsl(var(--neon-green))' },
-  { label: 'Pedidos', icon: 'ShoppingCart', path: '/orders', color: 'hsl(var(--neon-cyan))' },
-  { label: 'Recompensas', icon: 'Gift', path: '/rewards', color: 'hsl(var(--neon-red))' },
-  { label: 'Fechamento', icon: 'Receipt', path: '/cash-closing', color: 'hsl(var(--neon-purple))' },
-];
+// Quick links removed per user request
 
 export function EmployeeDashboard() {
-  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { activeUnitId, activeUnit } = useUnit();
-  const { hasAccess } = useUserModules();
   const { earned, balance, monthlyScore, refetch: refetchPoints } = usePoints();
   const [rankingScope, setRankingScope] = useState<LeaderboardScope>('unit');
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard(rankingScope);
@@ -77,10 +66,6 @@ export function EmployeeDashboard() {
   const animatedMonthly = useCountUp(monthlyScore);
   const animatedBalance = useCountUp(balance);
 
-  const visibleLinks = QUICK_LINKS.filter(link => {
-    const moduleKey = getModuleKeyFromRoute(link.path);
-    return moduleKey ? hasAccess(moduleKey) : true;
-  });
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
   const firstName = profile?.full_name?.split(' ')[0] || 'Colaborador';
@@ -169,25 +154,6 @@ export function EmployeeDashboard() {
         </div>
       )}
 
-      {/* Quick Links */}
-      {visibleLinks.length > 0 && (
-        <div className="animate-spring-in spring-stagger-2">
-          <div className={cn("grid gap-2", visibleLinks.length <= 4 ? `grid-cols-${visibleLinks.length}` : "grid-cols-5")}>
-            {visibleLinks.map((link) => (
-              <button
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-95 transition-all"
-              >
-                <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
-                  <AppIcon name={link.icon} size={18} fill={1} style={{ color: link.color }} />
-                </div>
-                <span className="text-[10px] font-medium text-muted-foreground leading-tight text-center">{link.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Tabs: Ranking / Elos / Medalhas */}
       <div className="animate-spring-in spring-stagger-3">
