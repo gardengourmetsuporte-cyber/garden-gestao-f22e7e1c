@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
 @property --neon-angle {
   syntax: '<angle>';
@@ -374,7 +374,8 @@
 
   .page-title {
     @apply text-xl font-extrabold tracking-tight text-foreground;
-    letter-spacing: -0.02em;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.03em;
   }
 
   .page-subtitle {
@@ -571,7 +572,8 @@
 
   .section-title {
     @apply text-base font-bold text-foreground;
-    letter-spacing: -0.01em;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 
   .section-label {
@@ -789,7 +791,18 @@
   }
 
   .animate-page-enter {
-    animation: pageFadeIn 0.3s ease-out both;
+    animation: pageEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.998);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   @keyframes neonPulse {

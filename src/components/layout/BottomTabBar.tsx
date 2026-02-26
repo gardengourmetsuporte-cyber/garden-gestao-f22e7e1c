@@ -85,7 +85,7 @@ export function BottomTabBar() {
       <QuickActionSheet open={quickOpen} onOpenChange={setQuickOpen} />
 
       <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 bg-card/95 backdrop-blur-2xl border-t border-border/15"
+        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 bg-card/95 backdrop-blur-2xl border-t border-border/10"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {/* Top glow line */}

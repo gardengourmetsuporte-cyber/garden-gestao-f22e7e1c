@@ -71,7 +71,7 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="px-4 pb-8 pt-2">
-        <h3 className="text-sm font-bold text-muted-foreground/60 uppercase tracking-wider mb-3 px-1">
+        <h3 className="text-sm font-bold text-muted-foreground/60 uppercase tracking-wider mb-3 px-1 font-display">
           Ação rápida
         </h3>
         <div className="space-y-2">

@@ -1,6 +1,7 @@
 import atlasIcon from '@/assets/atlas-icon.png';
 import { ReactNode, useState, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { PageTransition } from './PageTransition';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
@@ -311,11 +312,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Main Content ======= */}
       <main
-        key={location.pathname}
-        className="min-h-screen animate-page-slide-up lg:ml-[260px] lg:pt-0"
+        className="min-h-screen lg:ml-[260px] lg:pt-0"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 5.5rem)' }}
       >
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </main>
 
       {/* ======= Global Bottom Tab Bar (mobile only) ======= */}
