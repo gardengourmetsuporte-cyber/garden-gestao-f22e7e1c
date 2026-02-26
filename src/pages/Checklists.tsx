@@ -298,19 +298,14 @@ export default function ChecklistsPage() {
                   className={cn(
                     "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                     checklistType === 'abertura'
-                      ? "finance-hero-card ring-0 scale-[1.02] shadow-lg"
-                      : "ring-1 ring-border/40 hover:ring-border opacity-80 hover:opacity-100"
+                      ? "finance-hero-card ring-0 scale-[1.02]"
+                      : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                   )}
-                  style={checklistType !== 'abertura' ? {
-                    background: 'hsl(var(--card))',
-                  } : undefined}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className={cn(
                       "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
-                      checklistType === 'abertura'
-                        ? "bg-orange-500/15"
-                        : "bg-secondary"
+                      checklistType === 'abertura' ? "bg-orange-500/15" : "bg-secondary"
                     )}>
                       <AppIcon name="Sun" size={22} className={cn(
                         "transition-colors",
@@ -322,9 +317,8 @@ export default function ChecklistsPage() {
                       checklistType === 'abertura' ? "text-slate-800" : "text-foreground"
                     )} style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
                   </div>
-                  {/* Progress bar + percentage */}
                   <div className="space-y-1.5">
-                    <div className="w-full h-1.5 rounded-full bg-secondary/60 overflow-hidden">
+                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-slate-200/60" : "bg-secondary/60")}>
                       <div
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{
@@ -336,12 +330,12 @@ export default function ChecklistsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className={cn("text-[10px]", checklistType === 'abertura' ? "text-slate-500" : "text-muted-foreground")}>
                         {getTypeProgress.abertura.completed}/{getTypeProgress.abertura.total}
                       </span>
                       <span className={cn(
                         "text-sm font-black",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-orange-400"
+                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-orange-500"
                       )}>
                         {getTypeProgress.abertura.percent}%
                       </span>
@@ -358,59 +352,51 @@ export default function ChecklistsPage() {
                   className={cn(
                     "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                     checklistType === 'fechamento'
-                      ? "ring-2 scale-[1.02] shadow-lg"
-                      : "ring-1 ring-border/40 hover:ring-border opacity-80 hover:opacity-100"
+                      ? "finance-hero-card ring-0 scale-[1.02]"
+                      : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                   )}
-                  style={{
-                    background: checklistType === 'fechamento'
-                      ? 'linear-gradient(135deg, hsl(var(--accent) / 0.15), hsl(var(--accent) / 0.05))'
-                      : 'hsl(var(--card))',
-                    borderColor: checklistType === 'fechamento' ? 'hsl(var(--accent) / 0.5)' : undefined,
-                  }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className={cn(
                       "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
-                      checklistType === 'fechamento'
-                        ? "shadow-inner"
-                        : "bg-secondary"
-                    )}
-                    style={checklistType === 'fechamento' ? { background: 'hsl(var(--accent) / 0.2)' } : undefined}
-                    >
+                      checklistType === 'fechamento' ? "bg-indigo-500/15" : "bg-secondary"
+                    )}>
                       <AppIcon name="Moon" size={22} className={cn(
                         "transition-colors",
-                        checklistType === 'fechamento' ? "text-accent" : "text-muted-foreground"
+                        checklistType === 'fechamento' ? "text-indigo-500" : "text-muted-foreground"
                       )} />
                     </div>
-                    <h3 className="text-base font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
+                    <h3 className={cn(
+                      "text-base font-bold font-display",
+                      checklistType === 'fechamento' ? "text-slate-800" : "text-foreground"
+                    )} style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
                   </div>
-                  {/* Progress bar + percentage */}
                   <div className="space-y-1.5">
-                    <div className="w-full h-1.5 rounded-full bg-secondary/60 overflow-hidden">
+                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-slate-200/60" : "bg-secondary/60")}>
                       <div
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{
                           width: `${getTypeProgress.fechamento.percent}%`,
                           background: getTypeProgress.fechamento.percent === 100
                             ? 'hsl(var(--success))'
-                            : 'linear-gradient(90deg, hsl(var(--accent)), hsl(var(--accent) / 0.6))',
+                            : 'linear-gradient(90deg, hsl(234 89% 67%), hsl(234 70% 75% / 0.7))',
                         }}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className={cn("text-[10px]", checklistType === 'fechamento' ? "text-slate-500" : "text-muted-foreground")}>
                         {getTypeProgress.fechamento.completed}/{getTypeProgress.fechamento.total}
                       </span>
                       <span className={cn(
                         "text-sm font-black",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-accent"
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-indigo-500"
                       )}>
                         {getTypeProgress.fechamento.percent}%
                       </span>
                     </div>
                   </div>
                   {checklistType === 'fechamento' && (
-                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
+                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full animate-pulse" style={{ background: 'hsl(234 89% 67%)' }} />
                   )}
                 </button>
               </div>
