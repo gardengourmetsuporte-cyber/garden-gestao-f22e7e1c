@@ -92,7 +92,7 @@ export function useChecklists() {
   });
 
   // Completions fetched via a dedicated useQuery tied to current date/type
-  const { data: completions = [] } = useQuery({
+  const { data: completions = [], isFetched: completionsFetched } = useQuery({
     queryKey: completionsKey,
     queryFn: () => fetchCompletionsData(currentDate, currentType, activeUnitId),
     enabled: !!user && !!currentDate && !!currentType && !!activeUnitId,
@@ -401,7 +401,7 @@ export function useChecklists() {
   }, [sectors, isItemCompleted]);
 
   return {
-    sectors, completions, isLoading,
+    sectors, completions, completionsFetched, isLoading,
     addSector, updateSector, deleteSector, reorderSectors,
     addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
     addItem, updateItem, deleteItem, restoreItem, permanentDeleteItem,

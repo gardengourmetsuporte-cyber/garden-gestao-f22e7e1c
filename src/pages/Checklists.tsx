@@ -88,6 +88,7 @@ export default function ChecklistsPage() {
   const {
     sectors,
     completions,
+    completionsFetched,
     isLoading,
     addSector, updateSector, deleteSector, reorderSectors,
     addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
@@ -196,7 +197,10 @@ export default function ChecklistsPage() {
     const key = `${currentDate}|${checklistType}`;
     if (autoClosedRef.current === key) return;
     if (!deadlinePassed || !user?.id || !activeUnitId) return;
-    if (sectors.length === 0 || completions === undefined) return;
+    if (sectors.length === 0) return;
+    // CRITICAL: Wait for completions to actually be fetched for this date/type
+    // to avoid treating an empty loading state as "all items pending"
+    if (!completionsFetched) return;
 
     // Gather all active item IDs for this type
     const activeItemIds: string[] = [];
@@ -245,7 +249,7 @@ export default function ChecklistsPage() {
         fetchCompletions(currentDate, checklistType);
         queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
       });
-  }, [deadlinePassed, currentDate, checklistType, sectors, completions, user?.id, activeUnitId, fetchCompletions, queryClient]);
+  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, activeUnitId, fetchCompletions, queryClient]);
 
   // Realtime: invalidate progress queries when completions change
   useEffect(() => {
