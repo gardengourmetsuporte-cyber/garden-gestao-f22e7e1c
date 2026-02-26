@@ -19,10 +19,10 @@ export function CTASection() {
 
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-          Seu restaurante merece gestão profissional.
+          Criado por quem entende sua operação.
         </h2>
         <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-          Comece hoje, veja resultado essa semana.
+          Nasceu dentro de uma hamburgueria de verdade. Comece hoje, veja resultado essa semana.
         </p>
         <Link
           to="/auth?plan=free"

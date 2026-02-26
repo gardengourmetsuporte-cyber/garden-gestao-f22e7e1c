@@ -9,7 +9,7 @@ export function FooterSection() {
           <div className="flex items-center gap-2">
             <img src={logoImg} alt="Garden Gestão" className="h-11 w-11 rounded-full object-contain" />
             <span className="text-sm text-muted-foreground">
-              Garden Gestão — Gestão inteligente para restaurantes
+              Garden Gestão — Feito por restaurante, para restaurantes
             </span>
           </div>
 
