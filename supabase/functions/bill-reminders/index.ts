@@ -122,9 +122,8 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Insert notifications
+      // Insert notifications and send push directly
       for (const notif of notifications) {
-        // Get the first unit_id for the notification
         const unitId = unitIds[0]
         await supabase.from('notifications').insert({
           user_id: userId,
@@ -134,6 +133,27 @@ Deno.serve(async (req) => {
           origin: 'financeiro',
           unit_id: unitId,
         } as any)
+
+        // Direct push call as fallback (trigger may not fire reliably)
+        try {
+          await fetch(`${supabaseUrl}/functions/v1/push-notifier?action=send-push`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${serviceRoleKey}`,
+            },
+            body: JSON.stringify({
+              user_id: userId,
+              title: notif.title,
+              message: notif.description,
+              url: '/finance',
+              tag: 'financeiro',
+            }),
+          })
+        } catch (pushErr) {
+          console.error('Push notification failed for user', userId, pushErr)
+        }
+
         totalNotifications++
       }
     }
