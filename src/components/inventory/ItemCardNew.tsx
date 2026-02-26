@@ -30,27 +30,30 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
 
   return (
     <div
-      className="bg-card/60 backdrop-blur-sm rounded-xl p-3 transition-all duration-200 cursor-pointer hover:bg-card/90 border border-border/30"
-      style={{ borderLeftWidth: 3, borderLeftColor: categoryColor }}
+      onClick={onClick}
+      className="card-surface p-3.5 cursor-pointer hover:shadow-card-hover active:scale-[0.98] transition-all duration-200"
     >
       <div className="flex items-center gap-3">
-        {/* Icon */}
+        {/* Icon with category color */}
         <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-          style={{ backgroundColor: `${categoryColor}15` }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+          style={{ backgroundColor: `${categoryColor}12` }}
         >
           <AppIcon name="Package" size={18} style={{ color: categoryColor }} />
         </div>
 
         {/* Info */}
-        <button onClick={onClick} className="flex-1 min-w-0 text-left">
+        <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm text-foreground truncate">{item.name}</h3>
-          <p className="text-xs truncate" style={{ color: categoryColor }}>
-            {item.category?.name || 'Sem categoria'}
-          </p>
-        </button>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: categoryColor }} />
+            <p className="text-xs text-muted-foreground truncate">
+              {item.category?.name || 'Sem categoria'}
+            </p>
+          </div>
+        </div>
 
-        {/* Stock */}
+        {/* Stock value + badge */}
         <div className="text-right shrink-0 flex items-center gap-2">
           <div>
             <p className={cn(
@@ -72,7 +75,6 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
             </span>
           </div>
 
-          {/* Edit */}
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(); }}
@@ -82,7 +84,7 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
             </button>
           )}
 
-          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/50 shrink-0" />
         </div>
       </div>
     </div>
