@@ -351,6 +351,46 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === 'test-push') {
+      // Quick test endpoint - sends a test push to a user
+      const body = await req.json();
+      const userId = body.user_id;
+      if (!userId) {
+        return new Response(JSON.stringify({ error: 'user_id required' }), { status: 400, headers: corsHeaders });
+      }
+      
+      const config = await getConfig();
+      const { data: subs } = await supabaseAdmin.from('push_subscriptions').select('*').eq('user_id', userId);
+      console.log('[test-push] Found', subs?.length || 0, 'subscriptions');
+      
+      const results: Array<{ endpoint: string; ok: boolean; status: number; error?: string }> = [];
+      for (const s of (subs || [])) {
+        try {
+          console.log('[test-push] Trying endpoint:', s.endpoint?.substring(0, 80));
+          const r = await sendPush(
+            { endpoint: s.endpoint, p256dh: s.p256dh, auth: s.auth },
+            JSON.stringify({ title: '🔔 Teste Push', body: 'Notificação de teste do Garden Gestão!', url: '/', tag: 'sistema' }),
+            config.vapid_public_key, config.vapid_private_key, config.vapid_subject
+          );
+          console.log('[test-push] Result:', r.ok, r.status);
+          results.push({ endpoint: s.endpoint.substring(0, 80), ok: r.ok, status: r.status });
+          
+          // Clean up stale subscriptions
+          if (r.status === 410 || r.status === 404) {
+            await supabaseAdmin.from('push_subscriptions').delete().eq('id', s.id);
+          }
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error('[test-push] Error:', msg);
+          results.push({ endpoint: s.endpoint.substring(0, 80), ok: false, status: 0, error: msg });
+        }
+      }
+      
+      return new Response(JSON.stringify({ subscriptions: subs?.length || 0, results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify({ error: 'Unknown action' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (err: unknown) {
     return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
