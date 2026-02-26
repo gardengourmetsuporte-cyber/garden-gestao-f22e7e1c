@@ -1,62 +1,103 @@
 
 
-## Agrupar Lista de Pessoas em Opção Colapsável
+## Migração Completa de Cores: Padrão SaaS Profissional
 
-### Problema
-Quando o admin clica num item do checklist, a lista completa de pessoas aparece imediatamente, ocupando muito espaço e poluindo a interface. O ideal é mostrar primeiro apenas as opções principais ("Quem realizou?", "Já estava pronto", "Não fiz") e só expandir a lista de pessoas ao clicar em "Quem realizou?".
+### Análise das Referências
+Os maiores SaaS do mundo convergem para uma paleta primária baseada em **Indigo/Violet**:
+- **Linear**: Indigo `#5E6AD2` (hsl 235 47% 58%)
+- **Stripe**: Violet `#635BFF` (hsl 245 100% 68%)
+- **Vercel/GitHub**: Neutro preto/branco
+- **Mercury**: Blue `#4361EE`
+- **Notion**: Preto/branco com acentos mínimos
 
-### Solução
-Transformar a seção "Quem realizou?" em um botão colapsável. Ao clicar, expande a lista de pessoas com animação. As opções "Já estava pronto" e "Não fiz" ficam sempre visíveis.
+A escolha mais segura e universal é um **Indigo** limpo — profissional, neutro, funciona perfeitamente em dark e light mode.
 
-### Mudanças
-
-**Arquivo: `src/components/checklists/ChecklistView.tsx`**
-
-1. Adicionar um estado local `expandedPeopleFor` (string | null) que controla qual item está com a lista de pessoas expandida.
-
-2. **Seção admin do checklist standard (linhas ~530-543)** e **seção admin do checklist bônus (linhas ~844-858)**: Em ambos os blocos, substituir a renderização direta da lista de pessoas por:
-   - Um botão "Quem realizou?" com ícone de chevron (ChevronDown/ChevronUp) que ao clicar faz toggle do `expandedPeopleFor`
-   - A lista de pessoas fica condicionada a `expandedPeopleFor === item.id`
-   - Animação suave de expand/collapse
-
-3. Reordenar as opções do admin para ficarem nesta ordem:
-   - **"Quem realizou?"** (colapsável) — com pontos
-   - **"Já estava pronto"** — sem pontos
-   - **"Não fiz"** — sem pontos
-
-### Resultado Visual
+### Paleta Proposta
 
 ```text
-┌──────────────────────────────┐
-│  👥 Quem realizou?        ▸  │  ← botão, clicável
-├──────────────────────────────┤
-│  🔄 Já estava pronto         │
-│     Sem pontos (eu marquei)  │
-├──────────────────────────────┤
-│  ✕  Não fiz                  │
-│     Sem pontos               │
-└──────────────────────────────┘
+PRIMARY (Indigo):     hsl(234 89% 74%)  ≈ #818CF8  (Indigo-400)
+  - Dark foreground:  hsl(0 0% 5%)
+  - Light foreground: hsl(0 0% 100%)
 
-Após clicar em "Quem realizou?":
+ACCENT (Violet):      hsl(258 90% 66%)  ≈ #8B5CF6
+  
+BACKGROUNDS (Dark):
+  - background:       hsl(240 6% 6%)    ≈ #0F0F11  (quase preto, leve tom frio)
+  - card:             hsl(240 5% 10%)   ≈ #18181B
+  - popover:          hsl(240 5% 9%)
+  - secondary:        hsl(240 4% 14%)
+  - muted:            hsl(240 4% 16%)
+  - border:           hsl(240 4% 18%)
+  - input:            hsl(240 4% 12%)
 
-┌──────────────────────────────┐
-│  👥 Quem realizou?        ▾  │
-│  ┌────────────────────────┐  │
-│  │ 👤 Gabriele Bonaita    │  │
-│  │ 👤 garden sjbv         │  │
-│  │ 👤 Lucilene Pereira    │  │
-│  │ 👤 Maria               │  │
-│  └────────────────────────┘  │
-├──────────────────────────────┤
-│  🔄 Já estava pronto         │
-├──────────────────────────────┤
-│  ✕  Não fiz                  │
-└──────────────────────────────┘
+BACKGROUNDS (Light):
+  - background:       hsl(0 0% 99%)     ≈ #FCFCFC
+  - card:             hsl(0 0% 100%)
+  - primary:          hsl(234 89% 64%)   (mais saturado para contraste)
+  
+SEMANTIC (iguais aos padrões):
+  - success:          hsl(142 71% 45%)   (verde)
+  - destructive:      hsl(0 84% 60%)     (vermelho)
+  - warning:          hsl(38 92% 50%)    (âmbar)
 ```
 
-### Arquivos Editados (1 arquivo)
+### Mudanças por Arquivo
 
+**1. `src/index.css`** — Migração completa de ~100 referências de `42 72% 52%` (gold) para indigo
+
+| Seção | Mudança |
+|-------|---------|
+| `:root` tokens | `--neon-cyan` → indigo, `--neon-purple` → violet real, `--garden-gold` removido |
+| `.dark` | Background preto real (`240 6% 6%`), primary indigo, todos os glows/gradients com indigo |
+| `:root:not(.dark)` | Primary indigo mais saturado, backgrounds brancos puros |
+| `--gradient-brand` | `indigo → violet` em vez de `gold → green` |
+| `--gradient-gold` | Renomeado conceitualmente para `--gradient-brand-rich` com tons indigo/violet |
+| Todas as hardcoded `hsl(42 72% 52% / ...)` | Substituídas por `hsl(var(--primary) / ...)` ou novo indigo |
+| `.list-command` border-left | Indigo |
+| `.tab-command-active` | Indigo |
+| `.fab-neon-border` | Indigo → Violet |
+| `.nav-bar-neon-glow` | Indigo |
+| `.text-gradient-gold` → `.text-gradient-gold` | Cores indigo/violet |
+| `.bg-gradient-animated` | Indigo → Violet loop |
+| `.gold-shimmer` | Shimmer com tom indigo |
+| `.animate-gold-pulse` | Pulse com indigo |
+| `.border-gradient-animated` | Rotating gradient indigo/violet |
+| `neonBorderPulse` | Indigo |
+| `neonPulse` | Indigo |
+| `.achievement-shimmer` | Indigo sutil |
+| `.finance-hero-card` | Dark surfaces com glow indigo |
+
+**2. `src/lib/unitThemes.ts`** — Atualizar `STANDARD_THEME_COLORS`
+
+| Token | Novo Valor |
+|-------|-----------|
+| `primary` | `234 89% 74%` |
+| `neonCyan` | `234 89% 74%` |
+| `ring` | `234 89% 74%` |
+| `glowPrimary` | Glow com indigo |
+| `glowCyan` | Glow com indigo |
+
+**3. `tailwind.config.ts`** — Keyframe `glow-border` com indigo
+
+**4. `src/components/layout/BottomTabBar.tsx`** — FAB hardcoded colors
+
+| Elemento | Mudança |
+|----------|---------|
+| Glow ring `div` | `hsl(42 72% 52% / ...)` → `hsl(var(--primary) / ...)` |
+| FAB `boxShadow` | Indigo glow |
+| FAB `border` | `hsl(var(--primary) / 0.6)` |
+
+### Resultado Visual
+- **Dark mode**: Fundo quase preto (#0F0F11), cards cinza neutro escuro, primary indigo vibrante — idêntico a Linear/Stripe
+- **Light mode**: Fundo branco puro, indigo com bom contraste WCAG AA
+- **Gradientes**: Indigo → Violet (elegante, profissional)
+- **Glows**: Tom azulado frio em vez de dourado quente
+
+### Arquivos Editados (4)
 | Arquivo | Mudança |
 |---------|---------|
-| `src/components/checklists/ChecklistView.tsx` | Estado `expandedPeopleFor`, 2 blocos admin refatorados (standard + bônus), import ChevronDown/ChevronRight |
+| `src/index.css` | Migração completa gold → indigo (~100 referências) |
+| `src/lib/unitThemes.ts` | Tokens padronizados com indigo |
+| `tailwind.config.ts` | Keyframe glow-border |
+| `src/components/layout/BottomTabBar.tsx` | FAB colors dinâmicos |
 
