@@ -62,7 +62,7 @@ export function SolutionSection() {
                     className="relative w-[240px] sm:w-[260px] rounded-[2.5rem] overflow-hidden p-2"
                     style={{
                       background: "linear-gradient(145deg, hsl(var(--border) / 0.6), hsl(var(--border) / 0.2))",
-                      boxShadow: "0 0 30px hsl(var(--neon-green) / 0.1), 0 20px 50px rgba(0,0,0,0.4)",
+                      boxShadow: "0 0 30px hsl(var(--primary) / 0.1), 0 20px 50px rgba(0,0,0,0.4)",
                     }}
                   >
                     <div className="rounded-[2rem] overflow-hidden bg-background">
@@ -83,9 +83,9 @@ export function SolutionSection() {
                   <div
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
                     style={{
-                      background: "hsl(var(--neon-green) / 0.1)",
-                      border: "1px solid hsl(var(--neon-green) / 0.25)",
-                      color: "hsl(var(--neon-green))",
+                      background: "hsl(var(--primary) / 0.1)",
+                      border: "1px solid hsl(var(--primary) / 0.25)",
+                      color: "hsl(var(--primary))",
                     }}
                   >
                     <Check className="w-3.5 h-3.5" />

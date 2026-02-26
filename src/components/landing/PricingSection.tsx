@@ -64,9 +64,9 @@ export function PricingSection() {
         <p
           className="text-center text-sm font-semibold mb-10 py-2 px-4 rounded-full inline-flex mx-auto"
           style={{
-            background: "hsl(var(--neon-green) / 0.1)",
-            border: "1px solid hsl(var(--neon-green) / 0.25)",
-            color: "hsl(var(--neon-green))",
+            background: "hsl(var(--primary) / 0.1)",
+            border: "1px solid hsl(var(--primary) / 0.25)",
+            color: "hsl(var(--primary))",
             display: "table",
             margin: "0 auto 2.5rem",
           }}
@@ -81,7 +81,7 @@ export function PricingSection() {
             Anual{" "}
             <span
               className="inline-block ml-1 px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ background: "hsl(var(--neon-green) / 0.15)", color: "hsl(var(--neon-green))" }}
+              style={{ background: "hsl(var(--primary) / 0.15)", color: "hsl(var(--primary))" }}
             >
               -20%
             </span>
@@ -100,10 +100,10 @@ export function PricingSection() {
                   ? "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))"
                   : "hsl(var(--card))",
                 border: plan.highlight
-                  ? "2px solid hsl(var(--neon-cyan) / 0.5)"
+                  ? "2px solid hsl(var(--primary) / 0.5)"
                   : "1px solid hsl(var(--border) / 0.5)",
                 boxShadow: plan.highlight
-                  ? "0 0 40px hsl(var(--neon-cyan) / 0.15), var(--shadow-elevated)"
+                  ? "0 0 40px hsl(var(--primary) / 0.15), var(--shadow-elevated)"
                   : "var(--shadow-card)",
               }}
             >
@@ -111,9 +111,9 @@ export function PricingSection() {
                 <div
                   className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
                   style={{
-                    background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
-                    color: "white",
-                    boxShadow: "0 0 15px hsl(var(--neon-green) / 0.4)",
+                    background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
+                    color: "hsl(var(--primary-foreground))",
+                    boxShadow: "0 0 15px hsl(var(--primary) / 0.4)",
                   }}
                 >
                   <Star className="w-3 h-3" /> Mais popular
@@ -134,9 +134,9 @@ export function PricingSection() {
                 onClick={() => setSelectedPlan(plan)}
                 className="block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-all hover:scale-[1.01] active:scale-[0.98]"
                 style={plan.highlight ? {
-                  background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
-                  color: "white",
-                  boxShadow: "0 0 20px hsl(var(--neon-green) / 0.3)",
+                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
+                  color: "hsl(var(--primary-foreground))",
+                  boxShadow: "0 0 20px hsl(var(--primary) / 0.3)",
                 } : {
                   background: "hsl(var(--secondary))",
                   color: "hsl(var(--foreground))",
@@ -148,7 +148,7 @@ export function PricingSection() {
               <ul className="mt-8 space-y-3">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(var(--neon-green))" }} />
+                    <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                     {f}
                   </li>
                 ))}
