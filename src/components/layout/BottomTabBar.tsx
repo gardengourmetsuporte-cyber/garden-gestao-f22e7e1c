@@ -198,7 +198,17 @@ const TabButton = forwardRef<
   const handleTap = () => {
     navigator.vibrate?.(10);
     setBouncing(true);
-    onClick();
+    if (active) {
+      // Already on this page — scroll to top
+      const scrollable = document.querySelector('.flex-1.overflow-y-auto') || document.querySelector('main');
+      if (scrollable) {
+        scrollable.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      onClick();
+    }
     setTimeout(() => setBouncing(false), 160);
   };
 
