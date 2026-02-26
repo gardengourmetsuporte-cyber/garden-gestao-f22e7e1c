@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 
 import { useInventoryDB } from '@/hooks/useInventoryDB';
@@ -27,6 +27,7 @@ type View = 'items' | 'history';
 
 export default function InventoryPage() {
   const location = useLocation();
+  const [invSearchParams, setInvSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
   const {
     items, movements, isLoading,
@@ -45,6 +46,14 @@ export default function InventoryPage() {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
+
+  // Handle ?action=move from quick actions
+  useEffect(() => {
+    if (invSearchParams.get('action') === 'move') {
+      setMovementSheetOpen(true);
+      setInvSearchParams({}, { replace: true });
+    }
+  }, [invSearchParams, setInvSearchParams]);
 
   // Handle navigation state from Dashboard
   useEffect(() => {

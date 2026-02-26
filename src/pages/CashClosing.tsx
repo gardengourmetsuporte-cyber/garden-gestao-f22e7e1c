@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -19,6 +20,15 @@ export default function CashClosing() {
   const { isAdmin, user } = useAuth();
   const { closings, isLoading, refetch } = useCashClosing();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [cashSearchParams, setCashSearchParams] = useSearchParams();
+
+  // Handle ?action=new from quick actions
+  useEffect(() => {
+    if (cashSearchParams.get('action') === 'new') {
+      setIsFormOpen(true);
+      setCashSearchParams({}, { replace: true });
+    }
+  }, [cashSearchParams, setCashSearchParams]);
 
   useFabAction({ icon: 'Plus', label: 'Novo Fechamento', onClick: () => setIsFormOpen(true) }, []);
 

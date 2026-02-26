@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
@@ -25,6 +26,23 @@ import { Button } from '@/components/ui/button';
 export default function Finance() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
+  const [transactionType, setTransactionType] = useState<TransactionType>('expense');
+  const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
+  const [accountManagementOpen, setAccountManagementOpen] = useState(false);
+  const [transactionInitialFilters, setTransactionInitialFilters] = useState<Partial<TransactionFiltersState>>({});
+
+  // Handle ?action=income|expense from quick actions
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'income' || action === 'expense') {
+      setTransactionType(action === 'income' ? 'income' : 'expense');
+      setEditingTransaction(null);
+      setTransactionSheetOpen(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Listen for back-swipe: if on a sub-tab, go to home tab instead of leaving the module
   useEffect(() => {
@@ -45,11 +63,6 @@ export default function Finance() {
       setTransactionInitialFilters({});
     }
   }, [activeTab]);
-  const [transactionSheetOpen, setTransactionSheetOpen] = useState(false);
-  const [transactionType, setTransactionType] = useState<TransactionType>('expense');
-  const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
-  const [accountManagementOpen, setAccountManagementOpen] = useState(false);
-  const [transactionInitialFilters, setTransactionInitialFilters] = useState<Partial<TransactionFiltersState>>({});
 
   const handleFinanceNavigate = useCallback((tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => {
     if (filter) {
