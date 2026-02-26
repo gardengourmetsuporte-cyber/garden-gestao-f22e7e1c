@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { useAuth } from '@/contexts/AuthContext';
 import { Employee } from '@/types/employee';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -15,6 +16,7 @@ export default function Employees() {
   const { isAdmin } = useAuth();
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [activeTab, setActiveTab] = useState('employees');
+  useScrollToTopOnChange(activeTab);
 
   return (
     <AppLayout>

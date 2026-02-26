@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -36,6 +37,7 @@ export default function Recipes() {
   const [recipeToDelete, setRecipeToDelete] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('produtos');
+  useScrollToTopOnChange(activeTab);
   const [preSelectedCategoryId, setPreSelectedCategoryId] = useState<string | null>(null);
 
   const basesCategory = useMemo(() => {

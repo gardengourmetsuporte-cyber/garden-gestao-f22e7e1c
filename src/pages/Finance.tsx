@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
@@ -37,7 +38,8 @@ export default function Finance() {
     return () => window.removeEventListener('app-back-swipe', handler);
   }, [activeTab]);
 
-  // Reset filters when leaving the transactions tab
+  // Scroll to top on tab change + reset filters
+  useScrollToTopOnChange(activeTab);
   useEffect(() => {
     if (activeTab !== 'transactions') {
       setTransactionInitialFilters({});

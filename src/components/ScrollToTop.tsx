@@ -13,3 +13,10 @@ export const ScrollToTop = () => {
 
   return null;
 };
+
+/** Hook for internal tab changes — scroll to top when tab value changes */
+export function useScrollToTopOnChange(value: unknown) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [value]);
+}

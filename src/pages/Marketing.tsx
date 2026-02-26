@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -22,6 +23,7 @@ export default function Marketing() {
   const [editingPost, setEditingPost] = useState<MarketingPost | null>(null);
   const [publishPost, setPublishPost] = useState<MarketingPost | null>(null);
   const [activeTab, setActiveTab] = useState('calendar');
+  useScrollToTopOnChange(activeTab);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [prefillDate, setPrefillDate] = useState<Date | null>(null);
   const [prefillTitle, setPrefillTitle] = useState('');

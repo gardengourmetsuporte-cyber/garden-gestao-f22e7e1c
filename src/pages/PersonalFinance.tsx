@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
@@ -20,7 +21,7 @@ import { Button } from '@/components/ui/button';
 export default function PersonalFinance() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
-
+  useScrollToTopOnChange(activeTab);
   useEffect(() => {
     const handler = (e: Event) => {
       if (activeTab !== 'home') {

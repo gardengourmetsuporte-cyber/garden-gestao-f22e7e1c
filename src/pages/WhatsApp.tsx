@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { AppIcon } from '@/components/ui/app-icon';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ConversationList } from '@/components/whatsapp/ConversationList';
@@ -21,6 +22,7 @@ const tabs = [
 
 export default function WhatsAppPage() {
   const [activeTab, setActiveTab] = useState('conversations');
+  useScrollToTopOnChange(activeTab);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
   const { conversations, isLoading, updateStatus } = useWhatsAppConversations(statusFilter);
