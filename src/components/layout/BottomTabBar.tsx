@@ -201,21 +201,34 @@ const TabButton = forwardRef<
     onClick: () => void;
   }
 >(({ tab, active, moduleStatus, onClick }, ref) => {
+  const [bouncing, setBouncing] = useState(false);
+
+  const handleTap = () => {
+    navigator.vibrate?.(10);
+    setBouncing(true);
+    setTimeout(() => {
+      setBouncing(false);
+      onClick();
+    }, 120);
+  };
+
   return (
     <button
       ref={ref}
-      onClick={() => {
-        navigator.vibrate?.(10);
-        onClick();
-      }}
+      onClick={handleTap}
       className={cn(
-        "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
+        "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
         active ? "text-primary" : "text-muted-foreground"
       )}
       style={{ width: '20%' }}
     >
-      <div className={cn("relative transition-transform duration-300", active && "scale-110")}
-        style={active ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : undefined}
+      <div
+        className="relative"
+        style={{
+          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.1)' : 'scale(1)'),
+          transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          ...(active ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : {}),
+        }}
       >
         <AppIcon
           name={tab.icon}

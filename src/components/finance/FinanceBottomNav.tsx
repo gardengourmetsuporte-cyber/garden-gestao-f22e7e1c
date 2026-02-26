@@ -5,6 +5,42 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { FinanceTab, TransactionType } from '@/types/finance';
 
+function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
+  const [bouncing, setBouncing] = useState(false);
+
+  const handleTap = () => {
+    navigator.vibrate?.(10);
+    setBouncing(true);
+    setTimeout(() => {
+      setBouncing(false);
+      onTabChange(tab.id);
+    }, 120);
+  };
+
+  return (
+    <button
+      onClick={handleTap}
+      className={cn(
+        "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
+        active ? "text-primary" : "text-muted-foreground"
+      )}
+      style={{ width: '20%' }}
+    >
+      <div
+        className="relative"
+        style={{
+          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.1)' : 'scale(1)'),
+          transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          ...(active ? { filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))' } : {}),
+        }}
+      >
+        <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} />
+      </div>
+      <span className={cn("text-[10px]", active ? "font-semibold" : "font-normal")}>{tab.label}</span>
+    </button>
+  );
+}
+
 interface FinanceBottomNavProps {
   activeTab: FinanceTab;
   onTabChange: (tab: FinanceTab) => void;
@@ -77,23 +113,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
           <div className="flex items-center h-[68px] max-w-lg mx-auto relative">
             {/* Left tabs */}
             {tabs.slice(0, 2).map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => { navigator.vibrate?.(10); onTabChange(tab.id); }}
-                className={cn(
-                  "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
-                  activeTab === tab.id ? "text-primary" : "text-muted-foreground"
-                )}
-                style={{ width: '20%' }}
-              >
-                <div
-                  className={cn("relative transition-transform duration-300", activeTab === tab.id && "scale-110")}
-                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))' } : undefined}
-                >
-                  <AppIcon name={tab.icon} size={22} fill={activeTab === tab.id ? 1 : 0} weight={activeTab === tab.id ? 600 : 400} />
-                </div>
-                <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal")}>{tab.label}</span>
-              </button>
+              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={onTabChange} />
             ))}
 
             {/* Center FAB "+" — round, same as main */}
@@ -119,23 +139,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
 
             {/* Right tabs */}
             {tabs.slice(2, 4).map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => { navigator.vibrate?.(10); onTabChange(tab.id); }}
-                className={cn(
-                  "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
-                  activeTab === tab.id ? "text-primary" : "text-muted-foreground"
-                )}
-                style={{ width: '20%' }}
-              >
-                <div
-                  className={cn("relative transition-transform duration-300", activeTab === tab.id && "scale-110")}
-                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))' } : undefined}
-                >
-                  <AppIcon name={tab.icon} size={22} fill={activeTab === tab.id ? 1 : 0} weight={activeTab === tab.id ? 600 : 400} />
-                </div>
-                <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal")}>{tab.label}</span>
-              </button>
+              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={onTabChange} />
             ))}
           </div>
         </div>
