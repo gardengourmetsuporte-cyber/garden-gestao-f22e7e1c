@@ -298,31 +298,29 @@ export default function ChecklistsPage() {
                   className={cn(
                     "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                     checklistType === 'abertura'
-                      ? "ring-2 scale-[1.02] shadow-lg"
+                      ? "finance-hero-card ring-0 scale-[1.02] shadow-lg"
                       : "ring-1 ring-border/40 hover:ring-border opacity-80 hover:opacity-100"
                   )}
-                  style={{
-                    background: checklistType === 'abertura'
-                      ? 'linear-gradient(135deg, hsl(32 100% 50% / 0.18), hsl(45 100% 55% / 0.08))'
-                      : 'hsl(var(--card))',
-                    borderColor: checklistType === 'abertura' ? 'hsl(32 100% 50% / 0.5)' : undefined,
-                  }}
+                  style={checklistType !== 'abertura' ? {
+                    background: 'hsl(var(--card))',
+                  } : undefined}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className={cn(
                       "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
                       checklistType === 'abertura'
-                        ? "shadow-inner"
+                        ? "bg-orange-500/15"
                         : "bg-secondary"
-                    )}
-                    style={checklistType === 'abertura' ? { background: 'hsl(32 100% 50% / 0.2)' } : undefined}
-                    >
+                    )}>
                       <AppIcon name="Sun" size={22} className={cn(
                         "transition-colors",
-                        checklistType === 'abertura' ? "text-orange-400" : "text-muted-foreground"
+                        checklistType === 'abertura' ? "text-orange-500" : "text-muted-foreground"
                       )} />
                     </div>
-                    <h3 className="text-base font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
+                    <h3 className={cn(
+                      "text-base font-bold font-display",
+                      checklistType === 'abertura' ? "text-slate-800" : "text-foreground"
+                    )} style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
                   </div>
                   {/* Progress bar + percentage */}
                   <div className="space-y-1.5">
