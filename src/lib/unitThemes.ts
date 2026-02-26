@@ -27,11 +27,11 @@ const UNIT_THEMES: Record<string, UnitTheme> = {
 };
 
 const DEFAULT_THEME: UnitTheme = {
-  primary: '160 84% 39%',
-  neonCyan: '172 66% 50%',
-  ring: '160 84% 39%',
-  glowPrimary: '0 0 24px hsl(160 84% 39% / 0.2), 0 0 48px hsl(160 84% 39% / 0.08)',
-  glowCyan: '0 0 24px hsl(172 66% 50% / 0.2), 0 0 48px hsl(172 66% 50% / 0.08)',
+  primary: '158 64% 32%',
+  neonCyan: '170 55% 45%',
+  ring: '158 64% 32%',
+  glowPrimary: '0 0 24px hsl(158 64% 32% / 0.2), 0 0 48px hsl(158 64% 32% / 0.08)',
+  glowCyan: '0 0 24px hsl(170 55% 45% / 0.2), 0 0 48px hsl(170 55% 45% / 0.08)',
   label: 'Esmeralda Garden',
 };
 

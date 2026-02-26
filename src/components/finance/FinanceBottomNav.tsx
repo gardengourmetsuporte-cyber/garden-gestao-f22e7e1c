@@ -125,12 +125,8 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-105 active:scale-90"
                 )}
                 style={{
-                  background: variant === 'personal'
-                    ? 'linear-gradient(135deg, hsl(160 60% 45%), hsl(160 60% 35%))'
-                    : 'var(--gradient-brand)',
-                  boxShadow: variant === 'personal'
-                    ? '0 0 24px hsl(160 60% 45% / 0.5), 0 4px 12px hsl(0 0% 0% / 0.5)'
-                    : 'var(--shadow-glow), 0 4px 12px hsl(0 0% 0% / 0.5)',
+                  background: 'var(--gradient-brand)',
+                  boxShadow: 'var(--shadow-glow), 0 4px 12px hsl(0 0% 0% / 0.5)',
                 }}
               >
                 <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />

@@ -123,7 +123,7 @@ export function PersonalFinanceChartWidget() {
     >
       <div
         className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none"
-        style={{ background: 'hsl(160 60% 40%)' }}
+        style={{ background: 'hsl(var(--primary))' }}
       />
 
       <div className="p-4 pb-3">
@@ -132,10 +132,10 @@ export function PersonalFinanceChartWidget() {
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
-                background: 'hsl(160 60% 30% / 0.15)',
+                background: 'hsl(var(--primary) / 0.15)',
               }}
             >
-              <AppIcon name="PieChart" size={18} style={{ color: 'hsl(160 60% 40%)' }} />
+              <AppIcon name="PieChart" size={18} className="text-primary" />
             </div>
             <div>
               <span className="text-sm font-bold text-foreground">Minhas despesas</span>
@@ -168,7 +168,7 @@ export function PersonalFinanceChartWidget() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-xs font-bold leading-none" style={{ color: 'hsl(160 60% 40%)' }}>
+                <p className="text-xs font-bold leading-none text-primary">
                   {totalExpense >= 1000
                     ? `${(totalExpense / 1000).toFixed(1)}k`
                     : formatCurrency(totalExpense)}

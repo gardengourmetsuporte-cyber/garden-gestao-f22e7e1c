@@ -366,9 +366,9 @@ export default function ChecklistsPage() {
                   )}
                   style={{
                     background: checklistType === 'fechamento'
-                      ? 'linear-gradient(135deg, hsl(262 80% 65% / 0.15), hsl(280 90% 70% / 0.05))'
+                      ? 'linear-gradient(135deg, hsl(var(--accent) / 0.15), hsl(var(--accent) / 0.05))'
                       : 'hsl(var(--card))',
-                    borderColor: checklistType === 'fechamento' ? 'hsl(262 80% 65% / 0.5)' : undefined,
+                    borderColor: checklistType === 'fechamento' ? 'hsl(var(--accent) / 0.5)' : undefined,
                   }}
                 >
                   <div className="flex items-center gap-3 mb-3">
@@ -378,11 +378,11 @@ export default function ChecklistsPage() {
                         ? "shadow-inner"
                         : "bg-secondary"
                     )}
-                    style={checklistType === 'fechamento' ? { background: 'hsl(262 80% 65% / 0.2)' } : undefined}
+                    style={checklistType === 'fechamento' ? { background: 'hsl(var(--accent) / 0.2)' } : undefined}
                     >
                       <AppIcon name="Moon" size={22} className={cn(
                         "transition-colors",
-                        checklistType === 'fechamento' ? "text-violet-400" : "text-muted-foreground"
+                        checklistType === 'fechamento' ? "text-accent" : "text-muted-foreground"
                       )} />
                     </div>
                     <h3 className="text-base font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
@@ -396,7 +396,7 @@ export default function ChecklistsPage() {
                           width: `${getTypeProgress.fechamento.percent}%`,
                           background: getTypeProgress.fechamento.percent === 100
                             ? 'hsl(var(--success))'
-                            : 'linear-gradient(90deg, hsl(262 80% 65%), hsl(262 80% 65% / 0.6))',
+                            : 'linear-gradient(90deg, hsl(var(--accent)), hsl(var(--accent) / 0.6))',
                         }}
                       />
                     </div>
@@ -406,14 +406,14 @@ export default function ChecklistsPage() {
                       </span>
                       <span className={cn(
                         "text-sm font-black",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-violet-400"
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-accent"
                       )}>
                         {getTypeProgress.fechamento.percent}%
                       </span>
                     </div>
                   </div>
                   {checklistType === 'fechamento' && (
-                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
                   )}
                 </button>
               </div>
