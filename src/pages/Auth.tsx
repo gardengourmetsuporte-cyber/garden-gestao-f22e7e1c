@@ -194,16 +194,16 @@ export default function Auth() {
   const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-secondary bg-secondary/50 hover:bg-secondary/80 text-foreground";
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto animate-fade-in">
+    <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto animate-fade-in" style={{ paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
       {/* Back to Landing */}
-      <div className="absolute top-8 left-4 z-20">
+      <div className="absolute top-3 left-4 z-20" style={{ marginTop: 'env(safe-area-inset-top)' }}>
         <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-muted-foreground hover:text-foreground">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           Voltar
         </Button>
       </div>
       {/* Theme Toggle */}
-      <div className="absolute top-8 right-4 z-20">
+      <div className="absolute top-3 right-4 z-20" style={{ marginTop: 'env(safe-area-inset-top)' }}>
         <ThemeToggle />
       </div>
       {/* Animated background effects */}
@@ -235,7 +235,7 @@ export default function Auth() {
         }}
       />
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 py-16 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-start p-6 pt-16 pb-8 relative z-10">
         <div className="w-full max-w-sm space-y-6">
           {/* Logo */}
           <div className="flex flex-col items-center space-y-5 animate-slide-up">
