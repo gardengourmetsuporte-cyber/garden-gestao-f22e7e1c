@@ -1,4 +1,4 @@
-import atlasIcon from '@/assets/atlas-icon.png';
+import gardenLogo from '@/assets/logo.png';
 import { ReactNode, useState, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PageTransition } from './PageTransition';
@@ -155,7 +155,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               className="flex items-center gap-2 active:scale-95 transition-transform min-w-0"
             >
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 border border-border/20 shrink-0">
-                <img alt="Atlas" className="w-full h-full object-contain rounded-full p-0.5" src={atlasIcon} />
+                <img alt="Garden Gestão" className="w-full h-full object-contain rounded-full p-0.5" src={gardenLogo} />
               </div>
               <span className="text-sm font-bold text-foreground truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
                 {activeUnit?.name || 'Garden'}
@@ -208,7 +208,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             onClick={() => navigate('/')}
             className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 border border-border/20 active:scale-95 transition-transform shrink-0"
           >
-            <img alt="Atlas" className="w-full h-full object-contain rounded-full p-0.5" src={atlasIcon} />
+            <img alt="Garden Gestão" className="w-full h-full object-contain rounded-full p-0.5" src={gardenLogo} />
           </button>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>

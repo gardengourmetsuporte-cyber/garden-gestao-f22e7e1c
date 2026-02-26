@@ -27,12 +27,12 @@ const UNIT_THEMES: Record<string, UnitTheme> = {
 };
 
 const DEFAULT_THEME: UnitTheme = {
-  primary: '220 85% 58%',
-  neonCyan: '262 70% 55%',
-  ring: '220 85% 58%',
-  glowPrimary: '0 0 24px hsl(220 85% 58% / 0.2), 0 0 48px hsl(220 85% 58% / 0.08)',
-  glowCyan: '0 0 24px hsl(262 70% 55% / 0.2), 0 0 48px hsl(262 70% 55% / 0.08)',
-  label: 'Azul Atlas',
+  primary: '160 84% 39%',
+  neonCyan: '172 66% 50%',
+  ring: '160 84% 39%',
+  glowPrimary: '0 0 24px hsl(160 84% 39% / 0.2), 0 0 48px hsl(160 84% 39% / 0.08)',
+  glowCyan: '0 0 24px hsl(172 66% 50% / 0.2), 0 0 48px hsl(172 66% 50% / 0.08)',
+  label: 'Esmeralda Garden',
 };
 
 export function getUnitTheme(slug: string): UnitTheme {

@@ -47,7 +47,7 @@ export function HeroSection() {
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
               Financeiro, estoque, equipe e IA — tudo em um app.
               <br />
-              Enquanto você serve, o Atlas cuida dos números.
+              Enquanto você serve, o Garden cuida dos números.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start gap-3">
@@ -88,7 +88,7 @@ export function HeroSection() {
               <div className="rounded-[2rem] overflow-hidden bg-background">
                 <img
                   src={screenshotFinanceiro}
-                  alt="Tela financeira do Atlas"
+                  alt="Tela financeira do Garden Gestão"
                   className="w-full"
                   loading="lazy"
                 />

@@ -12,7 +12,7 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { lovable } from '@/integrations/lovable/index';
-import atlasIcon from '@/assets/atlas-icon.png';
+import gardenLogo from '@/assets/logo.png';
 
 const emailSchema = z.string().email('Email inválido');
 const passwordSchema = z.string().min(6, 'Senha deve ter no mínimo 6 caracteres');
@@ -238,15 +238,15 @@ export default function Auth() {
               />
               <div className="absolute inset-[1px] rounded-full overflow-hidden bg-white flex items-center justify-center">
                 <img
-                  alt="Atlas"
+                  alt="Garden Gestão"
                   className="w-[70%] h-[70%] object-contain"
-                  src={atlasIcon}
+                  src={gardenLogo}
                 />
               </div>
             </div>
             <div className="text-center space-y-1">
-              <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-                Atlas
+               <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+                Garden
               </h1>
               <p className="text-sm text-muted-foreground tracking-widest uppercase">
                 Gestão Inteligente

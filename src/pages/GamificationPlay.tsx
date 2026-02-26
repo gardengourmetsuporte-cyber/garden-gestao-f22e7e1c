@@ -1,4 +1,4 @@
-import atlasIcon from '@/assets/atlas-icon.png';
+import gardenLogo from '@/assets/logo.png';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
@@ -84,11 +84,11 @@ export default function GamificationPlay() {
       {/* Header */}
       <div className="text-center mb-6">
         <img
-           src={atlasIcon}
-          alt="Atlas"
+           src={gardenLogo}
+          alt="Garden Gestão"
           className="w-16 h-16 rounded-full mx-auto mb-3 object-contain border border-border/20"
         />
-        <h1 className="text-2xl font-bold text-foreground">Atlas</h1>
+        <h1 className="text-2xl font-bold text-foreground">Garden</h1>
         {phase === 'input' && (
           <p className="text-muted-foreground mt-1">
             Enquanto seu pedido fica pronto, gire a roleta 🎉
