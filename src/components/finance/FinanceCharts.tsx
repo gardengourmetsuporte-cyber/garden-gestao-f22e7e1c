@@ -225,35 +225,21 @@ export function FinanceCharts({
                 </div>
 
                 {/* Category List */}
-                <div className="space-y-1.5">
+                <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
                   {displayData.map((item) => (
                     <button
                       key={item.category.id}
                       onClick={() => handleCategoryClick(item.category)}
                       disabled={!!entityView}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg bg-card/40 hover:bg-card/70 transition-colors border border-border/30 text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/30 active:bg-secondary/50 transition-colors text-left"
                     >
-                      <div className="relative flex items-center justify-center shrink-0 w-8 h-8">
-                        <svg className="absolute inset-0 w-8 h-8" viewBox="0 0 32 32">
-                          <circle
-                            cx="16" cy="16" r="12"
-                            fill="none"
-                            stroke={item.category.color}
-                            strokeWidth="2.5"
-                            strokeDasharray="50 75.7"
-                            strokeDashoffset="12"
-                            strokeLinecap="round"
-                            opacity={0.7}
-                          />
-                        </svg>
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: item.category.color }}
-                        />
-                      </div>
-                      <span className="flex-1 text-left font-medium text-sm truncate">{item.category.name}</span>
-                      <span className="text-muted-foreground text-xs tabular-nums">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold text-sm tabular-nums">{formatCurrency(item.amount)}</span>
+                      <div
+                        className="w-3.5 h-3.5 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
+                        style={{ backgroundColor: item.category.color, '--tw-ring-color': item.category.color } as React.CSSProperties}
+                      />
+                      <span className="flex-1 text-left font-medium text-sm truncate text-foreground">{item.category.name}</span>
+                      <span className="text-muted-foreground text-xs tabular-nums mr-2">{item.percentage.toFixed(1)}%</span>
+                      <span className="font-semibold text-sm tabular-nums text-foreground">{formatCurrency(item.amount)}</span>
                     </button>
                   ))}
                 </div>
@@ -301,38 +287,24 @@ export function FinanceCharts({
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
                   {entityData.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 w-full p-3 rounded-lg bg-card/40 border border-border/30"
+                      className="flex items-center gap-3 w-full px-4 py-3.5"
                     >
-                      <div className="relative flex items-center justify-center shrink-0 w-8 h-8">
-                        <svg className="absolute inset-0 w-8 h-8" viewBox="0 0 32 32">
-                          <circle
-                            cx="16" cy="16" r="12"
-                            fill="none"
-                            stroke={item.color}
-                            strokeWidth="2.5"
-                            strokeDasharray="50 75.7"
-                            strokeDashoffset="12"
-                            strokeLinecap="round"
-                            opacity={0.7}
-                          />
-                        </svg>
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                      </div>
+                      <div
+                        className="w-3.5 h-3.5 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
+                        style={{ backgroundColor: item.color, '--tw-ring-color': item.color } as React.CSSProperties}
+                      />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{item.name}</p>
+                        <p className="font-medium text-sm truncate text-foreground">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {item.count} lançamento{item.count !== 1 ? 's' : ''}
                         </p>
                       </div>
-                      <span className="text-muted-foreground text-xs tabular-nums">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold text-sm tabular-nums">{formatCurrency(item.amount)}</span>
+                      <span className="text-muted-foreground text-xs tabular-nums mr-2">{item.percentage.toFixed(1)}%</span>
+                      <span className="font-semibold text-sm tabular-nums text-foreground">{formatCurrency(item.amount)}</span>
                     </div>
                   ))}
                 </div>
