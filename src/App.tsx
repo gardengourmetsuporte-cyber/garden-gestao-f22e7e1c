@@ -58,7 +58,6 @@ const NotFound = lazy(() => lazyRetry(() => import("./pages/NotFound")));
 const CashClosing = lazy(() => lazyRetry(() => import("./pages/CashClosing")));
 const Recipes = lazy(() => lazyRetry(() => import("./pages/Recipes")));
 const Employees = lazy(() => lazyRetry(() => import("./pages/Employees")));
-const Chat = lazy(() => lazyRetry(() => import("./pages/Chat")));
 const TabletSelect = lazy(() => lazyRetry(() => import("./pages/TabletSelect")));
 const TabletMenu = lazy(() => lazyRetry(() => import("./pages/TabletMenu")));
 const TabletConfirm = lazy(() => lazyRetry(() => import("./pages/TabletConfirm")));
@@ -72,7 +71,7 @@ const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
-const Alerts = lazy(() => lazyRetry(() => import("./pages/Alerts")));
+
 const Gamification = lazy(() => lazyRetry(() => import("./pages/Gamification")));
 const GamificationPlay = lazy(() => lazyRetry(() => import("./pages/GamificationPlay")));
 const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
@@ -175,7 +174,6 @@ function AppRoutes() {
           <Route path="/cash-closing" element={<ProtectedRoute><CashClosing /></ProtectedRoute>} />
           <Route path="/recipes" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
           <Route path="/cotacao/:token" element={<QuotationPublic />} />
           <Route path="/tablet/:unitId" element={<TabletSelect />} />
           <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
@@ -189,7 +187,6 @@ function AppRoutes() {
           <Route path="/personal-finance" element={<ProtectedRoute><PersonalFinance /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
-          <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
           <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />

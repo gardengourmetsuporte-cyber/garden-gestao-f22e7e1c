@@ -5,7 +5,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import type { ManagerTask } from '@/types/agenda';
-import { getTaskUrgencyColor } from '@/hooks/useTimeBasedUrgency';
 
 interface TaskItemProps {
   task: ManagerTask;
@@ -36,8 +35,8 @@ function isOverdue(dateStr: string | null): boolean {
 export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, onAddSubtask, onUpdateSubtask, isDragging, dragHandleProps }: TaskItemProps) {
   const dueLabel = formatDueDate(task.due_date || null, task.due_time || null);
   const overdue = !task.is_completed && isOverdue(task.due_date || null);
-  const clockUrgency = !task.is_completed
-    ? getTaskUrgencyColor(task.due_date || null, task.due_time || null)
+  const clockUrgency = !task.is_completed && overdue
+    ? { colorClass: 'text-destructive', pulse: true }
     : { colorClass: 'text-muted-foreground', pulse: false };
   const subtasks = task.subtasks || [];
   const hasSubtasks = subtasks.length > 0;
