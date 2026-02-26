@@ -46,26 +46,31 @@ function DateStrip({ days, selectedDate, onSelectDate, scrollRef }: {
               <button
                 key={day.toISOString()}
                 onClick={() => onSelectDate(day)}
-                className={cn(
-                  "flex flex-col items-center w-[44px] h-[56px] justify-center rounded-xl shrink-0 transition-colors",
-                  isSelected
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : isDayToday
-                      ? "bg-primary/8 text-primary"
-                      : "text-muted-foreground hover:bg-secondary/60"
-                )}
+                className="flex flex-col items-center gap-1 shrink-0 w-[44px]"
               >
-                <span className="text-[10px] font-medium uppercase leading-none mb-1">
+                <span className={cn(
+                  "text-[10px] font-medium uppercase leading-none",
+                  isSelected ? "text-foreground" : isDayToday ? "text-primary" : "text-muted-foreground"
+                )}>
                   {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
                 </span>
-                <span className={cn(
-                  "text-base font-bold leading-none",
-                  isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
+                <div className={cn(
+                  "w-[38px] h-[38px] rounded-full flex items-center justify-center transition-colors",
+                  isSelected
+                    ? "finance-hero-card checklist-gradient-slow shadow-md"
+                    : isDayToday
+                      ? "bg-primary/8"
+                      : "hover:bg-secondary/60"
                 )}>
-                  {format(day, 'dd')}
-                </span>
+                  <span className={cn(
+                    "text-sm font-bold leading-none",
+                    isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
+                  )}>
+                    {format(day, 'dd')}
+                  </span>
+                </div>
                 {isDayToday && !isSelected && (
-                  <div className="w-1 h-1 rounded-full bg-primary mt-1" />
+                  <div className="w-1 h-1 rounded-full bg-primary" />
                 )}
               </button>
             );
