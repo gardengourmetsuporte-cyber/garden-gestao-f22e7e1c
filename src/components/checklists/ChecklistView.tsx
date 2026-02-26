@@ -18,7 +18,9 @@ import {
   Users,
   Sparkles,
   X,
-  Zap
+  Zap,
+  AlertTriangle,
+  Send
 } from 'lucide-react';
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -38,6 +40,7 @@ interface ChecklistViewProps {
   currentUserId?: string;
   isAdmin: boolean;
   deadlinePassed?: boolean;
+  onContestCompletion?: (completionId: string, reason: string) => Promise<void>;
 }
 
 const isToday = (dateStr: string): boolean => {
@@ -70,6 +73,7 @@ export function ChecklistView({
   isItemCompleted,
   onToggleItem,
   getCompletionProgress,
+  onContestCompletion,
   currentUserId,
   isAdmin,
   deadlinePassed = false,
@@ -79,10 +83,12 @@ export function ChecklistView({
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<Pick<Profile, 'user_id' | 'full_name'>[]>([]);
-  // Optimistic toggles for instant UI feedback
   const [optimisticToggles, setOptimisticToggles] = useState<Set<string>>(new Set());
-  // Recently completed items for burst animation
   const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
+  // Contestation state
+  const [contestingItemId, setContestingItemId] = useState<string | null>(null);
+  const [contestReason, setContestReason] = useState('');
+  const [contestLoading, setContestLoading] = useState(false);
 
   useEffect(() => {
     if (isAdmin) {
@@ -198,7 +204,20 @@ export function ChecklistView({
     setOpenPopover(null);
   };
 
-  // Filter sectors to only show those with active items for this checklist type
+  const handleContest = async (completionId: string) => {
+    if (!onContestCompletion || !contestReason.trim()) return;
+    setContestLoading(true);
+    try {
+      await onContestCompletion(completionId, contestReason);
+      setContestingItemId(null);
+      setContestReason('');
+    } catch (err: any) {
+      console.error('Contest error:', err);
+    } finally {
+      setContestLoading(false);
+    }
+  };
+
   const filteredSectors = sectors.filter(sector => {
     const hasActiveItems = sector.subcategories?.some(sub =>
       sub.items?.some(i => i.is_active && (i as any).checklist_type === checklistType)
@@ -318,63 +337,113 @@ export function ChecklistView({
                     const isJustCompleted = recentlyCompleted.has(item.id);
 
                     if (completed) {
+                      const isContested = (completion as any)?.is_contested === true;
+                      const contestedReason = (completion as any)?.contested_reason;
                       return (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            if (!canToggle) return;
-                            setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                            onToggleItem(item.id, 0);
-                          }}
-                          disabled={!canToggle}
-                          className={cn(
-                            "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
-                            !canToggle && "cursor-not-allowed opacity-80",
-                            canToggle && "active:scale-[0.97] hover:shadow-md",
-                            wasSkipped
-                              ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
-                              : "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
-                            isJustCompleted && "animate-scale-in"
-                          )}
-                          style={{ animationDelay: `${itemIndex * 40}ms` }}
-                        >
-                          <div className={cn(
-                            "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
-                            wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
-                            isJustCompleted && "scale-125"
-                          )}>
-                            {wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="flex items-center gap-2">
-                              <p className={cn("font-medium line-through", wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
-                              {isLockedByOther && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
-                            </div>
-                            {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
-                            {completion && (
-                              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                <User className="w-3 h-3" />
-                                <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
-                                {wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
-                                {!wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
-                              </div>
+                        <div key={item.id} className="space-y-1.5">
+                          <button
+                            onClick={() => {
+                              if (isContested) return; // contested items are not untoggable
+                              if (!canToggle) return;
+                              setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                              onToggleItem(item.id, 0);
+                            }}
+                            disabled={!canToggle || isContested}
+                            className={cn(
+                              "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
+                              isContested
+                                ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
+                                : !canToggle && "cursor-not-allowed opacity-80",
+                              !isContested && canToggle && "active:scale-[0.97] hover:shadow-md",
+                              !isContested && wasSkipped
+                                ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                                : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
+                              isJustCompleted && "animate-scale-in"
                             )}
-                          </div>
-                          <div className={cn(
-                            "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
-                            wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
-                              : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
+                            style={{ animationDelay: `${itemIndex * 40}ms` }}
+                          >
+                            <div className={cn(
+                              "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
+                              isContested ? "bg-amber-500 shadow-amber-500/30"
+                                : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
+                              isJustCompleted && "scale-125"
+                            )}>
+                              {isContested ? <AlertTriangle className="w-5 h-5" /> : wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
+                            </div>
+                            <div className="flex-1 text-left">
+                              <div className="flex items-center gap-2">
+                                <p className={cn("font-medium line-through", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
+                                {isLockedByOther && !isContested && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                              </div>
+                              {isContested && contestedReason && (
+                                <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Contestado: {contestedReason}</p>
+                              )}
+                              {item.description && !isContested && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                              {completion && (
+                                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                  <User className="w-3 h-3" />
+                                  <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
+                                  {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
+                                  {!isContested && wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
+                                  {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
+                                </div>
+                              )}
+                            </div>
+                            <div className={cn(
+                              "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
+                              isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
+                            )}
+                            style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
+                              backgroundColor: getItemPointsColors(pointsAwarded).bg,
+                              color: getItemPointsColors(pointsAwarded).color,
+                              borderColor: getItemPointsColors(pointsAwarded).border,
+                            } : undefined}>
+                              {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
+                                : wasSkipped ? (<><X className="w-3 h-3" /><span>não fiz</span></>) 
+                                : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
+                                : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
+                            </div>
+                          </button>
+                          {/* Admin contest button */}
+                          {isAdmin && !isContested && !wasSkipped && completion && (
+                            <>
+                              {contestingItemId === item.id ? (
+                                <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in">
+                                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                                  <input
+                                    type="text"
+                                    value={contestReason}
+                                    onChange={(e) => setContestReason(e.target.value)}
+                                    placeholder="Motivo da contestação..."
+                                    className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                                    autoFocus
+                                    onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
+                                  />
+                                  <button
+                                    onClick={() => handleContest(completion.id)}
+                                    disabled={!contestReason.trim() || contestLoading}
+                                    className="p-1.5 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
+                                  >
+                                    <Send className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+                                    <X className="w-3.5 h-3.5 text-muted-foreground" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setContestingItemId(item.id); setContestReason(''); }}
+                                  className="w-full flex items-center justify-center gap-1.5 p-2 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                                >
+                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                  <span>Contestar</span>
+                                </button>
+                              )}
+                            </>
                           )}
-                          style={!wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
-                            backgroundColor: getItemPointsColors(pointsAwarded).bg,
-                            color: getItemPointsColors(pointsAwarded).color,
-                            borderColor: getItemPointsColors(pointsAwarded).border,
-                          } : undefined}>
-                            {wasSkipped ? (<><X className="w-3 h-3" /><span>não fiz</span></>) 
-                              : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
-                              : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
-                          </div>
-                        </button>
+                        </div>
                       );
                     }
 
@@ -535,68 +604,120 @@ export function ChecklistView({
                             const isJustCompleted = recentlyCompleted.has(item.id);
 
                             if (completed) {
+                              const isContested = (completion as any)?.is_contested === true;
+                              const contestedReason = (completion as any)?.contested_reason;
                               return (
-                                <button
-                                  key={item.id}
-                                  onClick={() => {
-                                    if (!canToggle) return;
-                                    setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                    onToggleItem(item.id, 0);
-                                  }}
-                                  disabled={!canToggle}
-                                  className={cn(
-                                    "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
-                                    !canToggle && "cursor-not-allowed opacity-80",
-                                    canToggle && "active:scale-[0.97] hover:shadow-md",
-                                    wasSkipped ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30" : "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
-                                    isJustCompleted && "animate-scale-in"
-                                  )}
-                                  style={{ animationDelay: `${itemIndex * 40}ms` }}
-                                >
-                                  <div className={cn(
-                                    "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
-                                    wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
-                                    isJustCompleted && "scale-125"
-                                  )}>
-                                    {wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
-                                  </div>
-                                  <div className="flex-1 text-left">
-                                    <div className="flex items-center gap-2">
-                                      <p className={cn("font-medium line-through", wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
-                                      {isLockedByOther && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
-                                    </div>
-                                    {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
-                                    {completion && (
-                                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                        <User className="w-3 h-3" />
-                                        <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
-                                        {wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
-                                        {!wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
-                                      </div>
+                                <div key={item.id} className="space-y-1.5">
+                                  <button
+                                    onClick={() => {
+                                      if (isContested) return;
+                                      if (!canToggle) return;
+                                      setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                                      onToggleItem(item.id, 0);
+                                    }}
+                                    disabled={!canToggle || isContested}
+                                    className={cn(
+                                      "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
+                                      isContested
+                                        ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
+                                        : !canToggle && "cursor-not-allowed opacity-80",
+                                      !isContested && canToggle && "active:scale-[0.97] hover:shadow-md",
+                                      !isContested && wasSkipped
+                                        ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                                        : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
+                                      isJustCompleted && "animate-scale-in"
                                     )}
-                                  </div>
-                                  <div className={cn(
-                                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
-                                    wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
-                                      : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
+                                    style={{ animationDelay: `${itemIndex * 40}ms` }}
+                                  >
+                                    <div className={cn(
+                                      "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
+                                      isContested ? "bg-amber-500 shadow-amber-500/30"
+                                        : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
+                                      isJustCompleted && "scale-125"
+                                    )}>
+                                      {isContested ? <AlertTriangle className="w-5 h-5" /> : wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                      <div className="flex items-center gap-2">
+                                        <p className={cn("font-medium line-through", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
+                                        {isLockedByOther && !isContested && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                                      </div>
+                                      {isContested && contestedReason && (
+                                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Contestado: {contestedReason}</p>
+                                      )}
+                                      {item.description && !isContested && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                                      {completion && (
+                                        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                                          <User className="w-3 h-3" />
+                                          <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
+                                          {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
+                                          {!isContested && wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
+                                          {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className={cn(
+                                      "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
+                                      isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                        : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                        : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
+                                    )}
+                                    style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
+                                      backgroundColor: getItemPointsColors(pointsAwarded).bg,
+                                      color: getItemPointsColors(pointsAwarded).color,
+                                      borderColor: getItemPointsColors(pointsAwarded).border,
+                                    } : undefined}>
+                                      {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
+                                        : wasSkipped ? (<><X className="w-3 h-3" /><span>não fiz</span></>) 
+                                        : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
+                                        : (<div className="flex items-center gap-0.5">
+                                            {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
+                                              const colors = getItemPointsColors(pointsAwarded);
+                                              return <Star key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
+                                            })}
+                                            {isBonus && <Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
+                                            <span className="ml-0.5">+{pointsAwarded}</span>
+                                          </div>)}
+                                    </div>
+                                  </button>
+                                  {/* Admin contest button */}
+                                  {isAdmin && !isContested && !wasSkipped && completion && (
+                                    <>
+                                      {contestingItemId === item.id ? (
+                                        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in">
+                                          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                                          <input
+                                            type="text"
+                                            value={contestReason}
+                                            onChange={(e) => setContestReason(e.target.value)}
+                                            placeholder="Motivo da contestação..."
+                                            className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                                            autoFocus
+                                            onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
+                                          />
+                                          <button
+                                            onClick={() => handleContest(completion.id)}
+                                            disabled={!contestReason.trim() || contestLoading}
+                                            className="p-1.5 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
+                                          >
+                                            <Send className="w-3.5 h-3.5" />
+                                          </button>
+                                          <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+                                            <X className="w-3.5 h-3.5 text-muted-foreground" />
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setContestingItemId(item.id); setContestReason(''); }}
+                                          className="w-full flex items-center justify-center gap-1.5 p-2 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                                        >
+                                          <AlertTriangle className="w-3.5 h-3.5" />
+                                          <span>Contestar</span>
+                                        </button>
+                                      )}
+                                    </>
                                   )}
-                                  style={!wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
-                                    backgroundColor: getItemPointsColors(pointsAwarded).bg,
-                                    color: getItemPointsColors(pointsAwarded).color,
-                                    borderColor: getItemPointsColors(pointsAwarded).border,
-                                  } : undefined}>
-                                    {wasSkipped ? (<><X className="w-3 h-3" /><span>não fiz</span></>) 
-                                      : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
-                                      : (<div className="flex items-center gap-0.5">
-                                          {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
-                                            const colors = getItemPointsColors(pointsAwarded);
-                                            return <Star key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
-                                          })}
-                                          {isBonus && <Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
-                                          <span className="ml-0.5">+{pointsAwarded}</span>
-                                        </div>)}
-                                  </div>
-                                </button>
+                                </div>
                               );
                             }
 
