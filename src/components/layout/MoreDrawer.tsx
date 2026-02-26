@@ -181,10 +181,10 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         <div
                           className={cn(
                             "w-12 h-12 rounded-[18px] flex items-center justify-center transition-all",
-                            active ? "finance-hero-card" : "bg-secondary"
+                            active ? "bg-primary" : "bg-secondary"
                           )}
                           style={{
-                            boxShadow: active ? '0 4px 16px hsl(0 0% 0% / 0.08)' : undefined,
+                            boxShadow: active ? '0 4px 16px hsl(var(--primary) / 0.35)' : undefined,
                             opacity: locked ? 0.5 : 1,
                             border: locked ? '1px dashed hsl(var(--primary) / 0.4)' : active ? 'none' : '1px solid hsl(var(--border) / 0.3)',
                           }}
@@ -193,8 +193,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                             name={item.icon}
                             size={20}
                             fill={active ? 1 : 0}
-                            style={active ? { color: 'var(--gp-value)' } : undefined}
-                            className={active ? "" : "text-foreground/70"}
+                            className={active ? "text-primary-foreground" : "text-foreground/70"}
                           />
                         </div>
                         {locked && (
