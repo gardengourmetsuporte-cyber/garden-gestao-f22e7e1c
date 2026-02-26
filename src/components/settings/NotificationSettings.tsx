@@ -16,11 +16,11 @@ interface NotifCategory {
 }
 
 const CATEGORIES: NotifCategory[] = [
-  { key: 'chat', label: 'Mensagens do Chat', description: 'Mensagens diretas, grupos e comunicados', icon: 'MessageCircle' },
   { key: 'estoque', label: 'Estoque', description: 'Alertas de estoque baixo ou zerado', icon: 'Package' },
   { key: 'financeiro', label: 'Financeiro', description: 'Contas a pagar, vencidas e saldo negativo', icon: 'DollarSign' },
   { key: 'checklist', label: 'Checklists', description: 'Lembretes de tarefas pendentes', icon: 'ClipboardCheck' },
   { key: 'caixa', label: 'Fechamento de Caixa', description: 'Alertas de caixa não fechado', icon: 'Calculator' },
+  { key: 'agenda', label: 'Agenda', description: 'Compromissos e eventos próximos', icon: 'CalendarDays' },
   { key: 'sistema', label: 'Sistema', description: 'Atualizações e avisos gerais', icon: 'Bell' },
 ];
 
