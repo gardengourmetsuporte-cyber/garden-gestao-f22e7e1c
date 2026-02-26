@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { format, parseISO, isAfter, startOfDay, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -92,9 +92,92 @@ export default function ChecklistsPage() {
       fechamento: calc('fechamento', fechamentoCompletions),
     };
   }, [sectors, aberturaCompletions, fechamentoCompletions]);
+  // ── Deadline logic ──
+  const isDeadlinePassed = useCallback((date: string, type: ChecklistType): boolean => {
+    if (type === 'bonus') return false;
+    const now = new Date();
+    const checkDate = parseISO(date);
+
+    if (type === 'abertura') {
+      // Deadline: same day at 07:30
+      const deadline = new Date(checkDate);
+      deadline.setHours(7, 30, 0, 0);
+      return isAfter(now, deadline);
+    }
+
+    if (type === 'fechamento') {
+      // Deadline: next day at 02:00
+      const nextDay = addDays(startOfDay(checkDate), 1);
+      nextDay.setHours(2, 0, 0, 0);
+      return isAfter(now, nextDay);
+    }
+
+    return false;
+  }, []);
+
+  const deadlinePassed = useMemo(() => isDeadlinePassed(currentDate, checklistType), [currentDate, checklistType, isDeadlinePassed]);
+
+  // ── Auto-close: mark pending items as skipped after deadline ──
+  const autoClosedRef = useRef<string>('');
+
   useEffect(() => {
     fetchCompletions(currentDate, checklistType);
   }, [currentDate, checklistType, fetchCompletions]);
+
+  useEffect(() => {
+    const key = `${currentDate}|${checklistType}`;
+    if (autoClosedRef.current === key) return;
+    if (!deadlinePassed || !user?.id || !activeUnitId) return;
+    if (sectors.length === 0 || completions === undefined) return;
+
+    // Gather all active item IDs for this type
+    const activeItemIds: string[] = [];
+    sectors.forEach((s: any) => {
+      if (checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus') {
+        s.subcategories?.forEach((sub: any) => {
+          sub.items?.forEach((item: any) => {
+            if (item.is_active && item.checklist_type === checklistType) {
+              activeItemIds.push(item.id);
+            }
+          });
+        });
+      }
+    });
+
+    const completedIds = new Set(completions.map(c => c.item_id));
+    const pendingIds = activeItemIds.filter(id => !completedIds.has(id));
+
+    if (pendingIds.length === 0) {
+      autoClosedRef.current = key;
+      return;
+    }
+
+    // Batch upsert skipped completions
+    const rows = pendingIds.map(itemId => ({
+      item_id: itemId,
+      checklist_type: checklistType,
+      completed_by: user.id,
+      date: currentDate,
+      awarded_points: false,
+      points_awarded: 0,
+      is_skipped: true,
+      unit_id: activeUnitId,
+    }));
+
+    autoClosedRef.current = key;
+
+    supabase
+      .from('checklist_completions')
+      .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' })
+      .then(({ error }) => {
+        if (error) {
+          console.error('Auto-close error:', error);
+          return;
+        }
+        fetchCompletions(currentDate, checklistType);
+        queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
+      });
+  }, [deadlinePassed, currentDate, checklistType, sectors, completions, user?.id, activeUnitId, fetchCompletions, queryClient]);
 
   // Realtime: invalidate progress queries when completions change
   useEffect(() => {
@@ -429,6 +512,7 @@ export default function ChecklistsPage() {
                 getCompletionProgress={(sectorId) => getCompletionProgress(sectorId, checklistType)}
                 currentUserId={user?.id}
                 isAdmin={isAdmin}
+                deadlinePassed={deadlinePassed}
               />
             </div>
           ) : (
