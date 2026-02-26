@@ -1,68 +1,53 @@
 
 
-## Plan: Unificar módulos no padrão card com layout adaptativo
+## Plan: Botão "Dividir" no painel inline do admin (junto com Contestar)
 
-### Contexto
-Atualmente os módulos estão em grid 4 colunas com ícones pequenos, enquanto Agenda e Configurações usam cards horizontais (`rounded-xl bg-secondary/50` com ícone circular + label + chevron). O pedido é colocar todos os módulos nesse mesmo padrão de card, mas dividindo o espaço horizontalmente de acordo com a quantidade de itens no grupo.
+### Resumo
+Adicionar o botão "Dividir pontos" no mesmo painel inline que já aparece ao clicar num item completado (onde ficam "Desmarcar" e "Contestar"). O admin seleciona os participantes com checkboxes e confirma — os pontos são divididos igualmente.
 
-### Abordagem
-Substituir o grid de ícones por uma grade de cards horizontais que se adaptam ao número de itens:
-- Cada grupo renderiza seus itens em um `grid` com colunas dinâmicas baseado no `items.length`
-- Se 3 itens: `grid-cols-3` — cada card ocupa 1/3 da largura
-- Se 4 itens: `grid-cols-2` com 2 linhas (2x2), preenchendo bem o espaço
-- Se 6 itens: `grid-cols-3` com 2 linhas (3x2)
-- Cada card segue o mesmo visual do card de Agenda/Configurações: `rounded-xl bg-secondary/50`, ícone circular à esquerda, label ao lado
+### Mudanças
 
-### Mudanças no arquivo
+**1. `src/hooks/useChecklists.ts`** — Nova função `splitCompletion`
+- Recebe `itemId`, `date`, `checklistType`, `userIds[]` (todos os participantes incluindo o original)
+- Busca o completion original para pegar os pontos
+- Calcula `pointsPerPerson = Math.floor(originalPoints / userIds.length)`
+- Atualiza o registro existente com pontos divididos
+- Insere novos `checklist_completions` para os demais participantes (upsert com `onConflict`)
+- Invalida caches
 
-**`src/components/layout/MoreDrawer.tsx`**:
+**2. `src/components/checklists/ChecklistView.tsx`** — UI no painel inline
+- Novo estado: `splittingItemId`, `splitSelectedUsers` (Set de user_ids)
+- No painel admin de item completado (aparece 2x: bonus e standard, linhas ~434 e ~764), adicionar entre "Desmarcar" e "Contestar":
+  - Botão "Dividir pontos" com ícone `Users` em estilo azul/primary
+  - Ao clicar, expande lista de checkboxes com membros da equipe (o completador original vem pré-selecionado)
+  - Preview: "X participantes → Y pts cada"
+  - Botão "Confirmar divisão"
+- Mostrar indicador visual quando item já tem múltiplas completions (ex: "👥 2 participantes" no card completado)
 
-1. **Remover o card isolado de Agenda** (linhas 169-181) — Agenda passa a ser um item normal dentro do seu grupo ou adicionado ao `navItems`
+**3. `src/components/checklists/ChecklistView.tsx`** — Props
+- Adicionar `onSplitCompletion` prop para receber a função do hook
+- Passada pelo componente pai (Checklists page)
 
-2. **Substituir o bloco "Module grid"** (linhas 183-237) por um layout adaptativo:
-   - Para cada grupo, calcular `cols` baseado em `items.length`:
-     - 1 item: full-width (como Agenda atual)
-     - 2 items: `grid-cols-2`
-     - 3 items: `grid-cols-3`
-     - 4+ items: `grid-cols-2` (2 por linha, cards maiores)
-   - Cada item renderiza como card vertical compacto: ícone circular centralizado + label abaixo, dentro de `rounded-xl bg-secondary/50`, ocupando todo o espaço da célula
-   - Cards com `flex flex-col items-center justify-center gap-1.5 py-3 px-2`
+**4. `src/pages/Checklists.tsx`** — Conectar a prop
+- Passar `splitCompletion` do hook como `onSplitCompletion` para `ChecklistView`
 
-3. **Manter Configurações e Sair** no padrão atual (card horizontal full-width com chevron), pois são ações de sistema
-
-### Layout visual esperado
+### Layout no painel inline
 
 ```text
 ┌─────────────────────────────────────┐
-│ [Gestão]                            │
-│ ┌──────────┬──────────┬──────────┐  │
-│ │  💰      │  📦      │  🛒      │  │
-│ │Financeiro│ Estoque  │ Pedidos  │  │
-│ └──────────┴──────────┴──────────┘  │
-│                                     │
-│ [Operação]                          │
-│ ┌──────────┬──────────┬──────────┐  │
-│ │  ✅      │  🧾      │  👨‍🍳     │  │
-│ │Checklists│Fechamento│Fichas Téc│  │
-│ └──────────┴──────────┴──────────┘  │
-│                                     │
-│ [Pessoas]                           │
-│ ┌──────────┬──────────┬──────────┐  │
-│ │  👥      │  🎁      │  🏆      │  │
-│ │Funcionár.│Recompens.│ Ranking  │  │
-│ └──────────┴──────────┴──────────┘  │
-│                                     │
-│ [Premium] - 6 items = 3x2           │
-│ ┌──────────┬──────────┬──────────┐  │
-│ │Marketing │ Copilot  │ WhatsApp │  │
-│ ├──────────┼──────────┼──────────┤  │
-│ │ Cardápio │ Tablets  │Gamificaç.│  │
-│ └──────────┴──────────┴──────────┘  │
-│                                     │
-│ [⚙️ Configurações          >]       │
-│ [🚪 Sair da conta          >]       │
+│ [↩️ Desmarcar item                ] │
+│ ─────────────────────────────────── │
+│ [👥 Dividir pontos                ] │  ← NOVO
+│   ☑ João (completou)               │
+│   ☐ Maria                          │
+│   ☐ Pedro                          │
+│   4 pts ÷ 2 = 2 pts cada           │
+│   [Confirmar divisão]              │
+│ ─────────────────────────────────── │
+│ [⚠️ Contestar                     ] │
 └─────────────────────────────────────┘
 ```
 
-Cada card de módulo terá o estilo `rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80` com ícone circular `w-9 h-9 rounded-full bg-muted` centralizado e label abaixo, mantendo consistência visual com Agenda/Configurações mas em formato compacto vertical.
+### Sem alterações no banco
+O schema já suporta múltiplos registros por item (`item_id, completed_by, date, checklist_type` unique constraint). Cada participante terá seu próprio registro.
 
