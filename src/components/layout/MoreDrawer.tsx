@@ -110,7 +110,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[80vh] overflow-hidden">
-        <div className="overflow-y-auto px-4 pb-8 pt-2" style={{ maxHeight: '75vh' }}>
+        <div className="overflow-y-auto px-4 pb-8 pt-2 space-y-3" style={{ maxHeight: '75vh' }}>
           {/* Profile card */}
           <button
             onClick={() => { navigate('/profile/me'); onOpenChange(false); }}
@@ -118,8 +118,8 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           >
             <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
             <div className="text-left min-w-0 flex-1">
-              <p className="text-sm font-bold text-foreground truncate">{profile?.full_name || 'Usuário'}</p>
-              <p className="text-xs font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
+              <p className="text-sm font-bold text-foreground truncate font-display">{profile?.full_name || 'Usuário'}</p>
+              <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
             </div>
             <ThemeToggle className="p-1.5 shrink-0" />
           </button>
@@ -162,7 +162,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           {/* Module grid */}
           {groupedNav.map(group => (
             <div key={group.label} className="mb-5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2.5 block text-muted-foreground/50">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2.5 block text-muted-foreground/50 font-display">
                 {group.label}
               </span>
               <div className="grid grid-cols-4 gap-3">

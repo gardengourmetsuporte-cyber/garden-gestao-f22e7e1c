@@ -56,7 +56,7 @@ export function AdminDashboard() {
     <div className="space-y-4 p-4 lg:p-6">
       {/* Welcome - minimal */}
       <div className="animate-spring-in spring-stagger-1">
-        <h2 className="text-xl font-bold text-foreground">
+        <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
           {greeting}, {firstName} 👋
         </h2>
         <p className="text-muted-foreground text-xs capitalize mt-0.5">
