@@ -175,19 +175,7 @@ export function FinanceTransactions({
     hasScrolledRef.current = false;
   }, [selectedMonth]);
 
-  // Auto-scroll to today's date on mount — align "Hoje" header to top
-  useEffect(() => {
-    if (hasScrolledRef.current) return;
-    if (!todayRef.current) return;
-    hasScrolledRef.current = true;
-    const timer = setTimeout(() => {
-      if (todayRef.current) {
-        const y = todayRef.current.getBoundingClientRect().top + window.scrollY - 8;
-        window.scrollTo({ top: y, behavior: 'instant' });
-      }
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [sortedDates]);
+  // No auto-scroll — always open at the top of the list
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -282,12 +270,12 @@ export function FinanceTransactions({
                 return (
                   <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
                     {/* Date Header */}
-                    <div className={`flex items-center justify-between py-2 px-2 rounded-lg ${dateStr === todayStr ? 'bg-primary/10 border border-primary/30' : ''}`}>
+                    <div className={`flex items-center justify-between py-2 px-2 rounded-lg ${dateStr === todayStr ? 'bg-foreground text-background' : ''}`}>
                       <div className="flex items-center gap-2">
                         {dateStr === todayStr && (
-                          <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-background animate-pulse shrink-0" />
                         )}
-                        <span className={`text-sm font-medium capitalize ${dateStr === todayStr ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
+                        <span className={`text-sm font-medium capitalize ${dateStr === todayStr ? 'font-semibold' : 'text-muted-foreground'}`}>
                           {getDateLabel(dateStr)}
                         </span>
                       </div>
