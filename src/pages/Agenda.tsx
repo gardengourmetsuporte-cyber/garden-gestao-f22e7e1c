@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -54,6 +54,7 @@ export default function Agenda() {
   const { hasAccess } = useUserModules();
   const canAccessAgenda = isAdmin || hasAccess('agenda');
   const navigate = useNavigate();
+  const [agendaSearchParams, setAgendaSearchParams] = useSearchParams();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('list');
@@ -61,6 +62,15 @@ export default function Agenda() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  // Handle ?action=new from quick actions
+  useEffect(() => {
+    if (agendaSearchParams.get('action') === 'new') {
+      setEditingTask(null);
+      setTaskSheetOpen(true);
+      setAgendaSearchParams({}, { replace: true });
+    }
+  }, [agendaSearchParams, setAgendaSearchParams]);
 
   // Optimistic local state for reorder
   const [tempTasks, setTempTasks] = useState<ManagerTask[] | null>(null);
