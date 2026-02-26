@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils';
 const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 export function UnifiedCalendarWidget() {
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const { eventsMap, isLoading } = useDashboardCalendar(currentMonth);
@@ -56,25 +58,33 @@ export function UnifiedCalendarWidget() {
     <div className="col-span-2 animate-slide-up stagger-4">
       <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
+        <button
+          onClick={() => navigate('/calendar')}
+          className="flex items-center justify-between px-4 py-3 border-b border-border/30 w-full hover:bg-secondary/30 transition-colors"
+        >
           <div className="flex items-center gap-2">
             <AppIcon name="CalendarDays" size={16} className="text-primary" />
             <span className="text-xs font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Calendário</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
-              <AppIcon name="ChevronLeft" size={14} />
-            </Button>
-            <button
-              className="text-xs font-medium text-foreground capitalize px-2 py-1 rounded-md hover:bg-secondary/50 transition-colors"
-              onClick={() => setCurrentMonth(new Date())}
-            >
-              {format(currentMonth, 'MMM yyyy', { locale: ptBR })}
-            </button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
-              <AppIcon name="ChevronRight" size={14} />
-            </Button>
+            <span className="text-[10px] text-muted-foreground mr-1">Ver completo</span>
+            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground" />
           </div>
+        </button>
+        {/* Month nav */}
+        <div className="flex items-center justify-center gap-1 py-1.5 border-b border-border/20">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
+            <AppIcon name="ChevronLeft" size={14} />
+          </Button>
+          <button
+            className="text-xs font-medium text-foreground capitalize px-2 py-1 rounded-md hover:bg-secondary/50 transition-colors"
+            onClick={() => setCurrentMonth(new Date())}
+          >
+            {format(currentMonth, 'MMM yyyy', { locale: ptBR })}
+          </button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
+            <AppIcon name="ChevronRight" size={14} />
+          </Button>
         </div>
 
         {/* Week headers */}
