@@ -2,11 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
-  ChefHat, 
-  UtensilsCrossed, 
-  Wallet, 
-  Bath, 
-  Folder,
   Check,
   ChevronDown,
   ChevronRight,
@@ -23,6 +18,8 @@ import {
   Send,
   Undo2
 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
+import { ICON_MAP } from '@/lib/iconMap';
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
@@ -58,13 +55,7 @@ const isToday = (dateStr: string): boolean => {
   return false;
 };
 
-const iconMap: Record<string, React.ReactNode> = {
-  ChefHat: <ChefHat className="w-5 h-5" />,
-  UtensilsCrossed: <UtensilsCrossed className="w-5 h-5" />,
-  Wallet: <Wallet className="w-5 h-5" />,
-  Bath: <Bath className="w-5 h-5" />,
-  Folder: <Folder className="w-5 h-5" />,
-};
+// Icon resolved via AppIcon + ICON_MAP (Material Symbols)
 
 export function ChecklistView({
   sectors,
@@ -274,17 +265,17 @@ export function ChecklistView({
               )}
             >
               <div className="flex items-center gap-3">
+                {/* Lateral color bar */}
                 <div
-                  className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500",
-                    sectorComplete ? "bg-success/20 text-success scale-110" : "text-white"
-                  )}
-                  style={{ backgroundColor: sectorComplete ? undefined : sector.color }}
-                >
+                  className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-500"
+                  style={{ backgroundColor: sectorComplete ? 'hsl(var(--success))' : sector.color }}
+                />
+                {/* Monochrome icon */}
+                <div className="shrink-0">
                   {sectorComplete ? (
-                    <Check className="w-5 h-5 animate-scale-in" />
+                    <AppIcon name="check_circle" size={22} fill={1} className="text-success animate-scale-in" />
                   ) : (
-                    iconMap[sector.icon || 'Folder']
+                    <AppIcon name={sector.icon || 'Folder'} size={22} fill={0} className="text-muted-foreground" />
                   )}
                 </div>
                 <div className="text-left">
@@ -958,7 +949,7 @@ export function ChecklistView({
 
       {sectors.length === 0 && (
         <div className="text-center py-12 text-muted-foreground animate-fade-in">
-          <Folder className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <AppIcon name="Folder" size={48} fill={0} className="mx-auto mb-3 opacity-50" />
           <p className="font-medium">Nenhum setor configurado</p>
           <p className="text-sm mt-1">Adicione setores nas configurações</p>
         </div>
