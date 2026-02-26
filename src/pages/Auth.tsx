@@ -167,10 +167,10 @@ export default function Auth() {
   }
 
   const inputClasses = (field: string) => cn(
-    "pl-11 h-12 rounded-xl border bg-secondary/30 text-foreground placeholder:text-muted-foreground/50 transition-all duration-300",
+    "pl-11 h-12 rounded-xl border text-[hsl(234_20%_20%)] placeholder:text-[hsl(234_20%_50%/0.5)] transition-all duration-300",
     focusedField === field
-      ? "border-primary/60 bg-secondary/50"
-      : "border-border/30 hover:border-border/60",
+      ? "border-[hsl(234_50%_70%)] bg-white/80"
+      : "border-[hsl(234_30%_80%/0.4)] bg-white/50 hover:border-[hsl(234_30%_70%/0.6)]",
     errors[field] && "border-destructive/50"
   );
 
@@ -216,7 +216,7 @@ export default function Auth() {
         }}
       />
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 py-10 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 py-16 relative z-10">
         <div className="w-full max-w-sm space-y-6">
           {/* Logo */}
           <div className="flex flex-col items-center space-y-5 animate-slide-up">
@@ -256,23 +256,20 @@ export default function Auth() {
 
           {/* Form Card */}
           <div
-            className="animate-slide-up rounded-2xl p-6 space-y-6 backdrop-blur-xl"
+            className="animate-slide-up rounded-2xl p-6 space-y-6 backdrop-blur-xl gradient-primary"
             style={{
               animationDelay: '100ms',
-              background: 'linear-gradient(145deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.6))',
-              border: '1px solid hsl(var(--neon-cyan) / 0.15)',
-              boxShadow: '0 0 40px hsl(var(--neon-cyan) / 0.06), var(--shadow-elevated)',
             }}
           >
             {/* Title with icon */}
             <div className="text-center space-y-1.5">
               <div className="flex items-center justify-center gap-2">
-                <AppIcon name="Sparkles" size={20} className="text-primary" />
-                <h2 className="text-xl font-bold text-foreground">
+                <AppIcon name="Sparkles" size={20} style={{ color: 'hsl(234 40% 45%)' }} />
+                <h2 className="text-xl font-bold" style={{ color: 'hsl(234 30% 20%)' }}>
                   {isNewPassword ? 'Nova Senha' : isResetPassword ? 'Recuperar Senha' : isLogin ? 'Bem-vindo' : 'Criar Conta'}
                 </h2>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm" style={{ color: 'hsl(234 20% 40%)' }}>
                 {isNewPassword
                   ? 'Defina sua nova senha'
                   : isResetPassword
@@ -334,15 +331,11 @@ export default function Auth() {
                   {errors.confirmPassword && <p className="text-xs text-destructive animate-fade-in">{errors.confirmPassword}</p>}
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98]"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan) / 0.8))',
-                    boxShadow: '0 4px 24px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--neon-cyan) / 0.1)',
-                  }}
-                >
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] bg-[hsl(234_30%_20%)] text-white hover:bg-[hsl(234_30%_25%)] border-none"
+                  >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
@@ -384,15 +377,11 @@ export default function Auth() {
                   )}
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98]"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan) / 0.8))',
-                    boxShadow: '0 4px 24px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--neon-cyan) / 0.1)',
-                  }}
-                >
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] bg-[hsl(234_30%_20%)] text-white hover:bg-[hsl(234_30%_25%)] border-none"
+                  >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
@@ -522,11 +511,7 @@ export default function Auth() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98]"
-                    style={{
-                      background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--neon-cyan) / 0.8))',
-                      boxShadow: '0 4px 24px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--neon-cyan) / 0.1)',
-                    }}
+                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] bg-[hsl(234_30%_20%)] text-white hover:bg-[hsl(234_30%_25%)] border-none"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
