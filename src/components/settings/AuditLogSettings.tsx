@@ -5,14 +5,14 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
-const ACTION_ICONS: Record<string, { icon: string; color: string }> = {
-  stock_entrada: { icon: 'ArrowDownToLine', color: 'var(--neon-green)' },
-  stock_saida: { icon: 'ArrowUpFromLine', color: 'var(--neon-red)' },
-  transaction_created: { icon: 'Plus', color: 'var(--neon-cyan)' },
-  transaction_deleted: { icon: 'Trash2', color: 'var(--neon-red)' },
-  cash_closing_created: { icon: 'Receipt', color: 'var(--neon-amber)' },
-  cash_closing_updated: { icon: 'RefreshCw', color: 'var(--neon-amber)' },
-  checklist_completed: { icon: 'CheckCircle', color: 'var(--neon-purple)' },
+const ACTION_ICONS: Record<string, { icon: string; bg: string; text: string }> = {
+  stock_entrada: { icon: 'ArrowDownToLine', bg: 'bg-emerald-500/12', text: 'text-emerald-600 dark:text-emerald-400' },
+  stock_saida: { icon: 'ArrowUpFromLine', bg: 'bg-red-500/12', text: 'text-red-600 dark:text-red-400' },
+  transaction_created: { icon: 'Plus', bg: 'bg-cyan-500/12', text: 'text-cyan-600 dark:text-cyan-400' },
+  transaction_deleted: { icon: 'Trash2', bg: 'bg-red-500/12', text: 'text-red-600 dark:text-red-400' },
+  cash_closing_created: { icon: 'Receipt', bg: 'bg-amber-500/12', text: 'text-amber-600 dark:text-amber-400' },
+  cash_closing_updated: { icon: 'RefreshCw', bg: 'bg-amber-500/12', text: 'text-amber-600 dark:text-amber-400' },
+  checklist_completed: { icon: 'CheckCircle', bg: 'bg-violet-500/12', text: 'text-violet-600 dark:text-violet-400' },
 };
 
 export function AuditLogSettings() {
@@ -64,7 +64,7 @@ export function AuditLogSettings() {
       ) : (
         <div className="space-y-1.5">
           {logs.map(log => {
-            const cfg = ACTION_ICONS[log.action] || { icon: 'Activity', color: 'var(--neon-cyan)' };
+            const cfg = ACTION_ICONS[log.action] || { icon: 'Activity', bg: 'bg-cyan-500/12', text: 'text-cyan-600 dark:text-cyan-400' };
             const details = log.details || {};
             let detailText = '';
             if (details.item_name) detailText = details.item_name;
@@ -75,11 +75,7 @@ export function AuditLogSettings() {
             return (
               <div key={log.id} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors">
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                  style={{
-                    backgroundColor: `hsl(${cfg.color} / 0.12)`,
-                    color: `hsl(${cfg.color})`,
-                  }}
+                  className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5", cfg.bg, cfg.text)}
                 >
                   <AppIcon name={cfg.icon} size={16} />
                 </div>
