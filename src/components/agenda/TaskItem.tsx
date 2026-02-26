@@ -44,7 +44,6 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const categoryColor = task.category?.color;
 
   const [expanded, setExpanded] = useState(false);
-  const [addingSubtask, setAddingSubtask] = useState(false);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const subtaskInputRef = useRef<HTMLInputElement>(null);
   const [editingSubId, setEditingSubId] = useState<string | null>(null);
@@ -72,29 +71,34 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
 
   const handleSubtaskKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') { e.preventDefault(); handleAddSubtask(); }
-    if (e.key === 'Escape') { setAddingSubtask(false); setNewSubtaskTitle(''); }
+    if (e.key === 'Escape') setNewSubtaskTitle('');
   };
 
   return (
     <div
-      className={cn("relative rounded-2xl", completing && "animate-task-complete")}
+      className={cn("relative rounded-xl", completing && "animate-task-complete")}
       {...dragHandleProps}
     >
       <div
         className={cn(
-          'card-surface overflow-hidden',
-          task.is_completed && 'opacity-50',
-          isDragging && 'shadow-elevated ring-2 ring-primary/40 scale-[1.03]',
+          'bg-card rounded-xl border border-border/40 overflow-hidden transition-all duration-200',
+          task.is_completed && 'opacity-45',
+          isDragging && 'shadow-elevated ring-2 ring-primary/40 scale-[1.02]',
         )}
       >
+        {/* Category color accent */}
+        {categoryColor && (
+          <div className="h-[2px] w-full" style={{ backgroundColor: categoryColor }} />
+        )}
+
         {/* Parent task row */}
-        <div className="flex items-start gap-3 p-4">
+        <div className="flex items-start gap-2.5 p-3">
           <Checkbox
             checked={task.is_completed}
             onCheckedChange={handleToggle}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "w-5 h-5 rounded-full border-2 mt-0.5 shrink-0 transition-all duration-300",
+              "w-[18px] h-[18px] rounded-full border-2 mt-0.5 shrink-0 transition-all duration-300",
               "data-[state=checked]:bg-success data-[state=checked]:border-success",
               completing && "animate-check-pop"
             )}
@@ -104,67 +108,64 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             className="flex-1 min-w-0 text-left"
             onClick={() => hasSubtasks ? setExpanded(!expanded) : onClick?.()}
           >
-            <div className="flex items-center gap-2">
-              {categoryColor && (
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: categoryColor }} />
-              )}
+            <div className="flex items-center gap-1.5">
               <p className={cn(
-                'font-medium text-sm text-foreground flex-1',
+                'font-medium text-[13px] leading-snug text-foreground flex-1',
                 task.is_completed && 'line-through text-muted-foreground'
               )}>
                 {task.title}
               </p>
               {hasSubtasks && (
-                <AppIcon name="ChevronRight" size={14} className={cn(
-                  'text-muted-foreground transition-transform duration-200 shrink-0',
+                <AppIcon name="ChevronRight" size={13} className={cn(
+                  'text-muted-foreground/60 transition-transform duration-200 shrink-0',
                   expanded && 'rotate-90'
                 )} />
               )}
             </div>
 
             {task.notes && !task.is_completed && (
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+              <p className="text-[11px] text-muted-foreground/70 mt-0.5 line-clamp-1">
                 {task.notes}
               </p>
             )}
 
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
               {hasSubtasks && !expanded && (
-                <span className="text-[11px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-                  {completedSubtasks}/{subtasks.length} subtarefas
+                <span className="text-[10px] text-muted-foreground bg-secondary/80 px-1.5 py-0.5 rounded-md">
+                  {completedSubtasks}/{subtasks.length}
                 </span>
               )}
               {dueLabel && (
                 <span className={cn(
-                  'text-[11px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1',
+                  'text-[10px] px-1.5 py-0.5 rounded-md font-medium flex items-center gap-1',
                   overdue
                     ? 'bg-destructive/10 text-destructive'
                     : dueLabel.includes('Hoje')
                       ? 'bg-warning/10 text-warning'
                       : dueLabel.includes('Amanhã')
                         ? 'bg-primary/10 text-primary'
-                        : 'bg-secondary text-muted-foreground'
+                        : 'bg-secondary/80 text-muted-foreground'
                 )}>
-                  <AppIcon name="Clock" size={10} className={cn(clockUrgency.colorClass, clockUrgency.pulse && 'animate-pulse')} />
+                  <AppIcon name="Clock" size={9} className={cn(clockUrgency.colorClass, clockUrgency.pulse && 'animate-pulse')} />
                   {dueLabel}
                 </span>
               )}
             </div>
           </button>
 
-          {/* Inline action buttons */}
-          <div className="flex items-center gap-1 shrink-0 mt-0.5">
+          {/* Inline actions */}
+          <div className="flex items-center shrink-0 mt-0.5">
             <button
               onClick={(e) => { e.stopPropagation(); onClick?.(); }}
-              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-primary hover:bg-primary/10 transition-colors"
+              className="p-1 rounded-md text-muted-foreground/40 hover:text-primary hover:bg-primary/8 transition-colors"
             >
-              <AppIcon name="Edit" size={15} />
+              <AppIcon name="Edit" size={14} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
+              className="p-1 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/8 transition-colors"
             >
-              <AppIcon name="Trash2" size={15} />
+              <AppIcon name="Trash2" size={14} />
             </button>
           </div>
         </div>
@@ -174,15 +175,15 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           "overflow-hidden transition-all duration-300 ease-in-out",
           expanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
         )}>
-          <div className="border-t border-border/30 mx-4" />
-          <div className="px-4 py-1">
+          <div className="border-t border-border/20 mx-3" />
+          <div className="px-3 py-1">
             {subtasks.map(sub => (
-              <div key={sub.id} className="flex items-center gap-3 py-2.5">
-                <div className="w-3" />
+              <div key={sub.id} className="flex items-center gap-2.5 py-2">
+                <div className="w-2.5" />
                 <Checkbox
                   checked={sub.is_completed}
                   onCheckedChange={() => onToggle(sub.id)}
-                  className="w-4 h-4 rounded-full border-2 shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
+                  className="w-4 h-4 rounded-full border-[1.5px] shrink-0 data-[state=checked]:bg-success data-[state=checked]:border-success"
                 />
                 {editingSubId === sub.id ? (
                   <input
@@ -194,7 +195,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                       if (e.key === 'Escape') setEditingSubId(null);
                     }}
                     onBlur={() => { const t = editingSubTitle.trim(); if (t && t !== sub.title) onUpdateSubtask?.(sub.id, t); setEditingSubId(null); }}
-                    className="flex-1 text-sm bg-transparent border-none outline-none caret-primary"
+                    className="flex-1 text-[12px] bg-transparent border-none outline-none caret-primary"
                     autoFocus
                   />
                 ) : (
@@ -202,33 +203,32 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
                     className="flex-1 text-left"
                     onClick={() => { if (sub.is_completed) return; setEditingSubId(sub.id); setEditingSubTitle(sub.title); setTimeout(() => editSubRef.current?.focus(), 50); }}
                   >
-                    <span className={cn('text-sm', sub.is_completed && 'line-through text-muted-foreground')}>
+                    <span className={cn('text-[12px]', sub.is_completed && 'line-through text-muted-foreground')}>
                       {sub.title}
                     </span>
                   </button>
                 )}
                 <button
                   onClick={(e) => { e.stopPropagation(); onDelete(sub.id); }}
-                  className="p-1 rounded-lg text-muted-foreground/30 hover:text-destructive transition-colors"
+                  className="p-0.5 rounded text-muted-foreground/25 hover:text-destructive transition-colors"
                 >
-                  <AppIcon name="Trash2" size={14} />
+                  <AppIcon name="Trash2" size={12} />
                 </button>
               </div>
             ))}
 
             {/* Add subtask inline */}
-            <div className="flex items-center gap-3 py-2.5">
-              <div className="w-3" />
-              <AppIcon name="Plus" size={14} className="text-primary/60 shrink-0" />
+            <div className="flex items-center gap-2.5 py-2">
+              <div className="w-2.5" />
+              <AppIcon name="Plus" size={12} className="text-primary/50 shrink-0" />
               <input
                 ref={subtaskInputRef}
                 value={newSubtaskTitle}
                 onChange={(e) => setNewSubtaskTitle(e.target.value)}
                 onKeyDown={handleSubtaskKeyDown}
-                onFocus={() => setAddingSubtask(true)}
-                onBlur={() => { if (newSubtaskTitle.trim()) handleAddSubtask(); setAddingSubtask(false); }}
+                onBlur={() => { if (newSubtaskTitle.trim()) handleAddSubtask(); }}
                 placeholder="Nova subtarefa..."
-                className="flex-1 text-sm bg-transparent border-none outline-none caret-primary placeholder:text-muted-foreground/40"
+                className="flex-1 text-[12px] bg-transparent border-none outline-none caret-primary placeholder:text-muted-foreground/35"
               />
             </div>
           </div>

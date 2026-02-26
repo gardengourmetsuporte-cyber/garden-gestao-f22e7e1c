@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import type { ManagerTask, TaskCategory } from '@/types/agenda';
 
 interface ReorderUpdate {
@@ -14,8 +14,8 @@ interface ReorderUpdate {
 export function useAgenda() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
+  const pendingDeleteRef = useRef<Map<string, { task: ManagerTask; timer: ReturnType<typeof setTimeout> }>>(new Map());
 
   const queryKey = ['manager-tasks', user?.id, activeUnitId];
 
@@ -36,7 +36,7 @@ export function useAgenda() {
     enabled: !!user?.id,
   });
 
-  // Fetch all tasks for user (not filtered by date)
+  // Fetch all tasks for user
   const { data: allTasks = [], isLoading: tasksLoading } = useQuery({
     queryKey,
     queryFn: async () => {
@@ -55,11 +55,13 @@ export function useAgenda() {
     enabled: !!user?.id && !!activeUnitId,
   });
 
-  // Build hierarchical tasks: group subtasks under parents
+  // Build hierarchical tasks
   const tasks = useMemo(() => {
-    const parentTasks = allTasks.filter(t => !t.parent_id);
+    const pendingIds = new Set(pendingDeleteRef.current.keys());
+    const filtered = allTasks.filter(t => !pendingIds.has(t.id));
+    const parentTasks = filtered.filter(t => !t.parent_id);
     const childMap = new Map<string, ManagerTask[]>();
-    allTasks.filter(t => t.parent_id).forEach(t => {
+    filtered.filter(t => t.parent_id).forEach(t => {
       const children = childMap.get(t.parent_id!) || [];
       children.push(t);
       childMap.set(t.parent_id!, children);
@@ -68,7 +70,7 @@ export function useAgenda() {
       ...t,
       subtasks: childMap.get(t.id) || [],
     }));
-  }, [allTasks]);
+  }, [allTasks, pendingDeleteRef.current.size]);
 
   // Add task mutation
   const addTaskMutation = useMutation({
@@ -91,10 +93,10 @@ export function useAgenda() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
-      toast({ title: 'Lembrete criado!' });
+      toast.success('Lembrete criado!');
     },
     onError: () => {
-      toast({ title: 'Erro ao criar lembrete', variant: 'destructive' });
+      toast.error('Erro ao criar lembrete');
     },
   });
 
@@ -115,14 +117,14 @@ export function useAgenda() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
-      toast({ title: 'Lembrete atualizado!' });
+      toast.success('Lembrete atualizado!');
     },
     onError: () => {
-      toast({ title: 'Erro ao atualizar lembrete', variant: 'destructive' });
+      toast.error('Erro ao atualizar lembrete');
     },
   });
 
-  // Toggle task completion mutation with optimistic update
+  // Toggle task completion with optimistic update
   const toggleTaskMutation = useMutation({
     mutationFn: async (taskId: string) => {
       const task = allTasks.find(t => t.id === taskId);
@@ -153,23 +155,53 @@ export function useAgenda() {
     },
   });
 
-  // Delete task mutation
-  const deleteTaskMutation = useMutation({
-    mutationFn: async (taskId: string) => {
+  // Soft delete with undo — removes from UI immediately, deletes after 5s
+  const deleteTask = useCallback((taskId: string) => {
+    const task = allTasks.find(t => t.id === taskId);
+    const taskTitle = task?.title || 'Lembrete';
+
+    // Optimistic: hide from UI
+    queryClient.setQueryData<ManagerTask[]>(queryKey, (old) =>
+      old?.filter(t => t.id !== taskId && t.parent_id !== taskId)
+    );
+
+    const timer = setTimeout(async () => {
+      pendingDeleteRef.current.delete(taskId);
       const { error } = await supabase
         .from('manager_tasks')
         .delete()
         .eq('id', taskId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
-      toast({ title: 'Lembrete removido!' });
-    },
-    onError: () => {
-      toast({ title: 'Erro ao remover lembrete', variant: 'destructive' });
-    },
-  });
+      if (error) {
+        toast.error('Erro ao remover lembrete');
+        queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
+      }
+    }, 5000);
+
+    pendingDeleteRef.current.set(taskId, { task: task as ManagerTask, timer });
+
+    toast(`"${taskTitle}" removido`, {
+      action: {
+        label: 'Desfazer',
+        onClick: () => {
+          const pending = pendingDeleteRef.current.get(taskId);
+          if (pending) {
+            clearTimeout(pending.timer);
+            pendingDeleteRef.current.delete(taskId);
+            queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
+            toast.success('Lembrete restaurado!');
+          }
+        },
+      },
+      duration: 5000,
+    });
+  }, [allTasks, queryClient, queryKey]);
+
+  // Cleanup pending deletes on unmount
+  useEffect(() => {
+    return () => {
+      pendingDeleteRef.current.forEach(({ timer }) => clearTimeout(timer));
+    };
+  }, []);
 
   // Reorder tasks mutation with optimistic update
   const reorderTasksMutation = useMutation({
@@ -180,17 +212,13 @@ export function useAgenda() {
           .update({ sort_order })
           .eq('id', id)
       );
-      
       const results = await Promise.all(promises);
       const error = results.find(r => r.error)?.error;
       if (error) throw error;
     },
     onMutate: async (updates: ReorderUpdate[]) => {
-      // Cancel in-flight queries to prevent overwriting optimistic update
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<ManagerTask[]>(queryKey);
-      
-      // Apply optimistic reorder to cache
       queryClient.setQueryData<ManagerTask[]>(queryKey, (old) => {
         if (!old) return old;
         const orderMap = new Map(updates.map(u => [u.id, u.sort_order]));
@@ -199,23 +227,18 @@ export function useAgenda() {
           return newOrder !== undefined ? { ...t, sort_order: newOrder } : t;
         }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
       });
-      
       return { previous };
     },
     onError: (_err, _updates, context) => {
-      // Rollback on error
-      if (context?.previous) {
-        queryClient.setQueryData(queryKey, context.previous);
-      }
-      toast({ title: 'Erro ao reordenar', variant: 'destructive' });
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+      toast.error('Erro ao reordenar');
     },
     onSettled: () => {
-      // Re-sync with server
       queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
     },
   });
 
-  // Add category mutation
+  // Category mutations
   const addCategoryMutation = useMutation({
     mutationFn: async (category: { name: string; color: string; icon?: string }) => {
       if (!user?.id) throw new Error('User not authenticated');
@@ -232,14 +255,11 @@ export function useAgenda() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-categories'] });
-      toast({ title: 'Categoria criada!' });
+      toast.success('Categoria criada!');
     },
-    onError: () => {
-      toast({ title: 'Erro ao criar categoria', variant: 'destructive' });
-    },
+    onError: () => toast.error('Erro ao criar categoria'),
   });
 
-  // Update category mutation
   const updateCategoryMutation = useMutation({
     mutationFn: async ({ id, name, color }: { id: string; name: string; color: string }) => {
       const { error } = await supabase
@@ -251,14 +271,11 @@ export function useAgenda() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-categories'] });
       queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
-      toast({ title: 'Categoria atualizada!' });
+      toast.success('Categoria atualizada!');
     },
-    onError: () => {
-      toast({ title: 'Erro ao atualizar categoria', variant: 'destructive' });
-    },
+    onError: () => toast.error('Erro ao atualizar categoria'),
   });
 
-  // Delete category mutation
   const deleteCategoryMutation = useMutation({
     mutationFn: async (categoryId: string) => {
       const { error } = await supabase
@@ -269,14 +286,11 @@ export function useAgenda() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-categories'] });
-      toast({ title: 'Categoria removida!' });
+      toast.success('Categoria removida!');
     },
-    onError: () => {
-      toast({ title: 'Erro ao remover categoria', variant: 'destructive' });
-    },
+    onError: () => toast.error('Erro ao remover categoria'),
   });
 
-  // Reorder categories mutation
   const reorderCategoriesMutation = useMutation({
     mutationFn: async (reorderedCategories: TaskCategory[]) => {
       const promises = reorderedCategories.map((cat, index) =>
@@ -302,7 +316,7 @@ export function useAgenda() {
     addTask: addTaskMutation.mutate,
     updateTask: updateTaskMutation.mutate,
     toggleTask: toggleTaskMutation.mutate,
-    deleteTask: deleteTaskMutation.mutate,
+    deleteTask,
     addCategory: addCategoryMutation.mutate,
     updateCategory: updateCategoryMutation.mutate,
     deleteCategory: deleteCategoryMutation.mutate,
