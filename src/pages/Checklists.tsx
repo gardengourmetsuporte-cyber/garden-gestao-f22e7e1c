@@ -269,23 +269,24 @@ export default function ChecklistsPage() {
             {!settingsMode && (() => {
               const today = new Date();
               const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
-              const todayIndex = 20;
+
+              const scrollToSelected = (container: HTMLDivElement | null) => {
+                if (!container) return;
+                const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
+                if (selectedIdx < 0) return;
+                const btn = container.children[selectedIdx] as HTMLElement;
+                if (!btn) return;
+                const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+                container.scrollTo({ left: scrollLeft, behavior: 'instant' });
+              };
 
               return (
                 <div className="space-y-1.5">
-                  <div className="-mx-4 overflow-x-auto scrollbar-hide">
-                    <div className="flex gap-1 px-4 py-1" ref={(el) => {
-                      if (el && !el.dataset.scrolled) {
-                        el.dataset.scrolled = 'true';
-                        const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
-                        const target = el.children[selectedIdx >= 0 ? selectedIdx : todayIndex] as HTMLElement;
-                        if (target) {
-                          requestAnimationFrame(() => {
-                            target.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' });
-                          });
-                        }
-                      }
-                    }}>
+                  <div
+                    className="-mx-4 overflow-x-auto scrollbar-hide"
+                    ref={scrollToSelected}
+                  >
+                    <div className="flex gap-1 px-4 py-1">
                       {days.map((day) => {
                         const isSelected = isSameDay(day, selectedDate);
                         const isDayToday = isDateToday(day);
