@@ -121,25 +121,48 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             <ThemeToggle className="p-1.5 shrink-0" />
           </div>
 
-          {/* Unit selector */}
+          {/* Store selector */}
           {units.length > 1 && (
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 shrink-0">Loja</span>
-              {units.map(unit => (
-                <button
-                  key={unit.id}
-                  onClick={() => setActiveUnitId(unit.id)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0",
-                    unit.id === activeUnit?.id
-                      ? "bg-primary/15 text-primary ring-1 ring-primary/30"
-                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                  )}
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
-                  {unit.name}
-                </button>
-              ))}
+            <div className="rounded-2xl bg-card p-3 space-y-2" style={{ border: '1px solid hsl(var(--border) / 0.4)' }}>
+              <div className="flex items-center justify-between px-0.5">
+                <div className="flex items-center gap-1.5">
+                  <AppIcon name="Store" size={13} className="text-muted-foreground/50" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">Loja ativa</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground/40">{units.length} lojas</span>
+              </div>
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+                {units.map(unit => {
+                  const isActive = unit.id === activeUnit?.id;
+                  const themeColor = getThemeColor(unit.slug);
+                  return (
+                    <button
+                      key={unit.id}
+                      onClick={() => setActiveUnitId(unit.id)}
+                      className={cn(
+                        "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0",
+                        isActive
+                          ? "text-foreground"
+                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                      )}
+                      style={isActive ? {
+                        background: `linear-gradient(135deg, ${themeColor}20, ${themeColor}10)`,
+                        boxShadow: `0 0 0 1.5px ${themeColor}40, 0 2px 8px ${themeColor}15`,
+                      } : undefined}
+                    >
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0 transition-all"
+                        style={{
+                          background: themeColor,
+                          boxShadow: isActive ? `0 0 8px ${themeColor}80` : 'none',
+                        }}
+                      />
+                      {unit.name}
+                      {isActive && <AppIcon name="Check" size={12} className="text-primary ml-0.5" />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
