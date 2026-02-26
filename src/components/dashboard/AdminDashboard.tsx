@@ -69,7 +69,7 @@ export function AdminDashboard() {
       </div>
 
       {/* === FINANCE BLOCK (above fold) === */}
-      <div className="space-y-4 animate-spring-in spring-stagger-2">
+      <div className="space-y-7 animate-spring-in spring-stagger-2">
         {hasAccess('finance') ? (
           <>
             <button
