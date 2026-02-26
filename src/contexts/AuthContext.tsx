@@ -142,8 +142,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Poll subscription every 60s when logged in
   useEffect(() => {
     if (user) {
-      const timeout = setTimeout(() => refreshSubscription(), 2000);
-      subIntervalRef.current = setInterval(refreshSubscription, 60_000);
+      const timeout = setTimeout(() => refreshSubscription(), 5000);
+      subIntervalRef.current = setInterval(refreshSubscription, 300_000);
       return () => {
         clearTimeout(timeout);
         if (subIntervalRef.current) clearInterval(subIntervalRef.current);

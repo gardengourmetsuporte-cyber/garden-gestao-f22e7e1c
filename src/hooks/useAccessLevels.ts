@@ -35,21 +35,17 @@ async function fetchAccessLevels(unitId: string): Promise<AccessLevel[]> {
 
 // Fetch current user's allowed modules
 async function fetchUserModules(userId: string, unitId: string): Promise<string[] | null> {
+  // Single query with join to avoid sequential waterfall
   const { data, error } = await supabase
     .from('user_units')
-    .select('access_level_id')
+    .select('access_level_id, access_levels:access_levels!user_units_access_level_id_fkey(modules)')
     .eq('user_id', userId)
     .eq('unit_id', unitId)
     .maybeSingle();
 
   if (error || !data?.access_level_id) return null; // null = no restriction (full access)
 
-  const { data: level } = await supabase
-    .from('access_levels')
-    .select('modules')
-    .eq('id', data.access_level_id)
-    .single();
-
+  const level = data.access_levels as any;
   return (level?.modules as string[]) || null;
 }
 
