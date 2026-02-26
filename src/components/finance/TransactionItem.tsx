@@ -6,7 +6,6 @@ import { useState, useRef, useCallback } from 'react';
 
 interface TransactionItemProps {
   transaction: FinanceTransaction;
-  isNew?: boolean;
   onClick?: () => void;
   onTogglePaid?: (id: string, isPaid: boolean) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
@@ -16,7 +15,7 @@ interface TransactionItemProps {
 const MAX_SWIPE = 140;
 const DEADZONE = 8;
 
-export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onDelete, disableSwipe }: TransactionItemProps) {
+export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete, disableSwipe }: TransactionItemProps) {
   const { type, amount, description, category, account, is_paid } = transaction;
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -193,8 +192,6 @@ export function TransactionItem({ transaction, isNew, onClick, onTogglePaid, onD
         className={cn(
           'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
           !is_paid && 'opacity-70',
-          'transition-[border-color,box-shadow] duration-500 ease-out',
-          isNew && 'border-[hsl(var(--neon-cyan)/0.6)] shadow-[0_0_12px_hsl(var(--neon-cyan)/0.3),0_0_4px_hsl(var(--neon-cyan)/0.2)]',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
         style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
