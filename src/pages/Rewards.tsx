@@ -44,11 +44,11 @@ export default function RewardsPage() {
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-4">
           {/* Points Balance */}
-          <div className="card-command-warning p-6">
+          <div className="gradient-primary p-6 rounded-2xl">
             <p className="text-sm text-muted-foreground mb-1">Seu saldo</p>
             <div className="flex items-center gap-3">
-              <div className="icon-glow icon-glow-lg icon-glow-warning">
-                <AppIcon name="Star" size={24} className="text-warning" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-500/15">
+                <AppIcon name="Star" size={24} className="text-amber-400" />
               </div>
               <span className="text-4xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{balance}</span>
               <span className="text-lg text-muted-foreground">pontos</span>

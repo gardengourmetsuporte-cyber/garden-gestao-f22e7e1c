@@ -49,7 +49,8 @@ export default function Gamification() {
 
   return (
     <AppLayout>
-      <div className="p-4 pb-24 max-w-2xl mx-auto space-y-6">
+      <div className="min-h-screen bg-background pb-24">
+        <div className="px-4 py-3 lg:px-6 space-y-4">
 
         {/* Settings */}
         <GamificationSettingsPanel
@@ -134,6 +135,7 @@ export default function Gamification() {
               ))}
             </div>
           )}
+        </div>
         </div>
       </div>
 

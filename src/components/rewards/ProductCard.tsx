@@ -1,4 +1,4 @@
-import { Star, Package } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RewardProduct } from '@/hooks/useRewards';
@@ -25,7 +25,7 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
             className="w-full h-full object-cover"
           />
         ) : (
-          <Package className="w-12 h-12 text-primary/40" />
+          <AppIcon name="Package" size={48} className="text-primary/40" />
         )}
       </div>
       
@@ -44,8 +44,8 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
         )}
         
         <div className="flex items-center gap-1.5">
-          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-          <span className="font-bold text-lg">{product.points_cost}</span>
+          <AppIcon name="Star" size={16} className="text-amber-500" />
+          <span className="font-bold text-lg text-foreground">{product.points_cost}</span>
           <span className="text-sm text-muted-foreground">pontos</span>
         </div>
         
