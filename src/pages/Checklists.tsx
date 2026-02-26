@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { format, parseISO, isAfter, startOfDay, addDays } from 'date-fns';
+import { format, parseISO, isAfter, startOfDay, addDays, subDays, isSameDay, isToday as isDateToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -266,16 +266,91 @@ export default function ChecklistsPage() {
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-5">
           <div className="animate-fade-in space-y-5" key={settingsMode ? 'settings' : 'view'}>
-            {/* Date picker — only in view mode */}
-            {!settingsMode && (
-              <div className="flex justify-center">
-                <DatePicker
-                  date={selectedDate}
-                  onSelect={(date) => setSelectedDate(date)}
-                  className="w-auto"
-                />
-              </div>
-            )}
+            {/* Smart Date Strip — only in view mode */}
+            {!settingsMode && (() => {
+              const today = new Date();
+              const days = Array.from({ length: 7 }, (_, i) => subDays(today, 6 - i));
+              const isSelectedToday = isDateToday(selectedDate);
+              const isSelectedYesterday = isYesterday(selectedDate);
+
+              return (
+                <div className="space-y-2">
+                  {/* Quick access chips */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSelectedDate(subDays(today, 1))}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+                        isSelectedYesterday
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                      )}
+                    >
+                      Ontem
+                    </button>
+                    <button
+                      onClick={() => setSelectedDate(today)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+                        isSelectedToday
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                      )}
+                    >
+                      Hoje
+                    </button>
+                    <div className="flex-1" />
+                    <DatePicker
+                      date={selectedDate}
+                      onSelect={(date) => setSelectedDate(date)}
+                      className="w-auto h-8 text-xs px-3 rounded-lg bg-secondary/40 border-0 text-muted-foreground hover:bg-secondary/60"
+                      formatStr="dd/MM/yyyy"
+                    />
+                  </div>
+
+                  {/* Horizontal day strip */}
+                  <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                    {days.map((day) => {
+                      const isSelected = isSameDay(day, selectedDate);
+                      const isDayToday = isDateToday(day);
+                      return (
+                        <button
+                          key={day.toISOString()}
+                          onClick={() => setSelectedDate(day)}
+                          className={cn(
+                            "flex flex-col items-center min-w-[44px] py-2 px-2 rounded-xl transition-all duration-200",
+                            isSelected
+                              ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                              : isDayToday
+                                ? "bg-primary/10 text-primary ring-1 ring-primary/30"
+                                : "text-muted-foreground hover:bg-secondary/60"
+                          )}
+                        >
+                          <span className="text-[10px] font-medium uppercase leading-none mb-1">
+                            {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
+                          </span>
+                          <span className={cn(
+                            "text-base font-bold leading-none",
+                            isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
+                          )}>
+                            {format(day, 'dd')}
+                          </span>
+                          {isDayToday && !isSelected && (
+                            <div className="w-1 h-1 rounded-full bg-primary mt-1" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Current date label */}
+                  <p className="text-center text-xs text-muted-foreground capitalize">
+                    {isSelectedToday ? '📍 Hoje' : isSelectedYesterday ? '⏪ Ontem' : ''}{' '}
+                    {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                  </p>
+                </div>
+              );
+            })()}
 
             {/* Settings mode header banner */}
             {settingsMode && (
