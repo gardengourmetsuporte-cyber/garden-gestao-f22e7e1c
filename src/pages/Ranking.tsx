@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,6 +52,7 @@ export default function Ranking() {
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard(rankingScope);
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
+  useScrollToTopOnChange(activeTab);
   const [mountRefreshed, setMountRefreshed] = useState(false);
 
   useEffect(() => {
