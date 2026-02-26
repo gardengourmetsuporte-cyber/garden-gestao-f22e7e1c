@@ -132,22 +132,7 @@ export function BottomTabBar() {
           }}
         >
           <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative">
-            {/* Highlight pill */}
-            {pillStyle && (
-              <div
-                className="absolute nav-highlight-pill rounded-[12px]"
-                style={{
-                  background: 'hsl(var(--primary) / 0.12)',
-                  border: '1px solid hsl(var(--primary) / 0.2)',
-                  width: pillStyle.width,
-                  height: '40px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  left: pillStyle.left,
-                  willChange: 'left',
-                }}
-              />
-            )}
+            {/* No pill — active state is icon glow only */}
 
             {/* Left tabs */}
             {leftTabs.map(tab => (
