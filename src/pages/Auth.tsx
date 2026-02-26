@@ -166,13 +166,32 @@ export default function Auth() {
     );
   }
 
+  // Colors adapted for gradient-primary (white) card background
+  const cardText = "text-[hsl(234_20%_20%)]";
+  const cardTextMuted = "text-[hsl(234_20%_40%)]";
+  const cardIconDefault = "text-[hsl(234_20%_55%)]";
+  const cardIconFocused = "text-[hsl(234_60%_50%)]";
+  const cardLink = "text-[hsl(234_60%_45%)]";
+
   const inputClasses = (field: string) => cn(
-    "pl-11 h-12 rounded-xl border text-[hsl(234_20%_20%)] placeholder:text-[hsl(234_20%_50%/0.5)] transition-all duration-300",
+    "pl-11 h-12 rounded-xl border transition-all duration-300",
+    cardText, "placeholder:text-[hsl(234_20%_50%/0.5)]",
     focusedField === field
-      ? "border-[hsl(234_50%_70%)] bg-white/80"
-      : "border-[hsl(234_30%_80%/0.4)] bg-white/50 hover:border-[hsl(234_30%_70%/0.6)]",
+      ? "border-[hsl(234_50%_70%)] bg-white"
+      : "border-[hsl(234_30%_85%/0.5)] bg-white/70 hover:border-[hsl(234_30%_70%/0.6)]",
     errors[field] && "border-destructive/50"
   );
+
+  const labelClass = cn("text-sm font-medium", cardTextMuted);
+
+  const submitBtnClass = "w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border-none";
+  const submitBtnStyle = {
+    background: 'hsl(234 30% 20%)',
+    color: '#fff',
+    boxShadow: '0 4px 24px hsl(234 30% 20% / 0.25)',
+  };
+
+  const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-[hsl(234_30%_85%/0.5)] bg-white/60 hover:bg-white/90 " + cardText;
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto">
@@ -257,19 +276,17 @@ export default function Auth() {
           {/* Form Card */}
           <div
             className="animate-slide-up rounded-2xl p-6 space-y-6 backdrop-blur-xl gradient-primary"
-            style={{
-              animationDelay: '100ms',
-            }}
+            style={{ animationDelay: '100ms' }}
           >
             {/* Title with icon */}
             <div className="text-center space-y-1.5">
               <div className="flex items-center justify-center gap-2">
-                <AppIcon name="Sparkles" size={20} style={{ color: 'hsl(234 40% 45%)' }} />
-                <h2 className="text-xl font-bold" style={{ color: 'hsl(234 30% 20%)' }}>
+                <AppIcon name="Sparkles" size={20} className={cardIconFocused} />
+                <h2 className={cn("text-xl font-bold", cardText)}>
                   {isNewPassword ? 'Nova Senha' : isResetPassword ? 'Recuperar Senha' : isLogin ? 'Bem-vindo' : 'Criar Conta'}
                 </h2>
               </div>
-              <p className="text-sm" style={{ color: 'hsl(234 20% 40%)' }}>
+              <p className={cn("text-sm", cardTextMuted)}>
                 {isNewPassword
                   ? 'Defina sua nova senha'
                   : isResetPassword
@@ -285,11 +302,9 @@ export default function Auth() {
             {isNewPassword ? (
               <form onSubmit={handleSetNewPassword} className="space-y-4">
                 <div className="space-y-2 animate-fade-in">
-                  <Label htmlFor="newPassword" className="text-sm text-muted-foreground font-medium">
-                    Nova Senha
-                  </Label>
+                  <Label htmlFor="newPassword" className={labelClass}>Nova Senha</Label>
                   <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'newPassword' ? "text-primary" : "text-muted-foreground/60")}>
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'newPassword' ? cardIconFocused : cardIconDefault)}>
                       <AppIcon name="Lock" size={20} />
                     </div>
                     <Input
@@ -302,7 +317,7 @@ export default function Auth() {
                       placeholder="••••••••"
                       className={cn(inputClasses('password'), "pr-11")}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors">
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className={cn("absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors", cardIconDefault, "hover:" + cardText)}>
                       {showPassword ? <AppIcon name="EyeOff" size={20} /> : <AppIcon name="Eye" size={20} />}
                     </button>
                   </div>
@@ -310,11 +325,9 @@ export default function Auth() {
                 </div>
 
                 <div className="space-y-2 animate-fade-in">
-                  <Label htmlFor="confirmPassword" className="text-sm text-muted-foreground font-medium">
-                    Confirmar Senha
-                  </Label>
+                  <Label htmlFor="confirmPassword" className={labelClass}>Confirmar Senha</Label>
                   <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'confirmPassword' ? "text-primary" : "text-muted-foreground/60")}>
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'confirmPassword' ? cardIconFocused : cardIconDefault)}>
                       <AppIcon name="Lock" size={20} />
                     </div>
                     <Input
@@ -331,14 +344,10 @@ export default function Auth() {
                   {errors.confirmPassword && <p className="text-xs text-destructive animate-fade-in">{errors.confirmPassword}</p>}
                 </div>
 
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] bg-[hsl(234_30%_20%)] text-white hover:bg-[hsl(234_30%_25%)] border-none"
-                  >
+                <Button type="submit" disabled={isSubmitting} className={submitBtnClass} style={submitBtnStyle}>
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Aguarde...
                     </span>
                   ) : (
@@ -349,16 +358,9 @@ export default function Auth() {
             ) : isResetPassword ? (
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2 animate-fade-in">
-                  <Label htmlFor="resetEmail" className="text-sm text-muted-foreground font-medium">
-                    Email
-                  </Label>
+                  <Label htmlFor="resetEmail" className={labelClass}>Email</Label>
                   <div className="relative group">
-                    <div
-                      className={cn(
-                        "absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-300",
-                        focusedField === 'resetEmail' ? "text-primary" : "text-muted-foreground/60"
-                      )}
-                    >
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-300", focusedField === 'resetEmail' ? cardIconFocused : cardIconDefault)}>
                       <AppIcon name="Mail" size={20} />
                     </div>
                     <Input
@@ -372,19 +374,13 @@ export default function Auth() {
                       className={inputClasses('email')}
                     />
                   </div>
-                  {errors.email && (
-                    <p className="text-xs text-destructive animate-fade-in">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="text-xs text-destructive animate-fade-in">{errors.email}</p>}
                 </div>
 
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] bg-[hsl(234_30%_20%)] text-white hover:bg-[hsl(234_30%_25%)] border-none"
-                  >
+                <Button type="submit" disabled={isSubmitting} className={submitBtnClass} style={submitBtnStyle}>
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Aguarde...
                     </span>
                   ) : (
@@ -396,16 +392,9 @@ export default function Auth() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-2 animate-fade-in">
-                    <Label htmlFor="fullName" className="text-sm text-muted-foreground font-medium">
-                      Nome Completo
-                    </Label>
+                    <Label htmlFor="fullName" className={labelClass}>Nome Completo</Label>
                     <div className="relative">
-                      <div
-                        className={cn(
-                          "absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300",
-                          focusedField === 'fullName' ? "text-primary" : "text-muted-foreground/60"
-                        )}
-                      >
+                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'fullName' ? cardIconFocused : cardIconDefault)}>
                         <AppIcon name="User" size={20} />
                       </div>
                       <Input
@@ -421,23 +410,14 @@ export default function Auth() {
                         className={inputClasses('fullName')}
                       />
                     </div>
-                    {errors.fullName && (
-                      <p className="text-xs text-destructive animate-fade-in">{errors.fullName}</p>
-                    )}
+                    {errors.fullName && <p className="text-xs text-destructive animate-fade-in">{errors.fullName}</p>}
                   </div>
                 )}
 
                 <div className="space-y-2 animate-slide-up" style={{ animationDelay: '50ms' }}>
-                  <Label htmlFor="email" className="text-sm text-muted-foreground font-medium">
-                    Email
-                  </Label>
+                  <Label htmlFor="email" className={labelClass}>Email</Label>
                   <div className="relative">
-                    <div
-                      className={cn(
-                        "absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300",
-                        focusedField === 'email' ? "text-primary" : "text-muted-foreground/60"
-                      )}
-                    >
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'email' ? cardIconFocused : cardIconDefault)}>
                       <AppIcon name="Mail" size={20} />
                     </div>
                     <Input
@@ -454,33 +434,24 @@ export default function Auth() {
                       className={inputClasses('email')}
                     />
                   </div>
-                  {errors.email && (
-                    <p className="text-xs text-destructive animate-fade-in">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="text-xs text-destructive animate-fade-in">{errors.email}</p>}
                 </div>
 
                 <div className="space-y-2 animate-slide-up" style={{ animationDelay: '100ms' }}>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-sm text-muted-foreground font-medium">
-                      Senha
-                    </Label>
+                    <Label htmlFor="password" className={labelClass}>Senha</Label>
                     {isLogin && (
                       <button
                         type="button"
                         onClick={() => { setIsResetPassword(true); setErrors({}); }}
-                        className="text-xs text-primary/80 hover:text-primary transition-colors"
+                        className={cn("text-xs transition-colors", cardLink, "hover:opacity-80")}
                       >
                         Esqueceu a senha?
                       </button>
                     )}
                   </div>
                   <div className="relative">
-                    <div
-                      className={cn(
-                        "absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300",
-                        focusedField === 'password' ? "text-primary" : "text-muted-foreground/60"
-                      )}
-                    >
+                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300", focusedField === 'password' ? cardIconFocused : cardIconDefault)}>
                       <AppIcon name="Lock" size={20} />
                     </div>
                     <Input
@@ -497,25 +468,19 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                      className={cn("absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors", cardIconDefault)}
                     >
                       {showPassword ? <AppIcon name="EyeOff" size={20} /> : <AppIcon name="Eye" size={20} />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="text-xs text-destructive animate-fade-in">{errors.password}</p>
-                  )}
+                  {errors.password && <p className="text-xs text-destructive animate-fade-in">{errors.password}</p>}
                 </div>
 
                 <div className="pt-1 animate-slide-up" style={{ animationDelay: '150ms' }}>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] bg-[hsl(234_30%_20%)] text-white hover:bg-[hsl(234_30%_25%)] border-none"
-                  >
+                  <Button type="submit" disabled={isSubmitting} className={submitBtnClass} style={submitBtnStyle}>
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
-                        <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Aguarde...
                       </span>
                     ) : (
@@ -533,9 +498,9 @@ export default function Auth() {
             {!isNewPassword && !isResetPassword && (
               <>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
-                  <span className="text-xs text-muted-foreground/60 uppercase tracking-wider">ou</span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(234 30% 80% / 0.4), transparent)' }} />
+                  <span className={cn("text-xs uppercase tracking-wider", cardTextMuted)}>ou</span>
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(234 30% 80% / 0.4), transparent)' }} />
                 </div>
 
                 <div className="space-y-3">
@@ -551,7 +516,7 @@ export default function Auth() {
                         toast.error('Erro ao conectar com Google');
                       }
                     }}
-                    className="w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-border/30 bg-secondary/30 backdrop-blur-sm hover:border-border/60 hover:bg-secondary/50 text-foreground"
+                    className={socialBtnClass}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -573,9 +538,9 @@ export default function Auth() {
                         toast.error('Erro ao conectar com Apple');
                       }
                     }}
-                    className="w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-border/30 bg-secondary/30 backdrop-blur-sm hover:border-border/60 hover:bg-secondary/50 text-foreground"
+                    className={socialBtnClass}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="hsl(234, 20%, 20%)">
                       <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                     </svg>
                     Entrar com Apple
@@ -586,7 +551,7 @@ export default function Auth() {
 
             {/* Divider */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+              <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(234 30% 80% / 0.3), transparent)' }} />
             </div>
 
             <div className="text-center">
@@ -594,7 +559,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => { setIsResetPassword(false); setErrors({}); }}
-                  className="text-sm text-primary/80 hover:text-primary transition-colors font-medium"
+                  className={cn("text-sm font-medium transition-colors", cardLink, "hover:opacity-80")}
                 >
                   ← Voltar para o login
                 </button>
@@ -602,19 +567,19 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => { setIsLogin(!isLogin); setErrors({}); setPassword(''); setFullName(''); }}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className={cn("text-sm transition-colors", cardTextMuted)}
                 >
                   {isLogin ? (
-                    <>Não tem conta? <span className="text-primary font-medium">Cadastre-se</span></>
+                    <>Não tem conta? <span className={cn("font-medium", cardLink)}>Cadastre-se</span></>
                   ) : (
-                    <>Já tem conta? <span className="text-primary font-medium">Entrar</span></>
+                    <>Já tem conta? <span className={cn("font-medium", cardLink)}>Entrar</span></>
                   )}
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={() => navigate('/landing')}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className={cn("text-sm transition-colors", cardTextMuted)}
                 >
                   ← Voltar para o site
                 </button>
