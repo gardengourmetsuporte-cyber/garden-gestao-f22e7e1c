@@ -132,7 +132,10 @@ export function TransactionSheet({
   const [showSupplierPicker, setShowSupplierPicker] = useState(false);
   const [showEmployeePicker, setShowEmployeePicker] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const valueInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const [debouncedDescription, setDebouncedDescription] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{ description?: boolean; amount?: boolean }>({});
   const draftRestoredRef = useRef(false);
 
   // Prevent browser back gesture from navigating away while sheet is open
@@ -150,7 +153,7 @@ export function TransactionSheet({
     if (open) {
       if (editingTransaction) {
         setType(editingTransaction.type);
-        setAmount(String(editingTransaction.amount));
+        setAmount(editingTransaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         setDescription(editingTransaction.description);
         setCategoryId(editingTransaction.category_id);
         setAccountId(editingTransaction.account_id);
@@ -201,20 +204,59 @@ export function TransactionSheet({
     }
   }, [open, defaultType, accounts, editingTransaction]);
 
+  // Debounce description for suggestions
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedDescription(description), 300);
+    return () => clearTimeout(t);
+  }, [description]);
+
   // Auto-toggle isPaid based on date
   const handleDateChange = (newDate: Date) => {
     setDate(newDate);
-    // If date is in the future, automatically set is_paid to false
     const today = startOfDay(new Date());
     const selectedDay = startOfDay(newDate);
     if (selectedDay > today) {
       setIsPaid(false);
+    } else {
+      setIsPaid(true);
     }
   };
 
+  // Currency formatting helpers
+  const formatCurrencyDisplay = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (!digits) return '';
+    const num = parseInt(digits, 10) / 100;
+    return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const parseCurrencyValue = (display: string): number => {
+    if (!display) return 0;
+    const clean = display.replace(/\./g, '').replace(',', '.');
+    return parseFloat(clean) || 0;
+  };
+
+  const handleAmountChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) { setAmount(''); return; }
+    const num = parseInt(digits, 10) / 100;
+    setAmount(num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    setValidationErrors(prev => ({ ...prev, amount: false }));
+  };
+
+  const getNumericAmount = (): number => {
+    return parseCurrencyValue(amount);
+  };
+
   const handleSave = async () => {
-    if (!amount || parseFloat(amount) <= 0) return;
-    if (!description.trim()) return;
+    const numAmount = getNumericAmount();
+    const hasErrors = { description: !description.trim(), amount: !numAmount || numAmount <= 0 };
+    if (hasErrors.description || hasErrors.amount) {
+      setValidationErrors(hasErrors);
+      toast.error('Preencha a descrição e o valor');
+      return;
+    }
+    setValidationErrors({});
     
     // If editing a recurring transaction, show the edit mode dialog
     if (editingTransaction && editingTransaction.is_recurring && editingTransaction.installment_group_id) {
@@ -225,7 +267,6 @@ export function TransactionSheet({
     setIsLoading(true);
     
     if (isRecurring && parseInt(recurringCount) > 1) {
-      // Create recurring transactions
       const groupId = crypto.randomUUID();
       const count = parseInt(recurringCount);
       const today = startOfDay(new Date());
@@ -248,12 +289,11 @@ export function TransactionSheet({
           txDate = addMonths(date, i * 12);
         }
         
-        // Only the first transaction (if date is today or past) should be marked as paid
         const txIsPaid = (i === 0 && startOfDay(txDate) <= today) ? isPaid : false;
         
         await onSave({
           type,
-          amount: parseFloat(amount),
+          amount: numAmount,
           description: `${description.trim()} (${i + 1}/${count})`,
           category_id: categoryId,
           account_id: accountId,
@@ -273,10 +313,9 @@ export function TransactionSheet({
       }
 
     } else {
-      // Single transaction
       await onSave({
         type,
-        amount: parseFloat(amount),
+        amount: numAmount,
         description: description.trim(),
         category_id: categoryId,
         account_id: accountId,
@@ -294,18 +333,24 @@ export function TransactionSheet({
     
     setIsLoading(false);
     clearDraft();
+    toast.success(editingTransaction ? 'Transação atualizada!' : 'Transação salva!');
     onOpenChange(false);
   };
 
   const handleSaveAndContinue = async () => {
-    if (!amount || parseFloat(amount) <= 0) return;
-    if (!description.trim()) return;
-    
+    const numAmount = getNumericAmount();
+    const hasErrors = { description: !description.trim(), amount: !numAmount || numAmount <= 0 };
+    if (hasErrors.description || hasErrors.amount) {
+      setValidationErrors(hasErrors);
+      toast.error('Preencha a descrição e o valor');
+      return;
+    }
+    setValidationErrors({});
     setIsLoading(true);
     
     await onSave({
       type,
-      amount: parseFloat(amount),
+      amount: numAmount,
       description: description.trim(),
       category_id: categoryId,
       account_id: accountId,
@@ -320,6 +365,7 @@ export function TransactionSheet({
     });
     
     setIsLoading(false);
+    toast.success('Transação salva!');
     
     // Reset form for next entry
     clearDraft();
@@ -338,9 +384,9 @@ export function TransactionSheet({
     setShowRecurringEditDialog(false);
     setIsLoading(true);
     
-    const updateData: Partial<TransactionFormData> = {
+      const updateData: Partial<TransactionFormData> = {
       type,
-      amount: parseFloat(amount),
+      amount: getNumericAmount(),
       description: description.trim(),
       category_id: categoryId,
       account_id: accountId,
@@ -367,6 +413,7 @@ export function TransactionSheet({
     setIsLoading(true);
     await onDelete(editingTransaction.id);
     setIsLoading(false);
+    toast.success('Transação excluída!');
     onOpenChange(false);
   };
 
@@ -442,11 +489,10 @@ export function TransactionSheet({
                   }}
                   onFocus={() => setShowSuggestions(description.length >= 2)}
                   onBlur={() => {
-                    // Delay to allow click on suggestion
-                    setTimeout(() => setShowSuggestions(false), 200);
+                    setTimeout(() => setShowSuggestions(false), 400);
                   }}
+                  className={cn("h-12", validationErrors.description && "ring-2 ring-destructive")}
                   placeholder="Ex: Compra de carnes"
-                  className="h-12"
                   autoComplete="off"
                 />
                 {showSuggestions && !editingTransaction && (
@@ -470,6 +516,7 @@ export function TransactionSheet({
                         setEmployeeId(suggestion.employeeId);
                       }
                       setShowSuggestions(false);
+                      setTimeout(() => valueInputRef.current?.focus(), 100);
                     }}
                   />
                 )}
@@ -482,12 +529,13 @@ export function TransactionSheet({
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
                 <Input
-                  type="number"
+                  ref={valueInputRef}
+                  type="text"
                   inputMode="decimal"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="0,00"
-                  className="pl-10 text-2xl h-14 font-semibold"
+                  className={cn("pl-10 text-2xl h-14 font-semibold", validationErrors.amount && "ring-2 ring-destructive")}
                 />
               </div>
             </div>
@@ -786,7 +834,7 @@ export function TransactionSheet({
               <Button
                 variant="ghost"
                 onClick={handleSaveAndContinue}
-                disabled={isLoading || !amount || parseFloat(amount) <= 0 || !description.trim()}
+                disabled={isLoading}
                 className="text-primary w-full mb-2"
               >
                 Salvar e continuar
@@ -806,7 +854,7 @@ export function TransactionSheet({
               )}
               <LoadingButton
                 onClick={handleSave}
-                disabled={!amount || parseFloat(amount) <= 0 || !description.trim()}
+                disabled={isLoading}
                 loading={isLoading}
                 loadingText="Salvando..."
                 className="flex-1 h-12"

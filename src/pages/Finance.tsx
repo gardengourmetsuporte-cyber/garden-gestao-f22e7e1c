@@ -203,6 +203,8 @@ export default function Finance() {
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
             totalBalance={totalBalance}
+            categories={categories}
+            transactions={transactions}
           />
         )}
 
