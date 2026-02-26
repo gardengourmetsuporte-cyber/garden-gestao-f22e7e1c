@@ -349,7 +349,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       {/* ======= Main Content ======= */}
       <main
         className="min-h-screen lg:ml-[260px] lg:pt-0"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 5.5rem)' }}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3.5rem)' }}
       >
         <PageTransition>
           {children}
