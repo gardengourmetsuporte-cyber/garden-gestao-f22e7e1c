@@ -249,21 +249,6 @@ const TabButton = forwardRef<
           fill={active ? 1 : 0}
           weight={active ? 600 : 400}
         />
-        {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
-          <span
-            className={cn(
-              "absolute -top-1.5 -right-2.5 min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center",
-              (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
-            )}
-            style={{
-              background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
-              color: moduleStatus.level === 'critical' ? '#fff' : '#000',
-              border: '2px solid hsl(225 30% 6%)',
-            }}
-          >
-            {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
-          </span>
-        )}
       </div>
       <span className={cn("text-[10px]", active ? "font-semibold" : "font-normal")}>{tab.label}</span>
     </button>
