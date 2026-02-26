@@ -222,14 +222,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
           </div>
-          {/* Bottom neon glow — soft diffused */}
-          <div className="relative -z-10" style={{ height: '16px', overflow: 'visible' }}>
-            <div className="absolute inset-x-[14%] top-0 h-[2px] rounded-full blur-[2px] opacity-75" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.65) 30%, hsl(var(--accent) / 0.45) 50%, hsl(var(--primary) / 0.65) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-            <div className="absolute inset-x-[5%] top-[-2px] h-[9px] rounded-full blur-[10px] opacity-65" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.5) 30%, hsl(var(--accent) / 0.35) 50%, hsl(var(--primary) / 0.5) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-            <div className="absolute inset-x-[10%] top-[-5px] h-[18px] rounded-full blur-[18px] opacity-45" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.3) 30%, hsl(var(--accent) / 0.18) 50%, hsl(var(--primary) / 0.3) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-          </div>
         </div>
       </header>
+      {/* Header glow — rendered outside header to sit behind page content */}
+      <div className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none" style={{ top: 'calc(env(safe-area-inset-top) + 3.5rem)', height: '16px', overflow: 'visible' }}>
+        <div className="absolute inset-x-[14%] top-0 h-[2px] rounded-full blur-[2px] opacity-75" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.65) 30%, hsl(var(--accent) / 0.45) 50%, hsl(var(--primary) / 0.65) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute inset-x-[5%] top-[-2px] h-[9px] rounded-full blur-[10px] opacity-65" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.5) 30%, hsl(var(--accent) / 0.35) 50%, hsl(var(--primary) / 0.5) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute inset-x-[10%] top-[-5px] h-[18px] rounded-full blur-[18px] opacity-45" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.3) 30%, hsl(var(--accent) / 0.18) 50%, hsl(var(--primary) / 0.3) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+      </div>
 
       {/* ======= Desktop Sidebar (unchanged) ======= */}
       <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card border-r border-border/20">
