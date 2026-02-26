@@ -46,7 +46,7 @@ function useGlobalMedals(unitId: string | null) {
 
 export default function Ranking() {
   const { user, profile } = useAuth();
-  const { activeUnitId } = useUnit();
+  const { activeUnitId, activeUnit } = useUnit();
   const { earned, balance, monthlyScore, refetch: refetchPoints } = usePoints();
   const [rankingScope, setRankingScope] = useState<LeaderboardScope>('unit');
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard(rankingScope);
@@ -112,7 +112,7 @@ export default function Ranking() {
                     )}
                   >
                     <AppIcon name="Home" size={12} />
-                    Minha Casa
+                    {activeUnit?.name || 'Minha Unidade'}
                   </button>
                   <button
                     onClick={() => setRankingScope('global')}
