@@ -497,7 +497,7 @@ export function TransactionSheet({
                 />
                 {showSuggestions && !editingTransaction && (
                   <TransactionSuggestions
-                    searchTerm={description}
+                    searchTerm={debouncedDescription}
                     transactions={allTransactions}
                     categories={categories}
                     accounts={accounts}
