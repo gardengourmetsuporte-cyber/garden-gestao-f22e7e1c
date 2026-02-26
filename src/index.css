@@ -242,8 +242,8 @@
 
   .gradient-primary {
     background: linear-gradient(135deg, hsl(0 0% 5%) 0%, hsl(220 20% 8%) 40%, hsl(210 30% 10%) 60%, hsl(0 0% 4%) 100%);
-    background-size: 300% 300%;
-    animation: darkCardShimmer 8s ease-in-out infinite;
+    background-size: 200% 200%;
+    animation: darkCardShimmer 20s ease-in-out infinite;
     color: hsl(0 0% 95%);
     border: 1px solid hsl(0 0% 15%);
     box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
@@ -349,8 +349,8 @@
   .finance-hero-card {
     @apply rounded-2xl overflow-hidden transition-all duration-300;
     background: linear-gradient(135deg, hsl(0 0% 3%) 0%, hsl(220 40% 12%) 25%, hsl(225 55% 20%) 50%, hsl(230 45% 16%) 70%, hsl(220 25% 7%) 100%);
-    background-size: 300% 300%;
-    animation: darkCardShimmer 8s ease-in-out infinite;
+    background-size: 200% 200%;
+    animation: darkCardShimmer 20s ease-in-out infinite;
     color: hsl(0 0% 95%);
     box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
     border: 1px solid hsl(0 0% 15%);
