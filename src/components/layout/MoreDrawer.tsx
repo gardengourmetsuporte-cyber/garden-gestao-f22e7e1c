@@ -137,20 +137,15 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
                       isActive
-                        ? "text-foreground"
+                        ? "text-foreground ring-2 ring-primary bg-primary/10"
                         : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
                     )}
-                    style={isActive ? {
-                      background: `linear-gradient(135deg, ${themeColor}20, ${themeColor}10)`,
-                      boxShadow: `0 0 0 1.5px ${themeColor}40`,
-                    } : undefined}
                   >
                     <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{
-                        background: themeColor,
-                        boxShadow: isActive ? `0 0 6px ${themeColor}80` : 'none',
-                      }}
+                      className={cn(
+                        "w-2 h-2 rounded-full shrink-0",
+                        isActive ? "bg-primary" : "bg-muted-foreground/40"
+                      )}
                     />
                     {unit.name}
                   </button>
