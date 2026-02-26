@@ -223,10 +223,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </div>
           {/* Bottom neon glow — 3-layer animated */}
-          <div className="relative">
-            <div className="h-[1px] mx-[8%]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-            <div className="h-[4px] mx-[3%] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-            <div className="h-[8px] mx-[12%] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+          <div className="relative" style={{ height: '12px' }}>
+            <div className="absolute inset-x-[8%] top-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.9) 25%, hsl(var(--accent) / 0.7) 50%, hsl(var(--primary) / 0.9) 75%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+            <div className="absolute inset-x-[3%] top-0 h-[6px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.6) 25%, hsl(var(--accent) / 0.4) 50%, hsl(var(--primary) / 0.6) 75%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+            <div className="absolute inset-x-[12%] top-0 h-[10px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.4) 25%, hsl(var(--accent) / 0.3) 50%, hsl(var(--primary) / 0.4) 75%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
           </div>
         </div>
       </header>
