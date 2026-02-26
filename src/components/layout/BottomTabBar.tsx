@@ -88,7 +88,6 @@ export function BottomTabBar() {
 
   useEffect(() => {
     updatePill();
-    // Small delay for initial layout
     const t = setTimeout(updatePill, 100);
     window.addEventListener('resize', updatePill);
     return () => { window.removeEventListener('resize', updatePill); clearTimeout(t); };
@@ -106,27 +105,30 @@ export function BottomTabBar() {
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div
-          className="mx-4 mb-3 rounded-[28px] glass-border"
+          className="mx-3 mb-3 rounded-[24px]"
           style={{
-            background: 'hsl(var(--card) / 0.75)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-            boxShadow: 'var(--shadow-floating)',
+            background: 'hsl(220 20% 7% / 0.92)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderTop: '1px solid hsl(0 0% 100% / 0.06)',
+            border: '1px solid hsl(0 0% 100% / 0.08)',
+            boxShadow: '0 -4px 32px hsl(0 0% 0% / 0.4), 0 -1px 8px hsl(0 0% 0% / 0.2)',
           }}
         >
-          <div ref={containerRef} className="flex items-center h-[64px] max-w-lg mx-auto relative">
-            {/* Highlight pill — ref-based positioning */}
+          <div ref={containerRef} className="flex items-center h-[70px] max-w-lg mx-auto relative">
+            {/* Highlight pill */}
             {pillStyle && (
               <div
-                className="absolute nav-highlight-pill rounded-2xl"
+                className="absolute nav-highlight-pill rounded-[14px]"
                 style={{
                   background: 'hsl(var(--primary) / 0.12)',
-                  border: '1px solid hsl(var(--primary) / 0.18)',
+                  border: '1px solid hsl(var(--primary) / 0.2)',
                   width: pillStyle.width,
-                  height: '44px',
+                  height: '42px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   left: pillStyle.left,
+                  willChange: 'left',
                 }}
               />
             )}
@@ -148,15 +150,15 @@ export function BottomTabBar() {
               <button
                 onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
                 className={cn(
-                  "absolute -top-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
+                  "absolute -top-5 w-[55px] h-[55px] rounded-[18px] flex items-center justify-center transition-all duration-300",
                   "hover:scale-105 active:scale-90"
                 )}
                 style={{
-                  background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
-                  boxShadow: '0 4px 16px hsl(var(--primary) / 0.35)',
+                  background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(262 80% 55%))',
+                  boxShadow: '0 8px 24px hsl(262 80% 55% / 0.4), 0 2px 8px hsl(var(--primary) / 0.3)',
                 }}
               >
-                <AppIcon name="Plus" size={26} className="relative z-10 text-primary-foreground" />
+                <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />
               </button>
             </div>
 
@@ -175,11 +177,16 @@ export function BottomTabBar() {
             {/* "Mais" tab */}
             <button
               onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
-              className="flex flex-col items-center justify-center h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground relative z-10"
+              className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
               style={{ width: '20%' }}
             >
-              <AppIcon name="Menu" size={22} />
-              <span className="text-[10px] font-normal">Mais</span>
+              <AppIcon
+                name="Menu"
+                size={22}
+                fill={0}
+                className="text-muted-foreground transition-colors"
+              />
+              <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
             </button>
           </div>
         </div>
@@ -201,15 +208,23 @@ const TabButton = forwardRef<
   return (
     <button
       ref={ref}
-      onClick={onClick}
+      onClick={() => {
+        navigator.vibrate?.(10);
+        onClick();
+      }}
       className={cn(
-        "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+        "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10 active:scale-90",
+        active ? "text-foreground" : "text-muted-foreground"
       )}
       style={{ width: '20%' }}
     >
-      <div className={cn("relative", active && "nav-icon-active")}>
-        <AppIcon name={tab.icon} size={22} />
+      <div className={cn("relative transition-transform duration-300", active && "scale-110")}>
+        <AppIcon
+          name={tab.icon}
+          size={22}
+          fill={active ? 1 : 0}
+          weight={active ? 600 : 400}
+        />
         {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
           <span
             className={cn(
@@ -219,7 +234,7 @@ const TabButton = forwardRef<
             style={{
               background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
               color: moduleStatus.level === 'critical' ? '#fff' : '#000',
-              border: '2px solid hsl(var(--card))',
+              border: '2px solid hsl(220 20% 7%)',
             }}
           >
             {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
