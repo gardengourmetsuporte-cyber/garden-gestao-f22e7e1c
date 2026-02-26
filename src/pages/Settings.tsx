@@ -48,7 +48,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema' },
 ];
 
-const variantBorderColors: Record<string, string> = {
+const variantColors: Record<string, string> = {
   cyan: 'hsl(var(--neon-cyan))',
   green: 'hsl(var(--neon-green))',
   red: 'hsl(var(--neon-red))',
@@ -140,7 +140,7 @@ export default function SettingsPage() {
               <h3 className="section-label mb-2 px-1">{section.label}</h3>
               <div className="space-y-2">
                 {section.items.map((item, index) => {
-                  const borderColor = variantBorderColors[item.variant];
+                  const color = variantColors[item.variant];
                   return (
                     <button
                       key={item.value}
@@ -149,14 +149,12 @@ export default function SettingsPage() {
                         "list-command w-full flex items-center gap-3 p-4 text-left",
                         `animate-slide-up stagger-${index + 1}`
                       )}
-                      style={{ borderLeftColor: borderColor }}
                     >
                       <div
-                        className="icon-glow icon-glow-md shrink-0"
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                         style={{ 
-                          backgroundColor: `${borderColor}12`,
-                          borderColor: `${borderColor}30`,
-                          color: borderColor
+                          backgroundColor: `${color}12`,
+                          color: color
                         }}
                       >
                         <AppIcon name={item.icon} size={20} />

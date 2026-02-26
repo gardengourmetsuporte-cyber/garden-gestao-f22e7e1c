@@ -159,7 +159,7 @@ export default function AlertsPage() {
                   <div
                     key={alert.id}
                     className={cn(
-                      "list-command p-4 border-l-[3px] transition-all animate-slide-up",
+                      "list-command p-4 transition-all animate-slide-up",
                       TYPE_STYLES[alert.type] || TYPE_STYLES.info,
                       !alert.read && "bg-primary/[0.03]"
                     )}
