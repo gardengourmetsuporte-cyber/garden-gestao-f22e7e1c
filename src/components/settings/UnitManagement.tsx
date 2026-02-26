@@ -464,22 +464,22 @@ export function UnitManagement() {
       <div className="space-y-2">
         {units.map(unit => (
           <div key={unit.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <Building2 className="w-5 h-5 text-primary" />
               </div>
-              <div>
-                <span className="font-medium block">{unit.name}</span>
+              <div className="min-w-0">
+                <span className="font-medium block truncate">{unit.name}</span>
                 <span className="text-xs text-muted-foreground">{unit.slug}</span>
               </div>
               {!unit.is_active && <Badge variant="secondary" className="text-xs">Inativa</Badge>}
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
               {units.length > 1 && (
                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => { setDeletingUnit(unit); setDeleteConfirmOpen(true); }} title="Excluir">
                   <Trash2 className="w-4 h-4" />
                 </Button>
               )}
-            </div>
-            <div className="flex items-center gap-1">
               <Button variant="ghost" size="icon" onClick={() => openCloneSheet(unit)} title="Copiar templates">
                 <Copy className="w-4 h-4" />
               </Button>
