@@ -28,7 +28,7 @@ export function FinanceChartWidget() {
 
   if (isLoading) {
     return (
-      <div className="card-surface col-span-2 p-5 animate-slide-up stagger-2">
+      <div className="card-surface w-full p-5 animate-slide-up stagger-2">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-secondary/60 relative overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -61,7 +61,7 @@ export function FinanceChartWidget() {
   return (
     <button
       onClick={() => navigate('/finance', { state: { tab: 'charts' } })}
-      className="card-command col-span-2 p-0 text-left animate-slide-up stagger-2 transition-all duration-200 hover:scale-[1.005] active:scale-[0.98] overflow-hidden relative"
+      className="card-command w-full p-0 text-left animate-slide-up stagger-2 transition-all duration-200 hover:scale-[1.005] active:scale-[0.98] overflow-hidden relative"
     >
       {/* Decorative glow */}
       <div
