@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useBudgets } from '@/hooks/useBudgets';
-import { useFinance } from '@/hooks/useFinance';
-import { FinanceCategory } from '@/types/finance';
+import { FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { CashFlowProjection } from './CashFlowProjection';
 
@@ -15,13 +14,14 @@ interface FinancePlanningProps {
   selectedMonth: Date;
   onMonthChange: (date: Date) => void;
   totalBalance?: number;
+  categories: FinanceCategory[];
+  transactions: FinanceTransaction[];
 }
 
-export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0 }: FinancePlanningProps) {
+export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0, categories, transactions }: FinancePlanningProps) {
   const month = selectedMonth.getMonth() + 1;
   const year = selectedMonth.getFullYear();
   const { budgets, isLoading: budgetsLoading, upsertBudget, deleteBudget } = useBudgets(month, year);
-  const { categories, transactions } = useFinance(selectedMonth);
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<FinanceCategory | null>(null);
@@ -226,7 +226,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
 
 
       {/* Cash Flow Projection */}
-      <div className="pb-4">
+      <div className="pb-32">
         <CashFlowProjection totalBalance={totalBalance} />
       </div>
 

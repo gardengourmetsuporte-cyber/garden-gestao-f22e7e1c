@@ -52,19 +52,24 @@ function _initSeen() {
   } catch {}
 }
 
+let _persistTimeout: ReturnType<typeof setTimeout> | null = null;
+
 function _persistSeen() {
-  try {
-    const data: Record<string, number> = {};
-    _seenIds.forEach(id => { data[id] = Date.now(); });
-    localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(data));
-  } catch {}
+  if (_persistTimeout) clearTimeout(_persistTimeout);
+  _persistTimeout = setTimeout(() => {
+    try {
+      const data: Record<string, number> = {};
+      _seenIds.forEach(id => { data[id] = Date.now(); });
+      localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(data));
+    } catch {}
+  }, 2000);
 }
 
 function markSeenGlobal(id: string): boolean {
   if (_seenIds.has(id)) return false;
   _seenIds.add(id);
   _persistSeen();
-  return true; // changed
+  return true;
 }
 
 function isSeenGlobal(id: string): boolean {
@@ -311,7 +316,7 @@ export function FinanceTransactions({
             onDragStart={() => { try { navigator.vibrate?.(50); } catch {} }}
             onDragEnd={handleDragEnd}
           >
-            <div className="px-4 pb-24 space-y-4">
+            <div className="px-4 pb-32 space-y-4">
               {sortedDates.map(dateStr => {
                 const transactions = filteredTransactionsByDate[dateStr];
                 const dayTotal = transactions.reduce((sum, t) => {
@@ -356,10 +361,7 @@ export function FinanceTransactions({
                                   transaction={transaction}
                                   isNew={isNewTransaction(transaction)}
                                   onClick={() => {
-                                    if (isNewTransaction(transaction)) {
-                                      markSeen(transaction.id);
-                                      return;
-                                    }
+                                    markSeen(transaction.id);
                                     onTransactionClick(transaction);
                                   }}
                                   onTogglePaid={async (id, isPaid) => {
