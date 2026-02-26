@@ -159,7 +159,7 @@ export function ChecklistSettingsManager() {
           className={cn(
             "flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all",
             selectedType === 'fechamento' 
-              ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400" 
+              ? "border-primary bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary" 
               : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
           )}
         >

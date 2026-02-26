@@ -12,7 +12,7 @@ const ACTION_ICONS: Record<string, { icon: string; bg: string; text: string }> =
   transaction_deleted: { icon: 'Trash2', bg: 'bg-red-500/12', text: 'text-red-600 dark:text-red-400' },
   cash_closing_created: { icon: 'Receipt', bg: 'bg-amber-500/12', text: 'text-amber-600 dark:text-amber-400' },
   cash_closing_updated: { icon: 'RefreshCw', bg: 'bg-amber-500/12', text: 'text-amber-600 dark:text-amber-400' },
-  checklist_completed: { icon: 'CheckCircle', bg: 'bg-violet-500/12', text: 'text-violet-600 dark:text-violet-400' },
+  checklist_completed: { icon: 'CheckCircle', bg: 'bg-primary/12', text: 'text-primary' },
 };
 
 export function AuditLogSettings() {

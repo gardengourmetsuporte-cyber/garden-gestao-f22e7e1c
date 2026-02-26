@@ -176,7 +176,7 @@ export function ChecklistDashboardWidget() {
                       ? "bg-success"
                       : card.type === 'abertura'
                         ? "bg-orange-500"
-                        : "bg-violet-500"
+                        : "bg-primary"
                 )}
                 style={{ width: `${card.progress.percent}%` }}
               />

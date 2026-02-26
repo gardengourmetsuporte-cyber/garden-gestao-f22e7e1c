@@ -257,7 +257,7 @@ interface SubRecipeItem {
                               )}
                             >
                               <div className="flex items-center gap-2">
-                                <Soup className="h-4 w-4 text-purple-500" />
+                                <Soup className="h-4 w-4 text-accent" />
                                 <span className="font-medium">{recipe.name}</span>
                               </div>
                               <span className="text-sm text-muted-foreground">
