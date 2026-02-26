@@ -1,39 +1,18 @@
 
 
 ## Problema
-Os ícones dos setores (Cozinha, Salão, Caixa, Banheiros) usam um fundo colorido sólido (círculo/quadrado) com ícone branco dentro — visual pesado e "infantil" para a estética premium Atlas.
+Os botões de Receita, Despesa e Transferência no menu FAB do financeiro estão com aparência opaca. O fundo `card-glass` (60% de opacidade + blur) sobre o overlay escuro dilui visualmente as cores dos ícones.
 
-## Proposta: Ícone monocromático com indicador lateral de cor
+## Solução
+Tornar os containers dos ícones mais opacos e dar mais destaque às cores, além de aumentar o `fill` dos ícones para ficarem preenchidos (sólidos) em vez de contornados.
 
-Trocar o círculo colorido por um layout mais refinado, inspirado no Linear/Mercury:
+## Alterações
 
-```text
-┌──────────────────────────────────────────┐
-│ ┃  🍳  Cozinha                    ── ▸  │
-│ ┃      0/23 concluídos                   │
-└──────────────────────────────────────────┘
-```
-
-**Abordagem:** Remover o fundo colorido do ícone. Em vez disso:
-1. **Ícone monocromático** (`text-muted-foreground`) usando `AppIcon` (Material Symbols) — elegante e leve
-2. **Barra lateral fina** (3px, `rounded-full`) com a cor do setor no lado esquerdo do card — indicador sutil de identidade
-3. Quando o setor estiver **100% completo**, o ícone vira um check verde e a barra lateral fica verde
-
-## Mudanças técnicas
-
-### `src/components/checklists/ChecklistView.tsx`
-- Remover o `iconMap` de Lucide (linhas 61-67) e usar `AppIcon` com mapeamento via `iconMap.ts`
-- Remover o `div` com `backgroundColor: sector.color` (linhas 277-289)
-- Substituir por:
-  - Uma `div` de barra lateral (3px width, height full, `rounded-full`, `backgroundColor: sector.color`)
-  - Um `AppIcon` com `fill={0}` (outlined), `text-muted-foreground`, sem fundo
-- Quando completo: ícone `check_circle` verde, barra lateral verde
-
-### `src/components/checklists/ChecklistSettings.tsx`
-- Atualizar o preview do setor na tela de configurações para refletir o mesmo estilo (barra lateral + ícone outlined)
-
-## Resultado visual
-- Visual limpo, minimalista, premium
-- A cor do setor aparece como detalhe sutil (barra lateral), não como bloco pesado
-- Consistente com a estética Linear/Mercury do Atlas
+### `src/components/finance/FinanceBottomNav.tsx`
+1. Trocar o fundo dos 3 botões de `card-glass` para um fundo sólido com leve tint da cor correspondente:
+   - Receita: `bg-[hsl(var(--color-income)/0.15)]` com borda `border border-[hsl(var(--color-income)/0.3)]`
+   - Despesa: `bg-[hsl(var(--color-expense)/0.15)]` com borda `border border-[hsl(var(--color-expense)/0.3)]`
+   - Transferência: `bg-[hsl(var(--color-transfer)/0.15)]` com borda `border border-[hsl(var(--color-transfer)/0.3)]`
+2. Adicionar `fill={1}` nos `AppIcon` para que fiquem preenchidos e visualmente mais vibrantes
+3. Manter o `boxShadow` glow existente para cada cor
 
