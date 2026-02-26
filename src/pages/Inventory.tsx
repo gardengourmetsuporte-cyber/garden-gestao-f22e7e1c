@@ -231,7 +231,7 @@ export default function InventoryPage() {
                         >
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: categoryColor }} />
-                            <span className="font-semibold text-foreground">{categoryName}</span>
+                            <span className="font-semibold text-foreground font-display">{categoryName}</span>
                             <span className="text-sm text-muted-foreground">({categoryItems.length})</span>
                           </div>
                           <AppIcon

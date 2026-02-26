@@ -72,14 +72,14 @@ export default function Profile() {
 
 
         {/* Score do Mês - Card em destaque */}
-        <div className="card-command p-4 space-y-3" style={{ borderColor: 'hsl(var(--warning) / 0.3)' }}>
+        <div className="card-surface p-4 space-y-3" style={{ borderColor: 'hsl(var(--warning) / 0.3)' }}>
           <div className="flex items-center gap-2 mb-1">
             <AppIcon name="Trophy" size={16} className="text-warning" />
-            <h3 className="font-semibold text-sm text-warning">Score do Mês</h3>
+            <h3 className="font-bold text-sm text-warning font-display" style={{ letterSpacing: '-0.02em' }}>Score do Mês</h3>
           </div>
           <div className="flex items-center justify-center gap-2 py-2">
             <AppIcon name="Flame" size={24} className="text-warning" />
-            <span className="text-3xl font-bold text-foreground">{formatPoints(profile.monthlyScore)}</span>
+            <span className="text-3xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{formatPoints(profile.monthlyScore)}</span>
             <span className="text-sm text-muted-foreground">pts</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -132,10 +132,10 @@ export default function Profile() {
         )}
 
         {/* Histórico Total - Card secundário */}
-        <div className="card-command p-4 space-y-3">
+        <div className="card-surface p-4 space-y-3">
           <div className="flex items-center gap-2 mb-1">
             <AppIcon name="Star" size={16} className="text-muted-foreground" />
-            <h3 className="font-semibold text-sm text-muted-foreground">Histórico Total</h3>
+            <h3 className="font-bold text-sm text-muted-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Histórico Total</h3>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center">
@@ -164,12 +164,12 @@ export default function Profile() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="stat-command text-center">
-            <p className="text-2xl font-bold text-foreground">{profile.totalCompletions}</p>
+          <div className="card-surface text-center p-4">
+            <p className="text-2xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{profile.totalCompletions}</p>
             <p className="text-xs text-muted-foreground">Tarefas completas</p>
           </div>
-          <div className="stat-command text-center">
-            <p className="text-2xl font-bold text-foreground">{profile.totalRedemptions}</p>
+          <div className="card-surface text-center p-4">
+            <p className="text-2xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{profile.totalRedemptions}</p>
             <p className="text-xs text-muted-foreground">Resgates feitos</p>
           </div>
         </div>
