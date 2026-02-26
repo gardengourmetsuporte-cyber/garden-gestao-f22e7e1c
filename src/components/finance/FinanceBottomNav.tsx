@@ -84,14 +84,14 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
         className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60]"
       >
         {/* Top neon glow line */}
-        <div className="absolute top-0 left-[10%] right-[10%] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.8), hsl(262 80% 60% / 0.6), hsl(var(--primary) / 0.8), transparent)' }} />
-        <div className="absolute -top-[1px] left-[5%] right-[5%] h-[3px] blur-[4px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), hsl(262 80% 60% / 0.4), hsl(var(--primary) / 0.5), transparent)' }} />
-        <div className="absolute -top-[2px] left-[15%] right-[15%] h-[6px] blur-[8px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), hsl(262 80% 60% / 0.2), hsl(var(--primary) / 0.3), transparent)' }} />
+        <div className="absolute top-0 left-[8%] right-[8%] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)' }} />
+        <div className="absolute -top-[1px] left-[3%] right-[3%] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)' }} />
+        <div className="absolute -top-[3px] left-[12%] right-[12%] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)' }} />
 
         <div
           className="relative"
           style={{
-            background: 'hsl(225 30% 6%)',
+            background: 'hsl(var(--background))',
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
@@ -120,10 +120,12 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                 onClick={() => { navigator.vibrate?.(10); onTabChange(tab.id); }}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
-                  activeTab === tab.id ? "text-foreground" : "text-muted-foreground"
+                  activeTab === tab.id ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                <div className={cn("transition-transform duration-300", activeTab === tab.id && "scale-110")}>
+                <div className={cn("transition-transform duration-300", activeTab === tab.id && "scale-110")}
+                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : undefined}
+                >
                   <AppIcon name={tab.icon} size={22} fill={activeTab === tab.id ? 1 : 0} weight={activeTab === tab.id ? 600 : 400} />
                 </div>
                 <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal")}>{tab.label}</span>
@@ -134,16 +136,16 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
-                  "absolute -top-7 w-[54px] h-[54px] rounded-[16px] flex items-center justify-center transition-all duration-300",
+                  "absolute -top-7 w-[56px] h-[56px] rounded-full flex items-center justify-center transition-all duration-300",
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-105 active:scale-90"
                 )}
                 style={{
                   background: variant === 'personal'
                     ? 'linear-gradient(135deg, hsl(160 60% 45%), hsl(160 60% 35%))'
-                    : 'linear-gradient(135deg, hsl(var(--primary)), hsl(262 80% 55%))',
+                    : 'var(--gradient-brand)',
                   boxShadow: variant === 'personal'
-                    ? '0 0 20px hsl(160 60% 45% / 0.5), 0 4px 12px hsl(0 0% 0% / 0.5)'
-                    : '0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(262 80% 55% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
+                    ? '0 0 24px hsl(160 60% 45% / 0.5), 0 4px 12px hsl(0 0% 0% / 0.5)'
+                    : '0 0 24px hsl(220 85% 58% / 0.5), 0 0 48px hsl(262 70% 55% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
                 }}
               >
                 <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />
@@ -157,10 +159,12 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                 onClick={() => { navigator.vibrate?.(10); onTabChange(tab.id); }}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
-                  activeTab === tab.id ? "text-foreground" : "text-muted-foreground"
+                  activeTab === tab.id ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                <div className={cn("transition-transform duration-300", activeTab === tab.id && "scale-110")}>
+                <div className={cn("transition-transform duration-300", activeTab === tab.id && "scale-110")}
+                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : undefined}
+                >
                   <AppIcon name={tab.icon} size={22} fill={activeTab === tab.id ? 1 : 0} weight={activeTab === tab.id ? 600 : 400} />
                 </div>
                 <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal")}>{tab.label}</span>
