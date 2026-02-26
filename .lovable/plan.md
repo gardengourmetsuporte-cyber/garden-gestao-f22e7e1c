@@ -1,18 +1,31 @@
 
 
 ## Problema
+O dashboard do funcionário está visualmente desalinhado do padrão premium do app: ícones azuis chapados, layout genérico, cards sem gradientes, e a disposição não é útil nem bonita.
 
-Os ícones na tela de histórico de movimentações estão quebrados, mostrando texto "IRCLEDOWN" / "IRCLEUP" em vez dos ícones corretos. A causa é que o componente `MovementHistoryNew.tsx` usa nomes de ícone `ArrowCircleDown` e `ArrowCircleUp`, mas o mapa de ícones (`iconMap.ts`) registra apenas `ArrowDownCircle` e `ArrowUpCircle`.
+## Correções
 
-## Correção
+### 1. Hero Card do Funcionário (substituir welcome plain)
+- Substituir o `card-surface` de boas-vindas por um hero card com classe `gradient-primary` (mesmo estilo do card financeiro do admin), exibindo:
+  - Saudação dinâmica (Bom dia/Boa tarde/Boa noite) + nome
+  - Score mensal em destaque grande
+  - Posição no ranking como badge discreto
+  - Data atual formatada
 
-**Arquivo:** `src/components/inventory/MovementHistoryNew.tsx`
+### 2. Quick Links modernizados
+- Substituir os ícones `bg-primary/10 text-primary` por ícones com fundo `bg-secondary` e usar cores contextuais por módulo (laranja para checklists, verde para estoque, etc.)
+- Reduzir para um layout mais compacto horizontal com ícones menores e labels condensados
+- Usar Material Symbols com `fill=1` nos ícones dos quick links para visual sólido
 
-Trocar os nomes dos ícones nas linhas 99 e 139:
-- `ArrowCircleDown` → `ArrowDownCircle`  
-- `ArrowCircleUp` → `ArrowUpCircle`
-- `Progress_activity` → `progress_activity` (Material Symbol direto, já funciona mas padronizar)
-- `Delete` → `Trash2` (usar o alias correto do mapa)
+### 3. MyRankCard integrado ao hero
+- Mover as informações de pontos (Base, Bônus, Saldo) do MyRankCard para dentro do hero card como uma row de stats (similar ao `UserPointsCard`)
+- Manter o avatar com rank frame e a barra de progresso para próximo elo logo abaixo do hero
+- Eliminar card separado redundante
 
-São correções de 4 strings — sem mudança estrutural.
+### 4. Seção de Ranking simplificada
+- Manter as tabs (Ranking/Elos/Medalhas) e o scope toggle como estão - já seguem o padrão
+- Remover animação `spring-stagger-3` duplicada (aparece 2x)
+
+### Arquivos editados
+- `src/components/dashboard/EmployeeDashboard.tsx` — reestruturar layout completo
 
