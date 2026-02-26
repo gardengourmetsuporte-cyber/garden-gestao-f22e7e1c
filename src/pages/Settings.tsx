@@ -133,39 +133,21 @@ export default function SettingsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
 
-        <div className="px-4 py-3 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-6">
           {sections.map((section) => (
             <div key={section.label}>
-              <h3 className="section-label mb-2 px-1">{section.label}</h3>
-              <div className="space-y-2">
-                {section.items.map((item, index) => {
-                  const color = variantColors[item.variant];
-                  return (
-                    <button
-                      key={item.value}
-                      onClick={() => handleSectionClick(item.value)}
-                      className={cn(
-                        "list-command w-full flex items-center gap-3 p-4 text-left",
-                        `animate-slide-up stagger-${index + 1}`
-                      )}
-                    >
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ 
-                          backgroundColor: `${color}12`,
-                          color: color
-                        }}
-                      >
-                        <AppIcon name={item.icon} size={20} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-semibold font-display text-sm block">{item.label}</span>
-                        <span className="text-[11px] text-muted-foreground">{item.description}</span>
-                      </div>
-                      <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-                    </button>
-                  );
-                })}
+              <h3 className="section-label mb-1 px-1">{section.label}</h3>
+              <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
+                {section.items.map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => handleSectionClick(item.value)}
+                    className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
+                  >
+                    <span className="font-medium text-sm text-foreground">{item.label}</span>
+                    <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+                  </button>
+                ))}
               </div>
             </div>
           ))}
