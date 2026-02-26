@@ -70,40 +70,40 @@ export default function Profile() {
           {/* Score do Mês - Hero Card */}
           <div className="gradient-primary rounded-2xl p-5 space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'hsl(38 92% 50% / 0.12)' }}>
-                <AppIcon name="Trophy" size={18} className="text-[hsl(38_80%_40%)]" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-500/15">
+                <AppIcon name="Trophy" size={18} className="text-amber-400" />
               </div>
-              <h3 className="font-bold text-sm text-[hsl(234_20%_25%)] font-display" style={{ letterSpacing: '-0.02em' }}>
+              <h3 className="font-bold text-sm text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
                 Score do Mês
               </h3>
             </div>
 
             <div className="flex items-center justify-center gap-2 py-1">
-              <AppIcon name="Flame" size={28} className="text-[hsl(38_80%_40%)]" />
-              <span className="text-4xl font-extrabold text-[hsl(234_20%_15%)] font-display" style={{ letterSpacing: '-0.03em' }}>
+              <AppIcon name="Flame" size={28} className="text-amber-400" />
+              <span className="text-4xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
                 {formatPoints(profile.monthlyScore)}
               </span>
-              <span className="text-sm text-[hsl(234_20%_50%)]">pts</span>
+              <span className="text-sm text-muted-foreground">pts</span>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-3 rounded-xl bg-white/60 border border-[hsl(142_40%_60%/0.2)]">
-                <AppIcon name="TrendingUp" size={16} className="mx-auto mb-1 text-[hsl(142_60%_35%)]" />
-                <p className="text-lg font-bold text-[hsl(234_20%_15%)]">{formatPoints(profile.monthlyBase)}</p>
-                <p className="text-[10px] text-[hsl(234_20%_45%)]">Base Mensal</p>
+              <div className="text-center p-3 rounded-xl bg-secondary/40">
+                <AppIcon name="TrendingUp" size={16} className="mx-auto mb-1 text-emerald-400" />
+                <p className="text-lg font-bold text-foreground">{formatPoints(profile.monthlyBase)}</p>
+                <p className="text-[10px] text-muted-foreground">Base Mensal</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-white/60 border border-[hsl(38_80%_60%/0.2)]">
-                <AppIcon name="Flame" size={16} className="mx-auto mb-1 text-[hsl(38_80%_40%)]" />
-                <p className="text-lg font-bold text-[hsl(38_80%_35%)]">{formatPoints(profile.monthlyBonus)}</p>
-                <p className="text-[10px] text-[hsl(234_20%_45%)]">Bônus Mensal</p>
+              <div className="text-center p-3 rounded-xl bg-secondary/40">
+                <AppIcon name="Flame" size={16} className="mx-auto mb-1 text-amber-400" />
+                <p className="text-lg font-bold text-amber-400">{formatPoints(profile.monthlyBonus)}</p>
+                <p className="text-[10px] text-muted-foreground">Bônus Mensal</p>
               </div>
             </div>
 
             {profile.leaderboardRank && (
-              <div className="flex items-center justify-center gap-2 pt-3 border-t border-[hsl(234_30%_80%/0.3)]">
-                <AppIcon name="Trophy" size={16} className="text-[hsl(38_80%_40%)]" />
-                <span className="text-sm text-[hsl(234_20%_40%)]">
-                  Posição <span className="font-bold text-[hsl(234_20%_15%)]">#{profile.leaderboardRank}</span> no ranking
+              <div className="flex items-center justify-center gap-2 pt-3 border-t border-secondary/30">
+                <AppIcon name="Trophy" size={16} className="text-amber-400" />
+                <span className="text-sm text-muted-foreground">
+                  Posição <span className="font-bold text-foreground">#{profile.leaderboardRank}</span> no ranking
                 </span>
               </div>
             )}
