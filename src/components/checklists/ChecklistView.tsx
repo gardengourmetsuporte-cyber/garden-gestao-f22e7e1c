@@ -20,7 +20,8 @@ import {
   X,
   Zap,
   AlertTriangle,
-  Send
+  Send,
+  Undo2
 } from 'lucide-react';
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -343,22 +344,30 @@ export function ChecklistView({
                         <div key={item.id} className="space-y-1.5">
                           <button
                             onClick={() => {
-                              if (isContested) return; // contested items are not untoggable
+                              if (isContested) return;
+                              if (isAdmin) {
+                                // Admin: open inline panel instead of direct uncheck
+                                setOpenPopover(openPopover === item.id ? null : item.id);
+                                setContestingItemId(null);
+                                setContestReason('');
+                                return;
+                              }
                               if (!canToggle) return;
                               setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                               onToggleItem(item.id, 0);
                             }}
-                            disabled={!canToggle || isContested}
+                            disabled={isContested ? true : isAdmin ? false : !canToggle}
                             className={cn(
                               "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
                               isContested
                                 ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
-                                : !canToggle && "cursor-not-allowed opacity-80",
-                              !isContested && canToggle && "active:scale-[0.97] hover:shadow-md",
+                                : !canToggle && !isAdmin && "cursor-not-allowed opacity-80",
+                              !isContested && (canToggle || isAdmin) && "active:scale-[0.97] hover:shadow-md",
                               !isContested && wasSkipped
                                 ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
                                 : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
-                              isJustCompleted && "animate-scale-in"
+                              isJustCompleted && "animate-scale-in",
+                              openPopover === item.id && !isContested && "ring-2 ring-primary/30"
                             )}
                             style={{ animationDelay: `${itemIndex * 40}ms` }}
                           >
@@ -406,42 +415,77 @@ export function ChecklistView({
                                 : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
                             </div>
                           </button>
-                          {/* Admin contest button */}
-                          {isAdmin && !isContested && !wasSkipped && completion && (
-                            <>
-                              {contestingItemId === item.id ? (
-                                <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in">
-                                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-                                  <input
-                                    type="text"
-                                    value={contestReason}
-                                    onChange={(e) => setContestReason(e.target.value)}
-                                    placeholder="Motivo da contestação..."
-                                    className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
-                                    autoFocus
-                                    onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
-                                  />
-                                  <button
-                                    onClick={() => handleContest(completion.id)}
-                                    disabled={!contestReason.trim() || contestLoading}
-                                    className="p-1.5 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
-                                  >
-                                    <Send className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-                                    <X className="w-3.5 h-3.5 text-muted-foreground" />
-                                  </button>
-                                </div>
-                              ) : (
+                          {/* Admin inline panel for completed items */}
+                          {isAdmin && openPopover === item.id && !isContested && completion && (
+                            <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
+                              {/* Desmarcar */}
+                              {canToggle && (
                                 <button
-                                  onClick={(e) => { e.stopPropagation(); setContestingItemId(item.id); setContestReason(''); }}
-                                  className="w-full flex items-center justify-center gap-1.5 p-2 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                                  onClick={() => {
+                                    setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                                    onToggleItem(item.id, 0);
+                                    setOpenPopover(null);
+                                  }}
+                                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                 >
-                                  <AlertTriangle className="w-3.5 h-3.5" />
-                                  <span>Contestar</span>
+                                  <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                    <Undo2 className="w-5 h-5 text-muted-foreground" />
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-foreground">Desmarcar item</p>
+                                    <p className="text-xs text-muted-foreground">Reverter a conclusão</p>
+                                  </div>
                                 </button>
                               )}
-                            </>
+                              {/* Contestar */}
+                              {!wasSkipped && (
+                                <>
+                                  <div className="border-t border-border" />
+                                  {contestingItemId === item.id ? (
+                                    <div className="space-y-2 animate-fade-in">
+                                      <div className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
+                                        <AlertTriangle className="w-4 h-4" />
+                                        <span>Motivo da contestação</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <input
+                                          type="text"
+                                          value={contestReason}
+                                          onChange={(e) => setContestReason(e.target.value)}
+                                          placeholder="Descreva o motivo..."
+                                          className="flex-1 bg-transparent border border-amber-500/30 rounded-lg px-3 py-2 outline-none text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-amber-500/30"
+                                          autoFocus
+                                          onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
+                                        />
+                                        <button
+                                          onClick={() => handleContest(completion.id)}
+                                          disabled={!contestReason.trim() || contestLoading}
+                                          className="p-2 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
+                                        >
+                                          <Send className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                                          <X className="w-4 h-4 text-muted-foreground" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => { setContestingItemId(item.id); setContestReason(''); }}
+                                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]"
+                                    >
+                                      <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center">
+                                        <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-amber-600 dark:text-amber-400">Contestar</p>
+                                        <p className="text-xs text-muted-foreground">Registrar que não foi feito</p>
+                                      </div>
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           )}
                         </div>
                       );
@@ -611,21 +655,28 @@ export function ChecklistView({
                                   <button
                                     onClick={() => {
                                       if (isContested) return;
+                                      if (isAdmin) {
+                                        setOpenPopover(openPopover === item.id ? null : item.id);
+                                        setContestingItemId(null);
+                                        setContestReason('');
+                                        return;
+                                      }
                                       if (!canToggle) return;
                                       setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                       onToggleItem(item.id, 0);
                                     }}
-                                    disabled={!canToggle || isContested}
+                                    disabled={isContested ? true : isAdmin ? false : !canToggle}
                                     className={cn(
                                       "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
                                       isContested
                                         ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
-                                        : !canToggle && "cursor-not-allowed opacity-80",
-                                      !isContested && canToggle && "active:scale-[0.97] hover:shadow-md",
+                                        : !canToggle && !isAdmin && "cursor-not-allowed opacity-80",
+                                      !isContested && (canToggle || isAdmin) && "active:scale-[0.97] hover:shadow-md",
                                       !isContested && wasSkipped
                                         ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
                                         : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
-                                      isJustCompleted && "animate-scale-in"
+                                      isJustCompleted && "animate-scale-in",
+                                      openPopover === item.id && !isContested && "ring-2 ring-primary/30"
                                     )}
                                     style={{ animationDelay: `${itemIndex * 40}ms` }}
                                   >
@@ -680,42 +731,75 @@ export function ChecklistView({
                                           </div>)}
                                     </div>
                                   </button>
-                                  {/* Admin contest button */}
-                                  {isAdmin && !isContested && !wasSkipped && completion && (
-                                    <>
-                                      {contestingItemId === item.id ? (
-                                        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-fade-in">
-                                          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-                                          <input
-                                            type="text"
-                                            value={contestReason}
-                                            onChange={(e) => setContestReason(e.target.value)}
-                                            placeholder="Motivo da contestação..."
-                                            className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
-                                            autoFocus
-                                            onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
-                                          />
-                                          <button
-                                            onClick={() => handleContest(completion.id)}
-                                            disabled={!contestReason.trim() || contestLoading}
-                                            className="p-1.5 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
-                                          >
-                                            <Send className="w-3.5 h-3.5" />
-                                          </button>
-                                          <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-                                            <X className="w-3.5 h-3.5 text-muted-foreground" />
-                                          </button>
-                                        </div>
-                                      ) : (
+                                  {/* Admin inline panel for completed items */}
+                                  {isAdmin && openPopover === item.id && !isContested && completion && (
+                                    <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
+                                      {canToggle && (
                                         <button
-                                          onClick={(e) => { e.stopPropagation(); setContestingItemId(item.id); setContestReason(''); }}
-                                          className="w-full flex items-center justify-center gap-1.5 p-2 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                                          onClick={() => {
+                                            setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                                            onToggleItem(item.id, 0);
+                                            setOpenPopover(null);
+                                          }}
+                                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                         >
-                                          <AlertTriangle className="w-3.5 h-3.5" />
-                                          <span>Contestar</span>
+                                          <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                            <Undo2 className="w-5 h-5 text-muted-foreground" />
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-foreground">Desmarcar item</p>
+                                            <p className="text-xs text-muted-foreground">Reverter a conclusão</p>
+                                          </div>
                                         </button>
                                       )}
-                                    </>
+                                      {!wasSkipped && (
+                                        <>
+                                          <div className="border-t border-border" />
+                                          {contestingItemId === item.id ? (
+                                            <div className="space-y-2 animate-fade-in">
+                                              <div className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
+                                                <AlertTriangle className="w-4 h-4" />
+                                                <span>Motivo da contestação</span>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <input
+                                                  type="text"
+                                                  value={contestReason}
+                                                  onChange={(e) => setContestReason(e.target.value)}
+                                                  placeholder="Descreva o motivo..."
+                                                  className="flex-1 bg-transparent border border-amber-500/30 rounded-lg px-3 py-2 outline-none text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-amber-500/30"
+                                                  autoFocus
+                                                  onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
+                                                />
+                                                <button
+                                                  onClick={() => handleContest(completion.id)}
+                                                  disabled={!contestReason.trim() || contestLoading}
+                                                  className="p-2 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
+                                                >
+                                                  <Send className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                                                  <X className="w-4 h-4 text-muted-foreground" />
+                                                </button>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <button
+                                              onClick={() => { setContestingItemId(item.id); setContestReason(''); }}
+                                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]"
+                                            >
+                                              <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center">
+                                                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                              </div>
+                                              <div>
+                                                <p className="font-semibold text-amber-600 dark:text-amber-400">Contestar</p>
+                                                <p className="text-xs text-muted-foreground">Registrar que não foi feito</p>
+                                              </div>
+                                            </button>
+                                          )}
+                                        </>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               );
