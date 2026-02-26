@@ -345,7 +345,7 @@ export default function ChecklistsPage() {
                         checklistType === 'abertura' ? "text-amber-400" : "text-muted-foreground"
                       )} />
                     </div>
-                    <h3 className="text-base font-bold text-foreground">Abertura</h3>
+                    <h3 className="text-base font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
                   </div>
                   {/* Progress bar + percentage */}
                   <div className="space-y-1.5">
@@ -407,7 +407,7 @@ export default function ChecklistsPage() {
                         checklistType === 'fechamento' ? "text-violet-400" : "text-muted-foreground"
                       )} />
                     </div>
-                    <h3 className="text-base font-bold text-foreground">Fechamento</h3>
+                    <h3 className="text-base font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
                   </div>
                   {/* Progress bar + percentage */}
                   <div className="space-y-1.5">
@@ -479,7 +479,7 @@ export default function ChecklistsPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-black text-foreground">Bônus</h3>
+                      <h3 className="text-base font-black text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-emerald-400" style={{ background: 'hsl(160 84% 39% / 0.12)' }}>
                         Extra pts
                       </span>

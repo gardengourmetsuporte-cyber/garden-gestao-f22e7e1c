@@ -42,18 +42,18 @@ export function StatsCard({ title, value, icon, variant = 'default', onClick }: 
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left p-3 rounded-xl bg-card/60 backdrop-blur-sm border transition-all duration-200",
+        "w-full text-left p-3 rounded-xl card-surface transition-all duration-200",
         "hover:bg-card/90 active:scale-[0.97]",
         styles.border
       )}
     >
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-medium text-muted-foreground leading-tight">{title}</p>
+        <p className="text-[11px] font-medium text-muted-foreground leading-tight uppercase tracking-wide">{title}</p>
         <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", styles.iconBg)}>
           <AppIcon name={icon} size={16} className={styles.iconColor} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-foreground">{numericValue !== null ? animatedValue : value}</p>
+      <p className="text-2xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{numericValue !== null ? animatedValue : value}</p>
     </button>
   );
 }
