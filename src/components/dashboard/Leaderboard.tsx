@@ -52,7 +52,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
       <div className="card-surface p-4">
         <div className="flex items-center gap-2 mb-3">
           <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
-          <h3 className="font-semibold text-sm text-foreground">Ranking Mensal</h3>
+          <h3 className="font-bold text-sm text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Ranking Mensal</h3>
         </div>
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
@@ -68,7 +68,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
-          <h3 className="font-semibold text-sm text-foreground">Ranking Mensal</h3>
+          <h3 className="font-bold text-sm text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Ranking Mensal</h3>
           {onRefresh && (
             <button
               onClick={onRefresh}

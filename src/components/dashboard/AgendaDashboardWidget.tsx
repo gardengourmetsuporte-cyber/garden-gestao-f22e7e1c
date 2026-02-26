@@ -129,7 +129,7 @@ export function AgendaDashboardWidget() {
               <AppIcon name="CalendarDays" size={18} className="text-primary" />
             </div>
             <div>
-              <span className="text-sm font-bold text-foreground">Agenda</span>
+              <span className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Agenda</span>
               <span className="text-[10px] text-muted-foreground block">Tarefas de hoje</span>
             </div>
           </button>
