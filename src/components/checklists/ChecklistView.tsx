@@ -55,7 +55,27 @@ const isToday = (dateStr: string): boolean => {
   return false;
 };
 
-// Icon resolved via AppIcon + ICON_MAP (Material Symbols)
+// Fallback icon based on sector name when icon field is null
+const sectorNameIconMap: Record<string, string> = {
+  'cozinha': 'restaurant',
+  'salão': 'storefront',
+  'salao': 'storefront',
+  'caixa': 'payments',
+  'banheiro': 'bathtub',
+  'banheiros': 'bathtub',
+  'geral': 'checklist',
+  'produção': 'manufacturing',
+  'producao': 'manufacturing',
+  'estoque': 'inventory_2',
+  'limpeza': 'cleaning_services',
+  'atendimento': 'support_agent',
+};
+
+function getSectorIcon(sector: { icon?: string | null; name: string }): string {
+  if (sector.icon) return sector.icon;
+  const key = sector.name.toLowerCase().trim();
+  return sectorNameIconMap[key] || 'folder';
+}
 
 export function ChecklistView({
   sectors,
@@ -275,7 +295,7 @@ export function ChecklistView({
                   {sectorComplete ? (
                     <AppIcon name="check_circle" size={22} fill={1} className="text-success animate-scale-in" />
                   ) : (
-                    <AppIcon name={sector.icon || 'Folder'} size={22} fill={0} className="text-muted-foreground" />
+                    <AppIcon name={getSectorIcon(sector)} size={22} fill={0} className="text-muted-foreground" />
                   )}
                 </div>
                 <div className="text-left">
