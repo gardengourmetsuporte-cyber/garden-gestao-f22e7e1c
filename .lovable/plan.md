@@ -1,82 +1,54 @@
 
 
-## Plano: Bottom Bar Premium — Acabamento Perfeito
+## Plano: Espaçamento Padronizado + Bottom Bar Premium
 
-### Problemas atuais (baseado na análise do código e sessão)
+### Problemas identificados
 
-1. **Glass-border com `::before` pseudo-element** cria um efeito "borda dupla" que parece desalinhado — o `mask-composite` nem sempre renderiza bem em mobile
-2. **Pill highlight** tem bordas quadradas demais (`rounded-2xl` = 16px) e o fundo com opacity 12% é quase invisível — não dá feedback visual claro
-3. **FAB central** flutua com `-top-4` mas não tem "encaixe" visual na barra — parece colado, sem conexão orgânica
-4. **Ícones Material Symbols** sem fill no ativo — parecem todos iguais, sem distinção clara entre ativo/inativo
-5. **Sombra da barra** (`--shadow-floating`) é genérica — precisa de uma sombra mais dramática e difusa para realmente "flutuar"
-6. **FinanceBottomNav** usa cálculo percentual para pill que desalinha — precisa do mesmo sistema ref-based
+1. **Cards grudados**: O dashboard usa `gap-3` (12px) no grid — muito apertado. A referência Mobills usa ~16-20px entre seções e cards distintos.
+2. **Bottom bar — labels ausentes nos inativos**: Apenas o tab ativo mostra label, os inativos ficam só com ícone sem nome, dificultando a navegação.
+3. **Highlight pill desalinhada**: O cálculo `left: calc(...)` usa divisão por `slotCount` que nem sempre alinha corretamente com o centro real do botão flex, causando desalinhamento visual.
 
 ---
 
-### Redesign completo
+### 1. Espaçamento padronizado no Dashboard (Mobills-style)
 
-#### 1. `BottomTabBar.tsx` — Acabamento tier-1
+**`AdminDashboard.tsx`** e **`EmployeeDashboard.tsx`**:
+- Aumentar `gap-3` → `gap-4` (16px) no grid principal
+- Adicionar `space-y-6` entre seções distintas (finanças, calendário, checklist, ranking) em vez de empilhar tudo no mesmo grid
+- Separar os widgets em grupos lógicos com `space-y-5` entre eles, similar à estrutura Mobills que agrupa "Pendências", "Contas", "Cartões" em blocos separados
 
-**Barra externa:**
-- Trocar `glass-border` (pseudo-element problemático) por borda inline simples: `border: 1px solid hsl(var(--border) / 0.08)`
-- Sombra custom mais dramática: `0 -4px 32px hsl(0 0% 0% / 0.2), 0 -1px 8px hsl(0 0% 0% / 0.1)` (sombra para cima, como se flutuasse)
-- Fundo com mais opacidade: `hsl(var(--card) / 0.85)` para legibilidade
+**`index.css`**:
+- Padronizar `.section-gap` como classe utilitária: `margin-top: 1.25rem` para seções dentro de páginas
 
-**Pill highlight:**
-- `rounded-[14px]` (mais suave que `rounded-2xl`)
-- Fundo mais visível: `hsl(var(--primary) / 0.15)` com borda `hsl(var(--primary) / 0.25)`
-- Adicionar `will-change: left, width` para transição GPU-accelerated
-- Altura proporcional: `40px` em vez de `44px` para não encostar nas bordas
+### 2. Bottom Tab Bar — Labels sempre visíveis + pill corrigida
 
-**Ícones ativos vs inativos:**
-- Ativo: `fill={1}` (ícone preenchido) + `text-primary` + scale 1.05 (sutil)
-- Inativo: `fill={0}` (outline) + `text-muted-foreground` + sem scale
-- Isso cria distinção imediata sem precisar de cores gritantes
+**`BottomTabBar.tsx`**:
+- **Labels sempre visíveis**: Mostrar o label (`text-[10px]`) em TODOS os tabs, não apenas no ativo. O ativo terá `font-bold text-primary`, inativos terão `font-normal text-muted-foreground`
+- **Pill alinhada**: Remover o cálculo percentual manual e usar uma abordagem com `refs` + `getBoundingClientRect` ou simplesmente medir pelo index real dos elementos. Alternativa mais simples: usar CSS `justify-evenly` e calcular a posição baseada em largura fixa dos slots
+- **Altura da barra**: Aumentar de `h-[60px]` → `h-[64px]` para acomodar ícone + label com mais respiração
+- **Tab "Mais"**: Adicionar label "Mais" abaixo do ícone (consistência)
+- **FAB**: Ajustar `-top-5` para compensar a altura extra
 
-**FAB central:**
-- Adicionar "notch" visual: sombra interna na barra onde o FAB se encaixa (via CSS `radial-gradient` no fundo)
-- `rounded-[18px]` (squircle mais pronunciado)
-- Sombra mais difusa: `0 6px 24px hsl(var(--primary) / 0.4)`
-- `w-[52px] h-[52px]` (levemente maior para presença)
+**`FinanceBottomNav.tsx`**: Aplicar as mesmas correções (labels sempre visíveis, pill alinhada, altura 64px).
 
-**Label "Mais":**
-- Usar ícone `Grid2x2` em vez de `Menu` — mais moderno e reconhecível como "mais opções"
+### 3. CSS — Animação e polish da pill
 
-#### 2. `FinanceBottomNav.tsx` — Ref-based pill + mesmo polish
-
-- Implementar o mesmo sistema de `useRef` + `getBoundingClientRect` da barra global
-- Trocar o cálculo percentual `left: calc(...)` por posicionamento pixel-perfect
-- Aplicar os mesmos acabamentos: borda inline, sombra dramática, ícones fill/outline
-
-#### 3. `index.css` — Animações e utilitários refinados
-
-- `.nav-highlight-pill`: adicionar `will-change: left` e transição com `cubic-bezier(0.34, 1.56, 0.64, 1)` (spring bounce sutil)
-- `.nav-icon-active`: scale `1.05` em vez de `1.1` (mais sutil)
-- `.glass-border`: simplificar para borda inline sem pseudo-element (o `::before` com mask causa artefatos)
-- Novo `.nav-bar-floating`: classe dedicada com a sombra dramática e fundo otimizado
-- Light mode: sombra adaptada com `hsl(220 25% 10% / 0.08)` em vez de preto puro
+**`index.css`**:
+- `.nav-highlight-pill` já tem transição suave — manter
+- Adicionar `will-change: left` para performance
 
 ---
 
 ### Arquivos a editar
 
-1. **`src/components/layout/BottomTabBar.tsx`** — pill refinada, ícones fill/outline, FAB squircle maior, borda simplificada
-2. **`src/components/finance/FinanceBottomNav.tsx`** — ref-based pill, mesmos acabamentos visuais
-3. **`src/index.css`** — `.nav-bar-floating`, `.nav-highlight-pill` spring, `.nav-icon-active` sutil, simplificar `.glass-border`
+1. **`src/components/layout/BottomTabBar.tsx`** — labels sempre visíveis, pill position fix, altura 64px, label no "Mais"
+2. **`src/components/finance/FinanceBottomNav.tsx`** — mesmas correções de labels e pill
+3. **`src/components/dashboard/AdminDashboard.tsx`** — gap e espaçamento entre seções
+4. **`src/index.css`** — classe utilitária de espaçamento se necessário
 
-### Visual esperado
+### Resultado esperado
 
-```text
-                    ╭─── FAB ───╮
-          ╭─────────┤   [  +  ] ├─────────╮
-          │  🏠      ╰───────────╯    📦   ⊞ │
-          │ Início  ✅ Check            Est  Mais│
-          ╰───────────────────────────────────╯
-              ↑ pill com fundo primary/15
-              ↑ ícone ativo = preenchido (fill)
-              ↑ sombra flutuante dramática
-```
-
-### Resultado
-Barra inferior com acabamento premium: pill com spring animation, ícones que mudam de outline para fill ao ativar, FAB com presença visual integrada, e sombra que faz a ilha realmente flutuar. Padrão visual consistente entre a barra global e a do financeiro.
+- Cards com espaço visual entre si como no Mobills (respiração entre seções)
+- Bottom bar com todos os nomes visíveis (Principal, Checklists, Estoque, Mais)
+- Pill de seleção centralizada corretamente no tab ativo
 
