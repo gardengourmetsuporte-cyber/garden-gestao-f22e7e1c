@@ -53,7 +53,7 @@ const QUICK_LINKS = [
 export function EmployeeDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { activeUnitId } = useUnit();
+  const { activeUnitId, activeUnit } = useUnit();
   const { hasAccess } = useUserModules();
   const { earned, balance, monthlyScore, refetch: refetchPoints } = usePoints();
   const [rankingScope, setRankingScope] = useState<LeaderboardScope>('unit');
@@ -154,7 +154,7 @@ export function EmployeeDashboard() {
                 )}
               >
                 <AppIcon name="Home" size={12} />
-                Minha Casa
+                {activeUnit?.name || 'Minha Unidade'}
               </button>
               <button
                 onClick={() => setRankingScope('global')}
