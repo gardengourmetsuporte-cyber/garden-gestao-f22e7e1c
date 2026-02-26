@@ -399,16 +399,6 @@ export default function ChecklistsPage() {
                     )}
                   />
                    <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
-                   {deadlineLabel.abertura && (
-                     <span className={cn(
-                       "text-[9px] font-semibold px-1.5 py-0.5 rounded-full ml-auto",
-                       getDeadlineInfo(currentDate, 'abertura')?.passed
-                         ? "bg-destructive/15 text-destructive"
-                         : "bg-muted text-muted-foreground"
-                     )}>
-                       {getDeadlineInfo(currentDate, 'abertura')?.passed ? '⏰ Encerrado' : `⏳ ${deadlineLabel.abertura}`}
-                     </span>
-                   )}
                  </div>
                 {!settingsMode && (
                   <div className="space-y-1.5">
@@ -426,6 +416,11 @@ export default function ChecklistsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground">
                         {getTypeProgress.abertura.completed}/{getTypeProgress.abertura.total}
+                        {deadlineLabel.abertura && (
+                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'abertura')?.passed ? "text-destructive/70" : "")}>
+                            · {getDeadlineInfo(currentDate, 'abertura')?.passed ? 'Encerrado' : deadlineLabel.abertura}
+                          </span>
+                        )}
                       </span>
                       <span className={cn(
                         "text-sm font-black",
@@ -462,16 +457,6 @@ export default function ChecklistsPage() {
                     )}
                   />
                    <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
-                   {deadlineLabel.fechamento && (
-                     <span className={cn(
-                       "text-[9px] font-semibold px-1.5 py-0.5 rounded-full ml-auto",
-                       getDeadlineInfo(currentDate, 'fechamento')?.passed
-                         ? "bg-destructive/15 text-destructive"
-                         : "bg-muted text-muted-foreground"
-                     )}>
-                       {getDeadlineInfo(currentDate, 'fechamento')?.passed ? '⏰ Encerrado' : `⏳ ${deadlineLabel.fechamento}`}
-                     </span>
-                   )}
                  </div>
                 {!settingsMode && (
                   <div className="space-y-1.5">
@@ -489,6 +474,11 @@ export default function ChecklistsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground">
                         {getTypeProgress.fechamento.completed}/{getTypeProgress.fechamento.total}
+                        {deadlineLabel.fechamento && (
+                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'fechamento')?.passed ? "text-destructive/70" : "")}>
+                            · {getDeadlineInfo(currentDate, 'fechamento')?.passed ? 'Encerrado' : deadlineLabel.fechamento}
+                          </span>
+                        )}
                       </span>
                       <span className={cn(
                         "text-sm font-black",
