@@ -107,7 +107,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
             boxShadow: 'var(--shadow-floating)',
           }}
         >
-          <div className="flex items-center justify-around h-[60px] max-w-lg mx-auto relative px-2">
+          <div className="flex items-center justify-evenly h-[64px] max-w-lg mx-auto relative px-1">
             {/* Highlight pill */}
             <div
               className="absolute nav-highlight-pill rounded-2xl"
@@ -115,10 +115,10 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                 background: `${accentColor}15`,
                 border: `1px solid ${accentColor}20`,
                 width: '48px',
-                height: '40px',
+                height: '44px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                left: `calc(${((activeSlotIdx + 0.5) / 5) * 100}% - 24px)`,
+                left: `calc(${(activeSlotIdx / 5) * 100}% + 10% - 24px)`,
               }}
             />
 
@@ -135,7 +135,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                 <div className={cn(activeTab === tab.id && "nav-icon-active")}>
                   <AppIcon name={tab.icon} size={22} />
                 </div>
-                {activeTab === tab.id && <span className="text-[10px] font-semibold">{tab.label}</span>}
+                <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal text-muted-foreground")}>{tab.label}</span>
               </button>
             ))}
 
@@ -173,7 +173,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                 <div className={cn(activeTab === tab.id && "nav-icon-active")}>
                   <AppIcon name={tab.icon} size={22} />
                 </div>
-                {activeTab === tab.id && <span className="text-[10px] font-semibold">{tab.label}</span>}
+                <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal text-muted-foreground")}>{tab.label}</span>
               </button>
             ))}
           </div>

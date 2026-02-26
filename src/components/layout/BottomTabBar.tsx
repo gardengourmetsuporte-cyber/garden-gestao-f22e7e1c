@@ -90,7 +90,7 @@ export function BottomTabBar() {
             boxShadow: 'var(--shadow-floating)',
           }}
         >
-          <div className="flex items-center justify-around h-[60px] max-w-lg mx-auto relative px-2">
+          <div className="flex items-center justify-evenly h-[64px] max-w-lg mx-auto relative px-1">
             {/* Highlight pill behind active tab */}
             {activeIdx >= 0 && (
               <div
@@ -99,10 +99,10 @@ export function BottomTabBar() {
                   background: 'hsl(var(--primary) / 0.1)',
                   border: '1px solid hsl(var(--primary) / 0.15)',
                   width: '48px',
-                  height: '40px',
+                  height: '44px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  left: `calc(${((activeIdx + 0.5) / slotCount) * 100}% - 24px)`,
+                  left: `calc(${(activeIdx / slotCount) * 100}% + ${100 / slotCount / 2}% - 24px)`,
                 }}
               />
             )}
@@ -149,9 +149,10 @@ export function BottomTabBar() {
             {/* "Mais" tab */}
             <button
               onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
-              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground"
+              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground relative z-10"
             >
               <AppIcon name="Menu" size={22} />
+              <span className="text-[10px] font-normal">Mais</span>
             </button>
           </div>
         </div>
@@ -198,7 +199,7 @@ function TabButton({
           </span>
         )}
       </div>
-      {active && <span className="text-[10px] font-semibold">{tab.label}</span>}
+      <span className={cn("text-[10px]", active ? "font-semibold" : "font-normal text-muted-foreground")}>{tab.label}</span>
     </button>
   );
 }
