@@ -40,13 +40,9 @@ export default function WhatsAppPage() {
   return (
     <AppLayout>
       <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen">
-        {/* Header */}
-        <div className="page-header-bar shrink-0">
-          <div className="page-header-content">
-            <h1 className="page-title font-display">WhatsApp</h1>
-          </div>
-          {/* Tab bar */}
-          <div className="px-4 pb-2">
+        {/* Tab bar */}
+        <div className="shrink-0">
+          <div className="px-4 py-2">
             <div className="tab-command">
               {tabs.map(tab => (
                 <button
@@ -64,7 +60,6 @@ export default function WhatsAppPage() {
             </div>
           </div>
         </div>
-
         {/* Content */}
         <div className="flex-1 overflow-hidden">
           {activeTab === 'conversations' && (

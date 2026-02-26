@@ -289,22 +289,19 @@ export default function Agenda() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header */}
+        {/* Header actions */}
         <header className="page-header-bar">
           <div className="page-header-content flex items-center justify-between">
-            <div>
-              <h1 className="page-title">Agenda</h1>
-              {!isLoading && (
-                <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-xs text-muted-foreground">
-                    <span className="font-bold text-foreground">{pendingCount}</span> pendentes
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    <span className="font-bold text-success">{completedCount}</span> concluídos
-                  </span>
-                </div>
-              )}
-            </div>
+            {!isLoading && (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">
+                  <span className="font-bold text-foreground">{pendingCount}</span> pendentes
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  <span className="font-bold text-success">{completedCount}</span> concluídos
+                </span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

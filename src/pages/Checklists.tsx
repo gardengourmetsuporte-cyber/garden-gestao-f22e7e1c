@@ -246,11 +246,6 @@ export default function ChecklistsPage() {
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
-          <header className="page-header-bar">
-            <div className="page-header-content">
-              <Skeleton className="h-7 w-28" />
-            </div>
-          </header>
           <div className="px-4 py-4 space-y-4">
             <Skeleton className="h-12 rounded-xl" />
             <div className="grid grid-cols-2 gap-3">
@@ -266,11 +261,10 @@ export default function ChecklistsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header */}
-        <header className="page-header-bar">
-          <div className="page-header-content flex items-center justify-between">
-            <h1 className="page-title">Checklists</h1>
-            {isAdmin && (
+        {/* Header actions */}
+        {isAdmin && (
+          <header className="page-header-bar">
+            <div className="page-header-content flex items-center justify-end">
               <button
                 onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
                 className={cn(
@@ -282,9 +276,9 @@ export default function ChecklistsPage() {
               >
                 <AppIcon name="Settings" size={18} />
               </button>
-            )}
-          </div>
-        </header>
+            </div>
+          </header>
+        )}
 
         <div className="px-4 py-4 lg:px-6 space-y-8">
           <div className="animate-fade-in space-y-6" key={currentTab}>
