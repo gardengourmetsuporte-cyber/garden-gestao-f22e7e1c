@@ -16,7 +16,7 @@ export function PageLoader() {
           }}
         />
         {/* Logo */}
-        <div className="absolute inset-2 rounded-full overflow-hidden bg-card border border-border/30 flex items-center justify-center">
+        <div className="absolute inset-2 rounded-full overflow-hidden bg-white border border-border/30 flex items-center justify-center">
           <img
             alt="Garden Gestão"
             className="w-full h-full object-contain rounded-full p-1"

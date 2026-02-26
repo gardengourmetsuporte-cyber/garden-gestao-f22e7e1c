@@ -195,7 +195,7 @@ export default function TabletMenu() {
           <button
             onClick={() => setCartOpen(true)}
             className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-primary text-primary-foreground active:scale-[0.98] transition-transform"
-            style={{ boxShadow: '0 8px 32px hsl(217 91% 60% / 0.4)' }}
+            style={{ boxShadow: '0 8px 32px hsl(var(--primary) / 0.4)' }}
           >
             <div className="flex items-center gap-3">
               <ShoppingCart className="w-5 h-5" />
