@@ -112,12 +112,17 @@ export default {
           "50%": { opacity: "1" },
         },
         "glow-border": {
-          "0%, 100%": { borderColor: "hsl(190 90% 55% / 0.2)" },
-          "50%": { borderColor: "hsl(190 90% 55% / 0.45)" },
+          "0%, 100%": { borderColor: "hsl(42 72% 52% / 0.2)" },
+          "50%": { borderColor: "hsl(42 72% 52% / 0.45)" },
         },
         "task-complete": {
           "0%": { opacity: "1", transform: "translateX(0)" },
           "100%": { opacity: "0", transform: "translateX(40px)" },
+        },
+        "gradient-flow": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
         },
       },
       animation: {
