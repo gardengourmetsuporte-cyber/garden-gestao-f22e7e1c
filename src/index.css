@@ -285,28 +285,30 @@
   .finance-hero-card {
     @apply rounded-2xl overflow-hidden transition-all duration-300;
     background: linear-gradient(145deg, 
-      hsl(234 30% 14%) 0%, 
-      hsl(234 45% 18%) 30%, 
-      hsl(234 55% 22%) 60%,
-      hsl(234 35% 15%) 100%
+      hsl(0 0% 100%) 0%, 
+      hsl(0 0% 98%) 25%,
+      hsl(234 40% 95%) 50%, 
+      hsl(234 60% 92%) 65%,
+      hsl(0 0% 99%) 80%,
+      hsl(0 0% 100%) 100%
     );
-    background-size: 200% 200%;
+    background-size: 300% 300%;
     animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
-      0 4px 24px hsl(234 89% 67% / 0.15),
-      0 12px 48px hsl(234 89% 67% / 0.08),
-      inset 0 1px 0 hsl(0 0% 100% / 0.06);
-    border: 1px solid hsl(234 89% 67% / 0.15);
+      0 4px 24px hsl(234 89% 67% / 0.08),
+      0 12px 48px hsl(234 89% 67% / 0.05),
+      inset 0 1px 0 hsl(0 0% 100% / 0.9);
+    border: 1px solid hsl(234 50% 80% / 0.3);
     cursor: pointer;
   }
 
   .finance-hero-card:hover {
     transform: scale(1.01);
-    border-color: hsl(234 89% 67% / 0.3);
+    border-color: hsl(234 60% 75% / 0.4);
     box-shadow: 
-      0 8px 32px hsl(234 89% 67% / 0.2),
-      0 16px 56px hsl(234 89% 67% / 0.1),
-      inset 0 1px 0 hsl(0 0% 100% / 0.08);
+      0 8px 32px hsl(234 89% 67% / 0.12),
+      0 16px 56px hsl(234 89% 67% / 0.06),
+      inset 0 1px 0 hsl(0 0% 100% / 1);
   }
 
   .finance-hero-card:active {
@@ -315,24 +317,26 @@
 
   .dark .finance-hero-card {
     background: linear-gradient(145deg, 
-      hsl(234 30% 11%) 0%, 
-      hsl(234 45% 15%) 30%, 
-      hsl(234 55% 18%) 60%,
-      hsl(234 35% 12%) 100%
+      hsl(0 0% 97%) 0%, 
+      hsl(0 0% 95%) 25%,
+      hsl(234 35% 90%) 50%, 
+      hsl(234 50% 87%) 65%,
+      hsl(0 0% 96%) 80%,
+      hsl(0 0% 98%) 100%
     );
     box-shadow: 
-      0 4px 24px hsl(0 0% 0% / 0.4),
-      0 12px 48px hsl(234 89% 67% / 0.12),
-      inset 0 1px 0 hsl(0 0% 100% / 0.04);
-    border-color: hsl(234 89% 67% / 0.12);
+      0 4px 24px hsl(0 0% 0% / 0.15),
+      0 12px 48px hsl(234 89% 67% / 0.08),
+      inset 0 1px 0 hsl(0 0% 100% / 0.9);
+    border-color: hsl(234 40% 80% / 0.25);
   }
 
   .dark .finance-hero-card:hover {
-    border-color: hsl(234 89% 67% / 0.25);
+    border-color: hsl(234 50% 75% / 0.35);
     box-shadow: 
-      0 8px 32px hsl(0 0% 0% / 0.5),
-      0 16px 56px hsl(234 89% 67% / 0.15),
-      inset 0 1px 0 hsl(0 0% 100% / 0.06);
+      0 8px 32px hsl(0 0% 0% / 0.2),
+      0 16px 56px hsl(234 89% 67% / 0.1),
+      inset 0 1px 0 hsl(0 0% 100% / 1);
   }
 
   .finance-hero-card--personal {
@@ -1248,14 +1252,16 @@
 
   .fab-gradient {
     background: linear-gradient(135deg, 
-      hsl(234 89% 60%) 0%, 
-      hsl(234 89% 67%) 25%,
-      hsl(220 90% 72%) 50%,
-      hsl(234 89% 67%) 75%,
-      hsl(234 89% 60%) 100%
+      hsl(0 0% 100%) 0%, 
+      hsl(0 0% 98%) 20%,
+      hsl(234 50% 92%) 40%,
+      hsl(234 70% 88%) 50%,
+      hsl(0 0% 98%) 65%,
+      hsl(0 0% 100%) 80%,
+      hsl(234 40% 94%) 100%
     );
-    background-size: 300% 300%;
-    animation: fabGradientSpin 4s ease-in-out infinite;
+    background-size: 400% 400%;
+    animation: fabGradientSpin 5s ease-in-out infinite;
   }
 
   /* Check pop animation */
