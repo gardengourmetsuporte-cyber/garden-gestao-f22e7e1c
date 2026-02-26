@@ -182,21 +182,19 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         <div
                           className={cn(
                             "w-12 h-12 rounded-[18px] flex items-center justify-center transition-all",
-                            active ? "" : "bg-secondary"
+                            active ? "finance-hero-card" : "bg-secondary"
                           )}
                           style={{
-                            boxShadow: active ? '0 4px 16px hsl(var(--primary) / 0.4)' : undefined,
+                            boxShadow: active ? '0 4px 16px hsl(0 0% 0% / 0.08)' : undefined,
                             opacity: locked ? 0.5 : 1,
                             border: locked ? '1px dashed hsl(var(--primary) / 0.4)' : active ? 'none' : '1px solid hsl(var(--border) / 0.3)',
-                            ...(active ? {
-                              background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
-                            } : {}),
                           }}
                         >
                           <AppIcon
                             name={item.icon}
                             size={20}
-                            className={active ? "text-primary-foreground" : "text-foreground/70"}
+                            fill={active ? 1 : 0}
+                            className={active ? "text-slate-700" : "text-foreground/70"}
                           />
                         </div>
                         {locked && (
@@ -222,7 +220,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                       </div>
                       <span
                         className="text-[10px] font-medium leading-tight text-center truncate max-w-full"
-                        style={{ color: active ? 'hsl(var(--primary))' : locked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground) / 0.8)' }}
+                        style={{ color: active ? 'hsl(var(--foreground))' : locked ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground) / 0.8)' }}
                       >
                         {item.label}
                       </span>
