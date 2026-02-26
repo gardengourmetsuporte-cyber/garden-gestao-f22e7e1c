@@ -26,15 +26,9 @@ self.addEventListener('push', function(event) {
     icon: '/pwa-192x192.png',
     badge: '/pwa-192x192.png',
     data: { url: data.url || '/' },
-    vibrate: [200, 100, 200, 100, 200],
+    // iOS Safari is stricter with advanced options; keep a minimal, compatible set
     tag: data.tag || 'default',
-    renotify: true,
-    requireInteraction: true,
-    silent: false,
-    actions: [
-      { action: 'open', title: 'Abrir' },
-      { action: 'close', title: 'Fechar' },
-    ],
+    renotify: false,
   };
   
   event.waitUntil(
