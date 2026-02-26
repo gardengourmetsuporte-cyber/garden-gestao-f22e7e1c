@@ -1,53 +1,66 @@
 
 
-## Plan: Botão "Dividir" no painel inline do admin (junto com Contestar)
+## Plano: Centralizar Gestão de Usuários com Níveis de Acesso e Convites
 
 ### Resumo
-Adicionar o botão "Dividir pontos" no mesmo painel inline que já aparece ao clicar num item completado (onde ficam "Desmarcar" e "Contestar"). O admin seleciona os participantes com checkboxes e confirma — os pontos são divididos igualmente.
+Unificar três telas separadas (Usuários, Equipe & Convites, Níveis de Acesso) em uma única seção "Equipe" dentro das Configurações. A seleção de cargo (Admin, Funcionário) passa a ser feita via níveis de acesso customizáveis, e o convite de novos membros fica integrado na mesma tela.
 
-### Mudanças
-
-**1. `src/hooks/useChecklists.ts`** — Nova função `splitCompletion`
-- Recebe `itemId`, `date`, `checklistType`, `userIds[]` (todos os participantes incluindo o original)
-- Busca o completion original para pegar os pontos
-- Calcula `pointsPerPerson = Math.floor(originalPoints / userIds.length)`
-- Atualiza o registro existente com pontos divididos
-- Insere novos `checklist_completions` para os demais participantes (upsert com `onConflict`)
-- Invalida caches
-
-**2. `src/components/checklists/ChecklistView.tsx`** — UI no painel inline
-- Novo estado: `splittingItemId`, `splitSelectedUsers` (Set de user_ids)
-- No painel admin de item completado (aparece 2x: bonus e standard, linhas ~434 e ~764), adicionar entre "Desmarcar" e "Contestar":
-  - Botão "Dividir pontos" com ícone `Users` em estilo azul/primary
-  - Ao clicar, expande lista de checkboxes com membros da equipe (o completador original vem pré-selecionado)
-  - Preview: "X participantes → Y pts cada"
-  - Botão "Confirmar divisão"
-- Mostrar indicador visual quando item já tem múltiplas completions (ex: "👥 2 participantes" no card completado)
-
-**3. `src/components/checklists/ChecklistView.tsx`** — Props
-- Adicionar `onSplitCompletion` prop para receber a função do hook
-- Passada pelo componente pai (Checklists page)
-
-**4. `src/pages/Checklists.tsx`** — Conectar a prop
-- Passar `splitCompletion` do hook como `onSplitCompletion` para `ChecklistView`
-
-### Layout no painel inline
+### Estrutura da nova tela "Equipe"
 
 ```text
 ┌─────────────────────────────────────┐
-│ [↩️ Desmarcar item                ] │
-│ ─────────────────────────────────── │
-│ [👥 Dividir pontos                ] │  ← NOVO
-│   ☑ João (completou)               │
-│   ☐ Maria                          │
-│   ☐ Pedro                          │
-│   4 pts ÷ 2 = 2 pts cada           │
-│   [Confirmar divisão]              │
-│ ─────────────────────────────────── │
-│ [⚠️ Contestar                     ] │
+│  [+ Convidar]              Equipe   │
+├─────────────────────────────────────┤
+│  Tabs: [Membros] [Convites] [Níveis]│
+├─────────────────────────────────────┤
+│                                     │
+│  Tab Membros:                       │
+│  ┌─────────────────────────────────┐│
+│  │ 👤 João Silva                   ││
+│  │    Dono · Acesso completo       ││
+│  │              [Nível ▾] [⋮]     ││
+│  ├─────────────────────────────────┤│
+│  │ 👤 Maria                        ││
+│  │    Funcionário · Líder          ││
+│  │              [Nível ▾] [⋮]     ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  Tab Convites:                      │
+│  (Formulário de convite + lista)    │
+│                                     │
+│  Tab Níveis:                        │
+│  (Criar/editar níveis de acesso)    │
+│  Ex: "Líder" → Checklists ✓        │
+│       Estoque ✓  Financeiro ✗       │
 └─────────────────────────────────────┘
 ```
 
-### Sem alterações no banco
-O schema já suporta múltiplos registros por item (`item_id, completed_by, date, checklist_type` unique constraint). Cada participante terá seu próprio registro.
+### Passos de implementação
+
+1. **Criar componente unificado `TeamHub.tsx`**
+   - Componente com 3 tabs (Membros, Convites, Níveis de Acesso)
+   - Tab "Membros": lista de usuários da unidade, cada um com botão de nível de acesso (picker inline), botão de ações (senha, transferir, remover, excluir)
+   - Tab "Convites": mover lógica do `TeamManagement.tsx` (formulário de email + cargo + lista de pendentes)
+   - Tab "Níveis": mover lógica do `AccessLevelSettings.tsx` (criar/editar/excluir níveis com permissões por módulo)
+
+2. **Unificar seleção de cargo + nível de acesso no card do usuário**
+   - Substituir o dropdown de role (Admin/Super Admin/Funcionário) por um picker de nível de acesso
+   - Os níveis padrão do sistema (Dono, Gerente, Funcionário) vêm pré-configurados com permissões default
+   - Níveis customizados (ex: "Líder") aparecem na mesma lista
+   - Ao selecionar um nível, atualiza tanto o `user_units.role` quanto o `user_units.access_level_id`
+
+3. **Atualizar `Settings.tsx`**
+   - Remover entradas separadas de "Usuários", "Equipe & Convites" e "Níveis de Acesso"
+   - Adicionar uma única entrada "Equipe" que renderiza o novo `TeamHub`
+
+4. **Manter hooks existentes**
+   - Reutilizar `useUsers`, `useAccessLevels`, e a lógica de convites sem alteração nos hooks
+   - Apenas a camada de UI é consolidada
+
+### Detalhes técnicos
+
+- Sem alterações no banco de dados — a estrutura atual de `access_levels`, `user_units`, e `user_roles` suporta o modelo
+- O nível de acesso "Acesso completo" continua sendo `access_level_id = null`
+- Níveis padrão do sistema (Dono/Gerente/Funcionário) são os roles do `user_units` — mantidos como estão, com a opção de atribuir um nível de acesso adicional para refinar permissões
+- O botão de convite no tab "Convites" mantém a mesma lógica de gerar link com compartilhamento via WhatsApp/Email
 
