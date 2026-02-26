@@ -17,12 +17,16 @@ import {
    MessageSquare,
    Loader2,
   Trash2,
-  Receipt
+  Receipt,
+  Pencil,
+  X,
+  Save
  } from 'lucide-react';
  import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
  import { Badge } from '@/components/ui/badge';
  import { Textarea } from '@/components/ui/textarea';
+ import { Input } from '@/components/ui/input';
  import { Label } from '@/components/ui/label';
  import { ScrollArea } from '@/components/ui/scroll-area';
  import {
@@ -46,14 +50,60 @@ import {
  }
  
  export function CashClosingDetail({ closing, isAdmin, onClose }: Props) {
-   const { approveClosing, markDivergent, deleteClosing } = useCashClosing();
+   const { approveClosing, markDivergent, deleteClosing, updateClosing } = useCashClosing();
    const [isApproving, setIsApproving] = useState(false);
    const [isMarkingDivergent, setIsMarkingDivergent] = useState(false);
    const [showDivergentDialog, setShowDivergentDialog] = useState(false);
    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
    const [divergentNotes, setDivergentNotes] = useState('');
    const [showReceipt, setShowReceipt] = useState(false);
- 
+
+   // Edit mode
+   const [isEditing, setIsEditing] = useState(false);
+   const [isSaving, setIsSaving] = useState(false);
+   const [editDate, setEditDate] = useState(closing.date);
+   const [editValues, setEditValues] = useState({
+     cash_amount: closing.cash_amount,
+     debit_amount: closing.debit_amount,
+     credit_amount: closing.credit_amount,
+     pix_amount: closing.pix_amount,
+     meal_voucher_amount: closing.meal_voucher_amount,
+     delivery_amount: closing.delivery_amount,
+     signed_account_amount: closing.signed_account_amount,
+   });
+
+   const startEditing = () => {
+     setEditDate(closing.date);
+     setEditValues({
+       cash_amount: closing.cash_amount,
+       debit_amount: closing.debit_amount,
+       credit_amount: closing.credit_amount,
+       pix_amount: closing.pix_amount,
+       meal_voucher_amount: closing.meal_voucher_amount,
+       delivery_amount: closing.delivery_amount,
+       signed_account_amount: closing.signed_account_amount,
+     });
+     setIsEditing(true);
+   };
+
+   const handleSaveEdit = async () => {
+     setIsSaving(true);
+     const success = await updateClosing(closing.id, {
+       date: editDate,
+       ...editValues,
+     });
+     setIsSaving(false);
+     if (success) {
+       setIsEditing(false);
+       onClose();
+     }
+   };
+
+   const updateEditValue = (key: string, value: string) => {
+     const num = parseFloat(value.replace(',', '.')) || 0;
+     setEditValues(prev => ({ ...prev, [key]: num }));
+   };
+
    const getStatusConfig = (status: string) => {
      switch (status) {
        case 'approved':
@@ -115,11 +165,15 @@ import {
  
    const status = getStatusConfig(closing.status);
    const StatusIcon = status.icon;
+
+   // Allow edit/delete for admin OR for the user who created (only pending)
+   const canEdit = closing.status === 'pending';
+   const canDelete = isAdmin || closing.status === 'pending';
  
    return (
      <ScrollArea className="h-[calc(90vh-80px)] pr-4">
        <div className="space-y-4 pb-6 pt-4">
-         {/* Status Badge */}
+         {/* Status Badge + Actions */}
          <div className="flex items-center justify-between">
            <Badge 
              variant="outline" 
@@ -130,6 +184,26 @@ import {
            </Badge>
            
             <div className="flex items-center gap-1">
+              {canEdit && !isEditing && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-primary"
+                  onClick={startEditing}
+                >
+                  <Pencil className="w-5 h-5" />
+                </Button>
+              )}
+              {isEditing && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground"
+                  onClick={() => setIsEditing(false)}
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -138,7 +212,7 @@ import {
               >
                 <Receipt className="w-5 h-5" />
               </Button>
-              {isAdmin && (
+              {canDelete && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -163,11 +237,20 @@ import {
              </div>
              <div className="flex items-center gap-3">
                <Calendar className="w-5 h-5 text-muted-foreground" />
-               <div>
+               <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Data</p>
-                  <p className="font-medium">
-                    {format(parseISO(closing.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                  </p>
+                  {isEditing ? (
+                    <Input
+                      type="date"
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                      className="h-10 mt-1"
+                    />
+                  ) : (
+                    <p className="font-medium">
+                      {format(parseISO(closing.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                    </p>
+                  )}
                 </div>
              </div>
              <div className="flex items-center gap-3">
@@ -187,8 +270,10 @@ import {
             
             {PAYMENT_METHODS.map(method => {
               const Icon = getIcon(method.icon);
-              const value = closing[method.key as keyof CashClosing] as number;
-              if (value === 0) return null;
+              const value = isEditing 
+                ? (editValues[method.key as keyof typeof editValues] ?? 0)
+                : (closing[method.key as keyof CashClosing] as number);
+              if (!isEditing && value === 0) return null;
               
               return (
                 <div key={method.key} className="flex items-center justify-between">
@@ -201,17 +286,37 @@ import {
                     </div>
                     <span className="text-sm">{method.label}</span>
                   </div>
-                  <span className="font-medium">
-                    R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
+                  {isEditing ? (
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      step="0.01"
+                      value={editValues[method.key as keyof typeof editValues] || ''}
+                      onChange={(e) => updateEditValue(method.key, e.target.value)}
+                      className="w-28 h-9 text-right"
+                      placeholder="0,00"
+                    />
+                  ) : (
+                    <span className="font-medium">
+                      R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  )}
                 </div>
               );
             })}
 
-            {/* Total real de vendas (sem descontar despesas) */}
+            {/* Total */}
             {(() => {
-              const rawTotal = closing.cash_amount + closing.debit_amount + closing.credit_amount + 
-                closing.pix_amount + closing.meal_voucher_amount + closing.delivery_amount + (closing.signed_account_amount || 0);
+              const vals = isEditing ? editValues : {
+                cash_amount: closing.cash_amount,
+                debit_amount: closing.debit_amount,
+                credit_amount: closing.credit_amount,
+                pix_amount: closing.pix_amount,
+                meal_voucher_amount: closing.meal_voucher_amount,
+                delivery_amount: closing.delivery_amount,
+                signed_account_amount: closing.signed_account_amount,
+              };
+              const rawTotal = Object.values(vals).reduce((s, v) => s + (v || 0), 0);
               return (
                 <div className="border-t pt-3 mt-3">
                   <div className="flex items-center justify-between">
@@ -224,7 +329,7 @@ import {
               );
             })()}
 
-            {closing.cash_difference !== 0 && (
+            {!isEditing && closing.cash_difference !== 0 && (
               <div className="flex items-center justify-between text-amber-600 text-sm">
                 <span>Diferença de caixa</span>
                 <span className="font-medium">
@@ -234,6 +339,22 @@ import {
             )}
           </CardContent>
         </Card>
+
+        {/* Save Edit button */}
+        {isEditing && (
+          <Button
+            onClick={handleSaveEdit}
+            disabled={isSaving}
+            className="w-full h-12"
+          >
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
+            Salvar Alterações
+          </Button>
+        )}
  
         {/* Expenses */}
         {closing.expenses && closing.expenses.length > 0 && (
@@ -284,17 +405,17 @@ import {
               )}
              </div>
              
-            {!closing.receipt_url && (
-              <p className="text-sm text-muted-foreground">Nenhum comprovante anexado</p>
+           {!closing.receipt_url && (
+             <p className="text-sm text-muted-foreground">Nenhum comprovante anexado</p>
+           )}
+           
+           {showReceipt && closing.receipt_url && (
+              <img 
+                src={closing.receipt_url} 
+                alt="Comprovante" 
+                className="w-full rounded-xl border"
+              />
             )}
-            
-            {showReceipt && closing.receipt_url && (
-               <img 
-                 src={closing.receipt_url} 
-                 alt="Comprovante" 
-                 className="w-full rounded-xl border"
-               />
-             )}
            </CardContent>
          </Card>
  
@@ -354,7 +475,7 @@ import {
          )}
  
          {/* Admin Actions */}
-         {isAdmin && closing.status === 'pending' && (
+         {isAdmin && closing.status === 'pending' && !isEditing && (
            <div className="flex gap-3 pt-2">
              <Button
                variant="outline"
