@@ -12,7 +12,7 @@ import { getRank } from '@/lib/ranks';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { getThemeColor } from '@/lib/unitThemes';
 import { getModuleKeyFromRoute } from '@/lib/modules';
-import { MODULE_REQUIRED_PLAN, HIDDEN_MODULES, planSatisfies } from '@/lib/plans';
+import { MODULE_REQUIRED_PLAN, PRODUCTION_MODULES, planSatisfies } from '@/lib/plans';
 import type { PlanTier } from '@/lib/plans';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
@@ -38,6 +38,10 @@ const navItems: NavItem[] = [
   { icon: 'Trophy', label: 'Ranking', href: '/ranking', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Utensils', label: 'Cardápio', href: '/menu-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+  { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
 ];
 
 interface MoreDrawerProps {
@@ -100,6 +104,11 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
     if (!required) return null;
     if (planSatisfies(plan, required)) return null;
     return required === 'business' ? 'BUSINESS' : 'PRO';
+  };
+
+  const isProductionModule = (href: string): boolean => {
+    const moduleKey = getModuleKeyFromRoute(href);
+    return moduleKey ? PRODUCTION_MODULES.includes(moduleKey) : false;
   };
 
   const handleSignOut = async () => {
@@ -198,19 +207,26 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                     const locked = isModuleLocked(item.href);
                     const planLabel = getRequiredPlanLabel(item.href);
 
+                    const isProduction = isProductionModule(item.href);
+
                     return (
                       <Link
                         key={item.href}
                         to={locked ? '/plans' : item.href}
                         onClick={() => onOpenChange(false)}
                         className={cn(
-                          "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95",
+                          "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
                           active
                             ? "bg-primary/10"
                             : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
                         )}
                         style={{ opacity: locked ? 0.55 : 1 }}
                       >
+                        {isProduction && (
+                          <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
+                            Beta
+                          </span>
+                        )}
                         <div className="relative">
                           <div
                             className={cn(
