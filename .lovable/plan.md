@@ -1,66 +1,45 @@
 
 
-## Plano: Centralizar Gestão de Usuários com Níveis de Acesso e Convites
+## Plano: Experiência Premium com Diamante e Módulos Travados
 
-### Resumo
-Unificar três telas separadas (Usuários, Equipe & Convites, Níveis de Acesso) em uma única seção "Equipe" dentro das Configurações. A seleção de cargo (Admin, Funcionário) passa a ser feita via níveis de acesso customizáveis, e o convite de novos membros fica integrado na mesma tela.
+### Configuração definida pelo usuário
 
-### Estrutura da nova tela "Equipe"
+**FREE** (sem pagar): Dashboard, Agenda, Checklists, Estoque + Pedidos
+**PRO** (R$97/mês, diamante amarelo): Financeiro, Fechamento de Caixa, Fichas Técnicas, Funcionários, Ranking, Recompensas, Finanças Pessoais
+**BUSINESS** (R$197/mês, diamante amarelo): Marketing, Copilot IA
+**OCULTOS** (não aparecem no menu): Cardápio, Tablets, Gamificação, WhatsApp
 
-```text
-┌─────────────────────────────────────┐
-│  [+ Convidar]              Equipe   │
-├─────────────────────────────────────┤
-│  Tabs: [Membros] [Convites] [Níveis]│
-├─────────────────────────────────────┤
-│                                     │
-│  Tab Membros:                       │
-│  ┌─────────────────────────────────┐│
-│  │ 👤 João Silva                   ││
-│  │    Dono · Acesso completo       ││
-│  │              [Nível ▾] [⋮]     ││
-│  ├─────────────────────────────────┤│
-│  │ 👤 Maria                        ││
-│  │    Funcionário · Líder          ││
-│  │              [Nível ▾] [⋮]     ││
-│  └─────────────────────────────────┘│
-│                                     │
-│  Tab Convites:                      │
-│  (Formulário de convite + lista)    │
-│                                     │
-│  Tab Níveis:                        │
-│  (Criar/editar níveis de acesso)    │
-│  Ex: "Líder" → Checklists ✓        │
-│       Estoque ✓  Financeiro ✗       │
-└─────────────────────────────────────┘
-```
+---
 
-### Passos de implementação
+### Alterações
 
-1. **Criar componente unificado `TeamHub.tsx`**
-   - Componente com 3 tabs (Membros, Convites, Níveis de Acesso)
-   - Tab "Membros": lista de usuários da unidade, cada um com botão de nível de acesso (picker inline), botão de ações (senha, transferir, remover, excluir)
-   - Tab "Convites": mover lógica do `TeamManagement.tsx` (formulário de email + cargo + lista de pendentes)
-   - Tab "Níveis": mover lógica do `AccessLevelSettings.tsx` (criar/editar/excluir níveis com permissões por módulo)
+#### 1. Atualizar mapeamento de módulos (`src/lib/plans.ts`)
+- Adicionar módulos faltantes ao `MODULE_REQUIRED_PLAN`: `finance`, `cash-closing`, `employees`, `ranking`, `rewards` como `pro`
+- Manter `marketing` e `copilot` como `business`
+- Remover `menu-admin`, `tablet-admin`, `gamification`, `whatsapp` do mapeamento (serão ocultos)
 
-2. **Unificar seleção de cargo + nível de acesso no card do usuário**
-   - Substituir o dropdown de role (Admin/Super Admin/Funcionário) por um picker de nível de acesso
-   - Os níveis padrão do sistema (Dono, Gerente, Funcionário) vêm pré-configurados com permissões default
-   - Níveis customizados (ex: "Líder") aparecem na mesma lista
-   - Ao selecionar um nível, atualiza tanto o `user_units.role` quanto o `user_units.access_level_id`
+#### 2. Atualizar MoreDrawer (`src/components/layout/MoreDrawer.tsx`)
+- Remover do array `navItems` os módulos ocultos: Cardápio, Tablets, Gamificação, WhatsApp
+- Trocar o ícone de cadeado (`Lock`) por diamante (`Gem`) com cor amarela dourada (`hsl(45 90% 55%)`)
+- Adicionar label "PRO" ou "BUSINESS" pequeno abaixo do diamante nos cards travados
+- Garantir que ao clicar em módulo travado, navega para `/plans`
 
-3. **Atualizar `Settings.tsx`**
-   - Remover entradas separadas de "Usuários", "Equipe & Convites" e "Níveis de Acesso"
-   - Adicionar uma única entrada "Equipe" que renderiza o novo `TeamHub`
+#### 3. Atualizar BottomTabBar (`src/components/layout/BottomTabBar.tsx`)
+- Verificar se módulos PRO na barra inferior mostram indicador de diamante quando travados (ex: Financeiro no slot 3)
+- Se o módulo está travado, ao tocar redirecionar para `/plans` ao invés da rota do módulo
 
-4. **Manter hooks existentes**
-   - Reutilizar `useUsers`, `useAccessLevels`, e a lógica de convites sem alteração nos hooks
-   - Apenas a camada de UI é consolidada
+#### 4. Card de Planos no Menu Drawer
+- O botão de Planos (coroa dourada) já existe para admins — garantir que aparece para TODOS os usuários no plano free (não só admins), pois o cliente precisa ver a opção de upgrade
+
+#### 5. Página de Planos (`src/pages/Plans.tsx`)
+- Manter como está — já funciona bem para free (cards de preço) e para assinantes (gerenciamento)
+
+---
 
 ### Detalhes técnicos
 
-- Sem alterações no banco de dados — a estrutura atual de `access_levels`, `user_units`, e `user_roles` suporta o modelo
-- O nível de acesso "Acesso completo" continua sendo `access_level_id = null`
-- Níveis padrão do sistema (Dono/Gerente/Funcionário) são os roles do `user_units` — mantidos como estão, com a opção de atribuir um nível de acesso adicional para refinar permissões
-- O botão de convite no tab "Convites" mantém a mesma lógica de gerar link com compartilhamento via WhatsApp/Email
+- O ícone `Gem` do Lucide será usado como diamante amarelo com `style={{ color: 'hsl(45 90% 55%)' }}`
+- Módulos ocultos são simplesmente removidos do array `navItems` no MoreDrawer
+- A lógica de `isModuleLocked` já existe e usa `MODULE_REQUIRED_PLAN` + `planSatisfies` — basta atualizar o mapeamento
+- O botão de Planos no drawer será visível para todos os usuários (remover condição `isAdmin`)
 
