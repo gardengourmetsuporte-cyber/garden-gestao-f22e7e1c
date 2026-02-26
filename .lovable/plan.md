@@ -1,26 +1,58 @@
 
+Objetivo
+- Corrigir a regressão de horários no checklist (19:30/02:00), recuperar a visualização correta dos registros de funcionários e adicionar contador discreto de tempo restante sem quebrar o padrão visual.
 
-## Problems Identified
+Diagnóstico confirmado
+- Há marcações automáticas `is_skipped=true` indevidas para abertura do dia atual (40 registros), feitas antes do horário de encerramento.
+- A tela usa seleção não determinística de conclusão por item (`find`), então quando existem múltiplos registros (feito + não fiz), pode mostrar “não fiz” e esconder o registro real do funcionário.
+- O auto-fechamento está permissivo para datas históricas e pode poluir o histórico ao navegar no calendário.
 
-1. **Save button not visible**: The sheet content scrolls but the action buttons (Excluir/Salvar) at the bottom get cut off behind the screen/bottom bar. They need to be sticky at the bottom.
-2. **No quick date shortcuts**: When editing an overdue task, user must open the full calendar to change to "today". Need quick-access buttons like "Hoje", "Amanhã".
+Plano de implementação
+1) Centralizar regra de horário do checklist
+- Criar utilitário de tempo do checklist (data operacional, deadline, tempo restante) com base fixa no horário operacional esperado (19:30 abertura, 02:00 fechamento).
+- Substituir cálculos diretos de `new Date()/parseISO/setHours` em:
+  - `src/pages/Checklists.tsx`
+  - `src/components/dashboard/ChecklistDashboardWidget.tsx`
 
-## Plan
+2) Blindar o auto-fechamento (não poluir histórico)
+- Em `src/pages/Checklists.tsx`, executar auto-close apenas para janelas operacionais válidas:
+  - `abertura`: somente para a data operacional de hoje
+  - `fechamento`: somente para a data operacional de ontem
+- Antes do upsert, buscar completions frescos do alvo (evitar corrida com cache antigo).
+- Restringir auto-close a perfil administrativo para evitar múltiplas gravações concorrentes por usuários comuns.
 
-### 1. Fix action buttons visibility
-- Move the button group (`flex gap-2`) **outside** the scrollable form area
-- Make the buttons sticky at the bottom of the sheet with a frosted background
-- Add `pb-20` to the form content so it doesn't get hidden behind the sticky buttons
+3) Recuperar estado do dia atual para uso imediato
+- Aplicar limpeza pontual de dados indevidos de hoje:
+  - remover `is_skipped=true` de `abertura` da data operacional atual na unidade ativa.
+- Rodar isso no fluxo de correção para deixar “abertura de hoje” zerado e pronto para uso.
 
-### 2. Add quick date shortcuts
-- When `hasDate` is enabled, show a row of quick-pick chips: **Hoje**, **Amanhã**, **Próx. semana**
-- Each chip sets `dueDate` with one tap
-- Highlight the active chip if the current date matches
-- Keep the calendar popover as a fallback for custom dates
+4) Garantir que registros de funcionários apareçam corretamente
+- Em `src/hooks/useChecklists.ts`, ordenar retorno de completions priorizando registros não-skipped.
+- Em `src/components/checklists/ChecklistView.tsx`, trocar lookup simples por agrupamento por item:
+  - escolher registro principal com prioridade para conclusão real do funcionário
+  - manter skipped como fallback
+- Quando houver múltiplos registros no item, exibir indicador discreto de quantidade de registros (sem poluir layout).
 
-### 3. File changes
-- **`src/components/agenda/TaskSheet.tsx`**: 
-  - Import `isToday`, `isTomorrow`, `addDays` from date-fns
-  - Add quick date chips row below the Data toggle
-  - Restructure the sheet to have a scrollable content area and a fixed bottom bar for the save/delete buttons
+5) Adicionar contador discreto por módulo de checklist
+- Em `src/pages/Checklists.tsx` (cards Abertura/Fechamento), incluir chip pequeno:
+  - “Encerra em Xh Ym” / “Encerrado”
+- Em `src/components/dashboard/ChecklistDashboardWidget.tsx`, repetir contador em versão compacta no mesmo padrão visual.
+- Bônus mantém sem prazo (ou rótulo neutro “sem prazo”), sem destaque agressivo.
 
+Arquivos previstos
+- `src/pages/Checklists.tsx`
+- `src/components/checklists/ChecklistView.tsx`
+- `src/hooks/useChecklists.ts`
+- `src/components/dashboard/ChecklistDashboardWidget.tsx`
+- `src/lib/*` (novo utilitário de tempo de checklist)
+
+Validação (fim a fim)
+- Abrir checklist antes de 19:30: abertura não pode aparecer auto-completa por “não fiz”.
+- Verificar ontem: itens com conclusão real de funcionário devem aparecer corretamente.
+- Confirmar que o contador atualiza sem quebrar cards no mobile/PWA.
+- Testar navegação entre datas para garantir que histórico antigo não seja auto-marcado indevidamente.
+
+Detalhes técnicos
+- Não será necessária mudança de schema.
+- Haverá ajuste de dados (limpeza pontual) e correção de lógica no frontend.
+- A lógica de tempo ficará centralizada para evitar novos desvios de horário em widgets e página principal.
