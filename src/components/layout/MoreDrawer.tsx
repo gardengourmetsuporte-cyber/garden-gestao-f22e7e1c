@@ -223,7 +223,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                 <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
                   <AppIcon name="Settings" size={18} className="text-foreground/70" />
                 </div>
-                <span className="text-sm font-semibold text-foreground">Configurações</span>
+                <span className="text-sm font-medium text-foreground">Configurações</span>
                 <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
               </button>
             )}
@@ -234,7 +234,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
               <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
                 <AppIcon name="LogOut" size={18} className="text-muted-foreground" />
               </div>
-              <span className="text-sm font-semibold text-muted-foreground">Sair da conta</span>
+              <span className="text-sm font-medium text-muted-foreground">Sair da conta</span>
             </button>
           </div>
         </div>
