@@ -161,9 +161,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div
-          className="transition-all duration-300"
+          className="transition-all duration-300 backdrop-blur-xl"
           style={{
-            background: 'hsl(var(--background))',
+            background: 'hsl(var(--background) / 0.8)',
           }}
         >
           <div className="flex items-center justify-between h-14 px-3">
@@ -215,11 +215,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </div>
         </div>
-        {/* Header glow — attached to header bottom, behind page content */}
-        <div className="absolute left-0 right-0 bottom-0 translate-y-full pointer-events-none" style={{ height: '6px', zIndex: -1 }}>
-          <div className="absolute left-[10%] right-[10%] top-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.12), transparent)' }} />
-          <div className="absolute left-[5%] right-[5%] top-0 h-[3px] blur-[4px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.06), transparent)' }} />
-        </div>
+        {/* Subtle separator */}
+        <div className="absolute left-0 right-0 bottom-0 h-px bg-border/10" />
       </header>
 
       {/* ======= Desktop Sidebar (unchanged) ======= */}

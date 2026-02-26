@@ -314,27 +314,40 @@
   .card-base,
   .card-surface {
     @apply bg-card rounded-2xl transition-all duration-200;
-    border: 1px solid hsl(var(--border) / 0.4);
+    border: 1px solid transparent;
     box-shadow: var(--shadow-card);
+  }
+
+  :is(.dark) .card-base,
+  :is(.dark) .card-surface {
+    border-color: hsl(var(--border) / 0.15);
   }
 
   .card-elevated {
     @apply bg-card rounded-2xl transition-all duration-200;
-    border: 1px solid hsl(var(--border) / 0.3);
+    border: 1px solid transparent;
     box-shadow: var(--shadow-elevated);
+  }
+
+  :is(.dark) .card-elevated {
+    border-color: hsl(var(--border) / 0.15);
   }
 
   .card-interactive {
     @apply bg-card rounded-2xl
            cursor-pointer transition-all duration-200
            active:scale-[0.97];
-    border: 1px solid hsl(var(--border) / 0.4);
+    border: 1px solid transparent;
     box-shadow: var(--shadow-card);
+  }
+
+  :is(.dark) .card-interactive {
+    border-color: hsl(var(--border) / 0.15);
   }
 
   .card-interactive:hover {
     box-shadow: var(--shadow-card-hover);
-    border-color: hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.1);
   }
 
   .card-glass {
@@ -342,8 +355,12 @@
     background: hsl(var(--card) / 0.6);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid hsl(var(--border) / 0.15);
+    border: 1px solid transparent;
     box-shadow: var(--shadow-card);
+  }
+
+  :is(.dark) .card-glass {
+    border-color: hsl(var(--border) / 0.15);
   }
 
 
