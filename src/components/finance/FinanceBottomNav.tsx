@@ -137,9 +137,6 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                 <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal")}>{tab.label}</span>
               </button>
             ))}
-
-            {/* Empty 5th slot for consistent spacing */}
-            <div style={{ width: '20%' }} />
           </div>
         </div>
       </nav>
