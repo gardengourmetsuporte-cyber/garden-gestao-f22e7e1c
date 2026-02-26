@@ -27,9 +27,9 @@ export function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorPro
         <PopoverTrigger asChild>
           <Button
             variant="ghost"
-            className="text-sm font-semibold min-w-[150px] text-center capitalize text-foreground/80 gap-1.5 h-9 px-3"
+            className="text-sm font-semibold min-w-[150px] text-center capitalize gap-1.5 h-9 px-4 rounded-full bg-foreground text-background hover:bg-foreground/90 hover:text-background"
           >
-            <AppIcon name="Calendar" size={16} className="text-muted-foreground shrink-0" />
+            <AppIcon name="Calendar" size={16} className="shrink-0" />
             {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
           </Button>
         </PopoverTrigger>
