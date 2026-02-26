@@ -165,11 +165,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Simplified Mobile Header (3 elements) ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div
-          className="backdrop-blur-2xl transition-all duration-300"
+          className="transition-all duration-300"
           style={{
             background: 'hsl(var(--background))',
           }}
