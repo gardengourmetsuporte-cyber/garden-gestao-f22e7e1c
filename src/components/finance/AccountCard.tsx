@@ -46,13 +46,13 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl bg-card border transition-all duration-200 w-full text-left",
-        onClick && "hover:bg-secondary/50 cursor-pointer"
+        "flex items-center gap-3 p-3 rounded-xl bg-card border border-border/40 transition-all duration-200 w-full text-left",
+        onClick && "hover:bg-secondary/50 cursor-pointer active:scale-[0.98]"
       )}
     >
       <BankAvatar account={account} />
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">{account.name}</p>
+        <p className="font-semibold truncate font-display" style={{ letterSpacing: '-0.01em' }}>{account.name}</p>
         <p className="text-xs text-muted-foreground capitalize">{account.type === 'wallet' ? 'Carteira' : account.type === 'bank' ? 'Banco' : 'Cartão'}</p>
       </div>
       <p className={cn(

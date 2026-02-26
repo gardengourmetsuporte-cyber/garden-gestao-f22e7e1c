@@ -62,7 +62,7 @@ export function UnifiedCalendarWidget() {
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
           <div className="flex items-center gap-2">
             <AppIcon name="CalendarDays" size={16} className="text-primary" />
-            <span className="text-xs font-semibold text-foreground">Calendário</span>
+            <span className="text-xs font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Calendário</span>
           </div>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>

@@ -143,9 +143,9 @@ export function ChecklistDashboardWidget() {
               </div>
               <div>
                 <span className={cn(
-                  "text-base font-bold block",
+                  "text-base font-bold block font-display",
                   isComplete ? "text-success" : "text-foreground"
-                )}>
+                )} style={{ letterSpacing: '-0.02em' }}>
                   {card.label}
                 </span>
                 <span className={cn(

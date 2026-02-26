@@ -1,5 +1,4 @@
 import { AppIcon } from '@/components/ui/app-icon';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
 
@@ -42,14 +41,13 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
         const variant = stat.variant || 'default';
 
         return (
-          <Card key={index} className="overflow-hidden">
-            <CardContent className="p-4">
+          <div key={index} className="card-surface p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">{stat.title}</p>
-                  <p className="text-2xl font-bold"><AnimatedStatValue value={stat.value} /></p>
+                  <p className="text-[11px] font-medium text-muted-foreground mb-1 uppercase tracking-wide">{stat.title}</p>
+                  <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}><AnimatedStatValue value={stat.value} /></p>
                   {stat.subtitle && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{stat.subtitle}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{stat.subtitle}</p>
                   )}
                 </div>
                 <div className={cn(
@@ -59,8 +57,7 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
                   <AppIcon name={stat.icon} size={20} />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+          </div>
         );
       })}
     </div>

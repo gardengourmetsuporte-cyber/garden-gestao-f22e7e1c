@@ -28,15 +28,30 @@ export function FinanceChartWidget() {
 
   if (isLoading) {
     return (
-      <div className="card-command col-span-2 p-5 animate-slide-up stagger-2">
+      <div className="card-surface col-span-2 p-5 animate-slide-up stagger-2">
         <div className="flex items-center gap-2 mb-4">
-          <Skeleton className="w-8 h-8 rounded-lg" />
-          <Skeleton className="h-4 w-32" />
+          <div className="w-8 h-8 rounded-lg bg-secondary/60 relative overflow-hidden">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="h-3.5 w-24 rounded bg-secondary/60 relative overflow-hidden">
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+            <div className="h-2.5 w-16 rounded bg-secondary/60 relative overflow-hidden">
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-4">
-          <Skeleton className="w-[140px] h-[140px] rounded-full" />
+          <div className="w-[120px] h-[120px] rounded-full bg-secondary/60 relative overflow-hidden">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </div>
           <div className="flex-1 space-y-2">
-            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-5 w-full" />)}
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-4 w-full rounded bg-secondary/60 relative overflow-hidden">
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -67,7 +82,7 @@ export function FinanceChartWidget() {
               <AppIcon name="PieChart" size={18} className="text-destructive" />
             </div>
             <div>
-              <span className="text-sm font-bold text-foreground">Despesas do mês</span>
+              <span className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Despesas do mês</span>
               <span className="text-[10px] text-muted-foreground block">Por categoria</span>
             </div>
           </div>

@@ -176,7 +176,7 @@ export function FinanceHome({
       {/* Accounts List */}
       <div className="space-y-3 animate-slide-up stagger-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Contas</h2>
+          <h2 className="font-bold text-sm uppercase tracking-wider text-muted-foreground font-display">Contas</h2>
         </div>
         <div className="space-y-2">
           {accounts.map(account => (
