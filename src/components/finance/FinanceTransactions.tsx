@@ -182,7 +182,7 @@ export function FinanceTransactions({
     hasScrolledRef.current = true;
     const timer = setTimeout(() => {
       if (todayRef.current) {
-        const y = todayRef.current.getBoundingClientRect().top + window.scrollY - 80;
+        const y = todayRef.current.getBoundingClientRect().top + window.scrollY - 8;
         window.scrollTo({ top: y, behavior: 'instant' });
       }
     }, 150);
