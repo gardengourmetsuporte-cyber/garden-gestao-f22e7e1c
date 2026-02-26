@@ -216,11 +216,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           </div>
         </div>
       </header>
-      {/* Header glow — rendered outside header to sit behind page content */}
-      <div className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none" style={{ top: 'calc(env(safe-area-inset-top) + 3.5rem)', height: '16px', overflow: 'visible' }}>
-        <div className="absolute inset-x-[14%] top-0 h-[2px] rounded-full blur-[2px] opacity-75" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.65) 30%, hsl(var(--accent) / 0.45) 50%, hsl(var(--primary) / 0.65) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 12s ease-in-out infinite' }} />
-        <div className="absolute inset-x-[5%] top-[-2px] h-[9px] rounded-full blur-[10px] opacity-65" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.5) 30%, hsl(var(--accent) / 0.35) 50%, hsl(var(--primary) / 0.5) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 12s ease-in-out infinite' }} />
-        <div className="absolute inset-x-[10%] top-[-5px] h-[18px] rounded-full blur-[18px] opacity-45" style={{ background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.3) 30%, hsl(var(--accent) / 0.18) 50%, hsl(var(--primary) / 0.3) 70%, transparent 100%)', backgroundSize: '200% 100%', animation: 'headerGlowShift 12s ease-in-out infinite' }} />
+      {/* Header glow — soft diffused light matching bottom bar */}
+      <div className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none" style={{ top: 'calc(env(safe-area-inset-top) + 3.5rem)', height: '20px', overflow: 'visible' }}>
+        <div className="absolute left-[8%] right-[8%] bottom-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.35), hsl(var(--primary) / 0.5), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute left-[3%] right-[3%] bottom-[-1px] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), hsl(var(--accent) / 0.2), hsl(var(--primary) / 0.3), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute left-[12%] right-[12%] bottom-[-3px] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.1), hsl(var(--primary) / 0.15), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
       </div>
 
       {/* ======= Desktop Sidebar (unchanged) ======= */}
