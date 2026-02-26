@@ -8,6 +8,9 @@ import { useFabContext } from '@/contexts/FabActionContext';
 import { MoreDrawer } from './MoreDrawer';
 import { QuickActionSheet } from './QuickActionSheet';
 import { preloadRoute } from '@/lib/routePreload';
+import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
+import { useAuth } from '@/contexts/AuthContext';
+import { getModuleKeyFromRoute } from '@/lib/modules';
 
 interface TabDef {
   key: string;
@@ -38,6 +41,7 @@ export function BottomTabBar() {
   const navigate = useNavigate();
   const { hasAccess } = useUserModules();
   const { fabAction } = useFabContext();
+  const { plan } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -68,6 +72,14 @@ export function BottomTabBar() {
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
+  };
+
+  const isTabLocked = (path: string): boolean => {
+    const moduleKey = getModuleKeyFromRoute(path);
+    if (!moduleKey) return false;
+    const required = MODULE_REQUIRED_PLAN[moduleKey];
+    if (!required) return false;
+    return !planSatisfies(plan, required);
   };
 
   const activeKey = resolvedTabs.find(t => isActive(t.path))?.key ?? null;
@@ -125,7 +137,8 @@ export function BottomTabBar() {
                 ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
-                onClick={() => navigate(tab.path)}
+                locked={isTabLocked(tab.path)}
+                onClick={() => isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path)}
               />
             ))}
 
@@ -164,7 +177,8 @@ export function BottomTabBar() {
                 ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
-                onClick={() => navigate(tab.path)}
+                locked={isTabLocked(tab.path)}
+                onClick={() => isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path)}
               />
             ))}
 
@@ -190,9 +204,10 @@ const TabButton = forwardRef<
   {
     tab: TabDef;
     active: boolean;
+    locked?: boolean;
     onClick: () => void;
   }
->(({ tab, active, onClick }, ref) => {
+>(({ tab, active, locked, onClick }, ref) => {
   const [bouncing, setBouncing] = useState(false);
 
   const handleTap = () => {
@@ -238,6 +253,11 @@ const TabButton = forwardRef<
           weight={active ? 600 : 400}
           className={active ? 'tab-icon-galaxy' : ''}
         />
+        {locked && (
+          <span className="absolute -top-1 -right-2 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: 'hsl(45 90% 55% / 0.25)', border: '1px solid hsl(45 90% 55% / 0.6)' }}>
+            <AppIcon name="Gem" size={7} style={{ color: 'hsl(45 90% 55%)' }} />
+          </span>
+        )}
       </div>
       <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>
     </button>
