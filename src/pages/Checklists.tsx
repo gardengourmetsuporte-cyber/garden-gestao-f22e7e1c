@@ -460,7 +460,7 @@ export default function ChecklistsPage() {
                       </span>
                       <span className={cn(
                         "text-sm font-black",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-indigo-500"
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-primary"
                       )}>
                         {getTypeProgress.fechamento.percent}%
                       </span>

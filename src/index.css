@@ -27,14 +27,14 @@
     --neon-green: 142 71% 45%;
     --neon-red: 0 84% 60%;
     --neon-amber: 38 92% 50%;
-    --neon-purple: 258 90% 66%;
+    --neon-purple: 225 70% 50%;
 
     /* Semantic finance tokens */
     --color-income: 142 71% 45%;
     --color-expense: 0 84% 60%;
     --color-transfer: 234 50% 60%;
     --color-pending: 38 92% 50%;
-    --color-credit-card: 258 40% 55%;
+    --color-credit-card: 225 40% 50%;
 
     /* Surface hierarchy */
     --surface-elevated: 240 5% 12%;
@@ -81,7 +81,7 @@
     --muted: 240 4% 16%;
     --muted-foreground: 0 0% 50%;
 
-    --accent: 258 90% 66%;
+    --accent: 225 70% 50%;
     --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84% 60%;
@@ -99,18 +99,18 @@
 
     /* Glow & Shadow tokens */
     --glow-primary: 0 0 20px hsl(234 89% 67% / 0.25), 0 0 48px hsl(234 89% 67% / 0.12);
-    --glow-accent: 0 0 16px hsl(258 90% 66% / 0.18), 0 0 40px hsl(258 90% 66% / 0.08);
+    --glow-accent: 0 0 16px hsl(225 70% 50% / 0.18), 0 0 40px hsl(225 70% 50% / 0.08);
     --glow-success: 0 0 16px hsl(142 71% 45% / 0.15), 0 0 32px hsl(142 71% 45% / 0.08);
     --glow-destructive: 0 0 16px hsl(0 84% 60% / 0.15), 0 0 32px hsl(0 84% 60% / 0.08);
     --glow-warning: 0 0 16px hsl(38 92% 50% / 0.15), 0 0 32px hsl(38 92% 50% / 0.08);
     --glow-cyan: 0 0 16px hsl(234 89% 67% / 0.2), 0 0 32px hsl(234 89% 67% / 0.12);
 
     /* Gradient tokens */
-    --gradient-brand: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 67% / 0.12), hsl(258 90% 66% / 0.08));
+    --gradient-brand: linear-gradient(135deg, hsl(220 45% 18%), hsl(225 55% 22%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(220 45% 18% / 0.12), hsl(225 55% 22% / 0.08));
     --gradient-surface: linear-gradient(180deg, hsl(240 5% 12%), hsl(240 6% 5%));
-    --gradient-gold: linear-gradient(135deg, hsl(234 89% 67%), hsl(245 80% 68%), hsl(258 90% 66%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 67% / 0.15), hsl(258 90% 66% / 0.08));
+    --gradient-gold: linear-gradient(135deg, hsl(220 40% 15%), hsl(225 55% 20%), hsl(230 45% 16%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(220 45% 18% / 0.15), hsl(225 55% 22% / 0.08));
 
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.5), 0 6px 20px hsl(0 0% 0% / 0.35);
     --shadow-card-hover: 0 6px 24px hsl(0 0% 0% / 0.6), 0 12px 40px hsl(0 0% 0% / 0.3);
@@ -126,7 +126,7 @@
     --color-expense: 0 72% 42%;
     --color-transfer: 234 50% 45%;
     --color-pending: 38 80% 40%;
-    --color-credit-card: 258 35% 45%;
+    --color-credit-card: 225 35% 45%;
     --surface-elevated: 0 0% 100%;
     --surface-sunken: 234 8% 95%;
     --background: 234 8% 97%;
@@ -147,7 +147,7 @@
     --muted: 234 8% 94%;
     --muted-foreground: 240 6% 35%;
 
-    --accent: 258 90% 60%;
+    --accent: 225 65% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 48%;
@@ -168,7 +168,7 @@
     --neon-green: 142 71% 32%;
     --neon-red: 0 72% 48%;
     --neon-amber: 38 92% 42%;
-    --neon-purple: 258 80% 55%;
+    --neon-purple: 225 60% 45%;
 
     /* Light glow & shadow tokens — minimal, no colored glow */
     --glow-primary: 0 0 0 transparent;
@@ -183,11 +183,11 @@
     --shadow-floating: 0 8px 32px hsl(234 20% 30% / 0.08), 0 2px 8px hsl(234 20% 30% / 0.04);
 
     /* Gradient tokens — light: flat, minimal */
-    --gradient-brand: linear-gradient(135deg, hsl(234 89% 52%), hsl(258 80% 55%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 52% / 0.06), hsl(258 80% 55% / 0.03));
+    --gradient-brand: linear-gradient(135deg, hsl(220 45% 18%), hsl(225 55% 22%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(220 45% 18% / 0.06), hsl(225 55% 22% / 0.03));
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(234 8% 97%));
-    --gradient-gold: linear-gradient(135deg, hsl(234 89% 52%), hsl(245 80% 58%), hsl(258 80% 55%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 52% / 0.08), hsl(258 80% 55% / 0.04));
+    --gradient-gold: linear-gradient(135deg, hsl(220 40% 15%), hsl(225 55% 20%), hsl(230 45% 16%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(220 45% 18% / 0.08), hsl(225 55% 22% / 0.04));
     --shadow-glow: none;
   }
 
@@ -418,22 +418,22 @@
 
   .finance-hero-card--personal {
     background: linear-gradient(145deg, 
-      hsl(258 15% 10%) 0%, 
-      hsl(258 12% 13%) 40%, 
-      hsl(234 20% 16%) 100%
+      hsl(225 15% 10%) 0%, 
+      hsl(225 12% 13%) 40%, 
+      hsl(220 20% 16%) 100%
     );
     box-shadow: 
-      0 4px 24px hsl(258 90% 66% / 0.2),
-      0 8px 48px hsl(234 89% 67% / 0.08),
+      0 4px 24px hsl(225 70% 50% / 0.2),
+      0 8px 48px hsl(220 45% 18% / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.06);
     border-color: hsl(234 89% 67% / 0.12);
   }
 
   .finance-hero-card--personal:hover {
-    border-color: hsl(234 89% 67% / 0.2);
+    border-color: hsl(225 70% 50% / 0.2);
     box-shadow: 
-      0 6px 32px hsl(258 90% 66% / 0.25),
-      0 12px 56px hsl(234 89% 67% / 0.12),
+      0 6px 32px hsl(225 70% 50% / 0.25),
+      0 12px 56px hsl(220 45% 18% / 0.12),
       inset 0 1px 0 hsl(0 0% 100% / 0.08);
   }
 
@@ -450,8 +450,8 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(258 60% 60% / 0.1) 0%, transparent 55%),
-                radial-gradient(ellipse 100% 60% at 5% 110%, hsl(234 50% 55% / 0.06) 0%, transparent 45%);
+    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(225 60% 50% / 0.1) 0%, transparent 55%),
+                radial-gradient(ellipse 100% 60% at 5% 110%, hsl(220 50% 45% / 0.06) 0%, transparent 45%);
     pointer-events: none;
   }
 
@@ -789,18 +789,18 @@
 
   .fab-neon-border {
     background: linear-gradient(135deg,
-      hsl(234 89% 67%),
-      hsl(258 90% 66%),
-      hsl(234 89% 67%)
+      hsl(220 45% 18%),
+      hsl(225 55% 22%),
+      hsl(220 45% 18%)
     );
     opacity: 0.7;
   }
 
   .fab-neon-border-personal {
     background: linear-gradient(135deg,
-      hsl(234 89% 67%),
-      hsl(258 90% 66%),
-      hsl(234 89% 67%)
+      hsl(220 45% 18%),
+      hsl(225 55% 22%),
+      hsl(220 45% 18%)
     );
     opacity: 0.7;
   }
@@ -1467,17 +1467,17 @@
   .nav-bar-neon-glow {
     background: linear-gradient(
       135deg,
-      hsl(234 89% 67% / 0.7),
-      hsl(258 90% 66% / 0.5),
-      hsl(234 89% 67% / 0.2),
-      hsl(258 90% 66% / 0.5),
-      hsl(234 89% 67% / 0.7)
+      hsl(220 45% 18% / 0.7),
+      hsl(225 55% 22% / 0.5),
+      hsl(220 45% 18% / 0.2),
+      hsl(225 55% 22% / 0.5),
+      hsl(220 45% 18% / 0.7)
     );
     box-shadow:
-      0 0 15px hsl(234 89% 67% / 0.35),
-      0 0 30px hsl(234 89% 67% / 0.15),
-      0 0 60px hsl(258 90% 66% / 0.1),
-      inset 0 0 15px hsl(234 89% 67% / 0.05);
+      0 0 15px hsl(220 45% 18% / 0.35),
+      0 0 30px hsl(220 45% 18% / 0.15),
+      0 0 60px hsl(225 55% 22% / 0.1),
+      inset 0 0 15px hsl(220 45% 18% / 0.05);
   }
 
   @keyframes neonPulse {
@@ -1538,7 +1538,7 @@
 
   /* Indigo shimmer text — use on headings */
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 89% 75%));
+    background: linear-gradient(135deg, hsl(220 45% 18%), hsl(225 55% 22%), hsl(220 40% 25%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1554,7 +1554,7 @@
 
   /* Animated gradient background */
   .bg-gradient-animated {
-    background: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 70% 55%), hsl(234 89% 67%));
+    background: linear-gradient(135deg, hsl(220 45% 18%), hsl(225 55% 22%), hsl(220 40% 15%), hsl(220 45% 18%));
     background-size: 300% 300%;
     animation: gradientFlow 18s ease-in-out infinite;
   }
@@ -1622,7 +1622,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(var(--neon-angle, 0deg), hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 70% 55%), hsl(234 89% 67%));
+    background: linear-gradient(var(--neon-angle, 0deg), hsl(220 45% 18%), hsl(225 55% 22%), hsl(220 40% 15%), hsl(220 45% 18%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

@@ -215,7 +215,7 @@ export default function CalendarFull() {
 
                   {/* Marketing */}
                   {selectedEvents!.marketing.length > 0 && (
-                    <EventSection icon="Megaphone" iconColor="text-violet-500" title="Marketing">
+                    <EventSection icon="Megaphone" iconColor="text-accent" title="Marketing">
                       {selectedEvents!.marketing.map(ev => <EventRow key={ev.id} event={ev} />)}
                     </EventSection>
                   )}

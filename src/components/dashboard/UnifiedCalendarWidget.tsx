@@ -188,7 +188,7 @@ export function UnifiedCalendarWidget() {
 
             {/* Marketing */}
             {selectedEvents.marketing.length > 0 && (
-              <EventSection icon={<AppIcon name="Megaphone" size={14} className="text-violet-500" />} title="Marketing">
+              <EventSection icon={<AppIcon name="Megaphone" size={14} className="text-accent" />} title="Marketing">
                 {selectedEvents.marketing.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}

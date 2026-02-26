@@ -128,7 +128,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <div className={cn(
               "p-1.5 rounded-lg shrink-0",
-              isSubRecipe ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" : "bg-primary/10 text-primary"
+              isSubRecipe ? "bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent" : "bg-primary/10 text-primary"
             )}>
               {isSubRecipe ? <Soup className="h-4 w-4" /> : <Package className="h-4 w-4" />}
             </div>
