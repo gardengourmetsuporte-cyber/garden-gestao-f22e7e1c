@@ -97,9 +97,10 @@ export default function AlertsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {unreadCount > 0 && (
-          <header className="page-header-bar">
-            <div className="page-header-content flex items-center justify-end">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
+          {/* Action row */}
+          {unreadCount > 0 && (
+            <div className="flex items-center justify-end">
               <button
                 onClick={markAllAsRead}
                 className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
@@ -107,10 +108,7 @@ export default function AlertsPage() {
                 Marcar todas como lidas
               </button>
             </div>
-          </header>
-        )}
-
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+          )}
           {/* Origin filter chips */}
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {origins.map(o => (

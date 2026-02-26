@@ -289,9 +289,9 @@ export default function Agenda() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header actions */}
-        <header className="page-header-bar">
-          <div className="page-header-content flex items-center justify-between">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
+          {/* Stats + actions row */}
+          <div className="flex items-center justify-between">
             {!isLoading && (
               <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground">
@@ -302,7 +302,7 @@ export default function Agenda() {
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="ghost" className="rounded-xl w-10 h-10">
@@ -323,9 +323,6 @@ export default function Agenda() {
               </DropdownMenu>
             </div>
           </div>
-        </header>
-
-        <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* View mode tabs with animated indicator */}
           <div className="relative flex bg-muted/50 rounded-2xl p-1 border border-border">
             <div

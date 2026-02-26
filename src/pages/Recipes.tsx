@@ -177,15 +177,13 @@ export default function Recipes() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        <header className="page-header-bar">
-          <div className="page-header-content flex items-center justify-end">
+        <div className="px-4 py-4 lg:px-6 space-y-4">
+          {/* Action row */}
+          <div className="flex items-center justify-end">
             <button onClick={handleCreate} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
               <AppIcon name="Plus" size={20} />
             </button>
           </div>
-        </header>
-
-        <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="stat-command stat-command-purple">
