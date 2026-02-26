@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
-import { differenceInHours, format, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MonthSelector } from './MonthSelector';
 import { TransactionItem } from './TransactionItem';
@@ -26,58 +26,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Module-level constants & helpers (avoid re-creation on every render)
-const FINANCE_SEEN_KEY = 'finance_seen_txns';
-
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const formatCurrency = (value: number) => currencyFormatter.format(value);
-
-// Module-level seen set — survives all mount/unmount cycles within the session
-const _seenIds: Set<string> = new Set();
-let _seenInitialised = false;
-
-function _initSeen() {
-  if (_seenInitialised) return;
-  _seenInitialised = true;
-  try {
-    const raw = localStorage.getItem(FINANCE_SEEN_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const entries: [string, number][] = Array.isArray(parsed)
-        ? parsed.map((id: string) => [id, Date.now()] as [string, number])
-        : Object.entries(parsed);
-      const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days
-      entries.forEach(([id, ts]) => { if ((ts as number) > cutoff) _seenIds.add(id); });
-    }
-  } catch {}
-}
-
-let _persistTimeout: ReturnType<typeof setTimeout> | null = null;
-
-function _persistSeen() {
-  if (_persistTimeout) clearTimeout(_persistTimeout);
-  _persistTimeout = setTimeout(() => {
-    try {
-      const data: Record<string, number> = {};
-      _seenIds.forEach(id => { data[id] = Date.now(); });
-      localStorage.setItem(FINANCE_SEEN_KEY, JSON.stringify(data));
-    } catch {}
-  }, 2000);
-}
-
-function markSeenGlobal(id: string): boolean {
-  if (_seenIds.has(id)) return false;
-  _seenIds.add(id);
-  _persistSeen();
-  return true;
-}
-
-function isSeenGlobal(id: string): boolean {
-  return _seenIds.has(id);
-}
-
-// Run once at module load
-_initSeen();
 
 function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
   const {
@@ -153,18 +103,6 @@ export function FinanceTransactions({
     ...initialFilters
   });
 
-  const [, forceUpdate] = useState(0);
-
-  const markSeen = useCallback((id: string) => {
-    if (!markSeenGlobal(id)) return;
-    forceUpdate(v => v + 1);
-  }, []);
-
-  const isNewTransaction = (t: FinanceTransaction): boolean => {
-    if (isSeenGlobal(t.id)) return false;
-    const hoursAgo = differenceInHours(new Date(), new Date(t.created_at));
-    return hoursAgo < 48;
-  };
 
   // Apply initialFilters when they change from parent (reset to defaults when empty)
   useEffect(() => {
@@ -359,19 +297,9 @@ export function FinanceTransactions({
                                 )}
                                 <TransactionItem
                                   transaction={transaction}
-                                  isNew={isNewTransaction(transaction)}
-                                  onClick={() => {
-                                    markSeen(transaction.id);
-                                    onTransactionClick(transaction);
-                                  }}
-                                  onTogglePaid={async (id, isPaid) => {
-                                    markSeen(id);
-                                    await onTogglePaid(id, isPaid);
-                                  }}
-                                  onDelete={async (id) => {
-                                    markSeen(id);
-                                    await onDeleteTransaction(id);
-                                  }}
+                                  onClick={() => onTransactionClick(transaction)}
+                                  onTogglePaid={onTogglePaid}
+                                  onDelete={onDeleteTransaction}
                                   disableSwipe={isDragging}
                                 />
                               </div>

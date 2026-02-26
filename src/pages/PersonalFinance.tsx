@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
 import { FinanceHome } from '@/components/finance/FinanceHome';
@@ -90,8 +91,16 @@ export default function PersonalFinance() {
   const handleSaveTransaction = async (data: Parameters<typeof addTransaction>[0]) => {
     if (editingTransaction) {
       await updateTransaction(editingTransaction.id, data);
+      toast.success('Transação atualizada!', {
+        action: { label: 'Ver', onClick: () => setActiveTab('transactions') },
+        duration: 5000,
+      });
     } else {
       await addTransaction(data);
+      toast.success('Transação criada!', {
+        action: { label: 'Ver', onClick: () => setActiveTab('transactions') },
+        duration: 5000,
+      });
     }
   };
 
