@@ -165,7 +165,7 @@ export function BottomTabBar() {
                 )}
                 style={{
                   background: 'var(--gradient-brand)',
-                  boxShadow: '0 0 24px hsl(220 85% 58% / 0.5), 0 0 48px hsl(262 70% 55% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
+                  boxShadow: '0 0 24px hsl(var(--primary) / 0.5), 0 0 48px hsl(var(--accent) / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
                 }}
               >
                 <AppIcon
@@ -240,7 +240,7 @@ const TabButton = forwardRef<
         style={{
           transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.1)' : 'scale(1)'),
           transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-          ...(active ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : {}),
+          ...(active ? { filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))' } : {}),
         }}
       >
         <AppIcon

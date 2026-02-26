@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/accordion";
 
 const faqs = [
-  { q: "Preciso instalar alguma coisa?", a: "Não. O Atlas funciona no navegador e no celular como um app (PWA). Basta acessar e adicionar à tela inicial." },
+  { q: "Preciso instalar alguma coisa?", a: "Não. O Garden funciona no navegador e no celular como um app (PWA). Basta acessar e adicionar à tela inicial." },
   { q: "Quantos usuários posso ter?", a: "Pro: até 15 usuários. Business: ilimitado. Cada membro da equipe tem seu login e permissões." },
   { q: "Funciona com iFood e delivery?", a: "Sim! O módulo financeiro separa automaticamente os canais de venda — iFood, delivery, cartão, Pix, dinheiro." },
   { q: "Meus dados ficam seguros?", a: "Sim. Infraestrutura em nuvem com criptografia e backup diário automático. Seus dados são 100% seus." },

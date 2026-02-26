@@ -1,4 +1,4 @@
-import atlasIcon from "@/assets/atlas-icon.png";
+import gardenLogo from "@/assets/logo.png";
 
 export function PageLoader() {
   return (
@@ -18,9 +18,9 @@ export function PageLoader() {
         {/* Logo */}
         <div className="absolute inset-2 rounded-full overflow-hidden bg-card border border-border/30 flex items-center justify-center">
           <img
-            alt="Atlas"
+            alt="Garden Gestão"
             className="w-full h-full object-contain rounded-full p-1"
-            src={atlasIcon}
+            src={gardenLogo}
           />
         </div>
       </div>

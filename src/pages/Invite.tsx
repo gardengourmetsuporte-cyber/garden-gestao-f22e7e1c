@@ -1,4 +1,4 @@
-import atlasIcon from '@/assets/atlas-icon.png';
+import gardenLogo from '@/assets/logo.png';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -214,7 +214,7 @@ export default function Invite() {
             <div className="w-20 h-20 rounded-full overflow-hidden bg-white border-2 border-primary/20"
               style={{ boxShadow: '0 0 30px hsl(var(--neon-cyan) / 0.15)' }}
             >
-              <img alt="Atlas" className="w-full h-full object-contain rounded-full p-1" src={atlasIcon} />
+              <img alt="Garden Gestão" className="w-full h-full object-contain rounded-full p-1" src={gardenLogo} />
             </div>
             <div className="text-center">
               <h1 className="text-2xl font-extrabold text-foreground">Você foi convidado!</h1>

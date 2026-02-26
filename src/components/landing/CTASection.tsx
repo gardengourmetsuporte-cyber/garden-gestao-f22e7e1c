@@ -8,7 +8,7 @@ export function CTASection() {
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(135deg, hsl(142 71% 15% / 0.6), hsl(190 90% 10% / 0.4), hsl(var(--background)))",
+            background: "linear-gradient(135deg, hsl(160 84% 12% / 0.6), hsl(172 66% 10% / 0.4), hsl(var(--background)))",
           }}
         />
         <div
