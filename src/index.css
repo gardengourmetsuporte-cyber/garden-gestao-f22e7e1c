@@ -17,7 +17,7 @@
 @layer base {
   /* Base tokens shared by both themes */
   :root {
-    --radius: 1rem;
+    --radius: 1.25rem;
 
     /* Neon glow tokens */
     --neon-cyan: 190 90% 55%;
@@ -101,9 +101,10 @@
     --glow-warning: 0 0 16px hsl(38 92% 50% / 0.15), 0 0 32px hsl(38 92% 50% / 0.08);
     --glow-cyan: 0 0 16px hsl(190 90% 55% / 0.15), 0 0 32px hsl(190 90% 55% / 0.08);
 
-    --shadow-card: 0 2px 8px hsl(222 50% 3% / 0.5), 0 4px 16px hsl(222 50% 3% / 0.3);
-    --shadow-card-hover: 0 4px 20px hsl(222 50% 3% / 0.6), 0 8px 32px hsl(222 50% 3% / 0.3);
-    --shadow-elevated: 0 8px 32px hsl(222 50% 3% / 0.7), 0 12px 48px hsl(222 50% 3% / 0.3);
+    --shadow-card: 0 2px 8px hsl(222 50% 3% / 0.5), 0 6px 20px hsl(222 50% 3% / 0.35);
+    --shadow-card-hover: 0 6px 24px hsl(222 50% 3% / 0.6), 0 12px 40px hsl(222 50% 3% / 0.3);
+    --shadow-elevated: 0 8px 32px hsl(222 50% 3% / 0.7), 0 16px 56px hsl(222 50% 3% / 0.35);
+    --shadow-floating: 0 8px 32px hsl(0 0% 0% / 0.25), 0 2px 8px hsl(0 0% 0% / 0.15);
   }
 
   /* ===== LIGHT THEME ===== */
@@ -157,9 +158,10 @@
     --glow-warning: 0 0 12px hsl(38 92% 50% / 0.1);
     --glow-cyan: 0 0 12px hsl(190 90% 55% / 0.1);
 
-    --shadow-card: 0 1px 3px hsl(220 25% 10% / 0.06), 0 2px 8px hsl(220 25% 10% / 0.04), 0 0 0 1px hsl(220 13% 90% / 0.6);
-    --shadow-card-hover: 0 4px 12px hsl(220 25% 10% / 0.08), 0 8px 24px hsl(220 25% 10% / 0.04), 0 0 0 1px hsl(220 13% 88% / 0.8);
-    --shadow-elevated: 0 4px 16px hsl(220 25% 10% / 0.1), 0 8px 32px hsl(220 25% 10% / 0.05);
+    --shadow-card: 0 1px 3px hsl(220 25% 10% / 0.06), 0 4px 12px hsl(220 25% 10% / 0.06), 0 0 0 1px hsl(220 13% 90% / 0.6);
+    --shadow-card-hover: 0 4px 16px hsl(220 25% 10% / 0.1), 0 8px 28px hsl(220 25% 10% / 0.06), 0 0 0 1px hsl(220 13% 88% / 0.8);
+    --shadow-elevated: 0 6px 20px hsl(220 25% 10% / 0.12), 0 12px 40px hsl(220 25% 10% / 0.06);
+    --shadow-floating: 0 8px 32px hsl(220 25% 10% / 0.12), 0 2px 8px hsl(220 25% 10% / 0.06);
   }
 
 }
@@ -227,13 +229,23 @@
   .card-interactive {
     @apply bg-card rounded-2xl
            cursor-pointer transition-all duration-200
-           hover:border-primary/20 active:scale-[0.97];
+           active:scale-[0.97];
     border: 1px solid hsl(var(--border) / 0.4);
     box-shadow: var(--shadow-card);
   }
 
   .card-interactive:hover {
     box-shadow: var(--shadow-card-hover);
+    border-color: hsl(var(--primary) / 0.15);
+  }
+
+  .card-glass {
+    @apply rounded-2xl transition-all duration-200;
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--border) / 0.15);
+    box-shadow: var(--shadow-card);
   }
 
 
@@ -366,16 +378,26 @@
 
   .page-header-bar {
     @apply bg-card/80 backdrop-blur-2xl sticky top-0 z-40;
-    border-bottom: 1px solid hsl(var(--border) / 0.2);
-    box-shadow: 0 1px 0 hsl(var(--primary) / 0.04), 0 4px 16px hsl(var(--background) / 0.4);
+    border-bottom: none;
+    box-shadow: 0 1px 0 hsl(var(--border) / 0.08), 0 4px 16px hsl(var(--background) / 0.4);
+  }
+
+  .page-header-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, hsl(var(--border) / 0.2) 20%, hsl(var(--border) / 0.2) 80%, transparent 100%);
   }
 
   .page-header-bar .page-header-content {
-    @apply px-4 py-3 lg:px-6;
+    @apply px-4 py-3.5 lg:px-6;
   }
 
   .page-title {
-    @apply text-xl font-extrabold tracking-tight text-foreground;
+    @apply text-2xl font-extrabold tracking-tight text-foreground;
     font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
     letter-spacing: -0.03em;
   }
@@ -616,27 +638,21 @@
   /* ========== FAB NEON ========== */
 
   .fab-neon-border {
-    background: conic-gradient(
-      from var(--neon-angle, 0deg),
-      hsl(var(--neon-cyan)),
-      hsl(var(--neon-purple)),
+    background: linear-gradient(135deg,
       hsl(var(--primary)),
-      hsl(var(--neon-cyan))
+      hsl(var(--neon-cyan)),
+      hsl(var(--neon-purple))
     );
-    animation: neonRotate 3s linear infinite;
-    box-shadow: 0 0 16px hsl(var(--neon-cyan) / 0.3), 0 0 32px hsl(var(--neon-purple) / 0.15);
+    opacity: 0.7;
   }
 
   .fab-neon-border-personal {
-    background: conic-gradient(
-      from var(--neon-angle, 0deg),
+    background: linear-gradient(135deg,
       hsl(160 60% 45%),
       hsl(140 50% 35%),
-      hsl(170 55% 40%),
-      hsl(160 60% 45%)
+      hsl(170 55% 40%)
     );
-    animation: neonRotate 3s linear infinite;
-    box-shadow: 0 0 16px hsl(160 60% 45% / 0.3), 0 0 32px hsl(150 45% 35% / 0.15);
+    opacity: 0.7;
   }
 
   .fab {
@@ -1190,10 +1206,36 @@
     100% { transform: scale(1); }
   }
 
-  /* Nav pill indicator */
+  /* Nav pill indicator — now a highlight pill behind active item */
   .nav-pill-indicator {
-    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease;
+  }
+
+  .nav-highlight-pill {
+    transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Glass border effect */
+  .glass-border {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .glass-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(0 0% 100% / 0.12), hsl(0 0% 100% / 0.03));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 
   /* Page transition - slide + fade */
@@ -1220,15 +1262,10 @@
   .spring-stagger-5 { animation-delay: 320ms; }
   .spring-stagger-6 { animation-delay: 400ms; }
 
-  /* Active nav icon bounce */
+  /* Active nav icon — subtle scale */
   .nav-icon-active {
-    animation: navIconBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-  }
-
-  @keyframes navIconBounce {
-    0% { transform: translateY(0); }
-    40% { transform: translateY(-3px); }
-    100% { transform: translateY(-2px); }
+    transform: scale(1.1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* Reduced motion support */

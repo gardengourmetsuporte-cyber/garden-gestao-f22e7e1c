@@ -20,15 +20,17 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
 ];
 
 export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, variant = 'business' }: FinanceBottomNavProps) {
-  const accentColor = variant === 'personal' ? 'hsl(160 60% 45%)' : 'hsl(var(--neon-cyan))';
-  const accentGlow = variant === 'personal' ? 'hsl(160 60% 45% / 0.5)' : 'hsl(var(--neon-cyan) / 0.5)';
-  const accentGlow2 = variant === 'personal' ? 'hsl(160 60% 45% / 0.2)' : 'hsl(var(--neon-cyan) / 0.2)';
+  const accentColor = variant === 'personal' ? 'hsl(160 60% 45%)' : 'hsl(var(--primary))';
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleAction = (type: TransactionType) => {
     setMenuOpen(false);
     onAddTransaction(type);
   };
+
+  // Calculate active tab index (accounting for FAB in center)
+  const allSlots = [tabs[0], tabs[1], '__fab__' as any, tabs[2], tabs[3]];
+  const activeSlotIdx = activeTab === 'home' ? 0 : activeTab === 'transactions' ? 1 : activeTab === 'charts' ? 3 : 4;
 
   return createPortal(
     <>
@@ -42,130 +44,139 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
 
       {/* Radial Menu */}
       {menuOpen && (
-      <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <div className="flex items-end gap-6 mb-4">
-          {/* Income */}
-          <button
-            onClick={() => handleAction('income')}
-            className="flex flex-col items-center gap-2 animate-scale-in"
-            style={{ animationDelay: '0ms' }}
-          >
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-emerald-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
-              style={{ boxShadow: '0 0 16px rgba(16, 185, 129, 0.3)' }}
+        <div className="fixed bottom-24 left-0 right-0 z-50 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="flex items-end gap-5 mb-4">
+            {/* Income */}
+            <button
+              onClick={() => handleAction('income')}
+              className="flex flex-col items-center gap-2 animate-scale-in"
+              style={{ animationDelay: '0ms' }}
             >
-              <AppIcon name="ArrowUpCircle" size={28} className="text-emerald-400" />
-            </div>
-            <span className="text-[11px] font-semibold text-emerald-400">Receita</span>
-          </button>
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150"
+                style={{ boxShadow: '0 0 16px rgba(16, 185, 129, 0.2)' }}
+              >
+                <AppIcon name="ArrowUpCircle" size={28} className="text-emerald-400" />
+              </div>
+              <span className="text-[11px] font-semibold text-emerald-400">Receita</span>
+            </button>
 
-          {/* Expense */}
-          <button
-            onClick={() => handleAction('expense')}
-            className="flex flex-col items-center gap-2 animate-scale-in -mt-4"
-            style={{ animationDelay: '50ms' }}
-          >
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-red-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
-              style={{ boxShadow: '0 0 16px rgba(239, 68, 68, 0.3)' }}
+            {/* Expense */}
+            <button
+              onClick={() => handleAction('expense')}
+              className="flex flex-col items-center gap-2 animate-scale-in -mt-4"
+              style={{ animationDelay: '50ms' }}
             >
-              <AppIcon name="ArrowDownCircle" size={28} className="text-red-400" />
-            </div>
-            <span className="text-[11px] font-semibold text-red-400">Despesa</span>
-          </button>
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150"
+                style={{ boxShadow: '0 0 16px rgba(239, 68, 68, 0.2)' }}
+              >
+                <AppIcon name="ArrowDownCircle" size={28} className="text-red-400" />
+              </div>
+              <span className="text-[11px] font-semibold text-red-400">Despesa</span>
+            </button>
 
-          {/* Transfer */}
-          <button
-            onClick={() => handleAction('transfer')}
-            className="flex flex-col items-center gap-2 animate-scale-in"
-            style={{ animationDelay: '100ms' }}
-          >
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-card border-2 border-cyan-500/50 active:scale-90 transition-transform duration-150 shadow-lg"
-              style={{ boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)' }}
+            {/* Transfer */}
+            <button
+              onClick={() => handleAction('transfer')}
+              className="flex flex-col items-center gap-2 animate-scale-in"
+              style={{ animationDelay: '100ms' }}
             >
-              <AppIcon name="ArrowLeftRight" size={28} className="text-cyan-400" />
-            </div>
-            <span className="text-[11px] font-semibold text-cyan-400">Transf.</span>
-          </button>
-        </div>
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150"
+                style={{ boxShadow: '0 0 16px rgba(6, 182, 212, 0.2)' }}
+              >
+                <AppIcon name="ArrowLeftRight" size={28} className="text-cyan-400" />
+              </div>
+              <span className="text-[11px] font-semibold text-cyan-400">Transf.</span>
+            </button>
+          </div>
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60] bg-card/95 backdrop-blur-2xl border-t border-border/15" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        {/* Top glow line */}
-        <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-        <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
-          {/* Animated pill indicator */}
-          <div
-            className="absolute bottom-1 h-[3px] rounded-full nav-pill-indicator"
+      <nav
+        className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <div
+          className="mx-4 mb-3 rounded-[28px] glass-border"
+          style={{
+            background: 'hsl(var(--card) / 0.7)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+            boxShadow: 'var(--shadow-floating)',
+          }}
+        >
+          <div className="flex items-center justify-around h-[60px] max-w-lg mx-auto relative px-2">
+            {/* Highlight pill */}
+            <div
+              className="absolute nav-highlight-pill rounded-2xl"
               style={{
-              background: accentColor,
-              boxShadow: `0 0 14px ${accentGlow}, 0 0 28px ${accentGlow2}`,
-              width: '24px',
-              left: `calc(${
-                activeTab === 'home' ? '12.5%' :
-                activeTab === 'transactions' ? '31.25%' :
-                activeTab === 'charts' ? '68.75%' :
-                '87.5%'
-              } - 12px)`,
-            }}
-          />
-          {/* Left tabs */}
-          {tabs.slice(0, 2).map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
-                activeTab === tab.id
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className={cn(activeTab === tab.id && "nav-icon-active")}>
-                <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
-              </div>
-              <span className="text-[10px] font-medium">{tab.label}</span>
-            </button>
-          ))}
+                background: `${accentColor}15`,
+                border: `1px solid ${accentColor}20`,
+                width: '48px',
+                height: '40px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                left: `calc(${((activeSlotIdx + 0.5) / 5) * 100}% - 24px)`,
+              }}
+            />
 
-          {/* Center FAB */}
-          <div className="flex-1 flex items-center justify-center">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className={cn(
-                "absolute -top-6 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300",
-                menuOpen ? "rotate-45 scale-95" : "hover:scale-105 active:scale-95"
-              )}
-            >
-              {/* Neon rotating border */}
-              <div className={cn("absolute inset-0 rounded-full", variant === 'personal' ? 'fab-neon-border-personal' : 'fab-neon-border')} />
-              {/* Inner background */}
-              <div className="absolute inset-[2px] rounded-full bg-card" />
-              {/* Icon */}
-              <AppIcon name="Plus" size={32} className="relative z-10" style={{ color: accentColor }} />
-            </button>
+            {/* Left tabs */}
+            {tabs.slice(0, 2).map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
+                  activeTab === tab.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <div className={cn(activeTab === tab.id && "nav-icon-active")}>
+                  <AppIcon name={tab.icon} size={22} />
+                </div>
+                {activeTab === tab.id && <span className="text-[10px] font-semibold">{tab.label}</span>}
+              </button>
+            ))}
+
+            {/* Center FAB */}
+            <div className="flex-1 flex items-center justify-center">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className={cn(
+                  "absolute -top-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
+                  menuOpen ? "rotate-45 scale-95" : "hover:scale-105 active:scale-90"
+                )}
+                style={{
+                  background: variant === 'personal'
+                    ? 'linear-gradient(135deg, hsl(160 60% 45%), hsl(160 60% 35%))'
+                    : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
+                  boxShadow: variant === 'personal'
+                    ? '0 4px 16px hsl(160 60% 45% / 0.35)'
+                    : '0 4px 16px hsl(var(--primary) / 0.35)',
+                }}
+              >
+                <AppIcon name="Plus" size={26} className="relative z-10 text-primary-foreground" />
+              </button>
+            </div>
+
+            {/* Right tabs */}
+            {tabs.slice(2, 4).map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
+                  activeTab === tab.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <div className={cn(activeTab === tab.id && "nav-icon-active")}>
+                  <AppIcon name={tab.icon} size={22} />
+                </div>
+                {activeTab === tab.id && <span className="text-[10px] font-semibold">{tab.label}</span>}
+              </button>
+            ))}
           </div>
-
-          {/* Right tabs */}
-          {tabs.slice(2, 5).map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
-                activeTab === tab.id
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className={cn(activeTab === tab.id && "nav-icon-active")}>
-                <AppIcon name={tab.icon} size={24} style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 6px hsl(217 91% 60% / 0.6))' } : undefined} />
-              </div>
-              <span className="text-[10px] font-medium">{tab.label}</span>
-            </button>
-          ))}
         </div>
       </nav>
     </>,

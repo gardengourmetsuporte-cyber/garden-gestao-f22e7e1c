@@ -165,7 +165,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
               <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2.5 block text-muted-foreground/50 font-display">
                 {group.label}
               </span>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 gap-4">
                 {group.items.map(item => {
                   const active = location.pathname === item.href;
                   const moduleStatus = moduleStatuses[item.href];
@@ -181,13 +181,16 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                       <div className="relative">
                         <div
                           className={cn(
-                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
-                            active ? "bg-primary" : "bg-secondary"
+                            "w-12 h-12 rounded-[18px] flex items-center justify-center transition-all",
+                            active ? "" : "bg-secondary"
                           )}
                           style={{
                             boxShadow: active ? '0 4px 16px hsl(var(--primary) / 0.4)' : undefined,
                             opacity: locked ? 0.5 : 1,
-                            border: locked ? '1px dashed hsl(var(--primary) / 0.4)' : active ? 'none' : '1px solid hsl(var(--border) / 0.5)',
+                            border: locked ? '1px dashed hsl(var(--primary) / 0.4)' : active ? 'none' : '1px solid hsl(var(--border) / 0.3)',
+                            ...(active ? {
+                              background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
+                            } : {}),
                           }}
                         >
                           <AppIcon
