@@ -72,12 +72,6 @@ export default function Marketing() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-4 lg:px-6 space-y-4">
-          {/* Action row */}
-          <div className="flex items-center justify-end">
-            <button onClick={() => handleNewPost()} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
-              <AppIcon name="Plus" size={20} />
-            </button>
-          </div>
           <AnimatedTabs
             tabs={[
               { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
@@ -117,6 +111,14 @@ export default function Marketing() {
           </div>
         </div>
 
+        {/* FAB - New Post */}
+        <button
+          onClick={() => handleNewPost()}
+          className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
+        >
+          <AppIcon name="Plus" size={24} />
+        </button>
       </div>
 
       <PostSheet

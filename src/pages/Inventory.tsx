@@ -158,24 +158,15 @@ export default function InventoryPage() {
             </div>
           )}
 
-          {/* Tabs + Add button */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <AnimatedTabs
-                tabs={[
-                  { key: 'items', label: 'Itens', icon: <AppIcon name="ClipboardList" size={16} /> },
-                  { key: 'history', label: 'Histórico', icon: <AppIcon name="History" size={16} /> },
-                ]}
-                activeTab={view}
-                onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
-              />
-            </div>
-            {isAdmin && (
-              <button onClick={handleAddItem} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shrink-0">
-                <AppIcon name="Plus" size={20} />
-              </button>
-            )}
-          </div>
+          {/* Tabs */}
+          <AnimatedTabs
+            tabs={[
+              { key: 'items', label: 'Itens', icon: <AppIcon name="ClipboardList" size={16} /> },
+              { key: 'history', label: 'Histórico', icon: <AppIcon name="History" size={16} /> },
+            ]}
+            activeTab={view}
+            onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
+          />
 
           {/* Search */}
           <SearchBar
@@ -275,6 +266,16 @@ export default function InventoryPage() {
             )}
           </div>
         </div>
+        {/* FAB - Add Item */}
+        {isAdmin && (
+          <button
+            onClick={handleAddItem}
+            className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
+          >
+            <AppIcon name="Plus" size={24} />
+          </button>
+        )}
 
         <QuickMovementSheetNew
           item={selectedItem}
