@@ -174,8 +174,19 @@ export function useFinanceCore({
       const { error } = await supabase.from('finance_transactions').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => invalidateTransactionsAndAccounts(),
-    onError: () => toast.error('Erro ao excluir transação'),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: transactionsKey });
+      const previous = queryClient.getQueryData<FinanceTransaction[]>(transactionsKey);
+      queryClient.setQueryData<FinanceTransaction[]>(transactionsKey, (old) =>
+        old?.filter(t => t.id !== id)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(transactionsKey, context.previous);
+      toast.error('Erro ao excluir transação');
+    },
+    onSettled: () => invalidateTransactionsAndAccounts(),
   });
 
   const togglePaidMut = useMutation({

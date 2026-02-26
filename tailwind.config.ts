@@ -61,6 +61,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        income: "hsl(var(--color-income))",
+        expense: "hsl(var(--color-expense))",
+        transfer: "hsl(var(--color-transfer))",
+        pending: "hsl(var(--color-pending))",
       },
       borderRadius: {
         lg: "var(--radius)",

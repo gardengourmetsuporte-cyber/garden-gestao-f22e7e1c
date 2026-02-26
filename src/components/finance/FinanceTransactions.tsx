@@ -314,10 +314,20 @@ export function FinanceTransactions({
             </div>
           </DndContext>
         ) : (
-          <div className="empty-state">
-            <AppIcon name="FileText" size={48} className="mb-4 opacity-50" />
-            <p className="text-lg font-medium">Nenhuma transação</p>
-            <p className="text-sm">Toque em + para adicionar</p>
+          <div className="px-4">
+            <div className="flex flex-col items-center justify-center py-16 animate-fade-in">
+              <div className="relative mb-5">
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-primary/8 border border-primary/15">
+                  <AppIcon name="FileText" size={36} className="text-primary/60" style={{ filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.2))' }} />
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary/20 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-primary/15 animate-pulse" style={{ animationDelay: '0.8s' }} />
+              </div>
+              <p className="font-bold text-foreground text-center">Nenhuma transação</p>
+              <p className="text-sm text-muted-foreground mt-1.5 text-center max-w-[280px] leading-relaxed">
+                {hasActiveFilters ? 'Nenhuma transação encontrada com os filtros selecionados' : 'Adicione sua primeira transação para começar a controlar suas finanças'}
+              </p>
+            </div>
           </div>
         )}
       </div>
