@@ -175,15 +175,18 @@ export function FinanceTransactions({
     hasScrolledRef.current = false;
   }, [selectedMonth]);
 
-  // Auto-scroll to today's date on mount — align to top
+  // Auto-scroll to today's date on mount — align "Hoje" header to top
   useEffect(() => {
     if (hasScrolledRef.current) return;
-    if (todayRef.current) {
-      hasScrolledRef.current = true;
-      setTimeout(() => {
-        todayRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
-      }, 100);
-    }
+    if (!todayRef.current) return;
+    hasScrolledRef.current = true;
+    const timer = setTimeout(() => {
+      if (todayRef.current) {
+        const y = todayRef.current.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: y, behavior: 'instant' });
+      }
+    }, 150);
+    return () => clearTimeout(timer);
   }, [sortedDates]);
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
