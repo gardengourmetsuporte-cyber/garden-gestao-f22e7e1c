@@ -393,11 +393,28 @@ export default function ChecklistsPage() {
                   "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
                   checklistType === 'bonus'
                     ? "finance-hero-card ring-0 scale-[1.01] shadow-xl"
-                    : "ring-1 ring-border/40 bg-card/60 opacity-70 hover:opacity-90 hover:ring-emerald-500/40"
+                    : "bg-card hover:shadow-lg"
                 )}
+                style={checklistType !== 'bonus' ? {
+                  border: '1px solid hsl(160 60% 45% / 0.3)',
+                  boxShadow: '0 0 12px hsl(160 70% 45% / 0.08), 0 2px 8px hsl(0 0% 0% / 0.04)',
+                } : undefined}
               >
                 <div className="flex items-center gap-4">
-                  <AppIcon name="Zap" size={24} fill={0} style={{ color: checklistType === 'bonus' ? '#475569' : undefined }} className={cn("shrink-0 transition-colors", "text-muted-foreground")} />
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
+                    checklistType === 'bonus'
+                      ? "bg-emerald-500/15"
+                      : "bg-emerald-500/10"
+                  )}>
+                    <AppIcon
+                      name="Zap"
+                      size={22}
+                      fill={checklistType === 'bonus' ? 1 : 0}
+                      className="transition-colors"
+                      style={{ color: checklistType === 'bonus' ? '#475569' : 'hsl(160 70% 45%)' }}
+                    />
+                  </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className={cn(
@@ -420,10 +437,11 @@ export default function ChecklistsPage() {
                   </div>
                   <AppIcon name="ChevronRight" size={18} className={checklistType === 'bonus' ? "text-slate-400" : "text-muted-foreground"} />
                 </div>
-                {/* Shimmer effect */}
+                {/* Shimmer effect — always visible, stronger when selected */}
                 <div
-                  className="absolute inset-0 pointer-events-none opacity-30"
+                  className="absolute inset-0 pointer-events-none"
                   style={{
+                    opacity: checklistType === 'bonus' ? 0.3 : 0.2,
                     background: 'linear-gradient(105deg, transparent 40%, hsl(160 84% 39% / 0.15) 45%, hsl(var(--neon-cyan) / 0.1) 55%, transparent 60%)',
                     backgroundSize: '200% 100%',
                     animation: 'shimmer 3s ease-in-out infinite',
