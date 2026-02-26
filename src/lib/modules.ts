@@ -22,7 +22,7 @@ export const ALL_MODULES: ModuleDef[] = [
   { key: 'rewards', label: 'Recompensas', icon: 'Gift', route: '/rewards', routes: ['/rewards'], group: 'Pessoas' },
   { key: 'tablet-admin', label: 'Tablets', icon: 'Monitor', route: '/tablet-admin', routes: ['/tablet-admin'], group: 'Premium' },
   { key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing'], group: 'Premium' },
-  { key: 'menu-admin', label: 'Cardápio', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio'], group: 'Premium' },
+  { key: 'menu-admin', label: 'Cardápio', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin'], group: 'Premium' },
   { key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Premium' },
   { key: 'gamification', label: 'Gamificação', icon: 'Dices', route: '/gamification', routes: ['/gamification'], group: 'Premium' },
   { key: 'ranking', label: 'Ranking', icon: 'Trophy', route: '/ranking', routes: ['/ranking'], group: 'Pessoas' },
