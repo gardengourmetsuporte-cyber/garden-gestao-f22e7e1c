@@ -1250,6 +1250,12 @@
     100% { background-position: 0% 50%; }
   }
 
+  @keyframes headerGlowShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   .fab-gradient {
     background: linear-gradient(135deg, 
       hsl(0 0% 100%) 0%, 

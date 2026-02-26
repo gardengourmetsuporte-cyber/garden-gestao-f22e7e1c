@@ -165,10 +165,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Simplified Mobile Header (3 elements) ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="bg-card/60 backdrop-blur-2xl border-b border-border/15 transition-all duration-300" style={{ boxShadow: '0 1px 0 hsl(var(--primary) / 0.05), 0 4px 20px hsl(var(--background) / 0.4)' }}>
+        <div
+          className="backdrop-blur-2xl transition-all duration-300"
+          style={{
+            background: 'hsl(var(--background))',
+          }}
+        >
           <div className="flex items-center justify-between h-14 px-3">
             {/* Left: Logo + Unit Name */}
             <button
@@ -188,7 +193,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
                 <DrawerTrigger asChild>
                   <button className="relative p-2.5 rounded-lg hover:bg-secondary transition-all">
-                    <AppIcon name="Bell" size={22} className="text-muted-foreground" style={{ filter: 'drop-shadow(0 0 4px hsl(215 20% 50% / 0.3))' }} />
+                    <AppIcon name="Bell" size={22} className="text-muted-foreground" />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -217,7 +222,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
           </div>
-          <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          {/* Bottom neon glow line — animated, matching bottom bar */}
+          <div className="relative">
+            <div className="h-[1px] mx-[8%]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+            <div className="h-[4px] mx-[3%] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+          </div>
         </div>
       </header>
 
