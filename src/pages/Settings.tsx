@@ -5,18 +5,15 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { ProfileSettings } from '@/components/settings/ProfileSettings';
 import { CategorySettings } from '@/components/settings/CategorySettings';
 import { SupplierSettings } from '@/components/settings/SupplierSettings';
-import { UserManagement } from '@/components/settings/UserManagement';
 import { ChecklistSettingsManager } from '@/components/settings/ChecklistSettingsManager';
 import { RewardSettings } from '@/components/settings/RewardSettings';
 import { PaymentMethodSettings } from '@/components/settings/PaymentMethodSettings';
 import { RecipeCostSettings } from '@/components/settings/RecipeCostSettings';
 import { UnitManagement } from '@/components/settings/UnitManagement';
-
-import { AccessLevelSettings } from '@/components/settings/AccessLevelSettings';
+import { TeamHub } from '@/components/settings/TeamHub';
 import { MedalSettings } from '@/components/settings/MedalSettings';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { AuditLogSettings } from '@/components/settings/AuditLogSettings';
-import { TeamManagement } from '@/components/settings/TeamManagement';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -33,9 +30,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta' },
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
   { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta' },
-  { value: 'users', icon: 'Users', label: 'Usuários', description: 'Gerenciar acessos e permissões', variant: 'cyan', section: 'Conta' },
-  { value: 'team', icon: 'UserPlus', label: 'Equipe & Convites', description: 'Convidar funcionários por email', variant: 'cyan', section: 'Conta' },
-  { value: 'access-levels', icon: 'Shield', label: 'Níveis de Acesso', description: 'Controlar permissões por módulo', variant: 'cyan', section: 'Conta' },
+  { value: 'team', icon: 'Users', label: 'Equipe', description: 'Membros, convites e níveis de acesso', variant: 'cyan', section: 'Conta' },
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
   { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'amber', section: 'Operação' },
   { value: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'amber', section: 'Operação' },
@@ -61,12 +56,10 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const menuItems = allMenuItems.filter(item => {
-    if (item.value === 'plan') return true; // always visible
+    if (item.value === 'plan') return true;
     if (item.value === 'units') return isSuperAdmin;
     if (item.value === 'team') return isAdmin;
-    
     if (item.value === 'audit-log') return isAdmin;
-    if (item.value === 'access-levels') return isAdmin;
     if (item.value === 'medals') return isAdmin;
     if (item.value === 'profile' || item.value === 'notifications') return true;
     return isAdmin;
@@ -112,17 +105,14 @@ export default function SettingsPage() {
               {activeSection === 'categories' && <CategorySettings />}
               {activeSection === 'suppliers' && <SupplierSettings />}
               {activeSection === 'checklists' && <ChecklistSettingsManager />}
-              {activeSection === 'users' && <UserManagement />}
+              {activeSection === 'team' && <TeamHub />}
               {activeSection === 'rewards' && <RewardSettings />}
               {activeSection === 'payments' && <PaymentMethodSettings />}
               {activeSection === 'costs' && <RecipeCostSettings />}
               {activeSection === 'units' && <UnitManagement />}
-              
-              {activeSection === 'access-levels' && <AccessLevelSettings />}
               {activeSection === 'medals' && <MedalSettings />}
               {activeSection === 'notifications' && <NotificationSettings />}
               {activeSection === 'audit-log' && <AuditLogSettings />}
-              {activeSection === 'team' && <TeamManagement />}
           </div>
         </div>
       </AppLayout>
