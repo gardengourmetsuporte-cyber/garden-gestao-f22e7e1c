@@ -1,55 +1,123 @@
 
 
-## Plano: Contestação dinâmica inline (mesmo padrão de execução de tarefa)
+## Plano: Redesign Premium — Bottom Bars + Visual Overhaul
 
-### Problema atual
-A contestação aparece como um botão "Contestar" separado abaixo do card completado, fora do fluxo natural. O admin quer que ao clicar no card concluído, abra o painel expandido inline (mesmo padrão do `openPopover`) com a opção de contestar junto com a opção de desmarcar.
+### Problema
+O layout atual tem uma estética "quadrada" e datada — barras inferiores flat com bordas retas, cards sem profundidade visual suficiente, e a navegação carece de personalidade. Referências como Linear, Mobills e Mercury usam formas orgânicas, glassmorphism real, e micro-interações que fazem a UI "respirar".
 
-### Solução
-Unificar a interação: quando o admin clica num item **concluído**, o card expande um painel inline (igual ao painel de "Concluí agora / Não fiz / Já pronto") com as opções:
-1. **Desmarcar** (se permitido) — botão para reverter a conclusão
-2. **Contestar** — botão amber que ao clicar revela o campo de motivo inline dentro do mesmo painel
+### Escopo das mudanças
 
-Isso elimina o botão "Contestar" avulso abaixo do card e torna a experiência consistente.
+---
 
-### Alterações em `ChecklistView.tsx`
+### 1. Bottom Tab Bar Global — Redesign "Floating Island"
 
-**Comportamento atual dos items concluídos:**
-- Clique no card concluído → tenta desmarcar diretamente (onClick inline)
-- Botão "Contestar" separado aparece abaixo
+Inspiração: iOS Dynamic Island + Nubank bottom bar.
 
-**Novo comportamento:**
-- Clique no card concluído (admin) → abre painel expandido inline (`openPopover === item.id`)
-- Dentro do painel:
-  - Opção "Desmarcar item" (ícone undo, se canToggle)
-  - Opção "Contestar" (ícone AlertTriangle, amber) — ao clicar, troca para o input de motivo + botão enviar
-- Para funcionários, clique no card concluído mantém o comportamento atual (desmarcar direto se dentro da janela de 5 min)
+**De:**
+```text
+┌──────────────────────────────────────┐
+│  Home  Checklists  [+]  Estoque  Mais│
+└──────────────────────────────────────┘
+← barra colada na borda, fundo opaco, visual plano
+```
 
-### Detalhes técnicos
+**Para:**
+```text
+          ╭──────────────────────────╮
+          │ Home  Check  [+]  Est  ⋯ │
+          ╰──────────────────────────╯
+← ilha flutuante com bordas arredondadas (rounded-[28px]),
+  margin lateral 16px, bottom 12px, glassmorphism forte,
+  borda sutil com gradiente, sombra elevada
+```
 
-1. **Card concluído (admin)**: Em vez de `onClick → desmarcar`, faz `onClick → setOpenPopover(item.id)` (toggle)
-2. **Painel expandido para item concluído**: Novo bloco renderizado quando `openPopover === item.id && completed`:
-   - Botão "Desmarcar" com ícone de undo
-   - Botão "Contestar" → ao clicar, muda para input inline (mesmo visual amber atual)
-   - Botão "Cancelar" para fechar
-3. **Remove** o botão "Contestar" avulso que fica abaixo do card
-4. **Aplica em ambas as seções**: Bonus (flat list) e Standard (subcategory > items) — o padrão é duplicado então ambos precisam ser atualizados
+**Detalhes técnicos:**
+- `rounded-[28px]` em vez de borda reta colada ao bottom
+- `mx-4 mb-3` para dar margem e "flutuar" acima da safe-area
+- Fundo `bg-card/70 backdrop-blur-3xl` com `border: 1px solid hsl(var(--border) / 0.15)`
+- Shadow mais elevada: `0 8px 32px hsl(0 0% 0% / 0.25)`
+- Pill indicator: agora fica atrás do ícone ativo como um **highlight pill** (fundo arredondado atrás do item, não apenas uma barra de 3px no bottom)
+- FAB central: agora usa `rounded-2xl` (squircle) em vez de circle, com gradiente sutil no fundo em vez de borda neon rotating — mais refinado
+- Ícones ativos: leve scale(1.1) + tint do primary, sem drop-shadow exagerado
+- Labels removidos dos tabs inativos (mostrar apenas no ativo) — visual mais limpo
+
+**Arquivo:** `src/components/layout/BottomTabBar.tsx`, `src/index.css`
+
+---
+
+### 2. Finance Bottom Nav — Mesmo tratamento "Floating Island"
+
+Aplicar o mesmo padrão da barra global ao `FinanceBottomNav`:
+- Ilha flutuante com `mx-4 mb-3 rounded-[28px]`
+- Glassmorphism + shadow elevada
+- FAB central squircle com gradiente ao invés de neon rotating border
+- Radial menu (receita/despesa/transferência): cards com glassmorphism em vez de círculos flat
+
+**Arquivo:** `src/components/finance/FinanceBottomNav.tsx`
+
+---
+
+### 3. Cards — Mais profundidade e organicidade
+
+**Refinamentos no CSS:**
+- Aumentar `--radius` de `1rem` para `1.25rem` (20px) — cantos mais suaves
+- Cards com `shadow-card` mais pronunciada (mais depth)
+- `card-interactive` com hover que mostra subtle border gradient
+- Adicionar classe `.card-glass` com `bg-card/60 backdrop-blur-2xl` para widgets do dashboard
+
+**Arquivo:** `src/index.css`
+
+---
+
+### 4. Page Headers — Mais respiração
+
+- Remover border-bottom rígido, usar gradiente fade-out
+- Adicionar 4px a mais de padding vertical
+- Title com `text-2xl` em vez de `text-xl` para mais impacto
+
+**Arquivo:** `src/index.css`
+
+---
+
+### 5. MoreDrawer — Grid de ícones mais premium
+
+- Ícones do grid: `rounded-[18px]` (squircle) em vez de `rounded-2xl`
+- Adicionar subtle gradient no fundo do ícone ativo
+- Spacing mais generoso entre items
+
+**Arquivo:** `src/components/layout/MoreDrawer.tsx`
+
+---
+
+### 6. QuickActionSheet — Visual mais orgânico
+
+- Botões de ação com `rounded-2xl` e subtle gradient no ícone
+- Hover com glow sutil da cor do ícone
+
+**Arquivo:** `src/components/layout/QuickActionSheet.tsx`
+
+---
+
+### 7. Novas animações CSS
+
+- `.nav-highlight-pill`: animação de transição suave do highlight atrás do tab ativo
+- Atualizar `.fab-neon-border` para um gradiente mais sutil e menos "gamer"
+- Adicionar `.glass-border`: `border-image` com gradiente branco/transparente
+
+**Arquivo:** `src/index.css`
+
+---
 
 ### Arquivos a editar
-- `src/components/checklists/ChecklistView.tsx` — única alteração necessária
 
-### Visual do painel expandido (item concluído, admin)
+1. **`src/index.css`** — tokens de radius, shadow, card-glass, header, animações
+2. **`src/components/layout/BottomTabBar.tsx`** — redesign floating island
+3. **`src/components/finance/FinanceBottomNav.tsx`** — mesmo padrão floating
+4. **`src/components/layout/MoreDrawer.tsx`** — grid de ícones squircle
+5. **`src/components/layout/QuickActionSheet.tsx`** — visual orgânico
+6. **`tailwind.config.ts`** — adicionar `backdrop-blur-3xl` se necessário
 
-```text
-┌─────────────────────────────────────┐
-│ ✓ Limpar balcão    +2 pts          │  ← card concluído (clicável)
-└─────────────────────────────────────┘
-┌─────────────────────────────────────┐
-│  ↩ Desmarcar item                  │  ← reverte a conclusão
-│  ─────────────────────────────────  │
-│  ⚠ Contestar                       │  ← abre input motivo
-│  ─────────────────────────────────  │
-│  [Motivo da contestação...] [➤] [✕]│  ← aparece ao clicar Contestar
-└─────────────────────────────────────┘
-```
+### Resultado esperado
+
+A navegação inferior vira uma "ilha flutuante" elegante, os cards ganham mais profundidade e cantos orgânicos, e a aparência geral sai do "Windows 2000" para algo que compete com Nubank, Linear e Mobills em polish visual.
 
