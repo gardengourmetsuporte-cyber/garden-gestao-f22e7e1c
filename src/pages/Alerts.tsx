@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -85,6 +86,8 @@ export default function AlertsPage() {
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
     await supabase.from('notifications').update({ read: true } as any).in('id', ids);
   }, [alerts, queryClient, user?.id]);
+
+  useFabAction(unreadCount > 0 ? { icon: 'CheckCheck', label: 'Marcar lidas', onClick: markAllAsRead } : null, [unreadCount, markAllAsRead]);
 
   const origins: { key: FilterOrigin; label: string }[] = [
     { key: 'all', label: 'Todos' },
@@ -210,16 +213,6 @@ export default function AlertsPage() {
             </div>
           )}
         </div>
-        {/* FAB - Mark all as read */}
-        {unreadCount > 0 && (
-          <button
-            onClick={markAllAsRead}
-            className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-          >
-            <AppIcon name="CheckCheck" size={22} />
-          </button>
-        )}
       </div>
     </AppLayout>
   );

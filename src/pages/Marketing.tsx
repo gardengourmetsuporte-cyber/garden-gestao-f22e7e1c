@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useMarketing } from '@/hooks/useMarketing';
 import { MarketingCalendarGrid } from '@/components/marketing/MarketingCalendarGrid';
@@ -24,6 +25,8 @@ export default function Marketing() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [prefillDate, setPrefillDate] = useState<Date | null>(null);
   const [prefillTitle, setPrefillTitle] = useState('');
+
+  useFabAction({ icon: 'Plus', label: 'Novo Post', onClick: () => { setEditingPost(null); setPrefillDate(null); setPrefillTitle(''); setSheetOpen(true); } }, []);
 
   if (!hasPlan('business')) {
     return (
@@ -111,14 +114,6 @@ export default function Marketing() {
           </div>
         </div>
 
-        {/* FAB - New Post */}
-        <button
-          onClick={() => handleNewPost()}
-          className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-        >
-          <AppIcon name="Plus" size={24} />
-        </button>
       </div>
 
       <PostSheet

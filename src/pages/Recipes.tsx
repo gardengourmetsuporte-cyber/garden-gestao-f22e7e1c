@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { Input } from '@/components/ui/input';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
@@ -80,6 +81,8 @@ export default function Recipes() {
     setPreSelectedCategoryId(activeTab === 'bases' && basesCategory ? basesCategory.id : null);
     setSheetOpen(true);
   };
+
+  useFabAction({ icon: 'Plus', label: 'Nova Ficha', onClick: () => { setSelectedRecipe(null); setPreSelectedCategoryId(null); setSheetOpen(true); } }, []);
 
   const handleSave = async (data: any) => {
     if (data.id) await updateRecipe(data);
@@ -230,14 +233,6 @@ export default function Recipes() {
           </div>
         </div>
 
-        {/* FAB - New Recipe */}
-        <button
-          onClick={handleCreate}
-          className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-        >
-          <AppIcon name="Plus" size={24} />
-        </button>
       </div>
 
       <RecipeSheet

@@ -5,6 +5,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { useModuleStatus } from '@/hooks/useModuleStatus';
+import { useFabContext } from '@/contexts/FabActionContext';
 import { MoreDrawer } from './MoreDrawer';
 import { QuickActionSheet } from './QuickActionSheet';
 
@@ -37,6 +38,7 @@ export function BottomTabBar() {
   const navigate = useNavigate();
   const { hasAccess } = useUserModules();
   const moduleStatuses = useModuleStatus();
+  const { fabAction } = useFabContext();
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -146,10 +148,17 @@ export function BottomTabBar() {
               />
             ))}
 
-            {/* Center FAB "+" — round */}
+            {/* Center FAB — context-aware */}
             <div className="flex items-center justify-center" style={{ width: '20%' }}>
               <button
-                onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
+                onClick={() => {
+                  navigator.vibrate?.(10);
+                  if (fabAction) {
+                    fabAction.onClick();
+                  } else {
+                    setQuickOpen(true);
+                  }
+                }}
                 className={cn(
                   "absolute -top-7 w-[56px] h-[56px] rounded-full flex items-center justify-center transition-all duration-300",
                   "hover:scale-105 active:scale-90"
@@ -159,7 +168,11 @@ export function BottomTabBar() {
                   boxShadow: '0 0 24px hsl(220 85% 58% / 0.5), 0 0 48px hsl(262 70% 55% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
                 }}
               >
-                <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />
+                <AppIcon
+                  name={fabAction?.icon || 'Plus'}
+                  size={28}
+                  className="relative z-10 text-primary-foreground"
+                />
               </button>
             </div>
 

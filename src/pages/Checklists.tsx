@@ -11,6 +11,7 @@ import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -41,6 +42,8 @@ export default function ChecklistsPage() {
   const [settingsType, setSettingsType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
+
+  useFabAction(isAdmin ? { icon: currentTab === 'settings' ? 'X' : 'Settings', label: 'Configurações', onClick: () => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings') } : null, [isAdmin, currentTab]);
 
   // Fetch completions for abertura & fechamento to show progress on cards
   const { data: aberturaCompletions = [] } = useQuery({
@@ -569,21 +572,6 @@ export default function ChecklistsPage() {
           )}
           </div>
         </div>
-        {/* FAB - Settings toggle */}
-        {isAdmin && (
-          <button
-            onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
-            className={cn(
-              "fixed z-[9998] w-14 h-14 rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
-              currentTab === 'settings'
-                ? "bg-primary text-primary-foreground shadow-primary/30"
-                : "bg-card text-muted-foreground border border-border shadow-md"
-            )}
-            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-          >
-            <AppIcon name={currentTab === 'settings' ? 'X' : 'Settings'} size={22} />
-          </button>
-        )}
       </div>
     </AppLayout>
   );

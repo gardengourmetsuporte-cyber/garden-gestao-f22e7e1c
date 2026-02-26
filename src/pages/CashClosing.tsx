@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Loader2 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -18,6 +19,8 @@ export default function CashClosing() {
   const { isAdmin, user } = useAuth();
   const { closings, isLoading, refetch } = useCashClosing();
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  useFabAction({ icon: 'Plus', label: 'Novo Fechamento', onClick: () => setIsFormOpen(true) }, []);
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const todaysClosing = closings.find(c => c.date === today && c.user_id === user?.id);
@@ -73,14 +76,6 @@ export default function CashClosing() {
             </div>
           </SheetContent>
         </Sheet>
-        {/* FAB - New Cash Closing */}
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-        >
-          <AppIcon name="Plus" size={24} />
-        </button>
       </div>
     </AppLayout>
   );
