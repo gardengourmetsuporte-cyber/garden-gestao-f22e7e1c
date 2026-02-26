@@ -1,58 +1,39 @@
 
 
-## Problemas Identificados
+## Problema
+Os ícones dos setores (Cozinha, Salão, Caixa, Banheiros) usam um fundo colorido sólido (círculo/quadrado) com ícone branco dentro — visual pesado e "infantil" para a estética premium Atlas.
 
-1. **FAB central feio** — o botão com gradient indigo→violet sobre fundo escuro parece fraco/apagado, precisa de mais presença visual
-2. **Card principal sem contraste** — `--card: 240 5% 10%` (≈#18181B) sobre `--background: 240 6% 6%` (≈#0F0F11) dá diferença de apenas 4% de luminosidade — quase invisível
-3. **Indigo/Violet fraco** — o primary `234 89% 74%` é pastel demais no dark mode, falta punch
+## Proposta: Ícone monocromático com indicador lateral de cor
 
-## Plano de Mudanças
-
-### 1. `src/components/layout/BottomTabBar.tsx` — FAB redesenhado
-
-Redesenhar o botão central:
-- Aumentar para **60x60px** (de 56px) com `rounded-full`
-- Background: **branco puro** no dark mode (`hsl(0 0% 100%)`) com ícone em preto — padrão Linear/Vercel (FAB neutro que contrasta com tudo)
-- Glow ring: anel sutil com indigo blur atrás
-- Border: `1px solid hsl(0 0% 100% / 0.2)` — sutil, premium
-- Shadow: forte drop shadow preto para "flutuar"
-- Hover: scale 1.08, Active: scale 0.92
+Trocar o círculo colorido por um layout mais refinado, inspirado no Linear/Mercury:
 
 ```text
-       ╭──────╮
-      │  ╋    │   ← branco, ícone preto, glow indigo sutil
-       ╰──────╯
+┌──────────────────────────────────────────┐
+│ ┃  🍳  Cozinha                    ── ▸  │
+│ ┃      0/23 concluídos                   │
+└──────────────────────────────────────────┘
 ```
 
-### 2. `src/index.css` — Aumentar contraste dos cards e intensificar primary
+**Abordagem:** Remover o fundo colorido do ícone. Em vez disso:
+1. **Ícone monocromático** (`text-muted-foreground`) usando `AppIcon` (Material Symbols) — elegante e leve
+2. **Barra lateral fina** (3px, `rounded-full`) com a cor do setor no lado esquerdo do card — indicador sutil de identidade
+3. Quando o setor estiver **100% completo**, o ícone vira um check verde e a barra lateral fica verde
 
-**Dark mode (`.dark`)**:
-| Token | Atual | Novo | Razão |
-|-------|-------|------|-------|
-| `--background` | `240 6% 6%` | `240 6% 4%` | Mais preto (≈ #0A0A0B) |
-| `--card` | `240 5% 10%` | `240 5% 12%` | Card mais claro para contrastar (≈ #1E1E21) — +8% diferença |
-| `--primary` | `234 89% 74%` | `234 89% 67%` | Indigo mais saturado e vibrante, menos pastel |
-| `--ring` | `234 89% 74%` | `234 89% 67%` | Match primary |
-| `--border` | `240 4% 18%` | `240 4% 20%` | Bordas um pouco mais visíveis |
-| `--gradient-brand` | com `74%` | com `67%` | Gradient mais intenso |
-| Todos os glows | com `74%` | com `67%` | Glows mais vibrantes |
+## Mudanças técnicas
 
-**Light mode** — primary de `64%` para `58%` para mais contraste sobre branco
+### `src/components/checklists/ChecklistView.tsx`
+- Remover o `iconMap` de Lucide (linhas 61-67) e usar `AppIcon` com mapeamento via `iconMap.ts`
+- Remover o `div` com `backgroundColor: sector.color` (linhas 277-289)
+- Substituir por:
+  - Uma `div` de barra lateral (3px width, height full, `rounded-full`, `backgroundColor: sector.color`)
+  - Um `AppIcon` com `fill={0}` (outlined), `text-muted-foreground`, sem fundo
+- Quando completo: ícone `check_circle` verde, barra lateral verde
 
-### 3. `src/lib/unitThemes.ts` — Sync primary para `234 89% 67%`
+### `src/components/checklists/ChecklistSettings.tsx`
+- Atualizar o preview do setor na tela de configurações para refletir o mesmo estilo (barra lateral + ícone outlined)
 
-### 4. `tailwind.config.ts` — Sync `glow-border` keyframe para `234 89% 67%`
-
-### Resultado
-- FAB branco premium que se destaca em qualquer tema (padrão Linear/Notion)
-- Cards com +8% de diferença de luminosidade vs fundo — claramente visíveis
-- Indigo mais vibrante e "punchy" sem ser gritante
-
-### Arquivos editados (4)
-| Arquivo | Mudança |
-|---------|---------|
-| `src/components/layout/BottomTabBar.tsx` | FAB redesenhado: branco, maior, shadow forte |
-| `src/index.css` | Background mais escuro, card mais claro, primary mais saturado |
-| `src/lib/unitThemes.ts` | Primary sync |
-| `tailwind.config.ts` | Keyframe sync |
+## Resultado visual
+- Visual limpo, minimalista, premium
+- A cor do setor aparece como detalhe sutil (barra lateral), não como bloco pesado
+- Consistente com a estética Linear/Mercury do Atlas
 
