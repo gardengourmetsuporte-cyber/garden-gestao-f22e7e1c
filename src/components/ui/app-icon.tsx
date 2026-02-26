@@ -14,7 +14,7 @@ interface AppIconProps {
 }
 
 export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
-  ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
+  ({ name, size = 24, className, style, fill = 0, weight = 400 }, ref) => {
     const materialName = ICON_MAP[name] || name;
 
     return (
