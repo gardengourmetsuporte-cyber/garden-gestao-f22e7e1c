@@ -348,7 +348,7 @@
 
   .finance-hero-card {
     @apply rounded-2xl overflow-hidden transition-all duration-300;
-    background: linear-gradient(135deg, hsl(0 0% 4%) 0%, hsl(220 30% 10%) 30%, hsl(225 40% 14%) 55%, hsl(230 35% 11%) 75%, hsl(220 20% 6%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 3%) 0%, hsl(220 40% 12%) 25%, hsl(225 55% 20%) 50%, hsl(230 45% 16%) 70%, hsl(220 25% 7%) 100%);
     background-size: 300% 300%;
     animation: darkCardShimmer 8s ease-in-out infinite;
     color: hsl(0 0% 95%);
