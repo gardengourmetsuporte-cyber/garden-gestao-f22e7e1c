@@ -18,7 +18,7 @@ export function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorPro
   const handleNext = () => onMonthChange(addMonths(selectedMonth, 1));
 
   return (
-    <div className="flex items-center justify-center gap-1 py-1">
+    <div className="flex items-center justify-center gap-1 py-1.5">
       <Button variant="ghost" size="icon" onClick={handlePrev} className="w-8 h-8 text-muted-foreground hover:text-foreground">
         <AppIcon name="ChevronLeft" size={16} />
       </Button>

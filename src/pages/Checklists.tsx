@@ -261,17 +261,18 @@ export default function ChecklistsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-4 lg:px-6 space-y-8">
-          <div className="animate-fade-in space-y-6" key={currentTab}>
+        <div className="px-4 py-4 lg:px-6 space-y-5">
+          <div className="animate-fade-in space-y-5" key={currentTab}>
           {currentTab === 'checklist' ? (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <DatePicker
                 date={selectedDate}
                 onSelect={(date) => setSelectedDate(date)}
+                className="mx-auto"
               />
 
               {/* Checklist Type Cards */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {/* Abertura Card */}
                 <button
                   onClick={() => setChecklistType('abertura')}
