@@ -182,7 +182,7 @@ export default function Recipes() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-4">
           {/* Action row */}
           <div className="flex items-center justify-end">
             <button onClick={handleCreate} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">

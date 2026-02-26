@@ -42,7 +42,7 @@ export default function RewardsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-4">
           {/* Points Balance */}
           <div className="card-command-warning p-6">
             <p className="text-sm text-muted-foreground mb-1">Seu saldo</p>

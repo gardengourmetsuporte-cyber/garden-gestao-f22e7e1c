@@ -43,7 +43,7 @@ export function FinanceMore({
 
   return (
     <>
-      <div className="p-4 space-y-2 pb-32">
+      <div className="px-4 py-3 lg:px-6 space-y-2 pb-32">
         <h1 className="text-xl font-bold mb-4">Mais Opções</h1>
         
         {menuItems.map((item, index) => (

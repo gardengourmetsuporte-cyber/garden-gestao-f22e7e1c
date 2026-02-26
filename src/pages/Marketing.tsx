@@ -76,7 +76,7 @@ export default function Marketing() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-4">
           <AnimatedTabs
             tabs={[
               { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },

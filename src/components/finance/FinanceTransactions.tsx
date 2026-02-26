@@ -223,7 +223,7 @@ export function FinanceTransactions({
     <>
       <div className="space-y-4">
         {/* Month Selector */}
-        <div className="px-4 pt-4 flex items-center justify-between gap-2">
+        <div className="px-4 pt-3 lg:px-6 flex items-center justify-between gap-2">
           <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
           <div className="flex items-center gap-1">
             {(canUndo || canRedo) && (

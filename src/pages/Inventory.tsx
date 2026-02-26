@@ -151,7 +151,7 @@ export default function InventoryPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatsCard title="Total de Itens" value={items.length} icon="Package" variant="default" onClick={() => handleStockFilterClick('all')} />

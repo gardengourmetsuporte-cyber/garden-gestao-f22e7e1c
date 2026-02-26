@@ -108,7 +108,7 @@ export default function SettingsPage() {
             </div>
           </header>
 
-          <div className="px-4 py-4 lg:px-6 pb-24">
+          <div className="px-4 py-3 lg:px-6 pb-24">
               {activeSection === 'profile' && <ProfileSettings />}
               {activeSection === 'categories' && <CategorySettings />}
               {activeSection === 'suppliers' && <SupplierSettings />}
@@ -134,7 +134,7 @@ export default function SettingsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
 
-        <div className="px-4 py-4 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-4">
           {sections.map((section) => (
             <div key={section.label}>
               <h3 className="section-label mb-2 px-1">{section.label}</h3>

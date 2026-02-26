@@ -35,7 +35,7 @@ export function FinanceHome({
     : '0';
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="px-4 py-3 lg:px-6 space-y-4">
       {/* Month Selector */}
       <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
 

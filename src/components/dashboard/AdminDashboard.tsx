@@ -57,7 +57,7 @@ export function AdminDashboard() {
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
 
   return (
-    <div className="space-y-7 p-4 lg:p-6">
+    <div className="space-y-7 px-4 py-3 lg:px-6">
       {/* Welcome */}
       <div className="animate-spring-in spring-stagger-1">
         <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>

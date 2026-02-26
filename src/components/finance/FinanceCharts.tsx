@@ -134,7 +134,7 @@ export function FinanceCharts({
 
   return (
     <div className="space-y-4">
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-3 lg:px-6">
         <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
       </div>
 
