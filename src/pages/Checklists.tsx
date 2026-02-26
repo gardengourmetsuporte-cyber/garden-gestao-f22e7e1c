@@ -303,10 +303,9 @@ export default function ChecklistsPage() {
                   )}
                   style={{
                     background: checklistType === 'abertura'
-                      ? 'linear-gradient(135deg, hsl(38 92% 50% / 0.15), hsl(45 100% 60% / 0.05))'
+                      ? 'linear-gradient(135deg, hsl(32 100% 50% / 0.18), hsl(45 100% 55% / 0.08))'
                       : 'hsl(var(--card))',
-                    ...(checklistType === 'abertura' ? { ringColor: 'hsl(38 92% 50% / 0.5)' } : {}),
-                    borderColor: checklistType === 'abertura' ? 'hsl(38 92% 50% / 0.5)' : undefined,
+                    borderColor: checklistType === 'abertura' ? 'hsl(32 100% 50% / 0.5)' : undefined,
                   }}
                 >
                   <div className="flex items-center gap-3 mb-3">
@@ -316,11 +315,11 @@ export default function ChecklistsPage() {
                         ? "shadow-inner"
                         : "bg-secondary"
                     )}
-                    style={checklistType === 'abertura' ? { background: 'hsl(38 92% 50% / 0.2)' } : undefined}
+                    style={checklistType === 'abertura' ? { background: 'hsl(32 100% 50% / 0.2)' } : undefined}
                     >
                       <AppIcon name="Sun" size={22} className={cn(
                         "transition-colors",
-                        checklistType === 'abertura' ? "text-amber-400" : "text-muted-foreground"
+                        checklistType === 'abertura' ? "text-orange-400" : "text-muted-foreground"
                       )} />
                     </div>
                     <h3 className="text-base font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
@@ -334,7 +333,7 @@ export default function ChecklistsPage() {
                           width: `${getTypeProgress.abertura.percent}%`,
                           background: getTypeProgress.abertura.percent === 100
                             ? 'hsl(var(--success))'
-                            : 'linear-gradient(90deg, hsl(38 92% 50%), hsl(38 92% 50% / 0.6))',
+                            : 'linear-gradient(90deg, hsl(32 100% 50%), hsl(40 100% 55% / 0.7))',
                         }}
                       />
                     </div>
@@ -344,14 +343,14 @@ export default function ChecklistsPage() {
                       </span>
                       <span className={cn(
                         "text-sm font-black",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-amber-400"
+                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-orange-400"
                       )}>
                         {getTypeProgress.abertura.percent}%
                       </span>
                     </div>
                   </div>
                   {checklistType === 'abertura' && (
-                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
                   )}
                 </button>
 
