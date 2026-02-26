@@ -124,6 +124,7 @@ export const ICON_MAP: Record<string, string> = {
   Star: 'kid_star',
   Trophy: 'emoji_events',
   Crown: 'diamond',
+  Gem: 'diamond',
   Medal: 'military_tech',
   Award: 'workspace_premium',
   PartyPopper: 'celebration',

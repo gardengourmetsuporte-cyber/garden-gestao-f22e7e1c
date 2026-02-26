@@ -175,12 +175,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', userId)
-          .maybeSingle(),
+          .eq('user_id', userId),
       ]);
       
       const p = profileResult.data as any;
-      const r = (roleResult.data?.role as AppRole) ?? 'funcionario';
+      
+      // Pick highest priority role from all roles
+      const ROLE_PRIORITY: Record<string, number> = { super_admin: 3, admin: 2, funcionario: 1 };
+      const rolesData = (roleResult.data as { role: AppRole }[] | null) ?? [];
+      const r: AppRole = rolesData.length > 0
+        ? rolesData.reduce((best, cur) => (ROLE_PRIORITY[cur.role] ?? 0) > (ROLE_PRIORITY[best.role] ?? 0) ? cur : best).role
+        : 'funcionario';
       
       const profilePlan = (p?.plan as PlanTier) || 'free';
       const profilePlanStatus = p?.plan_status || 'active';
