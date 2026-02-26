@@ -64,15 +64,17 @@ const sectorNameIconMap: Record<string, string> = {
   'banheiro': 'bathtub',
   'banheiros': 'bathtub',
   'geral': 'checklist',
-  'produção': 'manufacturing',
-  'producao': 'manufacturing',
+  'produção': 'precision_manufacturing',
+  'producao': 'precision_manufacturing',
   'estoque': 'inventory_2',
   'limpeza': 'cleaning_services',
   'atendimento': 'support_agent',
 };
 
 function getSectorIcon(sector: { icon?: string | null; name: string }): string {
-  if (sector.icon) return sector.icon;
+  // If icon is set and not the generic 'Folder', use it
+  if (sector.icon && sector.icon !== 'Folder') return sector.icon;
+  // Fallback: match by sector name
   const key = sector.name.toLowerCase().trim();
   return sectorNameIconMap[key] || 'folder';
 }
