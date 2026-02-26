@@ -187,6 +187,8 @@ export default function Auth() {
   const submitBtnClass = "w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border-none bg-primary text-primary-foreground";
   const submitBtnStyle = {
     boxShadow: '0 4px 24px hsl(var(--primary) / 0.25)',
+    animationDuration: '240s',
+    animationTimingFunction: 'linear' as const,
   };
 
   const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-secondary bg-secondary/50 hover:bg-secondary/80 text-foreground";
