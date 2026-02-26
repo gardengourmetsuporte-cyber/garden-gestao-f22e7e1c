@@ -420,23 +420,11 @@ export default function ChecklistsPage() {
                 )}
               >
                 <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "w-14 h-14 rounded-xl flex items-center justify-center relative",
-                  )}
-                  style={{
-                    background: checklistType === 'bonus'
-                      ? 'hsl(160 84% 39% / 0.15)'
-                      : 'hsl(160 84% 39% / 0.08)',
-                  }}
-                  >
-                    <AppIcon name="Zap" size={28} style={{ color: checklistType === 'bonus' ? 'hsl(160 84% 30%)' : undefined }} className={cn(
-                      "transition-all",
-                      checklistType !== 'bonus' && "text-emerald-500/50"
-                    )} />
-                    {checklistType === 'bonus' && (
-                      <div className="absolute inset-0 rounded-xl animate-ping" style={{ animationDuration: '2s', background: 'hsl(160 84% 39% / 0.08)' }} />
-                    )}
-                  </div>
+                  <div
+                    className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-300"
+                    style={{ backgroundColor: 'hsl(160 84% 39%)' }}
+                  />
+                  <AppIcon name="Zap" size={24} fill={0} className="text-muted-foreground shrink-0" />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className={cn(
