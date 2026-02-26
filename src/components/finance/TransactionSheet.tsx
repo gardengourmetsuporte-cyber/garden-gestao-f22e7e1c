@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 import { useBackGuard } from '@/hooks/useBackGuard';
+import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
 
 export type { RecurringEditMode };
 
@@ -606,28 +607,46 @@ export function TransactionSheet({
             {/* Visual Cards Grid - Conta, Categoria, Fornecedor, Funcionário */}
             <div className="grid grid-cols-2 gap-3">
               {/* Card Conta */}
-              <button
-                type="button"
-                onClick={() => setShowAccountPicker(true)}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
-                  accountId
-                    ? "bg-primary/5 ring-1 ring-primary/20"
-                    : "bg-secondary/50"
-                )}
-              >
-                <AppIcon
-                  name="account_balance_wallet"
-                  size={22}
-                  className={accountId ? "text-primary" : "text-muted-foreground"}
-                />
-                <span className={cn(
-                  "text-sm font-medium truncate max-w-full",
-                  accountId ? "text-foreground" : "text-muted-foreground"
-                )}>
-                  {availableAccounts.find(a => a.id === accountId)?.name || (type === 'credit_card' ? 'Cartão' : 'Conta')}
-                </span>
-              </button>
+              {(() => {
+                const selectedAccount = availableAccounts.find(a => a.id === accountId);
+                const brand = selectedAccount
+                  ? (selectedAccount.type === 'wallet' ? WALLET_BRAND : matchBankBrand(selectedAccount.name))
+                  : null;
+
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setShowAccountPicker(true)}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl min-h-[80px] transition-all duration-200",
+                      accountId
+                        ? "bg-primary/5 ring-1 ring-primary/20"
+                        : "bg-secondary/50"
+                    )}
+                  >
+                    {selectedAccount && brand ? (
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 shadow-sm"
+                        style={{ backgroundColor: brand.bgColor, color: brand.textColor }}
+                      >
+                        {brand.abbr}
+                      </div>
+                    ) : (
+                      <AppIcon
+                        name="account_balance_wallet"
+                        size={22}
+                        className={accountId ? "text-primary" : "text-muted-foreground"}
+                      />
+                    )}
+                    <span className={cn(
+                      "text-sm font-medium truncate max-w-full",
+                      accountId ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      {selectedAccount?.name || (type === 'credit_card' ? 'Cartão' : 'Conta')}
+                    </span>
+                  </button>
+                );
+              })()}
 
               {/* Card Categoria (non-transfer) or Conta Destino (transfer) */}
               {type === 'transfer' ? (
@@ -664,12 +683,24 @@ export function TransactionSheet({
                       : "bg-secondary/50"
                   )}
                 >
-                  <AppIcon
-                    name={categoryIconName || 'category'}
-                    size={22}
-                    style={selectedCategory?.color ? { color: selectedCategory.color } : undefined}
-                    className={!selectedCategory?.color ? "text-muted-foreground" : undefined}
-                  />
+                  {selectedCategory?.color ? (
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: selectedCategory.color + '20' }}
+                    >
+                      <AppIcon
+                        name={categoryIconName || 'category'}
+                        size={18}
+                        style={{ color: selectedCategory.color }}
+                      />
+                    </div>
+                  ) : (
+                    <AppIcon
+                      name={categoryIconName || 'category'}
+                      size={22}
+                      className="text-muted-foreground"
+                    />
+                  )}
                   <span className={cn(
                     "text-sm font-medium truncate max-w-full",
                     categoryId ? "text-foreground" : "text-muted-foreground"
