@@ -44,7 +44,7 @@ export function SolutionSection() {
             Funcionalidades
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-            Um sistema feito para a realidade do seu restaurante
+            Nasceu na operação, resolve de verdade
           </h2>
         </div>
 

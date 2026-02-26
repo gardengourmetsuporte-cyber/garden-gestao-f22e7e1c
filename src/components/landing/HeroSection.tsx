@@ -29,7 +29,7 @@ export function HeroSection() {
               }}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              🍽️ Feito para restaurantes brasileiros
+              🍔 Feito por restaurante, para restaurantes
             </div>
 
             <h1 className="text-4xl sm:text-5xl font-extrabold text-foreground leading-[1.1] tracking-tight">
@@ -45,9 +45,9 @@ export function HeroSection() {
             </h1>
 
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Financeiro, estoque, equipe e IA — tudo em um app.
+              Criado por quem vive a rotina de um restaurante.
               <br />
-              Enquanto você serve, o Garden cuida dos números.
+              Financeiro, estoque, equipe e IA — tudo em um app.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start gap-3">
