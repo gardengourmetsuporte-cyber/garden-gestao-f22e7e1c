@@ -98,17 +98,6 @@ export default function AlertsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-4 lg:px-6 space-y-4">
-          {/* Action row */}
-          {unreadCount > 0 && (
-            <div className="flex items-center justify-end">
-              <button
-                onClick={markAllAsRead}
-                className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                Marcar todas como lidas
-              </button>
-            </div>
-          )}
           {/* Origin filter chips */}
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {origins.map(o => (
@@ -221,6 +210,16 @@ export default function AlertsPage() {
             </div>
           )}
         </div>
+        {/* FAB - Mark all as read */}
+        {unreadCount > 0 && (
+          <button
+            onClick={markAllAsRead}
+            className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
+          >
+            <AppIcon name="CheckCheck" size={22} />
+          </button>
+        )}
       </div>
     </AppLayout>
   );

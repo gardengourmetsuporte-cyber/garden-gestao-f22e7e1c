@@ -262,22 +262,6 @@ export default function ChecklistsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-4 lg:px-6 space-y-8">
-          {/* Settings toggle for admin */}
-          {isAdmin && (
-            <div className="flex items-center justify-end">
-              <button
-                onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
-                className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
-                  currentTab === 'settings'
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                    : "bg-secondary text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <AppIcon name="Settings" size={18} />
-              </button>
-            </div>
-          )}
           <div className="animate-fade-in space-y-6" key={currentTab}>
           {currentTab === 'checklist' ? (
             <div className="space-y-6">
@@ -585,6 +569,21 @@ export default function ChecklistsPage() {
           )}
           </div>
         </div>
+        {/* FAB - Settings toggle */}
+        {isAdmin && (
+          <button
+            onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
+            className={cn(
+              "fixed z-[9998] w-14 h-14 rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
+              currentTab === 'settings'
+                ? "bg-primary text-primary-foreground shadow-primary/30"
+                : "bg-card text-muted-foreground border border-border shadow-md"
+            )}
+            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
+          >
+            <AppIcon name={currentTab === 'settings' ? 'X' : 'Settings'} size={22} />
+          </button>
+        )}
       </div>
     </AppLayout>
   );
