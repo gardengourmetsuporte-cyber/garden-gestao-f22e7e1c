@@ -79,14 +79,17 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
             <button
               key={action.label}
               onClick={action.action}
-              className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl bg-secondary/50 hover:bg-secondary active:scale-[0.98] transition-all"
+              className="flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-[0.98] transition-all group"
             >
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-shadow duration-200"
                 style={{
-                  background: action.glow,
-                  border: `1px solid ${action.color}30`,
+                  background: `linear-gradient(135deg, ${action.glow}, transparent)`,
+                  border: `1px solid ${action.color}25`,
+                  boxShadow: `0 0 0 0 ${action.color}00`,
                 }}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 16px ${action.color}20`)}
+                onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 0 0 ${action.color}00`)}
               >
                 <AppIcon name={action.icon} size={22} style={{ color: action.color }} />
               </div>

@@ -31,7 +31,6 @@ const FALLBACK_TABS: TabDef[] = [
   { key: 'cash-closing', icon: 'Receipt', label: 'Fechamento', path: '/cash-closing', moduleKey: 'cash-closing' },
 ];
 
-// Routes where the global bottom tab bar should be hidden
 const HIDDEN_ROUTES = ['/finance', '/personal-finance', '/chat'];
 
 export function BottomTabBar() {
@@ -42,12 +41,9 @@ export function BottomTabBar() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
 
-  // Hide on routes that have their own bottom nav
   if (HIDDEN_ROUTES.some(r => location.pathname.startsWith(r))) return null;
-  // Hide on tablet/public routes
   if (location.pathname.startsWith('/tablet')) return null;
 
-  // Build visible tabs — replace inaccessible default tabs with fallbacks
   const resolvedTabs: TabDef[] = [];
   const usedKeys = new Set<string>();
 
@@ -56,7 +52,6 @@ export function BottomTabBar() {
       resolvedTabs.push(tab);
       usedKeys.add(tab.key);
     } else {
-      // Find first available fallback
       const fallback = FALLBACK_TABS.find(f => !usedKeys.has(f.key) && hasAccess(f.moduleKey));
       if (fallback) {
         resolvedTabs.push(fallback);
@@ -65,7 +60,6 @@ export function BottomTabBar() {
     }
   }
 
-  // Left tabs (before +), Right tabs (after +)
   const leftTabs = resolvedTabs.slice(0, 2);
   const rightTabs = resolvedTabs.slice(2);
 
@@ -74,7 +68,6 @@ export function BottomTabBar() {
     return location.pathname.startsWith(path);
   };
 
-  // Calculate pill position
   const allSlots = [...leftTabs, { key: '__plus__' } as any, ...rightTabs, { key: '__more__' } as any];
   const activeIdx = allSlots.findIndex(t => t.path && isActive(t.path));
   const slotCount = allSlots.length;
@@ -85,74 +78,82 @@ export function BottomTabBar() {
       <QuickActionSheet open={quickOpen} onOpenChange={setQuickOpen} />
 
       <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 bg-card/95 backdrop-blur-2xl border-t border-border/10"
+        className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {/* Top glow line */}
-        <div className="h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+        <div
+          className="mx-4 mb-3 rounded-[28px] glass-border"
+          style={{
+            background: 'hsl(var(--card) / 0.7)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+            boxShadow: 'var(--shadow-floating)',
+          }}
+        >
+          <div className="flex items-center justify-around h-[60px] max-w-lg mx-auto relative px-2">
+            {/* Highlight pill behind active tab */}
+            {activeIdx >= 0 && (
+              <div
+                className="absolute nav-highlight-pill rounded-2xl"
+                style={{
+                  background: 'hsl(var(--primary) / 0.1)',
+                  border: '1px solid hsl(var(--primary) / 0.15)',
+                  width: '48px',
+                  height: '40px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  left: `calc(${((activeIdx + 0.5) / slotCount) * 100}% - 24px)`,
+                }}
+              />
+            )}
 
-        <div className="flex items-center justify-around h-16 max-w-lg mx-auto relative">
-          {/* Animated pill indicator */}
-          {activeIdx >= 0 && (
-            <div
-              className="absolute bottom-1 h-[3px] rounded-full nav-pill-indicator"
-              style={{
-                background: 'hsl(var(--primary))',
-                boxShadow: '0 0 14px hsl(var(--primary) / 0.5), 0 0 28px hsl(var(--primary) / 0.2)',
-                width: '24px',
-                left: `calc(${((activeIdx + 0.5) / slotCount) * 100}% - 12px)`,
-              }}
-            />
-          )}
+            {/* Left tabs */}
+            {leftTabs.map(tab => (
+              <TabButton
+                key={tab.key}
+                tab={tab}
+                active={isActive(tab.path)}
+                moduleStatus={moduleStatuses[tab.path]}
+                onClick={() => navigate(tab.path)}
+              />
+            ))}
 
-          {/* Left tabs */}
-          {leftTabs.map(tab => (
-            <TabButton
-              key={tab.key}
-              tab={tab}
-              active={isActive(tab.path)}
-              moduleStatus={moduleStatuses[tab.path]}
-              onClick={() => navigate(tab.path)}
-            />
-          ))}
+            {/* Center FAB "+" */}
+            <div className="flex-1 flex items-center justify-center">
+              <button
+                onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
+                className={cn(
+                  "absolute -top-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
+                  "hover:scale-105 active:scale-90"
+                )}
+                style={{
+                  background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
+                  boxShadow: '0 4px 16px hsl(var(--primary) / 0.35)',
+                }}
+              >
+                <AppIcon name="Plus" size={26} className="relative z-10 text-primary-foreground" />
+              </button>
+            </div>
 
-          {/* Center FAB "+" */}
-          <div className="flex-1 flex items-center justify-center">
+            {/* Right tabs */}
+            {rightTabs.map(tab => (
+              <TabButton
+                key={tab.key}
+                tab={tab}
+                active={isActive(tab.path)}
+                moduleStatus={moduleStatuses[tab.path]}
+                onClick={() => navigate(tab.path)}
+              />
+            ))}
+
+            {/* "Mais" tab */}
             <button
-              onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
-              className={cn(
-                "absolute -top-5 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300",
-                "hover:scale-105 active:scale-90"
-              )}
+              onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
+              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground"
             >
-              <div className="absolute inset-0 rounded-full fab-neon-border opacity-60" />
-              <div className="absolute inset-[2px] rounded-full bg-card" />
-              <AppIcon name="Plus" size={28} className="relative z-10 text-primary" />
+              <AppIcon name="Menu" size={22} />
             </button>
           </div>
-
-          {/* Right tabs */}
-          {rightTabs.map(tab => (
-            <TabButton
-              key={tab.key}
-              tab={tab}
-              active={isActive(tab.path)}
-              moduleStatus={moduleStatuses[tab.path]}
-              onClick={() => navigate(tab.path)}
-            />
-          ))}
-
-          {/* "Mais" tab */}
-          <button
-            onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
-            className={cn(
-              "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
-              "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <AppIcon name="Menu" size={24} />
-            <span className="text-[10px] font-medium">Mais</span>
-          </button>
         </div>
       </nav>
     </>,
@@ -175,17 +176,12 @@ function TabButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all",
+        "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       )}
     >
       <div className={cn("relative", active && "nav-icon-active")}>
-        <AppIcon
-          name={tab.icon}
-          size={24}
-          style={active ? { filter: 'drop-shadow(0 0 6px hsl(var(--primary) / 0.6))' } : undefined}
-        />
-        {/* Module status badge */}
+        <AppIcon name={tab.icon} size={22} />
         {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
           <span
             className={cn(
@@ -202,7 +198,7 @@ function TabButton({
           </span>
         )}
       </div>
-      <span className="text-[10px] font-medium">{tab.label}</span>
+      {active && <span className="text-[10px] font-semibold">{tab.label}</span>}
     </button>
   );
 }
