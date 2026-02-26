@@ -53,6 +53,13 @@ const colorOptions = [
   '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
 ];
 
+const sectorIconOptions = [
+  'Folder', 'Bath', 'Utensils', 'ChefHat', 'Coffee', 'Sofa',
+  'Package', 'ClipboardCheck', 'Wrench', 'Droplets', 'Star',
+  'Zap', 'Sparkles', 'Store', 'ShoppingCart', 'Briefcase',
+  'Heart', 'Shield', 'Settings', 'Leaf',
+];
+
 const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Calendar }[] = [
   { value: 'daily', label: 'Diária', icon: Calendar },
   { value: 'weekly', label: 'Semanal', icon: CalendarDays },
@@ -94,8 +101,8 @@ interface ChecklistSettingsProps {
   sectors: ChecklistSector[];
   selectedType: ChecklistType;
   onTypeChange: (type: ChecklistType) => void;
-  onAddSector: (data: { name: string; color: string }) => Promise<void>;
-  onUpdateSector: (id: string, data: { name?: string; color?: string }) => Promise<void>;
+  onAddSector: (data: { name: string; color: string; icon?: string }) => Promise<void>;
+  onUpdateSector: (id: string, data: { name?: string; color?: string; icon?: string }) => Promise<void>;
   onDeleteSector: (id: string) => Promise<void>;
   onReorderSectors?: (orderedIds: string[]) => Promise<void>;
   onAddSubcategory: (data: { sector_id: string; name: string }) => Promise<void>;
@@ -202,6 +209,7 @@ export function ChecklistSettings({
   const [sectorName, setSectorName] = useState('');
   const [sectorColor, setSectorColor] = useState('#6366f1');
   const [subcategoryName, setSubcategoryName] = useState('');
+  const [sectorIcon, setSectorIcon] = useState('Folder');
   const [itemName, setItemName] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [itemFrequency, setItemFrequency] = useState<ItemFrequency>('daily');
@@ -297,10 +305,12 @@ export function ChecklistSettings({
       setEditingSector(sector);
       setSectorName(sector.name);
       setSectorColor(sector.color);
+      setSectorIcon(sector.icon || 'Folder');
     } else {
       setEditingSector(null);
       setSectorName('');
       setSectorColor('#6366f1');
+      setSectorIcon('Folder');
     }
     setSectorSheetOpen(true);
   };
@@ -309,9 +319,9 @@ export function ChecklistSettings({
     if (!sectorName.trim()) return;
 
     if (editingSector) {
-      await onUpdateSector(editingSector.id, { name: sectorName.trim(), color: sectorColor });
+      await onUpdateSector(editingSector.id, { name: sectorName.trim(), color: sectorColor, icon: sectorIcon });
     } else {
-      await onAddSector({ name: sectorName.trim(), color: sectorColor });
+      await onAddSector({ name: sectorName.trim(), color: sectorColor, icon: sectorIcon });
     }
     setSectorSheetOpen(false);
   };
@@ -758,6 +768,26 @@ export function ChecklistSettings({
                     }`}
                     style={{ backgroundColor: color }}
                   />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Ícone</Label>
+              <div className="grid grid-cols-5 gap-2">
+                {sectorIconOptions.map((icon) => (
+                  <button
+                    key={icon}
+                    onClick={() => setSectorIcon(icon)}
+                    className={cn(
+                      "w-full aspect-square rounded-xl flex items-center justify-center transition-all border",
+                      sectorIcon === icon
+                        ? 'ring-2 ring-primary ring-offset-2 border-primary bg-primary/10'
+                        : 'border-border/50 bg-secondary/30 hover:bg-secondary/60'
+                    )}
+                  >
+                    <AppIcon name={icon} size={20} className="text-foreground" />
+                  </button>
                 ))}
               </div>
             </div>
