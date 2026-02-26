@@ -174,7 +174,7 @@ export default function Auth() {
   const cardLink = "text-primary";
 
   const inputClasses = (field: string) => cn(
-    "pl-11 h-12 rounded-xl border transition-all duration-300",
+    "pl-11 h-12 rounded-xl border transition-all duration-300 focus-visible:!ring-0 focus-visible:!ring-offset-0",
     "text-foreground placeholder:text-muted-foreground/50",
     focusedField === field
       ? "border-primary/50 bg-secondary/80"
@@ -207,20 +207,20 @@ export default function Auth() {
       {/* Animated background effects */}
       <div
         className="absolute top-[-30%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[120px]"
-        style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.1), transparent 60%)', animation: 'floatLogo 20s ease-in-out infinite' }}
+        style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.1), transparent 60%)', animation: 'floatLogo 60s ease-in-out infinite' }}
       />
       <div
         className="absolute bottom-[-25%] right-[-15%] w-[500px] h-[500px] rounded-full blur-[100px]"
         style={{
           background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.08), transparent 60%)',
-          animation: 'floatLogo 25s ease-in-out infinite reverse',
+          animation: 'floatLogo 70s ease-in-out infinite reverse',
         }}
       />
       <div
         className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full blur-[80px]"
         style={{
           background: 'radial-gradient(circle, hsl(var(--primary) / 0.06), transparent 60%)',
-          animation: 'floatLogo 30s ease-in-out infinite',
+          animation: 'floatLogo 80s ease-in-out infinite',
         }}
       />
 
@@ -249,7 +249,7 @@ export default function Auth() {
                 className="absolute -inset-[2px] rounded-full opacity-60"
                 style={{
                   background: 'conic-gradient(from var(--neon-angle, 0deg), hsl(var(--neon-cyan)), transparent, hsl(var(--neon-purple)), transparent, hsl(var(--neon-cyan)))',
-                  animation: 'neonRotate 4s linear infinite',
+                  animation: 'neonRotate 20s linear infinite',
                   filter: 'blur(3px)',
                 }}
               />
