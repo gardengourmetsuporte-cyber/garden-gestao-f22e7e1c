@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isBefore, startOfDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useDashboardCalendar } from '@/hooks/useDashboardCalendar';
 import { calendarEventColors } from '@/types/calendar';
@@ -38,20 +38,17 @@ export function UnifiedCalendarWidget() {
     return ev.tasks.length > 0 || ev.finance.length > 0 || ev.marketing.length > 0 || ev.schedules.length > 0;
   };
 
+  const todayStart = startOfDay(new Date());
+
   const getChips = (dateKey: string) => {
     const ev = eventsMap.get(dateKey);
     if (!ev) return [];
     const chips: { type: string; color: string }[] = [];
-    const pendingTasks = ev.tasks.filter(t => t.type === 'task_pending');
-    const doneTasks = ev.tasks.filter(t => t.type === 'task_done');
-    if (pendingTasks.length > 0) chips.push({ type: 'task_pending', color: calendarEventColors.task_pending });
-    if (doneTasks.length > 0) chips.push({ type: 'task_done', color: calendarEventColors.task_done });
-    const hasPeak = ev.finance.some(f => f.type === 'finance_peak' && f.subtitle === 'Acima da média');
-    if (hasPeak) chips.push({ type: 'finance_peak', color: calendarEventColors.finance_peak });
-    const hasIncome = ev.finance.some(f => f.type === 'finance_income');
-    if (hasIncome) chips.push({ type: 'finance_income', color: calendarEventColors.finance_income });
+    // Only show marketing, schedules (folga), and finance peaks (datas importantes)
     if (ev.marketing.length > 0) chips.push({ type: 'marketing', color: calendarEventColors.marketing });
     if (ev.schedules.length > 0) chips.push({ type: 'schedule', color: calendarEventColors.schedule });
+    const hasPeak = ev.finance.some(f => f.type === 'finance_peak' && f.subtitle === 'Acima da média');
+    if (hasPeak) chips.push({ type: 'finance_peak', color: calendarEventColors.finance_peak });
     return chips;
   };
 
@@ -104,16 +101,20 @@ export function UnifiedCalendarWidget() {
             const dateKey = format(day, 'yyyy-MM-dd');
             const inMonth = isSameMonth(day, currentMonth);
             const today = isToday(day);
+            const isPast = isBefore(day, todayStart) && !today;
             const selected = selectedDate === dateKey;
-            const chips = inMonth ? getChips(dateKey) : [];
+            const chips = (inMonth && !isPast) ? getChips(dateKey) : [];
 
             return (
               <button
                 key={i}
-                onClick={() => setSelectedDate(selected ? null : dateKey)}
+                onClick={() => !isPast && inMonth && setSelectedDate(selected ? null : dateKey)}
+                disabled={isPast || !inMonth}
                 className={cn(
                   'relative min-h-[3.5rem] p-1 border-b border-r border-border/15 text-left transition-colors',
-                  inMonth ? 'hover:bg-secondary/40' : 'opacity-25 pointer-events-none',
+                  !inMonth && 'opacity-15 pointer-events-none',
+                  inMonth && isPast && 'opacity-30 pointer-events-none',
+                  inMonth && !isPast && 'hover:bg-secondary/40',
                   today && 'bg-primary/5',
                   selected && 'bg-primary/10 ring-1 ring-primary/30'
                 )}
@@ -139,12 +140,9 @@ export function UnifiedCalendarWidget() {
         {/* Legend */}
         <div className="flex flex-wrap gap-x-3 gap-y-1 justify-center px-3 py-2 border-t border-border/20">
           {[
-            { label: 'Pendente', color: calendarEventColors.task_pending },
-            { label: 'Concluída', color: calendarEventColors.task_done },
-            { label: 'Despesa', color: calendarEventColors.finance_peak },
-            { label: 'Receita', color: calendarEventColors.finance_income },
             { label: 'Marketing', color: calendarEventColors.marketing },
             { label: 'Folga', color: calendarEventColors.schedule },
+            { label: 'Data importante', color: calendarEventColors.finance_peak },
           ].map(s => (
             <div key={s.label} className="flex items-center gap-1">
               <div className={cn('w-2 h-2 rounded-full', s.color)} />
