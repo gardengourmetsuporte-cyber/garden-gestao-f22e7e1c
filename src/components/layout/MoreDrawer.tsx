@@ -138,7 +138,12 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                   return (
                     <button
                       key={unit.id}
-                      onClick={() => setActiveUnitId(unit.id)}
+                      onClick={() => {
+                        if (!isActive) {
+                          setActiveUnitId(unit.id);
+                          onOpenChange(false);
+                        }
+                      }}
                       className={cn(
                         "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0",
                         isActive
