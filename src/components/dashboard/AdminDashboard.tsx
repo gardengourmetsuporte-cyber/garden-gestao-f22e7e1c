@@ -78,20 +78,20 @@ export function AdminDashboard() {
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-foreground/50">Saldo da empresa</span>
-                  <AppIcon name="ChevronRight" size={18} className="text-foreground/30" />
+                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-black/50">Saldo da empresa</span>
+                  <AppIcon name="ChevronRight" size={18} className="text-black/30" />
                 </div>
                 <p className={cn(
                   "text-[2rem] font-extrabold tracking-tight leading-tight",
-                  stats.monthBalance >= 0 ? "text-foreground" : "text-destructive"
+                  stats.monthBalance >= 0 ? "text-black" : "text-red-600"
                 )}>
-                  {statsLoading ? <Skeleton className="h-9 w-40 bg-foreground/10" /> : formatCurrency(stats.monthBalance)}
+                  {statsLoading ? <Skeleton className="h-9 w-40 bg-black/10" /> : formatCurrency(stats.monthBalance)}
                 </p>
                 {stats.pendingExpenses > 0 && (
                   <div className="flex gap-2 mt-3">
-                    <div className="rounded-lg px-3 py-1.5 bg-foreground/5 border border-foreground/10">
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-foreground/50">Pendências</span>
-                      <span className="text-sm font-bold text-amber-600 dark:text-amber-500 ml-2">{statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}</span>
+                    <div className="rounded-lg px-3 py-1.5 bg-black/5 border border-black/10">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-black/50">Pendências</span>
+                      <span className="text-sm font-bold text-amber-600 ml-2">{statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}</span>
                     </div>
                   </div>
                 )}
