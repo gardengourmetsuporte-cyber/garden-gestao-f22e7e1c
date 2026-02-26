@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback, forwardRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -19,7 +19,6 @@ interface TabDef {
 const DEFAULT_TABS: TabDef[] = [
   { key: 'home', icon: 'Home', label: 'Início', path: '/', moduleKey: 'dashboard' },
   { key: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', path: '/checklists', moduleKey: 'checklists' },
-  // center slot is the "+" button — not in this array
   { key: 'inventory', icon: 'Package', label: 'Estoque', path: '/inventory', moduleKey: 'inventory' },
 ];
 
@@ -40,9 +39,11 @@ export function BottomTabBar() {
   const moduleStatuses = useModuleStatus();
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null);
 
-  if (HIDDEN_ROUTES.some(r => location.pathname.startsWith(r))) return null;
-  if (location.pathname.startsWith('/tablet')) return null;
+  const isHidden = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r)) || location.pathname.startsWith('/tablet');
 
   const resolvedTabs: TabDef[] = [];
   const usedKeys = new Set<string>();
@@ -68,9 +69,32 @@ export function BottomTabBar() {
     return location.pathname.startsWith(path);
   };
 
-  const allSlots = [...leftTabs, { key: '__plus__' } as any, ...rightTabs, { key: '__more__' } as any];
-  const activeIdx = allSlots.findIndex(t => t.path && isActive(t.path));
-  const slotCount = allSlots.length;
+  const activeKey = resolvedTabs.find(t => isActive(t.path))?.key ?? null;
+
+  const updatePill = useCallback(() => {
+    if (!activeKey || !containerRef.current) {
+      setPillStyle(null);
+      return;
+    }
+    const activeEl = tabRefs.current[activeKey];
+    if (!activeEl) { setPillStyle(null); return; }
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const tabRect = activeEl.getBoundingClientRect();
+    setPillStyle({
+      left: tabRect.left - containerRect.left + (tabRect.width - 48) / 2,
+      width: 48,
+    });
+  }, [activeKey]);
+
+  useEffect(() => {
+    updatePill();
+    // Small delay for initial layout
+    const t = setTimeout(updatePill, 100);
+    window.addEventListener('resize', updatePill);
+    return () => { window.removeEventListener('resize', updatePill); clearTimeout(t); };
+  }, [updatePill]);
+
+  if (isHidden) return null;
 
   return createPortal(
     <>
@@ -84,25 +108,25 @@ export function BottomTabBar() {
         <div
           className="mx-4 mb-3 rounded-[28px] glass-border"
           style={{
-            background: 'hsl(var(--card) / 0.7)',
+            background: 'hsl(var(--card) / 0.75)',
             backdropFilter: 'blur(40px)',
             WebkitBackdropFilter: 'blur(40px)',
             boxShadow: 'var(--shadow-floating)',
           }}
         >
-          <div className="flex items-center justify-evenly h-[64px] max-w-lg mx-auto relative px-1">
-            {/* Highlight pill behind active tab */}
-            {activeIdx >= 0 && (
+          <div ref={containerRef} className="flex items-center h-[64px] max-w-lg mx-auto relative">
+            {/* Highlight pill — ref-based positioning */}
+            {pillStyle && (
               <div
                 className="absolute nav-highlight-pill rounded-2xl"
                 style={{
-                  background: 'hsl(var(--primary) / 0.1)',
-                  border: '1px solid hsl(var(--primary) / 0.15)',
-                  width: '48px',
+                  background: 'hsl(var(--primary) / 0.12)',
+                  border: '1px solid hsl(var(--primary) / 0.18)',
+                  width: pillStyle.width,
                   height: '44px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  left: `calc(${(activeIdx / slotCount) * 100}% + ${100 / slotCount / 2}% - 24px)`,
+                  left: pillStyle.left,
                 }}
               />
             )}
@@ -111,6 +135,7 @@ export function BottomTabBar() {
             {leftTabs.map(tab => (
               <TabButton
                 key={tab.key}
+                ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
                 moduleStatus={moduleStatuses[tab.path]}
@@ -119,7 +144,7 @@ export function BottomTabBar() {
             ))}
 
             {/* Center FAB "+" */}
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex items-center justify-center" style={{ width: '20%' }}>
               <button
                 onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
                 className={cn(
@@ -139,6 +164,7 @@ export function BottomTabBar() {
             {rightTabs.map(tab => (
               <TabButton
                 key={tab.key}
+                ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
                 moduleStatus={moduleStatuses[tab.path]}
@@ -149,7 +175,8 @@ export function BottomTabBar() {
             {/* "Mais" tab */}
             <button
               onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
-              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground relative z-10"
+              className="flex flex-col items-center justify-center h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground relative z-10"
+              style={{ width: '20%' }}
             >
               <AppIcon name="Menu" size={22} />
               <span className="text-[10px] font-normal">Mais</span>
@@ -162,24 +189,24 @@ export function BottomTabBar() {
   );
 }
 
-function TabButton({
-  tab,
-  active,
-  moduleStatus,
-  onClick,
-}: {
-  tab: TabDef;
-  active: boolean;
-  moduleStatus?: { level: string; count: number } | null;
-  onClick: () => void;
-}) {
+const TabButton = forwardRef<
+  HTMLButtonElement,
+  {
+    tab: TabDef;
+    active: boolean;
+    moduleStatus?: { level: string; count: number } | null;
+    onClick: () => void;
+  }
+>(({ tab, active, moduleStatus, onClick }, ref) => {
   return (
     <button
+      ref={ref}
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
+        "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       )}
+      style={{ width: '20%' }}
     >
       <div className={cn("relative", active && "nav-icon-active")}>
         <AppIcon name={tab.icon} size={22} />
@@ -199,7 +226,9 @@ function TabButton({
           </span>
         )}
       </div>
-      <span className={cn("text-[10px]", active ? "font-semibold" : "font-normal text-muted-foreground")}>{tab.label}</span>
+      <span className={cn("text-[10px]", active ? "font-semibold" : "font-normal")}>{tab.label}</span>
     </button>
   );
-}
+});
+
+TabButton.displayName = 'TabButton';

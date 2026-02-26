@@ -101,7 +101,7 @@ export function PersonalFinanceChartWidget() {
 
   if (isLoading) {
     return (
-      <div className="card-command col-span-2 p-5 animate-slide-up stagger-4">
+      <div className="card-command w-full p-5 animate-slide-up stagger-4">
         <div className="flex items-center gap-2 mb-4">
           <Skeleton className="w-8 h-8 rounded-lg" />
           <Skeleton className="h-4 w-32" />
@@ -119,7 +119,7 @@ export function PersonalFinanceChartWidget() {
   return (
     <button
       onClick={() => navigate('/personal-finance')}
-      className="card-command col-span-2 p-0 text-left animate-slide-up stagger-4 transition-all duration-200 hover:scale-[1.005] active:scale-[0.98] overflow-hidden relative"
+      className="card-command w-full p-0 text-left animate-slide-up stagger-4 transition-all duration-200 hover:scale-[1.005] active:scale-[0.98] overflow-hidden relative"
     >
       <div
         className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-3xl pointer-events-none"
