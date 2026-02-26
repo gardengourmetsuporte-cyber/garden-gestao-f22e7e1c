@@ -504,7 +504,7 @@ export default function ChecklistsPage() {
                     size={22}
                     fill={checklistType === 'bonus' ? 1 : 0}
                     className="transition-colors"
-                    style={{ color: checklistType === 'bonus' ? '#475569' : 'hsl(160 70% 45%)' }}
+                    style={{ color: 'hsl(160 70% 45%)' }}
                   />
                 </div>
                 <div className="flex-1">
@@ -529,7 +529,7 @@ export default function ChecklistsPage() {
                   opacity: checklistType === 'bonus' ? 0.3 : 0.2,
                   background: 'linear-gradient(105deg, transparent 40%, hsl(160 84% 39% / 0.15) 45%, hsl(var(--neon-cyan) / 0.1) 55%, transparent 60%)',
                   backgroundSize: '200% 100%',
-                  animation: 'shimmer 8s ease-in-out infinite',
+                  animation: 'shimmer 120s ease-in-out infinite',
                 }}
               />
             </button>
