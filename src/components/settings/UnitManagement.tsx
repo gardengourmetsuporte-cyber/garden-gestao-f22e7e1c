@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Building2, Plus, Pencil, Users, Loader2, Check, Copy, ChevronRight, ChevronLeft, Sparkles, CheckCircle2, Trash2 } from 'lucide-react';
+import { Store, Plus, Pencil, Users, Loader2, Check, Copy, ChevronRight, ChevronLeft, Sparkles, CheckCircle2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -265,7 +265,7 @@ export function UnitManagement() {
         await refetchUnits();
         setWizardStep('done');
       } catch (err: any) {
-        toast.error(err.message || 'Erro ao criar unidade');
+        toast.error(err.message || 'Erro ao criar loja');
       } finally {
         setWSaving(false);
       }
@@ -275,7 +275,7 @@ export function UnitManagement() {
   const wizardFinish = () => {
     if (wCreatedUnitId) {
       setActiveUnitId(wCreatedUnitId);
-      toast.success('Unidade ativa alterada!');
+      toast.success('Loja ativa alterada!');
     }
     setWizardOpen(false);
   };
@@ -295,7 +295,7 @@ export function UnitManagement() {
         .update({ name: editName.trim(), slug: editSlug.trim() || generateSlug(editName) })
         .eq('id', editingUnit.id);
       if (error) throw error;
-      toast.success('Unidade atualizada');
+      toast.success('Loja atualizada');
       setEditSheetOpen(false);
       await refetchUnits();
     } catch (err: any) { toast.error(err.message || 'Erro'); }
@@ -308,7 +308,7 @@ export function UnitManagement() {
     try {
       const { error } = await supabase.rpc('delete_unit_cascade', { p_unit_id: deletingUnit.id });
       if (error) throw error;
-      toast.success(`Unidade "${deletingUnit.name}" excluída`);
+      toast.success(`Loja "${deletingUnit.name}" excluída`);
       setDeleteConfirmOpen(false);
       setDeletingUnit(null);
       await refetchUnits();
@@ -390,7 +390,7 @@ export function UnitManagement() {
   // ─── Render ──────────────────────────────────────────────
 
   if (!isSuperAdmin) {
-    return <div className="text-center py-8 text-muted-foreground text-sm">Apenas Super Admins podem gerenciar unidades.</div>;
+    return <div className="text-center py-8 text-muted-foreground text-sm">Apenas Super Admins podem gerenciar lojas.</div>;
   }
 
   const UserList = ({ items, setItems }: { items: UserUnitAssignment[]; setItems: React.Dispatch<React.SetStateAction<UserUnitAssignment[]>> }) => (
@@ -449,16 +449,16 @@ export function UnitManagement() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Building2 className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold text-foreground">Gerenciar Unidades</h3>
+          <Store className="w-5 h-5 text-primary" />
+          <h3 className="font-semibold text-foreground">Gerenciar Lojas</h3>
         </div>
         <Button size="sm" onClick={openWizard}>
-          <Plus className="w-4 h-4 mr-1" /> Nova Unidade
+          <Plus className="w-4 h-4 mr-1" /> Nova Loja
         </Button>
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Crie e gerencie as unidades operacionais do sistema.
+        Crie e gerencie as lojas do sistema.
       </p>
 
       <div className="space-y-2">
@@ -466,7 +466,7 @@ export function UnitManagement() {
           <div key={unit.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Building2 className="w-5 h-5 text-primary" />
+                <Store className="w-5 h-5 text-primary" />
               </div>
               <div className="min-w-0">
                 <span className="font-medium block truncate">{unit.name}</span>
@@ -493,7 +493,7 @@ export function UnitManagement() {
           </div>
         ))}
         {units.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-4">Nenhuma unidade cadastrada</p>
+          <p className="text-sm text-muted-foreground text-center py-4">Nenhuma loja cadastrada</p>
         )}
       </div>
 
@@ -503,7 +503,7 @@ export function UnitManagement() {
           <SheetHeader className="shrink-0">
             <SheetTitle className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
-              Nova Unidade
+              Nova Loja
             </SheetTitle>
           </SheetHeader>
 
@@ -528,11 +528,11 @@ export function UnitManagement() {
             {wizardStep === 'info' && (
               <>
                 <div className="space-y-2">
-                  <Label>Nome da unidade</Label>
+                  <Label>Nome da loja</Label>
                   <Input
                     value={wName}
                     onChange={e => { setWName(e.target.value); setWSlug(generateSlug(e.target.value)); }}
-                    placeholder="Ex: Filial Centro"
+                    placeholder="Ex: Loja Centro"
                     autoFocus
                   />
                 </div>
@@ -549,7 +549,7 @@ export function UnitManagement() {
                 {units.length > 0 ? (
                   <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">
-                      Selecione uma unidade existente para copiar seus templates, ou comece do zero.
+                      Selecione uma loja existente para copiar seus templates, ou comece do zero.
                     </p>
                     <Select value={wSourceId} onValueChange={setWSourceId}>
                       <SelectTrigger>
@@ -568,7 +568,7 @@ export function UnitManagement() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    Nenhuma unidade existente para copiar templates. A unidade será criada vazia.
+                    Nenhuma loja existente para copiar templates. A loja será criada vazia.
                   </p>
                 )}
               </>
@@ -578,7 +578,7 @@ export function UnitManagement() {
             {wizardStep === 'users' && (
               <>
                 <p className="text-sm text-muted-foreground">
-                  Selecione os usuários que terão acesso a esta unidade.
+                  Selecione os usuários que terão acesso a esta loja.
                 </p>
                 {wLoadingUsers ? (
                   <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
@@ -597,7 +597,7 @@ export function UnitManagement() {
                 <div>
                   <h3 className="font-semibold text-xl">Tudo pronto! 🎉</h3>
                   <p className="text-sm text-muted-foreground mt-2">
-                    A unidade <strong>{wName}</strong> está configurada e pronta para uso.
+                    A loja <strong>{wName}</strong> está configurada e pronta para uso.
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {wUsers.filter(u => u.is_assigned).length} usuário(s) com acesso.
@@ -610,8 +610,8 @@ export function UnitManagement() {
           <div className="shrink-0 pt-2 pb-4 flex gap-2">
             {wizardStep === 'done' ? (
               <Button onClick={wizardFinish} className="w-full">
-                <Building2 className="w-4 h-4 mr-2" />
-                Ativar e Usar Unidade
+                <Store className="w-4 h-4 mr-2" />
+                Ativar Loja
               </Button>
             ) : (
               <>
@@ -622,7 +622,7 @@ export function UnitManagement() {
                 )}
                 <Button onClick={wizardNext} disabled={wSaving} className="flex-1">
                   {wSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  {wizardStep === 'info' ? 'Próximo' : wizardStep === 'templates' ? 'Próximo' : 'Criar Unidade'}
+                  {wizardStep === 'info' ? 'Próximo' : wizardStep === 'templates' ? 'Próximo' : 'Criar Loja'}
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </>
@@ -634,7 +634,7 @@ export function UnitManagement() {
       {/* ═══ Edit Sheet ═══ */}
       <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
         <SheetContent side="bottom" className="rounded-t-2xl">
-          <SheetHeader><SheetTitle>Editar Unidade</SheetTitle></SheetHeader>
+          <SheetHeader><SheetTitle>Editar Loja</SheetTitle></SheetHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Nome</Label>
@@ -702,9 +702,9 @@ export function UnitManagement() {
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir unidade "{deletingUnit?.name}"?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir loja "{deletingUnit?.name}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação é irreversível. Todos os dados da unidade serão excluídos permanentemente: estoque, categorias, fornecedores, checklists, financeiro, funcionários e mais.
+              Esta ação é irreversível. Todos os dados da loja serão excluídos permanentemente: estoque, categorias, fornecedores, checklists, financeiro, funcionários e mais.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

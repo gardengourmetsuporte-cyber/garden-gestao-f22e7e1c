@@ -124,7 +124,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           {/* Unit selector */}
           {units.length > 1 && (
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 shrink-0">Unidade</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 shrink-0">Loja</span>
               {units.map(unit => (
                 <button
                   key={unit.id}
