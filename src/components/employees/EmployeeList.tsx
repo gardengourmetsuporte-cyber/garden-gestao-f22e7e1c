@@ -128,7 +128,7 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{employee.full_name}</span>
+                    <span className="font-semibold font-display">{employee.full_name}</span>
                     {!employee.is_active && (
                       <Badge variant="secondary" className="text-xs">Inativo</Badge>
                     )}
