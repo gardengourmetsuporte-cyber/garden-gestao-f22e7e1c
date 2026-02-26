@@ -269,6 +269,8 @@
       hsl(0 0% 96%) 80%,
       hsl(0 0% 98%) 100%
     );
+    background-size: 200% 200%;
+    animation: darkCardShimmer 120s ease-in-out infinite;
     color: hsl(234 30% 15%);
     box-shadow: 
       0 4px 24px hsl(0 0% 0% / 0.15),
@@ -386,6 +388,8 @@
       hsl(0 0% 96%) 80%,
       hsl(0 0% 98%) 100%
     );
+    background-size: 200% 200%;
+    animation: darkCardShimmer 120s ease-in-out infinite;
     color: hsl(234 30% 15%);
     box-shadow: 
       0 4px 24px hsl(0 0% 0% / 0.15),
@@ -1618,7 +1622,7 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: neonRotate 4s linear infinite;
+    animation: neonRotate 20s linear infinite;
   }
 
   /* Reduced motion support */
