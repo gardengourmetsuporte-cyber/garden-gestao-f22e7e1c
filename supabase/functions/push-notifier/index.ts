@@ -237,13 +237,15 @@ Deno.serve(async (req) => {
       }
 
       // Determine notification category from tag
+      // Support both legacy tag names and direct category names
       let category = 'sistema';
       if (tag?.startsWith('chat-')) category = 'chat';
-      else if (tag === 'zero-stock' || tag === 'low-stock') category = 'estoque';
-      else if (tag === 'bills-due' || tag === 'bills-overdue' || tag === 'neg-balance') category = 'financeiro';
-      else if (tag === 'checklist-pending') category = 'checklist';
-      else if (tag === 'cash-closing') category = 'caixa';
-      else if (tag === 'inv-due') category = 'estoque';
+      else if (tag === 'estoque' || tag === 'zero-stock' || tag === 'low-stock' || tag === 'inv-due') category = 'estoque';
+      else if (tag === 'financeiro' || tag === 'bills-due' || tag === 'bills-overdue' || tag === 'neg-balance') category = 'financeiro';
+      else if (tag === 'checklist' || tag === 'checklist-pending') category = 'checklist';
+      else if (tag === 'caixa' || tag === 'cash-closing') category = 'caixa';
+      else if (tag === 'agenda') category = 'agenda';
+      else if (tag === 'chat') category = 'chat';
 
       // Check if user has this category disabled
       const { data: pref } = await supabaseAdmin
