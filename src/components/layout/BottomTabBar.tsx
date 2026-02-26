@@ -102,90 +102,103 @@ export function BottomTabBar() {
 
       <nav
         className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {/* Outer glow wrapper */}
+        {/* Top neon glow line — only on top edge */}
         <div
-          className="mx-3 mb-3 rounded-[26px] p-[1px] nav-bar-neon-glow"
+          className="absolute top-0 left-[10%] right-[10%] h-[1px]"
+          style={{
+            background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.8), hsl(262 80% 60% / 0.6), hsl(var(--primary) / 0.8), transparent)',
+          }}
+        />
+        <div
+          className="absolute -top-[1px] left-[5%] right-[5%] h-[3px] blur-[4px]"
+          style={{
+            background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), hsl(262 80% 60% / 0.4), hsl(var(--primary) / 0.5), transparent)',
+          }}
+        />
+        <div
+          className="absolute -top-[2px] left-[15%] right-[15%] h-[6px] blur-[8px]"
+          style={{
+            background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), hsl(262 80% 60% / 0.2), hsl(var(--primary) / 0.3), transparent)',
+          }}
+        />
+
+        {/* Bar background — full width, edge to edge */}
+        <div
+          className="relative"
+          style={{
+            background: 'hsl(225 30% 6%)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
         >
-          {/* Inner bar */}
-          <div
-            className="rounded-[25px] relative overflow-hidden"
-            style={{
-              background: 'hsl(228 25% 8% / 0.95)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-            }}
-          >
-            <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative">
-              {/* Highlight pill */}
-              {pillStyle && (
-                <div
-                  className="absolute nav-highlight-pill rounded-[12px]"
-                  style={{
-                    background: 'hsl(var(--primary) / 0.15)',
-                    border: '1px solid hsl(var(--primary) / 0.25)',
-                    width: pillStyle.width,
-                    height: '40px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    left: pillStyle.left,
-                    willChange: 'left',
-                  }}
-                />
-              )}
+          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative">
+            {/* Highlight pill */}
+            {pillStyle && (
+              <div
+                className="absolute nav-highlight-pill rounded-[12px]"
+                style={{
+                  background: 'hsl(var(--primary) / 0.12)',
+                  border: '1px solid hsl(var(--primary) / 0.2)',
+                  width: pillStyle.width,
+                  height: '40px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  left: pillStyle.left,
+                  willChange: 'left',
+                }}
+              />
+            )}
 
-              {/* Left tabs */}
-              {leftTabs.map(tab => (
-                <TabButton
-                  key={tab.key}
-                  ref={(el) => { tabRefs.current[tab.key] = el; }}
-                  tab={tab}
-                  active={isActive(tab.path)}
-                  moduleStatus={moduleStatuses[tab.path]}
-                  onClick={() => navigate(tab.path)}
-                />
-              ))}
+            {/* Left tabs */}
+            {leftTabs.map(tab => (
+              <TabButton
+                key={tab.key}
+                ref={(el) => { tabRefs.current[tab.key] = el; }}
+                tab={tab}
+                active={isActive(tab.path)}
+                moduleStatus={moduleStatuses[tab.path]}
+                onClick={() => navigate(tab.path)}
+              />
+            ))}
 
-              {/* Center FAB "+" */}
-              <div className="flex items-center justify-center" style={{ width: '20%' }}>
-                <button
-                  onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
-                  className={cn(
-                    "absolute -top-5 w-[54px] h-[54px] rounded-[16px] flex items-center justify-center transition-all duration-300",
-                    "hover:scale-105 active:scale-90"
-                  )}
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(262 80% 55%))',
-                    boxShadow: '0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(262 80% 55% / 0.3), 0 4px 16px hsl(0 0% 0% / 0.4)',
-                  }}
-                >
-                  <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />
-                </button>
-              </div>
-
-              {/* Right tabs */}
-              {rightTabs.map(tab => (
-                <TabButton
-                  key={tab.key}
-                  ref={(el) => { tabRefs.current[tab.key] = el; }}
-                  tab={tab}
-                  active={isActive(tab.path)}
-                  moduleStatus={moduleStatuses[tab.path]}
-                  onClick={() => navigate(tab.path)}
-                />
-              ))}
-
-              {/* "Mais" tab */}
+            {/* Center FAB "+" */}
+            <div className="flex items-center justify-center" style={{ width: '20%' }}>
               <button
-                onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
-                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
-                style={{ width: '20%' }}
+                onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
+                className={cn(
+                  "absolute -top-7 w-[54px] h-[54px] rounded-[16px] flex items-center justify-center transition-all duration-300",
+                  "hover:scale-105 active:scale-90"
+                )}
+                style={{
+                  background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(262 80% 55%))',
+                  boxShadow: '0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(262 80% 55% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
+                }}
               >
-                <AppIcon name="Menu" size={22} fill={0} className="text-muted-foreground transition-colors" />
-                <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
+                <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />
               </button>
             </div>
+
+            {/* Right tabs */}
+            {rightTabs.map(tab => (
+              <TabButton
+                key={tab.key}
+                ref={(el) => { tabRefs.current[tab.key] = el; }}
+                tab={tab}
+                active={isActive(tab.path)}
+                moduleStatus={moduleStatuses[tab.path]}
+                onClick={() => navigate(tab.path)}
+              />
+            ))}
+
+            {/* "Mais" tab */}
+            <button
+              onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
+              className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
+              style={{ width: '20%' }}
+            >
+              <AppIcon name="Menu" size={22} fill={0} className="text-muted-foreground transition-colors" />
+              <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
+            </button>
           </div>
         </div>
       </nav>
@@ -232,7 +245,7 @@ const TabButton = forwardRef<
             style={{
               background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
               color: moduleStatus.level === 'critical' ? '#fff' : '#000',
-              border: '2px solid hsl(228 25% 8%)',
+              border: '2px solid hsl(225 30% 6%)',
             }}
           >
             {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
