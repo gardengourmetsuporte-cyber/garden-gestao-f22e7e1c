@@ -63,12 +63,13 @@ export default function RewardsPage() {
 
           {/* Products Grid */}
           <section>
-            <h2 className="section-title mb-4">Prêmios Disponíveis</h2>
+            <h2 className="section-title mb-4 font-display">Prêmios Disponíveis</h2>
             {activeProducts.length === 0 ? (
               <EmptyState
                 icon="Gift"
                 title="Nenhum prêmio disponível"
-                subtitle="Volte mais tarde para conferir novidades."
+                subtitle="Acumule pontos completando tarefas. Novos prêmios serão adicionados em breve!"
+                accent="warning"
               />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -83,7 +84,7 @@ export default function RewardsPage() {
 
           {/* Redemption History */}
           <section>
-            <h2 className="section-title mb-4">Meus Resgates</h2>
+            <h2 className="section-title mb-4 font-display">Meus Resgates</h2>
             <RedemptionHistory redemptions={redemptions} />
           </section>
         </div>

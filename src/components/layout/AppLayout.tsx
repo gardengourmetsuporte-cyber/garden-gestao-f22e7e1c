@@ -157,7 +157,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 border border-border/20 shrink-0">
                 <img alt="Atlas" className="w-full h-full object-contain rounded-full p-0.5" src={atlasIcon} />
               </div>
-              <span className="text-sm font-bold text-foreground truncate max-w-[140px]">
+              <span className="text-sm font-bold text-foreground truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
                 {activeUnit?.name || 'Garden'}
               </span>
             </button>

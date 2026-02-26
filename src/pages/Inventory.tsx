@@ -201,11 +201,15 @@ export default function InventoryPage() {
                   items.length === 0 ? (
                     <EmptyState
                       icon="Package"
-                      title="Nenhum item cadastrado"
-                      subtitle="Toque no + para adicionar"
+                      title="Seu estoque está vazio"
+                      subtitle="Cadastre o primeiro item para começar a controlar entradas e saídas."
+                      actionLabel={isAdmin ? "Cadastrar item" : undefined}
+                      actionIcon="Plus"
+                      onAction={isAdmin ? handleAddItem : undefined}
+                      accent="primary"
                     />
                   ) : (
-                    <EmptyState icon="Search" title="Nenhum item encontrado" />
+                    <EmptyState icon="Search" title="Nenhum item encontrado" subtitle="Tente buscar com outro termo." variant="compact" />
                   )
                 ) : (
                   sortedCategories.map((categoryName, catIndex) => {
