@@ -213,22 +213,30 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             </div>
           ))}
 
-          {/* Settings + Logout */}
-          {isAdmin && (
+          {/* Settings + Logout — Meta style */}
+          <div className="space-y-1.5 mt-2">
+            {isAdmin && (
+              <button
+                onClick={() => { navigate('/settings'); onOpenChange(false); }}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
+              >
+                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+                  <AppIcon name="Settings" size={18} className="text-foreground/70" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">Configurações</span>
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
+              </button>
+            )}
             <button
-              onClick={() => { navigate('/settings'); onOpenChange(false); }}
-              className="flex items-center justify-center w-full px-4 py-3 rounded-xl text-sm font-semibold text-foreground/80 hover:text-foreground active:bg-secondary/50 transition-all"
+              onClick={handleSignOut}
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
             >
-              Configurações
+              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+                <AppIcon name="LogOut" size={18} className="text-muted-foreground" />
+              </div>
+              <span className="text-sm font-semibold text-muted-foreground">Sair da conta</span>
             </button>
-          )}
-          <button
-            onClick={handleSignOut}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-secondary/80 border border-border/30 text-sm text-muted-foreground active:bg-secondary transition-all"
-          >
-            <AppIcon name="LogOut" size={18} />
-            <span className="font-medium">Sair da conta</span>
-          </button>
+          </div>
         </div>
       </DrawerContent>
     </Drawer>
