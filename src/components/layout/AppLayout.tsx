@@ -215,12 +215,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </div>
         </div>
+        {/* Header glow — attached to header bottom, behind page content */}
+        <div className="absolute left-0 right-0 bottom-0 translate-y-full pointer-events-none" style={{ height: '6px', zIndex: -1 }}>
+          <div className="absolute left-[10%] right-[10%] top-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.12), transparent)' }} />
+          <div className="absolute left-[5%] right-[5%] top-0 h-[3px] blur-[4px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.06), transparent)' }} />
+        </div>
       </header>
-      {/* Header glow — subtle diffused light (behind content, z-30 < header z-50) */}
-      <div className="lg:hidden fixed left-0 right-0 z-30 pointer-events-none" style={{ top: 'calc(env(safe-area-inset-top) + 3.5rem)', height: '20px', overflow: 'visible' }}>
-        <div className="absolute left-[10%] right-[10%] bottom-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.12), transparent)' }} />
-        <div className="absolute left-[5%] right-[5%] bottom-[-1px] h-[3px] blur-[4px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.06), transparent)' }} />
-      </div>
 
       {/* ======= Desktop Sidebar (unchanged) ======= */}
       <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card border-r border-border/20">
