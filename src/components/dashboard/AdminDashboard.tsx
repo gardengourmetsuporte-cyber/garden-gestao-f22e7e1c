@@ -53,7 +53,7 @@ export function AdminDashboard() {
   const progress = earnedPoints > 0 ? ((earnedPoints % 50) / 50) * 100 : 0;
 
   return (
-    <div className="space-y-4 p-4 lg:p-6">
+    <div className="space-y-5 p-4 lg:p-6">
       {/* Welcome - minimal */}
       <div className="animate-spring-in spring-stagger-1">
         <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
@@ -64,15 +64,13 @@ export function AdminDashboard() {
         </p>
       </div>
 
-      {/* === WIDGET GRID - iOS style mixed === */}
-      <div className="grid grid-cols-2 gap-3 animate-spring-in spring-stagger-2">
-
-        {/* === FINANCE BLOCK === */}
+      {/* === FINANCE BLOCK === */}
+      <div className="space-y-4 animate-spring-in spring-stagger-2">
         {hasAccess('finance') ? (
           <>
             <button
               onClick={() => navigate('/finance')}
-              className="finance-hero-card col-span-2 text-left card-press"
+              className="finance-hero-card w-full text-left card-press"
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
@@ -135,65 +133,65 @@ export function AdminDashboard() {
             <PersonalFinanceChartWidget />
           </>
         ) : null}
-
-        {/* WEEKLY CASH SUMMARY */}
-        {hasAccess('cash-closing') && (
-          <div className="col-span-2 animate-spring-in spring-stagger-3">
-            <WeeklySummary closings={closings} />
-          </div>
-        )}
-
-        {/* UNIFIED CALENDAR */}
-        {hasAccess('agenda') && (
-          <div className="col-span-2 card-press min-w-0 overflow-hidden">
-            <UnifiedCalendarWidget />
-          </div>
-        )}
-
-        {/* CHECKLIST PROGRESS WIDGET */}
-        {hasAccess('checklists') && (
-          <div className="col-span-2 card-press min-w-0 overflow-hidden">
-            <ChecklistDashboardWidget />
-          </div>
-        )}
-
-        {/* AGENDA WIDGET */}
-        {hasAccess('agenda') && (
-          <div className="col-span-2 card-press min-w-0 overflow-hidden">
-            <AgendaDashboardWidget />
-          </div>
-        )}
-
-        {/* ALERTS */}
-        {hasAccess('rewards') && (stats.pendingRedemptions > 0) && (
-          <div className="card-command-info col-span-2 p-4 animate-spring-in spring-stagger-4">
-            <div className="flex items-center gap-2 mb-2">
-              <AppIcon name="Bell" size={16} className="text-primary" />
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
-            </div>
-            <button
-              onClick={() => navigate('/rewards')}
-              className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors"
-            >
-              <span className="text-xs text-foreground">Resgates aguardando</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
-            </button>
-          </div>
-        )}
-
-        {/* RANKING WIDGET */}
-        {hasAccess('ranking') && (
-          <div className="col-span-2 animate-spring-in spring-stagger-5">
-            <Leaderboard
-              entries={leaderboard}
-              currentUserId={user?.id}
-              isLoading={leaderboardLoading}
-              selectedMonth={selectedMonth}
-              onMonthChange={setSelectedMonth}
-            />
-          </div>
-        )}
       </div>
+
+      {/* WEEKLY CASH SUMMARY */}
+      {hasAccess('cash-closing') && (
+        <div className="animate-spring-in spring-stagger-3">
+          <WeeklySummary closings={closings} />
+        </div>
+      )}
+
+      {/* UNIFIED CALENDAR */}
+      {hasAccess('agenda') && (
+        <div className="card-press min-w-0 overflow-hidden">
+          <UnifiedCalendarWidget />
+        </div>
+      )}
+
+      {/* CHECKLIST PROGRESS WIDGET */}
+      {hasAccess('checklists') && (
+        <div className="card-press min-w-0 overflow-hidden">
+          <ChecklistDashboardWidget />
+        </div>
+      )}
+
+      {/* AGENDA WIDGET */}
+      {hasAccess('agenda') && (
+        <div className="card-press min-w-0 overflow-hidden">
+          <AgendaDashboardWidget />
+        </div>
+      )}
+
+      {/* ALERTS */}
+      {hasAccess('rewards') && (stats.pendingRedemptions > 0) && (
+        <div className="card-command-info p-4 animate-spring-in spring-stagger-4">
+          <div className="flex items-center gap-2 mb-2">
+            <AppIcon name="Bell" size={16} className="text-primary" />
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
+          </div>
+          <button
+            onClick={() => navigate('/rewards')}
+            className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors"
+          >
+            <span className="text-xs text-foreground">Resgates aguardando</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
+          </button>
+        </div>
+      )}
+
+      {/* RANKING WIDGET */}
+      {hasAccess('ranking') && (
+        <div className="animate-spring-in spring-stagger-5">
+          <Leaderboard
+            entries={leaderboard}
+            currentUserId={user?.id}
+            isLoading={leaderboardLoading}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+          />
+        </div>
+      )}
     </div>
   );
 }
