@@ -15,6 +15,7 @@ import { TaskItem } from '@/components/agenda/TaskItem';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
 import { TimeBlocksView } from '@/components/agenda/TimeBlocksView';
 import { CategoryChips } from '@/components/agenda/CategoryChips';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -100,6 +101,8 @@ export default function Agenda() {
   useEffect(() => {
     if (!canAccessAgenda) navigate('/');
   }, [canAccessAgenda, navigate]);
+
+  useFabAction({ icon: 'Plus', label: 'Novo Lembrete', onClick: () => { setEditingTask(null); setTaskSheetOpen(true); } }, []);
 
   // Stats
   const pendingCount = useCountUp(displayTasks.filter(t => !t.is_completed).length);
@@ -387,14 +390,6 @@ export default function Agenda() {
           </div>
         </div>
 
-        {/* FAB - positioned above the App Launcher */}
-        <button
-          onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }}
-          className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-        >
-          <AppIcon name="Plus" size={24} />
-        </button>
       </div>
 
       <TaskSheet

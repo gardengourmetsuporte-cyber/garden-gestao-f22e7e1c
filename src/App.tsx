@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { FabActionProvider } from "@/contexts/FabActionContext";
 import { UnitProvider, useUnit } from "@/contexts/UnitContext";
 import { PageLoader } from "@/components/PageLoader";
 import { useUserModules } from "@/hooks/useAccessLevels";
@@ -367,9 +368,11 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <UnitProvider>
-              <UnhandledRejectionGuard>
-                <AppRoutes />
-              </UnhandledRejectionGuard>
+              <FabActionProvider>
+                <UnhandledRejectionGuard>
+                  <AppRoutes />
+                </UnhandledRejectionGuard>
+              </FabActionProvider>
             </UnitProvider>
           </AuthProvider>
         </BrowserRouter>

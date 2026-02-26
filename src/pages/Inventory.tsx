@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 
 import { useInventoryDB } from '@/hooks/useInventoryDB';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useAuth } from '@/contexts/AuthContext';
@@ -86,6 +87,8 @@ export default function InventoryPage() {
   const handleItemClick = (item: InventoryItem) => { setSelectedItem(item); setMovementSheetOpen(true); };
   const handleEditItem = (item: InventoryItem) => { setEditingItem(item); setItemFormOpen(true); };
   const handleAddItem = () => { setEditingItem(null); setItemFormOpen(true); };
+
+  useFabAction(isAdmin ? { icon: 'Plus', label: 'Novo Item', onClick: () => { setEditingItem(null); setItemFormOpen(true); } } : null, [isAdmin]);
 
   const handleSaveItem = async (data: {
     name: string; category_id: string | null; supplier_id: string | null;
@@ -266,16 +269,6 @@ export default function InventoryPage() {
             )}
           </div>
         </div>
-        {/* FAB - Add Item */}
-        {isAdmin && (
-          <button
-            onClick={handleAddItem}
-            className="fixed z-[9998] w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 94px)', right: '20px' }}
-          >
-            <AppIcon name="Plus" size={24} />
-          </button>
-        )}
 
         <QuickMovementSheetNew
           item={selectedItem}
