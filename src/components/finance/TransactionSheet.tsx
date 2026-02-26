@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CategoryPicker } from './CategoryPicker';
 import { TransactionSuggestions } from './TransactionSuggestions';
+import { CalculatorKeypad } from './CalculatorKeypad';
 import { ListPicker } from '@/components/ui/list-picker';
 import { 
   TransactionType, 
@@ -131,6 +132,7 @@ export function TransactionSheet({
   const [showToAccountPicker, setShowToAccountPicker] = useState(false);
   const [showSupplierPicker, setShowSupplierPicker] = useState(false);
   const [showEmployeePicker, setShowEmployeePicker] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
   const valueInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -516,28 +518,34 @@ export function TransactionSheet({
                         setEmployeeId(suggestion.employeeId);
                       }
                       setShowSuggestions(false);
-                      setTimeout(() => valueInputRef.current?.focus(), 100);
+                      setTimeout(() => setShowCalculator(true), 100);
                     }}
                   />
                 )}
               </div>
             </div>
 
-            {/* Amount */}
+            {/* Amount - tap to open calculator */}
             <div className="space-y-2">
               <Label>Valor</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
-                <Input
-                  ref={valueInputRef}
-                  type="text"
-                  inputMode="decimal"
-                  value={amount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  placeholder="0,00"
-                  className={cn("pl-10 text-2xl h-14 font-semibold", validationErrors.amount && "ring-2 ring-destructive")}
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.vibrate?.(10);
+                  setShowCalculator(true);
+                }}
+                className={cn(
+                  "w-full flex items-center h-14 rounded-xl border bg-card px-3 text-left transition-all",
+                  validationErrors.amount ? "ring-2 ring-destructive" : "border-border",
+                  !amount && "text-muted-foreground"
+                )}
+              >
+                <span className="text-muted-foreground mr-2 text-sm">R$</span>
+                <span className="text-2xl font-semibold text-foreground flex-1">
+                  {amount || '0,00'}
+                </span>
+                <AppIcon name="Calculate" size={20} className="text-muted-foreground" />
+              </button>
             </div>
 
             {/* Paid toggle and Date */}
@@ -863,6 +871,21 @@ export function TransactionSheet({
               </LoadingButton>
             </div>
           </div>
+
+          {/* Calculator overlay */}
+          {showCalculator && (
+            <div className="absolute inset-x-0 bottom-0 z-50 animate-fade-in">
+              <CalculatorKeypad
+                value={amount}
+                onChange={(v) => {
+                  setAmount(v);
+                  setValidationErrors(prev => ({ ...prev, amount: false }));
+                }}
+                onConfirm={() => setShowCalculator(false)}
+                onCancel={() => setShowCalculator(false)}
+              />
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 
