@@ -78,6 +78,7 @@ const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 const Onboarding = lazy(() => lazyRetry(() => import("./pages/Onboarding")));
 const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
 const QuotationPublic = lazy(() => lazyRetry(() => import("./pages/QuotationPublic")));
+const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -189,6 +190,7 @@ function AppRoutes() {
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
           <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+          <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
