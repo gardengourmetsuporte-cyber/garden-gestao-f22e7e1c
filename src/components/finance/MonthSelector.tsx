@@ -19,7 +19,7 @@ export function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorPro
 
   return (
     <div className="flex items-center justify-center gap-1 py-1.5">
-      <Button variant="ghost" size="icon" onClick={handlePrev} className="w-8 h-8 text-muted-foreground hover:text-foreground">
+      <Button variant="ghost" size="icon" onClick={handlePrev} className="w-8 h-8 text-foreground hover:bg-muted">
         <AppIcon name="ChevronLeft" size={16} />
       </Button>
 
@@ -50,7 +50,7 @@ export function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorPro
         </PopoverContent>
       </Popover>
 
-      <Button variant="ghost" size="icon" onClick={handleNext} className="w-8 h-8 text-muted-foreground hover:text-foreground">
+      <Button variant="ghost" size="icon" onClick={handleNext} className="w-8 h-8 text-foreground hover:bg-muted">
         <AppIcon name="ChevronRight" size={16} />
       </Button>
     </div>
