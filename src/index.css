@@ -23,7 +23,7 @@
     --garden-green: 150 28% 22%;
 
     /* Neon glow tokens */
-    --neon-cyan: 234 89% 74%;
+    --neon-cyan: 234 89% 67%;
     --neon-green: 142 71% 45%;
     --neon-red: 0 84% 60%;
     --neon-amber: 38 92% 50%;
@@ -63,16 +63,16 @@
 
   /* ===== DARK THEME (default) ===== */
   .dark {
-    --background: 240 6% 6%;
+    --background: 240 6% 4%;
     --foreground: 0 0% 95%;
 
-    --card: 240 5% 10%;
+    --card: 240 5% 12%;
     --card-foreground: 0 0% 95%;
 
     --popover: 240 5% 9%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 234 89% 74%;
+    --primary: 234 89% 67%;
     --primary-foreground: 0 0% 5%;
 
     --secondary: 240 4% 14%;
@@ -93,30 +93,30 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 240 4% 18%;
+    --border: 240 4% 20%;
     --input: 240 4% 12%;
-    --ring: 234 89% 74%;
+    --ring: 234 89% 67%;
 
     /* Glow & Shadow tokens */
-    --glow-primary: 0 0 20px hsl(234 89% 74% / 0.2), 0 0 48px hsl(234 89% 74% / 0.1);
+    --glow-primary: 0 0 20px hsl(234 89% 67% / 0.25), 0 0 48px hsl(234 89% 67% / 0.12);
     --glow-accent: 0 0 16px hsl(258 90% 66% / 0.18), 0 0 40px hsl(258 90% 66% / 0.08);
     --glow-success: 0 0 16px hsl(142 71% 45% / 0.15), 0 0 32px hsl(142 71% 45% / 0.08);
     --glow-destructive: 0 0 16px hsl(0 84% 60% / 0.15), 0 0 32px hsl(0 84% 60% / 0.08);
     --glow-warning: 0 0 16px hsl(38 92% 50% / 0.15), 0 0 32px hsl(38 92% 50% / 0.08);
-    --glow-cyan: 0 0 16px hsl(234 89% 74% / 0.18), 0 0 32px hsl(234 89% 74% / 0.1);
+    --glow-cyan: 0 0 16px hsl(234 89% 67% / 0.2), 0 0 32px hsl(234 89% 67% / 0.12);
 
     /* Gradient tokens */
-    --gradient-brand: linear-gradient(135deg, hsl(234 89% 74%), hsl(258 90% 66%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 74% / 0.12), hsl(258 90% 66% / 0.08));
-    --gradient-surface: linear-gradient(180deg, hsl(240 5% 10%), hsl(240 6% 7%));
-    --gradient-gold: linear-gradient(135deg, hsl(234 89% 74%), hsl(245 80% 70%), hsl(258 90% 66%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 74% / 0.15), hsl(258 90% 66% / 0.08));
+    --gradient-brand: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 67% / 0.12), hsl(258 90% 66% / 0.08));
+    --gradient-surface: linear-gradient(180deg, hsl(240 5% 12%), hsl(240 6% 5%));
+    --gradient-gold: linear-gradient(135deg, hsl(234 89% 67%), hsl(245 80% 68%), hsl(258 90% 66%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 67% / 0.15), hsl(258 90% 66% / 0.08));
 
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.5), 0 6px 20px hsl(0 0% 0% / 0.35);
     --shadow-card-hover: 0 6px 24px hsl(0 0% 0% / 0.6), 0 12px 40px hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 8px 32px hsl(0 0% 0% / 0.7), 0 16px 56px hsl(0 0% 0% / 0.35);
     --shadow-floating: 0 8px 32px hsl(0 0% 0% / 0.25), 0 2px 8px hsl(0 0% 0% / 0.15);
-    --shadow-glow: 0 0 24px hsl(234 89% 74% / 0.25), 0 0 48px hsl(234 89% 74% / 0.12);
+    --shadow-glow: 0 0 24px hsl(234 89% 67% / 0.3), 0 0 48px hsl(234 89% 67% / 0.15);
   }
 
   /* ===== LIGHT THEME ===== */
@@ -138,7 +138,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 10%;
 
-    --primary: 234 89% 64%;
+    --primary: 234 89% 58%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 240 5% 94%;
@@ -161,27 +161,27 @@
 
     --border: 240 5% 88%;
     --input: 240 5% 92%;
-    --ring: 234 89% 64%;
+    --ring: 234 89% 58%;
 
     /* Light glow & shadow tokens */
-    --glow-primary: 0 0 16px hsl(234 89% 64% / 0.15);
+    --glow-primary: 0 0 16px hsl(234 89% 58% / 0.15);
     --glow-success: 0 0 12px hsl(142 71% 40% / 0.1);
     --glow-destructive: 0 0 12px hsl(0 72% 51% / 0.1);
     --glow-warning: 0 0 12px hsl(38 92% 50% / 0.1);
-    --glow-cyan: 0 0 12px hsl(234 89% 64% / 0.12);
+    --glow-cyan: 0 0 12px hsl(234 89% 58% / 0.12);
 
     --shadow-card: 0 1px 3px hsl(240 10% 10% / 0.04), 0 4px 12px hsl(240 10% 10% / 0.06), 0 0 0 1px hsl(240 5% 88% / 0.6);
-    --shadow-card-hover: 0 4px 16px hsl(240 10% 10% / 0.08), 0 8px 28px hsl(240 10% 10% / 0.05), 0 0 0 1px hsl(234 89% 64% / 0.2);
+    --shadow-card-hover: 0 4px 16px hsl(240 10% 10% / 0.08), 0 8px 28px hsl(240 10% 10% / 0.05), 0 0 0 1px hsl(234 89% 58% / 0.2);
     --shadow-elevated: 0 6px 20px hsl(240 10% 10% / 0.1), 0 12px 40px hsl(240 10% 10% / 0.06);
     --shadow-floating: 0 8px 32px hsl(240 10% 10% / 0.1), 0 2px 8px hsl(240 10% 10% / 0.06);
 
     /* Gradient tokens — light */
-    --gradient-brand: linear-gradient(135deg, hsl(234 89% 64%), hsl(258 90% 66%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 64% / 0.08), hsl(258 90% 66% / 0.04));
+    --gradient-brand: linear-gradient(135deg, hsl(234 89% 58%), hsl(258 90% 66%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 58% / 0.08), hsl(258 90% 66% / 0.04));
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(240 5% 98%));
-    --gradient-gold: linear-gradient(135deg, hsl(234 89% 64%), hsl(245 80% 66%), hsl(258 90% 66%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 64% / 0.1), hsl(258 90% 66% / 0.05));
-    --shadow-glow: 0 0 20px hsl(234 89% 64% / 0.15), 0 0 40px hsl(234 89% 64% / 0.08);
+    --gradient-gold: linear-gradient(135deg, hsl(234 89% 58%), hsl(245 80% 64%), hsl(258 90% 66%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 58% / 0.1), hsl(258 90% 66% / 0.05));
+    --shadow-glow: 0 0 20px hsl(234 89% 58% / 0.15), 0 0 40px hsl(234 89% 58% / 0.08);
   }
 
 }
@@ -292,20 +292,20 @@
     background-size: 200% 200%;
     animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
-      0 4px 24px hsl(234 89% 74% / 0.15),
-      0 8px 48px hsl(234 89% 74% / 0.08),
-      inset 0 1px 0 hsl(234 89% 74% / 0.1);
-    border: 1px solid hsl(234 89% 74% / 0.15);
+      0 4px 24px hsl(234 89% 67% / 0.15),
+      0 8px 48px hsl(234 89% 67% / 0.08),
+      inset 0 1px 0 hsl(234 89% 67% / 0.1);
+    border: 1px solid hsl(234 89% 67% / 0.15);
     cursor: pointer;
   }
 
   .finance-hero-card:hover {
     transform: scale(1.01);
-    border-color: hsl(234 89% 74% / 0.25);
+    border-color: hsl(234 89% 67% / 0.25);
     box-shadow: 
-      0 6px 32px hsl(234 89% 74% / 0.2),
-      0 12px 56px hsl(234 89% 74% / 0.12),
-      inset 0 1px 0 hsl(234 89% 74% / 0.15);
+      0 6px 32px hsl(234 89% 67% / 0.2),
+      0 12px 56px hsl(234 89% 67% / 0.12),
+      inset 0 1px 0 hsl(234 89% 67% / 0.15);
   }
 
   .finance-hero-card:active {
@@ -322,16 +322,16 @@
     animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
       0 4px 24px hsl(258 90% 66% / 0.2),
-      0 8px 48px hsl(234 89% 74% / 0.08),
+      0 8px 48px hsl(234 89% 67% / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.06);
-    border-color: hsl(234 89% 74% / 0.12);
+    border-color: hsl(234 89% 67% / 0.12);
   }
 
   .finance-hero-card--personal:hover {
-    border-color: hsl(234 89% 74% / 0.2);
+    border-color: hsl(234 89% 67% / 0.2);
     box-shadow: 
       0 6px 32px hsl(258 90% 66% / 0.25),
-      0 12px 56px hsl(234 89% 74% / 0.12),
+      0 12px 56px hsl(234 89% 67% / 0.12),
       inset 0 1px 0 hsl(0 0% 100% / 0.08);
   }
 
@@ -343,7 +343,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 80% -20%, hsl(234 89% 74% / 0.12) 0%, transparent 60%),
+    background: radial-gradient(ellipse 120% 80% at 80% -20%, hsl(234 89% 67% / 0.12) 0%, transparent 60%),
                 radial-gradient(ellipse 100% 60% at 10% 110%, hsl(258 90% 66% / 0.08) 0%, transparent 50%);
     pointer-events: none;
   }
@@ -659,18 +659,18 @@
 
   .fab-neon-border {
     background: linear-gradient(135deg,
-      hsl(234 89% 74%),
+      hsl(234 89% 67%),
       hsl(258 90% 66%),
-      hsl(234 89% 74%)
+      hsl(234 89% 67%)
     );
     opacity: 0.7;
   }
 
   .fab-neon-border-personal {
     background: linear-gradient(135deg,
-      hsl(234 89% 74%),
+      hsl(234 89% 67%),
       hsl(258 90% 66%),
-      hsl(234 89% 74%)
+      hsl(234 89% 67%)
     );
     opacity: 0.7;
   }
@@ -790,12 +790,12 @@
 
   @keyframes neonBorderPulse {
     0%, 100% {
-      border-color: hsl(234 89% 74% / 0.2);
-      box-shadow: var(--shadow-card), 0 0 16px hsl(234 89% 74% / 0.1);
+      border-color: hsl(234 89% 67% / 0.2);
+      box-shadow: var(--shadow-card), 0 0 16px hsl(234 89% 67% / 0.1);
     }
     50% {
-      border-color: hsl(234 89% 74% / 0.4);
-      box-shadow: var(--shadow-card), 0 0 24px hsl(234 89% 74% / 0.2);
+      border-color: hsl(234 89% 67% / 0.4);
+      box-shadow: var(--shadow-card), 0 0 24px hsl(234 89% 67% / 0.2);
     }
   }
 
@@ -844,8 +844,8 @@
   }
 
   @keyframes neonPulse {
-    0%, 100% { box-shadow: 0 0 6px hsl(234 89% 74% / 0.2), 0 0 2px hsl(234 89% 74% / 0.15); }
-    50% { box-shadow: 0 0 14px hsl(234 89% 74% / 0.35), 0 0 4px hsl(234 89% 74% / 0.25); }
+    0%, 100% { box-shadow: 0 0 6px hsl(234 89% 67% / 0.2), 0 0 2px hsl(234 89% 67% / 0.15); }
+    50% { box-shadow: 0 0 14px hsl(234 89% 67% / 0.35), 0 0 4px hsl(234 89% 67% / 0.25); }
   }
 
   /* Stagger animation delays */
@@ -1110,9 +1110,9 @@
     background: linear-gradient(
       110deg,
       transparent 25%,
-      hsl(234 89% 74% / 0.08) 37%,
-      hsl(234 89% 74% / 0.15) 50%,
-      hsl(234 89% 74% / 0.08) 63%,
+      hsl(234 89% 67% / 0.08) 37%,
+      hsl(234 89% 67% / 0.15) 50%,
+      hsl(234 89% 67% / 0.08) 63%,
       transparent 75%
     );
     background-size: 250% 100%;
@@ -1243,17 +1243,17 @@
   .nav-bar-neon-glow {
     background: linear-gradient(
       135deg,
-      hsl(234 89% 74% / 0.7),
+      hsl(234 89% 67% / 0.7),
       hsl(258 90% 66% / 0.5),
-      hsl(234 89% 74% / 0.2),
+      hsl(234 89% 67% / 0.2),
       hsl(258 90% 66% / 0.5),
-      hsl(234 89% 74% / 0.7)
+      hsl(234 89% 67% / 0.7)
     );
     box-shadow:
-      0 0 15px hsl(234 89% 74% / 0.35),
-      0 0 30px hsl(234 89% 74% / 0.15),
+      0 0 15px hsl(234 89% 67% / 0.35),
+      0 0 30px hsl(234 89% 67% / 0.15),
       0 0 60px hsl(258 90% 66% / 0.1),
-      inset 0 0 15px hsl(234 89% 74% / 0.05);
+      inset 0 0 15px hsl(234 89% 67% / 0.05);
   }
 
   @keyframes neonPulse {
@@ -1314,7 +1314,7 @@
 
   /* Indigo shimmer text — use on headings */
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(234 89% 74%), hsl(258 90% 66%), hsl(234 89% 80%));
+    background: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 89% 75%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1330,7 +1330,7 @@
 
   /* Animated gradient background */
   .bg-gradient-animated {
-    background: linear-gradient(135deg, hsl(234 89% 74%), hsl(258 90% 66%), hsl(234 70% 60%), hsl(234 89% 74%));
+    background: linear-gradient(135deg, hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 70% 55%), hsl(234 89% 67%));
     background-size: 300% 300%;
     animation: gradientFlow 6s ease-in-out infinite;
   }
@@ -1351,9 +1351,9 @@
     background: linear-gradient(
       90deg,
       transparent,
-      hsl(234 89% 74% / 0.08),
-      hsl(234 89% 74% / 0.15),
-      hsl(234 89% 74% / 0.08),
+      hsl(234 89% 67% / 0.08),
+      hsl(234 89% 67% / 0.15),
+      hsl(234 89% 67% / 0.08),
       transparent
     );
     animation: goldShimmerSlide 4s ease-in-out infinite;
@@ -1379,10 +1379,10 @@
 
   @keyframes goldPulse {
     0%, 100% {
-      box-shadow: 0 0 8px hsl(234 89% 74% / 0.15);
+      box-shadow: 0 0 8px hsl(234 89% 67% / 0.15);
     }
     50% {
-      box-shadow: 0 0 20px hsl(234 89% 74% / 0.3), 0 0 40px hsl(234 89% 74% / 0.12);
+      box-shadow: 0 0 20px hsl(234 89% 67% / 0.3), 0 0 40px hsl(234 89% 67% / 0.12);
     }
   }
 
@@ -1398,7 +1398,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(var(--neon-angle, 0deg), hsl(234 89% 74%), hsl(258 90% 66%), hsl(234 70% 60%), hsl(234 89% 74%));
+    background: linear-gradient(var(--neon-angle, 0deg), hsl(234 89% 67%), hsl(258 90% 66%), hsl(234 70% 55%), hsl(234 89% 67%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

@@ -150,12 +150,12 @@ export function BottomTabBar() {
 
             {/* Center FAB — context-aware */}
             <div className="flex items-center justify-center" style={{ width: '20%' }}>
-              {/* Animated glow ring behind FAB */}
+              {/* Subtle indigo glow ring behind FAB */}
               <div
-                className="absolute -top-7 w-[62px] h-[62px] rounded-full animate-gold-pulse"
+                className="absolute -top-8 w-[68px] h-[68px] rounded-full"
                 style={{
-                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.3), hsl(var(--primary) / 0.5))',
-                  filter: 'blur(4px)',
+                  background: 'radial-gradient(circle, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.1) 50%, transparent 70%)',
+                  filter: 'blur(8px)',
                 }}
               />
               <button
@@ -168,19 +168,19 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "absolute -top-7 w-[56px] h-[56px] rounded-full flex items-center justify-center transition-all duration-300",
-                  "hover:scale-105 active:scale-90"
+                  "absolute -top-7 w-[60px] h-[60px] rounded-full flex items-center justify-center transition-all duration-200",
+                  "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
-                  background: 'var(--gradient-brand)',
-                  boxShadow: '0 0 24px hsl(var(--primary) / 0.5), 0 0 48px hsl(var(--primary) / 0.2), 0 4px 12px hsl(0 0% 0% / 0.5)',
-                  border: '2px solid hsl(var(--primary) / 0.6)',
+                  background: 'hsl(0 0% 100%)',
+                  boxShadow: '0 4px 20px hsl(0 0% 0% / 0.5), 0 8px 32px hsl(0 0% 0% / 0.3), 0 0 0 1px hsl(0 0% 100% / 0.15)',
                 }}
               >
                 <AppIcon
                   name={fabAction?.icon || 'Plus'}
-                  size={28}
-                  className="relative z-10 text-primary-foreground"
+                  size={26}
+                  className="relative z-10"
+                  style={{ color: 'hsl(240 6% 10%)' }}
                 />
               </button>
             </div>
