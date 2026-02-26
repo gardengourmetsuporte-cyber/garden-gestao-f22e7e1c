@@ -156,13 +156,26 @@ export function FinanceTransactions({
   const hasActiveFilters = filters.status !== 'all' || filters.type !== 'all' || filters.categoryId || filters.accountId;
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayStr = format(yesterdayDate, 'yyyy-MM-dd');
+  const tomorrowDate = new Date();
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+  const tomorrowStr = format(tomorrowDate, 'yyyy-MM-dd');
+
+  const getDateLabel = useCallback((dateStr: string) => {
+    if (dateStr === todayStr) return 'Hoje';
+    if (dateStr === yesterdayStr) return 'Ontem';
+    if (dateStr === tomorrowStr) return 'Amanhã';
+    return format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR });
+  }, [todayStr, yesterdayStr, tomorrowStr]);
 
   // Reset scroll tracking when month changes
   useEffect(() => {
     hasScrolledRef.current = false;
   }, [selectedMonth]);
 
-  // Auto-scroll to today's date on mount
+  // Auto-scroll to today's date on mount — align to top
   useEffect(() => {
     if (hasScrolledRef.current) return;
     if (todayRef.current) {
@@ -272,7 +285,7 @@ export function FinanceTransactions({
                           <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
                         )}
                         <span className={`text-sm font-medium capitalize ${dateStr === todayStr ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-                          {dateStr === todayStr ? 'Hoje' : format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                          {getDateLabel(dateStr)}
                         </span>
                       </div>
                       <span className={`text-sm font-bold font-display ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
