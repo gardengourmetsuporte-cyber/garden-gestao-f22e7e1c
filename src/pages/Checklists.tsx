@@ -307,10 +307,10 @@ export default function ChecklistsPage() {
                       name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
                       size={22}
                       fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
+                      style={{ color: checklistType === 'abertura' ? '#475569' : undefined }}
                       className={cn(
                         "transition-colors",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" 
-                          : checklistType === 'abertura' ? "text-slate-600" : "text-muted-foreground"
+                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-muted-foreground"
                       )}
                     />
                     <h3 className={cn(
@@ -362,10 +362,10 @@ export default function ChecklistsPage() {
                       name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
                       size={22}
                       fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
+                      style={{ color: checklistType === 'fechamento' ? '#475569' : undefined }}
                       className={cn(
                         "transition-colors",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" 
-                          : checklistType === 'fechamento' ? "text-slate-600" : "text-muted-foreground"
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-muted-foreground"
                       )}
                     />
                     <h3 className={cn(
@@ -414,7 +414,7 @@ export default function ChecklistsPage() {
                 )}
               >
                 <div className="flex items-center gap-4">
-                  <AppIcon name="Zap" size={24} fill={0} className={cn("shrink-0 transition-colors", checklistType === 'bonus' ? "text-slate-600" : "text-muted-foreground")} />
+                  <AppIcon name="Zap" size={24} fill={0} style={{ color: checklistType === 'bonus' ? '#475569' : undefined }} className={cn("shrink-0 transition-colors", "text-muted-foreground")} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className={cn(
