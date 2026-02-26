@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,24 +6,32 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
+import { getCurrentChecklistType, getDeadlineInfo, getTodayDateStr } from '@/lib/checklistTiming';
 
 type ChecklistType = 'abertura' | 'fechamento';
-
-function getCurrentChecklistType(): ChecklistType {
-  const h = new Date().getHours();
-  const m = new Date().getMinutes();
-  // Abertura is active until 19:30, then fechamento takes over
-  if (h < 19 || (h === 19 && m < 30)) return 'abertura';
-  return 'fechamento';
-}
 
 export function ChecklistDashboardWidget() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
-  const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const today = getTodayDateStr();
   const activeType = getCurrentChecklistType();
+
+  // Countdown labels, updated every 30s
+  const [countdowns, setCountdowns] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const update = () => {
+      const ab = getDeadlineInfo(today, 'abertura');
+      const fe = getDeadlineInfo(today, 'fechamento');
+      setCountdowns({
+        abertura: ab?.label || '',
+        fechamento: fe?.label || '',
+      });
+    };
+    update();
+    const iv = setInterval(update, 30_000);
+    return () => clearInterval(iv);
+  }, [today]);
 
   const { data: sectors = [] } = useQuery({
     queryKey: ['dashboard-checklist-sectors', activeUnitId],
@@ -120,6 +128,7 @@ export function ChecklistDashboardWidget() {
       {cards.map((card) => {
         const isActive = card.type === activeType;
         const isComplete = card.progress.percent === 100;
+        const deadlineInfo = getDeadlineInfo(today, card.type);
 
         return (
           <button
@@ -167,8 +176,20 @@ export function ChecklistDashboardWidget() {
               </div>
             </div>
 
+            {/* Countdown chip */}
+            {deadlineInfo && (
+              <div className={cn(
+                "mt-1.5 mb-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-full inline-block",
+                deadlineInfo.passed
+                  ? "bg-destructive/15 text-destructive"
+                  : "bg-muted text-muted-foreground"
+              )}>
+                {deadlineInfo.passed ? '⏰ Encerrado' : `⏳ ${countdowns[card.type] || deadlineInfo.label}`}
+              </div>
+            )}
+
             {/* Progress bar */}
-            <div className="w-full h-1.5 rounded-full bg-secondary/50 overflow-hidden mb-3 mt-3">
+            <div className="w-full h-1.5 rounded-full bg-secondary/50 overflow-hidden mb-3 mt-2">
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-700 ease-out",
