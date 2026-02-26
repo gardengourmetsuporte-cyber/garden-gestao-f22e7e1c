@@ -123,24 +123,23 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
           {/* Unit selector */}
           {units.length > 1 && (
-            <div className="mb-4 p-1 rounded-xl bg-secondary/50">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 px-2 py-1 block">Unidade</span>
-              <div className="flex flex-col gap-0.5">
-                {units.map(unit => (
-                  <button
-                    key={unit.id}
-                    onClick={() => setActiveUnitId(unit.id)}
-                    className={cn(
-                      "flex items-center gap-2 px-2 py-2 rounded-lg text-sm transition-all",
-                      unit.id === activeUnit?.id ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-secondary"
-                    )}
-                  >
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
-                    <span className="truncate font-medium">{unit.name}</span>
-                    {unit.id === activeUnit?.id && <AppIcon name="Check" size={14} className="text-primary ml-auto shrink-0" />}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 shrink-0">Unidade</span>
+              {units.map(unit => (
+                <button
+                  key={unit.id}
+                  onClick={() => setActiveUnitId(unit.id)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0",
+                    unit.id === activeUnit?.id
+                      ? "bg-primary/15 text-primary ring-1 ring-primary/30"
+                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: getThemeColor(unit.slug), boxShadow: `0 0 6px ${getThemeColor(unit.slug)}60` }} />
+                  {unit.name}
+                </button>
+              ))}
             </div>
           )}
 
