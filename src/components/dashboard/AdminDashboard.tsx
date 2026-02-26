@@ -78,19 +78,19 @@ export function AdminDashboard() {
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-black/50">Saldo da empresa</span>
-                  <AppIcon name="ChevronRight" size={18} className="text-black/30" />
+                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">Saldo da empresa</span>
+                  <AppIcon name="ChevronRight" size={18} className="text-slate-400" />
                 </div>
                 <p className={cn(
                   "text-[2rem] font-extrabold tracking-tight leading-tight",
-                  stats.monthBalance >= 0 ? "text-black" : "text-red-600"
+                  stats.monthBalance >= 0 ? "text-slate-900" : "text-red-600"
                 )}>
-                  {statsLoading ? <Skeleton className="h-9 w-40 bg-black/10" /> : formatCurrency(stats.monthBalance)}
+                  {statsLoading ? <Skeleton className="h-9 w-40 bg-slate-200" /> : formatCurrency(stats.monthBalance)}
                 </p>
                 {stats.pendingExpenses > 0 && (
                   <div className="flex gap-2 mt-3">
-                    <div className="rounded-lg px-3 py-1.5 bg-black/5 border border-black/10">
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-black/50">Pendências</span>
+                    <div className="rounded-lg px-3 py-1.5 bg-amber-500/10 border border-amber-500/20">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Pendências</span>
                       <span className="text-sm font-bold text-amber-600 ml-2">{statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}</span>
                     </div>
                   </div>

@@ -47,16 +47,16 @@ export function FinanceHome({
         <div className="finance-hero-inner p-5 pb-4">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">
+            <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">
               {variant === 'personal' ? 'Meu saldo pessoal' : 'Saldo em contas'}
             </span>
-            <AppIcon name="ChevronRight" size={18} className="text-white/50" />
+            <AppIcon name="ChevronRight" size={18} className="text-slate-400" />
           </div>
 
           {/* Balance */}
           <p className={cn(
             "text-[2rem] font-extrabold tracking-tight leading-tight",
-            totalBalance >= 0 ? "text-white" : "text-destructive-foreground"
+            totalBalance >= 0 ? "text-slate-900" : "text-red-600"
           )}>
             {formatCurrency(totalBalance)}
           </p>
@@ -64,28 +64,28 @@ export function FinanceHome({
           {/* Sub-stats row */}
           <div className="flex gap-2 mt-3">
             <div className="finance-hero-chip finance-hero-chip--success">
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Lucro líquido</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Lucro líquido</span>
               <div className="flex items-center gap-1.5">
                 <span className={cn(
                   "text-sm font-bold",
-                  profit >= 0 ? "text-success" : "text-destructive"
+                  profit >= 0 ? "text-emerald-600" : "text-red-600"
                 )}>
                   {formatCurrency(Math.abs(profit))}
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold px-1 py-0.5 rounded",
                   profit >= 0 
-                    ? "text-success bg-success/15" 
-                    : "text-destructive bg-destructive/15"
+                    ? "text-emerald-700 bg-emerald-500/15" 
+                    : "text-red-700 bg-red-500/15"
                 )}>
                   {profit >= 0 ? '+' : '-'}{Math.abs(Number(profitPercent))}%
                 </span>
               </div>
             </div>
             <div className="finance-hero-chip finance-hero-chip--neutral">
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Despesas</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold text-destructive">
+                <span className="text-sm font-bold text-red-600">
                   {formatCurrency(monthStats.totalExpense)}
                 </span>
               </div>
