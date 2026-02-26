@@ -1,18 +1,26 @@
 
 
-## Problema
-Os botões de Receita, Despesa e Transferência no menu FAB do financeiro estão com aparência opaca. O fundo `card-glass` (60% de opacidade + blur) sobre o overlay escuro dilui visualmente as cores dos ícones.
+## Problems Identified
 
-## Solução
-Tornar os containers dos ícones mais opacos e dar mais destaque às cores, além de aumentar o `fill` dos ícones para ficarem preenchidos (sólidos) em vez de contornados.
+1. **Save button not visible**: The sheet content scrolls but the action buttons (Excluir/Salvar) at the bottom get cut off behind the screen/bottom bar. They need to be sticky at the bottom.
+2. **No quick date shortcuts**: When editing an overdue task, user must open the full calendar to change to "today". Need quick-access buttons like "Hoje", "Amanhã".
 
-## Alterações
+## Plan
 
-### `src/components/finance/FinanceBottomNav.tsx`
-1. Trocar o fundo dos 3 botões de `card-glass` para um fundo sólido com leve tint da cor correspondente:
-   - Receita: `bg-[hsl(var(--color-income)/0.15)]` com borda `border border-[hsl(var(--color-income)/0.3)]`
-   - Despesa: `bg-[hsl(var(--color-expense)/0.15)]` com borda `border border-[hsl(var(--color-expense)/0.3)]`
-   - Transferência: `bg-[hsl(var(--color-transfer)/0.15)]` com borda `border border-[hsl(var(--color-transfer)/0.3)]`
-2. Adicionar `fill={1}` nos `AppIcon` para que fiquem preenchidos e visualmente mais vibrantes
-3. Manter o `boxShadow` glow existente para cada cor
+### 1. Fix action buttons visibility
+- Move the button group (`flex gap-2`) **outside** the scrollable form area
+- Make the buttons sticky at the bottom of the sheet with a frosted background
+- Add `pb-20` to the form content so it doesn't get hidden behind the sticky buttons
+
+### 2. Add quick date shortcuts
+- When `hasDate` is enabled, show a row of quick-pick chips: **Hoje**, **Amanhã**, **Próx. semana**
+- Each chip sets `dueDate` with one tap
+- Highlight the active chip if the current date matches
+- Keep the calendar popover as a fallback for custom dates
+
+### 3. File changes
+- **`src/components/agenda/TaskSheet.tsx`**: 
+  - Import `isToday`, `isTomorrow`, `addDays` from date-fns
+  - Add quick date chips row below the Data toggle
+  - Restructure the sheet to have a scrollable content area and a fixed bottom bar for the save/delete buttons
 
