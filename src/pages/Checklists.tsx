@@ -414,17 +414,14 @@ export default function ChecklistsPage() {
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "w-14 h-14 rounded-xl flex items-center justify-center relative",
-                    checklistType === 'bonus'
-                      ? "bg-emerald-500/15"
-                      : "bg-emerald-500/8"
                   )}
                   style={{
                     background: checklistType === 'bonus'
-                      ? 'linear-gradient(135deg, hsl(160 84% 39% / 0.25), hsl(var(--neon-cyan) / 0.15))'
+                      ? 'hsl(160 84% 39% / 0.15)'
                       : 'hsl(160 84% 39% / 0.08)',
                   }}
                   >
-                    <AppIcon name="Zap" size={28} style={{ color: checklistType === 'bonus' ? 'hsl(160 84% 35%)' : undefined }} className={cn(
+                    <AppIcon name="Zap" size={28} style={{ color: checklistType === 'bonus' ? 'hsl(160 84% 30%)' : undefined }} className={cn(
                       "transition-all",
                       checklistType !== 'bonus' && "text-emerald-500/50"
                     )} />
@@ -434,16 +431,25 @@ export default function ChecklistsPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-black text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-emerald-400" style={{ background: 'hsl(160 84% 39% / 0.12)' }}>
+                      <h3 className={cn(
+                        "text-base font-black font-display",
+                        checklistType === 'bonus' ? "text-slate-800" : "text-foreground"
+                      )} style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{
+                        color: checklistType === 'bonus' ? 'hsl(160 84% 30%)' : 'hsl(160 84% 50%)',
+                        background: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.15)' : 'hsl(160 84% 39% / 0.12)',
+                      }}>
                         Extra pts
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className={cn(
+                      "text-xs mt-0.5",
+                      checklistType === 'bonus' ? "text-slate-500" : "text-muted-foreground"
+                    )}>
                       Tarefas exclusivas para mais pontos ⚡
                     </p>
                   </div>
-                  <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+                  <AppIcon name="ChevronRight" size={18} className={checklistType === 'bonus' ? "text-slate-400" : "text-muted-foreground"} />
                 </div>
                 {/* Shimmer effect */}
                 <div
