@@ -196,7 +196,8 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                             name={item.icon}
                             size={20}
                             fill={active ? 1 : 0}
-                            className={active ? "text-slate-700" : "text-foreground/70"}
+                            style={active ? { color: 'var(--gp-value)' } : undefined}
+                            className={active ? "" : "text-foreground/70"}
                           />
                         </div>
                         {locked && (

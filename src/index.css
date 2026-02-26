@@ -241,14 +241,16 @@
   /* ========== GRADIENT PRIMARY (White-Blue) ========== */
 
   .gradient-primary {
-    background: linear-gradient(145deg, 
-      hsl(240 8% 12%) 0%, 
-      hsl(234 15% 16%) 50%,
-      hsl(240 10% 14%) 100%
-    );
+    background: hsl(0 0% 4%);
     color: hsl(0 0% 95%);
-    border: 1px solid hsl(234 20% 22%);
-    box-shadow: 0 4px 20px hsl(240 10% 8% / 0.25);
+    border: 1px solid hsl(0 0% 15%);
+    box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
+    --gp-label: hsl(0 0% 65%);
+    --gp-sublabel: hsl(0 0% 55%);
+    --gp-value: hsl(0 0% 95%);
+    --gp-icon: hsl(0 0% 60%);
+    --gp-positive: hsl(142 60% 60%);
+    --gp-negative: hsl(0 70% 65%);
   }
 
   .dark .gradient-primary {
@@ -266,6 +268,12 @@
       0 12px 48px hsl(234 89% 67% / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.9);
     border-color: hsl(234 40% 80% / 0.25);
+    --gp-label: hsl(234 15% 50%);
+    --gp-sublabel: hsl(234 10% 55%);
+    --gp-value: hsl(234 30% 15%);
+    --gp-icon: hsl(234 15% 45%);
+    --gp-positive: hsl(142 60% 38%);
+    --gp-negative: hsl(0 70% 50%);
   }
 
   .gradient-primary:hover {
@@ -329,15 +337,17 @@
 
   .finance-hero-card {
     @apply rounded-2xl overflow-hidden transition-all duration-300;
-    background: linear-gradient(145deg, 
-      hsl(240 8% 12%) 0%, 
-      hsl(234 15% 16%) 50%,
-      hsl(240 10% 14%) 100%
-    );
+    background: hsl(0 0% 4%);
     color: hsl(0 0% 95%);
-    box-shadow: 0 4px 20px hsl(240 10% 8% / 0.25);
-    border: 1px solid hsl(234 20% 22%);
+    box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
+    border: 1px solid hsl(0 0% 15%);
     cursor: pointer;
+    --gp-label: hsl(0 0% 65%);
+    --gp-sublabel: hsl(0 0% 55%);
+    --gp-value: hsl(0 0% 95%);
+    --gp-icon: hsl(0 0% 60%);
+    --gp-positive: hsl(142 60% 60%);
+    --gp-negative: hsl(0 70% 65%);
   }
 
   .finance-hero-card:hover {
@@ -364,6 +374,12 @@
       0 12px 48px hsl(234 89% 67% / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.9);
     border-color: hsl(234 40% 80% / 0.25);
+    --gp-label: hsl(234 15% 50%);
+    --gp-sublabel: hsl(234 10% 55%);
+    --gp-value: hsl(234 30% 15%);
+    --gp-icon: hsl(234 15% 45%);
+    --gp-positive: hsl(142 60% 38%);
+    --gp-negative: hsl(0 70% 50%);
   }
 
   .dark .finance-hero-card:hover {

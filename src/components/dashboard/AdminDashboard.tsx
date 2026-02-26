@@ -78,20 +78,17 @@ export function AdminDashboard() {
             >
               <div className="finance-hero-inner p-5 pb-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">Saldo da empresa</span>
-                  <AppIcon name="ChevronRight" size={18} className="text-slate-400" />
+                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>Saldo da empresa</span>
+                  <AppIcon name="ChevronRight" size={18} style={{ color: 'var(--gp-icon)' }} />
                 </div>
-                <p className={cn(
-                  "text-[2rem] font-extrabold tracking-tight leading-tight",
-                  stats.monthBalance >= 0 ? "text-slate-900" : "text-red-600"
-                )}>
-                  {statsLoading ? <Skeleton className="h-9 w-40 bg-slate-200" /> : formatCurrency(stats.monthBalance)}
+                <p className="text-[2rem] font-extrabold tracking-tight leading-tight" style={{ color: stats.monthBalance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
+                  {statsLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(stats.monthBalance)}
                 </p>
                 {stats.pendingExpenses > 0 && (
                   <div className="flex gap-2 mt-3">
-                    <div className="rounded-lg px-3 py-1.5 bg-amber-500/10 border border-amber-500/20">
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Pendências</span>
-                      <span className="text-sm font-bold text-amber-600 ml-2">{statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}</span>
+                    <div className="rounded-lg px-3 py-1.5" style={{ background: 'hsl(38 92% 50% / 0.1)', border: '1px solid hsl(38 92% 50% / 0.2)' }}>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Pendências</span>
+                      <span className="text-sm font-bold ml-2" style={{ color: 'hsl(38 80% 55%)' }}>{statsLoading ? '...' : formatCurrency(stats.pendingExpenses)}</span>
                     </div>
                   </div>
                 )}
