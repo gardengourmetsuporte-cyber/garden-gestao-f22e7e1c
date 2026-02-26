@@ -87,6 +87,7 @@ export function ChecklistView({
   const [optimisticToggles, setOptimisticToggles] = useState<Set<string>>(new Set());
   const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
   // Contestation state
+  const [expandedPeopleFor, setExpandedPeopleFor] = useState<string | null>(null);
   const [contestingItemId, setContestingItemId] = useState<string | null>(null);
   const [contestReason, setContestReason] = useState('');
   const [contestLoading, setContestLoading] = useState(false);
@@ -201,8 +202,9 @@ export function ChecklistView({
         }, i * 100);
       }
     }
-    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped);
+                    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped);
     setOpenPopover(null);
+    setExpandedPeopleFor(null);
   };
 
   const handleContest = async (completionId: string) => {
@@ -529,16 +531,30 @@ export function ChecklistView({
                           <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                             {isAdmin && profiles.length > 0 && (
                               <>
-                                <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Users className="w-4 h-4" /><span>Quem realizou?</span></div>
-                                <div className="max-h-48 overflow-y-auto space-y-1">
-                                  {profiles.map((profile) => (
-                                    <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
-                                      className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
-                                        profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
-                                      <User className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
-                                      {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
-                                    </button>
-                                  ))}
+                                <button
+                                  onClick={() => setExpandedPeopleFor(expandedPeopleFor === item.id ? null : item.id)}
+                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
+                                >
+                                  <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
+                                    <Users className="w-5 h-5 text-primary" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-foreground">Quem realizou?</p>
+                                    <p className="text-xs text-muted-foreground">Selecione quem fez</p>
+                                  </div>
+                                  <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", expandedPeopleFor === item.id && "rotate-180")} />
+                                </button>
+                                <div className={cn("overflow-hidden transition-all duration-300 ease-out", expandedPeopleFor === item.id ? "max-h-64 opacity-100" : "max-h-0 opacity-0")}>
+                                  <div className="max-h-48 overflow-y-auto space-y-1 pt-1">
+                                    {profiles.map((profile) => (
+                                      <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
+                                        className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
+                                          profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
+                                        <User className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
+                                        {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
+                                      </button>
+                                    ))}
+                                  </div>
                                 </div>
                                 <div className="border-t border-border" />
                               </>
@@ -843,16 +859,30 @@ export function ChecklistView({
                                   <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                                     {isAdmin && profiles.length > 0 && (
                                       <>
-                                        <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Users className="w-4 h-4" /><span>Quem realizou?</span></div>
-                                        <div className="max-h-48 overflow-y-auto space-y-1">
-                                          {profiles.map((profile) => (
-                                            <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
-                                              className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
-                                                profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
-                                              <User className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
-                                              {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
-                                            </button>
-                                          ))}
+                                        <button
+                                          onClick={() => setExpandedPeopleFor(expandedPeopleFor === item.id ? null : item.id)}
+                                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
+                                        >
+                                          <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
+                                            <Users className="w-5 h-5 text-primary" />
+                                          </div>
+                                          <div className="flex-1">
+                                            <p className="font-semibold text-foreground">Quem realizou?</p>
+                                            <p className="text-xs text-muted-foreground">Selecione quem fez</p>
+                                          </div>
+                                          <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", expandedPeopleFor === item.id && "rotate-180")} />
+                                        </button>
+                                        <div className={cn("overflow-hidden transition-all duration-300 ease-out", expandedPeopleFor === item.id ? "max-h-64 opacity-100" : "max-h-0 opacity-0")}>
+                                          <div className="max-h-48 overflow-y-auto space-y-1 pt-1">
+                                            {profiles.map((profile) => (
+                                              <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
+                                                className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
+                                                  profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
+                                                <User className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
+                                                {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
+                                              </button>
+                                            ))}
+                                          </div>
                                         </div>
                                         <div className="border-t border-border" />
                                       </>
