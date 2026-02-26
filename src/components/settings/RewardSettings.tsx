@@ -15,14 +15,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useRewards, RewardProduct, RewardRedemption } from '@/hooks/useRewards';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -278,185 +270,106 @@ export function RewardSettings() {
             </Button>
           </div>
 
-          <div className="rounded-xl border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Produto</TableHead>
-                  <TableHead className="text-center">Pontos</TableHead>
-                  <TableHead className="text-center">Estoque</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        {product.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-1">
-                            {product.description}
-                          </p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <AppIcon name="Star" size={16} className="text-amber-500" fill={1} />
-                        {product.points_cost}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {product.stock === null ? '∞' : product.stock}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant={product.is_active ? 'default' : 'secondary'}>
-                        {product.is_active ? 'Ativo' : 'Inativo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditDialog(product)}
-                        >
-                          <AppIcon name="Pencil" size={16} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(product.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <AppIcon name="Trash2" size={16} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {products.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      Nenhum produto cadastrado
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+          <div className="space-y-2">
+            {products.map((product) => (
+              <div key={product.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border/20">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{product.name}</p>
+                  {product.description && (
+                    <p className="text-xs text-muted-foreground line-clamp-1">{product.description}</p>
+                  )}
+                  <div className="flex items-center gap-3 mt-1.5">
+                    <span className="flex items-center gap-1 text-xs font-medium">
+                      <AppIcon name="Star" size={14} className="text-amber-500" fill={1} />
+                      {product.points_cost}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Estoque: {product.stock === null ? '∞' : product.stock}
+                    </span>
+                    <Badge variant={product.is_active ? 'default' : 'secondary'} className="text-[10px] h-5">
+                      {product.is_active ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(product)}>
+                    <AppIcon name="Pencil" size={15} />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(product.id)}>
+                    <AppIcon name="Trash2" size={15} />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {products.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                Nenhum produto cadastrado
+              </div>
+            )}
           </div>
         </TabsContent>
 
         <TabsContent value="pending" className="space-y-4">
-          <div className="rounded-xl border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Usuário</TableHead>
-                  <TableHead>Produto</TableHead>
-                  <TableHead className="text-center">Pontos</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allRedemptions.map((redemption) => (
-                  <TableRow key={redemption.id}>
-                    <TableCell>
-                      <p className="font-medium">
-                        {redemption.profile?.full_name || 'Usuário'}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      {redemption.product?.name || 'Produto removido'}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <AppIcon name="Star" size={16} className="text-amber-500" fill={1} />
+          <div className="space-y-2">
+            {allRedemptions.map((redemption) => {
+              const statusLabel = redemption.status === 'pending' ? 'Pendente' :
+                redemption.status === 'approved' ? 'Aprovado' :
+                redemption.status === 'delivered' ? 'Entregue' : 'Cancelado';
+              return (
+                <div key={redemption.id} className="p-3 rounded-xl bg-secondary/30 border border-border/20 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">{redemption.profile?.full_name || 'Usuário'}</p>
+                      <p className="text-xs text-muted-foreground truncate">{redemption.product?.name || 'Produto removido'}</p>
+                    </div>
+                    <Badge
+                      variant={redemption.status === 'pending' ? 'outline' : redemption.status === 'cancelled' ? 'secondary' : 'default'}
+                      className={
+                        redemption.status === 'pending' ? 'border-warning text-warning' :
+                        redemption.status === 'approved' ? 'bg-success' :
+                        redemption.status === 'delivered' ? 'bg-primary' : ''
+                      }
+                    >
+                      {statusLabel}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <AppIcon name="Star" size={13} className="text-amber-500" fill={1} />
                         {redemption.points_spent}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(redemption.created_at), "dd/MM/yyyy", { locale: ptBR })}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge 
-                        variant={
-                          redemption.status === 'pending' ? 'outline' :
-                          redemption.status === 'approved' ? 'default' :
-                          redemption.status === 'delivered' ? 'default' :
-                          'secondary'
-                        }
-                        className={
-                          redemption.status === 'pending' ? 'border-warning text-warning' :
-                          redemption.status === 'approved' ? 'bg-success' :
-                          redemption.status === 'delivered' ? 'bg-primary' :
-                          ''
-                        }
-                      >
-                        {redemption.status === 'pending' ? 'Pendente' :
-                         redemption.status === 'approved' ? 'Aprovado' :
-                         redemption.status === 'delivered' ? 'Entregue' :
-                         'Cancelado'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {redemption.status === 'pending' && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleApprove(redemption)}
-                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            >
-                              <AppIcon name="Check" size={16} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleReject(redemption)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <AppIcon name="X" size={16} />
-                            </Button>
-                          </>
-                        )}
-                        {redemption.status === 'approved' && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeliver(redemption)}
-                          >
-                            Entregar
+                      </span>
+                      <span>{format(new Date(redemption.created_at), "dd/MM/yy", { locale: ptBR })}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {redemption.status === 'pending' && (
+                        <>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-600" onClick={() => handleApprove(redemption)}>
+                            <AppIcon name="Check" size={15} />
                           </Button>
-                        )}
-                        {/* Delete button - always visible for admin */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteRedemption(redemption)}
-                          className="text-muted-foreground hover:text-destructive"
-                          title="Excluir resgate"
-                        >
-                          <AppIcon name="Trash2" size={16} />
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleReject(redemption)}>
+                            <AppIcon name="X" size={15} />
+                          </Button>
+                        </>
+                      )}
+                      {redemption.status === 'approved' && (
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleDeliver(redemption)}>
+                          Entregar
                         </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {allRedemptions.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      Nenhum resgate registrado
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                      )}
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteRedemption(redemption)} title="Excluir">
+                        <AppIcon name="Trash2" size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {allRedemptions.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                Nenhum resgate registrado
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
