@@ -155,7 +155,7 @@ export function CalculatorKeypad({ value, onChange, onConfirm, onCancel }: Calcu
   const btnBase = "flex items-center justify-center rounded-xl text-lg font-semibold min-h-[52px] active:scale-95 transition-all duration-100";
 
   return (
-    <div className="bg-secondary/80 backdrop-blur-md rounded-t-3xl border-t border-border/50 p-4 pb-6 space-y-3">
+    <div className="bg-background rounded-t-3xl border-t border-border/50 p-4 pb-6 space-y-3">
       {/* Display */}
       <div className="flex items-center justify-between px-2 min-h-[36px]">
         <span className="text-sm text-muted-foreground font-medium">R$</span>
