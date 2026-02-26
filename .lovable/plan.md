@@ -1,35 +1,127 @@
 
 
-## Diagnóstico: 3 bugs encontrados
+## Plano: Pré-configuração completa para novos usuários
 
-### Bug 1: Ícone "Gem" não existe no ICON_MAP
-O `AppIcon` usa Material Symbols e precisa de um mapeamento em `src/lib/iconMap.ts`. O nome "Gem" não está mapeado, então o ícone renderiza como texto quebrado ao invés do diamante.
+Todo o setup será feito na function SQL `auto_provision_unit`, garantindo que ao criar a empresa, o usuário já tenha tudo pronto.
 
-**Fix**: Adicionar `Gem: 'diamond'` ao `ICON_MAP`.
+---
 
-### Bug 2: Query de role falha com múltiplas roles
-O `AuthContext` usa `.maybeSingle()` para buscar a role do usuário. Se o usuário tem 2 rows (ex: `admin` + `funcionario`), `.maybeSingle()` retorna erro → role cai para `'funcionario'` → `isAdmin = false` → módulos admin-only ficam escondidos, Configurações some, grupo Premium some.
+### 1. Contas Financeiras (na `auto_provision_unit`)
 
-**Fix**: Mudar query de `.maybeSingle()` para `.order('role').limit(1).maybeSingle()` ou buscar todas as roles e escolher a de maior hierarquia (`super_admin > admin > funcionario`).
+Criar 2 contas padrão diretamente no banco ao provisionar a unidade:
+- **Carteira** (wallet, cor azul, icon Wallet)
+- **Banco** (bank, cor verde, icon Building2)
 
-### Bug 3: Todo novo usuário recebe role `funcionario`
-O trigger `handle_new_user` sempre insere `'funcionario'` em `user_roles`. Quando o `auto_provision_unit` cria a loja, o usuário vira `owner` em `user_units` mas continua `funcionario` em `user_roles`.
+A inicialização JS (`initializeDefaultsCore`) continuará funcionando como fallback, mas o banco já terá as contas.
 
-**Fix**: Alterar `auto_provision_unit` para também fazer `UPDATE user_roles SET role = 'admin' WHERE user_id = p_user_id`. Isso garante que o primeiro usuário (dono da empresa) seja admin automaticamente.
+### 2. Categorias Financeiras (na `auto_provision_unit`)
+
+Inserir as categorias de despesa e receita (com subcategorias) diretamente no SQL, seguindo o modelo já definido em `DEFAULT_EXPENSE_CATEGORIES` e `DEFAULT_INCOME_CATEGORIES`:
+
+**Despesas (8 categorias pai + subcategorias):**
+- Matéria-prima (Carnes, Frios, Bebidas, Panificação, Hortifruti, Mercado, Embalagens)
+- Despesas Administrativas (Energia, Água, Aluguel, Limpeza, Internet, Telefone)
+- Folha de Pagamento (Salários, FGTS, INSS, 13º, Férias)
+- Pró-labore
+- Taxas Operacionais (App Delivery, PDV, Tarifa Bancária, Maquininha)
+- Impostos (DAS, IPTU, Alvará, Outros)
+- Financiamentos
+- Investimentos (Equipamentos, Marketing, Reformas)
+
+**Receitas (3 categorias pai + subcategorias):**
+- Vendas Balcão (Dinheiro, Débito, Crédito, Pix)
+- Vendas Delivery (iFood, Rappi, Próprio)
+- Outros
+
+### 3. Produtos de Estoque Pré-configurados (na `auto_provision_unit`)
+
+Inserir ~40 itens comuns em restaurantes/hamburguerias/pizzarias nas categorias já criadas:
+
+| Categoria | Produtos |
+|-----------|----------|
+| Carnes | Picanha, Contra-filé, Alcatra, Fraldinha, Costela, Carne moída, Linguiça |
+| Aves | Peito de frango, Coxa/Sobrecoxa, Filé de frango |
+| Frios e Embutidos | Presunto, Mussarela, Bacon, Calabresa |
+| Bebidas | Coca-Cola 2L, Guaraná 2L, Água mineral, Suco natural |
+| Bebidas Alcoólicas | Cerveja lata, Cerveja long neck |
+| Hortifruti | Tomate, Cebola, Alface, Batata, Limão, Alho |
+| Laticínios | Leite integral, Creme de leite, Manteiga, Requeijão |
+| Mercearia | Arroz 5kg, Feijão 1kg, Óleo soja, Açúcar, Sal, Farinha trigo |
+| Pães e Massas | Pão francês, Pão de hambúrguer, Massa pizza |
+| Molhos e Temperos | Ketchup, Mostarda, Maionese, Molho de tomate, Azeite |
+| Descartáveis | Copo descartável 300ml, Guardanapo, Embalagem marmitex |
+| Limpeza | Detergente, Água sanitária, Esponja |
+
+### 4. Checklist Padrão Completo (na `auto_provision_unit`)
+
+Criar setores, subcategorias e itens para abertura e fechamento:
+
+**Setor: Cozinha** (cor #ef4444, icon Flame)
+- Sub: Equipamentos
+  - [abertura] Ligar fogão e fornos
+  - [abertura] Verificar temperatura das geladeiras
+  - [abertura] Ligar chapas e fritadeiras
+  - [fechamento] Desligar fogão e fornos
+  - [fechamento] Limpar chapas e fritadeiras
+  - [fechamento] Verificar temperatura das geladeiras
+- Sub: Higiene
+  - [abertura] Higienizar bancadas e superfícies
+  - [abertura] Verificar lixeiras limpas
+  - [fechamento] Lavar e sanitizar bancadas
+  - [fechamento] Retirar lixo da cozinha
+  - [fechamento] Limpar piso da cozinha
+
+**Setor: Salão** (cor #3b82f6, icon Armchair)
+- Sub: Ambiente
+  - [abertura] Ligar ar-condicionado/ventiladores
+  - [abertura] Verificar iluminação
+  - [abertura] Organizar mesas e cadeiras
+  - [fechamento] Desligar ar-condicionado
+  - [fechamento] Limpar mesas e cadeiras
+  - [fechamento] Varrer e passar pano no salão
+- Sub: Atendimento
+  - [abertura] Preparar cardápios nas mesas
+  - [abertura] Abastecer porta-guardanapos
+  - [fechamento] Recolher cardápios
+  - [fechamento] Reabastecer molheiras e sachês
+
+**Setor: Estoque** (cor #22c55e, icon Package)
+- Sub: Conferência
+  - [abertura] Conferir validade dos produtos
+  - [abertura] Verificar itens em estoque mínimo
+  - [fechamento] Registrar produtos que acabaram
+  - [fechamento] Organizar câmara fria
+
+**Setor: Caixa** (cor #f59e0b, icon DollarSign)
+- Sub: Financeiro
+  - [abertura] Conferir troco inicial
+  - [abertura] Ligar máquinas de cartão
+  - [abertura] Verificar bobina de impressora
+  - [fechamento] Fechar caixa do dia
+  - [fechamento] Conferir sangrias e suprimentos
+  - [fechamento] Guardar dinheiro no cofre
+
+**Setor: Fachada e Externos** (cor #8b5cf6, icon Store)
+- Sub: Estrutura
+  - [abertura] Abrir portas e portões
+  - [abertura] Ligar letreiro/luminoso
+  - [abertura] Verificar limpeza da calçada
+  - [fechamento] Fechar portas e portões
+  - [fechamento] Desligar letreiro
+  - [fechamento] Verificar fechamento de janelas
 
 ---
 
 ### Alterações
 
-#### 1. `src/lib/iconMap.ts`
-- Adicionar `Gem: 'diamond'` ao mapeamento
+#### Migration SQL
+- Expandir `auto_provision_unit` para incluir:
+  1. 2 contas financeiras (Carteira + Banco)
+  2. 11 categorias financeiras pai + subcategorias
+  3. ~40 produtos de estoque vinculados às categorias
+  4. 5 setores de checklist com subcategorias e ~35 itens (abertura + fechamento)
+- Tudo condicionado a `NOT EXISTS` para não duplicar em unidades existentes
 
-#### 2. `src/contexts/AuthContext.tsx`
-- Mudar query de role de `.maybeSingle()` para buscar todas as roles e selecionar a de maior prioridade (`super_admin > admin > funcionario`)
-- Isso resolve o caso de múltiplas roles no banco
-
-#### 3. Migration SQL
-- Alterar `auto_provision_unit` para atualizar `user_roles` de `funcionario` → `admin` quando o usuário cria sua primeira unidade
-- Limpar roles duplicadas existentes: remover `funcionario` onde o mesmo user já tem `admin`
-- Garantir que todo owner de unidade tenha role `admin` em `user_roles`
+#### `src/hooks/useFinanceCore.ts`
+- Ajustar `initializeDefaultsCore` para também criar conta "Banco" quando não houver contas (atualmente só cria "Carteira")
 
