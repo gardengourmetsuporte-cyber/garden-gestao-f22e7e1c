@@ -203,7 +203,7 @@ export default function Agenda() {
   );
 
   const ListContent = () => (
-    <div className="space-y-3">
+    <div className="space-y-1.5">
       {isLoading ? (
         <div className="space-y-3">
           {[1,2,3,4].map(i => (
@@ -235,7 +235,7 @@ export default function Agenda() {
                   </div>
                   <AppIcon name="ChevronDown" size={14} className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-180")} />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-1.5 space-y-1.5">
+                <CollapsibleContent className="mt-1 space-y-1">
                   <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
                     <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                       {catTasks.map(task => renderTaskItem(task))}
@@ -248,7 +248,7 @@ export default function Agenda() {
 
           {/* Uncategorized tasks */}
           {uncategorizedTasks.length > 0 && (
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {tasksByCategory.length > 0 && (
                 <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
               )}
@@ -268,7 +268,7 @@ export default function Agenda() {
                 <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
                 <AppIcon name="ChevronDown" size={14} className="text-muted-foreground ml-auto" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-1.5 mt-1">
+              <CollapsibleContent className="space-y-1 mt-1">
                 {completedTasks.map(task => (
                   <TaskItem
                     key={task.id}
