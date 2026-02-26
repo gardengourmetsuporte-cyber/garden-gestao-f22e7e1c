@@ -96,7 +96,7 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
                       movement.type === 'entrada' ? "bg-success/10" : "bg-destructive/10"
                     )}>
                       <AppIcon
-                        name={movement.type === 'entrada' ? 'ArrowCircleDown' : 'ArrowCircleUp'}
+                        name={movement.type === 'entrada' ? 'ArrowDownCircle' : 'ArrowUpCircle'}
                         size={20}
                         className={movement.type === 'entrada' ? 'text-success' : 'text-destructive'}
                       />
@@ -136,9 +136,9 @@ export function MovementHistoryNew({ movements, items, showItemName = false, onD
                               disabled={deletingId === movement.id}
                             >
                               {deletingId === movement.id ? (
-                                <AppIcon name="Progress_activity" size={16} className="animate-spin" />
+                                <AppIcon name="progress_activity" size={16} className="animate-spin" />
                               ) : (
-                                <AppIcon name="Delete" size={16} />
+                                <AppIcon name="Trash2" size={16} />
                               )}
                             </Button>
                           </AlertDialogTrigger>
