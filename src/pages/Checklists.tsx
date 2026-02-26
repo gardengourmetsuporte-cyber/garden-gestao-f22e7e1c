@@ -307,9 +307,9 @@ export default function ChecklistsPage() {
                       "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
                       checklistType === 'abertura' ? "bg-orange-500/15" : "bg-secondary"
                     )}>
-                      <AppIcon name="Sun" size={22} className={cn(
+                      <AppIcon name="Sun" size={22} style={{ color: checklistType === 'abertura' ? 'hsl(32 100% 45%)' : undefined }} className={cn(
                         "transition-colors",
-                        checklistType === 'abertura' ? "text-orange-500" : "text-muted-foreground"
+                        checklistType !== 'abertura' && "text-muted-foreground"
                       )} />
                     </div>
                     <h3 className={cn(
@@ -361,9 +361,9 @@ export default function ChecklistsPage() {
                       "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
                       checklistType === 'fechamento' ? "bg-indigo-500/15" : "bg-secondary"
                     )}>
-                      <AppIcon name="Moon" size={22} className={cn(
+                      <AppIcon name="Moon" size={22} style={{ color: checklistType === 'fechamento' ? 'hsl(234 70% 50%)' : undefined }} className={cn(
                         "transition-colors",
-                        checklistType === 'fechamento' ? "text-indigo-500" : "text-muted-foreground"
+                        checklistType !== 'fechamento' && "text-muted-foreground"
                       )} />
                     </div>
                     <h3 className={cn(
