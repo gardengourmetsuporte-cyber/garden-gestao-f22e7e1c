@@ -86,11 +86,6 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
           isDragging && 'shadow-elevated ring-2 ring-primary/40 scale-[1.02]',
         )}
       >
-        {/* Category color accent */}
-        {categoryColor && (
-          <div className="h-[2px] w-full" style={{ backgroundColor: categoryColor }} />
-        )}
-
         {/* Parent task row */}
         <div className="flex items-start gap-2.5 p-3">
           <Checkbox
@@ -109,6 +104,9 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             onClick={() => hasSubtasks ? setExpanded(!expanded) : onClick?.()}
           >
             <div className="flex items-center gap-1.5">
+              {categoryColor && (
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: categoryColor }} />
+              )}
               <p className={cn(
                 'font-medium text-[13px] leading-snug text-foreground flex-1',
                 task.is_completed && 'line-through text-muted-foreground'
