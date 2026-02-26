@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { useUserModules } from '@/hooks/useAccessLevels';
-import { useModuleStatus } from '@/hooks/useModuleStatus';
+
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
@@ -37,14 +37,12 @@ const navItems: NavItem[] = [
   { icon: 'Users', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Trophy', label: 'Ranking', href: '/ranking', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'MessageCircle', label: 'Chat', href: '/chat', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Megaphone', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'MessageSquare', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Bell', label: 'Alertas', href: '/alerts', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
   { icon: 'Settings', label: 'Configurações', href: '/settings', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
 ];
 
@@ -59,7 +57,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
   const { user, profile, isAdmin, isSuperAdmin, signOut, plan } = useAuth();
   const { units, activeUnit, setActiveUnitId } = useUnit();
   const { hasAccess, allowedModules, isLoading: accessLoading } = useUserModules();
-  const moduleStatuses = useModuleStatus();
+  
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
 
@@ -170,7 +168,6 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
               <div className="grid grid-cols-4 gap-4">
                 {group.items.map(item => {
                   const active = location.pathname === item.href;
-                  const moduleStatus = moduleStatuses[item.href];
                   const locked = isModuleLocked(item.href);
 
                   return (
@@ -203,21 +200,6 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         {locked && (
                           <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center bg-primary/15 border border-primary/40">
                             <AppIcon name="Lock" size={8} className="text-primary" />
-                          </span>
-                        )}
-                        {!locked && moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
-                          <span
-                            className={cn(
-                              "absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center",
-                              (moduleStatus.level === 'critical' || moduleStatus.level === 'warning') && "animate-pulse"
-                            )}
-                            style={{
-                              background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
-                              color: moduleStatus.level === 'critical' ? '#fff' : '#000',
-                              border: '2px solid hsl(var(--card))',
-                            }}
-                          >
-                            {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
                           </span>
                         )}
                       </div>

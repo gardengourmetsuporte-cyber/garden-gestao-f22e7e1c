@@ -13,13 +13,10 @@ import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
-import { useChatUnreadCount } from '@/hooks/useChatUnreadCount';
-import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { getModuleKeyFromRoute } from '@/lib/modules';
 import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
 import type { PlanTier } from '@/lib/plans';
-import { useTimeAlerts } from '@/hooks/useTimeAlerts';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
@@ -61,7 +58,6 @@ const navItems: NavItem[] = [
   { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Bell', label: 'Central de Alertas', href: '/alerts', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
   { icon: 'Settings', label: 'Configurações', href: '/settings', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
 ];
 
@@ -75,10 +71,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { unreadCount } = useNotifications();
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
-  const chatUnreadCount = useChatUnreadCount();
   const isMobile = useIsMobile();
-  const moduleStatuses = useModuleStatus(!isMobile);
-  useTimeAlerts();
   const { leaderboard } = useLeaderboard();
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -284,9 +277,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </span>
               {group.items.map((item) => {
                 const isActive = location.pathname === item.href;
-                const showBadge = (item.href === '/chat' && chatUnreadCount > 0);
-                const badgeCount = chatUnreadCount;
-                const moduleStatus = moduleStatuses[item.href];
                 const locked = isModuleLocked(item.href);
                 const targetHref = locked ? '/plans' : item.href;
 
@@ -308,22 +298,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     <AppIcon name={item.icon} size={20} style={{ opacity: locked ? 0.5 : 1 }} />
                     <span className="truncate flex-1">{item.label}</span>
                     {locked && <AppIcon name="Lock" size={14} className="text-primary/60 shrink-0" />}
-                    {showBadge && (
-                      <span className="min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center bg-destructive text-destructive-foreground">
-                        {badgeCount > 9 ? '9+' : badgeCount}
-                      </span>
-                    )}
-                    {!locked && moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
-                      <span
-                        className="min-w-[18px] h-[18px] rounded-full text-[9px] font-bold flex items-center justify-center"
-                        style={{
-                          background: moduleStatus.level === 'critical' ? 'hsl(var(--neon-red))' : 'hsl(var(--neon-amber))',
-                          color: moduleStatus.level === 'critical' ? '#fff' : '#000',
-                        }}
-                      >
-                        {moduleStatus.count > 9 ? '9+' : moduleStatus.count}
-                      </span>
-                    )}
                   </Link>
                 );
               })}
