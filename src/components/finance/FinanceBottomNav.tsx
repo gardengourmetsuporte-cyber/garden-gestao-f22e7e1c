@@ -21,33 +21,11 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
 
 export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, variant = 'business' }: FinanceBottomNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null);
 
   const handleAction = (type: TransactionType) => {
     setMenuOpen(false);
     onAddTransaction(type);
   };
-
-  const updatePill = useCallback(() => {
-    if (!containerRef.current) return;
-    const activeEl = tabRefs.current[activeTab];
-    if (!activeEl) { setPillStyle(null); return; }
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const tabRect = activeEl.getBoundingClientRect();
-    setPillStyle({
-      left: tabRect.left - containerRect.left + (tabRect.width - 48) / 2,
-      width: 48,
-    });
-  }, [activeTab]);
-
-  useEffect(() => {
-    updatePill();
-    const t = setTimeout(updatePill, 100);
-    window.addEventListener('resize', updatePill);
-    return () => { window.removeEventListener('resize', updatePill); clearTimeout(t); };
-  }, [updatePill]);
 
   return createPortal(
     <>
@@ -59,22 +37,22 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
         <div className="fixed bottom-24 left-0 right-0 z-50 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="flex items-end gap-5 mb-4">
             <button onClick={() => handleAction('income')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '0ms' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150" style={{ boxShadow: '0 0 16px rgba(16, 185, 129, 0.2)' }}>
-                <AppIcon name="ArrowUpCircle" size={28} className="text-emerald-400" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150" style={{ boxShadow: '0 0 16px hsl(var(--color-income) / 0.25)' }}>
+                <AppIcon name="ArrowUpCircle" size={28} style={{ color: 'hsl(var(--color-income))' }} />
               </div>
-              <span className="text-[11px] font-semibold text-emerald-400">Receita</span>
+              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--color-income))' }}>Receita</span>
             </button>
             <button onClick={() => handleAction('expense')} className="flex flex-col items-center gap-2 animate-scale-in -mt-4" style={{ animationDelay: '50ms' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150" style={{ boxShadow: '0 0 16px rgba(239, 68, 68, 0.2)' }}>
-                <AppIcon name="ArrowDownCircle" size={28} className="text-red-400" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150" style={{ boxShadow: '0 0 16px hsl(var(--color-expense) / 0.25)' }}>
+                <AppIcon name="ArrowDownCircle" size={28} style={{ color: 'hsl(var(--color-expense))' }} />
               </div>
-              <span className="text-[11px] font-semibold text-red-400">Despesa</span>
+              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--color-expense))' }}>Despesa</span>
             </button>
             <button onClick={() => handleAction('transfer')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '100ms' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150" style={{ boxShadow: '0 0 16px rgba(6, 182, 212, 0.2)' }}>
-                <AppIcon name="ArrowLeftRight" size={28} className="text-cyan-400" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center card-glass active:scale-90 transition-transform duration-150" style={{ boxShadow: '0 0 16px hsl(var(--color-transfer) / 0.25)' }}>
+                <AppIcon name="ArrowLeftRight" size={28} style={{ color: 'hsl(var(--color-transfer))' }} />
               </div>
-              <span className="text-[11px] font-semibold text-cyan-400">Transf.</span>
+              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--color-transfer))' }}>Transf.</span>
             </button>
           </div>
         </div>
@@ -83,11 +61,12 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
       <nav
         className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60]"
       >
-        {/* Top neon glow line */}
+        {/* Top neon glow line — same as main bar */}
         <div className="absolute top-0 left-[8%] right-[8%] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)' }} />
         <div className="absolute -top-[1px] left-[3%] right-[3%] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)' }} />
         <div className="absolute -top-[3px] left-[12%] right-[12%] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)' }} />
 
+        {/* Bar background — full width, edge to edge, same as main */}
         <div
           className="relative"
           style={{
@@ -95,36 +74,21 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative px-1">
-            {/* Highlight pill */}
-            {pillStyle && (
-              <div
-                className="absolute nav-highlight-pill rounded-[12px]"
-                style={{
-                  background: 'hsl(var(--primary) / 0.12)',
-                  border: '1px solid hsl(var(--primary) / 0.2)',
-                  width: pillStyle.width,
-                  height: '40px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  left: pillStyle.left,
-                  willChange: 'left',
-                }}
-              />
-            )}
-
+          <div className="flex items-center h-[68px] max-w-lg mx-auto relative">
+            {/* Left tabs */}
             {tabs.slice(0, 2).map(tab => (
               <button
                 key={tab.id}
-                ref={(el) => { tabRefs.current[tab.id] = el; }}
                 onClick={() => { navigator.vibrate?.(10); onTabChange(tab.id); }}
                 className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
+                  "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
                   activeTab === tab.id ? "text-primary" : "text-muted-foreground"
                 )}
+                style={{ width: '20%' }}
               >
-                <div className={cn("transition-transform duration-300", activeTab === tab.id && "scale-110")}
-                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : undefined}
+                <div
+                  className={cn("relative transition-transform duration-300", activeTab === tab.id && "scale-110")}
+                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))' } : undefined}
                 >
                   <AppIcon name={tab.icon} size={22} fill={activeTab === tab.id ? 1 : 0} weight={activeTab === tab.id ? 600 : 400} />
                 </div>
@@ -132,7 +96,8 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
               </button>
             ))}
 
-            <div className="flex-1 flex items-center justify-center">
+            {/* Center FAB "+" — round, same as main */}
+            <div className="flex items-center justify-center" style={{ width: '20%' }}>
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
@@ -145,31 +110,36 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                     : 'var(--gradient-brand)',
                   boxShadow: variant === 'personal'
                     ? '0 0 24px hsl(160 60% 45% / 0.5), 0 4px 12px hsl(0 0% 0% / 0.5)'
-                    : '0 0 24px hsl(220 85% 58% / 0.5), 0 0 48px hsl(262 70% 55% / 0.25), 0 4px 12px hsl(0 0% 0% / 0.5)',
+                    : 'var(--shadow-glow), 0 4px 12px hsl(0 0% 0% / 0.5)',
                 }}
               >
                 <AppIcon name="Plus" size={28} className="relative z-10 text-primary-foreground" />
               </button>
             </div>
 
+            {/* Right tabs */}
             {tabs.slice(2, 4).map(tab => (
               <button
                 key={tab.id}
-                ref={(el) => { tabRefs.current[tab.id] = el; }}
                 onClick={() => { navigator.vibrate?.(10); onTabChange(tab.id); }}
                 className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-all relative z-10",
+                  "flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10",
                   activeTab === tab.id ? "text-primary" : "text-muted-foreground"
                 )}
+                style={{ width: '20%' }}
               >
-                <div className={cn("transition-transform duration-300", activeTab === tab.id && "scale-110")}
-                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(220 85% 58% / 0.6))' } : undefined}
+                <div
+                  className={cn("relative transition-transform duration-300", activeTab === tab.id && "scale-110")}
+                  style={activeTab === tab.id ? { filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))' } : undefined}
                 >
                   <AppIcon name={tab.icon} size={22} fill={activeTab === tab.id ? 1 : 0} weight={activeTab === tab.id ? 600 : 400} />
                 </div>
                 <span className={cn("text-[10px]", activeTab === tab.id ? "font-semibold" : "font-normal")}>{tab.label}</span>
               </button>
             ))}
+
+            {/* Empty 5th slot for consistent spacing */}
+            <div style={{ width: '20%' }} />
           </div>
         </div>
       </nav>
