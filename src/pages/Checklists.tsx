@@ -303,15 +303,19 @@ export default function ChecklistsPage() {
                   )}
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <div className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
-                      checklistType === 'abertura' ? "bg-orange-500/15" : "bg-secondary"
-                    )}>
-                      <AppIcon name="Sun" size={22} style={{ color: checklistType === 'abertura' ? 'hsl(32 100% 45%)' : undefined }} className={cn(
+                    <div
+                      className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-300"
+                      style={{ backgroundColor: getTypeProgress.abertura.percent === 100 ? 'hsl(var(--success))' : 'hsl(32 100% 50%)' }}
+                    />
+                    <AppIcon
+                      name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
+                      size={22}
+                      fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
+                      className={cn(
                         "transition-colors",
-                        checklistType !== 'abertura' && "text-muted-foreground"
-                      )} />
-                    </div>
+                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-muted-foreground"
+                      )}
+                    />
                     <h3 className={cn(
                       "text-base font-bold font-display",
                       checklistType === 'abertura' ? "text-slate-800" : "text-foreground"
@@ -357,15 +361,19 @@ export default function ChecklistsPage() {
                   )}
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <div className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
-                      checklistType === 'fechamento' ? "bg-indigo-500/15" : "bg-secondary"
-                    )}>
-                      <AppIcon name="Moon" size={22} style={{ color: checklistType === 'fechamento' ? 'hsl(234 70% 50%)' : undefined }} className={cn(
+                    <div
+                      className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-300"
+                      style={{ backgroundColor: getTypeProgress.fechamento.percent === 100 ? 'hsl(var(--success))' : 'hsl(234 89% 67%)' }}
+                    />
+                    <AppIcon
+                      name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
+                      size={22}
+                      fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
+                      className={cn(
                         "transition-colors",
-                        checklistType !== 'fechamento' && "text-muted-foreground"
-                      )} />
-                    </div>
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-muted-foreground"
+                      )}
+                    />
                     <h3 className={cn(
                       "text-base font-bold font-display",
                       checklistType === 'fechamento' ? "text-slate-800" : "text-foreground"
