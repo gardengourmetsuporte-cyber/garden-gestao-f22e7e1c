@@ -7,31 +7,27 @@ export interface UnitTheme {
   label: string;
 }
 
-const UNIT_THEMES: Record<string, UnitTheme> = {
-  'sao-joao-da-boa-vista': {
-    primary: '217 91% 60%',
-    neonCyan: '190 90% 55%',
-    ring: '217 91% 60%',
-    glowPrimary: '0 0 24px hsl(217 91% 60% / 0.2), 0 0 48px hsl(217 91% 60% / 0.08)',
-    glowCyan: '0 0 24px hsl(190 90% 55% / 0.2), 0 0 48px hsl(190 90% 55% / 0.08)',
-    label: 'Azul',
-  },
-  'porto-ferreira': {
-    primary: '160 84% 45%',
-    neonCyan: '172 66% 50%',
-    ring: '160 84% 45%',
-    glowPrimary: '0 0 24px hsl(160 84% 45% / 0.2), 0 0 48px hsl(160 84% 45% / 0.08)',
-    glowCyan: '0 0 24px hsl(172 66% 50% / 0.2), 0 0 48px hsl(172 66% 50% / 0.08)',
-    label: 'Esmeralda',
-  },
-};
-
-const DEFAULT_THEME: UnitTheme = {
+const STANDARD_THEME_COLORS: Omit<UnitTheme, 'label'> = {
   primary: '140 30% 24%',
   neonCyan: '140 35% 35%',
   ring: '140 30% 24%',
   glowPrimary: '0 0 24px hsl(140 30% 24% / 0.2), 0 0 48px hsl(140 30% 24% / 0.08)',
   glowCyan: '0 0 24px hsl(140 35% 35% / 0.2), 0 0 48px hsl(140 35% 35% / 0.08)',
+};
+
+const UNIT_THEMES: Record<string, UnitTheme> = {
+  'sao-joao-da-boa-vista': {
+    ...STANDARD_THEME_COLORS,
+    label: 'Garden',
+  },
+  'porto-ferreira': {
+    ...STANDARD_THEME_COLORS,
+    label: 'Garden',
+  },
+};
+
+const DEFAULT_THEME: UnitTheme = {
+  ...STANDARD_THEME_COLORS,
   label: 'Garden',
 };
 
