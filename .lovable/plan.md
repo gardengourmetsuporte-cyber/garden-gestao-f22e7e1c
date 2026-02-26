@@ -1,54 +1,58 @@
 
 
-## Plano: Espaçamento Padronizado + Bottom Bar Premium
+## Plano: Remover Títulos de Módulo e Reformar Headers de Todas as Páginas
 
-### Problemas identificados
+### Problema
+Cada página tem um `<header className="page-header-bar">` com um `<h1 className="page-title">` que repete o nome do módulo (ex: "Estoque", "Agenda", "Financeiro"). Isso é redundante — o usuário já sabe onde está pela navegação inferior e pelo sidebar.
 
-1. **Cards grudados**: O dashboard usa `gap-3` (12px) no grid — muito apertado. A referência Mobills usa ~16-20px entre seções e cards distintos.
-2. **Bottom bar — labels ausentes nos inativos**: Apenas o tab ativo mostra label, os inativos ficam só com ícone sem nome, dificultando a navegação.
-3. **Highlight pill desalinhada**: O cálculo `left: calc(...)` usa divisão por `slotCount` que nem sempre alinha corretamente com o centro real do botão flex, causando desalinhamento visual.
+### Abordagem
+Remover o bloco de título (`h1.page-title`) de todas as páginas. Páginas que têm **ações** no header (botões de adicionar, configurações, filtros) mantêm a barra de header mas sem o título — apenas com as ações alinhadas à direita. Páginas sem ações perdem o header completamente e o conteúdo sobe direto.
 
----
+### Páginas Afetadas (19 arquivos)
 
-### 1. Espaçamento padronizado no Dashboard (Mobills-style)
+**Grupo A — Header removido por completo** (só tinham título, sem ações):
+1. `src/pages/Orders.tsx` — só título "Pedidos"
+2. `src/pages/Rewards.tsx` — só título "Recompensas"
+3. `src/pages/Ranking.tsx` — só título "Ranking"
+4. `src/pages/CashClosing.tsx` — só título "Fechamento de Caixa"
+5. `src/pages/Finance.tsx` — só título "Financeiro"
+6. `src/pages/PersonalFinance.tsx` — só título "Finanças Pessoais"
+7. `src/pages/MenuAdmin.tsx` — só título "Cardápio"
+8. `src/pages/TabletAdmin.tsx` — só título "Pedidos Tablet"
+9. `src/pages/WhatsApp.tsx` — título + tabs (tabs descem pro conteúdo)
+10. `src/pages/Employees.tsx` — só título
+11. `src/pages/Gamification.tsx` — título inline (sem page-header-bar)
 
-**`AdminDashboard.tsx`** e **`EmployeeDashboard.tsx`**:
-- Aumentar `gap-3` → `gap-4` (16px) no grid principal
-- Adicionar `space-y-6` entre seções distintas (finanças, calendário, checklist, ranking) em vez de empilhar tudo no mesmo grid
-- Separar os widgets em grupos lógicos com `space-y-5` entre eles, similar à estrutura Mobills que agrupa "Pendências", "Contas", "Cartões" em blocos separados
+**Grupo B — Header mantido mas sem título** (têm ações/botões no header):
+1. `src/pages/Inventory.tsx` — botão "+" de adicionar item
+2. `src/pages/Checklists.tsx` — botão de settings
+3. `src/pages/Agenda.tsx` — contadores + dropdown de ações
+4. `src/pages/Alerts.tsx` — ações no header
+5. `src/pages/Marketing.tsx` — ações no header
+6. `src/pages/Recipes.tsx` — botão de adicionar
+7. `src/pages/Settings.tsx` — botão de voltar (quando em sub-seção)
 
-**`index.css`**:
-- Padronizar `.section-gap` como classe utilitária: `margin-top: 1.25rem` para seções dentro de páginas
+### Detalhes Técnicos
 
-### 2. Bottom Tab Bar — Labels sempre visíveis + pill corrigida
+**1. Grupo A — Remoção completa do bloco `<header>`**
+- Deletar todo o `<header className="page-header-bar">...</header>`
+- O conteúdo (`<div className="px-4 py-4 ...">`) fica direto abaixo do `<div className="min-h-screen">`
 
-**`BottomTabBar.tsx`**:
-- **Labels sempre visíveis**: Mostrar o label (`text-[10px]`) em TODOS os tabs, não apenas no ativo. O ativo terá `font-bold text-primary`, inativos terão `font-normal text-muted-foreground`
-- **Pill alinhada**: Remover o cálculo percentual manual e usar uma abordagem com `refs` + `getBoundingClientRect` ou simplesmente medir pelo index real dos elementos. Alternativa mais simples: usar CSS `justify-evenly` e calcular a posição baseada em largura fixa dos slots
-- **Altura da barra**: Aumentar de `h-[60px]` → `h-[64px]` para acomodar ícone + label com mais respiração
-- **Tab "Mais"**: Adicionar label "Mais" abaixo do ícone (consistência)
-- **FAB**: Ajustar `-top-5` para compensar a altura extra
+**2. Grupo B — Header slim (só ações)**
+- Remover `<h1 className="page-title">...</h1>` e qualquer wrapper de título
+- Manter apenas os botões de ação
+- Ajustar layout para `justify-end` (ações alinhadas à direita)
+- Para Agenda: manter os contadores pendentes/concluídos como chips discretos ao lado das ações
 
-**`FinanceBottomNav.tsx`**: Aplicar as mesmas correções (labels sempre visíveis, pill alinhada, altura 64px).
+**3. CSS cleanup (`src/index.css`)**
+- Manter as classes `.page-header-bar` e `.page-header-content` (ainda usadas no Grupo B)
+- Remover `.page-title` se não for mais usada em nenhum lugar
 
-### 3. CSS — Animação e polish da pill
+**4. Settings com sub-seção**
+- Quando dentro de uma sub-seção, manter o header com botão de voltar + nome da sub-seção (necessário para navegação)
 
-**`index.css`**:
-- `.nav-highlight-pill` já tem transição suave — manter
-- Adicionar `will-change: left` para performance
-
----
-
-### Arquivos a editar
-
-1. **`src/components/layout/BottomTabBar.tsx`** — labels sempre visíveis, pill position fix, altura 64px, label no "Mais"
-2. **`src/components/finance/FinanceBottomNav.tsx`** — mesmas correções de labels e pill
-3. **`src/components/dashboard/AdminDashboard.tsx`** — gap e espaçamento entre seções
-4. **`src/index.css`** — classe utilitária de espaçamento se necessário
-
-### Resultado esperado
-
-- Cards com espaço visual entre si como no Mobills (respiração entre seções)
-- Bottom bar com todos os nomes visíveis (Principal, Checklists, Estoque, Mais)
-- Pill de seleção centralizada corretamente no tab ativo
+### Resultado Visual
+- Conteúdo sobe ~60px no mobile, aproveitando melhor a tela
+- Páginas ficam mais limpas e modernas — o conteúdo fala por si
+- Ações permanecem acessíveis no topo quando necessário
 
