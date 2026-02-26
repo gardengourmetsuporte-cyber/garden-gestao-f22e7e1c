@@ -296,7 +296,7 @@ export default function ChecklistsPage() {
                             key={day.toISOString()}
                             onClick={() => setSelectedDate(day)}
                             className={cn(
-                              "flex flex-col items-center min-w-[44px] py-2 px-2.5 rounded-xl transition-all duration-200 shrink-0",
+                              "flex flex-col items-center w-[44px] h-[56px] justify-center rounded-xl transition-all duration-200 shrink-0",
                               isSelected
                                 ? "bg-primary text-primary-foreground shadow-md"
                                 : isDayToday
