@@ -1,103 +1,58 @@
 
 
-## Migração Completa de Cores: Padrão SaaS Profissional
+## Problemas Identificados
 
-### Análise das Referências
-Os maiores SaaS do mundo convergem para uma paleta primária baseada em **Indigo/Violet**:
-- **Linear**: Indigo `#5E6AD2` (hsl 235 47% 58%)
-- **Stripe**: Violet `#635BFF` (hsl 245 100% 68%)
-- **Vercel/GitHub**: Neutro preto/branco
-- **Mercury**: Blue `#4361EE`
-- **Notion**: Preto/branco com acentos mínimos
+1. **FAB central feio** — o botão com gradient indigo→violet sobre fundo escuro parece fraco/apagado, precisa de mais presença visual
+2. **Card principal sem contraste** — `--card: 240 5% 10%` (≈#18181B) sobre `--background: 240 6% 6%` (≈#0F0F11) dá diferença de apenas 4% de luminosidade — quase invisível
+3. **Indigo/Violet fraco** — o primary `234 89% 74%` é pastel demais no dark mode, falta punch
 
-A escolha mais segura e universal é um **Indigo** limpo — profissional, neutro, funciona perfeitamente em dark e light mode.
+## Plano de Mudanças
 
-### Paleta Proposta
+### 1. `src/components/layout/BottomTabBar.tsx` — FAB redesenhado
+
+Redesenhar o botão central:
+- Aumentar para **60x60px** (de 56px) com `rounded-full`
+- Background: **branco puro** no dark mode (`hsl(0 0% 100%)`) com ícone em preto — padrão Linear/Vercel (FAB neutro que contrasta com tudo)
+- Glow ring: anel sutil com indigo blur atrás
+- Border: `1px solid hsl(0 0% 100% / 0.2)` — sutil, premium
+- Shadow: forte drop shadow preto para "flutuar"
+- Hover: scale 1.08, Active: scale 0.92
 
 ```text
-PRIMARY (Indigo):     hsl(234 89% 74%)  ≈ #818CF8  (Indigo-400)
-  - Dark foreground:  hsl(0 0% 5%)
-  - Light foreground: hsl(0 0% 100%)
-
-ACCENT (Violet):      hsl(258 90% 66%)  ≈ #8B5CF6
-  
-BACKGROUNDS (Dark):
-  - background:       hsl(240 6% 6%)    ≈ #0F0F11  (quase preto, leve tom frio)
-  - card:             hsl(240 5% 10%)   ≈ #18181B
-  - popover:          hsl(240 5% 9%)
-  - secondary:        hsl(240 4% 14%)
-  - muted:            hsl(240 4% 16%)
-  - border:           hsl(240 4% 18%)
-  - input:            hsl(240 4% 12%)
-
-BACKGROUNDS (Light):
-  - background:       hsl(0 0% 99%)     ≈ #FCFCFC
-  - card:             hsl(0 0% 100%)
-  - primary:          hsl(234 89% 64%)   (mais saturado para contraste)
-  
-SEMANTIC (iguais aos padrões):
-  - success:          hsl(142 71% 45%)   (verde)
-  - destructive:      hsl(0 84% 60%)     (vermelho)
-  - warning:          hsl(38 92% 50%)    (âmbar)
+       ╭──────╮
+      │  ╋    │   ← branco, ícone preto, glow indigo sutil
+       ╰──────╯
 ```
 
-### Mudanças por Arquivo
+### 2. `src/index.css` — Aumentar contraste dos cards e intensificar primary
 
-**1. `src/index.css`** — Migração completa de ~100 referências de `42 72% 52%` (gold) para indigo
+**Dark mode (`.dark`)**:
+| Token | Atual | Novo | Razão |
+|-------|-------|------|-------|
+| `--background` | `240 6% 6%` | `240 6% 4%` | Mais preto (≈ #0A0A0B) |
+| `--card` | `240 5% 10%` | `240 5% 12%` | Card mais claro para contrastar (≈ #1E1E21) — +8% diferença |
+| `--primary` | `234 89% 74%` | `234 89% 67%` | Indigo mais saturado e vibrante, menos pastel |
+| `--ring` | `234 89% 74%` | `234 89% 67%` | Match primary |
+| `--border` | `240 4% 18%` | `240 4% 20%` | Bordas um pouco mais visíveis |
+| `--gradient-brand` | com `74%` | com `67%` | Gradient mais intenso |
+| Todos os glows | com `74%` | com `67%` | Glows mais vibrantes |
 
-| Seção | Mudança |
-|-------|---------|
-| `:root` tokens | `--neon-cyan` → indigo, `--neon-purple` → violet real, `--garden-gold` removido |
-| `.dark` | Background preto real (`240 6% 6%`), primary indigo, todos os glows/gradients com indigo |
-| `:root:not(.dark)` | Primary indigo mais saturado, backgrounds brancos puros |
-| `--gradient-brand` | `indigo → violet` em vez de `gold → green` |
-| `--gradient-gold` | Renomeado conceitualmente para `--gradient-brand-rich` com tons indigo/violet |
-| Todas as hardcoded `hsl(42 72% 52% / ...)` | Substituídas por `hsl(var(--primary) / ...)` ou novo indigo |
-| `.list-command` border-left | Indigo |
-| `.tab-command-active` | Indigo |
-| `.fab-neon-border` | Indigo → Violet |
-| `.nav-bar-neon-glow` | Indigo |
-| `.text-gradient-gold` → `.text-gradient-gold` | Cores indigo/violet |
-| `.bg-gradient-animated` | Indigo → Violet loop |
-| `.gold-shimmer` | Shimmer com tom indigo |
-| `.animate-gold-pulse` | Pulse com indigo |
-| `.border-gradient-animated` | Rotating gradient indigo/violet |
-| `neonBorderPulse` | Indigo |
-| `neonPulse` | Indigo |
-| `.achievement-shimmer` | Indigo sutil |
-| `.finance-hero-card` | Dark surfaces com glow indigo |
+**Light mode** — primary de `64%` para `58%` para mais contraste sobre branco
 
-**2. `src/lib/unitThemes.ts`** — Atualizar `STANDARD_THEME_COLORS`
+### 3. `src/lib/unitThemes.ts` — Sync primary para `234 89% 67%`
 
-| Token | Novo Valor |
-|-------|-----------|
-| `primary` | `234 89% 74%` |
-| `neonCyan` | `234 89% 74%` |
-| `ring` | `234 89% 74%` |
-| `glowPrimary` | Glow com indigo |
-| `glowCyan` | Glow com indigo |
+### 4. `tailwind.config.ts` — Sync `glow-border` keyframe para `234 89% 67%`
 
-**3. `tailwind.config.ts`** — Keyframe `glow-border` com indigo
+### Resultado
+- FAB branco premium que se destaca em qualquer tema (padrão Linear/Notion)
+- Cards com +8% de diferença de luminosidade vs fundo — claramente visíveis
+- Indigo mais vibrante e "punchy" sem ser gritante
 
-**4. `src/components/layout/BottomTabBar.tsx`** — FAB hardcoded colors
-
-| Elemento | Mudança |
-|----------|---------|
-| Glow ring `div` | `hsl(42 72% 52% / ...)` → `hsl(var(--primary) / ...)` |
-| FAB `boxShadow` | Indigo glow |
-| FAB `border` | `hsl(var(--primary) / 0.6)` |
-
-### Resultado Visual
-- **Dark mode**: Fundo quase preto (#0F0F11), cards cinza neutro escuro, primary indigo vibrante — idêntico a Linear/Stripe
-- **Light mode**: Fundo branco puro, indigo com bom contraste WCAG AA
-- **Gradientes**: Indigo → Violet (elegante, profissional)
-- **Glows**: Tom azulado frio em vez de dourado quente
-
-### Arquivos Editados (4)
+### Arquivos editados (4)
 | Arquivo | Mudança |
 |---------|---------|
-| `src/index.css` | Migração completa gold → indigo (~100 referências) |
-| `src/lib/unitThemes.ts` | Tokens padronizados com indigo |
-| `tailwind.config.ts` | Keyframe glow-border |
-| `src/components/layout/BottomTabBar.tsx` | FAB colors dinâmicos |
+| `src/components/layout/BottomTabBar.tsx` | FAB redesenhado: branco, maior, shadow forte |
+| `src/index.css` | Background mais escuro, card mais claro, primary mais saturado |
+| `src/lib/unitThemes.ts` | Primary sync |
+| `tailwind.config.ts` | Keyframe sync |
 
