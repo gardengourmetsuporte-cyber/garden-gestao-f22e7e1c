@@ -941,7 +941,7 @@
   }
 
   .animate-float {
-    animation: floatLogo 3s ease-in-out infinite;
+    animation: floatLogo 8s ease-in-out infinite;
   }
 
   @keyframes pageFadeIn {

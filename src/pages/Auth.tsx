@@ -206,21 +206,21 @@ export default function Auth() {
       </div>
       {/* Animated background effects */}
       <div
-        className="absolute top-[-30%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[120px] animate-float"
-        style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.1), transparent 60%)' }}
+        className="absolute top-[-30%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[120px]"
+        style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.1), transparent 60%)', animation: 'floatLogo 20s ease-in-out infinite' }}
       />
       <div
         className="absolute bottom-[-25%] right-[-15%] w-[500px] h-[500px] rounded-full blur-[100px]"
         style={{
           background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.08), transparent 60%)',
-          animation: 'floatLogo 4s ease-in-out infinite reverse',
+          animation: 'floatLogo 25s ease-in-out infinite reverse',
         }}
       />
       <div
         className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full blur-[80px]"
         style={{
           background: 'radial-gradient(circle, hsl(var(--primary) / 0.06), transparent 60%)',
-          animation: 'floatLogo 5s ease-in-out infinite',
+          animation: 'floatLogo 30s ease-in-out infinite',
         }}
       />
 
