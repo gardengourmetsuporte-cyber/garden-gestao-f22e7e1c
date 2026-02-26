@@ -265,11 +265,13 @@ export default function ChecklistsPage() {
           <div className="animate-fade-in space-y-5" key={currentTab}>
           {currentTab === 'checklist' ? (
             <div className="space-y-5">
-              <DatePicker
-                date={selectedDate}
-                onSelect={(date) => setSelectedDate(date)}
-                className="mx-auto"
-              />
+              <div className="flex justify-center">
+                <DatePicker
+                  date={selectedDate}
+                  onSelect={(date) => setSelectedDate(date)}
+                  className="w-auto"
+                />
+              </div>
 
               {/* Checklist Type Cards */}
               <div className="grid grid-cols-2 gap-3">
