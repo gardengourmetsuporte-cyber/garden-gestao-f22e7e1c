@@ -1,0 +1,1 @@
+DELETE FROM checklist_completions WHERE date = '2026-02-26' AND checklist_type = 'abertura' AND is_skipped = true

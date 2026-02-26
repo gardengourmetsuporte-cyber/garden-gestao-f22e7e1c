@@ -99,9 +99,9 @@ export default function ChecklistsPage() {
     const checkDate = parseISO(date);
 
     if (type === 'abertura') {
-      // Deadline: same day at 07:30
+      // Deadline: same day at 19:30
       const deadline = new Date(checkDate);
-      deadline.setHours(7, 30, 0, 0);
+      deadline.setHours(19, 30, 0, 0);
       return isAfter(now, deadline);
     }
 

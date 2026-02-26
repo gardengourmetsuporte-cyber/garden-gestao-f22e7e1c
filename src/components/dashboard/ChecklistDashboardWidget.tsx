@@ -11,7 +11,9 @@ type ChecklistType = 'abertura' | 'fechamento';
 
 function getCurrentChecklistType(): ChecklistType {
   const h = new Date().getHours();
-  if (h >= 17 && h < 23) return 'abertura';
+  const m = new Date().getMinutes();
+  // Abertura is active until 19:30, then fechamento takes over
+  if (h < 19 || (h === 19 && m < 30)) return 'abertura';
   return 'fechamento';
 }
 
