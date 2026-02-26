@@ -41,7 +41,7 @@ export function ChecklistSettingsManager() {
     );
   }
 
-  const handleAddSector = async (data: { name: string; color: string }) => {
+  const handleAddSector = async (data: { name: string; color: string; icon?: string }) => {
     try {
       await addSector(data);
     } catch (error) {
@@ -50,7 +50,7 @@ export function ChecklistSettingsManager() {
     }
   };
 
-  const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
+  const handleUpdateSector = async (id: string, data: { name?: string; color?: string; icon?: string }) => {
     try {
       await updateSector(id, data);
     } catch (error) {
