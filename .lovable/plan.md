@@ -1,170 +1,87 @@
 
 
-# Sprint 1 — Bottom Tab Bar Global + Header Simplificado
+## Plano: Contestação de Checklist
 
-Este sprint transforma completamente a navegação mobile do app, substituindo o FAB Launcher por uma Bottom Tab Bar moderna e simplificando o header de 8 para 3 elementos.
+### Contexto
+O admin precisa poder contestar um item que um funcionário marcou como feito, registrando que ele verificou e o item não foi realmente concluído. Isso deve penalizar o funcionário (remover os pontos) e manter um registro de auditoria.
 
----
+### 1. Nova tabela no banco de dados
 
-## Escopo e Impacto
+**`checklist_contestations`** — registra cada contestação feita por um admin:
 
-A mudança afeta **apenas o mobile** (< 768px). Desktop sidebar permanece inalterada. Isso toca primariamente o `AppLayout.tsx` (647 linhas) e o `index.css` (1354 linhas), com ajustes de padding em diversas páginas.
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `id` | uuid PK | — |
+| `completion_id` | uuid FK → checklist_completions | Conclusão contestada |
+| `item_id` | uuid FK → checklist_items | Referência ao item |
+| `contested_by` | uuid | Admin que contestou |
+| `original_completed_by` | uuid | Funcionário original |
+| `reason` | text NOT NULL | Motivo da contestação |
+| `date` | date | Data do checklist |
+| `points_removed` | integer | Pontos que foram removidos |
+| `unit_id` | uuid FK → units | Unidade |
+| `created_at` | timestamptz | — |
 
----
+RLS: somente usuários com acesso à unidade podem ver/inserir.
 
-## Parte 1: Bottom Tab Bar Global
+### 2. Lógica da contestação
 
-### Novo componente `src/components/layout/BottomTabBar.tsx`
+Quando o admin contesta:
+1. A `checklist_completion` existente é **atualizada**: `awarded_points = false`, `points_awarded = 0`, `is_skipped = false` e um novo campo `is_contested = true` é adicionado à tabela `checklist_completions`
+2. Um registro é inserido em `checklist_contestations` com o motivo
+3. Uma **notificação** é criada para o funcionário informando que seu item foi contestado
 
-Barra fixa inferior com 5 slots, visível em todas as páginas (exceto páginas que já têm bottom nav própria como Finance e PersonalFinance):
+Alternativa mais simples (sem nova tabela): adicionar `is_contested`, `contested_by`, `contested_reason` e `contested_at` diretamente na `checklist_completions`. Isso evita joins e simplifica queries.
 
-```text
-┌──────────────────────────────────────────┐
-│   Home   │  Checklists  │  ⊕  │ Estoque │ Mais │
-│    ○     │      ○       │ ●●● │    ○    │  ○   │
-└──────────────────────────────────────────┘
+**Decisão: usar campos na própria `checklist_completions`** — mais simples, menos joins, e cada completion só pode ter uma contestação.
+
+### 3. Alterações no banco
+
+Migration SQL:
+```sql
+ALTER TABLE checklist_completions 
+  ADD COLUMN is_contested boolean NOT NULL DEFAULT false,
+  ADD COLUMN contested_by uuid,
+  ADD COLUMN contested_reason text,
+  ADD COLUMN contested_at timestamptz;
 ```
 
-- **Home** (/) — sempre visível
-- **Checklists** (/checklists) — módulo mais usado por funcionários
-- **+** (centro) — FAB contextual, abre um bottom sheet com ações rápidas (Nova transação, Novo item estoque, etc.)
-- **Estoque** (/inventory) — segundo módulo mais operacional
-- **Mais** — abre um bottom sheet com grid de todos os módulos (estilo atual do launcher, mas como sheet, não fullscreen)
+### 4. Alterações no frontend
 
-A seleção dos 4 módulos fixos é baseada nos módulos mais acessados. Se o usuário não tem acesso a um módulo, ele é substituído pelo próximo disponível.
+**`ChecklistView.tsx`** — Para itens completed, quando `isAdmin`:
+- Adicionar botão "Contestar" (ícone `AlertTriangle`) no painel inline expandido ao clicar no item concluído
+- Ao clicar, abre um mini-form inline com campo de texto para o motivo e botão confirmar
+- Visual: fundo laranja/amber para itens contestados (diferente de "não fiz" que é vermelho)
 
-### Lógica do "+"
+**`useChecklists.ts`**:
+- Nova função `contestCompletion(completionId, reason)` que:
+  - Faz UPDATE na completion: `is_contested = true`, `awarded_points = false`, `points_awarded = 0`, `contested_by`, `contested_reason`, `contested_at`
+  - Insere notificação para o funcionário
+  - Invalida caches de completions, points, leaderboard
 
-O botão central abre um `Drawer` (vaul) com ações contextuais baseadas na rota atual:
-- **Dashboard**: Criar transação, Abrir checklist
-- **Qualquer página**: Ações genéricas (Nova transação, Novo item, Novo checklist)
+**`types/database.ts`**:
+- Adicionar campos `is_contested`, `contested_by`, `contested_reason`, `contested_at` na interface `ChecklistCompletion`
 
-### Lógica do "Mais"
+### 5. Visual do item contestado
 
-O botão "Mais" abre um `Drawer` com:
-- Profile card do usuário (avatar + nome + rank)
-- Grid de módulos (idêntico ao launcher atual, mas sem fullscreen overlay)
-- Seletor de unidade
-- Botão de logout
+- Borda e fundo **amber/warning** (`bg-amber-500/10 border-amber-500/30`)
+- Ícone `AlertTriangle` no badge em vez de check/X
+- Texto "Contestado" + motivo visível
+- Info de quem contestou e quando
+- Funcionário vê destaque visual diferente no seu checklist
 
-### Indicadores visuais
+### 6. Arquivos a editar
 
-- Aba ativa: ícone com cor `primary`, pill indicator animado (reutilizar `.nav-pill-indicator` do CSS)
-- Badges de notificação nos ícones (chat, notificações)
-- Module status indicators (dots verde/amarelo/vermelho)
+1. **Migration SQL** — adicionar colunas à `checklist_completions`
+2. **`src/types/database.ts`** — atualizar interface `ChecklistCompletion`
+3. **`src/hooks/useChecklists.ts`** — adicionar `contestCompletion()`
+4. **`src/components/checklists/ChecklistView.tsx`** — UI de contestação (botão + form inline + visual contestado)
 
----
+### Detalhes técnicos
 
-## Parte 2: Header Simplificado
-
-### De (atual — 8 elementos):
-```text
-[ThemeToggle] [Copilot] [Points] ... [Logo] ... [Ranking] [Chat] [Notificações]
-```
-
-### Para (novo — 3 elementos):
-```text
-[UnitName/Logo] ........................ [Notificações] [Avatar]
-```
-
-- **Esquerda**: Nome da unidade ativa com o ícone Atlas (clicável → vai pro dashboard)
-- **Direita**: Sino de notificações (com badge) + Avatar do usuário (clicável → abre drawer de perfil rápido ou navega pro perfil)
-- ThemeToggle → movido para Settings e para o drawer "Mais"
-- Points → visível no Profile card dentro do drawer "Mais"
-- Copilot → acessível via drawer "Mais" ou Bottom Tab se tiver acesso
-- Ranking/Chat → acessíveis via drawer "Mais"
-
----
-
-## Parte 3: Remoção do FAB Launcher
-
-Remover completamente do `AppLayout.tsx`:
-- FAB button (linhas 252-281)
-- Home button acima do FAB (linhas 236-250)
-- Launcher overlay fullscreen (linhas 283-504)
-- Variável `launcherOpen` e lógica associada
-- `fabBottom` calculation
-
-Remover do `index.css`:
-- `.launcher-overlay`, `.launcher-item`, `.launcher-content` styles
-- `.fab-idle-glow`, `.fab-close-spin`, `.launcher-home-btn` animations
-- `.fab-neon-border` (mantém apenas para FinanceBottomNav que ainda usa)
-
----
-
-## Parte 4: Ajustes de Padding
-
-Todas as páginas que usam `AppLayout` precisam de `pb-24` (bottom tab bar height + safe area). Páginas com bottom nav própria (Finance, PersonalFinance, Chat) já têm padding adequado e o BottomTabBar será ocultado nessas rotas.
-
----
-
-## Arquivos Afetados
-
-```text
-NOVOS:
-├── src/components/layout/BottomTabBar.tsx     — componente principal (bottom tabs)
-├── src/components/layout/MoreDrawer.tsx       — drawer "Mais" com grid de módulos
-├── src/components/layout/QuickActionSheet.tsx  — sheet do botão "+"
-
-EDITADOS:
-├── src/components/layout/AppLayout.tsx        — remover FAB/launcher, adicionar BottomTabBar, simplificar header
-├── src/index.css                              — limpar estilos do launcher, adicionar estilos do tab bar
-├── src/pages/DashboardNew.tsx                 — ajustar padding se necessário
-```
-
-Nenhuma alteração de banco de dados.
-
----
-
-## Detalhes de Implementacao
-
-### BottomTabBar
-
-- Renderizado via `createPortal(document.body)` (mesmo padrão do `FinanceBottomNav`)
-- Hidden em desktop (`lg:hidden`)
-- Z-index: `z-50` (abaixo de sheets/drawers que usam z-80+)
-- Safe area: `paddingBottom: env(safe-area-inset-bottom)`
-- Altura: `h-16` (64px) — padrão iOS/Android
-- Background: `bg-card/95 backdrop-blur-2xl` (mesmo estilo do FinanceBottomNav)
-- Top glow line: `h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent`
-- Hidden quando a rota é `/finance`, `/personal-finance`, `/chat` (essas têm nav própria)
-
-### MoreDrawer
-
-- Usa `Drawer` (vaul) — componente já disponível no projeto
-- Conteúdo idêntico ao launcher atual mas dentro de um drawer (não fullscreen)
-- Inclui: profile card, unit selector, module grid agrupado, planos (crown), logout
-- Max-height: `70vh` com scroll
-
-### QuickActionSheet
-
-- `Drawer` simples com 3-4 ações rápidas
-- Estilo similar ao menu radial do FinanceBottomNav mas em lista vertical
-- Ações: Nova Receita, Nova Despesa, Novo Item, dependendo dos módulos acessíveis
-
-### Header
-
-- Altura mantida em `h-14` (56px)
-- Estrutura: `flex items-center justify-between`
-- Left: `<img Atlas icon>` + `<span unitName>`
-- Right: `<NotifBell>` + `<Avatar small>`
-
----
-
-## Riscos e Mitigacoes
-
-1. **Páginas com bottom nav própria**: Finance, PersonalFinance e Chat já têm bottom nav. O BottomTabBar será ocultado nessas rotas via prop ou detecção de pathname.
-
-2. **Módulos restritos**: O tab bar respeita `useUserModules()` — se o usuário não tem acesso a Checklists, o slot mostra o próximo módulo disponível.
-
-3. **FAB de módulos específicos**: Inventory tem seu próprio FAB. O `+` central do BottomTabBar será ocultado ou adaptado nessas páginas para não conflitar.
-
----
-
-## Resultado Esperado
-
-- **Navegação**: 1 tap para Home, Checklists, Estoque (vs. 2 taps no launcher atual)
-- **Header**: Visual limpo com 3 elementos (vs. 8 atuais)
-- **Percepção**: App moderno alinhado com Nubank, Mobills, iFood
-- **Código**: ~150 linhas removidas do AppLayout (launcher), ~200 linhas em 3 novos componentes compactos
+- A contestação NÃO remove a completion — ela permanece como registro, mas com `is_contested = true` e pontos zerados
+- Somente admins podem contestar
+- O motivo é obrigatório (campo `reason` NOT NULL via validação no frontend)
+- Items contestados aparecem com visual distinto de "concluído", "não fiz" e "já pronto"
+- O leaderboard é recalculado automaticamente pois os pontos são zerados na completion
 
