@@ -184,14 +184,14 @@ export default function Auth() {
 
   const labelClass = cn("text-sm font-medium text-muted-foreground");
 
-  const submitBtnClass = "w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border-none bg-primary text-primary-foreground";
+  const submitBtnClass = "w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 border-none bg-primary text-primary-foreground";
   const submitBtnStyle = {
     boxShadow: '0 4px 24px hsl(var(--primary) / 0.25)',
     animationDuration: '240s',
     animationTimingFunction: 'linear' as const,
   };
 
-  const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-secondary bg-secondary/50 hover:bg-secondary/80 text-foreground";
+  const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 border border-secondary bg-secondary/50 hover:bg-secondary/80 text-foreground";
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto animate-fade-in" style={{ paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
