@@ -1,122 +1,85 @@
 
 
-## Rebranding: "Garden Gestão" — Paleta Emerald + Teal
+## Rebranding Completo de Cores — Paleta Emerald/Teal Escura + Logo com Fundo Branco
 
-### Resumo
-Rebranding completo: padronizar o nome "Garden Gestão" em todo o sistema, trocar a paleta de cores de azul/roxo para Emerald + Teal, usar o logo original do Garden (`src/assets/logo.png`) em vez do `atlas-icon.png`, e equilibrar ambos os temas (dark e light).
+### Problema
+O verde atual (`160 84% 39%`) ficou claro demais e "descolado" do resto do sistema. Há dezenas de cores hardcoded (azuis `220`, roxos `262`, etc.) que não foram migradas e criam uma paleta incoerente. Os cards com gradiente (finance-hero) ainda usam tons azul/roxo que não conversam com a nova identidade.
 
----
+### Direção Visual
+Paleta **Emerald escuro + Teal profundo** — mais saturada e mais escura que a atual, inspirada em Mercury/Wise. Tom premium, não "verde limão".
 
-### 1. Nome e Textos (Todas as referências "Atlas" → "Garden")
+### Paleta Proposta (Dark)
 
-**Arquivos afetados (11):**
-- `index.html` — title, og:title, apple-mobile-web-app-title → "Garden Gestão"
-- `src/pages/Auth.tsx` — import logo, alt texts, `<h1>Atlas</h1>` → `Garden`, subtítulo "Gestão Inteligente"
-- `src/components/PageLoader.tsx` — import logo, alt text
-- `src/components/layout/AppLayout.tsx` — import logo, alt texts (mobile header + desktop sidebar)
-- `src/pages/Invite.tsx` — import logo, alt text
-- `src/pages/GamificationPlay.tsx` — import logo
-- `src/components/landing/LandingNavbar.tsx` — import logo, alt text, nome "Atlas" → "Garden"
-- `src/components/landing/FooterSection.tsx` — import logo, textos, email contato
-- `src/components/landing/HeroSection.tsx` — texto "o Atlas cuida dos números" → "o Garden cuida dos números", alt img
-- `src/components/landing/FAQSection.tsx` — "O Atlas funciona" → "O Garden funciona"
-- `src/components/settings/TeamManagement.tsx` — texto de convite WhatsApp "no Atlas" → "no Garden"
-- `src/lib/unitThemes.ts` — label "Azul Atlas" → "Azul Garden"
-- `src/index.css` — comentário "Garden Gestão" (já está correto)
-
-**Ação:** Em todos estes arquivos, trocar `import atlasIcon from '@/assets/atlas-icon.png'` por `import gardenLogo from '@/assets/logo.png'` e substituir todas as strings "Atlas" por "Garden".
-
----
-
-### 2. Nova Paleta de Cores — Emerald + Teal
-
-Substituir a paleta azul/roxo atual por tons verdes esmeralda e teal.
-
-**Tokens alterados em `src/index.css`:**
-
-```
-DARK THEME (valores HSL):
---primary:           160 84% 39%     (era 220 85% 58% — azul)
---accent:            172 66% 50%     (era 262 70% 55% — roxo)
---ring:              160 84% 39%
---neon-cyan:         172 66% 50%     (teal — mantém nome mas valor muda)
---neon-green:        142 71% 45%     (mantém — já é verde)
---neon-purple:       160 50% 60%     (agora é um teal claro para manter harmonia)
---gradient-brand:    linear-gradient(135deg, hsl(160 84% 39%), hsl(172 66% 50%))
---glow-primary:      ajustado para emerald
---glow-accent:       ajustado para teal
---shadow-glow:       ajustado
-
-LIGHT THEME:
---primary:           160 70% 36%
---ring:              160 70% 36%
---accent:            172 55% 45%
-Glows e gradientes ajustados proporcionalmente
+```text
+Token               Antes                   Agora
+──────────────────────────────────────────────────────
+--primary           160 84% 39% (claro)     158 64% 32% (emerald escuro)
+--accent            172 66% 50% (teal)      170 55% 40% (teal profundo)
+--ring              160 84% 39%             158 64% 32%
+--neon-cyan          172 66% 50%            170 55% 45%
+--neon-purple        160 50% 60%            168 45% 50% (teal médio)
 ```
 
-**Tokens :root (compartilhados):**
-- `--neon-cyan`: `172 66% 50%` (teal)
-- `--neon-purple`: `160 50% 60%` (teal claro, para não quebrar componentes que usam)
+### Paleta Proposta (Light)
 
----
+```text
+--primary           160 70% 36%             158 55% 30%
+--accent            172 55% 45%             170 45% 38%
+--ring              160 70% 36%             158 55% 30%
+```
 
-### 3. Landing Page — Gradientes Atualizados
+### Mudanças Detalhadas
 
-Todos os `neon-green` e `neon-cyan` já são variáveis CSS, então mudam automaticamente com os tokens. Mas os backgrounds inline com valores hardcoded precisam de ajuste:
+**1. `src/index.css` — Tokens base + Hardcoded colors (~30 linhas)**
+- Atualizar todos os tokens `--primary`, `--accent`, `--ring` nos dois temas
+- Atualizar `--neon-cyan`, `--neon-purple` em `:root`
+- Atualizar todos os `--glow-*`, `--gradient-brand`, `--shadow-glow`
+- **finance-hero-card**: trocar gradiente de `hsl(220 70% 18%)` / `hsl(260 45% 18%)` para tons emerald escuros: `hsl(158 40% 12%)` / `hsl(168 35% 10%)` / `hsl(150 30% 14%)`
+- **finance-hero-card--personal**: ajustar para manter harmonia
+- **action-button-primary**: `box-shadow` hardcoded `hsl(217 91%)` → `hsl(var(--primary))`
+- **.fab**: `box-shadow` hardcoded `hsl(217 91%)` → `hsl(var(--primary))`
+- **.nav-bar-neon-glow**: trocar `hsl(262 80% 55%)` → `hsl(var(--accent))`
+- **finance-hero-chip--success**: border `hsl(142 71% 45%)` → `hsl(var(--success))`
 
-- `CTASection.tsx` — background gradient `hsl(142 71% 15%)` → `hsl(160 84% 12%)`
-- `HeroSection.tsx` — já usa variáveis, funciona automaticamente
-- `SolutionSection.tsx` — já usa variáveis
-- `LandingNavbar.tsx` — já usa variáveis
+**2. `src/lib/unitThemes.ts` — DEFAULT_THEME**
+- Atualizar primary/neonCyan/ring/glows para novos valores
 
----
+**3. `src/pages/TabletMenu.tsx` — 1 linha**
+- `boxShadow: 'hsl(217 91% 60%)'` → `hsl(var(--primary))`
 
-### 4. Componentes Internos com Cores Hardcoded
+**4. `src/components/finance/FinanceBottomNav.tsx` — FAB personal**
+- Trocar `hsl(160 60% 45%)` hardcoded → `hsl(var(--primary))`
 
-- `BottomTabBar.tsx` — FAB gradient usa `var(--gradient-brand)` ✅, mas o glow tem `hsl(220 85% 58%)` hardcoded → trocar para `hsl(var(--primary))`
-- `src/components/finance/FinanceBottomNav.tsx` — verificar se tem hardcoded
-- `src/lib/unitThemes.ts` — DEFAULT_THEME primary `220 85%` → `160 84% 39%`, neonCyan `262 70%` → `172 66% 50%`
+**5. `src/components/dashboard/PersonalFinanceChartWidget.tsx` — 4 linhas**
+- Trocar `hsl(160 60% 40%)` e `hsl(160 60% 30%)` → `hsl(var(--primary))`
 
----
+**6. `src/pages/Checklists.tsx` — Trocar `hsl(262 80% 65%)` (roxo)**
+- Substituir por `hsl(var(--accent))` para manter na paleta
 
-### 5. Logo — Trocar para `logo.png`
+**7. `src/index.css` — `.fab-neon-border-personal`**
+- Trocar hardcoded `hsl(160 60% 45%)`, `hsl(140 50% 35%)`, `hsl(170 55% 40%)` → usar tokens CSS
 
-O arquivo `src/assets/logo.png` é o logo original do Garden. Trocar todos os imports de `atlas-icon.png` → `logo.png` nos 7 arquivos identificados.
+**8. Logo com fundo branco**
+- O logo `src/assets/logo.png` já é o logo original. Se o usuário quer "com fundo branco", basta adicionar uma classe `bg-white rounded-full p-1` nos locais onde o logo aparece sobre fundo escuro (Auth, PageLoader, AppLayout, etc.) — garantindo contraste.
 
----
-
-### 6. PWA / Favicon
-
-- `index.html` — já tem "Garden" em alguns campos, padronizar tudo
-- `public/pwa-192x192.png` e `public/pwa-512x512.png` — idealmente regerar com o logo do Garden (pode ser feito depois)
-- `meta theme-color` → trocar `#0c1120` para algo que combine com emerald dark: `#0a1a15`
-
----
-
-### Arquivos Editados (Total: ~15 arquivos)
+### Arquivos Editados (~8 arquivos)
 
 | Arquivo | Mudança |
 |---------|---------|
-| `src/index.css` | Paleta emerald+teal (tokens dark + light) |
-| `src/lib/unitThemes.ts` | DEFAULT_THEME + labels |
-| `index.html` | Nome, theme-color |
-| `src/pages/Auth.tsx` | Logo + nome |
-| `src/components/PageLoader.tsx` | Logo |
-| `src/components/layout/AppLayout.tsx` | Logo |
-| `src/pages/Invite.tsx` | Logo |
-| `src/pages/GamificationPlay.tsx` | Logo |
-| `src/components/landing/LandingNavbar.tsx` | Logo + nome |
-| `src/components/landing/FooterSection.tsx` | Logo + nome + textos |
-| `src/components/landing/HeroSection.tsx` | Texto + gradient fix |
-| `src/components/landing/CTASection.tsx` | Gradient hardcoded |
-| `src/components/landing/FAQSection.tsx` | Texto |
-| `src/components/settings/TeamManagement.tsx` | Texto convite |
-| `src/components/layout/BottomTabBar.tsx` | Glow hardcoded → variável |
+| `src/index.css` | Paleta completa + todos os hardcoded |
+| `src/lib/unitThemes.ts` | DEFAULT_THEME atualizado |
+| `src/pages/TabletMenu.tsx` | 1 box-shadow |
+| `src/components/finance/FinanceBottomNav.tsx` | FAB colors |
+| `src/components/dashboard/PersonalFinanceChartWidget.tsx` | 4 linhas hardcoded |
+| `src/pages/Checklists.tsx` | Roxo → accent |
+| `src/pages/Auth.tsx` | Logo com bg-white rounded |
+| `src/components/PageLoader.tsx` | Logo com bg-white rounded |
+| `src/components/layout/AppLayout.tsx` | Logo com bg-white rounded |
 
 ### Resultado
-- Marca "Garden Gestão" consistente em todo o sistema
-- Paleta Emerald + Teal premium e sofisticada
-- Logo original do Garden em todos os pontos de contato
-- Ambos os temas (dark e light) equilibrados e harmônicos
-- Sem quebra de componentes — tudo via variáveis CSS
+- Paleta Emerald/Teal **escura e sofisticada** — sem verde claro
+- Finance hero cards com gradiente emerald escuro que conversa com o tema
+- Zero cores hardcoded fora da paleta
+- Logo com fundo branco para contraste em superfícies escuras
+- Ambos os temas (dark/light) harmônicos e equilibrados
 
