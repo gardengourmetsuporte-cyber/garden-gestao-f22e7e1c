@@ -156,6 +156,7 @@ export const ICON_MAP: Record<string, string> = {
   LineChart: 'show_chart',
   Activity: 'monitoring',
   Repeat: 'repeat',
+  FileSignature: 'contract',
 
   // Building & Places
   Briefcase: 'work',
