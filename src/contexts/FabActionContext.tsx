@@ -1,5 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface FabAction {
   icon: string;
@@ -19,12 +18,6 @@ const FabActionContext = createContext<FabActionContextType>({
 
 export function FabActionProvider({ children }: { children: ReactNode }) {
   const [fabAction, setFabAction] = useState<FabAction | null>(null);
-  const location = useLocation();
-
-  // Clear action on route change
-  useEffect(() => {
-    setFabAction(null);
-  }, [location.pathname]);
 
   return (
     <FabActionContext.Provider value={{ fabAction, setFabAction }}>
