@@ -214,11 +214,13 @@
   .card-base,
   .card-surface {
     @apply bg-card rounded-2xl transition-all duration-200;
+    border: 1px solid hsl(var(--border) / 0.4);
     box-shadow: var(--shadow-card);
   }
 
   .card-elevated {
     @apply bg-card rounded-2xl transition-all duration-200;
+    border: 1px solid hsl(var(--border) / 0.3);
     box-shadow: var(--shadow-elevated);
   }
 
@@ -226,7 +228,7 @@
     @apply bg-card rounded-2xl
            cursor-pointer transition-all duration-200
            hover:border-primary/20 active:scale-[0.97];
-    border: 1px solid hsl(var(--border) / 0.5);
+    border: 1px solid hsl(var(--border) / 0.4);
     box-shadow: var(--shadow-card);
   }
 
@@ -363,9 +365,9 @@
   }
 
   .page-header-bar {
-    @apply bg-card/70 backdrop-blur-2xl sticky top-0 z-40;
-    border-bottom: 1px solid hsl(var(--border) / 0.25);
-    box-shadow: 0 1px 0 hsl(var(--primary) / 0.06), 0 4px 20px hsl(var(--background) / 0.5);
+    @apply bg-card/80 backdrop-blur-2xl sticky top-0 z-40;
+    border-bottom: 1px solid hsl(var(--border) / 0.2);
+    box-shadow: 0 1px 0 hsl(var(--primary) / 0.04), 0 4px 16px hsl(var(--background) / 0.4);
   }
 
   .page-header-bar .page-header-content {

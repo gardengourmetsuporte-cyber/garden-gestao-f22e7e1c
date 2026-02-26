@@ -123,9 +123,12 @@ export default function Recipes() {
       ) : groupedRecipes.length === 0 ? (
         <EmptyState
           icon="ChefHat"
-          title={activeTab === 'bases' ? 'Nenhuma base encontrada' : 'Nenhuma ficha técnica encontrada'}
-          actionLabel={activeTab === 'bases' ? 'Criar primeira base' : 'Criar primeira ficha'}
+          title={activeTab === 'bases' ? 'Nenhuma base cadastrada' : 'Nenhuma ficha técnica ainda'}
+          subtitle={activeTab === 'bases' ? 'Bases são preparos reutilizáveis em outras receitas.' : 'Crie fichas técnicas para controlar o custo dos seus pratos.'}
+          actionLabel={activeTab === 'bases' ? 'Criar primeira base' : 'Criar ficha técnica'}
+          actionIcon="Plus"
           onAction={handleCreate}
+          accent="primary"
         />
       ) : (
         <div className="space-y-3">
