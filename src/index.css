@@ -285,28 +285,28 @@
   .finance-hero-card {
     @apply rounded-2xl overflow-hidden transition-all duration-300;
     background: linear-gradient(145deg, 
-      hsl(0 0% 100%) 0%, 
-      hsl(240 25% 96%) 30%, 
-      hsl(234 45% 92%) 60%,
-      hsl(258 40% 88%) 100%
+      hsl(240 15% 13%) 0%, 
+      hsl(234 25% 16%) 30%, 
+      hsl(258 30% 18%) 60%,
+      hsl(240 20% 14%) 100%
     );
     background-size: 200% 200%;
     animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
-      0 4px 24px hsl(258 50% 50% / 0.08),
-      0 12px 48px hsl(234 89% 67% / 0.06),
-      inset 0 1px 0 hsl(0 0% 100% / 0.9);
-    border: 1px solid hsl(258 50% 80% / 0.3);
+      0 4px 24px hsl(258 50% 50% / 0.15),
+      0 12px 48px hsl(234 89% 67% / 0.1),
+      inset 0 1px 0 hsl(0 0% 100% / 0.06);
+    border: 1px solid hsl(258 50% 50% / 0.15);
     cursor: pointer;
   }
 
   .finance-hero-card:hover {
     transform: scale(1.01);
-    border-color: hsl(258 50% 70% / 0.4);
+    border-color: hsl(258 50% 60% / 0.3);
     box-shadow: 
-      0 8px 32px hsl(258 50% 50% / 0.12),
-      0 16px 56px hsl(234 89% 67% / 0.08),
-      inset 0 1px 0 hsl(0 0% 100% / 1);
+      0 8px 32px hsl(258 50% 50% / 0.2),
+      0 16px 56px hsl(234 89% 67% / 0.12),
+      inset 0 1px 0 hsl(0 0% 100% / 0.08);
   }
 
   .finance-hero-card:active {
@@ -315,24 +315,24 @@
 
   .dark .finance-hero-card {
     background: linear-gradient(145deg, 
-      hsl(0 0% 97%) 0%, 
-      hsl(240 20% 94%) 30%, 
-      hsl(234 35% 89%) 60%,
-      hsl(258 35% 85%) 100%
+      hsl(240 15% 10%) 0%, 
+      hsl(234 25% 13%) 30%, 
+      hsl(258 30% 15%) 60%,
+      hsl(240 20% 11%) 100%
     );
     box-shadow: 
-      0 4px 24px hsl(0 0% 0% / 0.2),
-      0 12px 48px hsl(258 50% 50% / 0.1),
-      inset 0 1px 0 hsl(0 0% 100% / 0.9);
-    border-color: hsl(258 40% 80% / 0.25);
+      0 4px 24px hsl(0 0% 0% / 0.4),
+      0 12px 48px hsl(258 50% 50% / 0.15),
+      inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    border-color: hsl(258 40% 50% / 0.15);
   }
 
   .dark .finance-hero-card:hover {
-    border-color: hsl(258 40% 75% / 0.35);
+    border-color: hsl(258 40% 60% / 0.25);
     box-shadow: 
-      0 8px 32px hsl(0 0% 0% / 0.25),
-      0 16px 56px hsl(258 50% 50% / 0.12),
-      inset 0 1px 0 hsl(0 0% 100% / 1);
+      0 8px 32px hsl(0 0% 0% / 0.5),
+      0 16px 56px hsl(258 50% 50% / 0.18),
+      inset 0 1px 0 hsl(0 0% 100% / 0.06);
   }
 
   .finance-hero-card--personal {
@@ -1237,6 +1237,25 @@
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+  }
+
+  /* FAB animated gradient */
+  @keyframes fabGradientSpin {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .fab-gradient {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 25%,
+      hsl(var(--neon-cyan)) 50%,
+      hsl(var(--accent)) 75%,
+      hsl(var(--primary)) 100%
+    );
+    background-size: 300% 300%;
+    animation: fabGradientSpin 4s ease-in-out infinite;
   }
 
   /* Check pop animation */
