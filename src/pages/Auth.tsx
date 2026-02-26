@@ -166,32 +166,30 @@ export default function Auth() {
     );
   }
 
-  // Colors adapted for gradient-primary (white) card background
-  const cardText = "text-[hsl(234_20%_20%)]";
-  const cardTextMuted = "text-[hsl(234_20%_40%)]";
-  const cardIconDefault = "text-[hsl(234_20%_55%)]";
-  const cardIconFocused = "text-[hsl(234_60%_50%)]";
-  const cardLink = "text-[hsl(234_60%_45%)]";
+  // Use semantic tokens — gradient-primary overrides --foreground/--muted-foreground automatically
+  const cardText = "text-foreground";
+  const cardTextMuted = "text-muted-foreground";
+  const cardIconDefault = "text-muted-foreground";
+  const cardIconFocused = "text-primary";
+  const cardLink = "text-primary";
 
   const inputClasses = (field: string) => cn(
     "pl-11 h-12 rounded-xl border transition-all duration-300",
-    cardText, "placeholder:text-[hsl(234_20%_50%/0.5)]",
+    "text-foreground placeholder:text-muted-foreground/50",
     focusedField === field
-      ? "border-[hsl(234_50%_70%)] bg-white"
-      : "border-[hsl(234_30%_85%/0.5)] bg-white/70 hover:border-[hsl(234_30%_70%/0.6)]",
+      ? "border-primary/50 bg-secondary/80"
+      : "border-secondary bg-secondary/50 hover:border-secondary-foreground/20",
     errors[field] && "border-destructive/50"
   );
 
-  const labelClass = cn("text-sm font-medium", cardTextMuted);
+  const labelClass = cn("text-sm font-medium text-muted-foreground");
 
-  const submitBtnClass = "w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border-none";
+  const submitBtnClass = "w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border-none bg-primary text-primary-foreground";
   const submitBtnStyle = {
-    background: 'hsl(234 30% 20%)',
-    color: '#fff',
-    boxShadow: '0 4px 24px hsl(234 30% 20% / 0.25)',
+    boxShadow: '0 4px 24px hsl(var(--primary) / 0.25)',
   };
 
-  const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-[hsl(234_30%_85%/0.5)] bg-white/60 hover:bg-white/90 " + cardText;
+  const socialBtnClass = "w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] border border-secondary bg-secondary/50 hover:bg-secondary/80 text-foreground";
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-x-hidden overflow-y-auto">
@@ -498,9 +496,9 @@ export default function Auth() {
             {!isNewPassword && !isResetPassword && (
               <>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(234 30% 80% / 0.4), transparent)' }} />
+                  <div className="flex-1 h-px bg-secondary" />
                   <span className={cn("text-xs uppercase tracking-wider", cardTextMuted)}>ou</span>
-                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(234 30% 80% / 0.4), transparent)' }} />
+                  <div className="flex-1 h-px bg-secondary" />
                 </div>
 
                 <div className="space-y-3">
@@ -540,7 +538,7 @@ export default function Auth() {
                     }}
                     className={socialBtnClass}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="hsl(234, 20%, 20%)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                     </svg>
                     Entrar com Apple
@@ -551,7 +549,7 @@ export default function Auth() {
 
             {/* Divider */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(234 30% 80% / 0.3), transparent)' }} />
+              <div className="flex-1 h-px bg-secondary" />
             </div>
 
             <div className="text-center">
