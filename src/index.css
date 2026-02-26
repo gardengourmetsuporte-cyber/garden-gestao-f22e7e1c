@@ -245,10 +245,15 @@
     color: hsl(0 0% 95%);
     border: 1px solid hsl(0 0% 15%);
     box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
+    /* Override Tailwind theme tokens inside dark cards */
+    --foreground: 0 0% 95%;
+    --muted-foreground: 0 0% 65%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 85%;
     --gp-label: hsl(0 0% 65%);
     --gp-sublabel: hsl(0 0% 55%);
     --gp-value: hsl(0 0% 95%);
-    --gp-icon: hsl(0 0% 60%);
+    --gp-icon: hsl(0 0% 75%);
     --gp-positive: hsl(142 60% 60%);
     --gp-negative: hsl(0 70% 65%);
   }
@@ -268,6 +273,10 @@
       0 12px 48px hsl(234 89% 67% / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.9);
     border-color: hsl(234 40% 80% / 0.25);
+    --foreground: 234 30% 15%;
+    --muted-foreground: 234 15% 50%;
+    --secondary: 234 30% 85%;
+    --secondary-foreground: 234 30% 20%;
     --gp-label: hsl(234 15% 50%);
     --gp-sublabel: hsl(234 10% 55%);
     --gp-value: hsl(234 30% 15%);
@@ -342,10 +351,15 @@
     box-shadow: 0 4px 20px hsl(0 0% 0% / 0.3);
     border: 1px solid hsl(0 0% 15%);
     cursor: pointer;
+    /* Override Tailwind theme tokens inside dark cards */
+    --foreground: 0 0% 95%;
+    --muted-foreground: 0 0% 65%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 85%;
     --gp-label: hsl(0 0% 65%);
     --gp-sublabel: hsl(0 0% 55%);
     --gp-value: hsl(0 0% 95%);
-    --gp-icon: hsl(0 0% 60%);
+    --gp-icon: hsl(0 0% 75%);
     --gp-positive: hsl(142 60% 60%);
     --gp-negative: hsl(0 70% 65%);
   }
@@ -374,6 +388,10 @@
       0 12px 48px hsl(234 89% 67% / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.9);
     border-color: hsl(234 40% 80% / 0.25);
+    --foreground: 234 30% 15%;
+    --muted-foreground: 234 15% 50%;
+    --secondary: 234 30% 85%;
+    --secondary-foreground: 234 30% 20%;
     --gp-label: hsl(234 15% 50%);
     --gp-sublabel: hsl(234 10% 55%);
     --gp-value: hsl(234 30% 15%);
