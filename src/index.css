@@ -128,8 +128,8 @@
     --color-pending: 38 80% 40%;
     --color-credit-card: 258 35% 45%;
     --surface-elevated: 0 0% 100%;
-    --surface-sunken: 240 5% 96%;
-    --background: 0 0% 99%;
+    --surface-sunken: 234 8% 95%;
+    --background: 234 8% 97%;
     --foreground: 240 15% 6%;
 
     --card: 0 0% 100%;
@@ -241,10 +241,14 @@
   /* ========== GRADIENT PRIMARY (White-Blue) ========== */
 
   .gradient-primary {
-    background: hsl(0 0% 100%);
-    color: hsl(240 15% 6%);
-    border: 1px solid hsl(234 20% 88%);
-    box-shadow: var(--shadow-card);
+    background: linear-gradient(145deg, 
+      hsl(240 8% 12%) 0%, 
+      hsl(234 15% 16%) 50%,
+      hsl(240 10% 14%) 100%
+    );
+    color: hsl(0 0% 95%);
+    border: 1px solid hsl(234 20% 22%);
+    box-shadow: 0 4px 20px hsl(240 10% 8% / 0.25);
   }
 
   .dark .gradient-primary {
@@ -265,7 +269,6 @@
   }
 
   .gradient-primary:hover {
-    border-color: hsl(234 40% 80% / 0.5);
     box-shadow: var(--shadow-card-hover);
   }
 
@@ -326,17 +329,20 @@
 
   .finance-hero-card {
     @apply rounded-2xl overflow-hidden transition-all duration-300;
-    background: hsl(0 0% 100%);
-    color: hsl(240 15% 6%);
-    box-shadow: var(--shadow-card);
-    border: 1px solid hsl(234 20% 88%);
+    background: linear-gradient(145deg, 
+      hsl(240 8% 12%) 0%, 
+      hsl(234 15% 16%) 50%,
+      hsl(240 10% 14%) 100%
+    );
+    color: hsl(0 0% 95%);
+    box-shadow: 0 4px 20px hsl(240 10% 8% / 0.25);
+    border: 1px solid hsl(234 20% 22%);
     cursor: pointer;
   }
 
   .finance-hero-card:hover {
     transform: scale(1.01);
-    box-shadow: var(--shadow-card-hover);
-    border-color: hsl(234 40% 80%);
+    box-shadow: 0 8px 32px hsl(240 10% 8% / 0.35);
   }
 
   .finance-hero-card:active {
@@ -352,6 +358,7 @@
       hsl(0 0% 96%) 80%,
       hsl(0 0% 98%) 100%
     );
+    color: hsl(234 30% 15%);
     box-shadow: 
       0 4px 24px hsl(0 0% 0% / 0.15),
       0 12px 48px hsl(234 89% 67% / 0.08),
@@ -407,11 +414,21 @@
   }
 
   .finance-hero-chip--success {
+    background: hsl(140 40% 50% / 0.12);
+    border: 1px solid hsl(140 40% 50% / 0.2);
+  }
+
+  .dark .finance-hero-chip--success {
     background: hsl(140 40% 40% / 0.08);
     border: 1px solid hsl(140 40% 40% / 0.15);
   }
 
   .finance-hero-chip--neutral {
+    background: hsl(0 0% 100% / 0.08);
+    border: 1px solid hsl(0 0% 100% / 0.12);
+  }
+
+  .dark .finance-hero-chip--neutral {
     background: hsl(240 10% 30% / 0.06);
     border: 1px solid hsl(240 10% 30% / 0.1);
   }
