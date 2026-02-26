@@ -112,17 +112,19 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
       <DrawerContent className="max-h-[80vh] overflow-hidden">
         <div className="overflow-y-auto px-4 pb-8 pt-2 space-y-3" style={{ maxHeight: '75vh' }}>
           {/* Profile card */}
-          <button
-            onClick={() => { navigate('/profile/me'); onOpenChange(false); }}
-            className="flex items-center gap-3 w-full py-3 active:scale-[0.98] transition-transform"
-          >
-            <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
-            <div className="text-left min-w-0 flex-1">
-              <p className="text-sm font-bold text-foreground truncate font-display">{profile?.full_name || 'Usuário'}</p>
-              <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
-            </div>
+          <div className="flex items-center gap-3 w-full py-3">
+            <button
+              onClick={() => { navigate('/profile/me'); onOpenChange(false); }}
+              className="flex items-center gap-3 flex-1 min-w-0 active:scale-[0.98] transition-transform"
+            >
+              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
+              <div className="text-left min-w-0 flex-1">
+                <p className="text-sm font-bold text-foreground truncate font-display">{profile?.full_name || 'Usuário'}</p>
+                <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
+              </div>
+            </button>
             <ThemeToggle className="p-1.5 shrink-0" />
-          </button>
+          </div>
 
           {/* Unit selector */}
           {units.length > 1 && (
