@@ -64,11 +64,21 @@ async function fetchCompletionsData(date: string, type: ChecklistType, unitId: s
     (profiles || []).forEach(p => profileMap.set(p.user_id, { full_name: p.full_name }));
   }
 
-  return (completionsData || []).map(c => ({
-    ...c,
-    awarded_points: c.awarded_points ?? true,
-    profile: profileMap.get(c.completed_by),
-  })) as unknown as ChecklistCompletion[];
+  // Sort completions: real completions first, skipped last (for deterministic lookup)
+  const sorted = (completionsData || [])
+    .map(c => ({
+      ...c,
+      awarded_points: c.awarded_points ?? true,
+      profile: profileMap.get(c.completed_by),
+    }))
+    .sort((a, b) => {
+      // Non-skipped first
+      if (a.is_skipped && !b.is_skipped) return 1;
+      if (!a.is_skipped && b.is_skipped) return -1;
+      return 0;
+    });
+
+  return sorted as unknown as ChecklistCompletion[];
 }
 
 // ---- Hook ----

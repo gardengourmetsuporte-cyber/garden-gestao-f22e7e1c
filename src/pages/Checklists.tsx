@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { format, parseISO, isAfter, startOfDay, addDays, subDays, isSameDay, isToday as isDateToday } from 'date-fns';
+import { format, subDays, isSameDay, isToday as isDateToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +15,7 @@ import { useFabAction } from '@/contexts/FabActionContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { getDeadlineInfo, shouldAutoClose } from '@/lib/checklistTiming';
 
 function DateStrip({ days, selectedDate, onSelectDate }: {
   days: Date[];
@@ -161,30 +162,28 @@ export default function ChecklistsPage() {
       fechamento: calc('fechamento', fechamentoCompletions),
     };
   }, [sectors, aberturaCompletions, fechamentoCompletions]);
-  // ── Deadline logic ──
-  const isDeadlinePassed = useCallback((date: string, type: ChecklistType): boolean => {
-    if (type === 'bonus') return false;
-    const now = new Date();
-    const checkDate = parseISO(date);
+  // ── Deadline logic (centralized) ──
+  const [deadlineLabel, setDeadlineLabel] = useState<Record<string, string>>({});
 
-    if (type === 'abertura') {
-      // Deadline: same day at 19:30
-      const deadline = new Date(checkDate);
-      deadline.setHours(19, 30, 0, 0);
-      return isAfter(now, deadline);
-    }
+  // Update countdown every 30s
+  useEffect(() => {
+    const update = () => {
+      const ab = getDeadlineInfo(currentDate, 'abertura');
+      const fe = getDeadlineInfo(currentDate, 'fechamento');
+      setDeadlineLabel({
+        abertura: ab?.label || '',
+        fechamento: fe?.label || '',
+      });
+    };
+    update();
+    const iv = setInterval(update, 30_000);
+    return () => clearInterval(iv);
+  }, [currentDate]);
 
-    if (type === 'fechamento') {
-      // Deadline: next day at 02:00
-      const nextDay = addDays(startOfDay(checkDate), 1);
-      nextDay.setHours(2, 0, 0, 0);
-      return isAfter(now, nextDay);
-    }
-
-    return false;
-  }, []);
-
-  const deadlinePassed = useMemo(() => isDeadlinePassed(currentDate, checklistType), [currentDate, checklistType, isDeadlinePassed]);
+  const deadlinePassed = useMemo(() => {
+    const info = getDeadlineInfo(currentDate, checklistType);
+    return info?.passed ?? false;
+  }, [currentDate, checklistType, deadlineLabel]); // deadlineLabel dep forces re-eval
 
   // ── Auto-close: mark pending items as skipped after deadline ──
   const autoClosedRef = useRef<string>('');
@@ -198,9 +197,11 @@ export default function ChecklistsPage() {
     if (autoClosedRef.current === key) return;
     if (!deadlinePassed || !user?.id || !activeUnitId) return;
     if (sectors.length === 0) return;
-    // CRITICAL: Wait for completions to actually be fetched for this date/type
-    // to avoid treating an empty loading state as "all items pending"
     if (!completionsFetched) return;
+    // Only admins run auto-close to avoid concurrent writes
+    if (!isAdmin) { autoClosedRef.current = key; return; }
+    // Only auto-close for valid operational windows (today/yesterday)
+    if (!shouldAutoClose(currentDate, checklistType)) { autoClosedRef.current = key; return; }
 
     // Gather all active item IDs for this type
     const activeItemIds: string[] = [];
@@ -224,32 +225,39 @@ export default function ChecklistsPage() {
       return;
     }
 
-    // Batch upsert skipped completions
-    const rows = pendingIds.map(itemId => ({
-      item_id: itemId,
-      checklist_type: checklistType,
-      completed_by: user.id,
-      date: currentDate,
-      awarded_points: false,
-      points_awarded: 0,
-      is_skipped: true,
-      unit_id: activeUnitId,
-    }));
-
     autoClosedRef.current = key;
 
-    supabase
-      .from('checklist_completions')
-      .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' })
-      .then(({ error }) => {
-        if (error) {
-          console.error('Auto-close error:', error);
-          return;
-        }
-        fetchCompletions(currentDate, checklistType);
-        queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
-      });
-  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, activeUnitId, fetchCompletions, queryClient]);
+    // Fetch fresh completions to avoid race condition with stale cache
+    (async () => {
+      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', checklistType);
+      if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
+      const { data: freshCompletions } = await q;
+      const freshIds = new Set((freshCompletions || []).map((c: any) => c.item_id));
+      const realPending = pendingIds.filter(id => !freshIds.has(id));
+      if (realPending.length === 0) return;
+
+      const rows = realPending.map(itemId => ({
+        item_id: itemId,
+        checklist_type: checklistType,
+        completed_by: user.id,
+        date: currentDate,
+        awarded_points: false,
+        points_awarded: 0,
+        is_skipped: true,
+        unit_id: activeUnitId,
+      }));
+
+      const { error } = await supabase
+        .from('checklist_completions')
+        .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' });
+      if (error) {
+        console.error('Auto-close error:', error);
+        return;
+      }
+      fetchCompletions(currentDate, checklistType);
+      queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
+    })();
+  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, isAdmin, activeUnitId, fetchCompletions, queryClient]);
 
   // Realtime: invalidate progress queries when completions change
   useEffect(() => {
@@ -390,8 +398,18 @@ export default function ChecklistsPage() {
                       getTypeProgress.abertura.percent === 100 ? "text-success" : checklistType === 'abertura' ? "text-foreground" : "text-muted-foreground"
                     )}
                   />
-                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
-                </div>
+                   <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
+                   {deadlineLabel.abertura && (
+                     <span className={cn(
+                       "text-[9px] font-semibold px-1.5 py-0.5 rounded-full ml-auto",
+                       getDeadlineInfo(currentDate, 'abertura')?.passed
+                         ? "bg-destructive/15 text-destructive"
+                         : "bg-muted text-muted-foreground"
+                     )}>
+                       {getDeadlineInfo(currentDate, 'abertura')?.passed ? '⏰ Encerrado' : `⏳ ${deadlineLabel.abertura}`}
+                     </span>
+                   )}
+                 </div>
                 {!settingsMode && (
                   <div className="space-y-1.5">
                     <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-white/15" : "bg-secondary/60")}>
@@ -443,8 +461,18 @@ export default function ChecklistsPage() {
                       getTypeProgress.fechamento.percent === 100 ? "text-success" : checklistType === 'fechamento' ? "text-foreground" : "text-muted-foreground"
                     )}
                   />
-                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
-                </div>
+                   <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
+                   {deadlineLabel.fechamento && (
+                     <span className={cn(
+                       "text-[9px] font-semibold px-1.5 py-0.5 rounded-full ml-auto",
+                       getDeadlineInfo(currentDate, 'fechamento')?.passed
+                         ? "bg-destructive/15 text-destructive"
+                         : "bg-muted text-muted-foreground"
+                     )}>
+                       {getDeadlineInfo(currentDate, 'fechamento')?.passed ? '⏰ Encerrado' : `⏳ ${deadlineLabel.fechamento}`}
+                     </span>
+                   )}
+                 </div>
                 {!settingsMode && (
                   <div className="space-y-1.5">
                     <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-white/15" : "bg-secondary/60")}>
