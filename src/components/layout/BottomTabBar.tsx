@@ -88,7 +88,6 @@ export function BottomTabBar() {
 
   useEffect(() => {
     updatePill();
-    // Small delay for initial layout
     const t = setTimeout(updatePill, 100);
     window.addEventListener('resize', updatePill);
     return () => { window.removeEventListener('resize', updatePill); clearTimeout(t); };
@@ -105,25 +104,17 @@ export function BottomTabBar() {
         className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div
-          className="mx-4 mb-3 rounded-[28px] glass-border"
-          style={{
-            background: 'hsl(var(--card) / 0.75)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-            boxShadow: 'var(--shadow-floating)',
-          }}
-        >
+        <div className="mx-4 mb-3 rounded-[28px] nav-bar-floating">
           <div ref={containerRef} className="flex items-center h-[64px] max-w-lg mx-auto relative">
-            {/* Highlight pill — ref-based positioning */}
+            {/* Highlight pill */}
             {pillStyle && (
               <div
-                className="absolute nav-highlight-pill rounded-2xl"
+                className="absolute nav-highlight-pill rounded-[14px]"
                 style={{
-                  background: 'hsl(var(--primary) / 0.12)',
-                  border: '1px solid hsl(var(--primary) / 0.18)',
+                  background: 'hsl(var(--primary) / 0.15)',
+                  border: '1px solid hsl(var(--primary) / 0.25)',
                   width: pillStyle.width,
-                  height: '44px',
+                  height: '40px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   left: pillStyle.left,
@@ -143,17 +134,17 @@ export function BottomTabBar() {
               />
             ))}
 
-            {/* Center FAB "+" */}
+            {/* Center FAB */}
             <div className="flex items-center justify-center" style={{ width: '20%' }}>
               <button
                 onClick={() => { navigator.vibrate?.(10); setQuickOpen(true); }}
                 className={cn(
-                  "absolute -top-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
+                  "absolute -top-5 w-[52px] h-[52px] rounded-[18px] flex items-center justify-center transition-all duration-300",
                   "hover:scale-105 active:scale-90"
                 )}
                 style={{
                   background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
-                  boxShadow: '0 4px 16px hsl(var(--primary) / 0.35)',
+                  boxShadow: '0 6px 24px hsl(var(--primary) / 0.4)',
                 }}
               >
                 <AppIcon name="Plus" size={26} className="relative z-10 text-primary-foreground" />
@@ -178,7 +169,7 @@ export function BottomTabBar() {
               className="flex flex-col items-center justify-center h-full gap-0.5 transition-all text-muted-foreground hover:text-foreground relative z-10"
               style={{ width: '20%' }}
             >
-              <AppIcon name="Menu" size={22} />
+              <AppIcon name="Grid2x2" size={22} fill={0} />
               <span className="text-[10px] font-normal">Mais</span>
             </button>
           </div>
@@ -209,7 +200,7 @@ const TabButton = forwardRef<
       style={{ width: '20%' }}
     >
       <div className={cn("relative", active && "nav-icon-active")}>
-        <AppIcon name={tab.icon} size={22} />
+        <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} />
         {moduleStatus && moduleStatus.level !== 'ok' && moduleStatus.count > 0 && (
           <span
             className={cn(

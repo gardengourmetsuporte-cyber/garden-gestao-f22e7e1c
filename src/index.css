@@ -1214,28 +1214,36 @@
   }
 
   .nav-highlight-pill {
-    transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: left, width;
   }
 
-  /* Glass border effect */
+  /* Glass border — simplified inline (no pseudo-element artifacts) */
   .glass-border {
-    border: 1px solid transparent;
-    background-clip: padding-box;
+    border: 1px solid hsl(var(--border) / 0.1);
     position: relative;
   }
 
-  .glass-border::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, hsl(0 0% 100% / 0.12), hsl(0 0% 100% / 0.03));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+  /* Floating nav bar — dramatic shadow */
+  .nav-bar-floating {
+    background: hsl(var(--card) / 0.88);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    border: 1px solid hsl(var(--border) / 0.1);
+    box-shadow:
+      0 -4px 32px hsl(0 0% 0% / 0.18),
+      0 -1px 8px hsl(0 0% 0% / 0.08),
+      inset 0 1px 0 hsl(0 0% 100% / 0.06);
+  }
+
+  :root[class~="light"] .nav-bar-floating,
+  :root:not(.dark) .nav-bar-floating {
+    box-shadow:
+      0 -4px 32px hsl(220 25% 10% / 0.08),
+      0 -1px 8px hsl(220 25% 10% / 0.04),
+      inset 0 1px 0 hsl(0 0% 100% / 0.5);
   }
 
   /* Page transition - slide + fade */
@@ -1264,8 +1272,8 @@
 
   /* Active nav icon — subtle scale */
   .nav-icon-active {
-    transform: scale(1.1);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(1.05);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   /* Reduced motion support */
