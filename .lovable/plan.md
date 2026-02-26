@@ -1,50 +1,48 @@
 
 
-# Auto-encerramento de Checklists por Prazo
+# Substituir Sistema de "Novas Transações" por Snackbar de Navegação
 
-## Regras de Negócio
+## Análise da Situação Atual
 
-- **Abertura**: prazo até **07:30** do mesmo dia. Após esse horário, todos os itens não preenchidos são automaticamente marcados como "não fiz" (is_skipped = true, 0 pontos).
-- **Fechamento**: prazo até **02:00 do dia seguinte**. Após esse horário, mesma lógica — itens pendentes viram "não fiz".
-- **Bônus**: sem prazo de encerramento automático (tarefas extras opcionais).
-- Admins continuam podendo interagir após o prazo (podem desmarcar/remarcar).
+O sistema atual usa um conjunto de IDs "vistos" persistido em localStorage (`_seenIds`) para destacar transações criadas nas últimas 48h com um brilho neon ciano. Isso inclui ~80 linhas de lógica de módulo (`_initSeen`, `_persistSeen`, `markSeenGlobal`, `isSeenGlobal`), throttle de localStorage, e um `forceUpdate` para re-render. O usuário reporta que isso atrapalha mais do que ajuda.
 
-## Abordagem
+## Proposta: Snackbar/Toast Flutuante
 
-A lógica será **client-side**: quando a página de checklists carrega (ou quando o tipo/data muda), o sistema verifica se o prazo expirou. Se sim, busca os itens ativos sem completion e faz um batch upsert marcando todos como `is_skipped = true`.
+Minha recomendação é um **Snackbar flutuante temporário** (estilo "1 transação criada — Ver") que aparece por ~5 segundos após criar/salvar uma transação. Ao clicar "Ver", navega para a aba de transações e faz scroll até a transação.
 
-Isso evita a necessidade de uma Edge Function agendada (cron) e garante que o encerramento aconteça na primeira vez que qualquer usuário abrir a tela após o prazo.
+**Por que não navegar automaticamente:**
+- Se o usuário acabou de fechar o caixa e 10 lançamentos entram, ser jogado para a aba de transações 10 vezes seria irritante
+- O usuário pode estar no meio de outra tarefa (gráficos, planejamento)
+- O snackbar dá **controle ao usuário**: ele vê que algo aconteceu e decide se quer ir ver
 
-## Detalhes Técnicos
+**Por que não um balãozinho persistente:**
+- Um badge/bolha permanente cria ansiedade visual ("notificação não lida")
+- O snackbar some sozinho se o usuário não se importa
 
-### Função `isDeadlinePassed(date, checklistType)`
+## Implementação
 
-```text
-abertura + mesmo dia + hora >= 7:30  → true
-fechamento + dia seguinte + hora >= 2:00  → true
-fechamento + mesmo dia  → false (ainda não passou)
-```
+### Tarefa 1: Remover todo o sistema de "seen IDs"
+- Remover do `FinanceTransactions.tsx`: constantes `FINANCE_SEEN_KEY`, `_seenIds`, `_seenInitialised`, `_initSeen`, `_persistSeen`, `markSeenGlobal`, `isSeenGlobal`, `markSeen`, `isNewTransaction`, `forceUpdate`
+- Remover prop `isNew` do `TransactionItem` render
+- Remover de `TransactionItem.tsx`: prop `isNew`, lógica de brilho neon condicional
 
-### Auto-mark logic (em `Checklists.tsx`)
+### Tarefa 2: Snackbar "Ver transação" após salvar
+- Em `Finance.tsx` e `PersonalFinance.tsx`, após `addTransaction` ou `updateTransaction` retornar com sucesso:
+  - Usar `toast()` do Sonner com ação "Ver" que seta `activeTab = 'transactions'`
+  - O toast já existe para confirmação ("Transação salva!"), basta adicionar o botão de ação
 
-Após `fetchCompletions` retornar, um `useEffect` verifica:
-1. O prazo passou?
-2. Existem itens ativos sem completion?
-3. Se sim, faz batch insert de completions com `is_skipped: true, points_awarded: 0` para todos os pendentes.
-4. Usa um ref `autoClosedRef` para evitar loops (executa uma vez por date+type).
+### Tarefa 3: Scroll automático para transação recente (opcional mas valioso)
+- Após navegar via toast, passar o ID da transação recém-criada como state
+- Em `FinanceTransactions`, fazer `scrollIntoView` no elemento com aquele ID
 
-### Bloqueio visual (em `ChecklistView.tsx`)
-
-Quando o prazo expirou e o usuário não é admin:
-- `canToggleItem` retorna `false` para itens não completados
-- Um banner aparece no topo: "⏰ Prazo encerrado às 07:30 — itens pendentes marcados como 'não fiz'"
-
-### Arquivos afetados
+## Arquivos Afetados
 
 ```text
-src/pages/Checklists.tsx           — useEffect para auto-mark + função isDeadlinePassed
-src/components/checklists/ChecklistView.tsx — banner de prazo expirado + bloqueio de interação
+src/components/finance/FinanceTransactions.tsx  — remover ~80 linhas do sistema seen
+src/components/finance/TransactionItem.tsx      — remover prop isNew e estilo neon
+src/pages/Finance.tsx                           — toast com ação "Ver"
+src/pages/PersonalFinance.tsx                   — toast com ação "Ver"
 ```
 
-Nenhuma alteração de banco de dados necessária. Os completions de "não fiz" usam a mesma estrutura já existente (`is_skipped`, `awarded_points`, `points_awarded`).
+Nenhuma alteração de banco. Resultado: código mais simples, sem localStorage desnecessário, e UX controlada pelo usuário.
 
