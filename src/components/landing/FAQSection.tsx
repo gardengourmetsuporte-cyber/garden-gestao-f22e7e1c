@@ -8,7 +8,7 @@ import {
 const faqs = [
   { q: "Preciso instalar alguma coisa?", a: "Não. O Garden funciona no navegador e no celular como um app (PWA). Basta acessar e adicionar à tela inicial." },
   { q: "Quantos usuários posso ter?", a: "Pro: até 15 usuários. Business: ilimitado. Cada membro da equipe tem seu login e permissões." },
-  { q: "Funciona com iFood e delivery?", a: "Sim! O módulo financeiro separa automaticamente os canais de venda — iFood, delivery, cartão, Pix, dinheiro." },
+  { q: "Consigo usar no celular?", a: "Sim! O Garden é mobile-first. Funciona direto no navegador como um app (PWA) — você gerencia tudo pelo celular, de qualquer lugar." },
   { q: "Meus dados ficam seguros?", a: "Sim. Infraestrutura em nuvem com criptografia e backup diário automático. Seus dados são 100% seus." },
   { q: "Posso cancelar quando quiser?", a: "Sim, sem fidelidade. Cancele a qualquer momento sem taxas. Seus dados permanecem acessíveis por 30 dias após o cancelamento." },
 ];
