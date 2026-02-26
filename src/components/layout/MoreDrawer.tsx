@@ -42,7 +42,6 @@ const navItems: NavItem[] = [
   { icon: 'BookOpen', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Monitor', label: 'Tablets', href: '/tablet-admin', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'Dices', label: 'Gamificação', href: '/gamification', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Settings', label: 'Configurações', href: '/settings', adminOnly: true, group: 'config', groupLabel: 'Sistema' },
 ];
 
 interface MoreDrawerProps {
@@ -214,10 +213,18 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             </div>
           ))}
 
-          {/* Logout */}
+          {/* Settings + Logout */}
+          {isAdmin && (
+            <button
+              onClick={() => { navigate('/settings'); onOpenChange(false); }}
+              className="flex items-center justify-center w-full px-4 py-3 rounded-xl text-sm font-semibold text-foreground/80 hover:text-foreground active:bg-secondary/50 transition-all"
+            >
+              Configurações
+            </button>
+          )}
           <button
             onClick={handleSignOut}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-secondary/80 border border-border/30 text-sm text-muted-foreground active:bg-secondary transition-all mt-2"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-secondary/80 border border-border/30 text-sm text-muted-foreground active:bg-secondary transition-all"
           >
             <AppIcon name="LogOut" size={18} />
             <span className="font-medium">Sair da conta</span>
