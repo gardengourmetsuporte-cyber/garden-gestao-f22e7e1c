@@ -9,7 +9,7 @@ export interface AppNotification {
   type: 'info' | 'alert' | 'success';
   title: string;
   description: string;
-  origin: 'estoque' | 'financeiro' | 'checklist' | 'sistema';
+  origin: 'estoque' | 'financeiro' | 'checklist' | 'caixa' | 'agenda' | 'sistema';
   read: boolean;
   created_at: string;
 }
@@ -26,25 +26,47 @@ async function fetchNotificationsData(userId: string): Promise<AppNotification[]
   return (data as unknown as AppNotification[]) || [];
 }
 
-// Debounced sound - only play once per 5 seconds
+// WhatsApp-style notification sound — distinctive double-tone "pop"
 let lastSoundTime = 0;
 function playNotificationSound() {
   const now = Date.now();
-  if (now - lastSoundTime < 5000) return;
+  if (now - lastSoundTime < 3000) return;
   lastSoundTime = now;
 
   try {
     const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.frequency.value = 830;
-    osc.type = 'sine';
-    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-    osc.start(audioCtx.currentTime);
-    osc.stop(audioCtx.currentTime + 0.2);
+    const t = audioCtx.currentTime;
+
+    // First tone — rising sweep
+    const osc1 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    osc1.connect(gain1);
+    gain1.connect(audioCtx.destination);
+    osc1.frequency.setValueAtTime(600, t);
+    osc1.frequency.linearRampToValueAtTime(900, t + 0.08);
+    osc1.type = 'sine';
+    gain1.gain.setValueAtTime(0.3, t);
+    gain1.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+    osc1.start(t);
+    osc1.stop(t + 0.12);
+
+    // Second tone — higher pop
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(audioCtx.destination);
+    osc2.frequency.setValueAtTime(1200, t + 0.13);
+    osc2.type = 'sine';
+    gain2.gain.setValueAtTime(0, t);
+    gain2.gain.setValueAtTime(0.25, t + 0.13);
+    gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.28);
+    osc2.start(t + 0.13);
+    osc2.stop(t + 0.28);
+
+    // Vibrate if supported
+    if ('vibrate' in navigator) {
+      navigator.vibrate([100, 50, 100]);
+    }
   } catch {
     // Audio not available
   }
