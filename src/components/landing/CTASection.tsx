@@ -8,12 +8,12 @@ export function CTASection() {
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(135deg, hsl(160 84% 12% / 0.6), hsl(172 66% 10% / 0.4), hsl(var(--background)))",
+            background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.1), hsl(var(--background)))",
           }}
         />
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--neon-green) / 0.15), transparent 60%)" }}
+          style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 60%)" }}
         />
       </div>
 
@@ -28,9 +28,9 @@ export function CTASection() {
           to="/auth?plan=free"
           className="inline-flex items-center gap-2 h-14 px-10 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{
-            background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
-            color: "white",
-            boxShadow: "0 0 40px hsl(var(--neon-green) / 0.3), 0 4px 20px hsl(var(--neon-cyan) / 0.3)",
+            background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
+            color: "hsl(var(--primary-foreground))",
+            boxShadow: "0 0 40px hsl(var(--primary) / 0.3), 0 4px 20px hsl(var(--accent) / 0.3)",
           }}
         >
           Criar minha conta grátis

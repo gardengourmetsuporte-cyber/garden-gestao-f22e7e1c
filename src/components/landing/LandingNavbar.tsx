@@ -58,9 +58,9 @@ export function LandingNavbar() {
             to="/auth?plan=free"
             className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold transition-all"
             style={{
-              background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
+              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
               color: "hsl(var(--primary-foreground))",
-              boxShadow: "0 0 20px hsl(var(--neon-green) / 0.3)",
+              boxShadow: "0 0 20px hsl(var(--primary) / 0.3)",
             }}
           >
             Teste grátis
@@ -99,7 +99,7 @@ export function LandingNavbar() {
             onClick={() => setOpen(false)}
             className="block w-full text-center py-3 mt-1 rounded-lg text-sm font-semibold"
             style={{
-              background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
+              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
               color: "hsl(var(--primary-foreground))",
             }}
           >

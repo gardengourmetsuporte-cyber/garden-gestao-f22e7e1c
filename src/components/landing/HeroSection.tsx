@@ -9,7 +9,7 @@ export function HeroSection() {
       <div className="absolute inset-0 pointer-events-none">
         <div
           className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--neon-green) / 0.12), transparent 60%)" }}
+          style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.12), transparent 60%)" }}
         />
         <div
           className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[100px]"
@@ -23,9 +23,9 @@ export function HeroSection() {
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6 animate-pulse"
               style={{
-                background: "hsl(var(--neon-green) / 0.1)",
-                border: "1px solid hsl(var(--neon-green) / 0.25)",
-                color: "hsl(var(--neon-green))",
+                background: "hsl(var(--primary) / 0.1)",
+                border: "1px solid hsl(var(--primary) / 0.25)",
+                color: "hsl(var(--primary))",
               }}
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -37,7 +37,7 @@ export function HeroSection() {
               <span
                 className="bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
+                  backgroundImage: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
                 }}
               >
                 por falta de controle
@@ -55,9 +55,9 @@ export function HeroSection() {
                 to="/auth?plan=free"
                 className="inline-flex items-center gap-2 h-12 px-8 rounded-xl font-semibold text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))",
+                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
                   color: "hsl(var(--primary-foreground))",
-                  boxShadow: "0 0 30px hsl(var(--neon-green) / 0.3), 0 4px 20px hsl(var(--neon-cyan) / 0.3)",
+                  boxShadow: "0 0 30px hsl(var(--primary) / 0.3), 0 4px 20px hsl(var(--accent) / 0.3)",
                 }}
               >
                 Começar grátis agora
@@ -76,13 +76,13 @@ export function HeroSection() {
           <div className="relative flex justify-center">
             <div
               className="absolute -inset-4 rounded-3xl blur-2xl"
-              style={{ background: "radial-gradient(circle, hsl(var(--neon-green) / 0.15), transparent 70%)" }}
+              style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 70%)" }}
             />
             <div
               className="relative w-[280px] sm:w-[300px] rounded-[2.5rem] overflow-hidden p-2"
               style={{
                 background: "linear-gradient(145deg, hsl(var(--border) / 0.6), hsl(var(--border) / 0.2))",
-                boxShadow: "0 0 40px hsl(var(--neon-green) / 0.15), 0 25px 60px rgba(0,0,0,0.5)",
+                boxShadow: "0 0 40px hsl(var(--primary) / 0.15), 0 25px 60px rgba(0,0,0,0.5)",
               }}
             >
               <div className="rounded-[2rem] overflow-hidden bg-background">

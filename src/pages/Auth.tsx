@@ -209,29 +209,13 @@ export default function Auth() {
       {/* Animated background effects */}
       <div
         className="absolute top-[-30%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[120px]"
-        style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.1), transparent 60%)', animation: 'floatLogo 60s ease-in-out infinite' }}
+        style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.1), transparent 60%)', animation: 'floatLogo 60s ease-in-out infinite' }}
       />
       <div
         className="absolute bottom-[-25%] right-[-15%] w-[500px] h-[500px] rounded-full blur-[100px]"
         style={{
-          background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.08), transparent 60%)',
-          animation: 'floatLogo 70s ease-in-out infinite reverse',
-        }}
-      />
-      <div
-        className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full blur-[80px]"
-        style={{
           background: 'radial-gradient(circle, hsl(var(--primary) / 0.06), transparent 60%)',
-          animation: 'floatLogo 80s ease-in-out infinite',
-        }}
-      />
-
-      {/* Grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'linear-gradient(hsl(var(--neon-cyan)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--neon-cyan)) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+          animation: 'floatLogo 70s ease-in-out infinite reverse',
         }}
       />
 
@@ -242,15 +226,15 @@ export default function Auth() {
             <div
               className="relative w-24 h-24 rounded-full overflow-hidden animate-float flex items-center justify-center"
               style={{
-                border: '2px solid hsl(var(--neon-cyan) / 0.3)',
-                boxShadow: '0 0 40px hsl(var(--neon-cyan) / 0.2), 0 0 80px hsl(var(--neon-cyan) / 0.08), 0 8px 32px hsl(222 47% 3% / 0.5)',
+                border: '2px solid hsl(var(--primary) / 0.3)',
+                boxShadow: '0 0 40px hsl(var(--primary) / 0.2), 0 0 80px hsl(var(--primary) / 0.08), 0 8px 32px hsl(222 47% 3% / 0.5)',
               }}
             >
               {/* Rotating neon ring */}
               <div
                 className="absolute -inset-[2px] rounded-full opacity-60"
                 style={{
-                  background: 'conic-gradient(from var(--neon-angle, 0deg), hsl(var(--neon-cyan)), transparent, hsl(var(--neon-purple)), transparent, hsl(var(--neon-cyan)))',
+                  background: 'conic-gradient(from var(--neon-angle, 0deg), hsl(var(--primary)), transparent, hsl(var(--accent)), transparent, hsl(var(--primary)))',
                   animation: 'neonRotate 20s linear infinite',
                   filter: 'blur(3px)',
                 }}
