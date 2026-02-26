@@ -302,9 +302,9 @@ export default function ChecklistsPage() {
                       : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                   )}
                 >
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-stretch gap-3 mb-3">
                     <div
-                      className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-300"
+                      className="w-[3px] rounded-full shrink-0 transition-colors duration-300"
                       style={{ backgroundColor: getTypeProgress.abertura.percent === 100 ? 'hsl(var(--success))' : 'hsl(32 100% 50%)' }}
                     />
                     <AppIcon
@@ -360,9 +360,9 @@ export default function ChecklistsPage() {
                       : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                   )}
                 >
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-stretch gap-3 mb-3">
                     <div
-                      className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-300"
+                      className="w-[3px] rounded-full shrink-0 transition-colors duration-300"
                       style={{ backgroundColor: getTypeProgress.fechamento.percent === 100 ? 'hsl(var(--success))' : 'hsl(234 89% 67%)' }}
                     />
                     <AppIcon
@@ -419,9 +419,9 @@ export default function ChecklistsPage() {
                     : "ring-1 ring-border/40 bg-card/60 opacity-70 hover:opacity-90 hover:ring-emerald-500/40"
                 )}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-stretch gap-4">
                   <div
-                    className="w-[3px] self-stretch rounded-full shrink-0 transition-colors duration-300"
+                    className="w-[3px] rounded-full shrink-0 transition-colors duration-300"
                     style={{ backgroundColor: 'hsl(160 84% 39%)' }}
                   />
                   <AppIcon name="Zap" size={24} fill={0} className="text-muted-foreground shrink-0" />
