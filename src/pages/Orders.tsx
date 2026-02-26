@@ -205,7 +205,7 @@ export default function OrdersPage() {
                               <Package className={cn("w-5 h-5", isNoSupplier ? "text-muted-foreground" : "text-primary")} />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="font-semibold text-foreground truncate">
+                               <p className="font-semibold font-display text-foreground truncate">
                                 {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
                               </p>
                               <p className="text-xs text-muted-foreground">
@@ -296,7 +296,7 @@ export default function OrdersPage() {
                                     <ShoppingCart className="w-5 h-5 text-primary" />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="font-semibold text-foreground truncate">{order.supplier?.name}</p>
+                                     <p className="font-semibold font-display text-foreground truncate">{order.supplier?.name}</p>
                                     <p className="text-xs text-muted-foreground">
                                       {new Date(order.created_at).toLocaleDateString('pt-BR')} · {order.order_items?.length || 0} itens
                                     </p>

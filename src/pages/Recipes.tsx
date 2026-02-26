@@ -148,7 +148,7 @@ export default function Recipes() {
                   )}
                 />
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: group.category?.color || '#6b7280' }} />
-                <span className="font-medium">{group.category?.name || 'Sem categoria'}</span>
+                <span className="font-semibold font-display">{group.category?.name || 'Sem categoria'}</span>
                 <span className="text-sm text-muted-foreground ml-auto">({group.recipes.length})</span>
               </CollapsibleTrigger>
 
@@ -194,7 +194,7 @@ export default function Recipes() {
                 <div className="stat-icon bg-primary/10 mb-1">
                   <AppIcon name="ChefHat" size={20} className="text-primary" />
                 </div>
-                <p className="text-xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{stats.total}</p>
                 <p className="text-[10px] text-muted-foreground">Receitas</p>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function Recipes() {
                 <div className="stat-icon bg-success/10 mb-1">
                   <AppIcon name="DollarSign" size={20} className="text-success" />
                 </div>
-                <p className="text-lg font-bold text-foreground">{formatCurrency(stats.avgCost)}</p>
+                <p className="text-lg font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{formatCurrency(stats.avgCost)}</p>
                 <p className="text-[10px] text-muted-foreground">Custo Médio</p>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function Recipes() {
                 <div className="stat-icon bg-muted mb-1">
                   <AppIcon name="Archive" size={20} className="text-muted-foreground" />
                 </div>
-                <p className="text-xl font-bold text-foreground">{stats.inactive}</p>
+                <p className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{stats.inactive}</p>
                 <p className="text-[10px] text-muted-foreground">Inativas</p>
               </div>
             </div>

@@ -53,7 +53,7 @@ export function ConversationList({ conversations, selectedId, onSelect, statusFi
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm text-foreground truncate">{conv.contact?.name || conv.contact?.phone || 'Desconhecido'}</span>
+                      <span className="font-semibold font-display text-sm text-foreground truncate">{conv.contact?.name || conv.contact?.phone || 'Desconhecido'}</span>
                       <span className="text-[10px] text-muted-foreground shrink-0">{format(new Date(conv.created_at), 'dd/MM HH:mm', { locale: ptBR })}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">

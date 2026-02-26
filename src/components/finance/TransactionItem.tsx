@@ -234,7 +234,7 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete, 
 
           {/* Details */}
           <div className="flex-1 min-w-0">
-            <p className="font-medium truncate text-sm">{description}</p>
+            <p className="font-semibold font-display truncate text-sm">{description}</p>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
               {getCategoryIcon()}
               <span
@@ -257,7 +257,7 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete, 
 
           {/* Amount */}
           <p
-            className={cn('font-bold tabular-nums flex-shrink-0 text-sm')}
+            className={cn('font-bold font-display tabular-nums flex-shrink-0 text-sm')}
             style={{ color: `hsl(${getTypeColor()})` }}
           >
             {formatAmount()}

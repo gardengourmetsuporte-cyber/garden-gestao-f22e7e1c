@@ -28,7 +28,7 @@ export function ProfileHeader({ fullName, avatarUrl, jobTitle, earnedPoints, sel
         userId={userId}
       />
       <div className="text-center">
-        <h1 className="text-xl font-bold text-foreground">{fullName}</h1>
+        <h1 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>{fullName}</h1>
         {jobTitle && <p className="text-sm text-muted-foreground">{jobTitle}</p>}
       </div>
       {next && (
