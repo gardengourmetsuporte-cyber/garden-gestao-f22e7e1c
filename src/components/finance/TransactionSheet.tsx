@@ -132,6 +132,7 @@ export function TransactionSheet({
   const [showSupplierPicker, setShowSupplierPicker] = useState(false);
   const [showEmployeePicker, setShowEmployeePicker] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const draftRestoredRef = useRef(false);
 
   // Prevent browser back gesture from navigating away while sheet is open
@@ -515,7 +516,13 @@ export function TransactionSheet({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setShowCalendar(!showCalendar)}
+                  onClick={() => {
+                    const next = !showCalendar;
+                    setShowCalendar(next);
+                    if (next) {
+                      setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+                    }
+                  }}
                 >
                   <AppIcon name="Calendar" size={16} className="mr-1" />
                   {!isToday(date) && !isYesterday(date) ? getDateLabel() : 'Outros'}
@@ -525,7 +532,7 @@ export function TransactionSheet({
 
             {/* Inline calendar (no Popover/Portal) */}
             {showCalendar && (
-              <div className="rounded-xl border bg-card p-2">
+              <div ref={calendarRef} className="rounded-xl border bg-card p-2">
                 <Calendar
                   mode="single"
                   selected={date}
