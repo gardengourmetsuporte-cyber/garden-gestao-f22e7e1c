@@ -15,7 +15,6 @@ import { useFabAction } from '@/contexts/FabActionContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 
 
@@ -269,16 +268,15 @@ export default function ChecklistsPage() {
             {/* Scrollable Date Strip — only in view mode */}
             {!settingsMode && (() => {
               const today = new Date();
-              // Generate 30 days: 20 past + today + 9 future
               const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
               const todayIndex = 20;
 
               return (
                 <div className="space-y-1.5">
-                  <ScrollArea className="-mx-4">
+                  <div className="-mx-4 overflow-x-auto scrollbar-hide">
                     <div className="flex gap-1 px-4 py-1" ref={(el) => {
-                      // Auto-scroll to selected day on mount
-                      if (el) {
+                      if (el && !el.dataset.scrolled) {
+                        el.dataset.scrolled = 'true';
                         const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
                         const target = el.children[selectedIdx >= 0 ? selectedIdx : todayIndex] as HTMLElement;
                         if (target) {
@@ -296,7 +294,7 @@ export default function ChecklistsPage() {
                             key={day.toISOString()}
                             onClick={() => setSelectedDate(day)}
                             className={cn(
-                              "flex flex-col items-center w-[44px] h-[56px] justify-center rounded-xl transition-all duration-200 shrink-0",
+                              "flex flex-col items-center w-[44px] h-[56px] justify-center rounded-xl shrink-0 transition-colors",
                               isSelected
                                 ? "bg-primary text-primary-foreground shadow-md"
                                 : isDayToday
@@ -320,8 +318,7 @@ export default function ChecklistsPage() {
                         );
                       })}
                     </div>
-                    <ScrollBar orientation="horizontal" className="h-0 opacity-0" />
-                  </ScrollArea>
+                  </div>
 
                   {/* Minimal date label */}
                   <p className="text-center text-xs text-muted-foreground capitalize">
