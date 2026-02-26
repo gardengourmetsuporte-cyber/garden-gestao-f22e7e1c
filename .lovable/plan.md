@@ -1,45 +1,35 @@
 
 
-## Plano: Experiência Premium com Diamante e Módulos Travados
+## Diagnóstico: 3 bugs encontrados
 
-### Configuração definida pelo usuário
+### Bug 1: Ícone "Gem" não existe no ICON_MAP
+O `AppIcon` usa Material Symbols e precisa de um mapeamento em `src/lib/iconMap.ts`. O nome "Gem" não está mapeado, então o ícone renderiza como texto quebrado ao invés do diamante.
 
-**FREE** (sem pagar): Dashboard, Agenda, Checklists, Estoque + Pedidos
-**PRO** (R$97/mês, diamante amarelo): Financeiro, Fechamento de Caixa, Fichas Técnicas, Funcionários, Ranking, Recompensas, Finanças Pessoais
-**BUSINESS** (R$197/mês, diamante amarelo): Marketing, Copilot IA
-**OCULTOS** (não aparecem no menu): Cardápio, Tablets, Gamificação, WhatsApp
+**Fix**: Adicionar `Gem: 'diamond'` ao `ICON_MAP`.
+
+### Bug 2: Query de role falha com múltiplas roles
+O `AuthContext` usa `.maybeSingle()` para buscar a role do usuário. Se o usuário tem 2 rows (ex: `admin` + `funcionario`), `.maybeSingle()` retorna erro → role cai para `'funcionario'` → `isAdmin = false` → módulos admin-only ficam escondidos, Configurações some, grupo Premium some.
+
+**Fix**: Mudar query de `.maybeSingle()` para `.order('role').limit(1).maybeSingle()` ou buscar todas as roles e escolher a de maior hierarquia (`super_admin > admin > funcionario`).
+
+### Bug 3: Todo novo usuário recebe role `funcionario`
+O trigger `handle_new_user` sempre insere `'funcionario'` em `user_roles`. Quando o `auto_provision_unit` cria a loja, o usuário vira `owner` em `user_units` mas continua `funcionario` em `user_roles`.
+
+**Fix**: Alterar `auto_provision_unit` para também fazer `UPDATE user_roles SET role = 'admin' WHERE user_id = p_user_id`. Isso garante que o primeiro usuário (dono da empresa) seja admin automaticamente.
 
 ---
 
 ### Alterações
 
-#### 1. Atualizar mapeamento de módulos (`src/lib/plans.ts`)
-- Adicionar módulos faltantes ao `MODULE_REQUIRED_PLAN`: `finance`, `cash-closing`, `employees`, `ranking`, `rewards` como `pro`
-- Manter `marketing` e `copilot` como `business`
-- Remover `menu-admin`, `tablet-admin`, `gamification`, `whatsapp` do mapeamento (serão ocultos)
+#### 1. `src/lib/iconMap.ts`
+- Adicionar `Gem: 'diamond'` ao mapeamento
 
-#### 2. Atualizar MoreDrawer (`src/components/layout/MoreDrawer.tsx`)
-- Remover do array `navItems` os módulos ocultos: Cardápio, Tablets, Gamificação, WhatsApp
-- Trocar o ícone de cadeado (`Lock`) por diamante (`Gem`) com cor amarela dourada (`hsl(45 90% 55%)`)
-- Adicionar label "PRO" ou "BUSINESS" pequeno abaixo do diamante nos cards travados
-- Garantir que ao clicar em módulo travado, navega para `/plans`
+#### 2. `src/contexts/AuthContext.tsx`
+- Mudar query de role de `.maybeSingle()` para buscar todas as roles e selecionar a de maior prioridade (`super_admin > admin > funcionario`)
+- Isso resolve o caso de múltiplas roles no banco
 
-#### 3. Atualizar BottomTabBar (`src/components/layout/BottomTabBar.tsx`)
-- Verificar se módulos PRO na barra inferior mostram indicador de diamante quando travados (ex: Financeiro no slot 3)
-- Se o módulo está travado, ao tocar redirecionar para `/plans` ao invés da rota do módulo
-
-#### 4. Card de Planos no Menu Drawer
-- O botão de Planos (coroa dourada) já existe para admins — garantir que aparece para TODOS os usuários no plano free (não só admins), pois o cliente precisa ver a opção de upgrade
-
-#### 5. Página de Planos (`src/pages/Plans.tsx`)
-- Manter como está — já funciona bem para free (cards de preço) e para assinantes (gerenciamento)
-
----
-
-### Detalhes técnicos
-
-- O ícone `Gem` do Lucide será usado como diamante amarelo com `style={{ color: 'hsl(45 90% 55%)' }}`
-- Módulos ocultos são simplesmente removidos do array `navItems` no MoreDrawer
-- A lógica de `isModuleLocked` já existe e usa `MODULE_REQUIRED_PLAN` + `planSatisfies` — basta atualizar o mapeamento
-- O botão de Planos no drawer será visível para todos os usuários (remover condição `isAdmin`)
+#### 3. Migration SQL
+- Alterar `auto_provision_unit` para atualizar `user_roles` de `funcionario` → `admin` quando o usuário cria sua primeira unidade
+- Limpar roles duplicadas existentes: remover `funcionario` onde o mesmo user já tem `admin`
+- Garantir que todo owner de unidade tenha role `admin` em `user_roles`
 
