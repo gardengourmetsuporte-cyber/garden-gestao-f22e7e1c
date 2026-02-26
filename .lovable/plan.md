@@ -1,66 +1,50 @@
 
 
-# Auditoria Completa do Módulo Financeiro — Problemas Restantes
+# Auto-encerramento de Checklists por Prazo
 
-Após análise detalhada de todos os arquivos do módulo financeiro, identifiquei os seguintes problemas que ainda existem após as correções anteriores:
+## Regras de Negócio
 
----
+- **Abertura**: prazo até **07:30** do mesmo dia. Após esse horário, todos os itens não preenchidos são automaticamente marcados como "não fiz" (is_skipped = true, 0 pontos).
+- **Fechamento**: prazo até **02:00 do dia seguinte**. Após esse horário, mesma lógica — itens pendentes viram "não fiz".
+- **Bônus**: sem prazo de encerramento automático (tarefas extras opcionais).
+- Admins continuam podendo interagir após o prazo (podem desmarcar/remarcar).
 
-## Problemas Encontrados
+## Abordagem
 
-### 1. Debounce das sugestões não está conectado
-O `TransactionSheet` cria um `debouncedDescription` (linha 208-211) mas passa `description` (sem debounce) para o componente `TransactionSuggestions` (linha 500). O debounce não tem efeito algum — as sugestões ainda recalculam a cada keystroke.
+A lógica será **client-side**: quando a página de checklists carrega (ou quando o tipo/data muda), o sistema verifica se o prazo expirou. Se sim, busca os itens ativos sem completion e faz um batch upsert marcando todos como `is_skipped = true`.
 
-### 2. PersonalFinance com padding inferior insuficiente
-`PersonalFinance.tsx` linha 119 usa `pb-24` em vez de `pb-32`, podendo ter conteúdo cortado pela bottom nav.
+Isso evita a necessidade de uma Edge Function agendada (cron) e garante que o encerramento aconteça na primeira vez que qualquer usuário abrir a tela após o prazo.
 
-### 3. Undo/Redo duplicado e inconsistente no PersonalFinance
-O `PersonalFinance` renderiza botões de undo/redo no **header** (linhas 123-129) mas **não passa** as props `canUndo`/`canRedo`/`onUndo`/`onRedo` para `FinanceTransactions` (linhas 147-161). Isso significa que na aba de transações pessoais, os botões de undo/redo não aparecem. E no header, ficam visíveis em todas as abas (não só transações), o que é confuso.
+## Detalhes Técnicos
 
-### 4. Input de orçamento ainda usa `type="number"`
-O `FinancePlanning.tsx` (linha 280) usa `type="number"` para o valor do orçamento, mas deveria usar `type="text"` com `inputMode="decimal"` e formatação monetária, igual ao TransactionSheet.
-
-### 5. FinanceMore com padding inferior insuficiente
-`FinanceMore.tsx` linha 46 usa `pb-24` em vez de `pb-32`.
-
-### 6. FinanceCharts sem padding inferior
-O `FinanceCharts` provavelmente não tem padding bottom suficiente para a bottom nav (preciso confirmar, mas dado o padrão dos outros componentes, é provável).
-
----
-
-## Plano de Implementação
-
-### Tarefa 1: Conectar debounce nas sugestões
-Em `TransactionSheet.tsx`, trocar `description` por `debouncedDescription` na prop `searchTerm` do `TransactionSuggestions`.
-
-### Tarefa 2: Corrigir padding do PersonalFinance
-Trocar `pb-24` por `pb-32` na linha 119 de `PersonalFinance.tsx`.
-
-### Tarefa 3: Corrigir undo/redo no PersonalFinance
-- Remover os botões de undo/redo do header do `PersonalFinance.tsx`
-- Passar `canUndo`, `canRedo`, `onUndo`, `onRedo` para `FinanceTransactions` (igual ao `Finance.tsx`)
-
-### Tarefa 4: Melhorar input de orçamento no FinancePlanning
-Trocar o input de valor do orçamento para usar `inputMode="decimal"` com formatação monetária brasileira.
-
-### Tarefa 5: Ajustar padding inferior em FinanceMore
-Trocar `pb-24` por `pb-32`.
-
-### Tarefa 6: Verificar e ajustar padding do FinanceCharts
-Garantir `pb-32` no container principal do `FinanceCharts`.
-
----
-
-## Resumo Técnico
+### Função `isDeadlinePassed(date, checklistType)`
 
 ```text
-Arquivos afetados:
-├── src/components/finance/TransactionSheet.tsx    (tarefa 1)
-├── src/pages/PersonalFinance.tsx                  (tarefas 2, 3)
-├── src/components/finance/FinancePlanning.tsx      (tarefa 4)
-├── src/components/finance/FinanceMore.tsx          (tarefa 5)
-├── src/components/finance/FinanceCharts.tsx        (tarefa 6)
+abertura + mesmo dia + hora >= 7:30  → true
+fechamento + dia seguinte + hora >= 2:00  → true
+fechamento + mesmo dia  → false (ainda não passou)
 ```
 
-Todas as mudanças são no frontend. Nenhuma alteração de banco necessária.
+### Auto-mark logic (em `Checklists.tsx`)
+
+Após `fetchCompletions` retornar, um `useEffect` verifica:
+1. O prazo passou?
+2. Existem itens ativos sem completion?
+3. Se sim, faz batch insert de completions com `is_skipped: true, points_awarded: 0` para todos os pendentes.
+4. Usa um ref `autoClosedRef` para evitar loops (executa uma vez por date+type).
+
+### Bloqueio visual (em `ChecklistView.tsx`)
+
+Quando o prazo expirou e o usuário não é admin:
+- `canToggleItem` retorna `false` para itens não completados
+- Um banner aparece no topo: "⏰ Prazo encerrado às 07:30 — itens pendentes marcados como 'não fiz'"
+
+### Arquivos afetados
+
+```text
+src/pages/Checklists.tsx           — useEffect para auto-mark + função isDeadlinePassed
+src/components/checklists/ChecklistView.tsx — banner de prazo expirado + bloqueio de interação
+```
+
+Nenhuma alteração de banco de dados necessária. Os completions de "não fiz" usam a mesma estrutura já existente (`is_skipped`, `awarded_points`, `points_awarded`).
 
