@@ -13,6 +13,10 @@ const Switch = React.forwardRef<
       className,
     )}
     {...props}
+    onCheckedChange={(checked) => {
+      try { navigator.vibrate?.(10); } catch {}
+      props.onCheckedChange?.(checked);
+    }}
     ref={ref}
   >
     <SwitchPrimitives.Thumb

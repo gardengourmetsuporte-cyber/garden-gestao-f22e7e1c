@@ -87,7 +87,7 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
           {visibleActions.map(action => (
             <button
               key={action.label}
-              onClick={action.action}
+              onClick={() => { navigator.vibrate?.(10); action.action(); }}
               className="flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-[0.98] transition-all group"
             >
               <div
