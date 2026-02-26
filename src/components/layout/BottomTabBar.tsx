@@ -154,7 +154,7 @@ export function BottomTabBar() {
               <div
                 className="absolute -top-7 w-[62px] h-[62px] rounded-full animate-gold-pulse"
                 style={{
-                  background: 'linear-gradient(135deg, hsl(42 72% 52% / 0.5), hsl(38 85% 58% / 0.3), hsl(42 72% 52% / 0.5))',
+                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.3), hsl(var(--primary) / 0.5))',
                   filter: 'blur(4px)',
                 }}
               />
@@ -173,8 +173,8 @@ export function BottomTabBar() {
                 )}
                 style={{
                   background: 'var(--gradient-brand)',
-                  boxShadow: '0 0 24px hsl(42 72% 52% / 0.5), 0 0 48px hsl(42 72% 52% / 0.2), 0 4px 12px hsl(0 0% 0% / 0.5)',
-                  border: '2px solid hsl(42 72% 52% / 0.6)',
+                  boxShadow: '0 0 24px hsl(var(--primary) / 0.5), 0 0 48px hsl(var(--primary) / 0.2), 0 4px 12px hsl(0 0% 0% / 0.5)',
+                  border: '2px solid hsl(var(--primary) / 0.6)',
                 }}
               >
                 <AppIcon
