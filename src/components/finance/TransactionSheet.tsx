@@ -179,7 +179,6 @@ export function TransactionSheet({
         draftRestoredRef.current = false;
       } else {
         // New transaction — always start with a clean form
-        // Draft restoration is disabled to avoid stale data between consecutive creates
         clearDraft();
         draftRestoredRef.current = false;
         setType(defaultType);
@@ -199,6 +198,8 @@ export function TransactionSheet({
         setSupplierId(null);
         setEmployeeId(null);
         setShowRecurringConfig(false);
+        // Auto-open calculator for new transactions
+        setTimeout(() => setShowCalculator(true), 350);
       }
     } else {
       // Sheet closed — reset draft flag so next open starts fresh
