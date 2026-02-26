@@ -16,7 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TIER_CONFIG, type MedalTier } from '@/lib/medals';
+import { TIER_CONFIG, TIER_CONFIG_DARK, type MedalTier } from '@/lib/medals';
+import { useTheme } from 'next-themes';
+
+function useTierConfig() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  return (tier: MedalTier) => {
+    const base = TIER_CONFIG[tier];
+    if (isDark) {
+      const dark = TIER_CONFIG_DARK[tier];
+      return { ...base, color: dark.color, bg: dark.bg, border: dark.border };
+    }
+    return base;
+  };
+}
 
 interface MedalType {
   badge_id: string;
@@ -51,6 +65,7 @@ export function MedalSettings() {
   const { activeUnitId } = useUnit();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const getTier = useTierConfig();
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedMedal, setSelectedMedal] = useState<string>('');
   const [isGranting, setIsGranting] = useState(false);
@@ -151,7 +166,7 @@ export function MedalSettings() {
       {/* Available medals info */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {AVAILABLE_MEDALS.map(medal => {
-          const tier = TIER_CONFIG[medal.tier];
+          const tier = getTier(medal.tier);
           return (
             <div
               key={medal.badge_id}
@@ -228,7 +243,7 @@ export function MedalSettings() {
           <div className="space-y-2">
             {grantedMedals.map(gm => {
               const medal = getMedalInfo(gm.badge_id || '');
-              const tier = medal ? TIER_CONFIG[medal.tier] : null;
+              const tier = medal ? getTier(medal.tier) : null;
               return (
                 <div key={gm.id} className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/30 border border-border/20">
                   <div className="flex items-center gap-2">

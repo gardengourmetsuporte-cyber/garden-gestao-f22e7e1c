@@ -1,7 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
-import { TIER_CONFIG, type MedalTier } from '@/lib/medals';
+import { TIER_CONFIG, TIER_CONFIG_DARK, type MedalTier } from '@/lib/medals';
+import { useTheme } from 'next-themes';
+
+function useGetTier() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  return (tier: MedalTier) => {
+    const base = TIER_CONFIG[tier];
+    if (isDark) { const d = TIER_CONFIG_DARK[tier]; return { ...base, color: d.color, bg: d.bg, border: d.border }; }
+    return base;
+  };
+}
 import { AppIcon } from '@/components/ui/app-icon';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -23,6 +34,7 @@ const BADGE_META: Record<string, { title: string; icon: string; tier: MedalTier 
 
 export function MedalWinners() {
   const { activeUnitId } = useUnit();
+  const getTier = useGetTier();
 
   const { data: winners, isLoading } = useQuery({
     queryKey: ['medal-winners', activeUnitId],
@@ -71,7 +83,7 @@ export function MedalWinners() {
       </div>
 
       {grouped.map(group => {
-        const tier = TIER_CONFIG[group.tier];
+        const tier = getTier(group.tier);
         return (
           <div key={group.badgeId} className="space-y-3">
             {/* Category header */}

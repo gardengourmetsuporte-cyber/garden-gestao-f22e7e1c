@@ -1,4 +1,15 @@
-import { Medal, TIER_CONFIG } from '@/lib/medals';
+import { Medal, TIER_CONFIG, TIER_CONFIG_DARK, type MedalTier } from '@/lib/medals';
+import { useTheme } from 'next-themes';
+
+function useGetTier() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  return (tier: MedalTier) => {
+    const base = TIER_CONFIG[tier];
+    if (isDark) { const d = TIER_CONFIG_DARK[tier]; return { ...base, color: d.color, bg: d.bg, border: d.border }; }
+    return base;
+  };
+}
 import { cn } from '@/lib/utils';
 
 interface MedalListProps {
@@ -107,6 +118,7 @@ const MEDAL_ICONS: Record<string, React.FC<{ unlocked: boolean; color: string }>
 };
 
 export function MedalList({ medals }: MedalListProps) {
+  const getTier = useGetTier();
   const unlocked = medals.filter(m => m.unlocked);
 
   return (
@@ -132,7 +144,7 @@ export function MedalList({ medals }: MedalListProps) {
         </h3>
         <div className="grid grid-cols-2 gap-4">
           {medals.map(m => {
-            const tier = TIER_CONFIG[m.tier];
+            const tier = getTier(m.tier);
             const IconComp = MEDAL_ICONS[m.id];
             return (
               <div
