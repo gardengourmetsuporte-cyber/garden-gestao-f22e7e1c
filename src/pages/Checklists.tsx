@@ -528,7 +528,7 @@ export default function ChecklistsPage() {
                     "tab-command-item gap-2",
                     settingsType === 'fechamento' ? "tab-command-active" : "tab-command-inactive"
                   )}
-                  style={settingsType === 'fechamento' ? { borderColor: 'hsl(262 80% 65% / 0.4)', boxShadow: '0 0 12px hsl(262 80% 65% / 0.15)' } : undefined}
+                  style={settingsType === 'fechamento' ? { borderColor: 'hsl(var(--accent) / 0.4)', boxShadow: '0 0 12px hsl(var(--accent) / 0.15)' } : undefined}
                 >
                   <AppIcon name="Moon" size={20} />
                    <span className="font-semibold">Fechamento</span>
