@@ -26,7 +26,6 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', adminOnly: true, group: 'principal', groupLabel: 'Principal' },
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
@@ -154,6 +153,20 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
               <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
               <span className="text-sm font-semibold text-foreground">Planos</span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-primary ml-auto">{plan}</span>
+            </button>
+          )}
+
+          {/* Agenda — full width card */}
+          {(isSuperAdmin || isAdmin || (!hasAccessLevel || (allowedModules && allowedModules.includes('agenda')))) && (
+            <button
+              onClick={() => { navigate('/agenda'); onOpenChange(false); }}
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
+            >
+              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+                <AppIcon name="CalendarDays" size={18} className="text-foreground/70" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Agenda</span>
+              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
             </button>
           )}
 
