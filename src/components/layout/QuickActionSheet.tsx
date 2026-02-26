@@ -47,7 +47,7 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
       moduleKey: 'finance',
     },
     {
-      icon: 'CalendarPlus',
+      icon: 'CalendarDays',
       label: 'Nova Tarefa',
       description: 'Criar tarefa na agenda',
       color: 'hsl(var(--neon-cyan))',
@@ -65,7 +65,7 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
       moduleKey: 'cash-closing',
     },
     {
-      icon: 'PackagePlus',
+      icon: 'Package',
       label: 'Movimentar Estoque',
       description: 'Entrada ou saída rápida',
       color: 'hsl(var(--neon-purple))',
