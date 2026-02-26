@@ -139,17 +139,6 @@ export default function InventoryPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
-        {/* Header actions */}
-        {isAdmin && (
-          <header className="page-header-bar">
-            <div className="page-header-content flex items-center justify-end">
-              <button onClick={handleAddItem} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
-                <AppIcon name="Plus" size={20} />
-              </button>
-            </div>
-          </header>
-        )}
-
         <div className="px-4 py-4 lg:px-6 space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -169,15 +158,24 @@ export default function InventoryPage() {
             </div>
           )}
 
-          {/* Animated Tabs */}
-          <AnimatedTabs
-            tabs={[
-              { key: 'items', label: 'Itens', icon: <AppIcon name="ClipboardList" size={16} /> },
-              { key: 'history', label: 'Histórico', icon: <AppIcon name="History" size={16} /> },
-            ]}
-            activeTab={view}
-            onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
-          />
+          {/* Tabs + Add button */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <AnimatedTabs
+                tabs={[
+                  { key: 'items', label: 'Itens', icon: <AppIcon name="ClipboardList" size={16} /> },
+                  { key: 'history', label: 'Histórico', icon: <AppIcon name="History" size={16} /> },
+                ]}
+                activeTab={view}
+                onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
+              />
+            </div>
+            {isAdmin && (
+              <button onClick={handleAddItem} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform shrink-0">
+                <AppIcon name="Plus" size={20} />
+              </button>
+            )}
+          </div>
 
           {/* Search */}
           <SearchBar

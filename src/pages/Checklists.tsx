@@ -261,10 +261,10 @@ export default function ChecklistsPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header actions */}
-        {isAdmin && (
-          <header className="page-header-bar">
-            <div className="page-header-content flex items-center justify-end">
+        <div className="px-4 py-4 lg:px-6 space-y-8">
+          {/* Settings toggle for admin */}
+          {isAdmin && (
+            <div className="flex items-center justify-end">
               <button
                 onClick={() => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings')}
                 className={cn(
@@ -277,10 +277,7 @@ export default function ChecklistsPage() {
                 <AppIcon name="Settings" size={18} />
               </button>
             </div>
-          </header>
-        )}
-
-        <div className="px-4 py-4 lg:px-6 space-y-8">
+          )}
           <div className="animate-fade-in space-y-6" key={currentTab}>
           {currentTab === 'checklist' ? (
             <div className="space-y-6">

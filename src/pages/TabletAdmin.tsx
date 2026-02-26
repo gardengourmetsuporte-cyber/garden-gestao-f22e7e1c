@@ -81,10 +81,9 @@ export default function TabletAdmin() {
 
   return (
     <AppLayout>
-      {/* Header actions */}
-      {activeUnit && (
-        <div className="page-header-bar">
-          <div className="page-header-content flex items-center justify-end">
+      <div className="px-4 py-4 lg:px-6 space-y-4">
+        {activeUnit && (
+          <div className="flex items-center justify-end">
             <a
               href={`/tablet/${activeUnit.id}`}
               target="_blank"
@@ -95,10 +94,7 @@ export default function TabletAdmin() {
               Ver Cardápio
             </a>
           </div>
-        </div>
-      )}
-
-      <div className="px-4 py-4 lg:px-6 space-y-4">
+        )}
         <Tabs defaultValue="orders">
           <TabsList className="w-full">
             <TabsTrigger value="orders" className="flex-1">Pedidos</TabsTrigger>
