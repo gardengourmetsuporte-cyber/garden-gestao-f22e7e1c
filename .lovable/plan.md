@@ -1,48 +1,170 @@
 
 
-# Substituir Sistema de "Novas Transações" por Snackbar de Navegação
+# Sprint 1 — Bottom Tab Bar Global + Header Simplificado
 
-## Análise da Situação Atual
+Este sprint transforma completamente a navegação mobile do app, substituindo o FAB Launcher por uma Bottom Tab Bar moderna e simplificando o header de 8 para 3 elementos.
 
-O sistema atual usa um conjunto de IDs "vistos" persistido em localStorage (`_seenIds`) para destacar transações criadas nas últimas 48h com um brilho neon ciano. Isso inclui ~80 linhas de lógica de módulo (`_initSeen`, `_persistSeen`, `markSeenGlobal`, `isSeenGlobal`), throttle de localStorage, e um `forceUpdate` para re-render. O usuário reporta que isso atrapalha mais do que ajuda.
+---
 
-## Proposta: Snackbar/Toast Flutuante
+## Escopo e Impacto
 
-Minha recomendação é um **Snackbar flutuante temporário** (estilo "1 transação criada — Ver") que aparece por ~5 segundos após criar/salvar uma transação. Ao clicar "Ver", navega para a aba de transações e faz scroll até a transação.
+A mudança afeta **apenas o mobile** (< 768px). Desktop sidebar permanece inalterada. Isso toca primariamente o `AppLayout.tsx` (647 linhas) e o `index.css` (1354 linhas), com ajustes de padding em diversas páginas.
 
-**Por que não navegar automaticamente:**
-- Se o usuário acabou de fechar o caixa e 10 lançamentos entram, ser jogado para a aba de transações 10 vezes seria irritante
-- O usuário pode estar no meio de outra tarefa (gráficos, planejamento)
-- O snackbar dá **controle ao usuário**: ele vê que algo aconteceu e decide se quer ir ver
+---
 
-**Por que não um balãozinho persistente:**
-- Um badge/bolha permanente cria ansiedade visual ("notificação não lida")
-- O snackbar some sozinho se o usuário não se importa
+## Parte 1: Bottom Tab Bar Global
 
-## Implementação
+### Novo componente `src/components/layout/BottomTabBar.tsx`
 
-### Tarefa 1: Remover todo o sistema de "seen IDs"
-- Remover do `FinanceTransactions.tsx`: constantes `FINANCE_SEEN_KEY`, `_seenIds`, `_seenInitialised`, `_initSeen`, `_persistSeen`, `markSeenGlobal`, `isSeenGlobal`, `markSeen`, `isNewTransaction`, `forceUpdate`
-- Remover prop `isNew` do `TransactionItem` render
-- Remover de `TransactionItem.tsx`: prop `isNew`, lógica de brilho neon condicional
+Barra fixa inferior com 5 slots, visível em todas as páginas (exceto páginas que já têm bottom nav própria como Finance e PersonalFinance):
 
-### Tarefa 2: Snackbar "Ver transação" após salvar
-- Em `Finance.tsx` e `PersonalFinance.tsx`, após `addTransaction` ou `updateTransaction` retornar com sucesso:
-  - Usar `toast()` do Sonner com ação "Ver" que seta `activeTab = 'transactions'`
-  - O toast já existe para confirmação ("Transação salva!"), basta adicionar o botão de ação
+```text
+┌──────────────────────────────────────────┐
+│   Home   │  Checklists  │  ⊕  │ Estoque │ Mais │
+│    ○     │      ○       │ ●●● │    ○    │  ○   │
+└──────────────────────────────────────────┘
+```
 
-### Tarefa 3: Scroll automático para transação recente (opcional mas valioso)
-- Após navegar via toast, passar o ID da transação recém-criada como state
-- Em `FinanceTransactions`, fazer `scrollIntoView` no elemento com aquele ID
+- **Home** (/) — sempre visível
+- **Checklists** (/checklists) — módulo mais usado por funcionários
+- **+** (centro) — FAB contextual, abre um bottom sheet com ações rápidas (Nova transação, Novo item estoque, etc.)
+- **Estoque** (/inventory) — segundo módulo mais operacional
+- **Mais** — abre um bottom sheet com grid de todos os módulos (estilo atual do launcher, mas como sheet, não fullscreen)
+
+A seleção dos 4 módulos fixos é baseada nos módulos mais acessados. Se o usuário não tem acesso a um módulo, ele é substituído pelo próximo disponível.
+
+### Lógica do "+"
+
+O botão central abre um `Drawer` (vaul) com ações contextuais baseadas na rota atual:
+- **Dashboard**: Criar transação, Abrir checklist
+- **Qualquer página**: Ações genéricas (Nova transação, Novo item, Novo checklist)
+
+### Lógica do "Mais"
+
+O botão "Mais" abre um `Drawer` com:
+- Profile card do usuário (avatar + nome + rank)
+- Grid de módulos (idêntico ao launcher atual, mas sem fullscreen overlay)
+- Seletor de unidade
+- Botão de logout
+
+### Indicadores visuais
+
+- Aba ativa: ícone com cor `primary`, pill indicator animado (reutilizar `.nav-pill-indicator` do CSS)
+- Badges de notificação nos ícones (chat, notificações)
+- Module status indicators (dots verde/amarelo/vermelho)
+
+---
+
+## Parte 2: Header Simplificado
+
+### De (atual — 8 elementos):
+```text
+[ThemeToggle] [Copilot] [Points] ... [Logo] ... [Ranking] [Chat] [Notificações]
+```
+
+### Para (novo — 3 elementos):
+```text
+[UnitName/Logo] ........................ [Notificações] [Avatar]
+```
+
+- **Esquerda**: Nome da unidade ativa com o ícone Atlas (clicável → vai pro dashboard)
+- **Direita**: Sino de notificações (com badge) + Avatar do usuário (clicável → abre drawer de perfil rápido ou navega pro perfil)
+- ThemeToggle → movido para Settings e para o drawer "Mais"
+- Points → visível no Profile card dentro do drawer "Mais"
+- Copilot → acessível via drawer "Mais" ou Bottom Tab se tiver acesso
+- Ranking/Chat → acessíveis via drawer "Mais"
+
+---
+
+## Parte 3: Remoção do FAB Launcher
+
+Remover completamente do `AppLayout.tsx`:
+- FAB button (linhas 252-281)
+- Home button acima do FAB (linhas 236-250)
+- Launcher overlay fullscreen (linhas 283-504)
+- Variável `launcherOpen` e lógica associada
+- `fabBottom` calculation
+
+Remover do `index.css`:
+- `.launcher-overlay`, `.launcher-item`, `.launcher-content` styles
+- `.fab-idle-glow`, `.fab-close-spin`, `.launcher-home-btn` animations
+- `.fab-neon-border` (mantém apenas para FinanceBottomNav que ainda usa)
+
+---
+
+## Parte 4: Ajustes de Padding
+
+Todas as páginas que usam `AppLayout` precisam de `pb-24` (bottom tab bar height + safe area). Páginas com bottom nav própria (Finance, PersonalFinance, Chat) já têm padding adequado e o BottomTabBar será ocultado nessas rotas.
+
+---
 
 ## Arquivos Afetados
 
 ```text
-src/components/finance/FinanceTransactions.tsx  — remover ~80 linhas do sistema seen
-src/components/finance/TransactionItem.tsx      — remover prop isNew e estilo neon
-src/pages/Finance.tsx                           — toast com ação "Ver"
-src/pages/PersonalFinance.tsx                   — toast com ação "Ver"
+NOVOS:
+├── src/components/layout/BottomTabBar.tsx     — componente principal (bottom tabs)
+├── src/components/layout/MoreDrawer.tsx       — drawer "Mais" com grid de módulos
+├── src/components/layout/QuickActionSheet.tsx  — sheet do botão "+"
+
+EDITADOS:
+├── src/components/layout/AppLayout.tsx        — remover FAB/launcher, adicionar BottomTabBar, simplificar header
+├── src/index.css                              — limpar estilos do launcher, adicionar estilos do tab bar
+├── src/pages/DashboardNew.tsx                 — ajustar padding se necessário
 ```
 
-Nenhuma alteração de banco. Resultado: código mais simples, sem localStorage desnecessário, e UX controlada pelo usuário.
+Nenhuma alteração de banco de dados.
+
+---
+
+## Detalhes de Implementacao
+
+### BottomTabBar
+
+- Renderizado via `createPortal(document.body)` (mesmo padrão do `FinanceBottomNav`)
+- Hidden em desktop (`lg:hidden`)
+- Z-index: `z-50` (abaixo de sheets/drawers que usam z-80+)
+- Safe area: `paddingBottom: env(safe-area-inset-bottom)`
+- Altura: `h-16` (64px) — padrão iOS/Android
+- Background: `bg-card/95 backdrop-blur-2xl` (mesmo estilo do FinanceBottomNav)
+- Top glow line: `h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent`
+- Hidden quando a rota é `/finance`, `/personal-finance`, `/chat` (essas têm nav própria)
+
+### MoreDrawer
+
+- Usa `Drawer` (vaul) — componente já disponível no projeto
+- Conteúdo idêntico ao launcher atual mas dentro de um drawer (não fullscreen)
+- Inclui: profile card, unit selector, module grid agrupado, planos (crown), logout
+- Max-height: `70vh` com scroll
+
+### QuickActionSheet
+
+- `Drawer` simples com 3-4 ações rápidas
+- Estilo similar ao menu radial do FinanceBottomNav mas em lista vertical
+- Ações: Nova Receita, Nova Despesa, Novo Item, dependendo dos módulos acessíveis
+
+### Header
+
+- Altura mantida em `h-14` (56px)
+- Estrutura: `flex items-center justify-between`
+- Left: `<img Atlas icon>` + `<span unitName>`
+- Right: `<NotifBell>` + `<Avatar small>`
+
+---
+
+## Riscos e Mitigacoes
+
+1. **Páginas com bottom nav própria**: Finance, PersonalFinance e Chat já têm bottom nav. O BottomTabBar será ocultado nessas rotas via prop ou detecção de pathname.
+
+2. **Módulos restritos**: O tab bar respeita `useUserModules()` — se o usuário não tem acesso a Checklists, o slot mostra o próximo módulo disponível.
+
+3. **FAB de módulos específicos**: Inventory tem seu próprio FAB. O `+` central do BottomTabBar será ocultado ou adaptado nessas páginas para não conflitar.
+
+---
+
+## Resultado Esperado
+
+- **Navegação**: 1 tap para Home, Checklists, Estoque (vs. 2 taps no launcher atual)
+- **Header**: Visual limpo com 3 elementos (vs. 8 atuais)
+- **Percepção**: App moderno alinhado com Nubank, Mobills, iFood
+- **Código**: ~150 linhas removidas do AppLayout (launcher), ~200 linhas em 3 novos componentes compactos
 
