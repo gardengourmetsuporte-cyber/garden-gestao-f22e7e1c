@@ -44,11 +44,6 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const categoryColor = task.category?.color;
 
   const [expanded, setExpanded] = useState(false);
-  const [swipeX, setSwipeX] = useState(0);
-  const [isSwiping, setIsSwiping] = useState(false);
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const isHorizontalSwipe = useRef<boolean | null>(null);
   const [addingSubtask, setAddingSubtask] = useState(false);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const subtaskInputRef = useRef<HTMLInputElement>(null);
@@ -56,39 +51,6 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const [editingSubTitle, setEditingSubTitle] = useState('');
   const editSubRef = useRef<HTMLInputElement>(null);
   const [completing, setCompleting] = useState(false);
-
-  const SWIPE_THRESHOLD = -70;
-  const MAX_SWIPE = -240;
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    isHorizontalSwipe.current = null;
-    setIsSwiping(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isSwiping) return;
-    const dx = e.touches[0].clientX - touchStartX.current;
-    const dy = e.touches[0].clientY - touchStartY.current;
-    if (isHorizontalSwipe.current === null) {
-      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-        isHorizontalSwipe.current = Math.abs(dx) > Math.abs(dy);
-      }
-      return;
-    }
-    if (!isHorizontalSwipe.current) return;
-    const newX = Math.max(MAX_SWIPE, Math.min(0, dx + (swipeX < SWIPE_THRESHOLD ? SWIPE_THRESHOLD : 0)));
-    setSwipeX(newX);
-  };
-
-  const handleTouchEnd = () => {
-    setIsSwiping(false);
-    isHorizontalSwipe.current = null;
-    setSwipeX(swipeX < SWIPE_THRESHOLD ? MAX_SWIPE : 0);
-  };
-
-  const closeSwipe = () => setSwipeX(0);
 
   const handleToggle = () => {
     if (!task.is_completed) {
@@ -115,44 +77,15 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
 
   return (
     <div
-      className={cn("relative overflow-hidden rounded-2xl", completing && "animate-task-complete")}
-      style={{ willChange: 'transform' }}
+      className={cn("relative rounded-2xl", completing && "animate-task-complete")}
       {...dragHandleProps}
     >
-      {/* Swipe background actions */}
-      <div className="absolute inset-y-0 right-0 flex items-stretch z-0">
-        <button
-          onClick={(e) => { e.stopPropagation(); closeSwipe(); setExpanded(true); setAddingSubtask(true); setTimeout(() => subtaskInputRef.current?.focus(), 100); }}
-          className="w-20 flex items-center justify-center bg-primary text-primary-foreground"
-        >
-          <AppIcon name="Plus" size={20} />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); closeSwipe(); onClick?.(); }}
-          className="w-20 flex items-center justify-center bg-muted text-foreground"
-        >
-          <AppIcon name="Info" size={20} />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); closeSwipe(); onDelete(task.id); }}
-          className="w-20 flex items-center justify-center bg-destructive text-destructive-foreground"
-        >
-          <AppIcon name="Trash2" size={20} />
-        </button>
-      </div>
-
-      {/* Main content */}
       <div
         className={cn(
-          'relative z-10 card-surface overflow-hidden',
+          'card-surface overflow-hidden',
           task.is_completed && 'opacity-50',
           isDragging && 'shadow-elevated ring-2 ring-primary/40 scale-[1.03]',
-          !isSwiping && 'transition-transform duration-200',
         )}
-        style={{ transform: `translateX(${swipeX}px)` }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* Parent task row */}
         <div className="flex items-start gap-3 p-4">
@@ -172,7 +105,6 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             onClick={() => hasSubtasks ? setExpanded(!expanded) : onClick?.()}
           >
             <div className="flex items-center gap-2">
-              {/* Category dot */}
               {categoryColor && (
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: categoryColor }} />
               )}
@@ -190,14 +122,12 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
               )}
             </div>
 
-            {/* Notes preview */}
             {task.notes && !task.is_completed && (
               <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                 {task.notes}
               </p>
             )}
 
-            {/* Meta row: subtask count + due date */}
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               {hasSubtasks && !expanded && (
                 <span className="text-[11px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
@@ -221,6 +151,22 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
               )}
             </div>
           </button>
+
+          {/* Inline action buttons */}
+          <div className="flex items-center gap-1 shrink-0 mt-0.5">
+            <button
+              onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-primary hover:bg-primary/10 transition-colors"
+            >
+              <AppIcon name="Edit" size={15} />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <AppIcon name="Trash2" size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Expanded subtasks */}
