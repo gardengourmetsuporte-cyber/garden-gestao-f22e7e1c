@@ -16,7 +16,68 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+function DateStrip({ days, selectedDate, onSelectDate, scrollRef }: {
+  days: Date[];
+  selectedDate: Date;
+  onSelectDate: (d: Date) => void;
+  scrollRef: React.RefObject<HTMLDivElement>;
+}) {
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const innerDiv = container.firstElementChild as HTMLElement;
+    if (!innerDiv) return;
+    const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
+    if (selectedIdx < 0) return;
+    const btn = innerDiv.children[selectedIdx] as HTMLElement;
+    if (!btn) return;
+    const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+    container.scrollTo({ left: scrollLeft, behavior: 'instant' });
+  }, [selectedDate, days, scrollRef]);
 
+  return (
+    <div className="space-y-1.5">
+      <div className="-mx-4 overflow-x-auto scrollbar-hide" ref={scrollRef}>
+        <div className="flex gap-1 px-4 py-1">
+          {days.map((day) => {
+            const isSelected = isSameDay(day, selectedDate);
+            const isDayToday = isDateToday(day);
+            return (
+              <button
+                key={day.toISOString()}
+                onClick={() => onSelectDate(day)}
+                className={cn(
+                  "flex flex-col items-center w-[44px] h-[56px] justify-center rounded-xl shrink-0 transition-colors",
+                  isSelected
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : isDayToday
+                      ? "bg-primary/8 text-primary"
+                      : "text-muted-foreground hover:bg-secondary/60"
+                )}
+              >
+                <span className="text-[10px] font-medium uppercase leading-none mb-1">
+                  {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
+                </span>
+                <span className={cn(
+                  "text-base font-bold leading-none",
+                  isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
+                )}>
+                  {format(day, 'dd')}
+                </span>
+                {isDayToday && !isSelected && (
+                  <div className="w-1 h-1 rounded-full bg-primary mt-1" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <p className="text-center text-xs text-muted-foreground capitalize">
+        {isDateToday(selectedDate) ? '📍 ' : ''}{format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+      </p>
+    </div>
+  );
+}
 
 export default function ChecklistsPage() {
   const { isAdmin, user } = useAuth();
@@ -36,6 +97,7 @@ export default function ChecklistsPage() {
   const [settingsMode, setSettingsMode] = useState(false);
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const dateStripRef = useRef<HTMLDivElement>(null);
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
 
   // The settings type follows the checklist type
@@ -270,62 +332,13 @@ export default function ChecklistsPage() {
               const today = new Date();
               const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
 
-              const scrollToSelected = (container: HTMLDivElement | null) => {
-                if (!container) return;
-                const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
-                if (selectedIdx < 0) return;
-                const btn = container.children[selectedIdx] as HTMLElement;
-                if (!btn) return;
-                const scrollLeft = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
-                container.scrollTo({ left: scrollLeft, behavior: 'instant' });
-              };
-
               return (
-                <div className="space-y-1.5">
-                  <div
-                    className="-mx-4 overflow-x-auto scrollbar-hide"
-                    ref={scrollToSelected}
-                  >
-                    <div className="flex gap-1 px-4 py-1">
-                      {days.map((day) => {
-                        const isSelected = isSameDay(day, selectedDate);
-                        const isDayToday = isDateToday(day);
-                        return (
-                          <button
-                            key={day.toISOString()}
-                            onClick={() => setSelectedDate(day)}
-                            className={cn(
-                              "flex flex-col items-center w-[44px] h-[56px] justify-center rounded-xl shrink-0 transition-colors",
-                              isSelected
-                                ? "bg-primary text-primary-foreground shadow-md"
-                                : isDayToday
-                                  ? "bg-primary/8 text-primary"
-                                  : "text-muted-foreground hover:bg-secondary/60"
-                            )}
-                          >
-                            <span className="text-[10px] font-medium uppercase leading-none mb-1">
-                              {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
-                            </span>
-                            <span className={cn(
-                              "text-base font-bold leading-none",
-                              isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
-                            )}>
-                              {format(day, 'dd')}
-                            </span>
-                            {isDayToday && !isSelected && (
-                              <div className="w-1 h-1 rounded-full bg-primary mt-1" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Minimal date label */}
-                  <p className="text-center text-xs text-muted-foreground capitalize">
-                    {isDateToday(selectedDate) ? '📍 ' : ''}{format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-                  </p>
-                </div>
+                <DateStrip
+                  days={days}
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                  scrollRef={dateStripRef}
+                />
               );
             })()}
 
