@@ -17,7 +17,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type TabView = 'checklist' | 'settings';
+
 
 export default function ChecklistsPage() {
   const { isAdmin, user } = useAuth();
@@ -34,13 +34,16 @@ export default function ChecklistsPage() {
 
   const queryClient = useQueryClient();
   const { activeUnitId } = useUnit();
-  const [currentTab, setCurrentTab] = useState<TabView>('checklist');
+  const [settingsMode, setSettingsMode] = useState(false);
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
-  const [settingsType, setSettingsType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
 
-  useFabAction(isAdmin ? { icon: currentTab === 'settings' ? 'X' : 'Settings', label: 'Configurações', onClick: () => setCurrentTab(currentTab === 'settings' ? 'checklist' : 'settings') } : null, [isAdmin, currentTab]);
+  // The settings type follows the checklist type
+  const settingsType = checklistType;
+  const setSettingsType = setChecklistType;
+
+  useFabAction(isAdmin ? { icon: settingsMode ? 'X' : 'Settings', label: settingsMode ? 'Voltar' : 'Configurar', onClick: () => setSettingsMode(!settingsMode) } : null, [isAdmin, settingsMode]);
 
   // Fetch completions for abertura & fechamento to show progress on cards
   const { data: aberturaCompletions = [] } = useQuery({
@@ -262,9 +265,9 @@ export default function ChecklistsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-5">
-          <div className="animate-fade-in space-y-5" key={currentTab}>
-          {currentTab === 'checklist' ? (
-            <div className="space-y-5">
+          <div className="animate-fade-in space-y-5" key={settingsMode ? 'settings' : 'view'}>
+            {/* Date picker — only in view mode */}
+            {!settingsMode && (
               <div className="flex justify-center">
                 <DatePicker
                   date={selectedDate}
@@ -272,31 +275,52 @@ export default function ChecklistsPage() {
                   className="w-auto"
                 />
               </div>
+            )}
 
-              {/* Checklist Type Cards */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Abertura Card */}
+            {/* Settings mode header banner */}
+            {settingsMode && (
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 border border-primary/20">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="Settings" size={18} className="text-primary animate-spin" style={{ animationDuration: '3s' }} />
+                </div>
+                <div className="flex-1">
+                  <h2 className="font-semibold text-sm text-foreground">Modo Configuração</h2>
+                  <p className="text-[11px] text-muted-foreground">Editando {checklistType === 'bonus' ? 'Bônus' : checklistType === 'abertura' ? 'Abertura' : 'Fechamento'}</p>
+                </div>
                 <button
-                  onClick={() => setChecklistType('abertura')}
-                  className={cn(
-                    "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
-                    checklistType === 'abertura'
-                      ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
-                      : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
-                  )}
+                  onClick={() => setSettingsMode(false)}
+                  className="p-2 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors"
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <AppIcon
-                      name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
-                      size={22}
-                      fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
-                      className={cn(
-                        "transition-colors",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" : checklistType === 'abertura' ? "text-foreground" : "text-muted-foreground"
-                      )}
-                    />
-                    <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
-                  </div>
+                  <AppIcon name="X" size={16} className="text-muted-foreground" />
+                </button>
+              </div>
+            )}
+
+            {/* Checklist Type Cards — always visible */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Abertura Card */}
+              <button
+                onClick={() => setChecklistType('abertura')}
+                className={cn(
+                  "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
+                  checklistType === 'abertura'
+                    ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
+                    : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
+                )}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <AppIcon
+                    name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
+                    size={22}
+                    fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
+                    className={cn(
+                      "transition-colors",
+                      getTypeProgress.abertura.percent === 100 ? "text-success" : checklistType === 'abertura' ? "text-foreground" : "text-muted-foreground"
+                    )}
+                  />
+                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
+                </div>
+                {!settingsMode && (
                   <div className="space-y-1.5">
                     <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-white/15" : "bg-secondary/60")}>
                       <div
@@ -321,33 +345,35 @@ export default function ChecklistsPage() {
                       </span>
                     </div>
                   </div>
-                  {checklistType === 'abertura' && (
-                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-                  )}
-                </button>
+                )}
+                {checklistType === 'abertura' && (
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+                )}
+              </button>
 
-                {/* Fechamento Card */}
-                <button
-                  onClick={() => setChecklistType('fechamento')}
-                  className={cn(
-                    "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
-                    checklistType === 'fechamento'
-                      ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
-                      : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
-                  )}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <AppIcon
-                      name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
-                      size={22}
-                      fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
-                      className={cn(
-                        "transition-colors",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : checklistType === 'fechamento' ? "text-foreground" : "text-muted-foreground"
-                      )}
-                    />
-                    <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
-                  </div>
+              {/* Fechamento Card */}
+              <button
+                onClick={() => setChecklistType('fechamento')}
+                className={cn(
+                  "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
+                  checklistType === 'fechamento'
+                    ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
+                    : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
+                )}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <AppIcon
+                    name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
+                    size={22}
+                    fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
+                    className={cn(
+                      "transition-colors",
+                      getTypeProgress.fechamento.percent === 100 ? "text-success" : checklistType === 'fechamento' ? "text-foreground" : "text-muted-foreground"
+                    )}
+                  />
+                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
+                </div>
+                {!settingsMode && (
                   <div className="space-y-1.5">
                     <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-white/15" : "bg-secondary/60")}>
                       <div
@@ -372,162 +398,103 @@ export default function ChecklistsPage() {
                       </span>
                     </div>
                   </div>
-                  {checklistType === 'fechamento' && (
-                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full animate-pulse" style={{ background: 'hsl(234 89% 67%)' }} />
-                  )}
-                </button>
-              </div>
-
-              {/* Bônus Card - Full width, distinct colors (cyan/emerald, NOT amber) */}
-              <button
-                onClick={() => setChecklistType('bonus')}
-                className={cn(
-                  "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
-                  checklistType === 'bonus'
-                    ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.01] shadow-xl"
-                    : "bg-card hover:shadow-lg"
                 )}
-                style={checklistType !== 'bonus' ? {
-                  border: '1px solid hsl(160 60% 45% / 0.3)',
-                  boxShadow: '0 0 12px hsl(160 70% 45% / 0.08), 0 2px 8px hsl(0 0% 0% / 0.04)',
-                } : undefined}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
-                    checklistType === 'bonus'
-                      ? "bg-emerald-500/15"
-                      : "bg-emerald-500/10"
-                  )}>
-                    <AppIcon
-                      name="Zap"
-                      size={22}
-                      fill={checklistType === 'bonus' ? 1 : 0}
-                      className="transition-colors"
-                      style={{ color: checklistType === 'bonus' ? '#475569' : 'hsl(160 70% 45%)' }}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-black font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{
-                        color: checklistType === 'bonus' ? 'hsl(160 84% 70%)' : 'hsl(160 84% 50%)',
-                        background: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.2)' : 'hsl(160 84% 39% / 0.12)',
-                      }}>
-                        Extra pts
-                      </span>
-                    </div>
-                    <p className="text-xs mt-0.5 text-muted-foreground">
-                      Tarefas exclusivas para mais pontos ⚡
-                    </p>
-                  </div>
-                  <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
-                </div>
-                {/* Shimmer effect — always visible, stronger when selected */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    opacity: checklistType === 'bonus' ? 0.3 : 0.2,
-                    background: 'linear-gradient(105deg, transparent 40%, hsl(160 84% 39% / 0.15) 45%, hsl(var(--neon-cyan) / 0.1) 55%, transparent 60%)',
-                    backgroundSize: '200% 100%',
-                    animation: 'shimmer 8s ease-in-out infinite',
-                  }}
-                />
+                {checklistType === 'fechamento' && (
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full animate-pulse" style={{ background: 'hsl(234 89% 67%)' }} />
+                )}
               </button>
-
-              {/* Spacer + Checklist View */}
-              <div className="pt-3">
-              <ChecklistView
-                sectors={sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
-                checklistType={checklistType}
-                date={currentDate}
-                completions={completions}
-                isItemCompleted={isItemCompleted}
-                onToggleItem={handleToggleItem}
-                getCompletionProgress={(sectorId) => getCompletionProgress(sectorId, checklistType)}
-                currentUserId={user?.id}
-                isAdmin={isAdmin}
-                deadlinePassed={deadlinePassed}
-                onContestCompletion={contestCompletion}
-              />
-              </div>
             </div>
-          ) : (
-            <>
-              {/* Settings Header */}
-              <div className="card-command p-4">
-                <div className="flex items-center gap-3">
-                  <AppIcon name="ClipboardCheck" size={20} className="text-primary" />
-                  <div>
-                    <h2 className="font-semibold text-foreground">Configurar Checklists</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Gerencie setores, subcategorias e itens
-                    </p>
-                  </div>
+
+            {/* Bônus Card */}
+            <button
+              onClick={() => setChecklistType('bonus')}
+              className={cn(
+                "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
+                checklistType === 'bonus'
+                  ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.01] shadow-xl"
+                  : "bg-card hover:shadow-lg"
+              )}
+              style={checklistType !== 'bonus' ? {
+                border: '1px solid hsl(160 60% 45% / 0.3)',
+                boxShadow: '0 0 12px hsl(160 70% 45% / 0.08), 0 2px 8px hsl(0 0% 0% / 0.04)',
+              } : undefined}
+            >
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
+                  checklistType === 'bonus' ? "bg-emerald-500/15" : "bg-emerald-500/10"
+                )}>
+                  <AppIcon
+                    name="Zap"
+                    size={22}
+                    fill={checklistType === 'bonus' ? 1 : 0}
+                    className="transition-colors"
+                    style={{ color: checklistType === 'bonus' ? '#475569' : 'hsl(160 70% 45%)' }}
+                  />
                 </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-black font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{
+                      color: checklistType === 'bonus' ? 'hsl(160 84% 70%)' : 'hsl(160 84% 50%)',
+                      background: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.2)' : 'hsl(160 84% 39% / 0.12)',
+                    }}>
+                      Extra pts
+                    </span>
+                  </div>
+                  <p className="text-xs mt-0.5 text-muted-foreground">
+                    Tarefas exclusivas para mais pontos ⚡
+                  </p>
+                </div>
+                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
               </div>
-
-              {/* Type Selector */}
-              <div className="tab-command">
-                <button
-                  onClick={() => setSettingsType('abertura')}
-                  className={cn(
-                    "tab-command-item gap-2",
-                    settingsType === 'abertura' ? "tab-command-active" : "tab-command-inactive"
-                  )}
-                  style={settingsType === 'abertura' ? { borderColor: 'hsl(38 92% 50% / 0.4)', boxShadow: '0 0 12px hsl(38 92% 50% / 0.15)' } : undefined}
-                >
-                  <AppIcon name="Sun" size={20} />
-                   <span className="font-semibold">Abertura</span>
-                </button>
-                <button
-                  onClick={() => setSettingsType('fechamento')}
-                  className={cn(
-                    "tab-command-item gap-2",
-                    settingsType === 'fechamento' ? "tab-command-active" : "tab-command-inactive"
-                  )}
-                  style={settingsType === 'fechamento' ? { borderColor: 'hsl(var(--accent) / 0.4)', boxShadow: '0 0 12px hsl(var(--accent) / 0.15)' } : undefined}
-                >
-                  <AppIcon name="Moon" size={20} />
-                   <span className="font-semibold">Fechamento</span>
-                </button>
-                <button
-                  onClick={() => setSettingsType('bonus')}
-                  className={cn(
-                    "tab-command-item gap-1.5",
-                    settingsType === 'bonus' ? "tab-command-active" : "tab-command-inactive"
-                  )}
-                  style={settingsType === 'bonus' ? { 
-                    borderColor: 'hsl(38 92% 50% / 0.5)', 
-                    boxShadow: '0 0 16px hsl(38 92% 50% / 0.25)',
-                    background: 'linear-gradient(135deg, hsl(38 92% 50% / 0.08), hsl(280 90% 65% / 0.08))'
-                  } : undefined}
-                >
-                  <AppIcon name="Zap" size={16} />
-                  <span className="font-semibold text-xs">Bônus</span>
-                </button>
-              </div>
-
-              {/* Settings Component */}
-              <ChecklistSettings
-                sectors={sectors.filter((s: any) => settingsType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
-                selectedType={settingsType}
-                onTypeChange={setSettingsType}
-                onAddSector={handleAddSector}
-                onUpdateSector={handleUpdateSector}
-                onDeleteSector={handleDeleteSector}
-                onReorderSectors={reorderSectors}
-                onAddSubcategory={handleAddSubcategory}
-                onUpdateSubcategory={handleUpdateSubcategory}
-                onDeleteSubcategory={handleDeleteSubcategory}
-                onReorderSubcategories={reorderSubcategories}
-                onAddItem={handleAddItem}
-                onUpdateItem={handleUpdateItem}
-                onDeleteItem={handleDeleteItem}
-                onReorderItems={reorderItems}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  opacity: checklistType === 'bonus' ? 0.3 : 0.2,
+                  background: 'linear-gradient(105deg, transparent 40%, hsl(160 84% 39% / 0.15) 45%, hsl(var(--neon-cyan) / 0.1) 55%, transparent 60%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 8s ease-in-out infinite',
+                }}
               />
-            </>
-          )}
+            </button>
+
+            {/* Content area — either checklist view or settings */}
+            <div className="pt-3">
+              {settingsMode ? (
+                <ChecklistSettings
+                  sectors={sectors.filter((s: any) => settingsType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
+                  selectedType={settingsType}
+                  onTypeChange={setSettingsType}
+                  onAddSector={handleAddSector}
+                  onUpdateSector={handleUpdateSector}
+                  onDeleteSector={handleDeleteSector}
+                  onReorderSectors={reorderSectors}
+                  onAddSubcategory={handleAddSubcategory}
+                  onUpdateSubcategory={handleUpdateSubcategory}
+                  onDeleteSubcategory={handleDeleteSubcategory}
+                  onReorderSubcategories={reorderSubcategories}
+                  onAddItem={handleAddItem}
+                  onUpdateItem={handleUpdateItem}
+                  onDeleteItem={handleDeleteItem}
+                  onReorderItems={reorderItems}
+                />
+              ) : (
+                <ChecklistView
+                  sectors={sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
+                  checklistType={checklistType}
+                  date={currentDate}
+                  completions={completions}
+                  isItemCompleted={isItemCompleted}
+                  onToggleItem={handleToggleItem}
+                  getCompletionProgress={(sectorId) => getCompletionProgress(sectorId, checklistType)}
+                  currentUserId={user?.id}
+                  isAdmin={isAdmin}
+                  deadlinePassed={deadlinePassed}
+                  onContestCompletion={contestCompletion}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
