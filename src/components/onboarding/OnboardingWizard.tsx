@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Building2, Package, Wallet, ClipboardCheck, ChevronRight, Check, Sparkles } from 'lucide-react';
+import { Store, Package, Wallet, ClipboardCheck, ChevronRight, Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DEFAULT_PAYMENT_SETTINGS } from '@/hooks/usePaymentSettings';
 
@@ -63,7 +63,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
-    { icon: Building2, title: 'Nome do Negócio', desc: 'Como se chama o seu estabelecimento?' },
+    { icon: Store, title: 'Nome da Loja', desc: 'Como se chama o seu estabelecimento?' },
     { icon: Package, title: 'Categorias de Estoque', desc: 'Selecione as categorias do seu estoque' },
     { icon: Wallet, title: 'Pagamentos', desc: 'Meios de pagamento pré-configurados' },
     { icon: ClipboardCheck, title: 'Checklist Modelo', desc: 'Escolha um template do seu segmento' },
@@ -205,7 +205,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 autoFocus
               />
               <p className="text-xs text-muted-foreground text-center">
-                Você poderá adicionar mais unidades depois.
+                Você poderá adicionar mais lojas depois.
               </p>
             </div>
           )}

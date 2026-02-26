@@ -124,7 +124,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error('Failed to fetch units:', err);
-      toast.error('Erro ao carregar unidades. Tente recarregar a página.');
+      toast.error('Erro ao carregar lojas. Tente recarregar a página.');
     } finally {
       fetchedForUserRef.current = user.id;
       setIsLoading(false);
