@@ -235,16 +235,15 @@ const TabButton = forwardRef<
       onTouchStart={() => void preloadRoute(tab.path)}
       className={cn(
         "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
-        active ? "text-foreground" : "text-muted-foreground"
+        "text-muted-foreground"
       )}
       style={{ width: '20%' }}
     >
       <div
-        className={cn("relative", active && "fab-gradient rounded-xl p-1.5")}
+        className="relative"
         style={{
           transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.1)' : 'scale(1)'),
           transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-          ...(active ? { boxShadow: '0 2px 12px hsl(234 89% 67% / 0.2)' } : {}),
         }}
       >
         <AppIcon
@@ -252,10 +251,10 @@ const TabButton = forwardRef<
           size={22}
           fill={active ? 1 : 0}
           weight={active ? 600 : 400}
-          style={active ? { color: 'hsl(234 40% 30%)' } : {}}
+          className={active ? 'tab-icon-galaxy' : ''}
         />
       </div>
-      <span className={cn("text-[10px]", active ? "font-semibold" : "font-normal")}>{tab.label}</span>
+      <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>
     </button>
   );
 });
