@@ -216,11 +216,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           </div>
         </div>
       </header>
-      {/* Header glow — soft diffused light matching bottom bar */}
+      {/* Header glow — subtle diffused light */}
       <div className="lg:hidden fixed left-0 right-0 z-40 pointer-events-none" style={{ top: 'calc(env(safe-area-inset-top) + 3.5rem)', height: '20px', overflow: 'visible' }}>
-        <div className="absolute left-[8%] right-[8%] bottom-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.35), hsl(var(--primary) / 0.5), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-        <div className="absolute left-[3%] right-[3%] bottom-[-1px] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), hsl(var(--accent) / 0.2), hsl(var(--primary) / 0.3), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-        <div className="absolute left-[12%] right-[12%] bottom-[-3px] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.1), hsl(var(--primary) / 0.15), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute left-[10%] right-[10%] bottom-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.18), transparent)' }} />
+        <div className="absolute left-[5%] right-[5%] bottom-[-1px] h-[3px] blur-[4px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent)' }} />
       </div>
 
       {/* ======= Desktop Sidebar (unchanged) ======= */}
