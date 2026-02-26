@@ -68,7 +68,7 @@ const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
 const Orders = lazy(() => lazyRetry(() => import("./pages/Orders")));
 const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
-const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
+
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
 
@@ -184,7 +184,7 @@ function AppRoutes() {
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
           <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
-          <Route path="/personal-finance" element={<ProtectedRoute><PersonalFinance /></ProtectedRoute>} />
+          
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
           <Route path="/gamification" element={<ProtectedRoute><Gamification /></ProtectedRoute>} />

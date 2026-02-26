@@ -8,8 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { FinanceChartWidget } from './FinanceChartWidget';
-import { PersonalFinanceChartWidget } from './PersonalFinanceChartWidget';
-import { usePersonalFinanceStats } from '@/hooks/usePersonalFinanceStats';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { useLazyVisible } from '@/hooks/useLazyVisible';
 
@@ -42,7 +40,7 @@ export function AdminDashboard() {
   const { user, profile } = useAuth();
   const { hasAccess } = useUserModules();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const { totalBalance: personalBalance, monthExpenses: personalExpenses, pendingExpenses: personalPending, isLoading: personalLoading } = usePersonalFinanceStats();
+  
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -95,39 +93,6 @@ export function AdminDashboard() {
               </div>
             </button>
             <FinanceChartWidget />
-          </>
-        ) : hasAccess('personal-finance') ? (
-          <>
-            <button
-              onClick={() => navigate('/personal-finance')}
-              className="finance-hero-card finance-hero-card--personal col-span-2 text-left card-press"
-            >
-              <div className="finance-hero-inner p-5 pb-4">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-white/70">Meu saldo pessoal</span>
-                  <AppIcon name="ChevronRight" size={18} className="text-white/50" />
-                </div>
-                <p className={cn(
-                  "text-[2rem] font-extrabold tracking-tight leading-tight",
-                  personalBalance >= 0 ? "text-white" : "text-red-300"
-                )}>
-                  {personalLoading ? <Skeleton className="h-9 w-40 bg-white/10" /> : formatCurrency(personalBalance)}
-                </p>
-                <div className="flex gap-2 mt-3">
-                  <div className="finance-hero-chip finance-hero-chip--success">
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Despesas do mês</span>
-                    <span className="text-sm font-bold text-white">{personalLoading ? '...' : formatCurrency(personalExpenses)}</span>
-                  </div>
-                  {personalPending > 0 && (
-                    <div className="finance-hero-chip finance-hero-chip--neutral">
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-white/60">Pendências</span>
-                      <span className="text-sm font-bold text-amber-300">{formatCurrency(personalPending)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </button>
-            <PersonalFinanceChartWidget />
           </>
         ) : null}
       </div>

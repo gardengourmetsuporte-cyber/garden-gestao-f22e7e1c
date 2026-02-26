@@ -31,7 +31,7 @@ const FALLBACK_TABS: TabDef[] = [
   { key: 'cash-closing', icon: 'Receipt', label: 'Fechamento', path: '/cash-closing', moduleKey: 'cash-closing' },
 ];
 
-const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
+const HIDDEN_ROUTES = ['/finance'];
 
 export function BottomTabBar() {
   const location = useLocation();

@@ -21,7 +21,7 @@ const routeImporters: Record<string, RouteImporter> = {
   '/ranking': () => import('@/pages/Ranking'),
   
   '/plans': () => import('@/pages/Plans'),
-  '/personal-finance': () => import('@/pages/PersonalFinance'),
+  
 };
 
 const preloadedRoutes = new Set<string>();
