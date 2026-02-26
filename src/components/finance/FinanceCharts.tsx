@@ -189,7 +189,7 @@ export function FinanceCharts({
       )}
 
       {/* Charts */}
-      <div className="px-4 pb-24 overflow-hidden">
+      <div className="px-4 pb-32 overflow-hidden">
 
         {/* ═══ PIE / DONUT — Categories ═══ */}
         {viewType === 'categories' && !entityView && (

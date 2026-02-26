@@ -73,7 +73,9 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
 
   const handleSaveBudget = async () => {
     if (!selectedCategory || !amount) return;
-    await upsertBudget(selectedCategory.id, Number(amount));
+    const parsed = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
+    if (isNaN(parsed) || parsed <= 0) return;
+    await upsertBudget(selectedCategory.id, parsed);
     setSheetOpen(false);
     setSelectedCategory(null);
     setAmount('');
@@ -277,13 +279,15 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Valor planejado (R$)</label>
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="0,00"
                     value={amount}
-                    onChange={e => setAmount(e.target.value)}
+                    onChange={e => {
+                      const raw = e.target.value.replace(/[^\d,\.]/g, '');
+                      setAmount(raw);
+                    }}
                     className="text-lg"
-                    min="0"
-                    step="0.01"
                   />
                 </div>
 
@@ -306,7 +310,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
                   <Button
                     className="flex-1"
                     onClick={handleSaveBudget}
-                    disabled={!amount || Number(amount) <= 0}
+                    disabled={!amount || !amount.replace(/[^\d]/g, '')}
                   >
                     Salvar
                   </Button>
