@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { 
   Plus, 
   Trash2, 
@@ -418,11 +419,10 @@ export function ChecklistSettings({
                       className="flex-1 flex items-center gap-3"
                     >
                       <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
+                        className="w-[3px] self-stretch rounded-full shrink-0"
                         style={{ backgroundColor: sector.color }}
-                      >
-                        <Folder className="w-4 h-4" />
-                      </div>
+                      />
+                      <AppIcon name={sector.icon || 'Folder'} size={18} fill={0} className="text-muted-foreground" />
                       <span className="font-semibold text-foreground">{sector.name}</span>
                       {!isBonusMode && (
                         <span className="text-xs text-muted-foreground">
