@@ -26,8 +26,9 @@ function BankAvatar({ account }: { account: FinanceAccount }) {
     );
   }
 
-  // Fallback: use icon field mapped to AppIcon
-  const iconName = account.icon || 'Wallet';
+  // Fallback: use account type to pick a safe icon, ignore potentially invalid DB icon values
+  const typeIcons: Record<string, string> = { bank: 'Landmark', credit_card: 'CreditCard', wallet: 'Wallet' };
+  const iconName = typeIcons[account.type] || 'Wallet';
 
   return (
     <div
