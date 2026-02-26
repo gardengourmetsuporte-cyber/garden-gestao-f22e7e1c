@@ -94,7 +94,7 @@ export default function ChecklistsPage() {
     addSector, updateSector, deleteSector, reorderSectors,
     addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
     addItem, updateItem, deleteItem, reorderItems,
-    toggleCompletion, contestCompletion, isItemCompleted, getCompletionProgress,
+    toggleCompletion, contestCompletion, splitCompletion, isItemCompleted, getCompletionProgress,
     fetchCompletions,
   } = useChecklists();
 
@@ -581,6 +581,7 @@ export default function ChecklistsPage() {
                   isAdmin={isAdmin}
                   deadlinePassed={deadlinePassed}
                   onContestCompletion={contestCompletion}
+                  onSplitCompletion={splitCompletion}
                 />
               )}
             </div>

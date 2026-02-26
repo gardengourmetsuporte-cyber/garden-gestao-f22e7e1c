@@ -352,6 +352,56 @@ export function useChecklists() {
     queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
   }, [completions, user?.id, queryClient, activeUnitId]);
 
+  // ---- Split completion (divide points among participants) ----
+  const splitCompletion = useCallback(async (
+    itemId: string, date: string, checklistType: ChecklistType, userIds: string[]
+  ) => {
+    if (userIds.length < 2) throw new Error('Selecione ao menos 2 participantes');
+
+    // Find the original completion to get the item's configured points
+    const originalCompletion = completions.find(
+      c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date && !c.is_skipped
+    );
+    if (!originalCompletion) throw new Error('Conclusão original não encontrada');
+
+    // Get the item's configured points (not the awarded, which may already be split)
+    const itemData = sectors.flatMap(s => s.subcategories?.flatMap(sub => sub.items || []) || []).find(i => i.id === itemId);
+    const originalPoints = itemData?.points ?? originalCompletion.points_awarded ?? 1;
+    const pointsPerPerson = Math.floor(originalPoints / userIds.length);
+
+    // Update existing completion with split points
+    const { error: updateError } = await supabase
+      .from('checklist_completions')
+      .update({ points_awarded: pointsPerPerson, awarded_points: pointsPerPerson > 0 })
+      .eq('id', originalCompletion.id);
+    if (updateError) throw updateError;
+
+    // Insert completions for other participants
+    const otherUserIds = userIds.filter(uid => uid !== originalCompletion.completed_by);
+    if (otherUserIds.length > 0) {
+      const rows = otherUserIds.map(uid => ({
+        item_id: itemId,
+        checklist_type: checklistType,
+        completed_by: uid,
+        date,
+        awarded_points: pointsPerPerson > 0,
+        points_awarded: pointsPerPerson,
+        is_skipped: false,
+        unit_id: activeUnitId,
+      }));
+      const { error: insertError } = await supabase
+        .from('checklist_completions')
+        .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' });
+      if (insertError) throw insertError;
+    }
+
+    // Invalidate caches
+    queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, checklistType, activeUnitId] });
+    queryClient.invalidateQueries({ queryKey: ['points'] });
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+  }, [completions, sectors, queryClient, activeUnitId]);
+
   // ---- Contest a completion (admin only) ----
   const contestCompletion = useCallback(async (completionId: string, reason: string) => {
     if (!user?.id) throw new Error('Usuário não autenticado');
@@ -416,7 +466,7 @@ export function useChecklists() {
     addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
     addItem, updateItem, deleteItem, restoreItem, permanentDeleteItem,
     fetchDeletedItems, emptyTrash, reorderItems,
-    toggleCompletion, contestCompletion, isItemCompleted, getCompletionProgress,
+    toggleCompletion, contestCompletion, splitCompletion, isItemCompleted, getCompletionProgress,
     fetchCompletions,
     refetch: invalidateSectors,
   };

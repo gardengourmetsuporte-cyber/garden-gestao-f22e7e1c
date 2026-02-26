@@ -26,6 +26,8 @@ import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
 // Inline expandable options — no Popover/Portal to avoid scroll issues
 import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -39,6 +41,7 @@ interface ChecklistViewProps {
   isAdmin: boolean;
   deadlinePassed?: boolean;
   onContestCompletion?: (completionId: string, reason: string) => Promise<void>;
+  onSplitCompletion?: (itemId: string, date: string, checklistType: ChecklistType, userIds: string[]) => Promise<void>;
 }
 
 const isToday = (dateStr: string): boolean => {
@@ -88,6 +91,7 @@ export function ChecklistView({
   onToggleItem,
   getCompletionProgress,
   onContestCompletion,
+  onSplitCompletion,
   currentUserId,
   isAdmin,
   deadlinePassed = false,
@@ -104,6 +108,10 @@ export function ChecklistView({
   const [contestingItemId, setContestingItemId] = useState<string | null>(null);
   const [contestReason, setContestReason] = useState('');
   const [contestLoading, setContestLoading] = useState(false);
+  // Split state
+  const [splittingItemId, setSplittingItemId] = useState<string | null>(null);
+  const [splitSelectedUsers, setSplitSelectedUsers] = useState<Set<string>>(new Set());
+  const [splitLoading, setSplitLoading] = useState(false);
 
   useEffect(() => {
     if (isAdmin) {
@@ -219,6 +227,26 @@ export function ChecklistView({
     setOpenPopover(null);
     setExpandedPeopleFor(null);
   };
+
+  const handleSplit = async (itemId: string, completion: any, configuredPoints: number) => {
+    if (!onSplitCompletion || splitSelectedUsers.size < 2) return;
+    setSplitLoading(true);
+    try {
+      await onSplitCompletion(itemId, date, checklistType, Array.from(splitSelectedUsers));
+      setSplittingItemId(null);
+      setSplitSelectedUsers(new Set());
+      toast.success('Pontos divididos com sucesso!');
+    } catch (err: any) {
+      console.error('Split error:', err);
+      toast.error(err.message || 'Erro ao dividir pontos');
+    } finally {
+      setSplitLoading(false);
+    }
+  };
+
+  const getItemCompletionCount = useCallback((itemId: string) => {
+    return completions.filter(c => c.item_id === itemId && !c.is_skipped).length;
+  }, [completions]);
 
   const handleContest = async (completionId: string) => {
     if (!onContestCompletion || !contestReason.trim()) return;
@@ -410,6 +438,7 @@ export function ChecklistView({
                                   {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
                                   {!isContested && wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
                                   {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
+                                  {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
                                 </div>
                               )}
                             </div>
@@ -451,6 +480,69 @@ export function ChecklistView({
                                     <p className="text-xs text-muted-foreground">Reverter a conclusão</p>
                                   </div>
                                 </button>
+                              )}
+                              {/* Dividir pontos */}
+                              {!wasSkipped && onSplitCompletion && profiles.length > 0 && (
+                                <>
+                                  <div className="border-t border-border" />
+                                  {splittingItemId === item.id ? (
+                                    <div className="space-y-2 animate-fade-in">
+                                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                                        <Users className="w-4 h-4" />
+                                        <span>Dividir pontos ({item.points ?? 1} pts)</span>
+                                      </div>
+                                      <div className="max-h-40 overflow-y-auto space-y-1">
+                                        {profiles.map((profile) => {
+                                          const isSelected = splitSelectedUsers.has(profile.user_id);
+                                          const isOriginal = profile.user_id === completion.completed_by;
+                                          return (
+                                            <label key={profile.user_id} className={cn("flex items-center gap-2 p-2 rounded-lg cursor-pointer text-sm transition-colors", isSelected ? "bg-primary/10" : "hover:bg-secondary")}>
+                                              <Checkbox checked={isSelected} onCheckedChange={(checked) => {
+                                                setSplitSelectedUsers(prev => {
+                                                  const next = new Set(prev);
+                                                  if (checked) next.add(profile.user_id); else next.delete(profile.user_id);
+                                                  return next;
+                                                });
+                                              }} />
+                                              <span className="truncate">{profile.full_name}</span>
+                                              {isOriginal && <span className="text-xs text-muted-foreground ml-auto">(completou)</span>}
+                                            </label>
+                                          );
+                                        })}
+                                      </div>
+                                      {splitSelectedUsers.size >= 2 && (
+                                        <p className="text-xs text-muted-foreground text-center">
+                                          {item.points ?? 1} pts ÷ {splitSelectedUsers.size} = {Math.floor((item.points ?? 1) / splitSelectedUsers.size)} pts cada
+                                        </p>
+                                      )}
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => handleSplit(item.id, completion, item.points ?? 1)}
+                                          disabled={splitSelectedUsers.size < 2 || splitLoading}
+                                          className="flex-1 p-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors"
+                                        >
+                                          {splitLoading ? 'Dividindo...' : 'Confirmar divisão'}
+                                        </button>
+                                        <button onClick={() => { setSplittingItemId(null); setSplitSelectedUsers(new Set()); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                                          <X className="w-4 h-4 text-muted-foreground" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => { setSplittingItemId(item.id); setSplitSelectedUsers(new Set([completion.completed_by])); setContestingItemId(null); }}
+                                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
+                                    >
+                                      <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
+                                        <Users className="w-5 h-5 text-primary" />
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-primary">Dividir pontos</p>
+                                        <p className="text-xs text-muted-foreground">Dividir entre participantes</p>
+                                      </div>
+                                    </button>
+                                  )}
+                                </>
                               )}
                               {/* Contestar */}
                               {!wasSkipped && (
@@ -733,6 +825,7 @@ export function ChecklistView({
                                           {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
                                           {!isContested && wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
                                           {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
+                                          {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
                                         </div>
                                       )}
                                     </div>
@@ -780,6 +873,69 @@ export function ChecklistView({
                                             <p className="text-xs text-muted-foreground">Reverter a conclusão</p>
                                           </div>
                                         </button>
+                                      )}
+                                      {/* Dividir pontos */}
+                                      {!wasSkipped && onSplitCompletion && profiles.length > 0 && (
+                                        <>
+                                          <div className="border-t border-border" />
+                                          {splittingItemId === item.id ? (
+                                            <div className="space-y-2 animate-fade-in">
+                                              <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                                                <Users className="w-4 h-4" />
+                                                <span>Dividir pontos ({item.points ?? 1} pts)</span>
+                                              </div>
+                                              <div className="max-h-40 overflow-y-auto space-y-1">
+                                                {profiles.map((profile) => {
+                                                  const isSelected = splitSelectedUsers.has(profile.user_id);
+                                                  const isOriginal = profile.user_id === completion.completed_by;
+                                                  return (
+                                                    <label key={profile.user_id} className={cn("flex items-center gap-2 p-2 rounded-lg cursor-pointer text-sm transition-colors", isSelected ? "bg-primary/10" : "hover:bg-secondary")}>
+                                                      <Checkbox checked={isSelected} onCheckedChange={(checked) => {
+                                                        setSplitSelectedUsers(prev => {
+                                                          const next = new Set(prev);
+                                                          if (checked) next.add(profile.user_id); else next.delete(profile.user_id);
+                                                          return next;
+                                                        });
+                                                      }} />
+                                                      <span className="truncate">{profile.full_name}</span>
+                                                      {isOriginal && <span className="text-xs text-muted-foreground ml-auto">(completou)</span>}
+                                                    </label>
+                                                  );
+                                                })}
+                                              </div>
+                                              {splitSelectedUsers.size >= 2 && (
+                                                <p className="text-xs text-muted-foreground text-center">
+                                                  {item.points ?? 1} pts ÷ {splitSelectedUsers.size} = {Math.floor((item.points ?? 1) / splitSelectedUsers.size)} pts cada
+                                                </p>
+                                              )}
+                                              <div className="flex gap-2">
+                                                <button
+                                                  onClick={() => handleSplit(item.id, completion, item.points ?? 1)}
+                                                  disabled={splitSelectedUsers.size < 2 || splitLoading}
+                                                  className="flex-1 p-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors"
+                                                >
+                                                  {splitLoading ? 'Dividindo...' : 'Confirmar divisão'}
+                                                </button>
+                                                <button onClick={() => { setSplittingItemId(null); setSplitSelectedUsers(new Set()); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                                                  <X className="w-4 h-4 text-muted-foreground" />
+                                                </button>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <button
+                                              onClick={() => { setSplittingItemId(item.id); setSplitSelectedUsers(new Set([completion.completed_by])); setContestingItemId(null); }}
+                                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
+                                            >
+                                              <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
+                                                <Users className="w-5 h-5 text-primary" />
+                                              </div>
+                                              <div>
+                                                <p className="font-semibold text-primary">Dividir pontos</p>
+                                                <p className="text-xs text-muted-foreground">Dividir entre participantes</p>
+                                              </div>
+                                            </button>
+                                          )}
+                                        </>
                                       )}
                                       {!wasSkipped && (
                                         <>
