@@ -80,24 +80,24 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
 
       {menuOpen && (
         <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <div className="flex items-end gap-6 px-6 py-5 rounded-3xl bg-card border border-border/40" style={{ boxShadow: 'var(--shadow-elevated)' }}>
+          <div className="flex items-end gap-8">
             <button onClick={() => handleAction('income')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '0ms' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 transition-transform duration-150" style={{ background: 'hsl(var(--color-income) / 0.15)' }}>
-                <AppIcon name="ArrowUpCircle" size={28} fill={1} style={{ color: 'hsl(var(--color-income))' }} />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg" style={{ background: 'hsl(var(--color-income))' }}>
+                <AppIcon name="ArrowUpCircle" size={26} fill={1} style={{ color: 'white' }} />
               </div>
-              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--color-income))' }}>Receita</span>
+              <span className="text-[11px] font-bold" style={{ color: 'hsl(var(--color-income))' }}>Receita</span>
             </button>
-            <button onClick={() => handleAction('expense')} className="flex flex-col items-center gap-2 animate-scale-in -mt-2" style={{ animationDelay: '50ms' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 transition-transform duration-150" style={{ background: 'hsl(var(--color-expense) / 0.15)' }}>
-                <AppIcon name="ArrowDownCircle" size={28} fill={1} style={{ color: 'hsl(var(--color-expense))' }} />
+            <button onClick={() => handleAction('expense')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '50ms' }}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg" style={{ background: 'hsl(var(--color-expense))' }}>
+                <AppIcon name="ArrowDownCircle" size={26} fill={1} style={{ color: 'white' }} />
               </div>
-              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--color-expense))' }}>Despesa</span>
+              <span className="text-[11px] font-bold" style={{ color: 'hsl(var(--color-expense))' }}>Despesa</span>
             </button>
             <button onClick={() => handleAction('transfer')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '100ms' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 transition-transform duration-150" style={{ background: 'hsl(var(--color-transfer) / 0.15)' }}>
-                <AppIcon name="ArrowLeftRight" size={28} fill={1} style={{ color: 'hsl(var(--color-transfer))' }} />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg" style={{ background: 'hsl(var(--color-transfer))' }}>
+                <AppIcon name="ArrowLeftRight" size={24} fill={1} style={{ color: 'white' }} />
               </div>
-              <span className="text-[11px] font-semibold" style={{ color: 'hsl(var(--color-transfer))' }}>Transf.</span>
+              <span className="text-[11px] font-bold" style={{ color: 'hsl(var(--color-transfer))' }}>Transf.</span>
             </button>
           </div>
         </div>
