@@ -4,10 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useUserModules } from '@/hooks/useAccessLevels';
-import { useModuleStatus } from '@/hooks/useModuleStatus';
 import { useFabContext } from '@/contexts/FabActionContext';
 import { MoreDrawer } from './MoreDrawer';
 import { QuickActionSheet } from './QuickActionSheet';
+import { preloadRoute } from '@/lib/routePreload';
 
 interface TabDef {
   key: string;
@@ -37,7 +37,6 @@ export function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { hasAccess } = useUserModules();
-  const moduleStatuses = useModuleStatus();
   const { fabAction } = useFabContext();
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
@@ -143,7 +142,6 @@ export function BottomTabBar() {
                 ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
-                moduleStatus={moduleStatuses[tab.path]}
                 onClick={() => navigate(tab.path)}
               />
             ))}
@@ -192,7 +190,6 @@ export function BottomTabBar() {
                 ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
-                moduleStatus={moduleStatuses[tab.path]}
                 onClick={() => navigate(tab.path)}
               />
             ))}
@@ -219,25 +216,24 @@ const TabButton = forwardRef<
   {
     tab: TabDef;
     active: boolean;
-    moduleStatus?: { level: string; count: number } | null;
     onClick: () => void;
   }
->(({ tab, active, moduleStatus, onClick }, ref) => {
+>(({ tab, active, onClick }, ref) => {
   const [bouncing, setBouncing] = useState(false);
 
   const handleTap = () => {
     navigator.vibrate?.(10);
     setBouncing(true);
-    setTimeout(() => {
-      setBouncing(false);
-      onClick();
-    }, 120);
+    onClick();
+    setTimeout(() => setBouncing(false), 160);
   };
 
   return (
     <button
       ref={ref}
       onClick={handleTap}
+      onMouseEnter={() => void preloadRoute(tab.path)}
+      onTouchStart={() => void preloadRoute(tab.path)}
       className={cn(
         "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
         active ? "text-primary" : "text-muted-foreground"

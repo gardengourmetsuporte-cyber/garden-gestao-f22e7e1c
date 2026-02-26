@@ -1,5 +1,5 @@
 import gardenLogo from '@/assets/logo.png';
-import { ReactNode, useState, useMemo, useRef } from 'react';
+import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PageTransition } from './PageTransition';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -27,6 +27,8 @@ import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { BottomTabBar } from './BottomTabBar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { preloadRoute, preloadRoutes } from '@/lib/routePreload';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -74,7 +76,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
   const chatUnreadCount = useChatUnreadCount();
-  const moduleStatuses = useModuleStatus();
+  const isMobile = useIsMobile();
+  const moduleStatuses = useModuleStatus(!isMobile);
   useTimeAlerts();
   const { leaderboard } = useLeaderboard();
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
@@ -120,6 +123,24 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     lastNavRef.current = result;
     return result;
   }, [isSuperAdmin, isAdmin, hasAccessLevel, allowedModules, accessLoading]);
+
+  useEffect(() => {
+    const preloadPaths = filteredNavItems.map(item => item.href).slice(0, 8);
+    if (preloadPaths.length === 0) return;
+
+    const browserWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (browserWindow.requestIdleCallback) {
+      const idleId = browserWindow.requestIdleCallback(() => preloadRoutes(preloadPaths), { timeout: 1200 });
+      return () => browserWindow.cancelIdleCallback?.(idleId);
+    }
+
+    const timeoutId = window.setTimeout(() => preloadRoutes(preloadPaths), 350);
+    return () => window.clearTimeout(timeoutId);
+  }, [filteredNavItems]);
 
   const groupedNav: { label: string; items: typeof filteredNavItems }[] = [];
   const seenGroups = new Set<string>();
@@ -233,6 +254,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* Home */}
           <Link
             to="/"
+            onMouseEnter={() => void preloadRoute('/')}
+            onTouchStart={() => void preloadRoute('/')}
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all",
               location.pathname === '/'
@@ -255,11 +278,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 const badgeCount = chatUnreadCount;
                 const moduleStatus = moduleStatuses[item.href];
                 const locked = isModuleLocked(item.href);
+                const targetHref = locked ? '/plans' : item.href;
 
                 return (
                   <Link
                     key={item.href}
-                    to={locked ? '/plans' : item.href}
+                    to={targetHref}
+                    onMouseEnter={() => void preloadRoute(targetHref)}
+                    onTouchStart={() => void preloadRoute(targetHref)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all relative",
                       isActive

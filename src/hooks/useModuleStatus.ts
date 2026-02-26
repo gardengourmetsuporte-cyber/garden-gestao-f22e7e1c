@@ -231,7 +231,7 @@ function escalateLevel(base: StatusLevel, urgency: UrgencyLevel): StatusLevel {
   return order[Math.max(baseIdx, urgIdx)];
 }
 
-export function useModuleStatus() {
+export function useModuleStatus(enabled = true) {
   const { user, isAdmin } = useAuth();
   const { activeUnitId } = useUnit();
   const { moduleUrgency, urgencyBucket } = useTimeBasedUrgency();
@@ -239,7 +239,7 @@ export function useModuleStatus() {
   const { data: rawStatuses } = useQuery({
     queryKey: ['module-status', user?.id, activeUnitId],
     queryFn: () => fetchModuleStatuses(user!.id, activeUnitId!, isAdmin),
-    enabled: !!user && !!activeUnitId,
+    enabled: enabled && !!user && !!activeUnitId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
