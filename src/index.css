@@ -132,7 +132,7 @@
     --background: 0 0% 99%;
     --foreground: 240 10% 10%;
 
-    --card: 0 0% 100%;
+    --card: 234 25% 96%;
     --card-foreground: 240 10% 10%;
 
     --popover: 0 0% 100%;
@@ -141,10 +141,10 @@
     --primary: 234 89% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 94%;
+    --secondary: 234 15% 92%;
     --secondary-foreground: 240 10% 20%;
 
-    --muted: 240 5% 94%;
+    --muted: 234 10% 93%;
     --muted-foreground: 240 4% 42%;
 
     --accent: 258 90% 66%;
@@ -159,8 +159,8 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 240 5% 88%;
-    --input: 240 5% 92%;
+    --border: 234 15% 85%;
+    --input: 234 10% 92%;
     --ring: 234 89% 58%;
 
     /* Light glow & shadow tokens */
@@ -170,15 +170,15 @@
     --glow-warning: 0 0 12px hsl(38 92% 50% / 0.1);
     --glow-cyan: 0 0 12px hsl(234 89% 58% / 0.12);
 
-    --shadow-card: 0 1px 3px hsl(240 10% 10% / 0.04), 0 4px 12px hsl(240 10% 10% / 0.06), 0 0 0 1px hsl(240 5% 88% / 0.6);
-    --shadow-card-hover: 0 4px 16px hsl(240 10% 10% / 0.08), 0 8px 28px hsl(240 10% 10% / 0.05), 0 0 0 1px hsl(234 89% 58% / 0.2);
-    --shadow-elevated: 0 6px 20px hsl(240 10% 10% / 0.1), 0 12px 40px hsl(240 10% 10% / 0.06);
-    --shadow-floating: 0 8px 32px hsl(240 10% 10% / 0.1), 0 2px 8px hsl(240 10% 10% / 0.06);
+    --shadow-card: 0 1px 3px hsl(234 20% 30% / 0.04), 0 4px 12px hsl(234 20% 30% / 0.06);
+    --shadow-card-hover: 0 4px 16px hsl(234 20% 30% / 0.08), 0 8px 28px hsl(234 20% 30% / 0.05), 0 0 0 1px hsl(234 89% 58% / 0.15);
+    --shadow-elevated: 0 6px 20px hsl(234 20% 30% / 0.1), 0 12px 40px hsl(234 20% 30% / 0.06);
+    --shadow-floating: 0 8px 32px hsl(234 20% 30% / 0.1), 0 2px 8px hsl(234 20% 30% / 0.06);
 
     /* Gradient tokens — light */
     --gradient-brand: linear-gradient(135deg, hsl(234 89% 58%), hsl(258 90% 66%));
     --gradient-brand-subtle: linear-gradient(135deg, hsl(234 89% 58% / 0.08), hsl(258 90% 66% / 0.04));
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(240 5% 98%));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(234 10% 97%));
     --gradient-gold: linear-gradient(135deg, hsl(234 89% 58%), hsl(245 80% 64%), hsl(258 90% 66%));
     --gradient-gold-subtle: linear-gradient(135deg, hsl(234 89% 58% / 0.1), hsl(258 90% 66% / 0.05));
     --shadow-glow: 0 0 20px hsl(234 89% 58% / 0.15), 0 0 40px hsl(234 89% 58% / 0.08);
@@ -242,8 +242,6 @@
       hsl(0 0% 99%) 80%,
       hsl(0 0% 100%) 100%
     );
-    background-size: 300% 300%;
-    animation: gradientShift 8s ease-in-out infinite;
     color: hsl(234 30% 25%);
     border: 1px solid hsl(234 50% 80% / 0.3);
     box-shadow: 
@@ -261,8 +259,6 @@
       hsl(0 0% 96%) 80%,
       hsl(0 0% 98%) 100%
     );
-    background-size: 300% 300%;
-    animation: gradientShift 8s ease-in-out infinite;
     color: hsl(234 30% 25%);
     box-shadow: 
       0 4px 24px hsl(0 0% 0% / 0.15),
@@ -344,8 +340,6 @@
       hsl(0 0% 99%) 80%,
       hsl(0 0% 100%) 100%
     );
-    background-size: 300% 300%;
-    animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
       0 4px 24px hsl(234 89% 67% / 0.08),
       0 12px 48px hsl(234 89% 67% / 0.05),
@@ -397,8 +391,6 @@
       hsl(258 12% 13%) 40%, 
       hsl(234 20% 16%) 100%
     );
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease-in-out infinite;
     box-shadow: 
       0 4px 24px hsl(258 90% 66% / 0.2),
       0 8px 48px hsl(234 89% 67% / 0.08),
