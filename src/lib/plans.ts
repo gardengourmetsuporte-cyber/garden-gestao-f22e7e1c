@@ -64,10 +64,14 @@ export const MODULE_REQUIRED_PLAN: Record<string, PlanTier> = {
   // BUSINESS modules
   'marketing': 'business',
   'copilot': 'business',
+  'menu-admin': 'business',
+  'tablet-admin': 'business',
+  'gamification': 'business',
+  'whatsapp': 'business',
 };
 
-/** Modules hidden from navigation (not ready for production) */
-export const HIDDEN_MODULES: string[] = ['menu-admin', 'tablet-admin', 'gamification', 'whatsapp'];
+/** Modules that are still in production (shown with a beta/production badge) */
+export const PRODUCTION_MODULES: string[] = ['menu-admin', 'tablet-admin', 'gamification', 'whatsapp'];
 
 /** Check if a plan satisfies the required plan level */
 export function planSatisfies(userPlan: PlanTier, requiredPlan: PlanTier): boolean {
