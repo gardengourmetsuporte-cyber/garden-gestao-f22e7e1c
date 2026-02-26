@@ -290,19 +290,15 @@ export default function ChecklistsPage() {
                       name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
                       size={22}
                       fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
-                      style={{ color: checklistType === 'abertura' ? '#475569' : undefined }}
                       className={cn(
                         "transition-colors",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-muted-foreground"
+                        getTypeProgress.abertura.percent === 100 ? "text-success" : checklistType === 'abertura' ? "text-foreground" : "text-muted-foreground"
                       )}
                     />
-                    <h3 className={cn(
-                      "text-base font-bold font-display",
-                      checklistType === 'abertura' ? "text-slate-800" : "text-foreground"
-                    )} style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
+                    <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
                   </div>
                   <div className="space-y-1.5">
-                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-slate-200/60" : "bg-secondary/60")}>
+                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-white/15" : "bg-secondary/60")}>
                       <div
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{
@@ -314,7 +310,7 @@ export default function ChecklistsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={cn("text-[10px]", checklistType === 'abertura' ? "text-slate-500" : "text-muted-foreground")}>
+                      <span className="text-[10px] text-muted-foreground">
                         {getTypeProgress.abertura.completed}/{getTypeProgress.abertura.total}
                       </span>
                       <span className={cn(
@@ -345,19 +341,15 @@ export default function ChecklistsPage() {
                       name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
                       size={22}
                       fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
-                      style={{ color: checklistType === 'fechamento' ? '#475569' : undefined }}
                       className={cn(
                         "transition-colors",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-muted-foreground"
+                        getTypeProgress.fechamento.percent === 100 ? "text-success" : checklistType === 'fechamento' ? "text-foreground" : "text-muted-foreground"
                       )}
                     />
-                    <h3 className={cn(
-                      "text-base font-bold font-display",
-                      checklistType === 'fechamento' ? "text-slate-800" : "text-foreground"
-                    )} style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
+                    <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
                   </div>
                   <div className="space-y-1.5">
-                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-slate-200/60" : "bg-secondary/60")}>
+                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-white/15" : "bg-secondary/60")}>
                       <div
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{
@@ -369,7 +361,7 @@ export default function ChecklistsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={cn("text-[10px]", checklistType === 'fechamento' ? "text-slate-500" : "text-muted-foreground")}>
+                      <span className="text-[10px] text-muted-foreground">
                         {getTypeProgress.fechamento.completed}/{getTypeProgress.fechamento.total}
                       </span>
                       <span className={cn(
@@ -417,25 +409,19 @@ export default function ChecklistsPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className={cn(
-                        "text-base font-black font-display",
-                        checklistType === 'bonus' ? "text-slate-800" : "text-foreground"
-                      )} style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
+                      <h3 className="text-base font-black font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{
-                        color: checklistType === 'bonus' ? 'hsl(160 84% 30%)' : 'hsl(160 84% 50%)',
-                        background: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.15)' : 'hsl(160 84% 39% / 0.12)',
+                        color: checklistType === 'bonus' ? 'hsl(160 84% 70%)' : 'hsl(160 84% 50%)',
+                        background: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.2)' : 'hsl(160 84% 39% / 0.12)',
                       }}>
                         Extra pts
                       </span>
                     </div>
-                    <p className={cn(
-                      "text-xs mt-0.5",
-                      checklistType === 'bonus' ? "text-slate-500" : "text-muted-foreground"
-                    )}>
+                    <p className="text-xs mt-0.5 text-muted-foreground">
                       Tarefas exclusivas para mais pontos ⚡
                     </p>
                   </div>
-                  <AppIcon name="ChevronRight" size={18} className={checklistType === 'bonus' ? "text-slate-400" : "text-muted-foreground"} />
+                  <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
                 </div>
                 {/* Shimmer effect — always visible, stronger when selected */}
                 <div
