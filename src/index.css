@@ -215,6 +215,18 @@
     color-scheme: light;
   }
 
+  /* Force dark/light keyboard on iOS & Android */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    color-scheme: dark;
+  }
+  :root:not(.dark) input,
+  :root:not(.dark) textarea,
+  :root:not(.dark) select {
+    color-scheme: light;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     overscroll-behavior-y: contain;

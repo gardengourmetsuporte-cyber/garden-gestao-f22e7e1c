@@ -3,7 +3,15 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, onFocus, ...props }, ref) => {
+    const handleFocus = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      // Auto-scroll into view after keyboard opens (300ms delay for iOS)
+      setTimeout(() => {
+        e.target.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+      }, 300);
+      onFocus?.(e);
+    }, [onFocus]);
+
     return (
       <input
         type={type}
@@ -12,6 +20,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className,
         )}
         ref={ref}
+        onFocus={handleFocus}
         {...props}
       />
     );
