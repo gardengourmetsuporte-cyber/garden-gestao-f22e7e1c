@@ -96,10 +96,10 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
       <nav
         className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60]"
       >
-        {/* Top neon glow line — same as main bar */}
-        <div className="absolute top-0 left-[8%] right-[8%] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)' }} />
-        <div className="absolute -top-[1px] left-[3%] right-[3%] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)' }} />
-        <div className="absolute -top-[3px] left-[12%] right-[12%] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)' }} />
+        {/* Top neon glow — 3-layer animated */}
+        <div className="absolute top-0 left-[8%] right-[8%] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute -top-[1px] left-[3%] right-[3%] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        <div className="absolute -top-[3px] left-[12%] right-[12%] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
 
         {/* Bar background — full width, edge to edge, same as main */}
         <div

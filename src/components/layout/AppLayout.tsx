@@ -222,10 +222,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
           </div>
-          {/* Bottom neon glow line — animated, matching bottom bar */}
+          {/* Bottom neon glow — 3-layer animated */}
           <div className="relative">
             <div className="h-[1px] mx-[8%]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
             <div className="h-[4px] mx-[3%] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+            <div className="h-[8px] mx-[12%] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
           </div>
         </div>
       </header>
