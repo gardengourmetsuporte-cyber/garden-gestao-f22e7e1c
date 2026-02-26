@@ -37,6 +37,7 @@ interface ChecklistViewProps {
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
+  deadlinePassed?: boolean;
 }
 
 const isToday = (dateStr: string): boolean => {
@@ -71,6 +72,7 @@ export function ChecklistView({
   getCompletionProgress,
   currentUserId,
   isAdmin,
+  deadlinePassed = false,
 }: ChecklistViewProps) {
   const { triggerCoin } = useCoinAnimation();
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set());
@@ -135,9 +137,14 @@ export function ChecklistView({
   const isTodayDate = isToday(date);
 
   const canToggleItem = (completion: ChecklistCompletion | undefined, completed: boolean) => {
-    if (!isAdmin && !isTodayDate) return false;
+    if (isAdmin) {
+      if (completed) return true;
+      return true; // admins can always toggle
+    }
+    if (!isTodayDate) return false;
+    // After deadline, non-admins cannot toggle uncompleted items
+    if (deadlinePassed && !completed) return false;
     if (!completed) return true;
-    if (isAdmin) return true;
     if (completion?.completed_by === currentUserId) return true;
     return false;
   };
@@ -199,8 +206,22 @@ export function ChecklistView({
     return hasActiveItems;
   });
 
+  const deadlineBannerText = deadlinePassed && checklistType !== 'bonus'
+    ? checklistType === 'abertura'
+      ? '⏰ Prazo encerrado às 07:30 — itens pendentes marcados como "não fiz"'
+      : '⏰ Prazo encerrado às 02:00 — itens pendentes marcados como "não fiz"'
+    : null;
+
   return (
     <div className="space-y-5">
+      {/* Deadline banner */}
+      {deadlineBannerText && !isAdmin && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
+          <Clock className="w-4 h-4 shrink-0" />
+          <span>{deadlineBannerText}</span>
+        </div>
+      )}
+
       {/* Sectors */}
       {filteredSectors.length === 0 && (
         <div className="card-command p-8 text-center">
