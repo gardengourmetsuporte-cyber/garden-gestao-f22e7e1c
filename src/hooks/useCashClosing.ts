@@ -160,14 +160,32 @@ export function useCashClosing() {
   };
 
   const deleteClosing = async (closingId: string) => {
-    if (!user || !isAdmin) return false;
+    if (!user) return false;
     try {
       const { error } = await supabase.from('cash_closings' as any).delete().eq('id', closingId);
       if (error) throw error;
       invalidate();
+      toast.success('Fechamento excluído');
       return true;
     } catch {
       toast.error('Erro ao excluir fechamento');
+      return false;
+    }
+  };
+
+  const updateClosing = async (closingId: string, data: Partial<CashClosingFormData>) => {
+    if (!user) return false;
+    try {
+      const { error } = await supabase
+        .from('cash_closings' as any)
+        .update(data as any)
+        .eq('id', closingId);
+      if (error) throw error;
+      invalidate();
+      toast.success('Fechamento atualizado');
+      return true;
+    } catch {
+      toast.error('Erro ao atualizar fechamento');
       return false;
     }
   };
@@ -420,7 +438,7 @@ export function useCashClosing() {
   return {
     closings, isLoading, uploadReceipt,
     createClosing, approveClosing, markDivergent,
-    deleteClosing, checkChecklistCompleted,
+    deleteClosing, updateClosing, checkChecklistCompleted,
     refetch: invalidate,
   };
 }
