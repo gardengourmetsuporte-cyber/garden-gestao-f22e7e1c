@@ -236,13 +236,13 @@ export function FinanceTransactions({
         <div className="mx-4 card-command p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Saldo do mês</span>
-            <span className={monthStats.balance >= 0 ? 'text-success font-semibold' : 'text-destructive font-semibold'}>
+            <span className={monthStats.balance >= 0 ? 'text-success font-bold font-display' : 'text-destructive font-bold font-display'} style={{ letterSpacing: '-0.02em' }}>
               {formatCurrency(monthStats.balance)}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs mt-1">
-            <span className="text-success">+{formatCurrency(monthStats.totalIncome)}</span>
-            <span className="text-destructive">-{formatCurrency(monthStats.totalExpense)}</span>
+             <span className="text-success font-semibold font-display">+{formatCurrency(monthStats.totalIncome)}</span>
+             <span className="text-destructive font-semibold font-display">-{formatCurrency(monthStats.totalExpense)}</span>
           </div>
         </div>
 
@@ -275,7 +275,7 @@ export function FinanceTransactions({
                           {dateStr === todayStr ? 'Hoje' : format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR })}
                         </span>
                       </div>
-                      <span className={`text-sm font-semibold ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
+                      <span className={`text-sm font-bold font-display ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
                         {formatCurrency(dayTotal)}
                       </span>
                     </div>

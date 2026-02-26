@@ -56,7 +56,7 @@ export default function RewardsPage() {
               <div className="icon-glow icon-glow-lg icon-glow-warning">
                 <AppIcon name="Star" size={24} className="text-warning" />
               </div>
-              <span className="text-4xl font-bold text-foreground">{balance}</span>
+              <span className="text-4xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{balance}</span>
               <span className="text-lg text-muted-foreground">pontos</span>
             </div>
           </div>

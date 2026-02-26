@@ -167,7 +167,7 @@ export default function SettingsPage() {
                         <AppIcon name={item.icon} size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="font-medium text-sm block">{item.label}</span>
+                        <span className="font-semibold font-display text-sm block">{item.label}</span>
                         <span className="text-[11px] text-muted-foreground">{item.description}</span>
                       </div>
                       <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />

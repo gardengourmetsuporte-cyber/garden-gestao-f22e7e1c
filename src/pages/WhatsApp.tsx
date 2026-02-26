@@ -43,7 +43,7 @@ export default function WhatsAppPage() {
         {/* Header */}
         <div className="page-header-bar shrink-0">
           <div className="page-header-content">
-            <h1 className="page-title">WhatsApp</h1>
+            <h1 className="page-title font-display">WhatsApp</h1>
           </div>
           {/* Tab bar */}
           <div className="px-4 pb-2">

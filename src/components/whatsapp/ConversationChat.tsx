@@ -58,7 +58,7 @@ export function ConversationChat({ conversation, onStatusChange }: Props) {
             <MessageCircle className="w-4 h-4 text-primary" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-sm text-foreground truncate">
+            <p className="font-semibold font-display text-sm text-foreground truncate">
               {conversation.contact?.name || conversation.contact?.phone || 'Cliente'}
             </p>
             <p className="text-xs text-muted-foreground">{conversation.contact?.phone}</p>
