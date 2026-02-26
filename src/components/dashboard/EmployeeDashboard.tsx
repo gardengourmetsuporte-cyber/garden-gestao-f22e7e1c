@@ -5,13 +5,17 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Leaderboard } from './Leaderboard';
-import { MyRankCard } from '@/components/ranking/MyRankCard';
+import { RankedAvatar } from '@/components/profile/RankedAvatar';
+import { getRank, getNextRank } from '@/lib/ranks';
+import { formatPoints } from '@/lib/points';
+import { Progress } from '@/components/ui/progress';
 import { EloList } from '@/components/profile/EloList';
 import { MedalList } from '@/components/profile/MedalList';
 import { MedalWinners } from '@/components/profile/MedalWinners';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { useLeaderboard, LeaderboardScope } from '@/hooks/useLeaderboard';
 import { usePoints } from '@/hooks/usePoints';
+import { useCountUp } from '@/hooks/useCountUp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { useUserModules } from '@/hooks/useAccessLevels';
@@ -42,12 +46,19 @@ function useGlobalMedals(unitId: string | null) {
   });
 }
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Bom dia';
+  if (h < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
+
 const QUICK_LINKS = [
-  { label: 'Checklists', icon: 'CheckSquare', path: '/checklists' },
-  { label: 'Estoque', icon: 'Package', path: '/inventory' },
-  { label: 'Pedidos', icon: 'ShoppingCart', path: '/orders' },
-  { label: 'Recompensas', icon: 'Gift', path: '/rewards' },
-  { label: 'Fechamento', icon: 'Receipt', path: '/cash-closing' },
+  { label: 'Checklists', icon: 'CheckSquare', path: '/checklists', color: 'hsl(var(--neon-amber))' },
+  { label: 'Estoque', icon: 'Package', path: '/inventory', color: 'hsl(var(--neon-green))' },
+  { label: 'Pedidos', icon: 'ShoppingCart', path: '/orders', color: 'hsl(var(--neon-cyan))' },
+  { label: 'Recompensas', icon: 'Gift', path: '/rewards', color: 'hsl(var(--neon-red))' },
+  { label: 'Fechamento', icon: 'Receipt', path: '/cash-closing', color: 'hsl(var(--neon-purple))' },
 ];
 
 export function EmployeeDashboard() {
@@ -61,13 +72,18 @@ export function EmployeeDashboard() {
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
   const [activeTab, setActiveTab] = useState<TabKey>('ranking');
 
-  // Filter quick links by access level
+  const rank = getRank(earned);
+  const next = getNextRank(earned);
+  const animatedMonthly = useCountUp(monthlyScore);
+  const animatedBalance = useCountUp(balance);
+
   const visibleLinks = QUICK_LINKS.filter(link => {
     const moduleKey = getModuleKeyFromRoute(link.path);
     return moduleKey ? hasAccess(moduleKey) : true;
   });
 
   const myPosition = leaderboard.find(e => e.user_id === user?.id)?.rank;
+  const firstName = profile?.full_name?.split(' ')[0] || 'Colaborador';
 
   const [syncing, setSyncing] = useState(false);
   const handleSync = useCallback(async () => {
@@ -77,24 +93,83 @@ export function EmployeeDashboard() {
     toast.success('Ranking atualizado!');
   }, [refetchPoints, refetchLeaderboard]);
 
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+
   return (
-    <div className="space-y-6 px-4 py-3 lg:px-6">
-      {/* Welcome Header */}
+    <div className="space-y-4 px-4 py-3 lg:px-6">
+      {/* Hero Card with gradient */}
       <div className="animate-spring-in spring-stagger-1">
-        <div className="card-surface p-5" style={{ border: 'none' }}>
-          <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
-            Olá, {profile?.full_name?.split(' ')[0] || 'Colaborador'}!
-          </h2>
-          <p className="text-muted-foreground text-xs mt-1">
-            {myPosition ? (
-              <>Você está em <span className="font-bold text-primary">#{myPosition}</span> no ranking mensal</>
-            ) : (
-              'Complete tarefas para ganhar pontos'
-            )}
-          </p>
+        <div className="gradient-primary rounded-3xl p-5 relative overflow-hidden">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs opacity-70 capitalize">{formattedDate}</p>
+              <h2 className="text-lg font-extrabold font-display mt-1" style={{ letterSpacing: '-0.03em' }}>
+                {getGreeting()}, {firstName}!
+              </h2>
+              {myPosition && (
+                <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-sm">
+                  <AppIcon name="TrendingUp" size={12} />
+                  <span className="text-[10px] font-bold">#{myPosition} no ranking</span>
+                </div>
+              )}
+            </div>
+            <RankedAvatar
+              avatarUrl={profile?.avatar_url}
+              earnedPoints={earned}
+              size={56}
+              userName={profile?.full_name || ''}
+              userId={user?.id}
+            />
+          </div>
+
+          {/* Stats row */}
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-white/10">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-0.5">
+                <AppIcon name="Flame" size={14} />
+              </div>
+              <p className="text-lg font-black leading-none">{animatedMonthly}</p>
+              <p className="text-[9px] opacity-60 mt-0.5">pts/mês</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-0.5">
+                <AppIcon name="Wallet" size={14} />
+              </div>
+              <p className="text-lg font-black leading-none">{animatedBalance}</p>
+              <p className="text-[9px] opacity-60 mt-0.5">saldo</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-0.5">
+                <AppIcon name="Star" size={14} />
+              </div>
+              <p className="text-lg font-black leading-none">{formatPoints(earned)}</p>
+              <p className="text-[9px] opacity-60 mt-0.5">total</p>
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Elo progress bar */}
+      {next && (
+        <div className="animate-spring-in spring-stagger-2 card-surface p-4">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold" style={{ color: rank.color }}>{rank.title}</span>
+            <div className="flex-1">
+              <Progress
+                value={100 - (next.pointsNeeded / (earned + next.pointsNeeded)) * 100}
+                className="h-2"
+              />
+            </div>
+            <span className="text-xs text-muted-foreground">{next.title}</span>
+          </div>
+          <p className="text-[10px] text-center text-muted-foreground mt-1.5">
+            Faltam <span className="font-semibold text-foreground">{formatPoints(next.pointsNeeded)}</span> pts para {next.title}
+          </p>
+        </div>
+      )}
+
+      {/* Quick Links */}
       {visibleLinks.length > 0 && (
         <div className="animate-spring-in spring-stagger-2">
           <div className={cn("grid gap-2", visibleLinks.length <= 4 ? `grid-cols-${visibleLinks.length}` : "grid-cols-5")}>
@@ -104,8 +179,8 @@ export function EmployeeDashboard() {
                 onClick={() => navigate(link.path)}
                 className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-95 transition-all"
               >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <AppIcon name={link.icon} size={20} className="text-primary" />
+                <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
+                  <AppIcon name={link.icon} size={18} fill={1} style={{ color: link.color }} />
                 </div>
                 <span className="text-[10px] font-medium text-muted-foreground leading-tight text-center">{link.label}</span>
               </button>
@@ -113,18 +188,6 @@ export function EmployeeDashboard() {
           </div>
         </div>
       )}
-
-      {/* My Rank Card */}
-      <div className="animate-spring-in spring-stagger-3">
-        <MyRankCard
-          fullName={profile?.full_name || 'Usuário'}
-          avatarUrl={profile?.avatar_url}
-          earnedPoints={earned}
-          monthlyScore={monthlyScore}
-          accumulatedBalance={balance}
-          leaderboardPosition={myPosition}
-        />
-      </div>
 
       {/* Tabs: Ranking / Elos / Medalhas */}
       <div className="animate-spring-in spring-stagger-3">
@@ -142,7 +205,6 @@ export function EmployeeDashboard() {
       <div className="animate-fade-in" key={activeTab}>
         {activeTab === 'ranking' && (
           <div className="space-y-3">
-            {/* Scope toggle */}
             <div className="flex gap-2">
               <button
                 onClick={() => setRankingScope('unit')}
