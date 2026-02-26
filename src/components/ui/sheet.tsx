@@ -78,7 +78,7 @@ const SheetOverlay = React.forwardRef<
     return (
       <DrawerPrimitive.Overlay
         ref={ref}
-        className={cn("fixed inset-0 z-50 bg-black/80", className)}
+        className={cn("fixed inset-0 z-[80] bg-black/80", className)}
         {...props}
       />
     );
@@ -87,7 +87,7 @@ const SheetOverlay = React.forwardRef<
   return (
     <SheetPrimitive.Overlay
       className={cn(
-        "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "fixed inset-0 z-[80] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         className,
       )}
       {...props}
@@ -99,7 +99,7 @@ SheetOverlay.displayName = "SheetOverlay";
 
 // ── Content variants (desktop only) ──
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  "fixed z-[90] gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
   {
     variants: {
       side: {
@@ -128,11 +128,11 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
     if (isMobile) {
       return (
         <DrawerPrimitive.Portal>
-          <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80" />
+          <DrawerPrimitive.Overlay className="fixed inset-0 z-[80] bg-black/80" />
           <DrawerPrimitive.Content
             ref={ref as React.Ref<HTMLDivElement>}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto min-h-[55vh] max-h-[96vh] flex-col rounded-t-[10px] border bg-background",
+              "fixed inset-x-0 bottom-0 z-[90] mt-24 flex h-auto min-h-[55vh] max-h-[96vh] flex-col rounded-t-[10px] border bg-background",
               className,
             )}
             {...(props as any)}
