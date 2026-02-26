@@ -7,14 +7,14 @@ interface AppIconProps {
   size?: number;
   className?: string;
   style?: React.CSSProperties;
-  /** 0 = outlined (default), 1 = filled */
+  /** 0 = outlined, 1 = filled (default) */
   fill?: 0 | 1;
   /** Weight: 100-700, default 400 */
   weight?: number;
 }
 
 export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
-  ({ name, size = 24, className, style, fill = 0, weight = 400 }, ref) => {
+  ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
     const materialName = ICON_MAP[name] || name;
 
     return (
