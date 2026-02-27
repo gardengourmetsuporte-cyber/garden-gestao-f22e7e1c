@@ -24,13 +24,15 @@ export function LandingNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-background/85 backdrop-blur-2xl border-b border-border/30 shadow-sm"
+          ? "bg-background/90 backdrop-blur-2xl border-b border-border/30 shadow-sm"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
+        <Link to="/landing" className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-sm">
+            <img src={logoImg} alt="Garden" className="w-7 h-7 object-contain" />
+          </div>
           <span className={`font-display font-bold text-base transition-colors duration-300 ${scrolled ? "text-foreground" : "text-white"}`}>
             Garden
           </span>
@@ -41,9 +43,9 @@ export function LandingNavbar() {
             <a
               key={l.href}
               href={l.href}
-              className={`text-sm transition-colors duration-200 ${
+              className={`text-sm font-medium transition-colors duration-200 ${
                 scrolled
-                  ? "text-muted-foreground hover:text-primary"
+                  ? "text-muted-foreground hover:text-foreground"
                   : "text-white/60 hover:text-white"
               }`}
             >
@@ -56,20 +58,20 @@ export function LandingNavbar() {
           <ThemeToggle />
           <Link
             to="/auth"
-            className={`hidden sm:inline-flex text-sm transition-colors ${
+            className={`hidden sm:inline-flex text-sm font-medium transition-colors ${
               scrolled
                 ? "text-muted-foreground hover:text-foreground"
-                : "text-white/50 hover:text-white/80"
+                : "text-white/60 hover:text-white"
             }`}
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className={`hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            className={`hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-bold transition-all duration-200 ${
               scrolled
-                ? "gradient-primary text-primary-foreground"
-                : "bg-white text-[hsl(220,30%,15%)] hover:bg-white/90"
+                ? "gradient-primary text-primary-foreground shadow-md"
+                : "bg-white text-[hsl(220,30%,15%)] hover:bg-white/90 shadow-lg"
             }`}
           >
             Começar grátis
@@ -78,7 +80,7 @@ export function LandingNavbar() {
           <button
             onClick={() => setOpen(!open)}
             className={`md:hidden p-2 transition-colors ${
-              scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/60 hover:text-white"
+              scrolled ? "text-muted-foreground" : "text-white/70"
             }`}
           >
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -89,27 +91,12 @@ export function LandingNavbar() {
       {open && (
         <div className="md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 px-4 pb-6 pt-2 space-y-1 animate-fade-in">
           {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="block py-3 text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
               {l.label}
             </a>
           ))}
-          <Link
-            to="/auth"
-            onClick={() => setOpen(false)}
-            className="block py-3 text-sm text-muted-foreground"
-          >
-            Entrar
-          </Link>
-          <Link
-            to="/auth?plan=free"
-            onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold gradient-primary text-primary-foreground"
-          >
+          <Link to="/auth" onClick={() => setOpen(false)} className="block py-3 text-sm text-muted-foreground">Entrar</Link>
+          <Link to="/auth?plan=free" onClick={() => setOpen(false)} className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-bold gradient-primary text-primary-foreground">
             Começar grátis
           </Link>
         </div>
