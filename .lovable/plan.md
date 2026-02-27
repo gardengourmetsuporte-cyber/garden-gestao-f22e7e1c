@@ -1,98 +1,100 @@
 
 
-## Plano de Padronização Visual — Landing Page ao Sistema
+## Redesign Completo da Landing Page — Inspirado no Lovable
 
-Após auditoria completa do codebase, identifiquei as inconsistências e organizei as correções em blocos de impacto.
-
----
-
-### 1. Landing Navbar — Botões Desktop com `rounded-lg` (devem ser `rounded-xl`)
-
-**Arquivo**: `src/components/landing/LandingNavbar.tsx`
-
-Os botões desktop "Entrar" (linha 53) e "Teste grátis" (linha 59) usam `rounded-lg`. Todo o sistema usa `rounded-xl` como padrão para botões. Corrigir ambos para `rounded-xl`.
+A landing atual tem muitos gradientes, glows, e phone mockups que destoam do padrão clean/moderno. O redesign segue a estética Lovable: tipografia centralizada grande, backgrounds sutis, cards limpos com bordas finas, e espaçamento generoso.
 
 ---
 
-### 2. Landing — Cards da ProblemSection usando `style={}` inline avulso
+### Arquivos a reescrever (7 componentes):
 
-**Arquivo**: `src/components/landing/ProblemSection.tsx`
+**1. `LandingNavbar.tsx`** — Simplificar
+- Logo + nome à esquerda
+- Links centrais (Funcionalidades, Planos, FAQ)
+- Apenas 1 botão CTA à direita: "Começar grátis" (fundo escuro, texto branco)
+- Link "Entrar" como texto simples, sem borda
+- Remover botões duplicados no mobile — menu hamburguer com links + 1 CTA
 
-Os 3 cards de problema usam estilos inline (`style={{ background: "hsl(var(--card))", border: ... }}`). Devem usar a classe `card-surface` do design system, que já aplica `bg-card`, `rounded-2xl`, `shadow-card` e borda automática no dark mode. Isso garante consistência com o resto do app.
+**2. `HeroSection.tsx`** — Layout centralizado
+- Remover phone mockup e gradientes mesh
+- Headline centralizada grande (`text-5xl sm:text-6xl font-extrabold`)
+- Subtítulo `text-muted-foreground` abaixo
+- Badge sutil em cima ("Feito por restaurante, para restaurantes")
+- 1 CTA centralizado: "Começar grátis" (botão escuro)
+- Link secundário: "Já tenho conta" como texto
+- Screenshot real do sistema abaixo (em `rounded-2xl` com sombra sutil, sem moldura de celular)
 
----
+**3. `ProblemSection.tsx`** — Cards minimalistas
+- Manter os 3 cards mas com estilo mais limpo
+- `card-surface p-8` sem efeitos extras
+- Emoji menor, tipografia mais sóbria
+- Grid 3 colunas no desktop
 
-### 3. Landing — FAQ items usando estilos inline em vez de classes do sistema
+**4. `SolutionSection.tsx`** — Steps 1-2-3 como "Meet Lovable"
+- Substituir layout alternado com phone mockups por uma seção de 3 passos numerados
+- Cada passo: número grande + título + descrição + screenshot em `rounded-2xl` com `shadow-card`
+- Screenshots em container largo (não phone mockup)
+- Abaixo dos passos, grid 2x2 com os 4 módulos (Financeiro, Checklist, Estoque, Relatórios) como cards com ícone + título + descrição curta
 
-**Arquivo**: `src/components/landing/FAQSection.tsx`
+**5. `PricingSection.tsx`** — Estilo Lovable pricing
+- Cards com fundo `bg-card`, borda `border` sutil
+- Sem gradientes nos cards
+- Preço grande + features com checkmarks
+- Botão CTA: card destacado usa fundo escuro, outro usa borda
+- Toggle mensal/anual mantido
 
-Os `AccordionItem` usam `style={{ background: "hsl(var(--card))", border: ... }}` inline. Devem usar `card-surface` para padronizar com o resto.
+**6. `CTASection.tsx`** — Simplificar
+- Fundo limpo, sem gradientes mesh
+- Headline + subtítulo centralizados
+- 1 botão CTA escuro
+- Texto "14 dias grátis" abaixo
 
----
-
-### 4. Landing — PricingSection cards com estilos inline
-
-**Arquivo**: `src/components/landing/PricingSection.tsx`
-
-Os cards de plano usam estilos inline mistos. O card não-highlighted deve usar `card-surface`. O card highlighted pode manter o estilo especial mas usando a classe base + override.
-
----
-
-### 5. Landing — Espaçamento vertical inconsistente entre seções
-
-Cada seção da landing usa `py-20 md:py-28`, exceto o Hero que usa `pt-28 pb-16 md:pt-36 md:pb-24`. Padronizar o Hero para `pt-28 pb-20 md:pt-36 md:pb-28` para manter ritmo.
-
----
-
-### 6. Landing — Section headers sem padrão
-
-As seções Problem, Solution, Pricing e FAQ têm um padrão de `<p>` tag + `<h2>` como header. O espaçamento `mb-14`, `mb-16`, `mb-12`, `mb-4` varia entre eles. Padronizar todos para `mb-14`.
-
----
-
-### 7. Inventory — Skeleton loading usa `py-4` enquanto a página real usa `py-3`
-
-**Arquivo**: `src/pages/Inventory.tsx`  
-
-O estado de loading (linha 124) usa `px-4 py-4` enquanto o estado carregado (linha 154) usa `px-4 py-3 lg:px-6`. Padronizar para `px-4 py-3 lg:px-6`.
-
----
-
-### 8. PersonalFinance — Skeleton loading usa `py-4` sem `lg:px-6`
-
-**Arquivo**: `src/pages/PersonalFinance.tsx`
-
-Mesma inconsistência: loading state com `px-4 py-4` em vez de `px-4 py-3 lg:px-6`.
+**7. `FooterSection.tsx`** — Manter simples, apenas ajustar espaçamento
 
 ---
 
-### 9. GamificationMetrics — Usa `<Card>` component em vez de `card-surface`
+### Mudanças no CSS (`index.css`)
+- Nenhuma mudança necessária; os tokens existentes suportam o novo layout
 
-**Arquivo**: `src/components/gamification/GamificationMetrics.tsx`
+### Padrões visuais do redesign
 
-Os 3 metric cards usam `<Card className="p-3">`. O sistema padronizou cards de stats usando a classe `card-surface`. Converter para `<div className="card-surface p-3">` para consistência visual (sombra, borda, border-radius).
+```text
+┌─────────────────────────────────────────┐
+│  Logo    Funcionalidades  Planos  FAQ   │
+│                              Entrar  CTA│
+├─────────────────────────────────────────┤
+│         Badge sutil                     │
+│    Headline grande centralizado         │
+│      Subtítulo muted                    │
+│        [Começar grátis]                 │
+│         Já tenho conta                  │
+│                                         │
+│   ┌─────────────────────────────────┐   │
+│   │   Screenshot real do sistema    │   │
+│   │   (rounded-2xl + shadow-card)   │   │
+│   └─────────────────────────────────┘   │
+├─────────────────────────────────────────┤
+│   Card 1    Card 2    Card 3            │
+│  (problema) (problema) (problema)       │
+├─────────────────────────────────────────┤
+│  1. Passo  2. Passo  3. Passo          │
+│  + Grid 2x2 módulos                    │
+├─────────────────────────────────────────┤
+│  Pricing card   Pricing card            │
+├─────────────────────────────────────────┤
+│  FAQ accordion                          │
+├─────────────────────────────────────────┤
+│  CTA final                              │
+├─────────────────────────────────────────┤
+│  Footer                                 │
+└─────────────────────────────────────────┘
+```
 
----
-
-### 10. Footer — Logo com `rounded-full` enquanto navbar usa `rounded-full` mas com tamanhos diferentes
-
-**Arquivo**: `src/components/landing/FooterSection.tsx`
-
-O logo do footer usa `h-11 w-11` enquanto a navbar usa `h-12 w-12`. Padronizar para `h-10 w-10` em ambos (footer e navbar) ou manter `h-12 w-12` consistente.
-
----
-
-### Resumo de arquivos afetados
-
-| Arquivo | Tipo de correção |
-|---------|-----------------|
-| `LandingNavbar.tsx` | `rounded-lg` → `rounded-xl` nos botões desktop |
-| `ProblemSection.tsx` | Inline styles → `card-surface` class |
-| `FAQSection.tsx` | Inline styles → `card-surface` class |
-| `PricingSection.tsx` | Inline styles → classes do design system |
-| `HeroSection.tsx` | Ajuste de padding bottom |
-| `FooterSection.tsx` | Tamanho do logo padronizado |
-| `Inventory.tsx` | Skeleton padding `py-4` → `py-3 lg:px-6` |
-| `PersonalFinance.tsx` | Skeleton padding `py-4` → `py-3 lg:px-6` |
-| `GamificationMetrics.tsx` | `<Card>` → `card-surface` div |
+### Resumo
+- 7 arquivos reescritos
+- Estética limpa, centralizada, sem glows/mesh gradients
+- Screenshots reais do sistema em containers limpos (sem phone mockup)
+- Tipografia grande e espaçamento generoso
+- Cards com `card-surface` e bordas sutis
+- 1 CTA por seção, consistente (fundo escuro navy)
 
