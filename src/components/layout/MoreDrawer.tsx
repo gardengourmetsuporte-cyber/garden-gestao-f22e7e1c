@@ -224,10 +224,13 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                   className={cn(
                     "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
                     active
-                      ? "bg-primary/10 dark:bg-white dark:shadow-md"
+                      ? "text-primary-foreground shadow-md border border-primary/30"
                       : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
                   )}
-                  style={{ opacity: locked ? 0.55 : 1 }}
+                  style={{
+                    opacity: locked ? 0.55 : 1,
+                    ...(active ? { background: 'var(--gradient-brand)' } : {}),
+                  }}
                 >
                   {isProd && (
                     <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
@@ -235,14 +238,14 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                     </span>
                   )}
                   <div className="relative">
-                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", active ? "bg-primary" : "bg-muted")}>
+                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", active ? "bg-primary-foreground/15" : "bg-muted")}>
                       <AppIcon name={item.icon} size={18} fill={active ? 1 : 0} className={active ? "text-primary-foreground" : "text-foreground/70"} />
                     </div>
                     {locked && (
                       <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
                     )}
                   </div>
-                  <span className={cn("text-[11px] font-medium leading-tight text-center truncate max-w-full", active ? "text-foreground dark:text-[hsl(220_30%_20%)]" : locked ? "text-muted-foreground" : "text-foreground/80")}>
+                  <span className={cn("text-[11px] font-medium leading-tight text-center truncate max-w-full", active ? "text-primary-foreground" : locked ? "text-muted-foreground" : "text-foreground/80")}>
                     {item.label}
                   </span>
                   {locked && planLabel && (
