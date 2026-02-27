@@ -26,6 +26,13 @@ const DEFAULT_TABS: TabDef[] = [
   { key: 'finance', icon: 'DollarSign', label: 'Financeiro', path: '/finance', moduleKey: 'finance' },
 ];
 
+// Custom tabs when inside CardapioHub
+const CARDAPIO_TABS: TabDef[] = [
+  { key: 'home', icon: 'Home', label: 'Início', path: '/', moduleKey: 'dashboard' },
+  { key: 'cardapio', icon: 'BookOpen', label: 'Cardápio', path: '/cardapio', moduleKey: 'cardapio' },
+  { key: 'pedidos', icon: 'ShoppingBag', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
+];
+
 const FALLBACK_TABS: TabDef[] = [
   { key: 'inventory', icon: 'Package', label: 'Estoque', path: '/inventory', moduleKey: 'inventory' },
   { key: 'agenda', icon: 'CalendarDays', label: 'Agenda', path: '/agenda', moduleKey: 'agenda' },
@@ -50,18 +57,25 @@ export function BottomTabBar() {
 
   const isHidden = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r)) || location.pathname.startsWith('/tablet');
 
+  const isCardapioRoute = location.pathname.startsWith('/cardapio');
+
   const resolvedTabs: TabDef[] = [];
   const usedKeys = new Set<string>();
 
-  for (const tab of DEFAULT_TABS) {
-    if (hasAccess(tab.moduleKey)) {
-      resolvedTabs.push(tab);
-      usedKeys.add(tab.key);
-    } else {
-      const fallback = FALLBACK_TABS.find(f => !usedKeys.has(f.key) && hasAccess(f.moduleKey));
-      if (fallback) {
-        resolvedTabs.push(fallback);
-        usedKeys.add(fallback.key);
+  if (isCardapioRoute) {
+    // Use custom cardápio tabs
+    resolvedTabs.push(...CARDAPIO_TABS);
+  } else {
+    for (const tab of DEFAULT_TABS) {
+      if (hasAccess(tab.moduleKey)) {
+        resolvedTabs.push(tab);
+        usedKeys.add(tab.key);
+      } else {
+        const fallback = FALLBACK_TABS.find(f => !usedKeys.has(f.key) && hasAccess(f.moduleKey));
+        if (fallback) {
+          resolvedTabs.push(fallback);
+          usedKeys.add(fallback.key);
+        }
       }
     }
   }
@@ -71,11 +85,23 @@ export function BottomTabBar() {
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/';
+    // Handle query param based tabs (e.g. /cardapio?tab=pedidos)
+    if (path.includes('?')) {
+      const [basePath, query] = path.split('?');
+      const params = new URLSearchParams(query);
+      const tabParam = params.get('tab');
+      return location.pathname.startsWith(basePath) && new URLSearchParams(location.search).get('tab') === tabParam;
+    }
+    // For /cardapio without ?tab, only match when no tab param is set
+    if (isCardapioRoute && path === '/cardapio') {
+      return location.pathname.startsWith('/cardapio') && !new URLSearchParams(location.search).get('tab');
+    }
     return location.pathname.startsWith(path);
   };
 
   const isTabLocked = (path: string): boolean => {
-    const moduleKey = getModuleKeyFromRoute(path);
+    const basePath = path.split('?')[0];
+    const moduleKey = getModuleKeyFromRoute(basePath);
     if (!moduleKey) return false;
     const required = MODULE_REQUIRED_PLAN[moduleKey];
     if (!required) return false;

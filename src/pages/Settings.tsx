@@ -20,7 +20,7 @@ const TeamHub = lazy(() => import('@/components/settings/TeamHub').then(m => ({ 
 const MedalSettings = lazy(() => import('@/components/settings/MedalSettings').then(m => ({ default: m.MedalSettings })));
 const NotificationSettings = lazy(() => import('@/components/settings/NotificationSettings').then(m => ({ default: m.NotificationSettings })));
 const AuditLogSettings = lazy(() => import('@/components/settings/AuditLogSettings').then(m => ({ default: m.AuditLogSettings })));
-
+const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 interface MenuItem {
   value: string;
   icon: string;
@@ -45,6 +45,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'medals', icon: 'Award', label: 'Medalhas', description: 'Conceder medalhas de prestígio', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
   { value: 'units', icon: 'Store', label: 'Lojas', description: 'Gerenciar suas lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
+  { value: 'cardapio-digital', icon: 'BookOpen', label: 'Cardápio Digital', description: 'PDV, mesas, QR e roleta', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
 ];
 
 function SettingsFallback() {
@@ -145,6 +146,7 @@ export default function SettingsPage() {
               {activeSection === 'medals' && <MedalSettings />}
               {activeSection === 'notifications' && <NotificationSettings />}
               {activeSection === 'audit-log' && <AuditLogSettings />}
+              {activeSection === 'cardapio-digital' && <CardapioSettings />}
             </Suspense>
           </div>
         </div>
