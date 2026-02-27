@@ -622,6 +622,12 @@
     @apply text-sm font-medium text-muted-foreground;
   }
 
+  /* ========== PAGE LAYOUT ========== */
+  /* Standard page wrapper — use in all top-level pages */
+  .page-container {
+    @apply px-4 py-3 space-y-4;
+  }
+
   /* ========== ICON GLOW SYSTEM ========== */
 
   .icon-glow {
