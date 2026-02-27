@@ -21,7 +21,23 @@ export function useEmployees() {
       if (activeUnitId) query = query.eq('unit_id', activeUnitId);
       const { data, error } = await query;
       if (error) throw error;
-      return data as Employee[];
+      const emps = data as Employee[];
+
+      // Batch-fetch avatar_url from profiles for linked employees
+      const userIds = emps.map(e => e.user_id).filter(Boolean) as string[];
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, avatar_url')
+          .in('user_id', userIds);
+        if (profiles) {
+          const avatarMap = new Map(profiles.map(p => [p.user_id, p.avatar_url]));
+          emps.forEach(e => {
+            if (e.user_id) (e as any).avatar_url = avatarMap.get(e.user_id) || null;
+          });
+        }
+      }
+      return emps;
     },
   });
 
