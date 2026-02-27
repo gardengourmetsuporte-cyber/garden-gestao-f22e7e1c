@@ -1499,7 +1499,30 @@
     100% { background-position: 0% 0%; }
   }
 
-  /* Subtle shine sweep across card */
+  /* Auth page floating orbs */
+  @keyframes float-orb-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.1); }
+    66% { transform: translate(-20px, 15px) scale(0.95); }
+  }
+  @keyframes float-orb-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    40% { transform: translate(-25px, 20px) scale(1.08); }
+    70% { transform: translate(15px, -15px) scale(0.92); }
+  }
+  @keyframes float-orb-3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(20px, -25px); }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   @keyframes cardShineSwipe {
     0%   { background-position: 200% 0; opacity: 0; }
     15%  { opacity: 1; }
