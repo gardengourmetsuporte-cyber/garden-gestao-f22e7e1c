@@ -41,11 +41,7 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
     >
       {/* Image — clickable for upload */}
       <div
-        className="w-14 h-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center relative cursor-pointer"
-        style={{
-          background: 'hsl(var(--secondary) / 0.6)',
-          border: '1px solid hsl(var(--border) / 0.3)',
-        }}
+        className="w-14 h-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center relative cursor-pointer bg-secondary/60 border border-border/30"
         onClick={handleImageClick}
       >
         {product.image_url ? (
@@ -76,7 +72,7 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
         <div className="flex items-center gap-1.5">
           <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
           {product.is_highlighted && (
-            <AppIcon name="Star" size={12} className="text-warning shrink-0" style={{ filter: 'drop-shadow(0 0 4px hsl(var(--neon-amber) / 0.5))' }} />
+            <AppIcon name="Star" size={12} className="text-primary shrink-0" fill={1} />
           )}
         </div>
         {product.description && (
@@ -84,36 +80,26 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
         )}
         <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
           {product.codigo_pdv && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-              background: 'hsl(var(--secondary))', color: 'hsl(var(--muted-foreground))',
-            }}>PDV: {product.codigo_pdv}</span>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-secondary text-muted-foreground">PDV: {product.codigo_pdv}</span>
           )}
           {avail?.tablet && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-              background: 'hsl(var(--neon-cyan) / 0.1)', color: 'hsl(var(--neon-cyan))',
-            }}>Mesa</span>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Mesa</span>
           )}
           {avail?.delivery && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-              background: 'hsl(var(--neon-green) / 0.1)', color: 'hsl(var(--neon-green))',
-            }}>Delivery</span>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Delivery</span>
           )}
           {optionCount > 0 && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-              background: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))',
-            }}>{optionCount} {optionCount === 1 ? 'opcional' : 'opcionais'}</span>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">{optionCount} {optionCount === 1 ? 'opcional' : 'opcionais'}</span>
           )}
           {!product.is_active && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-              background: 'hsl(var(--destructive) / 0.1)', color: 'hsl(var(--destructive))',
-            }}>Inativo</span>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-destructive/10 text-destructive">Inativo</span>
           )}
         </div>
       </div>
 
       {/* Price + Actions */}
       <div className="text-right shrink-0 flex items-center gap-1">
-        <span className="font-bold text-sm" style={{ color: 'hsl(var(--neon-green))' }}>{formatPrice(product.price)}</span>
+        <span className="font-bold text-sm text-primary">{formatPrice(product.price)}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
             <button className="p-1.5 rounded-lg hover:bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -44,14 +44,10 @@ export function MenuGroupContent({
               <h2 className="text-base font-bold text-foreground">{group.name}</h2>
               <div className="flex items-center gap-2 mt-0.5">
                 {avail?.tablet && (
-                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-                    background: 'hsl(var(--neon-cyan) / 0.1)', color: 'hsl(var(--neon-cyan))',
-                  }}>Mesa</span>
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Mesa</span>
                 )}
                 {avail?.delivery && (
-                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-                    background: 'hsl(var(--neon-green) / 0.1)', color: 'hsl(var(--neon-green))',
-                  }}>Delivery</span>
+                  <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Delivery</span>
                 )}
                 <span className="text-[11px] text-muted-foreground">
                   {products.length} {products.length === 1 ? 'produto' : 'produtos'}

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
@@ -42,7 +41,7 @@ export function MenuCategoryTree({
   };
 
   const openNewCategory = () => {
-    setEditingCat({ name: '', icon: 'UtensilsCrossed', color: '#6366f1', is_active: true });
+    setEditingCat({ name: '', icon: 'UtensilsCrossed', color: 'hsl(var(--primary))', is_active: true });
     setCatDialog(true);
   };
 
@@ -91,15 +90,11 @@ export function MenuCategoryTree({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Add category button */}
       <button
         onClick={openNewCategory}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97]"
-        style={{
-          background: 'hsl(var(--primary) / 0.08)',
-          border: '1px dashed hsl(var(--primary) / 0.3)',
-        }}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97] bg-primary/[0.06] border border-dashed border-primary/20 hover:bg-primary/[0.1]"
       >
         <AppIcon name="Plus" size={16} /> Nova Categoria
       </button>
@@ -116,16 +111,8 @@ export function MenuCategoryTree({
                 onClick={() => toggleCat(cat.id)}
                 className="flex-1 flex items-center gap-2.5 px-3.5 py-3 text-sm font-semibold transition-all"
               >
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                  style={{
-                    background: `${cat.color}20`,
-                    border: `1px solid ${cat.color}40`,
-                  }}
-                >
-                  <span className="text-base" style={{ color: cat.color }}>
-                    {cat.icon === 'UtensilsCrossed' ? '🍴' : cat.icon === 'Coffee' ? '☕' : cat.icon === 'Wine' ? '🍷' : cat.icon === 'Dessert' ? '🍰' : '📋'}
-                  </span>
+                <div className="icon-glow icon-glow-sm icon-glow-primary">
+                  <AppIcon name={cat.icon || 'Package'} size={16} />
                 </div>
                 <span className="flex-1 text-left text-foreground">{cat.name}</span>
                 <span className="text-[10px] text-muted-foreground mr-1">{catGroups.length} grupos</span>
@@ -172,30 +159,21 @@ export function MenuCategoryTree({
                         className={cn(
                           "flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 active:scale-[0.98]",
                           isSelected
-                            ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+                            ? "finance-hero-card text-foreground font-medium"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent"
                         )}
-                        style={isSelected ? {
-                          background: 'hsl(var(--primary) / 0.1)',
-                          border: '1px solid hsl(var(--primary) / 0.25)',
-                          boxShadow: '0 0 12px hsl(var(--primary) / 0.08)',
-                        } : { border: '1px solid transparent' }}
                       >
                         <div
                           className="w-2 h-2 rounded-full shrink-0"
                           style={{ background: isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)' }}
                         />
-                        <span className="flex-1 text-left truncate font-medium">{grp.name}</span>
+                        <span className="flex-1 text-left truncate">{grp.name}</span>
                         <div className="flex items-center gap-1.5">
                           {avail?.tablet && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-                              background: 'hsl(var(--neon-cyan) / 0.1)', color: 'hsl(var(--neon-cyan))',
-                            }}>Mesa</span>
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Mesa</span>
                           )}
                           {avail?.delivery && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold" style={{
-                              background: 'hsl(var(--neon-green) / 0.1)', color: 'hsl(var(--neon-green))',
-                            }}>Delivery</span>
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Delivery</span>
                           )}
                           <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
                         </div>
@@ -242,15 +220,8 @@ export function MenuCategoryTree({
               <Input value={editingCat.name || ''} onChange={e => setEditingCat({ ...editingCat, name: e.target.value })} />
             </div>
             <div>
-              <Label>Ícone (Lucide)</Label>
+              <Label>Ícone (Material Symbol)</Label>
               <Input value={editingCat.icon || ''} onChange={e => setEditingCat({ ...editingCat, icon: e.target.value })} placeholder="UtensilsCrossed" />
-            </div>
-            <div>
-              <Label>Cor</Label>
-              <div className="flex gap-2 items-center">
-                <input type="color" value={editingCat.color || '#6366f1'} onChange={e => setEditingCat({ ...editingCat, color: e.target.value })} className="w-10 h-10 rounded-lg border-0 cursor-pointer" />
-                <Input value={editingCat.color || ''} onChange={e => setEditingCat({ ...editingCat, color: e.target.value })} className="flex-1" />
-              </div>
             </div>
           </div>
           <DialogFooter>
