@@ -145,6 +145,7 @@ export function BottomTabBar() {
             {/* Center FAB — context-aware */}
             <div className="flex items-center justify-center" style={{ width: '20%' }}>
               <button
+                aria-label={fabAction?.label || 'Ação rápida'}
                 onClick={() => {
                   navigator.vibrate?.(10);
                   if (fabAction) {
@@ -185,6 +186,7 @@ export function BottomTabBar() {
             {/* "Mais" tab */}
             <button
               onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
+              aria-label="Mais opções"
               className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
               style={{ width: '20%' }}
             >
@@ -235,6 +237,7 @@ const TabButton = forwardRef<
       onClick={handleTap}
       onMouseEnter={() => void preloadRoute(tab.path)}
       onTouchStart={() => void preloadRoute(tab.path)}
+      aria-label={tab.label}
       className={cn(
         "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
         "text-muted-foreground"
