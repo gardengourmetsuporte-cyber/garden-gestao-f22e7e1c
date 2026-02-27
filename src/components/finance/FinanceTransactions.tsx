@@ -270,10 +270,10 @@ export function FinanceTransactions({
                 return (
                   <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
                     {/* Date Header */}
-                    <div className={`flex items-center justify-between py-2 px-2 rounded-lg ${dateStr === todayStr ? 'bg-foreground text-background' : ''}`}>
+                    <div className={`flex items-center justify-between py-2 px-2 rounded-lg ${dateStr === todayStr ? 'bg-primary text-primary-foreground' : ''}`}>
                       <div className="flex items-center gap-2">
                         {dateStr === todayStr && (
-                          <span className="w-2 h-2 rounded-full bg-background animate-pulse shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-primary-foreground animate-pulse shrink-0" />
                         )}
                         <span className={`text-sm font-medium capitalize ${dateStr === todayStr ? 'font-semibold' : 'text-muted-foreground'}`}>
                           {getDateLabel(dateStr)}
