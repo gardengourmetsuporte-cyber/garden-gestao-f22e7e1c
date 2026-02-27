@@ -1,77 +1,78 @@
 
 
-# Plano: Redesign Completo do Cardápio Digital Unificado
+# Plano: Reestruturação — Cardápio Digital Centralizado + Unificação de Módulos
 
-## Problema Atual
-Os módulos estão fragmentados em 3 fluxos separados:
-- `/m/:unitId` → Cardápio digital (criado mas básico/esqueleto)
-- `/tablet/:unitId` → Seleção de mesa + cardápio tablet (fluxo antigo)  
-- `/gamification/:unitId` → Roleta standalone (fluxo antigo)
+## Diagnóstico dos Problemas Atuais
 
-O design está genérico e não segue o padrão visual Goomer que você mostrou nos screenshots.
+1. **Duplicidade de dados**: `useTabletAdmin` e `useMenuAdmin` ambos fazem CRUD na mesma tabela `tablet_products` — dois hooks, dois UIs, dois fluxos para a mesma coisa
+2. **Módulos fragmentados no menu**: "Cardápio", "Tablets" e "Gamificação" são 3 entradas separadas no MoreDrawer, quando deveriam ser sub-seções de um módulo unificado
+3. **Layout do cardápio digital (`/m/:unitId`) genérico**: Não atinge qualidade premium — falta polish visual, micro-interações, tipografia refinada
+4. **TabletAdmin gerencia produtos**: A aba "Produtos" dentro de Tablets é redundante com o Cardápio (`/cardapio`)
 
-## O que será feito
+## Arquitetura Proposta
 
-### 1. Redesign completo do `MenuLanding.tsx`
-Inspirado nos screenshots do Goomer:
-- Banner/cover image do estabelecimento (full-width, altura generosa ~180px)
-- Logo sobrepondo o banner (posição inferior, borda branca)
-- Nome do restaurante em destaque, tipo de cozinha, endereço
-- Badge "Aberto/Fechado" com horários visíveis
-- Info de entrega/tempo estimado (se configurado)
-- Botão de compartilhar/info
+```text
+Módulo "Cardápio Digital" (novo, unificado)
+├── Tab: Produtos (= MenuAdmin atual — hierarquia Categorias > Grupos > Produtos > Opcionais)
+├── Tab: Pedidos (= TabletAdmin.orders — pedidos em tempo real)
+├── Tab: Mesas & QR (= TabletAdmin.tables + QR codes)
+├── Tab: Conexão PDV (= TabletAdmin.config — Colibri)
+├── Tab: Roleta (= Gamification admin — prêmios e métricas)
+└── Tab: Configurações (= store_info, horários, delivery, branding)
+```
 
-### 2. Redesign do `MenuProductList.tsx`
-Estilo Goomer:
-- Chips de categoria horizontais com ícone + texto (estilo pill arredondado)
-- Cards de produto com imagem à direita (layout horizontal, não vertical)
-- Nome, descrição truncada (2 linhas), preço alinhado à esquerda
-- Tag "Mais vendido" / destaque visual para `is_highlighted`
-- Separadores visuais entre grupos com título + descrição
+A rota `/cardapio` vira o hub central. Rotas `/tablet-admin` e `/gamification` viram redirects para `/cardapio`.
 
-### 3. Redesign do `MenuProductDetail.tsx`
-- Imagem full-width no topo do sheet
-- Layout de opcionais com radio buttons para seleção única, checkboxes para múltipla
-- Badges "Obrigatório" em vermelho
-- Contador de quantidade com design arredondado
-- Botão "Adicionar R$ XX,XX" em verde/primary no rodapé fixo
-- Campo de observações colapsável
+## Etapas de Implementação
 
-### 4. Redesign do `MenuBottomNav.tsx`
-- 4 tabs com design glassmorphism: Início | Cardápio | Pedido | Roleta
-- Tab "Início" mostra o landing/info do restaurante
-- Badge de contagem no ícone do carrinho (estilo WhatsApp)
-- Indicador ativo com pílula/barra inferior animada
+### 1. Criar página unificada `CardapioHub.tsx`
+- Nova página com tabs: Produtos | Pedidos | Mesas | PDV | Roleta | Config
+- Reutiliza componentes existentes: `MenuCategoryTree`, `MenuGroupContent`, `ProductSheet`, `OptionGroupList`, `OptionGroupSheet`, `LinkOptionsDialog`
+- Move lógica de pedidos/mesas/PDV do `TabletAdmin` para dentro
+- Move admin de gamificação do `Gamification.tsx` para dentro
+- Nova tab "Configurações" para editar `store_info` (logo, banner, horários, endereço)
 
-### 5. Redesign do `MenuCart.tsx`
-- Header com contagem de itens
-- Cards de item com imagem thumbnail, controles +/- inline
-- Seção de "Resumo do pedido" com subtotal, taxas
-- Input de mesa com design grande e claro
-- Botão "Finalizar Pedido" fixo no bottom, verde, com valor total
-- Tela de sucesso com animação de check + número do pedido
+### 2. Eliminar duplicidade de hooks
+- Remover aba "Produtos" do `TabletAdmin` — já não existirá como página standalone
+- `useTabletAdmin` perde o CRUD de produtos (mantém apenas orders/tables/pdv)
+- `useMenuAdmin` vira a fonte única de verdade para produtos
 
-### 6. Redesign do `MenuSearch.tsx`
-- Barra de busca com ícone, placeholder contextual
-- Sugestões populares quando vazio (produtos destacados)
-- Resultados com mesmo card style do cardápio
+### 3. Unificar módulos no sistema de navegação
+- Em `modules.ts`: remover `tablet-admin` e `gamification` como módulos separados
+- Expandir `menu-admin` com children: `menu-admin.products`, `menu-admin.orders`, `menu-admin.tables`, `menu-admin.pdv`, `menu-admin.game`, `menu-admin.settings`
+- Em `MoreDrawer.tsx`: remover "Tablets" e "Gamificação" do menu — ficam dentro de "Cardápio"
 
-### 7. Unificar rotas — eliminar duplicatas
-- `/m/:unitId` → Experiência unificada (cardápio + roleta + pedido)
-- `/tablet/:unitId` → Redirecionar para `/m/:unitId?mesa=auto` (mantém compatibilidade)
-- `/gamification/:unitId` → Redirecionar para `/m/:unitId?tab=game`
-- Remover `TabletSelect.tsx` e `TabletMenu.tsx` como páginas standalone (manter redirect)
+### 4. Redesign premium do cardápio digital (`/m/:unitId`)
+- **MenuLanding**: Glassmorphism no banner, shimmer no logo, tipografia hierárquica (28px nome, 13px cuisine), rating placeholder, tempo de entrega com ícone animado
+- **MenuProductList**: Cards com sombra suave, imagem 96x96 com rounded-2xl, preço com destaque verde, badge "Mais vendido" com gradiente amber, separador de grupo com linha decorativa
+- **MenuProductDetail**: Sheet com spring animation (damping), imagem hero 240px, opcionais com cards individuais (não labels), preço dinâmico que anima ao mudar, botão CTA com gradiente e glow
+- **MenuBottomNav**: Blur 40px, borda luminosa sutil, ícone ativo com scale bounce, badge do carrinho com pulse animation
+- **MenuCart**: Cards com swipe-to-delete hint, animação de entrada staggered, tela de sucesso com confetti/check animado, cálculo de taxa de serviço opcional
+- **MenuSearch**: Debounce 300ms, skeleton loading, highlight do termo buscado nos resultados
 
-### 8. QR Code no TabletAdmin
-- Seção dedicada na aba "Mesas" com gerador de QR Code
-- QR por mesa: `/m/:unitId?mesa=N`
-- QR genérico (sem mesa) para balcão/delivery
-- Botão de copiar link + preview do QR
+### 5. Atualizar rotas em `App.tsx`
+- `/cardapio` → `CardapioHub` (protegida)
+- `/tablet-admin` → redirect para `/cardapio`
+- `/gamification` → redirect para `/cardapio`
+- `/m/:unitId` → `DigitalMenu` (pública, mantém)
+- Remover lazy imports de `TabletAdmin` e `Gamification` standalone
 
-### Detalhes Técnicos
-- Todos os redesigns acontecem nos arquivos existentes em `src/components/digital-menu/`
-- `DigitalMenu.tsx` recebe tab "home" como default (mostra landing)
-- Usar `qrcode.react` (já instalado) para gerar QR codes no admin
-- CSS: glassmorphism, gradientes suaves, sombras tier-1, animações spring
-- Mobile-first, max-width 480px centralizado
+### 6. Receitas (Fichas Técnicas) — vincular ao cardápio
+- Na tab "Produtos" do CardapioHub, mostrar link para ficha técnica do produto (se existir)
+- Na página de Receitas, mostrar preço de venda vindo do `tablet_products`
+- Ambos compartilham o mesmo produto base — sem duplicação
+
+## Componentes Novos/Modificados
+
+| Arquivo | Ação |
+|---|---|
+| `src/pages/CardapioHub.tsx` | Criar — página admin unificada |
+| `src/pages/MenuAdmin.tsx` | Remover (substituído por CardapioHub) |
+| `src/pages/TabletAdmin.tsx` | Remover (absorvido por CardapioHub) |
+| `src/pages/Gamification.tsx` | Remover (absorvido por CardapioHub) |
+| `src/lib/modules.ts` | Editar — unificar módulos |
+| `src/components/layout/MoreDrawer.tsx` | Editar — remover entradas duplicadas |
+| `src/App.tsx` | Editar — atualizar rotas |
+| `src/components/digital-menu/*.tsx` | Editar — redesign premium completo |
+| `src/pages/DigitalMenu.tsx` | Editar — polish visual |
 
