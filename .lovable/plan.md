@@ -1,33 +1,53 @@
 
 
-## Diagnóstico: Ícones renderizando como texto nos cards de setor
+## Correções Pendentes nos Fluxos de Entrada de Usuários
 
-O problema visível no screenshot é que os ícones Material Symbols estão sendo renderizados como texto bruto (ex: "storefront" aparece como "ARMQ" atrás do card "Salão"). Isso acontece quando a fonte Material Symbols Rounded ainda não carregou — o browser exibe o nome do ícone como texto normal.
+Confirmei que os 4 problemas identificados na auditoria anterior **ainda não foram corrigidos**:
 
-O `display=block` no link da fonte deveria bloquear a renderização até o carregamento, mas em conexões lentas ou em certos browsers isso falha.
+---
 
-### Correção
+### Bug 1: Login com token redireciona para `/` ao invés de `/invite`
+**Arquivo:** `src/pages/Auth.tsx`, linha 173-174
 
-#### 1. `src/index.css` — Ocultar ícones até a fonte carregar
-Adicionar regra CSS que esconde o texto dos ícones Material Symbols enquanto a fonte não estiver carregada, usando `document.fonts.ready`:
+O redirect pós-login ignora o `tokenFromUrl`. Funcionário com conta existente que clica "Já tem conta?" vai para `/auth?token=xxx`, faz login, e é jogado para `/` — nunca aceita o convite.
 
-```css
-/* Hide material symbols text until font is loaded */
-.material-symbols-rounded {
-  overflow: hidden;
-  max-width: 1em;
-  max-height: 1em;
-  display: inline-block;
-}
-```
+**Correção:** Se `tokenFromUrl` existir, redirecionar para `/invite?token=${tokenFromUrl}`.
 
-#### 2. `index.html` — Trocar `display=block` para `display=swap` + preload
-- Adicionar `<link rel="preload">` para a fonte Material Symbols com `as="style"`
-- Usar `display=swap` ao invés de `display=block` para melhor experiência (a fonte já está sendo preloaded)
+---
 
-#### 3. `src/components/ui/app-icon.tsx` — Adicionar overflow hidden
-- Garantir que o `<span>` do ícone tenha `overflow: hidden`, `width` e `height` fixos baseados no `size`, impedindo que o texto vaze visualmente mesmo se a fonte não carregou
+### Bug 2: Cadastro aberto sem restrição
+**Arquivo:** `src/pages/Auth.tsx`, linha 178
 
-### Resultado
-Os ícones ficam invisíveis (em vez de mostrar texto bugado) até a fonte carregar, e quando carrega renderizam normalmente.
+`canSignUp = true` permite qualquer pessoa criar conta em `/auth` sem plano ou convite.
+
+**Correção:** `const canSignUp = !!(planFromUrl || tokenFromUrl)`. Acesso direto a `/auth` mostra só login.
+
+---
+
+### Bug 3: OnboardingWizard é código morto
+**Arquivo:** `src/App.tsx`, linhas 78, 162-166
+
+O `auto_provision_unit` roda antes da rota `/onboarding` renderizar, então o wizard nunca é exibido. Se fosse, criaria dados incompletos.
+
+**Correção:** Remover a rota `/onboarding` e o import do `Onboarding`.
+
+---
+
+### Bug 4: Auto-provision cria unidade para funcionários convidados
+**Arquivo:** `src/contexts/UnitContext.tsx`, linhas 77-97
+
+Quando um funcionário convidado confirma email e é logado, o `UnitContext` detecta 0 unidades e chama `auto_provision_unit` antes da página `/invite` aceitar o convite. Resultado: funcionário fica com uma "Minha Empresa" fantasma.
+
+**Correção:** Antes de chamar `auto_provision_unit`, verificar se o usuário tem convites pendentes na tabela `invites`. Se tiver, não provisionar — aguardar o aceite do convite.
+
+---
+
+### Resumo de arquivos alterados
+
+| Arquivo | Alteração |
+|---|---|
+| `src/pages/Auth.tsx` | Redirect com token + restringir `canSignUp` |
+| `src/App.tsx` | Remover rota `/onboarding` e import |
+| `src/contexts/UnitContext.tsx` | Checar convites pendentes antes de auto-provision |
+| `src/pages/Onboarding.tsx` | Pode ser deletado (código morto) |
 
