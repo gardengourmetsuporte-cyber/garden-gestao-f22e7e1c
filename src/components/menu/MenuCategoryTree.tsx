@@ -152,6 +152,7 @@ export function MenuCategoryTree({
                   const count = getProductCount(grp.id);
                   const isSelected = selectedGroupId === grp.id;
                   const avail = grp.availability as any;
+                  const isAvailable = grp.is_active !== false && (avail?.tablet || avail?.delivery);
                   return (
                     <div key={grp.id} className="flex items-center gap-1">
                       <button
@@ -165,7 +166,7 @@ export function MenuCategoryTree({
                       >
                         <div
                           className="w-2 h-2 rounded-full shrink-0"
-                          style={{ background: isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)' }}
+                          style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
                         />
                         <span className="flex-1 text-left truncate">{grp.name}</span>
                         <div className="flex items-center gap-1.5">
