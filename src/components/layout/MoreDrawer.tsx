@@ -68,7 +68,8 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
       const moduleKey = getModuleKeyFromRoute(item.href);
       if (isSuperAdmin) return true;
       if (hasAccessLevel) {
-        if (moduleKey === 'settings' || moduleKey === 'dashboard') return isAdmin || !item.adminOnly;
+        if (moduleKey === 'dashboard') return true;
+        if (moduleKey === 'settings') return true; // Always accessible for profile editing
         if (moduleKey && !allowedModules!.includes(moduleKey)) return false;
         if (!moduleKey && item.adminOnly && !isAdmin) return false;
         return true;
@@ -274,7 +275,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
           {/* Settings + Logout — Meta style */}
           <div className="space-y-1.5 mt-2">
-            {(isAdmin || (hasAccessLevel && allowedModules!.includes('settings'))) && (
+            {(
               <button
                 onClick={() => { navigate('/settings'); onOpenChange(false); }}
                 className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"

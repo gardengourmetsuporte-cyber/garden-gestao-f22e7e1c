@@ -107,7 +107,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       const moduleKey = getModuleKeyFromRoute(item.href);
       if (isSuperAdmin) return true;
       if (hasAccessLevel) {
-        if (moduleKey === 'settings' || moduleKey === 'dashboard') return isAdmin || !item.adminOnly;
+        if (moduleKey === 'dashboard') return true;
+        if (moduleKey === 'settings') return true; // Always accessible for profile editing
         if (moduleKey && !allowedModules!.includes(moduleKey)) return false;
         if (!moduleKey && item.adminOnly && !isAdmin) return false;
         return true;
