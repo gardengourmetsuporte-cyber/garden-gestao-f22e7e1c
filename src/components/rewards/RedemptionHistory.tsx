@@ -50,7 +50,7 @@ export function RedemptionHistory({ redemptions }: RedemptionHistoryProps) {
         return (
           <div 
             key={redemption.id}
-            className="card-base flex items-center justify-between p-4"
+            className="card-base flex items-center justify-between p-3"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
