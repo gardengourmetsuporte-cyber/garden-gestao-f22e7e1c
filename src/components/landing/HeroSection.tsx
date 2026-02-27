@@ -35,13 +35,7 @@ export function HeroSection() {
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in [animation-delay:300ms]">
           <Link
             to="/auth?plan=free"
-            className="group relative inline-flex items-center gap-2.5 h-14 px-10 rounded-2xl font-bold text-base text-white shadow-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] hover:shadow-2xl"
-            style={{
-              background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%), hsl(220 65% 22%))',
-              backgroundSize: '300% 300%',
-              animation: 'navyCardFlow 8s ease-in-out infinite',
-              border: '1px solid hsl(234 40% 35% / 0.5)',
-            }}
+            className="group relative inline-flex items-center gap-2.5 h-14 px-10 rounded-2xl font-bold text-base text-primary-foreground shadow-xl gradient-primary"
           >
             Começar grátis
             <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
@@ -67,12 +61,12 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Screenshot with premium laptop frame */}
+      {/* Screenshot with premium frame */}
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 animate-fade-in [animation-delay:500ms]">
         {/* Glow behind screenshot */}
         <div className="absolute inset-6 bg-gradient-to-b from-primary/12 via-primary/6 to-transparent blur-[60px] rounded-3xl -z-10" />
-        
-        <div className="rounded-2xl overflow-hidden border border-border/50 shadow-elevated bg-card/80 backdrop-blur-sm">
+
+        <div className="card-surface overflow-hidden !rounded-2xl">
           {/* Browser chrome bar */}
           <div className="flex items-center gap-2 px-4 py-3 bg-secondary/60 border-b border-border/30">
             <div className="flex gap-1.5">
