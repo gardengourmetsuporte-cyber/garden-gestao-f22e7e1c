@@ -132,12 +132,16 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'menu-admin', label: 'Cardápio', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin'], group: 'Premium',
+    key: 'menu-admin', label: 'Cardápio Digital', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Premium',
     children: [
       { key: 'menu-admin.view', label: 'Ver cardápio', icon: 'Eye' },
       { key: 'menu-admin.products', label: 'Gerenciar produtos', icon: 'PenSquare' },
       { key: 'menu-admin.categories', label: 'Categorias do cardápio', icon: 'FolderTree' },
       { key: 'menu-admin.options', label: 'Grupos de opcionais', icon: 'ListPlus' },
+      { key: 'menu-admin.orders', label: 'Pedidos em tempo real', icon: 'ShoppingCart' },
+      { key: 'menu-admin.tables', label: 'Mesas e QR Codes', icon: 'QrCode' },
+      { key: 'menu-admin.pdv', label: 'Conexão PDV (Colibri)', icon: 'Monitor' },
+      { key: 'menu-admin.game', label: 'Roleta / Gamificação', icon: 'Dices' },
     ],
   },
   {
@@ -147,17 +151,6 @@ export const ALL_MODULES: ModuleDef[] = [
       { key: 'whatsapp.settings', label: 'Configurações bot', icon: 'Settings' },
       { key: 'whatsapp.knowledge', label: 'Base de conhecimento', icon: 'BookOpen' },
       { key: 'whatsapp.orders', label: 'Pedidos WhatsApp', icon: 'ShoppingCart' },
-    ],
-  },
-  {
-    key: 'tablet-admin', label: 'Tablets', icon: 'Monitor', route: '/tablet-admin', routes: ['/tablet-admin'], group: 'Premium',
-  },
-  {
-    key: 'gamification', label: 'Gamificação', icon: 'Dices', route: '/gamification', routes: ['/gamification'], group: 'Premium',
-    children: [
-      { key: 'gamification.play', label: 'Jogar', icon: 'Gamepad2' },
-      { key: 'gamification.prizes', label: 'Gerenciar prêmios', icon: 'Gift' },
-      { key: 'gamification.metrics', label: 'Métricas e relatórios', icon: 'BarChart3' },
     ],
   },
   {
