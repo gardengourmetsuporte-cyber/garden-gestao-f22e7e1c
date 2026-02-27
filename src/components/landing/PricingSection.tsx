@@ -93,12 +93,17 @@ export function PricingSection() {
             <div
               key={plan.name}
               className={`relative p-8 transition-all duration-300 ${
-                plan.highlight ? "landing-card-highlight scale-[1.02]" : "landing-card"
+                plan.highlight ? "card-surface scale-[1.02]" : "card-surface"
               }`}
+              style={plan.highlight ? {
+                background: "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))",
+                border: "2px solid hsl(var(--primary) / 0.5)",
+                boxShadow: "0 0 40px hsl(var(--primary) / 0.15), var(--shadow-elevated)",
+              } : undefined}
             >
               {plan.highlight && (
                 <div
-                  className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold z-10"
+                  className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
                   style={{
                     background: "var(--gradient-brand)",
                     color: "white",
@@ -109,23 +114,26 @@ export function PricingSection() {
                 </div>
               )}
 
-              <h3 className="text-xl font-bold">{plan.name}</h3>
-              <p className="text-sm opacity-60 mt-1">{plan.description}</p>
+              <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
 
               <div className="mt-6 mb-8">
-                <span className="text-4xl font-extrabold">
+                <span className="text-4xl font-extrabold text-foreground">
                   R$ {yearly ? plan.yearly : plan.monthly}
                 </span>
-                <span className="opacity-60 text-sm">/mês</span>
+                <span className="text-muted-foreground text-sm">/mês</span>
               </div>
 
               <button
                 onClick={() => setSelectedPlan(plan)}
                 className="block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-all hover:scale-[1.01] active:scale-[0.98]"
-                style={{
+                style={plan.highlight ? {
                   background: "var(--gradient-brand)",
                   color: "white",
                   boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
+                } : {
+                  background: "hsl(var(--secondary))",
+                  color: "hsl(var(--foreground))",
                 }}
               >
                 {plan.cta}
@@ -133,8 +141,8 @@ export function PricingSection() {
 
               <ul className="mt-8 space-y-3">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm opacity-70">
-                    <Check className="w-4 h-4 mt-0.5 shrink-0 text-success" />
+                  <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                     {f}
                   </li>
                 ))}
