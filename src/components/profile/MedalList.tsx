@@ -189,16 +189,6 @@ export function MedalList({ medals }: MedalListProps) {
                   />
                 )}
 
-                {/* Tier badge */}
-                <span
-                  className="absolute top-2.5 right-2.5 text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full"
-                  style={{
-                    background: m.unlocked ? `${tier.color}20` : 'hsl(var(--muted))',
-                    color: m.unlocked ? tier.color : 'hsl(var(--muted-foreground))',
-                  }}
-                >
-                  {tier.label}
-                </span>
 
                 {/* Icon */}
                 <div className={cn("relative mt-1", !m.unlocked && "grayscale opacity-50")}>
