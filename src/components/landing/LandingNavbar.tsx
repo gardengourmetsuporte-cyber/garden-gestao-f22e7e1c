@@ -32,7 +32,7 @@ export function LandingNavbar() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5">
           <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
-          <span className="font-bold text-base text-foreground">Garden</span>
+          <span className="font-display font-bold text-base text-foreground">Garden</span>
         </Link>
 
         {/* Center links */}
@@ -59,7 +59,7 @@ export function LandingNavbar() {
           </Link>
           <Link
             to="/auth?plan=free"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:shadow-glow-primary transition-all duration-300"
           >
             Começar grátis
           </Link>
@@ -95,7 +95,7 @@ export function LandingNavbar() {
           <Link
             to="/auth?plan=free"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold bg-foreground text-background"
+            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground"
           >
             Começar grátis
           </Link>
