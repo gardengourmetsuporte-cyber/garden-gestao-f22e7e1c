@@ -16,7 +16,9 @@ import {
   Zap,
   AlertTriangle,
   Send,
-  Undo2
+  Undo2,
+  Camera,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ICON_MAP } from '@/lib/iconMap';
@@ -29,6 +31,8 @@ import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -36,7 +40,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean) => void;
+  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string) => void;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -114,6 +118,17 @@ export function ChecklistView({
   const [splittingItemId, setSplittingItemId] = useState<string | null>(null);
   const [splitSelectedUsers, setSplitSelectedUsers] = useState<Set<string>>(new Set());
   const [splitLoading, setSplitLoading] = useState(false);
+  // Photo capture state
+  const [photoSheetOpen, setPhotoSheetOpen] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [pendingPhotoAction, setPendingPhotoAction] = useState<{
+    itemId: string; points: number; configuredPoints: number;
+    completedByUserId?: string; buttonElement?: HTMLElement;
+  } | null>(null);
+  // Photo viewer
+  const [viewingPhotoUrl, setViewingPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeUnitId) return;
@@ -204,6 +219,27 @@ export function ChecklistView({
   }, [isItemCompleted, optimisticToggles]);
 
   const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
+    // Check if item requires photo and is not being unchecked or skipped
+    if (!isSkipped) {
+      const itemRequiresPhoto = sectors.some(s => 
+        s.subcategories?.some(sub => 
+          sub.items?.some(i => i.id === itemId && (i as any).requires_photo === true)
+        )
+      );
+      if (itemRequiresPhoto) {
+        // Open photo capture sheet
+        setPendingPhotoAction({ itemId, points, configuredPoints, completedByUserId, buttonElement });
+        setPhotoSheetOpen(true);
+        setPhotoPreview(null);
+        setPhotoFile(null);
+        return;
+      }
+    }
+
+    executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, isSkipped);
+  };
+
+  const executeComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, photoUrl?: string) => {
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate(10);
 
@@ -239,9 +275,47 @@ export function ChecklistView({
         }, i * 100);
       }
     }
-                    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped);
+    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped, photoUrl);
     setOpenPopover(null);
     setExpandedPeopleFor(null);
+  };
+
+  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setPhotoPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handlePhotoConfirm = async () => {
+    if (!photoFile || !pendingPhotoAction) return;
+    setPhotoUploading(true);
+    try {
+      const ext = photoFile.name.split('.').pop() || 'jpg';
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('checklist-photos')
+        .upload(path, photoFile);
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('checklist-photos')
+        .getPublicUrl(path);
+
+      const { itemId, points, configuredPoints, completedByUserId, buttonElement } = pendingPhotoAction;
+      setPhotoSheetOpen(false);
+      executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, false, urlData.publicUrl);
+      setPendingPhotoAction(null);
+      setPhotoPreview(null);
+      setPhotoFile(null);
+    } catch (err: any) {
+      console.error('Photo upload error:', err);
+      toast.error('Erro ao enviar foto');
+    } finally {
+      setPhotoUploading(false);
+    }
   };
 
   const handleSplit = async (itemId: string, completion: any, configuredPoints: number) => {
@@ -448,6 +522,7 @@ export function ChecklistView({
                               )}
                               {item.description && !isContested && <p className="text-xs text-muted-foreground">{item.description}</p>}
                               {completion && (
+                                <>
                                 <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                                   <User className="w-3 h-3" />
                                   <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
@@ -456,6 +531,16 @@ export function ChecklistView({
                                   {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
                                   {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
                                 </div>
+                                {(completion as any)?.photo_url && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
+                                    className="mt-1.5 flex items-center gap-1.5 text-xs text-primary hover:underline"
+                                  >
+                                    <Camera className="w-3 h-3" />
+                                    <span>Ver foto</span>
+                                  </button>
+                                )}
+                                </>
                               )}
                             </div>
                             <div className={cn(
@@ -636,7 +721,10 @@ export function ChecklistView({
                         >
                           <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
                           <div className="flex-1 text-left">
-                            <p className="font-medium text-foreground">{item.name}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-medium text-foreground">{item.name}</p>
+                              {(item as any).requires_photo && <Camera className="w-3.5 h-3.5 text-primary shrink-0" />}
+                            </div>
                             {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
                           </div>
                           {configuredPoints > 0 ? (
@@ -843,6 +931,7 @@ export function ChecklistView({
                                       )}
                                       {item.description && !isContested && <p className="text-xs text-muted-foreground">{item.description}</p>}
                                       {completion && (
+                                        <>
                                         <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                                           <User className="w-3 h-3" />
                                           <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
@@ -851,6 +940,16 @@ export function ChecklistView({
                                           {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
                                           {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
                                         </div>
+                                        {(completion as any)?.photo_url && (
+                                          <button
+                                            onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
+                                            className="mt-1.5 flex items-center gap-1.5 text-xs text-primary hover:underline"
+                                          >
+                                            <Camera className="w-3 h-3" />
+                                            <span>Ver foto</span>
+                                          </button>
+                                        )}
+                                        </>
                                       )}
                                     </div>
                                     <div className={cn(
@@ -1036,7 +1135,10 @@ export function ChecklistView({
                                 >
                                   <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
                                   <div className="flex-1 text-left">
-                                    <p className="font-medium text-foreground">{item.name}</p>
+                                    <div className="flex items-center gap-1.5">
+                                      <p className="font-medium text-foreground">{item.name}</p>
+                                      {(item as any).requires_photo && <Camera className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                    </div>
                                     {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
                                   </div>
                                   {configuredPoints > 0 ? (
@@ -1162,6 +1264,70 @@ export function ChecklistView({
           <p className="text-sm mt-1">Adicione setores nas configurações</p>
         </div>
       )}
+
+      {/* Photo Capture Sheet */}
+      <Sheet open={photoSheetOpen} onOpenChange={(open) => {
+        if (!open) { setPhotoSheetOpen(false); setPendingPhotoAction(null); setPhotoPreview(null); setPhotoFile(null); }
+      }}>
+        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="flex items-center gap-2">
+              <Camera className="w-5 h-5 text-primary" />
+              Foto de confirmação
+            </SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Esta tarefa exige uma foto de confirmação. Tire uma foto ou selecione da galeria.
+            </p>
+            {photoPreview ? (
+              <div className="relative">
+                <img src={photoPreview} alt="Preview" className="w-full max-h-64 object-cover rounded-xl border" />
+                <button
+                  onClick={() => { setPhotoPreview(null); setPhotoFile(null); }}
+                  className="absolute top-2 right-2 w-8 h-8 bg-background/80 backdrop-blur rounded-full flex items-center justify-center"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors">
+                <Camera className="w-10 h-10 text-primary" />
+                <span className="text-sm font-medium text-primary">Tirar foto ou escolher</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handlePhotoCapture}
+                />
+              </label>
+            )}
+            <Button
+              onClick={handlePhotoConfirm}
+              disabled={!photoFile || photoUploading}
+              className="w-full h-12"
+            >
+              {photoUploading ? 'Enviando...' : 'Confirmar e concluir'}
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Photo Viewer */}
+      <Sheet open={!!viewingPhotoUrl} onOpenChange={(open) => { if (!open) setViewingPhotoUrl(null); }}>
+        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-primary" />
+              Foto de confirmação
+            </SheetTitle>
+          </SheetHeader>
+          {viewingPhotoUrl && (
+            <img src={viewingPhotoUrl} alt="Foto de confirmação" className="w-full max-h-[70vh] object-contain rounded-xl" />
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

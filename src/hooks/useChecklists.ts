@@ -186,6 +186,7 @@ export function useChecklists() {
     subcategory_id: string; name: string; description?: string;
     frequency?: 'daily' | 'weekly' | 'monthly';
     checklist_type?: ChecklistType; points?: number;
+    requires_photo?: boolean;
   }) => {
     const { data, error } = await supabase
       .from('checklist_items')
@@ -193,8 +194,9 @@ export function useChecklists() {
         subcategory_id: item.subcategory_id, name: item.name,
         description: item.description, frequency: item.frequency || 'daily',
         checklist_type: item.checklist_type || 'abertura', points: item.points ?? 1,
+        requires_photo: item.requires_photo ?? false,
         unit_id: activeUnitId,
-      })
+      } as any)
       .select().single();
     if (error) throw error;
     invalidateSectors();
@@ -309,7 +311,7 @@ export function useChecklists() {
   const toggleCompletion = useCallback(async (
     itemId: string, checklistType: ChecklistType, date: string,
     isAdmin?: boolean, points: number = 1, completedByUserId?: string,
-    isSkipped?: boolean
+    isSkipped?: boolean, photoUrl?: string
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -342,7 +344,8 @@ export function useChecklists() {
           points_awarded: isSkipped ? 0 : points,
           is_skipped: isSkipped || false,
           unit_id: activeUnitId,
-        }, { onConflict: 'item_id,completed_by,date,checklist_type' });
+          ...(photoUrl ? { photo_url: photoUrl } : {}),
+        } as any, { onConflict: 'item_id,completed_by,date,checklist_type' });
       if (error) throw error;
     }
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Switch } from '@/components/ui/switch';
 import { ChevronDown as SelectChevron } from 'lucide-react';
 import {
   DndContext,
@@ -112,8 +113,8 @@ interface ChecklistSettingsProps {
   onUpdateSubcategory: (id: string, data: { name?: string }) => Promise<void>;
   onDeleteSubcategory: (id: string) => Promise<void>;
   onReorderSubcategories?: (sectorId: string, orderedIds: string[]) => Promise<void>;
-  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number }) => Promise<void>;
+  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
@@ -208,6 +209,7 @@ export function ChecklistSettings({
   const [itemFrequency, setItemFrequency] = useState<ItemFrequency>('daily');
   const [itemChecklistType, setItemChecklistType] = useState<ChecklistType>('abertura');
   const [itemPoints, setItemPoints] = useState<number>(1);
+  const [itemRequiresPhoto, setItemRequiresPhoto] = useState(false);
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
@@ -353,6 +355,7 @@ export function ChecklistSettings({
       setItemFrequency(item.frequency || 'daily');
       setItemChecklistType(item.checklist_type || selectedType);
       setItemPoints(item.points ?? 1);
+      setItemRequiresPhoto((item as any).requires_photo ?? false);
     } else {
       setEditingItem(null);
       setItemName('');
@@ -361,6 +364,7 @@ export function ChecklistSettings({
       // Use selected type as default for new items
       setItemChecklistType(selectedType);
       setItemPoints(selectedType === 'bonus' ? 5 : 1);
+      setItemRequiresPhoto(false);
     }
     setItemSheetOpen(true);
   };
@@ -375,6 +379,7 @@ export function ChecklistSettings({
         frequency: itemFrequency,
         checklist_type: itemChecklistType,
         points: itemPoints,
+        requires_photo: itemRequiresPhoto,
       });
     } else if (selectedSubcategoryId) {
       await onAddItem({
@@ -384,6 +389,7 @@ export function ChecklistSettings({
         frequency: itemFrequency,
         checklist_type: itemChecklistType,
         points: itemPoints,
+        requires_photo: itemRequiresPhoto,
       });
     }
     setItemSheetOpen(false);
@@ -933,6 +939,18 @@ export function ChecklistSettings({
                   </>
                 );
               })()}
+            </div>
+
+            {/* Requires Photo */}
+            <div className="flex items-center justify-between p-3 rounded-xl border border-border/40 bg-secondary/30">
+              <div className="flex items-center gap-2">
+                <AppIcon name="photo_camera" size={18} className="text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Exige foto de confirmação</p>
+                  <p className="text-[11px] text-muted-foreground">Funcionário precisa tirar foto ao concluir</p>
+                </div>
+              </div>
+              <Switch checked={itemRequiresPhoto} onCheckedChange={setItemRequiresPhoto} />
             </div>
 
             <Button
