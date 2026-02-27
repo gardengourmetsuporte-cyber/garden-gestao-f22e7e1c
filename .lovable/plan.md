@@ -1,17 +1,40 @@
 
 
-## Plan: Replace Purple Primary with Navy Blue System-Wide
+## Plan: "Gerenciar tela inicial" for Admin Dashboard
 
-### Root Cause
-`src/lib/unitThemes.ts` defines `STANDARD_THEME_COLORS` with `primary: '234 89% 67%'` which is a bright purple/violet. When `applyUnitTheme()` runs, it overrides the CSS variable `--primary` from navy blue (`215 50% 28%`) to this purple.
+Add a Mobills-style widget manager at the bottom of the Admin Dashboard. Users can toggle visibility and reorder widgets via a full-screen Sheet with drag handles and switches. Preferences persist in localStorage.
+
+### Widget Registry
+
+Define a static list of dashboard widgets with keys, labels, and icons:
+
+| Key | Label | Icon |
+|-----|-------|------|
+| `finance` | Saldo financeiro | Wallet |
+| `finance-chart` | Gráfico financeiro | BarChart3 |
+| `weekly-summary` | Resumo semanal | Calendar |
+| `checklist` | Checklists | CheckSquare |
+| `calendar` | Calendário | CalendarDays |
+| `agenda` | Agenda | ListTodo |
+| `pending-actions` | Ações pendentes | Bell |
+| `leaderboard` | Ranking | Trophy |
 
 ### Changes
 
-**`src/lib/unitThemes.ts`** — Update `STANDARD_THEME_COLORS` to use the navy blue from the CSS design system:
-- `primary`: `234 89% 67%` → `215 50% 28%` (dark) / keep consistent
-- `neonCyan`: `234 89% 67%` → `215 50% 28%`
-- `ring`: `234 89% 67%` → `215 50% 28%`
-- `glowPrimary` and `glowCyan`: update HSL references from `234 89% 67%` to `215 50% 28%`
+1. **New hook `src/hooks/useDashboardWidgets.ts`**
+   - Reads/writes widget config from `localStorage` key `dashboard-widgets-config`
+   - Default: all widgets visible, ordered as current layout
+   - Exports `{ widgets, setWidgets, resetDefaults }` where each widget has `{ key, label, icon, visible, order }`
 
-This single file change propagates the navy blue across all units and all UI elements that reference `--primary`.
+2. **New component `src/components/dashboard/DashboardWidgetManager.tsx`**
+   - Sheet (bottom drawer) with title "Gerenciar tela inicial"
+   - List of widgets with drag handle (GripVertical icon) + label + Switch toggle
+   - Uses `@dnd-kit/sortable` for reordering (already installed)
+   - Cancel / Save buttons in header
+
+3. **Edit `src/components/dashboard/AdminDashboard.tsx`**
+   - Import and use `useDashboardWidgets`
+   - Add "Gerenciar tela inicial" button at bottom of dashboard (subtle, like Mobills)
+   - Render widgets conditionally based on `visible` flag and in the persisted order
+   - Keep `hasAccess()` as an AND condition (module access + widget visible)
 
