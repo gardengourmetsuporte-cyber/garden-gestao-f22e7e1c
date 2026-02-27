@@ -462,6 +462,44 @@ export type Database = {
           },
         ]
       }
+      checklist_deadline_settings: {
+        Row: {
+          checklist_type: string
+          deadline_hour: number
+          deadline_minute: number
+          id: string
+          is_next_day: boolean
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          checklist_type: string
+          deadline_hour?: number
+          deadline_minute?: number
+          id?: string
+          is_next_day?: boolean
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          checklist_type?: string
+          deadline_hour?: number
+          deadline_minute?: number
+          id?: string
+          is_next_day?: boolean
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_deadline_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       checklist_items: {
         Row: {
           checklist_type: Database["public"]["Enums"]["checklist_type"]

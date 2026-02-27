@@ -1,38 +1,51 @@
 /**
  * Centralized checklist timing logic.
- * Abertura deadline: same day at 19:30
- * Fechamento deadline: next day at 02:00
+ * Supports custom deadline settings per unit.
  */
 
 import { ChecklistType } from '@/types/database';
+
+export interface DeadlineSetting {
+  checklist_type: string;
+  deadline_hour: number;
+  deadline_minute: number;
+  is_next_day: boolean;
+}
 
 interface DeadlineInfo {
   deadline: Date;
   passed: boolean;
   remainingMs: number;
-  label: string; // e.g. "2h 15min" or "Encerrado"
+  label: string;
 }
 
-export function getChecklistDeadline(dateStr: string, type: ChecklistType): Date | null {
-  if (type === 'bonus') return null;
+/** Default deadlines when no custom setting exists */
+const DEFAULTS: Record<string, DeadlineSetting> = {
+  abertura: { checklist_type: 'abertura', deadline_hour: 19, deadline_minute: 30, is_next_day: false },
+  fechamento: { checklist_type: 'fechamento', deadline_hour: 2, deadline_minute: 0, is_next_day: true },
+};
 
-  // Parse date string safely (avoid UTC shift)
+function getSettingForType(type: ChecklistType, settings?: DeadlineSetting[] | null): DeadlineSetting | null {
+  if (type === 'bonus') {
+    // Bonus may have a custom setting, otherwise no deadline
+    const custom = settings?.find(s => s.checklist_type === 'bonus');
+    return custom || null;
+  }
+  const custom = settings?.find(s => s.checklist_type === type);
+  return custom || DEFAULTS[type] || null;
+}
+
+export function getChecklistDeadline(dateStr: string, type: ChecklistType, settings?: DeadlineSetting[] | null): Date | null {
+  const setting = getSettingForType(type, settings);
+  if (!setting) return null;
+
   const [y, m, d] = dateStr.split('-').map(Number);
-
-  if (type === 'abertura') {
-    return new Date(y, m - 1, d, 19, 30, 0, 0);
-  }
-
-  if (type === 'fechamento') {
-    // Next day at 02:00
-    return new Date(y, m - 1, d + 1, 2, 0, 0, 0);
-  }
-
-  return null;
+  const dayOffset = setting.is_next_day ? 1 : 0;
+  return new Date(y, m - 1, d + dayOffset, setting.deadline_hour, setting.deadline_minute, 0, 0);
 }
 
-export function getDeadlineInfo(dateStr: string, type: ChecklistType): DeadlineInfo | null {
-  const deadline = getChecklistDeadline(dateStr, type);
+export function getDeadlineInfo(dateStr: string, type: ChecklistType, settings?: DeadlineSetting[] | null): DeadlineInfo | null {
+  const deadline = getChecklistDeadline(dateStr, type, settings);
   if (!deadline) return null;
 
   const now = new Date();
@@ -58,32 +71,32 @@ export function getTodayDateStr(): string {
 
 /**
  * Determines which checklist type is currently "active" (primary).
- * Before 19:30 → abertura, after → fechamento.
+ * Uses custom settings if available.
  */
-export function getCurrentChecklistType(): ChecklistType {
+export function getCurrentChecklistType(settings?: DeadlineSetting[] | null): ChecklistType {
   const now = new Date();
-  const h = now.getHours();
-  const m = now.getMinutes();
-  if (h < 19 || (h === 19 && m < 30)) return 'abertura';
+  const todayStr = getTodayDateStr();
+  const abDeadline = getChecklistDeadline(todayStr, 'abertura', settings);
+  if (abDeadline && now < abDeadline) return 'abertura';
   return 'fechamento';
 }
 
 /**
  * Whether auto-close should run for a given date/type.
- * Only valid for today's operational windows.
  */
-export function shouldAutoClose(dateStr: string, type: ChecklistType): boolean {
-  if (type === 'bonus') return false;
+export function shouldAutoClose(dateStr: string, type: ChecklistType, settings?: DeadlineSetting[] | null): boolean {
+  if (type === 'bonus') {
+    // Bonus auto-closes only if it has a custom deadline
+    const setting = getSettingForType(type, settings);
+    if (!setting) return false;
+  }
   const today = getTodayDateStr();
 
   if (type === 'abertura') {
-    // Only auto-close abertura for today
     return dateStr === today;
   }
 
-  if (type === 'fechamento') {
-    // Fechamento closes at 02:00 next day, so valid for today AND yesterday
-    // But only if the deadline has actually passed
+  if (type === 'fechamento' || type === 'bonus') {
     const now = new Date();
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -92,4 +105,12 @@ export function shouldAutoClose(dateStr: string, type: ChecklistType): boolean {
   }
 
   return false;
+}
+
+/** Format a deadline setting as human-readable string */
+export function formatDeadlineSetting(setting: DeadlineSetting | null): string {
+  if (!setting) return 'Sem limite';
+  const h = String(setting.deadline_hour).padStart(2, '0');
+  const m = String(setting.deadline_minute).padStart(2, '0');
+  return `${h}:${m}${setting.is_next_day ? ' (dia seguinte)' : ''}`;
 }
