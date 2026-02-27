@@ -78,9 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stripeStatus = data.subscribed ? 'active' : 'canceled';
 
         // If Stripe says 'free' but UnitContext already set a higher plan, keep the unit plan
+        console.log('[AuthContext] refreshSubscription result:', { stripePlan, effectivePlan: effectivePlanRef.current });
         if (stripePlan === 'free' && effectivePlanRef.current && effectivePlanRef.current !== 'free') {
           // Only update status, don't downgrade plan
           setPlanStatus(stripeStatus);
+          console.log('[AuthContext] Keeping unit plan:', effectivePlanRef.current);
           return;
         }
 
@@ -132,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRole(r);
 
         // Don't overwrite plan if UnitContext already set a higher effective plan
+        console.log('[AuthContext] fetchUserData plan:', { profilePlan, effectivePlan: effectivePlanRef.current });
         if (!effectivePlanRef.current || effectivePlanRef.current === 'free') {
           setPlan(profilePlan);
           setPlanStatus(profilePlanStatus);
