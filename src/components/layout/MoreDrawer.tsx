@@ -245,9 +245,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                             />
                           </div>
                           {locked && (
-                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'hsl(45 90% 55% / 0.2)', border: '1px solid hsl(45 90% 55% / 0.5)' }}>
-                              <AppIcon name="Gem" size={8} style={{ color: 'hsl(45 90% 55%)' }} />
-                            </span>
+                            <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
                           )}
                         </div>
                         <span
