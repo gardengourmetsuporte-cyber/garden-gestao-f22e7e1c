@@ -133,6 +133,12 @@ export function useManagementAI() {
     init();
   }, [user, activeUnitId, loadConversations, loadConversationMessages]);
 
+  // Fetch stats independently on mount to populate briefing card + chips
+  useEffect(() => {
+    if (!user || !activeUnitId) return;
+    fetchFullContext().catch(() => {});
+  }, [user, activeUnitId, fetchFullContext]);
+
   // Save a message to the database
   const saveMessage = useCallback(async (convId: string, msg: AIMessage) => {
     await supabase.from('copilot_messages').insert({
