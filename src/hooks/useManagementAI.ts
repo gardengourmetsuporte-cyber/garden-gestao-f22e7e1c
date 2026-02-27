@@ -16,6 +16,15 @@ const OLD_HISTORY_KEY = 'garden_copilot_history';
 const MAX_HISTORY = 20;
 const CONVERSATION_KEY = 'garden_copilot_conversation_id';
 
+export interface CopilotContextStats {
+  pendingExpensesCount: number;
+  pendingExpensesTotal: number;
+  lowStockCount: number;
+  pendingTasksCount: number;
+  upcomingInvoicesCount: number;
+  checklistPct: number;
+}
+
 export function useManagementAI() {
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +32,7 @@ export function useManagementAI() {
   const [hasGreeted, setHasGreeted] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Array<{ id: string; title: string; created_at: string }>>([]);
+  const [contextStats, setContextStats] = useState<CopilotContextStats | null>(null);
   const { stats } = useDashboardStats();
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
