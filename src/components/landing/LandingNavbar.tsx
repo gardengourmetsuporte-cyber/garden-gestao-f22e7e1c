@@ -30,7 +30,7 @@ export function LandingNavbar() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src={logoImg} alt="Garden Gestão" className="h-12 w-12 rounded-full object-contain" />
+          <img src={logoImg} alt="Garden Gestão" className="h-10 w-10 rounded-full object-contain" />
           <span className="font-bold text-lg text-foreground">Garden</span>
         </div>
 
@@ -50,13 +50,13 @@ export function LandingNavbar() {
           <ThemeToggle />
           <Link
             to="/auth"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold border border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold border border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-lg text-sm font-semibold transition-all"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold transition-all"
             style={{
               background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
               color: "hsl(var(--primary-foreground))",

@@ -4,7 +4,7 @@ import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
 
 export function HeroSection() {
   return (
-    <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+    <section className="relative pt-28 pb-20 md:pt-36 md:pb-28 overflow-hidden">
       {/* Mesh gradient background */}
       <div className="absolute inset-0 pointer-events-none">
         <div

@@ -7,7 +7,7 @@ export function FooterSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <img src={logoImg} alt="Garden Gestão" className="h-11 w-11 rounded-full object-contain" />
+            <img src={logoImg} alt="Garden Gestão" className="h-10 w-10 rounded-full object-contain" />
             <span className="text-sm text-muted-foreground">
               Garden Gestão — Feito por restaurante, para restaurantes
             </span>
