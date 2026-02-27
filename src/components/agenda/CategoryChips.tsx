@@ -37,7 +37,7 @@ export function CategoryChips({ categories, selectedCategoryId, onSelectCategory
           className={cn(
             "px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
             selectedCategoryId === null
-              ? "bg-foreground text-background"
+              ? "bg-primary text-primary-foreground"
               : "bg-secondary/70 text-muted-foreground hover:text-foreground"
           )}
         >
