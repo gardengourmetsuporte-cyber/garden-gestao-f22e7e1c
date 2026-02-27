@@ -56,20 +56,11 @@ function BrandPanel() {
         <div
           className="relative w-36 h-36 rounded-[2rem] overflow-hidden flex items-center justify-center"
           style={{
-            background: 'linear-gradient(145deg, hsl(220 55% 18%), hsl(234 65% 26%), hsl(220 50% 14%))',
-            border: '1px solid hsl(220 60% 35% / 0.35)',
-            boxShadow: '0 0 100px hsl(220 80% 50% / 0.2), 0 25px 70px hsl(224 45% 6% / 0.6), inset 0 1px 0 hsl(220 60% 40% / 0.15)',
+            background: 'white',
+            boxShadow: '0 0 100px hsl(220 80% 50% / 0.2), 0 25px 70px hsl(224 45% 6% / 0.6)',
           }}
         >
-          <div
-            className="w-[5.5rem] h-[5.5rem] rounded-2xl overflow-hidden flex items-center justify-center"
-            style={{
-              background: 'white',
-              boxShadow: '0 4px 20px hsl(224 45% 6% / 0.3)',
-            }}
-          >
-            <img alt="Garden Gestão" className="w-[80%] h-[80%] object-contain" src={gardenLogo} />
-          </div>
+          <img alt="Garden Gestão" className="w-[75%] h-[75%] object-contain" src={gardenLogo} />
         </div>
 
         {/* Headline */}
@@ -143,20 +134,11 @@ function MobileBrandHeader() {
       <div
         className="w-28 h-28 rounded-[1.5rem] overflow-hidden flex items-center justify-center"
         style={{
-          background: 'linear-gradient(145deg, hsl(220 55% 18%), hsl(234 65% 26%), hsl(220 50% 14%))',
-          border: '1px solid hsl(220 60% 35% / 0.3)',
-          boxShadow: '0 0 60px hsl(220 80% 50% / 0.15), 0 12px 40px hsl(224 45% 6% / 0.5), inset 0 1px 0 hsl(220 60% 40% / 0.12)',
+          background: 'white',
+          boxShadow: '0 0 60px hsl(220 80% 50% / 0.15), 0 12px 40px hsl(224 45% 6% / 0.5)',
         }}
       >
-        <div
-          className="w-[4.5rem] h-[4.5rem] rounded-xl overflow-hidden flex items-center justify-center"
-          style={{
-            background: 'white',
-            boxShadow: '0 4px 16px hsl(224 45% 6% / 0.25)',
-          }}
-        >
-          <img alt="Garden Gestão" className="w-[80%] h-[80%] object-contain" src={gardenLogo} />
-        </div>
+        <img alt="Garden Gestão" className="w-[75%] h-[75%] object-contain" src={gardenLogo} />
       </div>
       <div className="text-center space-y-1.5">
         <h1 className="text-3xl font-extrabold text-white tracking-tight font-display">Garden</h1>
