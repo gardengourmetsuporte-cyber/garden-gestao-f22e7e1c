@@ -152,14 +152,15 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
                       isActive
-                        ? "text-foreground bg-primary/10"
+                        ? "text-white"
                         : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
                     )}
+                    style={isActive ? { background: 'linear-gradient(135deg, hsl(220 70% 16%), hsl(234 75% 28%), hsl(220 65% 18%))' } : undefined}
                   >
                     <span
                       className={cn(
                         "w-2 h-2 rounded-full shrink-0",
-                        isActive ? "bg-primary" : "bg-muted-foreground/40"
+                        isActive ? "bg-white" : "bg-muted-foreground/40"
                       )}
                     />
                     {unit.name}
@@ -187,7 +188,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             >
               <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
               <span className="text-sm font-semibold text-foreground">Planos</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary ml-auto">{plan}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(220 70% 25%)' }}>{plan}</span>
             </button>
           )}
 
