@@ -37,8 +37,8 @@ const POSITION_MEDALS = ['🥇', '🥈', '🥉'];
 function WinnerAvatar({ winner, tier }: { winner: BadgeWinner; tier: ReturnType<ReturnType<typeof useGetTier>> }) {
   return (
     <div
-      className="w-10 h-10 rounded-full shrink-0 overflow-hidden ring-2"
-      style={{ ringColor: tier.color, boxShadow: `0 0 0 2px ${tier.color}` }}
+      className="w-10 h-10 rounded-full shrink-0 overflow-hidden"
+      style={{ boxShadow: `0 0 0 2px ${tier.color}` }}
     >
       {winner.avatar_url ? (
         <img src={winner.avatar_url} alt={winner.full_name} className="w-full h-full object-cover" />
