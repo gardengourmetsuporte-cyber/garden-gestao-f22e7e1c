@@ -50,7 +50,7 @@ export function LandingNavbar() {
           <ThemeToggle />
           <Link
             to="/auth"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold border border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground transition-all"
           >
             Entrar
           </Link>
@@ -87,25 +87,27 @@ export function LandingNavbar() {
               {l.label}
             </a>
           ))}
-          <Link
-            to="/auth"
-            onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold border border-border/60 text-muted-foreground"
-          >
-            Entrar
-          </Link>
-          <Link
-            to="/auth?plan=free"
-            onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-1 rounded-xl text-sm font-semibold"
-            style={{
-              background: "var(--gradient-brand)",
-              color: "white",
-              boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
-            }}
-          >
-            Teste grátis
-          </Link>
+          <div className="pt-2 space-y-2">
+            <Link
+              to="/auth?plan=free"
+              onClick={() => setOpen(false)}
+              className="block w-full text-center py-3 rounded-xl text-sm font-semibold"
+              style={{
+                background: "var(--gradient-brand)",
+                color: "white",
+                boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
+              }}
+            >
+              Teste grátis
+            </Link>
+            <Link
+              to="/auth"
+              onClick={() => setOpen(false)}
+              className="block w-full text-center py-2 text-sm font-medium text-muted-foreground"
+            >
+              Já tenho conta
+            </Link>
+          </div>
         </div>
       )}
     </nav>
