@@ -28,6 +28,28 @@ import { ListPicker, ListPickerItem } from '@/components/ui/list-picker';
 import { cn } from '@/lib/utils';
 import { getPointsColors, clampPoints, getBonusPointsColors } from '@/lib/points';
 
+// Fallback icon based on sector name when icon field is null/Folder
+const sectorNameIconMap: Record<string, string> = {
+  'cozinha': 'restaurant',
+  'salão': 'storefront',
+  'salao': 'storefront',
+  'caixa': 'payments',
+  'banheiro': 'bathtub',
+  'banheiros': 'bathtub',
+  'geral': 'checklist',
+  'produção': 'precision_manufacturing',
+  'producao': 'precision_manufacturing',
+  'estoque': 'inventory_2',
+  'limpeza': 'cleaning_services',
+  'atendimento': 'support_agent',
+};
+
+function getSectorIcon(sector: { icon?: string | null; name: string }): string {
+  if (sector.icon && sector.icon !== 'Folder') return sector.icon;
+  const key = sector.name.toLowerCase().trim();
+  return sectorNameIconMap[key] || 'folder';
+}
+
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
   '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6',
@@ -403,7 +425,7 @@ export function ChecklistSettings({
                         className="w-[3px] self-stretch rounded-full shrink-0"
                         style={{ backgroundColor: sector.color }}
                       />
-                      <AppIcon name={sector.icon || 'Folder'} size={18} fill={0} className="text-muted-foreground" />
+                      <AppIcon name={getSectorIcon(sector)} size={18} fill={0} className="text-muted-foreground" />
                       <span className="font-semibold text-foreground">{sector.name}</span>
                       {!isBonusMode && (
                         <span className="text-xs text-muted-foreground">
