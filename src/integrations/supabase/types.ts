@@ -842,6 +842,65 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          birthday: string | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          id: string
+          last_purchase_at: string | null
+          name: string
+          notes: string | null
+          origin: string
+          phone: string | null
+          total_orders: number | null
+          total_spent: number | null
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          birthday?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          last_purchase_at?: string | null
+          name: string
+          notes?: string | null
+          origin?: string
+          phone?: string | null
+          total_orders?: number | null
+          total_spent?: number | null
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          birthday?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          last_purchase_at?: string | null
+          name?: string
+          notes?: string | null
+          origin?: string
+          phone?: string | null
+          total_orders?: number | null
+          total_spent?: number | null
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dashboard_layouts: {
         Row: {
           created_at: string
