@@ -1,19 +1,38 @@
 
 
-## Plano: Filtrar lista de funcionários no checklist por unidade ativa
+## Plano: Toggle ativo/inativo no deadline + restaurar relógio nos cards
 
-### Problema
-Em `src/components/checklists/ChecklistView.tsx` (linhas 116-123), a query busca TODOS os perfis do banco (`profiles`) sem filtrar pela unidade ativa. Isso faz aparecer usuários de outras unidades e contas inativas.
+### Problema 1: Falta toggle de ativar/desativar
+O popover de deadline só permite configurar horário ou remover. O usuário quer um switch simples para ativar/desativar o limite e encerramento automático sem precisar remover a configuração.
 
-### Alteração
+### Problema 2: Relógio de tempo restante não aparece nos cards
+`getDeadlineInfo` retorna `null` quando não existe setting salvo (opt-in). Se o usuário nunca configurou, o countdown não aparece. Antes existia um comportamento padrão que mostrava o tempo.
 
-#### `src/components/checklists/ChecklistView.tsx`
-- O componente recebe `activeUnitId` como prop (já disponível no contexto pai via `useUnit`)
-- Substituir a query direta em `profiles` por uma query em duas etapas:
-  1. Buscar `user_ids` da tabela `user_units` onde `unit_id = activeUnitId`
-  2. Buscar perfis apenas desses `user_ids` com `.in('user_id', userIds)`
-- Adicionar `activeUnitId` como dependência do `useEffect`
-- Se `activeUnitId` não existir, não buscar perfis
+---
 
-Isso garante que só apareçam funcionários que pertencem à unidade ativa do checklist.
+### Alterações
+
+#### 1. `src/lib/checklistTiming.ts` — Adicionar campo `is_active` ao `DeadlineSetting`
+- Adicionar `is_active: boolean` à interface `DeadlineSetting`
+- Em `getSettingForType`, retornar `null` se `is_active === false`
+
+#### 2. `src/hooks/useChecklistDeadlines.ts` — Persistir `is_active`
+- Incluir `is_active` no upsert da mutation
+
+#### 3. `src/components/checklists/DeadlineSettingPopover.tsx` — Adicionar toggle ativo/inativo
+- Adicionar estado `isActive` inicializado a partir de `currentSetting?.is_active ?? true`
+- Adicionar Switch "Ativo" no topo do popover, antes dos seletores de hora/minuto
+- Quando desativado, mostrar os campos de hora/minuto com opacidade reduzida (desabilitados visualmente)
+- Incluir `is_active` no objeto enviado ao `onSave`
+- Substituir botão "Remover" pelo toggle — salvar sempre com `is_active: true/false`
+
+#### 4. `src/pages/Checklists.tsx` — Garantir que countdown aparece nos cards
+- A lógica já funciona corretamente: se existe setting ativo, o countdown aparece. Com o toggle, o usuário controla isso diretamente.
+- Manter o `DeadlineSettingPopover` visível também fora do `settingsMode` (como ícone de relógio no card) para que o admin possa ativar/desativar rapidamente — OU manter só no settingsMode como está, mas garantir que quando ativo o relógio de countdown aparece.
+
+#### 5. Migração de banco — Adicionar coluna `is_active`
+```sql
+ALTER TABLE checklist_deadline_settings 
+ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT true;
+```
 
