@@ -79,7 +79,7 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
         {product.description && (
           <p className="text-[11px] text-muted-foreground truncate mt-0.5">{product.description}</p>
         )}
-        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+        <div className="flex items-center gap-1.5 mt-1.5">
           {product.codigo_pdv && (
             <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-secondary text-muted-foreground">PDV: {product.codigo_pdv}</span>
           )}
