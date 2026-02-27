@@ -1,45 +1,18 @@
 
 
-## Plano: Bloqueio por plano + lazy loading nas Configurações
+## Plano: Animação de saída ao fazer logout
 
-### Problema 1: Configurações sem bloqueio por plano
-Items como "Métodos de Pagamento", "Custos de Receitas", "Recompensas", "Medalhas" pertencem a módulos Pro/Business mas aparecem desbloqueados para usuários Free.
+### Problema
+Quando o usuário clica em "Sair", o `signOut()` aguarda a resposta do backend enquanto o menu lateral/bottom bar ficam visíveis e travados. Só depois do `navigate('/auth')` a tela muda.
 
-### Problema 2: Carregamento lento
-Todos os 12 componentes de configuração são importados no topo do arquivo (eager), carregando código desnecessário antes do usuário clicar.
-
----
+### Solução
+Adicionar um estado `isSigningOut` no `AppLayoutContent` que, ao ser ativado, imediatamente esconde todo o layout e mostra o `PageLoader` (com o logo) com uma animação de fade. O navigate acontece em background.
 
 ### Alterações
 
-#### 1. `src/pages/Settings.tsx` — Mapeamento de plano por item + lazy loading
-
-**Adicionar campo `requiredPlan`** a cada `MenuItem` que corresponde a um módulo pago:
-
-| Setting item | Módulo correspondente | Plano |
-|---|---|---|
-| `payments` | `finance` | `pro` |
-| `costs` | `recipes` | `pro` |
-| `rewards` | `rewards` | `pro` |
-| `medals` | `ranking` | `pro` |
-| `suppliers` | `inventory` | `free` |
-| `categories` | `inventory` | `free` |
-| `checklists` | `checklists` | `free` |
-| `team` | — | `free` |
-| `profile` | — | `free` |
-| `notifications` | — | `free` |
-| `audit-log` | — | `free` |
-| `units` | — | `free` |
-
-**Na renderização da lista:** Se o plano do usuário não satisfaz o `requiredPlan`, mostrar o item com opacidade reduzida + badge "PRO"/"BUSINESS" + ao clicar redirecionar para `/plans` ao invés de abrir o componente.
-
-**Lazy loading:** Trocar todos os imports estáticos dos componentes de configuração por `React.lazy()` e envolver o componente ativo em `<Suspense>` com um skeleton/spinner.
-
-#### 2. Visual do bloqueio
-Mesmo padrão do menu lateral: item visível mas com indicador de plano (💎 PRO) e ao clicar navega para `/plans`.
-
-### Resultado
-- Itens de configuração de módulos pagos ficam bloqueados para usuários Free
-- Página de configurações abre instantaneamente (lazy loading dos componentes)
-- Padrão visual consistente com o resto do app
+#### 1. `src/components/layout/AppLayout.tsx`
+- Adicionar `const [isSigningOut, setIsSigningOut] = useState(false)`
+- No `handleSignOut`: setar `setIsSigningOut(true)` **antes** de chamar `signOut()` e `navigate`
+- No return do componente: se `isSigningOut`, renderizar `<PageLoader />` com `animate-fade-in` ao invés do layout completo
+- O fluxo fica: clicou Sair → tela mostra loader com logo instantaneamente → signOut roda em background → navega para /auth
 
