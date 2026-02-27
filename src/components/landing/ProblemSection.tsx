@@ -1,27 +1,32 @@
+import { TrendingDown, AlertTriangle, Users } from "lucide-react";
+
 const problems = [
   {
-    emoji: "😰",
+    icon: TrendingDown,
     title: '"Quanto sobrou esse mês?"',
     desc: "Você fecha o mês sem saber se teve lucro ou prejuízo. As contas estão espalhadas em papéis e grupos de WhatsApp.",
-    gradient: "from-destructive/10 to-destructive/5",
-    border: "border-destructive/15 hover:border-destructive/30",
-    iconBg: "bg-destructive/10",
+    color: "text-destructive",
+    bg: "bg-destructive/10",
+    border: "border-destructive/20 hover:border-destructive/40",
+    shadow: "hover:shadow-[0_8px_30px_-8px_hsl(var(--destructive)/0.2)]",
   },
   {
-    emoji: "📦",
+    icon: AlertTriangle,
     title: '"Faltou ingrediente de novo"',
     desc: "Estoque zerado no meio do serviço. Sem controle, você descobre na hora errada.",
-    gradient: "from-warning/10 to-warning/5",
-    border: "border-warning/15 hover:border-warning/30",
-    iconBg: "bg-warning/10",
+    color: "text-warning",
+    bg: "bg-warning/10",
+    border: "border-warning/20 hover:border-warning/40",
+    shadow: "hover:shadow-[0_8px_30px_-8px_hsl(var(--warning)/0.2)]",
   },
   {
-    emoji: "👥",
+    icon: Users,
     title: '"A equipe não se engaja"',
     desc: "Funcionário sem feedback, sem meta, sem motivação. Alta rotatividade, baixa produtividade.",
-    gradient: "from-primary/10 to-primary/5",
-    border: "border-primary/15 hover:border-primary/30",
-    iconBg: "bg-primary/10",
+    color: "text-primary",
+    bg: "bg-primary/10",
+    border: "border-primary/20 hover:border-primary/40",
+    shadow: "hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.2)]",
   },
 ];
 
@@ -30,7 +35,7 @@ export function ProblemSection() {
     <section className="py-20 md:py-28">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
+          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/8 px-3 py-1 rounded-full mb-4">
             O problema
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
@@ -42,11 +47,10 @@ export function ProblemSection() {
           {problems.map((p, i) => (
             <div
               key={p.title}
-              className={`group rounded-2xl border ${p.border} bg-gradient-to-b ${p.gradient} p-8 text-center transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1`}
-              style={{ animationDelay: `${i * 100}ms` }}
+              className={`group rounded-2xl border ${p.border} bg-card p-8 text-center transition-all duration-300 hover:-translate-y-1.5 ${p.shadow}`}
             >
-              <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${p.iconBg} mb-5 text-3xl transition-transform group-hover:scale-110`}>
-                {p.emoji}
+              <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${p.bg} mb-5 transition-transform duration-300 group-hover:scale-110`}>
+                <p.icon className={`w-6 h-6 ${p.color}`} />
               </div>
               <h3 className="text-sm font-bold text-foreground mb-2">{p.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">{p.desc}</p>

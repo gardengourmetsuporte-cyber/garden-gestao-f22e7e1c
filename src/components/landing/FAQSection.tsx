@@ -18,7 +18,7 @@ export function FAQSection() {
     <section id="faq" className="py-20 md:py-28">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
+          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/8 px-3 py-1 rounded-full mb-4">
             FAQ
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
@@ -31,12 +31,12 @@ export function FAQSection() {
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="rounded-2xl border border-border/40 bg-card px-6 transition-all duration-200 hover:border-primary/20 hover:shadow-card data-[state=open]:border-primary/25 data-[state=open]:shadow-card"
+              className="rounded-2xl border border-border/50 bg-card px-6 transition-all duration-300 hover:border-primary/25 data-[state=open]:border-primary/30 data-[state=open]:shadow-[0_4px_20px_-6px_hsl(var(--primary)/0.12)]"
             >
-              <AccordionTrigger className="text-left text-foreground font-medium text-sm hover:no-underline">
+              <AccordionTrigger className="text-left text-foreground font-semibold text-sm hover:no-underline py-5">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+              <AccordionContent className="text-muted-foreground text-sm leading-relaxed pb-5">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>
