@@ -10,15 +10,21 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
 export default function Plans() {
-  const { profile, plan: userPlan, session } = useAuth();
+  const { profile, plan: userPlan, session, isSuperAdmin, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [yearly, setYearly] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
 
+  const isOwner = isSuperAdmin;
+
   const isPaid = userPlan === 'pro' || userPlan === 'business';
 
   const handleCheckout = async (planId: string) => {
+    if (!isOwner) {
+      toast.info('Apenas o proprietário da loja pode alterar o plano.');
+      return;
+    }
     setLoadingPlan(planId);
     try {
       const { data, error } = await supabase.functions.invoke('stripe-checkout', {
@@ -40,6 +46,10 @@ export default function Plans() {
   };
 
   const handleManageSubscription = async () => {
+    if (!isOwner) {
+      toast.info('Apenas o proprietário da loja pode gerenciar a assinatura.');
+      return;
+    }
     setPortalLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
@@ -138,26 +148,35 @@ export default function Plans() {
 
               {/* Management actions */}
               <div className="space-y-3">
-                <button
-                  onClick={handleManageSubscription}
-                  disabled={portalLoading}
-                  className="w-full h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))',
-                    color: 'white',
-                    boxShadow: '0 0 20px hsl(var(--neon-green) / 0.3)',
-                  }}
-                >
-                  {portalLoading ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Abrindo portal...</>
-                  ) : (
-                    <><AppIcon name="Settings" size={16} /> Gerenciar Assinatura</>
-                  )}
-                </button>
+                {isOwner ? (
+                  <button
+                    onClick={handleManageSubscription}
+                    disabled={portalLoading}
+                    className="w-full h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)))',
+                      color: 'white',
+                      boxShadow: '0 0 20px hsl(var(--neon-green) / 0.3)',
+                    }}
+                  >
+                    {portalLoading ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Abrindo portal...</>
+                    ) : (
+                      <><AppIcon name="Settings" size={16} /> Gerenciar Assinatura</>
+                    )}
+                  </button>
+                ) : (
+                  <div className="w-full py-3 px-4 rounded-xl text-sm text-center bg-muted/40 border border-border/30 text-muted-foreground">
+                    <AppIcon name="Lock" size={14} className="inline mr-1.5 -mt-0.5" />
+                    Apenas o proprietário da loja pode gerenciar a assinatura.
+                  </div>
+                )}
 
-                <p className="text-xs text-center text-muted-foreground">
-                  Altere seu plano, método de pagamento ou cancele a qualquer momento.
-                </p>
+                {isOwner && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    Altere seu plano, método de pagamento ou cancele a qualquer momento.
+                  </p>
+                )}
               </div>
 
               {/* Upgrade hint if on Pro */}
