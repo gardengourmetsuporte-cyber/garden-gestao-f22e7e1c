@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -6,32 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useAgenda } from '@/hooks/useAgenda';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import type { ManagerTask } from '@/types/agenda';
-
-function SortableTaskItem({ id, children }: { id: string; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  const style: React.CSSProperties = {
-    transform: CSS.Translate.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : 'auto',
-    willChange: 'transform',
-    position: 'relative',
-    ...(isDragging && {
-      scale: '1.02',
-      opacity: 0.95,
-    }),
-  };
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
-    </div>
-  );
-}
 
 export function AgendaDashboardWidget() {
   const navigate = useNavigate();
@@ -44,39 +19,24 @@ export function AgendaDashboardWidget() {
     toggleTask,
     deleteTask,
     addCategory,
-    reorderTasks,
     isAddingTask,
     isUpdatingTask,
   } = useAgenda();
 
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [tempTasks, setTempTasks] = useState<ManagerTask[] | null>(null);
 
-  const sensors = useSensors(
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
-    useSensor(MouseSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  const pendingTasks = useMemo(() =>
+    (tasks || [])
+      .filter(t => !t.is_completed)
+      .sort((a, b) => {
+        if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
+        if (a.due_date && !b.due_date) return -1;
+        if (!a.due_date && b.due_date) return 1;
+        return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+      }),
+    [tasks]
   );
-
-  const displayTasks = useMemo(() => tempTasks || tasks, [tempTasks, tasks]);
-
-  useEffect(() => {
-    if (tempTasks && tasks) {
-      const timer = setTimeout(() => setTempTasks(null), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [tasks, tempTasks]);
-
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
-  const pendingTasks = (displayTasks || [])
-    .filter(t => !t.is_completed)
-    .sort((a, b) => {
-      // Tasks with due_date first, sorted ascending; then tasks without due_date
-      if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
-      if (a.due_date && !b.due_date) return -1;
-      if (!a.due_date && b.due_date) return 1;
-      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
-    });
 
   const handleEditTask = (task: ManagerTask) => {
     setEditingTask(task);
@@ -100,30 +60,6 @@ export function AgendaDashboardWidget() {
     if (!open) setEditingTask(null);
   };
 
-  const handleDragStart = (_event: DragStartEvent) => {
-    try { navigator.vibrate?.(10); } catch {}
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = pendingTasks.findIndex(t => t.id === active.id);
-    const newIndex = pendingTasks.findIndex(t => t.id === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-    const reordered = arrayMove(pendingTasks, oldIndex, newIndex);
-
-    // Optimistic local state
-    setTempTasks(prev => {
-      const base = prev || tasks;
-      const taskIds = new Set(reordered.map(t => t.id));
-      const orderMap = new Map(reordered.map((t, i) => [t.id, i]));
-      return base.map(t => taskIds.has(t.id) ? { ...t, sort_order: orderMap.get(t.id)! } : t)
-        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-    });
-
-    reorderTasks(reordered.map((t, i) => ({ id: t.id, sort_order: i })));
-  };
-
   return (
     <>
       <div className="rounded-2xl bg-card overflow-hidden animate-slide-up stagger-3 relative">
@@ -137,7 +73,7 @@ export function AgendaDashboardWidget() {
             </div>
             <div>
               <span className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Agenda</span>
-              <span className="text-[10px] text-muted-foreground block">Tarefas de hoje</span>
+              <span className="text-[10px] text-muted-foreground block">Tarefas pendentes</span>
             </div>
           </button>
           <div className="flex items-center gap-1.5">
@@ -167,23 +103,18 @@ export function AgendaDashboardWidget() {
           </div>
         ) : pendingTasks.length > 0 ? (
           <div className="px-3 pb-3 max-h-[260px] overflow-y-auto space-y-1 scrollbar-thin">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-              <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                {pendingTasks.map(task => (
-                  <SortableTaskItem key={task.id} id={task.id}>
-                    <TaskItem
-                      task={task}
-                      onToggle={toggleTask}
-                      onDelete={deleteTask}
-                      onClick={() => handleEditTask(task)}
-                      onInlineUpdate={handleInlineUpdate}
-                      onAddSubtask={handleAddSubtask}
-                      onUpdateSubtask={handleUpdateSubtask}
-                    />
-                  </SortableTaskItem>
-                ))}
-              </SortableContext>
-            </DndContext>
+            {pendingTasks.map(task => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+                onClick={() => handleEditTask(task)}
+                onInlineUpdate={handleInlineUpdate}
+                onAddSubtask={handleAddSubtask}
+                onUpdateSubtask={handleUpdateSubtask}
+              />
+            ))}
           </div>
         ) : (
           <div className="text-center px-4 pb-5">
