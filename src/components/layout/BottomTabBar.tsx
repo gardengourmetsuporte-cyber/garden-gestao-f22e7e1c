@@ -215,7 +215,7 @@ export function BottomTabBar() {
             {/* "Mais" tab — 3-dot menu for cardápio, drawer for others */}
 {isCardapioRoute ? (
               <button
-                onClick={() => { navigator.vibrate?.(10); navigate('/settings?tab=cardapio-digital'); }}
+                onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }}
                 aria-label="Configurações"
                 className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
                 style={{ width: '20%' }}

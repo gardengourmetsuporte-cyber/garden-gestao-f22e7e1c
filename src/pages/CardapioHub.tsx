@@ -30,6 +30,7 @@ export default function CardapioHub() {
   const { activeUnit } = useUnit();
   const [searchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
+  const isConfigFromUrl = searchParams.get('section') === 'config';
 
   // Menu admin hook
   const menuAdmin = useMenuAdmin();
@@ -48,7 +49,7 @@ export default function CardapioHub() {
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
 
   // Internal tab for cardápio content
-  const [cardapioTab, setCardapioTab] = useState<CardapioTab>('produtos');
+  const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
   // Product sheet
