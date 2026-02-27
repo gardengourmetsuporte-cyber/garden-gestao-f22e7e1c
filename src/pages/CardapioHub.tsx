@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
@@ -18,10 +18,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type CardapioTab = 'produtos' | 'opcionais';
+const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
+
+type CardapioTab = 'produtos' | 'opcionais' | 'config';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
@@ -65,8 +68,8 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos) {
-      return null; // No primary action on orders
+    if (isPedidos || cardapioTab === 'config') {
+      return null; // No primary action on orders or config
     }
     if (cardapioTab === 'opcionais') {
       return { icon: 'Plus', label: 'Novo Opcional', onClick: () => {
@@ -247,6 +250,7 @@ export default function CardapioHub() {
             {([
               { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
               { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
+              { id: 'config' as CardapioTab, label: 'Config', icon: 'Settings', count: undefined },
             ]).map(tab => (
               <button
                 key={tab.id}
@@ -307,6 +311,13 @@ export default function CardapioHub() {
               onDelete={deleteOptionGroup}
               onLinkProducts={openLinkProducts}
             />
+          )}
+
+          {/* ==================== CONFIGURAÇÕES ==================== */}
+          {cardapioTab === 'config' && (
+            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
+              <CardapioSettings />
+            </Suspense>
           )}
         </div>
       </div>
