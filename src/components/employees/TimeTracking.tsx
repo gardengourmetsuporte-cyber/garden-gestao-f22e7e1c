@@ -160,6 +160,8 @@ export function EmployeeCheckInCard({
     );
   }
 
+  const greeting = now.getHours() < 12 ? 'Bom dia!' : now.getHours() < 18 ? 'Boa tarde!' : 'Boa noite!';
+
   // No record yet — show check-in
   return (
     <Card className="card-unified">
@@ -167,7 +169,7 @@ export function EmployeeCheckInCard({
         <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3">
           <AppIcon name="Clock" size={28} className="text-primary" />
         </div>
-        <h3 className="font-semibold text-lg mb-1">Bom dia!</h3>
+        <h3 className="font-semibold text-lg mb-1">{greeting}</h3>
         <p className="text-sm text-muted-foreground mb-4">
           {format(now, "EEEE, dd 'de' MMMM", { locale: ptBR })}
         </p>
