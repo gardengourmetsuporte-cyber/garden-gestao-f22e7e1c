@@ -43,9 +43,9 @@ export interface LoyaltyEvent {
 }
 
 export const SEGMENT_CONFIG: Record<CustomerSegment, { label: string; color: string; icon: string; bg: string }> = {
-  vip: { label: 'VIP', color: 'text-emerald-500', icon: 'Crown', bg: 'bg-emerald-500/10' },
-  frequent: { label: 'Frequente', color: 'text-blue-500', icon: 'TrendingUp', bg: 'bg-blue-500/10' },
-  occasional: { label: 'Ocasional', color: 'text-amber-500', icon: 'Clock', bg: 'bg-amber-500/10' },
-  inactive: { label: 'Inativo', color: 'text-red-500', icon: 'AlertCircle', bg: 'bg-red-500/10' },
-  new: { label: 'Novo', color: 'text-muted-foreground', icon: 'UserPlus', bg: 'bg-secondary' },
+  vip: { label: 'VIP', color: 'text-emerald-500', icon: 'diamond', bg: 'bg-emerald-500/10' },
+  frequent: { label: 'Frequente', color: 'text-blue-500', icon: 'trending_up', bg: 'bg-blue-500/10' },
+  occasional: { label: 'Ocasional', color: 'text-amber-500', icon: 'schedule', bg: 'bg-amber-500/10' },
+  inactive: { label: 'Inativo', color: 'text-red-500', icon: 'warning', bg: 'bg-red-500/10' },
+  new: { label: 'Novo', color: 'text-muted-foreground', icon: 'person_add', bg: 'bg-secondary' },
 };

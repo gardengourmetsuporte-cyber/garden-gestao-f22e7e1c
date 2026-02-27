@@ -1,5 +1,4 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { AppIcon } from '@/components/ui/app-icon';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -27,11 +26,6 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
     ? differenceInDays(new Date(), new Date(customer.last_purchase_at))
     : null;
 
-  // RFM breakdown (approximate from score)
-  const recency = Math.min(30, Math.max(0, customer.score * 0.3));
-  const frequency = Math.min(30, Math.max(0, customer.score * 0.3));
-  const monetary = Math.min(40, Math.max(0, customer.score * 0.4));
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[90vh] rounded-t-2xl flex flex-col">
@@ -39,7 +33,7 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
           <SheetTitle className="flex items-center gap-2">
             {customer.name}
             <span className={cn('inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full', seg.bg, seg.color)}>
-              <AppIcon name={seg.icon} size={10} />
+              <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{seg.icon}</span>
               {seg.label}
             </span>
           </SheetTitle>
@@ -71,33 +65,33 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
 
           {/* Quick info */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-card border p-3 text-center">
+            <div className="card-surface rounded-xl p-3 text-center">
               <p className="text-lg font-bold text-amber-500">{customer.loyalty_points}</p>
               <p className="text-[10px] text-muted-foreground">Pontos Fidelidade</p>
             </div>
-            <div className="rounded-xl bg-card border p-3 text-center">
+            <div className="card-surface rounded-xl p-3 text-center">
               <p className="text-lg font-bold">{customer.visit_frequency_days ? `${Math.round(customer.visit_frequency_days)}d` : '-'}</p>
               <p className="text-[10px] text-muted-foreground">Freq. Visita</p>
             </div>
           </div>
 
           {/* Contact */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {customer.phone && (
               <p className="text-sm flex items-center gap-2">
-                <AppIcon name="Phone" size={14} className="text-muted-foreground" />
+                <span className="material-symbols-rounded text-muted-foreground" style={{ fontSize: 16 }}>call</span>
                 {customer.phone}
               </p>
             )}
             {customer.email && (
               <p className="text-sm flex items-center gap-2">
-                <AppIcon name="Mail" size={14} className="text-muted-foreground" />
+                <span className="material-symbols-rounded text-muted-foreground" style={{ fontSize: 16 }}>mail</span>
                 {customer.email}
               </p>
             )}
             {customer.birthday && (
               <p className="text-sm flex items-center gap-2">
-                <AppIcon name="Cake" size={14} className="text-muted-foreground" />
+                <span className="material-symbols-rounded text-muted-foreground" style={{ fontSize: 16 }}>cake</span>
                 {format(new Date(customer.birthday + 'T12:00:00'), "dd 'de' MMMM", { locale: ptBR })}
               </p>
             )}
@@ -117,15 +111,19 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
                 {events.map(ev => (
                   <div key={ev.id} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <AppIcon
-                        name={ev.type === 'earn' ? 'Plus' : ev.type === 'redeem' ? 'Minus' : 'Gift'}
-                        size={12}
-                        className={ev.type === 'earn' ? 'text-emerald-500' : ev.type === 'redeem' ? 'text-red-500' : 'text-amber-500'}
-                      />
+                      <span
+                        className={cn(
+                          'material-symbols-rounded',
+                          ev.type === 'earn' ? 'text-emerald-500' : ev.type === 'redeem' ? 'text-destructive' : 'text-amber-500'
+                        )}
+                        style={{ fontSize: 14 }}
+                      >
+                        {ev.type === 'earn' ? 'add_circle' : ev.type === 'redeem' ? 'remove_circle' : 'redeem'}
+                      </span>
                       <span>{ev.description || ev.type}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={cn('font-bold', ev.type === 'redeem' ? 'text-red-500' : 'text-emerald-500')}>
+                      <span className={cn('font-bold', ev.type === 'redeem' ? 'text-destructive' : 'text-emerald-500')}>
                         {ev.type === 'redeem' ? '-' : '+'}{ev.points}
                       </span>
                       <span className="text-muted-foreground">
@@ -140,12 +138,12 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
 
           {/* Actions */}
           <div className="flex gap-2 pt-2 pb-4">
-            <Button variant="outline" className="flex-1" onClick={onEdit}>
-              <AppIcon name="PenSquare" size={16} />
+            <Button variant="outline" className="flex-1 rounded-xl" onClick={onEdit}>
+              <span className="material-symbols-rounded mr-1.5" style={{ fontSize: 16 }}>edit</span>
               Editar
             </Button>
-            <Button className="flex-1" onClick={() => onAddPoints(customer.id)}>
-              <AppIcon name="Star" size={16} />
+            <Button className="flex-1 rounded-xl" onClick={() => onAddPoints(customer.id)}>
+              <span className="material-symbols-rounded mr-1.5" style={{ fontSize: 16 }}>star</span>
               Adicionar Pontos
             </Button>
           </div>

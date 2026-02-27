@@ -1,9 +1,7 @@
-import { AppIcon } from '@/components/ui/app-icon';
 import { Progress } from '@/components/ui/progress';
 import type { Customer } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
-import { format, differenceInDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -20,57 +18,67 @@ export function CustomerCard({ customer, onEdit, onDelete }: Props) {
 
   return (
     <div
-      className="rounded-xl bg-card border p-4 space-y-2.5 active:scale-[0.98] transition-transform"
+      className="card-surface rounded-xl p-4 space-y-3 active:scale-[0.98] transition-transform cursor-pointer"
       onClick={onEdit}
     >
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-sm truncate">{customer.name}</p>
-            <span className={cn('inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full', seg.bg, seg.color)}>
-              <AppIcon name={seg.icon} size={10} />
+            <span className={cn(
+              'inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap',
+              seg.bg, seg.color
+            )}>
+              <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{seg.icon}</span>
               {seg.label}
             </span>
           </div>
           {customer.phone && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-              <AppIcon name="Phone" size={12} />
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
+              <span className="material-symbols-rounded" style={{ fontSize: 13 }}>call</span>
               {customer.phone}
             </p>
           )}
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+          className="p-2 -m-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
         >
-          <AppIcon name="Trash2" size={14} />
+          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>delete</span>
         </button>
       </div>
 
       {/* Score bar */}
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-muted-foreground w-10">Score</span>
+      <div className="flex items-center gap-2.5">
+        <span className="text-[10px] text-muted-foreground font-medium w-10">Score</span>
         <Progress value={Math.min(customer.score, 100)} className="h-1.5 flex-1" />
-        <span className="text-[10px] font-bold text-foreground w-6 text-right">{customer.score}</span>
+        <span className="text-[11px] font-bold w-7 text-right tabular-nums">{customer.score}</span>
       </div>
 
       {/* Bottom stats */}
       <div className="flex items-center gap-3 text-[11px] text-muted-foreground flex-wrap">
         {customer.loyalty_points > 0 && (
           <span className="flex items-center gap-1">
-            <AppIcon name="Star" size={11} className="text-amber-500" />
+            <span className="material-symbols-rounded text-amber-500" style={{ fontSize: 13 }}>star</span>
             {customer.loyalty_points} pts
           </span>
         )}
         {(Number(customer.total_orders) || 0) > 0 && (
-          <span>{customer.total_orders} pedidos</span>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-rounded" style={{ fontSize: 13 }}>receipt_long</span>
+            {customer.total_orders} pedidos
+          </span>
         )}
         {(Number(customer.total_spent) || 0) > 0 && (
-          <span>R$ {Number(customer.total_spent).toFixed(0)}</span>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-rounded" style={{ fontSize: 13 }}>payments</span>
+            R$ {Number(customer.total_spent).toFixed(0)}
+          </span>
         )}
         {daysSince !== null && (
-          <span className={cn(daysSince > 60 && 'text-red-400')}>
+          <span className={cn('flex items-center gap-1', daysSince > 60 && 'text-destructive')}>
+            <span className="material-symbols-rounded" style={{ fontSize: 13 }}>schedule</span>
             {daysSince === 0 ? 'Hoje' : `${daysSince}d atrás`}
           </span>
         )}
