@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
@@ -51,6 +51,10 @@ export default function CardapioHub() {
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isConfigFromUrl) setCardapioTab('config');
+  }, [isConfigFromUrl]);
   const productsRef = useRef<HTMLDivElement>(null);
 
   const handleSelectGroup = useCallback((groupId: string) => {
