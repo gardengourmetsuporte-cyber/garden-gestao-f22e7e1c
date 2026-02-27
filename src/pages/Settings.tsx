@@ -21,6 +21,7 @@ const MedalSettings = lazy(() => import('@/components/settings/MedalSettings').t
 const NotificationSettings = lazy(() => import('@/components/settings/NotificationSettings').then(m => ({ default: m.NotificationSettings })));
 const AuditLogSettings = lazy(() => import('@/components/settings/AuditLogSettings').then(m => ({ default: m.AuditLogSettings })));
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
+const LoyaltySettings = lazy(() => import('@/components/settings/LoyaltySettings').then(m => ({ default: m.LoyaltySettings })));
 interface MenuItem {
   value: string;
   icon: string;
@@ -46,6 +47,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'units', icon: 'Store', label: 'Lojas', description: 'Gerenciar suas lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'cardapio-digital', icon: 'BookOpen', label: 'Cardápio Digital', description: 'PDV, mesas, QR e roleta', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
+  { value: 'loyalty', icon: 'Heart', label: 'Fidelidade', description: 'Regras de pontos e recompensas', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
 ];
 
 function SettingsFallback() {
@@ -147,6 +149,7 @@ export default function SettingsPage() {
               {activeSection === 'notifications' && <NotificationSettings />}
               {activeSection === 'audit-log' && <AuditLogSettings />}
               {activeSection === 'cardapio-digital' && <CardapioSettings />}
+              {activeSection === 'loyalty' && <LoyaltySettings />}
             </Suspense>
           </div>
         </div>
