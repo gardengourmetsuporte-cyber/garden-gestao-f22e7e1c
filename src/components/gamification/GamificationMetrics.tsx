@@ -1,4 +1,3 @@
-import { Card } from '@/components/ui/card';
 import { AppIcon } from '@/components/ui/app-icon';
 
 interface GamificationMetricsProps {
@@ -13,19 +12,19 @@ export function GamificationMetrics({ playsToday, prizesToday, costToday, maxDai
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      <Card className="p-3 text-center">
+      <div className="card-surface p-3 text-center">
         <AppIcon name="Dices" size={20} className="mx-auto text-primary mb-1" />
         <p className="text-2xl font-bold text-foreground">{playsToday}</p>
         <p className="text-xs text-muted-foreground">Jogadas hoje</p>
-      </Card>
+      </div>
 
-      <Card className="p-3 text-center">
+      <div className="card-surface p-3 text-center">
         <AppIcon name="Gift" size={20} className="mx-auto text-success mb-1" />
         <p className="text-2xl font-bold text-foreground">{prizesToday}</p>
         <p className="text-xs text-muted-foreground">Prêmios dados</p>
-      </Card>
+      </div>
 
-      <Card className="p-3 text-center">
+      <div className="card-surface p-3 text-center">
         <AppIcon name="DollarSign" size={20} className="mx-auto text-warning mb-1" />
         <p className="text-2xl font-bold text-foreground">
           R$ {costToday.toFixed(0)}
@@ -46,7 +45,7 @@ export function GamificationMetrics({ playsToday, prizesToday, costToday, maxDai
             }}
           />
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

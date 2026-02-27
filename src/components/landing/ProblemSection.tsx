@@ -33,11 +33,7 @@ export function ProblemSection() {
           {problems.map((p) => (
             <div
               key={p.title}
-              className="rounded-2xl p-8 text-center"
-              style={{
-                background: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border) / 0.5)",
-              }}
+              className="card-surface p-8 text-center"
             >
               <div className="text-4xl mb-5">{p.emoji}</div>
               <h3 className="text-base font-bold text-foreground mb-3">{p.title}</h3>

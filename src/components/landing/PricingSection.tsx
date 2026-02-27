@@ -52,7 +52,7 @@ export function PricingSection() {
   return (
     <section id="planos" className="py-20 md:py-28">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--neon-cyan))" }}>
             Planos
           </p>
@@ -92,20 +92,14 @@ export function PricingSection() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl p-8 transition-all duration-300 ${
-                plan.highlight ? "scale-[1.02]" : ""
+              className={`relative p-8 transition-all duration-300 ${
+                plan.highlight ? "card-surface scale-[1.02]" : "card-surface"
               }`}
-              style={{
-                background: plan.highlight
-                  ? "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))"
-                  : "hsl(var(--card))",
-                border: plan.highlight
-                  ? "2px solid hsl(var(--primary) / 0.5)"
-                  : "1px solid hsl(var(--border) / 0.5)",
-                boxShadow: plan.highlight
-                  ? "0 0 40px hsl(var(--primary) / 0.15), var(--shadow-elevated)"
-                  : "var(--shadow-card)",
-              }}
+              style={plan.highlight ? {
+                background: "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))",
+                border: "2px solid hsl(var(--primary) / 0.5)",
+                boxShadow: "0 0 40px hsl(var(--primary) / 0.15), var(--shadow-elevated)",
+              } : undefined}
             >
               {plan.highlight && (
                 <div
