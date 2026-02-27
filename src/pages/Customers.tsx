@@ -21,6 +21,14 @@ import {
 
 const SEGMENTS: CustomerSegment[] = ['vip', 'frequent', 'occasional', 'inactive', 'new'];
 
+const STAT_ITEMS = [
+  { key: 'total', label: 'Total', icon: 'group', getValue: (s: any) => s.total },
+  { key: 'active', label: 'Ativos', icon: 'person_check', getValue: (s: any) => s.activeThisMonth },
+  { key: 'inactive', label: 'Inativos', icon: 'person_off', getValue: (s: any) => s.inactive },
+  { key: 'ticket', label: 'Ticket', icon: 'payments', getValue: (s: any) => `R$${s.avgTicket.toFixed(0)}` },
+  { key: 'return', label: 'Retorno', icon: 'sync', getValue: (s: any) => `${s.returnRate.toFixed(0)}%` },
+] as const;
+
 export default function Customers() {
   const { customers, isLoading, createCustomer, updateCustomer, deleteCustomer, importCSV } = useCustomers();
   const { stats, addEvent } = useCustomerCRM(customers);
@@ -55,7 +63,6 @@ export default function Customers() {
     return list;
   }, [customers, search, segmentFilter]);
 
-  // Segment counts
   const segCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     SEGMENTS.forEach(s => { counts[s] = customers.filter(c => c.segment === s).length; });
@@ -74,47 +81,48 @@ export default function Customers() {
 
   return (
     <AppLayout>
-      <div className="space-y-4 pb-24">
+      <div className="px-4 py-3 lg:px-6 space-y-4 pb-24">
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-5 gap-1.5">
-          {[
-            { label: 'Total', value: stats.total, icon: 'Users' },
-            { label: 'Ativos', value: stats.activeThisMonth, icon: 'UserCheck' },
-            { label: 'Inativos', value: stats.inactive, icon: 'UserX' },
-            { label: 'Ticket', value: `R$${stats.avgTicket.toFixed(0)}`, icon: 'Receipt' },
-            { label: 'Retorno', value: `${stats.returnRate.toFixed(0)}%`, icon: 'RefreshCw' },
-          ].map(s => (
-            <div key={s.label} className="rounded-xl bg-card border p-2.5 text-center">
-              <AppIcon name={s.icon} size={14} className="mx-auto text-muted-foreground mb-0.5" />
-              <p className="text-lg font-bold leading-tight">{s.value}</p>
-              <p className="text-[9px] text-muted-foreground">{s.label}</p>
+        <div className="grid grid-cols-5 gap-2">
+          {STAT_ITEMS.map(s => (
+            <div key={s.key} className="card-surface rounded-xl p-3 flex flex-col items-center gap-1">
+              <span className="material-symbols-rounded text-muted-foreground" style={{ fontSize: 18 }}>
+                {s.icon}
+              </span>
+              <p className="text-base font-bold leading-none">{s.getValue(stats)}</p>
+              <p className="text-[10px] text-muted-foreground leading-none">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* Segment chips */}
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
           <button
             onClick={() => setSegmentFilter(null)}
             className={cn(
-              'shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-              !segmentFilter ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+              'shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all',
+              !segmentFilter
+                ? 'bg-primary text-primary-foreground shadow-md'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
             )}
           >
             Todos ({customers.length})
           </button>
           {SEGMENTS.map(seg => {
             const cfg = SEGMENT_CONFIG[seg];
+            const isActive = segmentFilter === seg;
             return (
               <button
                 key={seg}
-                onClick={() => setSegmentFilter(segmentFilter === seg ? null : seg)}
+                onClick={() => setSegmentFilter(isActive ? null : seg)}
                 className={cn(
-                  'shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1',
-                  segmentFilter === seg ? cn(cfg.bg, cfg.color, 'ring-1 ring-current') : 'bg-secondary text-muted-foreground'
+                  'shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5',
+                  isActive
+                    ? cn(cfg.bg, cfg.color, 'ring-1 ring-current shadow-md')
+                    : 'bg-secondary text-muted-foreground hover:text-foreground'
                 )}
               >
-                <AppIcon name={cfg.icon} size={10} />
+                <span className="material-symbols-rounded" style={{ fontSize: 14 }}>{cfg.icon}</span>
                 {cfg.label} ({segCounts[seg] || 0})
               </button>
             );
@@ -124,18 +132,20 @@ export default function Customers() {
         {/* Search + Import */}
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-9" />
+            <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: 18 }}>
+              search
+            </span>
+            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11" />
           </div>
-          <Button size="icon" variant="outline" onClick={() => setCsvOpen(true)}>
-            <AppIcon name="Upload" size={16} />
+          <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => setCsvOpen(true)}>
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
           </Button>
         </div>
 
         {/* List */}
         {isLoading ? (
           <div className="space-y-3">
-            {[1, 2, 3].map(i => <div key={i} className="h-24 rounded-xl bg-secondary/50 animate-pulse" />)}
+            {[1, 2, 3].map(i => <div key={i} className="h-[88px] rounded-xl bg-secondary/50 animate-pulse" />)}
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState
@@ -144,7 +154,7 @@ export default function Customers() {
             subtitle={search || segmentFilter ? 'Nenhum resultado para os filtros.' : 'Cadastre seu primeiro cliente ou importe um CSV.'}
           />
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {filtered.map(c => (
               <CustomerCard
                 key={c.id}
@@ -157,7 +167,6 @@ export default function Customers() {
         )}
       </div>
 
-      {/* Detail sheet */}
       <CustomerDetail
         open={!!detailCustomer}
         onOpenChange={(v) => { if (!v) setDetailCustomer(null); }}
