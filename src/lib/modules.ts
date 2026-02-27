@@ -57,6 +57,15 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'customers', label: 'Clientes', icon: 'UserRound', route: '/customers', routes: ['/customers'], group: 'Gestão',
+    children: [
+      { key: 'customers.view', label: 'Ver clientes', icon: 'Eye' },
+      { key: 'customers.create', label: 'Criar/editar clientes', icon: 'PenSquare' },
+      { key: 'customers.import', label: 'Importar CSV', icon: 'Upload' },
+      { key: 'customers.delete', label: 'Excluir clientes', icon: 'Trash2' },
+    ],
+  },
+  {
     key: 'orders', label: 'Pedidos', icon: 'ShoppingCart', route: '/orders', routes: ['/orders'], group: 'Gestão',
     children: [
       { key: 'orders.view', label: 'Ver pedidos', icon: 'Eye' },
