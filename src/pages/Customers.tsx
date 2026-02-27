@@ -136,10 +136,11 @@ export default function Customers() {
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pt-1 pb-2">
           <button
             onClick={() => setSegmentFilter(null)}
+            style={!segmentFilter ? { background: 'var(--gradient-brand)' } : undefined}
             className={cn(
               'shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all',
               !segmentFilter
-                ? 'bg-primary text-primary-foreground shadow-md'
+                ? 'text-primary-foreground shadow-md border border-primary/30'
                 : 'bg-card text-muted-foreground hover:text-foreground border border-border'
             )}
           >
@@ -152,10 +153,11 @@ export default function Customers() {
               <button
                 key={seg}
                 onClick={() => setSegmentFilter(isActive ? null : seg)}
+                style={isActive ? { background: 'var(--gradient-brand)' } : undefined}
                 className={cn(
                   'shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5',
                   isActive
-                    ? cn(cfg.bg, cfg.color, 'ring-1 ring-current shadow-md')
+                    ? 'text-primary-foreground ring-1 ring-primary/40 shadow-md'
                     : 'bg-card text-muted-foreground hover:text-foreground border border-border'
                 )}
               >
