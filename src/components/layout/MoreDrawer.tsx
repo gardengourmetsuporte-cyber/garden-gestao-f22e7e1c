@@ -169,7 +169,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                 <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
                 <div className="text-left min-w-0 flex-1">
                   <p className="text-sm font-bold text-white truncate font-display">{profile?.full_name || 'Usuário'}</p>
-                  <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
+                  <p className="text-[11px] font-medium text-white/70">{rank.title} · {earnedPoints} pts</p>
                 </div>
               </button>
               <ThemeToggle className="p-1.5 shrink-0 text-white/70 hover:text-white" />
@@ -197,7 +197,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                       <span
                         className={cn(
                           "w-2 h-2 rounded-full shrink-0",
-                          isActive ? "bg-white" : "bg-white/40"
+                          isActive ? "bg-emerald-400" : "bg-white/40"
                         )}
                       />
                       {unit.name}
