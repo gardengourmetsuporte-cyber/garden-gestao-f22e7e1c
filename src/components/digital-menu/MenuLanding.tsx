@@ -3,9 +3,10 @@ import { AppIcon } from '@/components/ui/app-icon';
 
 interface Props {
   unit: DMUnit | null;
+  unitInitials?: string;
 }
 
-export function MenuLanding({ unit }: Props) {
+export function MenuLanding({ unit, unitInitials = '?' }: Props) {
   if (!unit) return null;
 
   const info = unit.store_info;
@@ -30,29 +31,32 @@ export function MenuLanding({ unit }: Props) {
   return (
     <div className="relative">
       {/* Banner */}
-      <div className="h-44 md:h-64 w-full overflow-hidden relative rounded-b-none md:rounded-b-3xl">
+      <div className="h-48 md:h-64 w-full overflow-hidden relative">
         {bannerUrl ? (
           <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/30 via-primary/10 to-background" />
+          <div className="w-full h-full" style={{
+            background: 'linear-gradient(180deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--primary) / 0.08) 40%, hsl(var(--background)) 100%)',
+          }} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
 
       {/* Logo + Info */}
-      <div className="px-4 md:px-8 -mt-14 relative z-10">
+      <div className="px-4 md:px-8 -mt-16 relative z-10">
         <div className="flex items-end gap-4">
+          {/* Logo container */}
           <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-secondary flex items-center justify-center">
-                <AppIcon name="Store" size={36} className="text-muted-foreground" />
+              <div className="w-full h-full bg-card flex items-center justify-center">
+                <span className="text-2xl md:text-3xl font-bold text-primary/60">{unitInitials}</span>
               </div>
             )}
           </div>
-          <div className="pb-1 min-w-0">
-            <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">{unit.name}</h1>
+          <div className="pb-2 min-w-0">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground leading-tight">{unit.name}</h1>
             {cuisineType && (
               <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{cuisineType}</p>
             )}
@@ -60,19 +64,19 @@ export function MenuLanding({ unit }: Props) {
         </div>
 
         {/* Status + Meta */}
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${
             isOpen
-              ? 'bg-[hsl(var(--neon-green)/0.12)] text-[hsl(var(--neon-green))]'
-              : 'bg-destructive/12 text-destructive'
+              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+              : 'bg-destructive/10 text-destructive'
           }`}>
-            <span className={`w-2 h-2 rounded-full ${isOpen ? 'bg-[hsl(var(--neon-green))] animate-pulse' : 'bg-destructive'}`} />
+            <span className={`w-2 h-2 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-destructive'}`} />
             {isOpen ? 'Aberto agora' : 'Fechado'}
           </div>
 
           {currentHours && (
             <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-              <AppIcon name="Clock" size={12} />
+              <AppIcon name="Schedule" size={12} />
               {currentHours}
             </span>
           )}
@@ -88,7 +92,7 @@ export function MenuLanding({ unit }: Props) {
         {/* Address */}
         {(city || address) && (
           <p className="text-xs md:text-sm text-muted-foreground mt-2 flex items-center gap-1">
-            <AppIcon name="MapPin" size={12} className="shrink-0" />
+            <AppIcon name="LocationOn" size={13} className="shrink-0" />
             {[address, city].filter(Boolean).join(' • ')}
           </p>
         )}
