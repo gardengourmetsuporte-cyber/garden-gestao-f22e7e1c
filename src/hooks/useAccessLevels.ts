@@ -152,8 +152,9 @@ export function useUserModules() {
   const hasAccess = (moduleKey: string): boolean => {
     // Super admins always have full access
     if (isSuperAdmin) return true;
-    // Dashboard always accessible
+    // Dashboard and settings (profile) always accessible
     if (moduleKey === 'dashboard') return true;
+    if (moduleKey === 'settings' || moduleKey === 'settings.profile') return true;
     // During loading, hide everything else to avoid flash of premium modules
     if (isLoading) return false;
     // If no access level assigned (null), user has full access
