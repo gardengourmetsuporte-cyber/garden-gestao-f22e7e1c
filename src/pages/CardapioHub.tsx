@@ -474,15 +474,15 @@ export default function CardapioHub() {
               onUpdate={handleSettingsUpdate}
             />
 
-            {/* Tablet link */}
+            {/* Link do cardápio digital */}
             {activeUnit && (
               <Card className="p-3">
-                <p className="text-xs text-muted-foreground mb-1">Link da roleta</p>
+                <p className="text-xs text-muted-foreground mb-1">Link do cardápio digital (com roleta)</p>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 text-xs bg-muted px-2 py-1.5 rounded truncate">
-                    {`${window.location.origin}/m/${activeUnit.id}?tab=game`}
+                    {`${window.location.origin}/m/${activeUnit.id}`}
                   </code>
-                  <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}?tab=game`); toast.success('Link copiado!'); }}>
+                  <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`); toast.success('Link copiado!'); }}>
                     <AppIcon name="Copy" size={14} />
                   </Button>
                 </div>
@@ -518,25 +518,39 @@ export default function CardapioHub() {
                   </Button>
                 </Card>
               ) : (
-                <div className="space-y-2">
-                  {gamAdmin.prizes.map(prize => (
-                    <Card key={prize.id} className="p-3 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: `${prize.color}20`, border: `2px solid ${prize.color}` }}>
-                        {prize.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm truncate">{prize.name}</p>
-                        <p className="text-xs text-muted-foreground">Peso: {prize.probability} · R$ {prize.estimated_cost.toFixed(2)}</p>
-                      </div>
-                      <Switch checked={prize.is_active} onCheckedChange={val => gamAdmin.togglePrize.mutate({ id: prize.id, is_active: val })} />
-                      <button onClick={() => { setEditingPrize(prize); setPrizeSheetOpen(true); }} className="p-1.5 hover:bg-muted rounded">
-                        <AppIcon name="Pencil" size={14} className="text-muted-foreground" />
-                      </button>
-                      <button onClick={() => handleDeletePrize(prize.id)} className="p-1.5 hover:bg-destructive/10 rounded">
-                        <AppIcon name="Trash2" size={14} className="text-destructive" />
-                      </button>
-                    </Card>
-                  ))}
+              <div className="space-y-2">
+                  {(() => {
+                    const totalWeight = gamAdmin.prizes.reduce((sum, p) => sum + p.probability, 0);
+                    return gamAdmin.prizes.map(prize => {
+                      const pct = totalWeight > 0 ? ((prize.probability / totalWeight) * 100) : 0;
+                      return (
+                        <Card key={prize.id} className="p-3 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: `${prize.color}20`, border: `2px solid ${prize.color}` }}>
+                              {prize.icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-foreground text-sm truncate">{prize.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                <span className="font-semibold text-primary">{pct.toFixed(1)}%</span> · R$ {prize.estimated_cost.toFixed(2)}
+                              </p>
+                            </div>
+                            <Switch checked={prize.is_active} onCheckedChange={val => gamAdmin.togglePrize.mutate({ id: prize.id, is_active: val })} />
+                            <button onClick={() => { setEditingPrize(prize); setPrizeSheetOpen(true); }} className="p-1.5 hover:bg-muted rounded">
+                              <AppIcon name="Pencil" size={14} className="text-muted-foreground" />
+                            </button>
+                            <button onClick={() => handleDeletePrize(prize.id)} className="p-1.5 hover:bg-destructive/10 rounded">
+                              <AppIcon name="Trash2" size={14} className="text-destructive" />
+                            </button>
+                          </div>
+                          {/* Probability bar */}
+                          <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: prize.color }} />
+                          </div>
+                        </Card>
+                      );
+                    });
+                  })()}
                 </div>
               )}
             </div>
@@ -554,7 +568,14 @@ export default function CardapioHub() {
       <LinkOptionsDialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen} optionGroup={linkingOG} categories={categories} groups={groups} products={products} linkedProductIds={linkingOG ? getLinkedProductIds(linkingOG.id) : []} onSave={(ogId, pids) => setProductOptionLinks(ogId, pids)} />
 
       {/* Prize Sheet */}
-      <PrizeSheet open={prizeSheetOpen} onOpenChange={setPrizeSheetOpen} prize={editingPrize} onSave={handleSavePrize} saving={gamAdmin.savePrize.isPending} />
+      <PrizeSheet
+        open={prizeSheetOpen}
+        onOpenChange={setPrizeSheetOpen}
+        prize={editingPrize}
+        onSave={handleSavePrize}
+        saving={gamAdmin.savePrize.isPending}
+        otherPrizesTotalWeight={gamAdmin.prizes.filter(p => p.id !== editingPrize?.id).reduce((sum, p) => sum + p.probability, 0)}
+      />
     </AppLayout>
   );
 }

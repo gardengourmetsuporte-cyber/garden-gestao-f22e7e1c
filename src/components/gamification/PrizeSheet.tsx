@@ -12,12 +12,14 @@ interface PrizeSheetProps {
   prize?: GamificationPrize | null;
   onSave: (data: Partial<GamificationPrize>) => void;
   saving?: boolean;
+  /** Total weight of all OTHER prizes (excluding current) for % calculation */
+  otherPrizesTotalWeight?: number;
 }
 
 const defaultColors = ['#6366f1', '#f43f5e', '#22c55e', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899', '#64748b'];
 const defaultIcons = ['🎁', '🍟', '🧀', '🥓', '💸', '😅', '🎉', '⭐', '🍔', '🥤'];
 
-export function PrizeSheet({ open, onOpenChange, prize, onSave, saving }: PrizeSheetProps) {
+export function PrizeSheet({ open, onOpenChange, prize, onSave, saving, otherPrizesTotalWeight = 0 }: PrizeSheetProps) {
   const [name, setName] = useState('');
   const [type, setType] = useState('item');
   const [probability, setProbability] = useState('10');
@@ -42,6 +44,10 @@ export function PrizeSheet({ open, onOpenChange, prize, onSave, saving }: PrizeS
       setColor('#6366f1');
     }
   }, [prize, open]);
+
+  const currentWeight = Number(probability) || 0;
+  const totalWeight = otherPrizesTotalWeight + currentWeight;
+  const realPercent = totalWeight > 0 ? ((currentWeight / totalWeight) * 100).toFixed(1) : '0.0';
 
   const handleSubmit = () => {
     if (!name.trim()) return;
@@ -85,6 +91,9 @@ export function PrizeSheet({ open, onOpenChange, prize, onSave, saving }: PrizeS
             <div>
               <Label>Probabilidade (peso)</Label>
               <Input type="number" value={probability} onChange={e => setProbability(e.target.value)} min="1" />
+              <p className="text-xs text-muted-foreground mt-1">
+                Chance real: <span className="font-semibold text-primary">{realPercent}%</span>
+              </p>
             </div>
             <div>
               <Label>Custo estimado (R$)</Label>
