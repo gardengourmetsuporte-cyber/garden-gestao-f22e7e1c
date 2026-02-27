@@ -133,7 +133,20 @@ export function useManagementAI() {
     init();
   }, [user, activeUnitId, loadConversations, loadConversationMessages]);
 
-  // Fetch stats independently on mount to populate briefing card + chips
+  // Populate contextStats immediately from dashboardStats (available via React Query)
+  useEffect(() => {
+    if (!stats) return;
+    setContextStats(prev => ({
+      pendingExpensesCount: stats.pendingExpenses ?? 0,
+      pendingExpensesTotal: 0,
+      lowStockCount: stats.criticalItems ?? 0,
+      pendingTasksCount: prev?.pendingTasksCount ?? 0,
+      upcomingInvoicesCount: prev?.upcomingInvoicesCount ?? 0,
+      checklistPct: prev?.checklistPct ?? 0,
+    }));
+  }, [stats]);
+
+  // Enrich contextStats in background with full data (tasks, invoices, checklist)
   useEffect(() => {
     if (!user || !activeUnitId) return;
     fetchFullContext().catch(() => {});
