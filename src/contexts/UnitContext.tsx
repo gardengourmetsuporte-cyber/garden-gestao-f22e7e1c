@@ -35,47 +35,40 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const hasInitialized = useRef(false);
-  const fetchedForUserRef = useRef<string | null>(null);
-
-  // Safety net: avoid infinite loading if unit fetch stalls after app resume
-  useEffect(() => {
-    if (!isLoading || !user) return;
-
-    const timeoutId = window.setTimeout(() => {
-      console.warn('[UnitContext] Loading watchdog released after timeout');
-      fetchedForUserRef.current = user.id;
-      setIsLoading(false);
-    }, 12000);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isLoading, user]);
+  // Read isSuperAdmin via ref so fetchUnits doesn't re-create when role loads
+  const isSuperAdminRef = useRef(isSuperAdmin);
+  isSuperAdminRef.current = isSuperAdmin;
+  // Fetch sequence counter for deduplication
+  const fetchIdRef = useRef(0);
 
   const fetchUnits = useCallback(async () => {
     if (!user) {
       setUnits([]);
-      fetchedForUserRef.current = null;
       setIsLoading(false);
       return;
     }
 
-    // Reset loading state so ProtectedRoute waits for fresh data
+    const fetchId = ++fetchIdRef.current;
     setIsLoading(true);
 
     try {
-      // Fetch units the user has access to
       const { data: userUnitsData } = await supabase
         .from('user_units')
         .select('unit_id, is_default')
         .eq('user_id', user.id);
 
+      // Stale check: if a newer fetch started, abandon this one
+      if (fetchId !== fetchIdRef.current) return;
+
       if (!userUnitsData || userUnitsData.length === 0) {
-        if (isSuperAdmin) {
-          // Super admin with no specific assignments - fetch all active units
+        if (isSuperAdminRef.current) {
           const { data: allUnits } = await supabase
             .from('units')
             .select('*')
             .eq('is_active', true)
             .order('name');
+
+          if (fetchId !== fetchIdRef.current) return;
 
           setUnits((allUnits as Unit[]) || []);
 
@@ -87,7 +80,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
             setActiveUnitIdState(allUnits[0].id);
           }
         } else {
-          // Regular user with no units — check for pending invites first
+          // Check for pending invites
           const { data: pendingInvites } = await supabase
             .from('invites')
             .select('id')
@@ -95,21 +88,28 @@ export function UnitProvider({ children }: { children: ReactNode }) {
             .is('accepted_at', null)
             .limit(1);
 
+          if (fetchId !== fetchIdRef.current) return;
+
           if (pendingInvites && pendingInvites.length > 0) {
-            // User has a pending invite — do NOT auto-provision, let /invite handle it
             console.log('[UnitContext] Pending invite found, skipping auto-provision');
             setUnits([]);
           } else {
-            // No pending invites — auto-provision a default unit
+            // Auto-provision
             try {
               const { data: newUnitId, error: provisionError } = await supabase
                 .rpc('auto_provision_unit', { p_user_id: user.id });
               if (provisionError) throw provisionError;
+
+              if (fetchId !== fetchIdRef.current) return;
+
               if (newUnitId) {
                 const { data: newUnits } = await supabase
                   .from('units')
                   .select('*')
                   .eq('id', newUnitId);
+
+                if (fetchId !== fetchIdRef.current) return;
+
                 setUnits((newUnits as Unit[]) || []);
                 if (newUnits && newUnits.length > 0) {
                   setActiveUnitIdState(newUnits[0].id);
@@ -118,7 +118,8 @@ export function UnitProvider({ children }: { children: ReactNode }) {
               }
             } catch (err) {
               console.error('Auto-provision failed:', err);
-              // Fallback: try to fetch any units the user's profile might already own
+              if (fetchId !== fetchIdRef.current) return;
+
               try {
                 const { data: ownedUnits } = await supabase
                   .from('units')
@@ -127,8 +128,10 @@ export function UnitProvider({ children }: { children: ReactNode }) {
                   .eq('is_active', true)
                   .order('name')
                   .limit(5);
+
+                if (fetchId !== fetchIdRef.current) return;
+
                 if (ownedUnits && ownedUnits.length > 0) {
-                  // Re-link user to unit
                   await supabase.from('user_units').upsert({
                     user_id: user.id,
                     unit_id: ownedUnits[0].id,
@@ -155,9 +158,10 @@ export function UnitProvider({ children }: { children: ReactNode }) {
           .eq('is_active', true)
           .order('name');
 
+        if (fetchId !== fetchIdRef.current) return;
+
         setUnits((unitsData as Unit[]) || []);
 
-        // Restore from localStorage, or use default, or first
         const stored = localStorage.getItem(ACTIVE_UNIT_KEY);
         const validUnit = (unitsData || []).find(u => u.id === stored);
         if (validUnit) {
@@ -174,19 +178,22 @@ export function UnitProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error('Failed to fetch units:', err);
+      if (fetchId !== fetchIdRef.current) return;
       toast.error('Erro ao carregar lojas. Tente recarregar a página.');
     } finally {
-      fetchedForUserRef.current = user.id;
-      setIsLoading(false);
+      // Only the latest fetch sets loading to false
+      if (fetchId === fetchIdRef.current) {
+        setIsLoading(false);
+      }
     }
-  }, [user, isSuperAdmin]);
+  }, [user]); // Only depends on user, not isSuperAdmin
 
   useEffect(() => {
     fetchUnits();
   }, [fetchUnits]);
 
-  // Prevent flash: if user exists but we haven't fetched for them yet, stay loading
-  const effectiveLoading = isLoading || authLoading || (!!user && fetchedForUserRef.current !== user.id);
+  // Simplified loading: just combine auth + unit loading
+  const effectiveLoading = isLoading || authLoading;
 
   const activeUnit = units.find(u => u.id === activeUnitId) || null;
 
@@ -196,7 +203,6 @@ export function UnitProvider({ children }: { children: ReactNode }) {
     const theme = getUnitTheme(activeUnit.slug);
     applyUnitTheme(theme);
 
-    // Only show transition after initial load
     if (hasInitialized.current) {
       setIsTransitioning(true);
       const timer = setTimeout(() => setIsTransitioning(false), 500);
