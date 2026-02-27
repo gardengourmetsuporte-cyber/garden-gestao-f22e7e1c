@@ -188,14 +188,13 @@ export function BottomTabBar() {
                   "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
-                  boxShadow: '0 4px 20px hsl(234 89% 67% / 0.15), 0 8px 32px hsl(0 0% 0% / 0.1), 0 0 0 1px hsl(234 50% 80% / 0.2)',
+                  boxShadow: '0 4px 20px hsl(220 70% 16% / 0.4), 0 8px 32px hsl(0 0% 0% / 0.15)',
                 }}
               >
                 <AppIcon
                   name={fabAction?.icon || 'Plus'}
                   size={26}
-                  className="relative z-10"
-                  style={{ color: 'hsl(234 40% 30%)' }}
+                  className="relative z-10 text-white"
                 />
               </button>
             </div>
