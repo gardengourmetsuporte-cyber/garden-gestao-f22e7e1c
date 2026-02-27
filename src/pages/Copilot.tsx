@@ -313,7 +313,7 @@ export default function CopilotPage() {
         )}
 
         {showChips && (
-          <CopilotSuggestionChips onChipClick={handleChipClick} />
+          <CopilotSuggestionChips onChipClick={handleChipClick} contextStats={contextStats} />
         )}
 
         <div ref={messagesEndRef} />
