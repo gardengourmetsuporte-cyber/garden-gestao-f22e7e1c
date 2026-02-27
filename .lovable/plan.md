@@ -1,40 +1,46 @@
 
 
-## Diagnóstico: Dois Sistemas Separados
+## Bug: `refreshSubscription` sobrescreve o plano herdado da unidade
 
-Os cadeados que voce ve em "Fechamento" e "Recompensas" NAO sao do sistema de niveis de acesso. Sao bloqueios de **plano de assinatura** (Free/Pro/Business).
+### Causa raiz
 
-Existem dois sistemas independentes:
+Existe uma condição de corrida entre dois sistemas:
 
-1. **Niveis de Acesso** (Configuracoes > Equipe > aba "Niveis de Acesso") — controla quais modulos aparecem/somem no menu. "Acesso completo" = todos os modulos visiveis. Isso esta funcionando corretamente.
+1. **UnitContext** carrega a unidade ativa → chama `get_unit_plan` RPC → retorna `'business'` (plano do dono) → chama `setEffectivePlan('business')` → plano = business ✓
 
-2. **Plano de assinatura** (Free/Pro/Business) — bloqueia modulos premium com o icone de diamante dourado. "Fechamento", "Recompensas", "Financeiro", "Fichas Tecnicas" etc exigem plano Pro. Funcionarios herdam o plano do dono da loja.
+2. **5 segundos depois**: AuthContext chama `refreshSubscription()` → edge function `check-subscription` verifica o Stripe do **funcionário logado** (não do dono) → funcionário não tem assinatura Stripe → retorna `plan: 'free'` → `setPlan('free')` → **sobrescreve** o plano herdado ✗
 
-O que acontece: a loja esta no plano **Free**, entao mesmo com "acesso completo", os modulos Pro ficam bloqueados com cadeado. Isso e esperado — acesso completo libera visibilidade, mas o plano limita funcionalidade.
+3. **A cada 5 minutos**: o polling repete isso, garantindo que o plano sempre volta para `free`.
 
----
+O `check-subscription` verifica a assinatura do **usuário logado**, não do dono da loja. Para funcionários (que não têm assinatura própria), isso sempre retorna `free`, desfazendo a herança configurada pelo UnitContext.
 
-### Onde gerenciar niveis de acesso
+### Solução
 
-**Configuracoes > Equipe > aba "Niveis de Acesso"**. La voce pode:
-- Criar niveis customizados (ex: "Gerente Operacional") selecionando quais modulos ficam visiveis
-- Atribuir niveis a cada usuario
+Modificar `AuthContext.tsx` para que o `refreshSubscription` **não sobrescreva** o plano quando existe um plano efetivo definido pelo UnitContext. A lógica:
 
----
+- Guardar em uma ref se o plano efetivo foi setado via `setEffectivePlan` (ou seja, pelo UnitContext)
+- No `refreshSubscription`, após receber o resultado do `check-subscription`, comparar: se o plano do usuário individual é `free` mas já existe um plano efetivo da unidade, manter o plano efetivo
+- Alternativa mais simples: no `refreshSubscription`, após setar o plano do Stripe, re-disparar o `get_unit_plan` para a unidade ativa
 
-### Melhoria de UX proposta
+**Abordagem escolhida**: Usar uma ref `effectivePlanRef` em AuthContext. Quando `setEffectivePlan` é chamado, marca que o plano veio da unidade. No `refreshSubscription`, se o Stripe retorna `free` mas a ref indica um plano de unidade, ignorar o resultado do Stripe.
 
-Para evitar essa confusao, posso melhorar a interface:
+### Arquivo a modificar
 
-1. **`MoreDrawer.tsx`** — Diferenciar visualmente bloqueios de plano vs acesso. Modulos bloqueados por plano mostram "PRO" ou "BUSINESS" em amarelo. Modulos bloqueados por acesso simplesmente nao aparecem (ja funciona assim).
-
-2. **`MoreDrawer.tsx`** — Quando o usuario clica num modulo bloqueado por plano, mostrar um toast explicativo ("Este modulo requer plano Pro. Fale com o administrador.") em vez de redirecionar direto para /plans (que nao faz sentido para funcionarios).
-
-3. **`AccessLevelSettings.tsx`** — Adicionar um aviso visual nos modulos que exigem plano pago, para que o admin saiba que mesmo liberando no nivel de acesso, o plano precisa cobrir.
-
-### Arquivos a modificar
-| Arquivo | Mudanca |
+| Arquivo | Mudança |
 |---------|---------|
-| `src/components/layout/MoreDrawer.tsx` | Toast explicativo para funcionarios em modulos bloqueados por plano |
-| `src/components/settings/AccessLevelSettings.tsx` | Badge "PRO"/"BUSINESS" ao lado dos modulos que exigem plano pago |
+| `src/contexts/AuthContext.tsx` | Adicionar `effectivePlanRef` para rastrear plano herdado da unidade. No `refreshSubscription`, não sobrescrever quando plano efetivo existe. No `fetchUserData`, idem — o plano do perfil individual não deve sobrescrever o plano da unidade se este já foi resolvido. |
+
+### Detalhe técnico
+
+```
+Fluxo atual (bugado):
+AuthContext.fetchUserData → plan = profile.plan ('free')
+UnitContext.useEffect   → setEffectivePlan('business')  ← correto
+AuthContext.refreshSub  → plan = stripe result ('free')  ← sobrescreve!
+
+Fluxo corrigido:
+AuthContext.fetchUserData → plan = profile.plan ('free')
+UnitContext.useEffect   → setEffectivePlan('business'), effectivePlanRef = 'business'
+AuthContext.refreshSub  → stripe = 'free', mas effectivePlanRef = 'business' → mantém 'business'
+```
 
