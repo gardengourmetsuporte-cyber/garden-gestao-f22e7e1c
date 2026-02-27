@@ -20,6 +20,33 @@ function stripActionMarker(content: string) {
   return content.replace(/^\[ACTION\]\s*/, '');
 }
 
+function getActionNavigation(content: string): { label: string; href: string; icon: string } | null {
+  const lower = content.toLowerCase();
+  if (lower.includes('transação') || lower.includes('receita') || lower.includes('despesa') || lower.includes('paga')) {
+    return { label: 'Ver no Financeiro', href: '/finance', icon: 'DollarSign' };
+  }
+  if (lower.includes('tarefa') || lower.includes('compromisso')) {
+    return { label: 'Ver na Agenda', href: '/agenda', icon: 'CalendarDays' };
+  }
+  if (lower.includes('estoque') || lower.includes('movimentação') || lower.includes('item')) {
+    return { label: 'Ver Estoque', href: '/inventory', icon: 'Package' };
+  }
+  if (lower.includes('pedido') || lower.includes('fornecedor')) {
+    return { label: 'Ver Pedidos', href: '/orders', icon: 'ShoppingCart' };
+  }
+  if (lower.includes('fechamento') || lower.includes('caixa')) {
+    return { label: 'Ver Fechamentos', href: '/cash-closing', icon: 'Receipt' };
+  }
+  if (lower.includes('checklist')) {
+    return { label: 'Ver Checklist', href: '/checklists', icon: 'ClipboardCheck' };
+  }
+  if (lower.includes('boleto') || lower.includes('fatura')) {
+    return { label: 'Ver Financeiro', href: '/finance', icon: 'FileText' };
+  }
+  return null;
+}
+}
+
 export default function CopilotPage() {
   const navigate = useNavigate();
   const {
