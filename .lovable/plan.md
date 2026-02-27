@@ -1,124 +1,70 @@
 
 
-# Plano: Módulo CRM — Banco de Clientes
+# Plano de Integração Garden + Colibri POS (Windows)
 
-## Visao Geral
+## Contexto da Pesquisa
 
-Criar o módulo "Clientes" completo: tabela no banco, hook de dados, página com listagem/cadastro/importação CSV, e integrar na árvore de módulos e rotas.
+Após estudar toda a documentação disponível do Colibri, identifiquei o seguinte:
 
-## 1. Migration: Criar tabela `customers`
+- O **Colibri POS (Windows)** é um sistema local, sem API REST pública direta
+- A integração com sistemas externos acontece via um middleware: o **Gestor de Pedidos** (que você já possui) ou o mais recente **DeliveryTunnel**
+- O Gestor de Pedidos se comunica com o servidor Colibri na rede local e expõe uma API HTTP para receber pedidos externos
+- Produtos são mapeados via **Código ERP** (campo `codigo_pdv` que já existe no nosso sistema)
+- O sistema atual já tem a estrutura base de integração na aba "PDV" do TabletAdmin (URL do Hub + Auth Key)
 
-```sql
-CREATE TABLE public.customers (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  unit_id uuid NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  phone text,
-  email text,
-  origin text NOT NULL DEFAULT 'manual', -- 'manual' | 'pdv' | 'mesa' | 'ifood' | 'whatsapp' | 'csv'
-  notes text,
-  total_spent numeric DEFAULT 0,
-  total_orders integer DEFAULT 0,
-  last_purchase_at timestamptz,
-  birthday date,
-  created_by uuid REFERENCES auth.users(id),
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+## Limitação Importante
 
-ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+O Colibri **não possui uma API REST pública na nuvem**. A comunicação passa pelo Gestor de Pedidos rodando na rede local do restaurante. Isso significa que:
 
--- RLS: unit access
-CREATE POLICY "Users can view customers of their unit"
-  ON public.customers FOR SELECT
-  USING (public.user_has_unit_access(auth.uid(), unit_id));
+1. **Enviar pedidos do Tablet ao Colibri** -- possível, desde que a URL do Gestor de Pedidos esteja acessível (rede local ou com túnel/DDNS configurado)
+2. **Sincronizar produtos/cardápio do Colibri** -- o Colibri não expõe endpoint de consulta de cardápio via API. Precisaria ser feito manualmente ou via importação CSV
+3. **Puxar dados de vendas/relatórios do Colibri** -- não disponível via API. O Colibri não expõe endpoints de leitura de vendas para sistemas externos
 
-CREATE POLICY "Users can insert customers"
-  ON public.customers FOR INSERT
-  WITH CHECK (public.user_has_unit_access(auth.uid(), unit_id));
+## O que podemos implementar
 
-CREATE POLICY "Users can update customers"
-  ON public.customers FOR UPDATE
-  USING (public.user_has_unit_access(auth.uid(), unit_id));
+### 1. Melhorar o envio de pedidos ao Colibri (já parcialmente implementado)
+- Adicionar suporte a **produtos combo** (prefixo `CMB-`)
+- Adicionar campo de **código de pagamento** para mapear formas de pagamento
+- Melhorar feedback visual de status da integração
+- Adicionar logs detalhados de envio/erro
+- Adicionar **teste de conexão** na tela de configuração PDV
 
-CREATE POLICY "Users can delete customers"
-  ON public.customers FOR DELETE
-  USING (public.user_has_unit_access(auth.uid(), unit_id));
+### 2. Guia de configuração integrado
+- Wizard passo-a-passo na aba PDV explicando como obter a URL e chave do Gestor de Pedidos
+- Link para download do DeliveryTunnel (nova versão recomendada pela Colibri)
 
--- Updated_at trigger
-CREATE TRIGGER update_customers_updated_at
-  BEFORE UPDATE ON public.customers
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+### 3. Mapeamento de produtos aprimorado
+- Validação visual de quais produtos têm/não têm código PDV
+- Alerta quando um pedido contém itens sem código PDV
 
--- Index
-CREATE INDEX idx_customers_unit_id ON public.customers(unit_id);
-CREATE INDEX idx_customers_phone ON public.customers(phone);
-```
+---
 
-## 2. Hook `useCustomers`
+## Implementação Proposta
 
-Arquivo: `src/hooks/useCustomers.ts`
+### Etapa 1: Melhorar a tela de configuração PDV
+- Adicionar botão "Testar Conexão" que faz um health-check na URL do Hub
+- Adicionar guia visual com os passos de configuração do Gestor de Pedidos/DeliveryTunnel
+- Adicionar campo para código de pagamento padrão (online)
 
-- CRUD completo via Supabase (listagem com filtro por unit_id, criação, edição, exclusão)
-- Função `importCSV` que parseia CSV (nome, telefone, email) e faz bulk insert
-- useQuery + useMutation com invalidação
+### Etapa 2: Melhorar o envio de pedidos
+- Atualizar a Edge Function `tablet-order` para suportar combos (prefixo `CMB-`)
+- Adicionar campo `payment_code` ao payload enviado
+- Implementar retry automático (até 5 tentativas, como o Colibri recomenda)
+- Salvar log completo de request/response na tabela `tablet_orders`
 
-## 3. Página `Customers.tsx`
+### Etapa 3: Dashboard de status da integração
+- Indicador visual de "conexão ativa" com o PDV
+- Contadores de pedidos enviados/com erro do dia
+- Lista de pedidos pendentes de reenvio
 
-Arquivo: `src/pages/Customers.tsx`
+### Etapa 4: Validação de produtos
+- Badge visual na lista de produtos indicando se o código PDV está preenchido
+- Alerta no momento do envio se há itens sem código
 
-- Listagem com busca por nome/telefone
-- Stats no topo: total de clientes, novos este mes, origens
-- Botao de adicionar cliente manualmente (sheet/dialog)
-- Botao de importar CSV
-- Card de cada cliente com nome, telefone, origem, total gasto, ultima compra
-
-## 4. Componentes
-
-- `src/components/customers/CustomerSheet.tsx` — Form de criar/editar cliente
-- `src/components/customers/CustomerImportCSV.tsx` — Upload e preview de CSV antes de importar
-- `src/components/customers/CustomerCard.tsx` — Card de listagem
-
-## 5. Integração na navegação
-
-- Adicionar módulo `customers` em `src/lib/modules.ts` no grupo "Gestão" com sub-módulos:
-  - `customers.view` — Ver clientes
-  - `customers.create` — Criar/editar clientes
-  - `customers.import` — Importar CSV
-  - `customers.delete` — Excluir clientes
-- Adicionar rota `/customers` em `App.tsx`
-- Adicionar lazy import da página
-- Adicionar item no `MoreDrawer` / `BottomTabBar`
-
-## 6. Tipo TypeScript
-
-Arquivo: `src/types/customer.ts`
-
-```typescript
-export interface Customer {
-  id: string;
-  unit_id: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-  origin: 'manual' | 'pdv' | 'mesa' | 'ifood' | 'whatsapp' | 'csv';
-  notes: string | null;
-  total_spent: number;
-  total_orders: number;
-  last_purchase_at: string | null;
-  birthday: string | null;
-  created_by: string | null;
-  created_at: string;
-  updated_at: string;
-}
-```
-
-## Ordem de implementação
-
-1. Migration do banco
-2. Tipo TypeScript
-3. Hook useCustomers
-4. Componentes (Sheet, ImportCSV, Card)
-5. Página Customers
-6. Rotas e navegação (App.tsx, modules.ts, MoreDrawer)
+### Detalhes Técnicos
+- Modificar `supabase/functions/tablet-order/index.ts` para suportar combos e retry automático
+- Adicionar coluna `payment_code` na tabela `tablet_pdv_config`
+- Adicionar coluna `retry_count` na tabela `tablet_orders`
+- Atualizar `src/pages/TabletAdmin.tsx` com os novos componentes de configuração e status
+- Criar Edge Function `colibri-health` para teste de conexão
 
