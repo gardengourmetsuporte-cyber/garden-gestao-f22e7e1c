@@ -62,13 +62,20 @@ export function AccessLevelSettings() {
     staleTime: 60 * 1000,
   });
 
+  // All module keys that have children — used to auto-expand
+  const allExpandableKeys = useMemo(() => {
+    const keys = new Set<string>();
+    ALL_MODULES.forEach(m => { if (m.children && m.children.length > 0) keys.add(m.key); });
+    return keys;
+  }, []);
+
   const openCreate = () => {
     setEditingLevel(null);
     setIsCreating(true);
     setFormName('');
     setFormDescription('');
     setFormModules([]);
-    setExpandedModules(new Set());
+    setExpandedModules(new Set(allExpandableKeys));
   };
 
   const openEdit = (level: AccessLevel) => {
@@ -77,14 +84,8 @@ export function AccessLevelSettings() {
     setFormName(level.name);
     setFormDescription(level.description || '');
     setFormModules([...level.modules]);
-    // Auto-expand modules that have selected children
-    const expanded = new Set<string>();
-    level.modules.forEach(m => {
-      if (isSubModuleKey(m)) {
-        expanded.add(getParentModuleKey(m));
-      }
-    });
-    setExpandedModules(expanded);
+    // Auto-expand all modules with children for full visibility
+    setExpandedModules(new Set(allExpandableKeys));
   };
 
   const toggleExpand = useCallback((key: string) => {
