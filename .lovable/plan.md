@@ -1,38 +1,36 @@
 
 
-## Plano: Modernizar Layout do Cardápio Digital (estilo Checklist)
+## Plan: Photo Confirmation for Checklist Items
 
-### Problemas Identificados
-- Categorias usam `cat.color` (padrão `#6366f1` = roxo/indigo) nos ícones e fundo
-- Cada categoria tem cor diferente, criando visual inconsistente
-- Ícones de categoria usam emojis hardcoded (`🍴`, `☕`, etc.) ao invés do `AppIcon`
-- Layout dos cards de categoria/grupo não segue o padrão moderno do Checklist (cards com `finance-hero-card`, progress bars, hierarquia visual clara)
-- Cor padrão de novas categorias é `#6366f1` (roxo)
+### Database Changes
+1. **Migration** — Add two columns:
+   - `checklist_items.requires_photo` (boolean, default false) — configures whether a task demands photo proof
+   - `checklist_completions.photo_url` (text, nullable) — stores the uploaded photo URL
 
-### Mudanças
+2. **Storage bucket** — Create `checklist-photos` public bucket with RLS policies for authenticated users to upload/read
 
-**1. `MenuCategoryTree.tsx` — Redesign completo dos cards de categoria**
-- Remover fundo colorido individual por categoria (eliminar `cat.color` nos ícones)
-- Usar ícone navy uniforme via `AppIcon` com `icon-glow-primary` (padrão do sistema)
-- Substituir emojis hardcoded por ícones Material Symbols mapeados
-- Aplicar estilo de card expandido inspirado no Checklist: bordas sutis, separadores limpos
-- Mudar cor padrão de nova categoria de `#6366f1` para navy do sistema
-- Grupo selecionado usa `finance-hero-card` ao invés de `hsl(var(--primary) / 0.1)`
-- Botão "Nova Categoria" com estilo mais discreto e alinhado
+### Type Updates
+- `ChecklistItem` in `src/types/database.ts`: add `requires_photo: boolean`
+- `ChecklistCompletion` in `src/types/database.ts`: add `photo_url: string | null`
 
-**2. `MenuGroupContent.tsx` — Header do grupo modernizado**
-- Substituir `icon-glow-primary` por estilo compacto navy consistente
-- Badges Mesa/Delivery com estilo unificado usando `--primary` ao invés de `--neon-cyan`/`--neon-green`
+### Settings (Admin — Item Form)
+- **`src/components/checklists/ChecklistSettings.tsx`**: Add a Switch toggle "Exige foto de confirmação" in the item sheet form (between Points and Save button). Wire it to `requires_photo` in save/edit handlers and props.
+- **`src/hooks/useChecklists.ts`**: Pass `requires_photo` through `addItem` and `updateItem`.
 
-**3. `ProductCard.tsx` — Limpeza de cores**
-- Badges Mesa/Delivery usando `--primary` ao invés de cores neon individuais
-- Preço usando `text-primary` ao invés de `--neon-green`
-- Estrela de destaque usando `text-primary` ao invés de `--neon-amber`
+### Completion Flow (ChecklistView)
+- **`src/components/checklists/ChecklistView.tsx`**:
+  - When user taps an uncompleted item that has `requires_photo === true`, instead of immediately toggling, open a photo capture sheet
+  - Create an inline photo capture UI (camera input + preview) that uploads to `checklist-photos` bucket
+  - Only after successful upload, call `onToggleItem` with the photo URL
+  - Show a small camera icon badge on items that require photo
+  - Display the photo thumbnail on completed items that have a `photo_url`
 
-**4. `CardapioHub.tsx` — Tabs internas modernizadas**
-- Tabs Produtos/Opcionais/Config usando estilo consistente navy (sem contadores com cores diferentes)
-- Badges de contagem com estilo uniforme
+- **`src/hooks/useChecklists.ts`**: Update `toggleCompletion` to accept an optional `photoUrl` parameter and save it to the `checklist_completions` record.
 
-### Resultado
-Visual limpo, monocromático navy, consistente com Checklist e demais módulos do sistema. Zero roxo, zero cores aleatórias por categoria.
+### Files
+- **Create**: SQL migration (via migration tool)
+- **Edit**: `src/types/database.ts` — add fields to interfaces
+- **Edit**: `src/hooks/useChecklists.ts` — pass `requires_photo` in CRUD, accept `photoUrl` in toggle
+- **Edit**: `src/components/checklists/ChecklistSettings.tsx` — add Switch in item sheet
+- **Edit**: `src/components/checklists/ChecklistView.tsx` — photo capture flow + display
 
