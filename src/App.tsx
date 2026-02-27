@@ -118,7 +118,8 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
     return <Navigate to="/auth" replace />;
   }
 
-  // Auto-provision: if user has no units, show loader (UnitContext handles auto-creation)
+  // If units are still empty after loading finished, show a brief loader
+  // but cap it — don't block forever (auto-provision may have failed)
   if (!skipOnboarding && units.length === 0) {
     return <PageLoader />;
   }
