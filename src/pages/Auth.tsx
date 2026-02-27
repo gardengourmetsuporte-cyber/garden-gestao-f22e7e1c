@@ -171,11 +171,15 @@ export default function Auth() {
 
   useEffect(() => {
     if (user && !isLoading && !isNewPassword) {
-      navigate('/', { replace: true });
+      if (tokenFromUrl) {
+        navigate(`/invite?token=${tokenFromUrl}`, { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
-  }, [user, isLoading, navigate, isNewPassword]);
+  }, [user, isLoading, navigate, isNewPassword, tokenFromUrl]);
 
-  const canSignUp = true;
+  const canSignUp = !!(planFromUrl || tokenFromUrl);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};

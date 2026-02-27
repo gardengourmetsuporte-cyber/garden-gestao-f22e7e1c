@@ -74,26 +74,39 @@ export function UnitProvider({ children }: { children: ReactNode }) {
             setActiveUnitIdState(allUnits[0].id);
           }
         } else {
-          // Regular user with no units - auto-provision a default unit
-          try {
-            const { data: newUnitId, error: provisionError } = await supabase
-              .rpc('auto_provision_unit', { p_user_id: user.id });
-            if (provisionError) throw provisionError;
-            if (newUnitId) {
-              // Re-fetch units after provisioning
-              const { data: newUnits } = await supabase
-                .from('units')
-                .select('*')
-                .eq('id', newUnitId);
-              setUnits((newUnits as Unit[]) || []);
-              if (newUnits && newUnits.length > 0) {
-                setActiveUnitIdState(newUnits[0].id);
-                localStorage.setItem(ACTIVE_UNIT_KEY, newUnits[0].id);
-              }
-            }
-          } catch (err) {
-            console.error('Auto-provision failed:', err);
+          // Regular user with no units — check for pending invites first
+          const { data: pendingInvites } = await supabase
+            .from('invites')
+            .select('id')
+            .eq('email', user.email!)
+            .is('accepted_at', null)
+            .limit(1);
+
+          if (pendingInvites && pendingInvites.length > 0) {
+            // User has a pending invite — do NOT auto-provision, let /invite handle it
+            console.log('[UnitContext] Pending invite found, skipping auto-provision');
             setUnits([]);
+          } else {
+            // No pending invites — auto-provision a default unit
+            try {
+              const { data: newUnitId, error: provisionError } = await supabase
+                .rpc('auto_provision_unit', { p_user_id: user.id });
+              if (provisionError) throw provisionError;
+              if (newUnitId) {
+                const { data: newUnits } = await supabase
+                  .from('units')
+                  .select('*')
+                  .eq('id', newUnitId);
+                setUnits((newUnits as Unit[]) || []);
+                if (newUnits && newUnits.length > 0) {
+                  setActiveUnitIdState(newUnits[0].id);
+                  localStorage.setItem(ACTIVE_UNIT_KEY, newUnits[0].id);
+                }
+              }
+            } catch (err) {
+              console.error('Auto-provision failed:', err);
+              setUnits([]);
+            }
           }
         }
       } else {
