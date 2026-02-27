@@ -78,18 +78,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const preferredUnitId = userUnits.find((u) => u.is_default)?.unit_id ?? userUnits[0].unit_id;
       if (!preferredUnitId) return null;
 
+      // Primary source: backend RPC
       const { data: unitPlan, error: unitPlanError } = await supabase.rpc('get_unit_plan', {
         p_unit_id: preferredUnitId,
       });
 
-      if (unitPlanError || !unitPlan) return null;
-
-      const inheritedPlan = unitPlan as PlanTier;
-      if (inheritedPlan !== 'free') {
-        effectivePlanRef.current = inheritedPlan;
+      const rpcPlan = (unitPlan as PlanTier | null) ?? null;
+      if (!unitPlanError && rpcPlan && rpcPlan !== 'free') {
+        effectivePlanRef.current = rpcPlan;
+        return rpcPlan;
       }
 
-      return inheritedPlan;
+      // Fallback for legacy units where created_by has no profile:
+      // infer highest active plan among members of the unit
+      const { data: members, error: membersError } = await supabase
+        .from('user_units')
+        .select('user_id')
+        .eq('unit_id', preferredUnitId);
+
+      if (membersError || !members?.length) return rpcPlan;
+
+      const memberIds = members.map((m) => m.user_id);
+      const { data: memberProfiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('plan, plan_status')
+        .in('user_id', memberIds);
+
+      if (profilesError || !memberProfiles?.length) return rpcPlan;
+
+      const activePlans = memberProfiles
+        .filter((p) => (p.plan_status ?? 'active') === 'active')
+        .map((p) => (p.plan as PlanTier) || 'free');
+
+      const inferredPlan: PlanTier = activePlans.includes('business')
+        ? 'business'
+        : activePlans.includes('pro')
+          ? 'pro'
+          : 'free';
+
+      if (inferredPlan !== 'free') {
+        effectivePlanRef.current = inferredPlan;
+      }
+
+      return inferredPlan;
     } catch (err) {
       console.error('[AuthContext] Failed to resolve inherited unit plan:', err);
       return null;
