@@ -1,34 +1,17 @@
 
 
-## Diagnóstico: Por que o fluxo de compra não funciona
+## Plano: Simplificar ícone de diamante (Gem) nos módulos bloqueados
 
-O fluxo Stripe → Cadastro → Ativação tem 3 problemas:
-
-### Bug 1: `paymentSuccess` nunca é usado
-A variável `paymentSuccess` é declarada na linha 153 de `Auth.tsx` mas nunca utilizada. Quando o usuário chega em `/auth?plan=pro&payment=success` após pagar no Stripe:
-- Vê o formulário de **login** (não de cadastro)
-- Nenhuma mensagem de sucesso do pagamento
-- Sem orientação sobre o próximo passo
-
-### Bug 2: Formulário não abre em modo cadastro após pagamento
-Quando `plan` + `payment=success` estão na URL, o formulário deveria automaticamente abrir no modo "Criar Conta" para que o cliente que acabou de pagar saiba que precisa criar a conta.
-
-### Bug 3: Stripe usa USD ao invés de BRL
-O checkout no Stripe não força a moeda para BRL, fazendo o preço aparecer em dólares.
-
----
+O diamante atualmente está dentro de um círculo com fundo e borda (`rounded-full`, `background`, `border`). O usuário quer apenas o ícone solto, com cor amarela pura.
 
 ### Alterações
 
-#### 1. `src/pages/Auth.tsx`
-- Quando `paymentSuccess === 'success'` e `planFromUrl` existe, auto-switch para modo cadastro (`isLogin = false`)
-- Exibir banner de sucesso no topo: "Pagamento confirmado! Crie sua conta para ativar o plano Pro"
-- Usar o `paymentSuccess` para orientar o usuário
+#### 1. `src/components/layout/MoreDrawer.tsx` (~linha 247-251)
+- Remover o `<span>` container com `rounded-full`, `background` e `border`
+- Deixar apenas o `<AppIcon name="Gem">` posicionado no canto, com cor amarela direta (`hsl(45 90% 55%)`)
+- Aumentar levemente o tamanho do ícone (de 8 para 10) para compensar a ausência do fundo
 
-#### 2. `supabase/functions/stripe-checkout/index.ts`
-- Adicionar `currency: 'brl'` na criação da session do Stripe para forçar cobrança em Reais
-- Corrigir para que o preço sempre apareça em BRL
-
-#### 3. Fluxo pós-cadastro (já funciona)
-- Após cadastro → confirmação email → login, o `check-subscription` (que roda 5s após login) já busca o Stripe customer pelo email e sincroniza o plano automaticamente. Essa parte não precisa de alteração.
+#### 2. `src/components/layout/BottomTabBar.tsx` (~linha 256-260)
+- Mesma mudança: remover container circular, deixar só o ícone Gem amarelo
+- Tamanho de 7 para 9
 
