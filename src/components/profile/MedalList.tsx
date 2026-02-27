@@ -1,5 +1,7 @@
+import * as React from 'react';
 import { Medal, TIER_CONFIG, TIER_CONFIG_DARK, type MedalTier } from '@/lib/medals';
 import { useTheme } from 'next-themes';
+import { cn } from '@/lib/utils';
 
 function useGetTier() {
   const { resolvedTheme } = useTheme();
@@ -10,7 +12,6 @@ function useGetTier() {
     return base;
   };
 }
-import { cn } from '@/lib/utils';
 
 interface MedalListProps {
   medals: Medal[];
@@ -18,7 +19,7 @@ interface MedalListProps {
 
 function StarIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
   return (
-    <svg viewBox="0 0 64 64" className={cn("w-20 h-20 drop-shadow-lg", unlocked && "animate-[medal-glow-pulse_3s_ease-in-out_infinite]")}>
+    <svg viewBox="0 0 64 64" className={cn("w-16 h-16 drop-shadow-lg", unlocked && "animate-[medal-glow-pulse_3s_ease-in-out_infinite]")}>
       <defs>
         <radialGradient id="star-grad" cx="40%" cy="35%">
           <stop offset="0%" stopColor={unlocked ? 'hsl(45 100% 80%)' : `${color}90`} />
@@ -43,7 +44,7 @@ function StarIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
 
 function ShieldIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
   return (
-    <svg viewBox="0 0 64 64" className={cn("w-20 h-20 drop-shadow-lg", unlocked && "animate-[medal-glow-pulse_4s_ease-in-out_infinite]")}>
+    <svg viewBox="0 0 64 64" className={cn("w-16 h-16 drop-shadow-lg", unlocked && "animate-[medal-glow-pulse_4s_ease-in-out_infinite]")}>
       <defs>
         <linearGradient id="shield-grad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={unlocked ? 'hsl(45 80% 70%)' : `${color}90`} />
@@ -63,7 +64,7 @@ function ShieldIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
 
 function CrownIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
   return (
-    <svg viewBox="0 0 64 64" className={cn("w-20 h-20 drop-shadow-lg", unlocked && "animate-[medal-glow-pulse_3.5s_ease-in-out_infinite]")}>
+    <svg viewBox="0 0 64 64" className={cn("w-16 h-16 drop-shadow-lg", unlocked && "animate-[medal-glow-pulse_3.5s_ease-in-out_infinite]")}>
       <defs>
         <linearGradient id="crown-grad" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor={unlocked ? 'hsl(190 90% 75%)' : `${color}80`} />
@@ -88,7 +89,7 @@ function CrownIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
 
 function FlaskIcon({ unlocked, color }: { unlocked: boolean; color: string }) {
   return (
-    <svg viewBox="0 0 64 64" className="w-20 h-20 drop-shadow-lg">
+    <svg viewBox="0 0 64 64" className="w-16 h-16 drop-shadow-lg">
       <defs>
         <linearGradient id="flask-grad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={unlocked ? 'hsl(45 80% 70%)' : `${color}90`} />
@@ -117,9 +118,16 @@ const MEDAL_ICONS: Record<string, React.FC<{ unlocked: boolean; color: string }>
   inventor: FlaskIcon,
 };
 
+const MEDAL_DESCRIPTIONS: Record<string, string> = {
+  employee_of_month: 'Reconhecido como o melhor do mês',
+  six_months: 'Completou 6 meses na empresa',
+  one_year: 'Completou 1 ano na empresa',
+  inventor: 'Criou uma receita oficial',
+};
+
 export function MedalList({ medals }: MedalListProps) {
   const getTier = useGetTier();
-  const unlocked = medals.filter(m => m.unlocked);
+  const unlockedCount = medals.filter(m => m.unlocked).length;
 
   return (
     <>
@@ -136,59 +144,103 @@ export function MedalList({ medals }: MedalListProps) {
           0%, 100% { filter: drop-shadow(0 0 3px currentColor); }
           50% { filter: drop-shadow(0 0 12px currentColor); }
         }
+        @keyframes medal-shine {
+          0% { transform: translateX(-100%) skewX(-15deg); }
+          100% { transform: translateX(300%) skewX(-15deg); }
+        }
       `}</style>
 
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-foreground px-1">
-          Medalhas ({unlocked.length}/{medals.length})
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
+        {/* Header */}
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-sm font-semibold text-foreground">Medalhas</h3>
+          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+            {unlockedCount}/{medals.length} conquistadas
+          </span>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-2 gap-3">
           {medals.map(m => {
             const tier = getTier(m.tier);
             const IconComp = MEDAL_ICONS[m.id];
+            const desc = MEDAL_DESCRIPTIONS[m.id] || m.description;
+
             return (
               <div
                 key={m.id}
-                className={cn(
-                  "flex flex-col items-center gap-1 pt-3 pb-2 transition-all",
-                  !m.unlocked && "grayscale opacity-40"
-                )}
+                className="relative flex flex-col items-center gap-2 p-4 rounded-2xl overflow-hidden transition-all"
+                style={{
+                  background: m.unlocked
+                    ? `linear-gradient(145deg, ${tier.bg} 0%, hsl(var(--card)) 100%)`
+                    : 'hsl(var(--card))',
+                  border: `1px solid ${m.unlocked ? tier.border : 'hsl(var(--border) / 0.4)'}`,
+                  boxShadow: m.unlocked ? `${tier.glow}, inset 0 1px 0 ${tier.color}20` : 'none',
+                }}
               >
-                {/* Floating medal icon */}
-                <div className="relative">
+                {/* Shine sweep on unlocked */}
+                {m.unlocked && (
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `linear-gradient(105deg, transparent 40%, ${tier.color}12 50%, transparent 60%)`,
+                      animation: 'medal-shine 6s ease-in-out infinite',
+                    }}
+                  />
+                )}
+
+                {/* Tier badge */}
+                <span
+                  className="absolute top-2.5 right-2.5 text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full"
+                  style={{
+                    background: m.unlocked ? `${tier.color}20` : 'hsl(var(--muted))',
+                    color: m.unlocked ? tier.color : 'hsl(var(--muted-foreground))',
+                  }}
+                >
+                  {tier.label}
+                </span>
+
+                {/* Icon */}
+                <div className={cn("relative mt-1", !m.unlocked && "grayscale opacity-50")}>
                   {m.unlocked && (
                     <div
-                      className="absolute inset-0 rounded-full blur-2xl opacity-25 -z-10 scale-125"
+                      className="absolute inset-0 rounded-full blur-xl opacity-25 scale-150 pointer-events-none"
                       style={{ background: tier.color }}
                     />
                   )}
                   {IconComp ? (
                     <IconComp unlocked={m.unlocked} color={tier.color} />
                   ) : (
-                    <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-2xl">?</div>
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-2xl">?</div>
                   )}
                 </div>
 
                 {/* Title */}
                 <p className={cn(
-                  "text-xs font-bold text-center leading-tight mt-1",
+                  "text-xs font-bold text-center leading-tight",
                   m.unlocked ? "text-foreground" : "text-muted-foreground"
                 )}>
                   {m.title}
                 </p>
 
-                {/* Status badge */}
+                {/* Description */}
+                <p className="text-[9px] text-muted-foreground/70 text-center leading-tight px-1">
+                  {desc}
+                </p>
+
+                {/* Points badge */}
                 {m.unlocked ? (
-                  <span
-                    className="text-[11px] font-extrabold tracking-wide"
-                    style={{ color: tier.color }}
+                  <div
+                    className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold mt-0.5"
+                    style={{ background: `${tier.color}18`, color: tier.color }}
                   >
                     +{m.bonusPoints} pts
-                  </span>
+                  </div>
                 ) : (
-                  <span className="text-[10px] text-muted-foreground/70">
-                    🔒 +{m.bonusPoints} pts
-                  </span>
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground/50 mt-0.5">
+                    <span>🔒</span>
+                    <span>+{m.bonusPoints} pts</span>
+                  </div>
                 )}
               </div>
             );
