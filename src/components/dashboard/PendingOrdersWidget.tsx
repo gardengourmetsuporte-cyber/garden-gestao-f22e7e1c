@@ -31,7 +31,19 @@ export function PendingOrdersWidget() {
     setSendingId(orderId);
     try {
       await updateOrderStatus(orderId, 'sent');
-      toast.success('Pedido enviado!');
+      toast.success('Pedido enviado!', {
+        action: {
+          label: 'Ver pedidos',
+          onClick: () => navigate('/orders'),
+        },
+        cancel: {
+          label: 'Desfazer',
+          onClick: async () => {
+            await updateOrderStatus(orderId, 'draft');
+            toast.info('Pedido voltou para rascunho');
+          },
+        },
+      });
     } catch {
       toast.error('Erro ao enviar pedido');
     } finally {
@@ -44,7 +56,19 @@ export function PendingOrdersWidget() {
     setSendingId(orderId);
     try {
       await updateOrderStatus(orderId, 'received');
-      toast.success('Pedido marcado como recebido!');
+      toast.success('Pedido marcado como recebido!', {
+        action: {
+          label: 'Ver pedidos',
+          onClick: () => navigate('/orders'),
+        },
+        cancel: {
+          label: 'Desfazer',
+          onClick: async () => {
+            await updateOrderStatus(orderId, 'sent');
+            toast.info('Pedido voltou para enviado');
+          },
+        },
+      });
     } catch {
       toast.error('Erro ao atualizar pedido');
     } finally {
