@@ -28,10 +28,12 @@ export function LandingNavbar() {
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
           <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
-          <span className="font-display font-bold text-base text-foreground">Garden</span>
+          <span className={`font-display font-bold text-base transition-colors duration-300 ${scrolled ? "text-foreground" : "text-white"}`}>
+            Garden
+          </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -39,7 +41,11 @@ export function LandingNavbar() {
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+              className={`text-sm transition-colors duration-200 ${
+                scrolled
+                  ? "text-muted-foreground hover:text-primary"
+                  : "text-white/60 hover:text-white"
+              }`}
             >
               {l.label}
             </a>
@@ -50,20 +56,30 @@ export function LandingNavbar() {
           <ThemeToggle />
           <Link
             to="/auth"
-            className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className={`hidden sm:inline-flex text-sm transition-colors ${
+              scrolled
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-white/50 hover:text-white/80"
+            }`}
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold gradient-primary text-primary-foreground"
+            className={`hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              scrolled
+                ? "gradient-primary text-primary-foreground"
+                : "bg-white text-[hsl(220,30%,15%)] hover:bg-white/90"
+            }`}
           >
             Começar grátis
           </Link>
 
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+            className={`md:hidden p-2 transition-colors ${
+              scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/60 hover:text-white"
+            }`}
           >
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
