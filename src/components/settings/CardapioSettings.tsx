@@ -19,16 +19,16 @@ import type { GamificationPrize } from '@/hooks/useGamification';
 type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'config';
 
 interface CardapioSettingsProps {
-  initialTab?: SettingsTab;
+  initialTab?: SettingsTab | null;
 }
 
-export function CardapioSettings({ initialTab = 'pdv' }: CardapioSettingsProps) {
+export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
   const { activeUnit } = useUnit();
   const tabletAdmin = useTabletAdmin();
   const { tables, pdvConfig, addTable, removeTable, savePDVConfig, retryPDV } = tabletAdmin;
   const gamAdmin = useGamificationAdmin();
 
-  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
+  const [activeTab, setActiveTab] = useState<SettingsTab | null>(initialTab);
   const [newTableNum, setNewTableNum] = useState('');
 
   // PDV form
@@ -84,32 +84,53 @@ export function CardapioSettings({ initialTab = 'pdv' }: CardapioSettingsProps) 
     gamAdmin.deletePrize.mutate(id, { onSuccess: () => toast.success('Prêmio removido') });
   };
 
-  const TABS: { id: SettingsTab; label: string; icon: string }[] = [
-    { id: 'pdv', label: 'PDV', icon: 'Zap' },
-    { id: 'mesas', label: 'Mesas & QR', icon: 'QrCode' },
-    { id: 'roleta', label: 'Roleta', icon: 'Dices' },
-    { id: 'config', label: 'Geral', icon: 'Cog' },
+  const TABS: { id: SettingsTab; label: string; icon: string; description: string }[] = [
+    { id: 'pdv', label: 'Integração PDV', icon: 'Zap', description: 'Conexão com Colibri e envio automático' },
+    { id: 'mesas', label: 'Mesas & QR Codes', icon: 'QrCode', description: 'Cadastrar mesas e gerar QR codes' },
+    { id: 'roleta', label: 'Roleta / Gamificação', icon: 'Dices', description: 'Prêmios, probabilidades e métricas' },
+    { id: 'config', label: 'Geral', icon: 'Cog', description: 'Delivery, retirada e horários' },
   ];
+
+  // Hub menu view
+  if (!activeTab) {
+    return (
+      <div className="space-y-2">
+        <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <AppIcon name={tab.icon} size={16} className="text-primary" />
+                </div>
+                <div>
+                  <span className="font-medium text-sm text-foreground">{tab.label}</span>
+                  <p className="text-[11px] text-muted-foreground">{tab.description}</p>
+                </div>
+              </div>
+              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const activeTabData = TABS.find(t => t.id === activeTab);
 
   return (
     <div className="space-y-4">
-      {/* Sub-tabs */}
-      <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 overflow-x-auto scrollbar-hide">
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
-              activeTab === tab.id
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <AppIcon name={tab.icon} size={14} />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Back button */}
+      <button
+        onClick={() => setActiveTab(null)}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors -mt-1"
+      >
+        <AppIcon name="ChevronLeft" size={16} />
+        <span>{activeTabData?.label}</span>
+      </button>
 
       {/* ==================== PDV ==================== */}
       {activeTab === 'pdv' && (
