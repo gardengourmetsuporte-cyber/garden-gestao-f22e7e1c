@@ -48,11 +48,7 @@ export function SolutionSection() {
     <section id="como-funciona" className="py-24 md:py-32 relative">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
 
-      {/* Ambient glows */}
-      <div className="absolute top-1/3 left-0 w-[400px] h-[400px] rounded-full bg-primary/4 blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-0 w-[300px] h-[300px] rounded-full bg-success/4 blur-[120px] pointer-events-none" />
-
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-20">
           <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/8 px-3 py-1.5 rounded-full mb-5">
             Como funciona
@@ -66,7 +62,7 @@ export function SolutionSection() {
         </div>
 
         {/* Steps */}
-        <div className="space-y-24 md:space-y-32">
+        <div className="space-y-20 md:space-y-28">
           {steps.map((step, i) => (
             <div
               key={step.number}
@@ -84,13 +80,13 @@ export function SolutionSection() {
               </div>
               <div className="md:[direction:ltr]">
                 <div className="relative group">
-                  <div className="absolute -inset-3 bg-gradient-to-b from-primary/8 via-primary/4 to-transparent blur-[40px] rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="absolute -inset-4 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent blur-[50px] rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="card-surface overflow-hidden !rounded-2xl group-hover:shadow-elevated transition-all duration-500 group-hover:-translate-y-1">
-                    {/* Mini browser bar */}
-                    <div className="flex items-center gap-1.5 px-3 py-2 bg-secondary/50 border-b border-border/30">
-                      <div className="w-2 h-2 rounded-full bg-destructive/40" />
-                      <div className="w-2 h-2 rounded-full bg-warning/40" />
-                      <div className="w-2 h-2 rounded-full bg-success/40" />
+                    {/* Browser bar */}
+                    <div className="flex items-center gap-1.5 px-3 py-2.5 bg-secondary/50 border-b border-border/30">
+                      <div className="w-2.5 h-2.5 rounded-full bg-destructive/40" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-warning/40" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-success/40" />
                     </div>
                     <img src={step.image} alt={step.alt} className="w-full" loading="lazy" />
                   </div>
@@ -114,9 +110,9 @@ export function SolutionSection() {
             {modules.map((m) => (
               <div key={m.title} className="card-interactive p-6 flex gap-4 items-start">
                 <div
-                  className={`w-12 h-12 rounded-2xl border ${m.border} ${m.bg} flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110`}
+                  className={`w-12 h-12 rounded-2xl border ${m.border} ${m.bg} flex items-center justify-center shrink-0`}
                 >
-                  <m.icon className={`w-5.5 h-5.5 ${m.color}`} />
+                  <m.icon className={`w-5 h-5 ${m.color}`} />
                 </div>
                 <div>
                   <h4 className="font-bold text-foreground text-sm mb-1">{m.title}</h4>

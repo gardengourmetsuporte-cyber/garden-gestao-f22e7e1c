@@ -46,15 +46,17 @@ export function ProblemSection() {
           {problems.map((p) => (
             <div
               key={p.title}
-              className="card-interactive p-8 text-center"
+              className="card-interactive p-6 flex gap-5 items-start"
             >
               <div
-                className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${p.bg} border ${p.iconBorder} mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
+                className={`w-14 h-14 rounded-2xl ${p.bg} border ${p.iconBorder} flex items-center justify-center shrink-0`}
               >
-                <p.icon className={`w-7 h-7 ${p.color}`} />
+                <p.icon className={`w-6 h-6 ${p.color}`} />
               </div>
-              <h3 className="text-base font-bold text-foreground mb-3">{p.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{p.desc}</p>
+              <div>
+                <h3 className="text-sm font-bold text-foreground mb-2">{p.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{p.desc}</p>
+              </div>
             </div>
           ))}
         </div>
