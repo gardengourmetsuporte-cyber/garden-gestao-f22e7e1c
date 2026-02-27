@@ -632,6 +632,7 @@
   .icon-glow svg,
   .icon-glow .material-symbols-rounded {
     transition: filter 0.2s ease;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 40%, transparent));
     .dark & { filter: drop-shadow(0 0 6px currentColor); }
   }
 
@@ -639,6 +640,7 @@
   .icon-glow:active svg,
   .icon-glow:hover .material-symbols-rounded,
   .icon-glow:active .material-symbols-rounded {
+    filter: drop-shadow(0 0 7px color-mix(in srgb, currentColor 60%, transparent));
     .dark & { filter: drop-shadow(0 0 10px currentColor); }
   }
 
