@@ -262,6 +262,7 @@ export function useMenuAdmin() {
       const payload = {
         name: prod.name, price: prod.price, codigo_pdv: prod.codigo_pdv,
         category: prod.category || 'Geral', description: prod.description,
+        image_url: prod.image_url ?? null,
         is_active: prod.is_active ?? true, sort_order: prod.sort_order ?? 0,
         group_id: prod.group_id || null, is_highlighted: prod.is_highlighted ?? false,
         is_18_plus: prod.is_18_plus ?? false,
@@ -379,6 +380,30 @@ export function useMenuAdmin() {
     toast({ title: 'Vínculos atualizados' });
   };
 
+  // ===== IMAGE UPLOAD =====
+  const uploadProductImage = async (productId: string, file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${activeUnitId}/${productId}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+      const publicUrl = `${data.publicUrl}?t=${Date.now()}`;
+
+      // Update product record
+      await supabase.from('tablet_products').update({ image_url: publicUrl }).eq('id', productId);
+      fetchProducts();
+      toast({ title: 'Foto atualizada' });
+      return publicUrl;
+    } catch (err: any) {
+      toast({ title: 'Erro ao enviar foto', description: err.message, variant: 'destructive' });
+      return null;
+    }
+  };
+
   // Helper: products in a group
   const getProductsByGroup = (groupId: string) => products.filter(p => p.group_id === groupId);
   const getGroupsByCategory = (categoryId: string) => groups.filter(g => g.category_id === categoryId);
@@ -391,7 +416,7 @@ export function useMenuAdmin() {
     categories, groups, products, optionGroups, productOptionLinks, loading,
     saveCategory, deleteCategory,
     saveGroup, deleteGroup,
-    saveProduct, deleteProduct,
+    saveProduct, deleteProduct, uploadProductImage,
     saveOptionGroup, deleteOptionGroup,
     linkOptionToProduct, unlinkOptionFromProduct, setProductOptionLinks,
     getProductsByGroup, getGroupsByCategory, getLinkedProductIds, getLinkedOptionGroupIds,

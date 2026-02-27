@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { MenuProduct } from '@/hooks/useMenuAdmin';
@@ -8,32 +9,67 @@ interface Props {
   onEdit: () => void;
   onDelete: () => void;
   onLinkOptions: () => void;
+  onImageUpload?: (productId: string, file: File) => void;
 }
 
 const formatPrice = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions }: Props) {
+export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload }: Props) {
   const avail = product.availability as any;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onImageUpload) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImageUpload) {
+      onImageUpload(product.id, file);
+    }
+    e.target.value = '';
+  };
 
   return (
     <div
       className="card-interactive flex items-center gap-3 p-3 group"
       onClick={onEdit}
     >
-      {/* Image */}
-      <div className="w-14 h-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center"
+      {/* Image — clickable for upload */}
+      <div
+        className="w-14 h-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center relative cursor-pointer"
         style={{
           background: 'hsl(var(--secondary) / 0.6)',
           border: '1px solid hsl(var(--border) / 0.3)',
         }}
+        onClick={handleImageClick}
       >
         {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+          <>
+            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <AppIcon name="Camera" size={16} className="text-white" />
+            </div>
+          </>
         ) : (
-          <span className="text-2xl">🍽️</span>
+          <div className="flex flex-col items-center gap-0.5">
+            <AppIcon name="Camera" size={16} className="text-muted-foreground" />
+            <span className="text-[8px] text-muted-foreground">Foto</span>
+          </div>
         )}
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
       {/* Info */}
       <div className="flex-1 min-w-0">

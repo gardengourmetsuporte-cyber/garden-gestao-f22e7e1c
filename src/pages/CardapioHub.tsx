@@ -41,7 +41,7 @@ export default function CardapioHub() {
     saveProduct, deleteProduct,
     saveOptionGroup, deleteOptionGroup,
     getProductsByGroup, getLinkedProductIds, getLinkedOptionGroupIds,
-    setProductOptionLinks,
+    setProductOptionLinks, uploadProductImage,
   } = menuAdmin;
 
   // Tablet admin hook (for orders)
@@ -299,6 +299,7 @@ export default function CardapioHub() {
                 onEditProduct={openEditProduct}
                 onDeleteProduct={deleteProduct}
                 onLinkOptions={() => setCardapioTab('opcionais')}
+                onImageUpload={(productId, file) => uploadProductImage(productId, file)}
               />
             </div>
           )}
