@@ -26,7 +26,7 @@ export function MenuCategoryTree({
   onSelectGroup, onSaveCategory, onDeleteCategory,
   onSaveGroup, onDeleteGroup, getProductCount,
 }: Props) {
-  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set(categories.map(c => c.id)));
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
   const [catDialog, setCatDialog] = useState(false);
   const [editingCat, setEditingCat] = useState<Partial<MenuCategory>>({});
   const [grpDialog, setGrpDialog] = useState(false);
