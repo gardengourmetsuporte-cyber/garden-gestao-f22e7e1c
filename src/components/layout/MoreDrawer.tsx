@@ -120,17 +120,25 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[80vh] overflow-hidden [&>div:first-child]:bg-white/20" style={{ borderColor: 'hsl(220 70% 16%)', background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 260px, hsl(var(--background)) 260px)' }}>
-        <div className="overflow-y-auto" style={{ maxHeight: '75vh' }}>
+      <DrawerContent className="h-[100dvh] max-h-[100dvh] overflow-hidden rounded-none border-0 [&>div:first-child]:hidden" style={{ background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)' }}>
+        <div className="overflow-y-auto h-full">
           {/* Navy gradient header area */}
           <div
-            className="relative px-4 pt-2 pb-6 space-y-3"
+            className="relative px-4 pt-[calc(env(safe-area-inset-top,12px)+12px)] pb-6 space-y-3"
             style={{
               background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
             }}
           >
+            {/* Close button */}
+            <button
+              onClick={() => onOpenChange(false)}
+              className="absolute top-[calc(env(safe-area-inset-top,12px)+12px)] right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10"
+            >
+              <AppIcon name="X" size={18} className="text-white/80" />
+            </button>
+
             {/* Profile card */}
-            <div className="flex items-center gap-3 w-full py-3">
+            <div className="flex items-center gap-3 w-full py-3 pr-10">
               <button
                 onClick={() => { navigate('/profile/me'); onOpenChange(false); }}
                 className="flex items-center gap-3 flex-1 min-w-0 active:scale-[0.98] transition-transform"
