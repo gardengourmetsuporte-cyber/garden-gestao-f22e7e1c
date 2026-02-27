@@ -54,15 +54,15 @@ function BrandPanel() {
       <div className="relative z-10 flex flex-col items-center gap-10 px-12 max-w-lg">
         {/* Logo */}
         <div
-          className="relative w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center"
+          className="relative w-32 h-32 rounded-3xl overflow-hidden flex items-center justify-center"
           style={{
             background: 'linear-gradient(135deg, hsl(220 50% 15%), hsl(234 60% 22%))',
             border: '1px solid hsl(220 60% 30% / 0.4)',
             boxShadow: '0 0 80px hsl(220 80% 50% / 0.15), 0 20px 60px hsl(224 45% 6% / 0.5)',
           }}
         >
-          <div className="w-16 h-16 rounded-xl overflow-hidden bg-white flex items-center justify-center">
-            <img alt="Garden Gestão" className="w-[80%] h-[80%] object-contain" src={gardenLogo} />
+          <div className="w-22 h-22 rounded-2xl overflow-hidden bg-white flex items-center justify-center" style={{ width: 88, height: 88 }}>
+            <img alt="Garden Gestão" className="w-[82%] h-[82%] object-contain" src={gardenLogo} />
           </div>
         </div>
 
@@ -134,15 +134,15 @@ function MobileBrandHeader() {
       }}
     >
       <div
-        className="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center"
+        className="w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center"
         style={{
           background: 'linear-gradient(135deg, hsl(220 50% 15%), hsl(234 60% 22%))',
           border: '1px solid hsl(220 60% 30% / 0.3)',
           boxShadow: '0 8px 32px hsl(224 45% 6% / 0.4)',
         }}
       >
-        <div className="w-11 h-11 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-          <img alt="Garden Gestão" className="w-[80%] h-[80%] object-contain" src={gardenLogo} />
+        <div className="w-16 h-16 rounded-xl overflow-hidden bg-white flex items-center justify-center">
+          <img alt="Garden Gestão" className="w-[82%] h-[82%] object-contain" src={gardenLogo} />
         </div>
       </div>
       <div className="text-center space-y-1">
