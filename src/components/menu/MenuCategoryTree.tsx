@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -208,13 +208,13 @@ export function MenuCategoryTree({
         );
       })}
 
-      {/* Category Dialog */}
-      <Dialog open={catDialog} onOpenChange={setCatDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingCat.id ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
+      {/* Category Sheet */}
+      <Sheet open={catDialog} onOpenChange={setCatDialog}>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>{editingCat.id ? 'Editar Categoria' : 'Nova Categoria'}</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 py-4">
             <div>
               <Label>Nome</Label>
               <Input value={editingCat.name || ''} onChange={e => setEditingCat({ ...editingCat, name: e.target.value })} />
@@ -224,20 +224,20 @@ export function MenuCategoryTree({
               <Input value={editingCat.icon || ''} onChange={e => setEditingCat({ ...editingCat, icon: e.target.value })} placeholder="UtensilsCrossed" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCatDialog(false)}>Cancelar</Button>
-            <Button onClick={handleSaveCat} disabled={!editingCat.name}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <SheetFooter className="flex-row gap-2 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setCatDialog(false)}>Cancelar</Button>
+            <Button className="flex-1" onClick={handleSaveCat} disabled={!editingCat.name}>Salvar</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      {/* Group Dialog */}
-      <Dialog open={grpDialog} onOpenChange={setGrpDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingGrp.id ? 'Editar Grupo' : 'Novo Grupo'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
+      {/* Group Sheet */}
+      <Sheet open={grpDialog} onOpenChange={setGrpDialog}>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>{editingGrp.id ? 'Editar Grupo' : 'Novo Grupo'}</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 py-4">
             <div>
               <Label>Nome</Label>
               <Input value={editingGrp.name || ''} onChange={e => setEditingGrp({ ...editingGrp, name: e.target.value })} />
@@ -261,12 +261,12 @@ export function MenuCategoryTree({
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setGrpDialog(false)}>Cancelar</Button>
-            <Button onClick={handleSaveGrp} disabled={!editingGrp.name}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <SheetFooter className="flex-row gap-2 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setGrpDialog(false)}>Cancelar</Button>
+            <Button className="flex-1" onClick={handleSaveGrp} disabled={!editingGrp.name}>Salvar</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
