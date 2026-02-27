@@ -213,48 +213,16 @@ export function BottomTabBar() {
             ))}
 
             {/* "Mais" tab — 3-dot menu for cardápio, drawer for others */}
-            {isCardapioRoute ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    onClick={() => navigator.vibrate?.(10)}
-                    aria-label="Configurações"
-                    className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
-                    style={{ width: '20%' }}
-                  >
-                    <AppIcon name="MoreVert" size={22} fill={0} className="text-muted-foreground transition-colors" />
-                    <span className="text-[10px] font-normal text-muted-foreground">Config</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="top" className="mb-2 min-w-[200px]">
-                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
-                    <AppIcon name="Zap" size={16} className="mr-2 text-muted-foreground" />
-                    Integração PDV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
-                    <AppIcon name="QrCode" size={16} className="mr-2 text-muted-foreground" />
-                    Mesas & QR Code
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
-                    <AppIcon name="Dices" size={16} className="mr-2 text-muted-foreground" />
-                    Roleta / Gamificação
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
-                    <AppIcon name="Cog" size={16} className="mr-2 text-muted-foreground" />
-                    Configurações do Cardápio
-                  </DropdownMenuItem>
-                  {activeUnit && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => window.open(`/m/${activeUnit.id}`, '_blank')}>
-                        <AppIcon name="ExternalLink" size={16} className="mr-2 text-muted-foreground" />
-                        Ver cardápio público
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+{isCardapioRoute ? (
+              <button
+                onClick={() => { navigator.vibrate?.(10); navigate('/settings?tab=cardapio-digital'); }}
+                aria-label="Configurações"
+                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
+                style={{ width: '20%' }}
+              >
+                <span className="material-symbols-rounded text-muted-foreground transition-colors" style={{ fontSize: 22 }}>settings</span>
+                <span className="text-[10px] font-normal text-muted-foreground">Config</span>
+              </button>
             ) : (
             <button
               onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
