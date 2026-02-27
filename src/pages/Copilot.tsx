@@ -52,6 +52,7 @@ export default function CopilotPage() {
   const {
     messages, isLoading, isExecuting, hasGreeted, sendMessage, clearHistory,
     conversations, conversationId, switchConversation, newConversation,
+    contextStats,
   } = useManagementAI();
   const [question, setQuestion] = useState('');
   const [showHistory, setShowHistory] = useState(false);
