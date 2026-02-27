@@ -437,7 +437,7 @@
 
   .finance-hero-card:hover {
     transform: scale(1.01);
-    box-shadow: 0 8px 36px hsl(234 60% 15% / 0.5), 0 0 50px hsl(234 70% 35% / 0.18);
+    box-shadow: 0 8px 28px hsl(220 60% 5% / 0.6);
   }
 
   .finance-hero-card:active {
