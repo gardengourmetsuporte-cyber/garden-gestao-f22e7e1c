@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import type { MenuProduct } from '@/hooks/useMenuAdmin';
 
 interface Props {
@@ -10,12 +11,13 @@ interface Props {
   onDelete: () => void;
   onLinkOptions: () => void;
   onImageUpload?: (productId: string, file: File) => void;
+  onToggleAvailability?: (product: MenuProduct, channel: 'tablet' | 'delivery') => void;
 }
 
 const formatPrice = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload }: Props) {
+export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload, onToggleAvailability }: Props) {
   const avail = product.availability as any;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -81,12 +83,28 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
           {product.codigo_pdv && (
             <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-secondary text-muted-foreground">PDV: {product.codigo_pdv}</span>
           )}
-          {avail?.tablet && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Mesa</span>
-          )}
-          {avail?.delivery && (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Delivery</span>
-          )}
+          {onToggleAvailability ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleAvailability(product, 'tablet'); }}
+              className={cn(
+                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+              )}
+            >Mesa</button>
+          ) : avail?.tablet ? (
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-success/15 text-success">Mesa</span>
+          ) : null}
+          {onToggleAvailability ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleAvailability(product, 'delivery'); }}
+              className={cn(
+                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+              )}
+            >Delivery</button>
+          ) : avail?.delivery ? (
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-success/15 text-success">Delivery</span>
+          ) : null}
           {optionCount > 0 && (
             <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">{optionCount} {optionCount === 1 ? 'opcional' : 'opcionais'}</span>
           )}
