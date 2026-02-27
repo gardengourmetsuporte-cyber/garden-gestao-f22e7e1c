@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, Plus, Star, X } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import type { MenuProduct, MenuGroup } from '@/hooks/useMenuAdmin';
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
   groups: MenuGroup[];
   onSave: (prod: Partial<MenuProduct> & { name: string; price: number }) => void;
   onDelete?: (id: string) => void;
+  onImageUpload?: (productId: string, file: File) => void;
 }
 
 interface CustomPrice {
@@ -24,16 +26,19 @@ interface CustomPrice {
   price: number;
 }
 
-export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDelete }: Props) {
+export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDelete, onImageUpload }: Props) {
   const [form, setForm] = useState<Partial<MenuProduct>>({});
   const [priceType, setPriceType] = useState<'fixed' | 'custom'>('fixed');
   const [customPrices, setCustomPrices] = useState<CustomPrice[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (product) {
       setForm(product);
       setPriceType((product.price_type as any) || 'fixed');
       setCustomPrices((product.custom_prices as CustomPrice[]) || []);
+      setPreviewUrl(product.image_url || null);
     }
   }, [product]);
 
@@ -47,6 +52,15 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
       custom_prices: priceType === 'custom' ? customPrices : null,
     } as any);
     onOpenChange(false);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && form.id && onImageUpload) {
+      setPreviewUrl(URL.createObjectURL(file));
+      onImageUpload(form.id, file);
+    }
+    e.target.value = '';
   };
 
   const addCustomPrice = () => {
@@ -69,6 +83,34 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
         </SheetHeader>
 
         <div className="mt-4 space-y-4 pb-8">
+          {/* Image Upload */}
+          {form.id && onImageUpload && (
+            <div>
+              <Label>Foto do produto</Label>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-1.5 w-full h-32 rounded-xl border-2 border-dashed border-border/60 bg-secondary/30 flex flex-col items-center justify-center gap-1.5 overflow-hidden transition-colors hover:bg-secondary/50 active:scale-[0.98]"
+              >
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Produto" className="w-full h-full object-cover rounded-xl" />
+                ) : (
+                  <>
+                    <AppIcon name="Camera" size={24} className="text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Toque para adicionar foto</span>
+                  </>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+          )}
+
           <div>
             <Label>Nome *</Label>
             <Input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -101,26 +143,14 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
           <div className="space-y-3">
             <Label>Tipo de Preço</Label>
             <div className="flex gap-2">
-              <Button
-                type="button" size="sm"
-                variant={priceType === 'fixed' ? 'default' : 'outline'}
-                onClick={() => setPriceType('fixed')}
-              >Único</Button>
-              <Button
-                type="button" size="sm"
-                variant={priceType === 'custom' ? 'default' : 'outline'}
-                onClick={() => setPriceType('custom')}
-              >Personalizado</Button>
+              <Button type="button" size="sm" variant={priceType === 'fixed' ? 'default' : 'outline'} onClick={() => setPriceType('fixed')}>Único</Button>
+              <Button type="button" size="sm" variant={priceType === 'custom' ? 'default' : 'outline'} onClick={() => setPriceType('custom')}>Personalizado</Button>
             </div>
 
             {priceType === 'fixed' ? (
               <div>
                 <Label>Preço *</Label>
-                <Input
-                  type="number" step="0.01"
-                  value={form.price || ''}
-                  onChange={e => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
-                />
+                <Input type="number" step="0.01" value={form.price || ''} onChange={e => setForm({ ...form, price: parseFloat(e.target.value) || 0 })} />
               </div>
             ) : (
               <div className="space-y-2">
@@ -144,25 +174,17 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
             <Label>Disponibilidade</Label>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Tablet (Mesa)</span>
-              <Switch
-                checked={(form.availability as any)?.tablet ?? true}
-                onCheckedChange={v => setForm({ ...form, availability: { ...(form.availability as any), tablet: v } })}
-              />
+              <Switch checked={(form.availability as any)?.tablet ?? true} onCheckedChange={v => setForm({ ...form, availability: { ...(form.availability as any), tablet: v } })} />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Delivery</span>
-              <Switch
-                checked={(form.availability as any)?.delivery ?? true}
-                onCheckedChange={v => setForm({ ...form, availability: { ...(form.availability as any), delivery: v } })}
-              />
+              <Switch checked={(form.availability as any)?.delivery ?? true} onCheckedChange={v => setForm({ ...form, availability: { ...(form.availability as any), delivery: v } })} />
             </div>
           </div>
 
           {/* Toggles */}
           <div className="flex items-center justify-between">
-            <Label className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-warning" /> Destaque
-            </Label>
+            <Label className="flex items-center gap-2"><Star className="w-4 h-4 text-warning" /> Destaque</Label>
             <Switch checked={form.is_highlighted ?? false} onCheckedChange={v => setForm({ ...form, is_highlighted: v })} />
           </div>
 
@@ -178,9 +200,7 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
 
           {/* Actions */}
           <div className="flex gap-2 pt-4">
-            <Button onClick={handleSave} className="flex-1" disabled={!form.name}>
-              Salvar
-            </Button>
+            <Button onClick={handleSave} className="flex-1" disabled={!form.name}>Salvar</Button>
             {form.id && onDelete && (
               <Button variant="destructive" onClick={() => { onDelete(form.id!); onOpenChange(false); }}>
                 <Trash2 className="w-4 h-4" />
