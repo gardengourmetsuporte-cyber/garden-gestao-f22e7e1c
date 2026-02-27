@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { useAccessLevels, AccessLevel } from '@/hooks/useAccessLevels';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,7 +6,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppRole } from '@/types/database';
-import { ALL_MODULES } from '@/lib/modules';
+import { ALL_MODULES, getSubModuleKeys, isSubModuleKey, getParentModuleKey } from '@/lib/modules';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,12 +32,12 @@ const moduleGroups = (() => {
   const groups: { label: string; modules: typeof ALL_MODULES }[] = [];
   const seen = new Set<string>();
   ALL_MODULES.forEach(m => {
-    if (m.key === 'dashboard' || m.key === 'settings') return;
+    if (m.key === 'dashboard') return;
     if (!seen.has(m.group)) {
       seen.add(m.group);
       groups.push({
         label: m.group,
-        modules: ALL_MODULES.filter(mod => mod.group === m.group && mod.key !== 'dashboard' && mod.key !== 'settings'),
+        modules: ALL_MODULES.filter(mod => mod.group === m.group && mod.key !== 'dashboard'),
       });
     }
   });
@@ -542,6 +542,14 @@ function LevelsTab() {
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formModules, setFormModules] = useState<string[]>([]);
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+
+  // All module keys that have children — used to auto-expand
+  const allExpandableKeys = useMemo(() => {
+    const keys = new Set<string>();
+    ALL_MODULES.forEach(m => { if (m.children && m.children.length > 0) keys.add(m.key); });
+    return keys;
+  }, []);
 
   // Fetch user assignments for count
   const { data: userAssignments = [] } = useQuery({
@@ -556,23 +564,85 @@ function LevelsTab() {
 
   const openCreate = () => {
     setEditingLevel(null); setIsCreating(true); setFormName(''); setFormDescription(''); setFormModules([]);
+    setExpandedModules(new Set(allExpandableKeys));
   };
 
   const openEdit = (level: AccessLevel) => {
     setEditingLevel(level); setIsCreating(true); setFormName(level.name); setFormDescription(level.description || ''); setFormModules([...level.modules]);
+    setExpandedModules(new Set(allExpandableKeys));
   };
 
-  const toggleModule = (key: string) => setFormModules(prev => prev.includes(key) ? prev.filter(m => m !== key) : [...prev, key]);
+  const toggleExpand = useCallback((key: string) => {
+    setExpandedModules(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }, []);
 
-  const toggleAllInGroup = (groupModules: typeof ALL_MODULES) => {
-    const keys = groupModules.map(m => m.key);
-    const allSelected = keys.every(k => formModules.includes(k));
-    setFormModules(prev => allSelected ? prev.filter(m => !keys.includes(m)) : [...new Set([...prev, ...keys])]);
-  };
+  // Toggle a parent module — also toggles all its children
+  const toggleParentModule = useCallback((parentKey: string) => {
+    setFormModules(prev => {
+      const subKeys = getSubModuleKeys(parentKey);
+      const isSelected = prev.includes(parentKey);
+      if (isSelected) {
+        return prev.filter(m => m !== parentKey && !subKeys.includes(m));
+      } else {
+        return [...new Set([...prev, parentKey, ...subKeys])];
+      }
+    });
+  }, []);
+
+  // Toggle a single child module
+  const toggleChildModule = useCallback((childKey: string) => {
+    setFormModules(prev => {
+      const parentKey = getParentModuleKey(childKey);
+      const subKeys = getSubModuleKeys(parentKey);
+      const isSelected = prev.includes(childKey);
+      let next: string[];
+      if (isSelected) {
+        next = prev.filter(m => m !== childKey);
+        const remainingChildren = next.filter(m => subKeys.includes(m));
+        if (remainingChildren.length === 0) next = next.filter(m => m !== parentKey);
+      } else {
+        next = [...new Set([...prev, childKey, parentKey])];
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleAllInGroup = useCallback((groupModules: typeof ALL_MODULES) => {
+    setFormModules(prev => {
+      const allKeys: string[] = [];
+      groupModules.forEach(m => {
+        allKeys.push(m.key);
+        if (m.children) m.children.forEach(c => allKeys.push(c.key));
+      });
+      const allSelected = allKeys.every(k => prev.includes(k));
+      if (allSelected) {
+        return prev.filter(m => !allKeys.includes(m));
+      } else {
+        return [...new Set([...prev, ...allKeys])];
+      }
+    });
+  }, []);
+
+  const getParentCheckState = useCallback((parentKey: string): boolean | 'indeterminate' => {
+    const subKeys = getSubModuleKeys(parentKey);
+    if (subKeys.length === 0) return formModules.includes(parentKey);
+    const selectedCount = subKeys.filter(k => formModules.includes(k)).length;
+    if (selectedCount === 0) return false;
+    if (selectedCount === subKeys.length) return true;
+    return 'indeterminate';
+  }, [formModules]);
+
+  const countParentModules = (modules: string[]) => modules.filter(m => !isSubModuleKey(m)).length;
+  const countSubModules = (modules: string[]) => modules.filter(m => isSubModuleKey(m)).length;
 
   const handleSave = async () => {
     if (!formName.trim()) { toast.error('Nome é obrigatório'); return; }
-    if (formModules.length === 0) { toast.error('Selecione pelo menos um módulo'); return; }
+    const parentModules = formModules.filter(m => !isSubModuleKey(m));
+    if (parentModules.length === 0) { toast.error('Selecione pelo menos um módulo'); return; }
     try {
       if (editingLevel) {
         await updateAccessLevel({ id: editingLevel.id, name: formName, description: formDescription, modules: formModules });
@@ -609,6 +679,8 @@ function LevelsTab() {
         <div className="space-y-2">
           {accessLevels.map(level => {
             const assignedCount = userAssignments.filter(a => a.access_level_id === level.id).length;
+            const parentCount = countParentModules(level.modules);
+            const subCount = countSubModules(level.modules);
             return (
               <div key={level.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/40 border border-border/30">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 border border-primary/20 shrink-0">
@@ -616,7 +688,11 @@ function LevelsTab() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{level.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{level.modules.length} módulo{level.modules.length !== 1 ? 's' : ''} · {assignedCount} usuário{assignedCount !== 1 ? 's' : ''}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {parentCount} módulo{parentCount !== 1 ? 's' : ''}
+                    {subCount > 0 && ` · ${subCount} sub-permiss${subCount !== 1 ? 'ões' : 'ão'}`}
+                    {' · '}{assignedCount} usuário{assignedCount !== 1 ? 's' : ''}
+                  </p>
                 </div>
                 <button onClick={() => openEdit(level)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
                   <AppIcon name="Pencil" size={14} className="text-muted-foreground" />
@@ -644,28 +720,85 @@ function LevelsTab() {
               <Input value={formDescription} onChange={e => setFormDescription(e.target.value)} placeholder="Ex: Acesso a operação sem financeiro" />
             </div>
             <div className="space-y-3">
-              <Label>Módulos permitidos</Label>
-              <p className="text-[10px] text-muted-foreground -mt-1">Dashboard e Configurações estão sempre acessíveis</p>
+              <div className="flex items-center justify-between">
+                <Label>Módulos e permissões</Label>
+                <span className="text-[10px] text-muted-foreground">
+                  {countParentModules(formModules)} módulos · {countSubModules(formModules)} sub
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground -mt-1">Dashboard está sempre acessível. Toque na seta para ver sub-permissões.</p>
               {moduleGroups.map(group => {
-                const allSelected = group.modules.every(m => formModules.includes(m.key));
-                const someSelected = group.modules.some(m => formModules.includes(m.key));
+                const allKeys: string[] = [];
+                group.modules.forEach(m => { allKeys.push(m.key); if (m.children) m.children.forEach(c => allKeys.push(c.key)); });
+                const selectedCount = allKeys.filter(k => formModules.includes(k)).length;
+                const groupCheck = selectedCount === 0 ? false : selectedCount === allKeys.length ? true : 'indeterminate' as const;
+
                 return (
-                  <div key={group.label} className="space-y-1.5">
+                  <div key={group.label} className="space-y-1">
                     <button onClick={() => toggleAllInGroup(group.modules)}
-                      className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors">
-                      <Checkbox checked={allSelected ? true : someSelected ? 'indeterminate' : false} className="h-3.5 w-3.5" />
+                      className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors w-full">
+                      <Checkbox checked={groupCheck === true ? true : groupCheck === 'indeterminate' ? 'indeterminate' : false} className="h-3.5 w-3.5 shrink-0" />
                       {group.label}
                     </button>
-                    <div className="grid grid-cols-2 gap-1.5 pl-1">
-                      {group.modules.map(mod => (
-                        <button key={mod.key} onClick={() => toggleModule(mod.key)}
-                          className={cn("flex items-center gap-2 p-2 rounded-lg text-left transition-all text-xs",
-                            formModules.includes(mod.key) ? "bg-primary/10 border border-primary/30 text-foreground" : "bg-secondary/40 border border-border/20 text-muted-foreground")}>
-                          <Checkbox checked={formModules.includes(mod.key)} className="h-3.5 w-3.5 pointer-events-none" />
-                          <AppIcon name={mod.icon} size={14} />
-                          <span className="truncate">{mod.label}</span>
-                        </button>
-                      ))}
+                    <div className="space-y-1 pl-0.5">
+                      {group.modules.map(mod => {
+                        const hasChildren = mod.children && mod.children.length > 0;
+                        const isExpanded = expandedModules.has(mod.key);
+                        const parentState = getParentCheckState(mod.key);
+                        const isSelected = hasChildren ? parentState === true : formModules.includes(mod.key);
+
+                        return (
+                          <div key={mod.key}>
+                            <div className={cn(
+                              "flex items-center gap-2 p-2 rounded-lg transition-all text-xs",
+                              isSelected || parentState === 'indeterminate'
+                                ? "bg-primary/10 border border-primary/30"
+                                : "bg-secondary/40 border border-border/20"
+                            )}>
+                              {hasChildren ? (
+                                <button onClick={() => toggleExpand(mod.key)} className="p-0.5 rounded hover:bg-secondary transition-colors shrink-0">
+                                  <AppIcon name="ChevronRight" size={14} className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-90")} />
+                                </button>
+                              ) : (
+                                <div className="w-[22px] shrink-0" />
+                              )}
+                              <button onClick={() => toggleParentModule(mod.key)} className="flex items-center gap-2 flex-1 min-w-0">
+                                <Checkbox
+                                  checked={parentState === true ? true : parentState === 'indeterminate' ? 'indeterminate' : false}
+                                  className="h-3.5 w-3.5 pointer-events-none shrink-0"
+                                />
+                                <AppIcon name={mod.icon} size={15} className="shrink-0" />
+                                <span className={cn("truncate flex-1 text-left font-medium", isSelected || parentState === 'indeterminate' ? "text-foreground" : "text-muted-foreground")}>
+                                  {mod.label}
+                                </span>
+                              </button>
+                              {hasChildren && (
+                                <span className="text-[9px] text-muted-foreground/60 shrink-0">
+                                  {mod.children!.filter(c => formModules.includes(c.key)).length}/{mod.children!.length}
+                                </span>
+                              )}
+                            </div>
+                            {hasChildren && isExpanded && (
+                              <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-primary/10 pl-2">
+                                {mod.children!.map(child => {
+                                  const childSelected = formModules.includes(child.key);
+                                  return (
+                                    <button key={child.key} onClick={() => toggleChildModule(child.key)}
+                                      className={cn(
+                                        "flex items-center gap-2 p-1.5 rounded-md transition-all text-[11px] w-full",
+                                        childSelected ? "bg-primary/8 text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+                                      )}>
+                                      <Checkbox checked={childSelected} className="h-3 w-3 pointer-events-none shrink-0" />
+                                      <AppIcon name={child.icon} size={12} className="shrink-0 opacity-70" />
+                                      <span className="truncate flex-1 text-left">{child.label}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );
