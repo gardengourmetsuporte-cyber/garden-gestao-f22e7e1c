@@ -1,45 +1,29 @@
 
 
-## Root Cause Analysis
+## Plan: Standardize Navy Blue Gradient Across Light Theme
 
-The infinite loading has three distinct root causes:
+The user wants the animated navy-blue gradient (visible on checklist/finance hero cards) to be the unified brand surface for all key branded elements in the light theme.
 
-### 1. AuthContext: Double initialization race
-Both `onAuthStateChange(INITIAL_SESSION)` and `getSession()` fire independently. They both call `fetchUserData()`, and if `onAuthStateChange` fires first, it calls `fetchUserData` via `setTimeout(0)`. Then `getSession()` resolves and calls `fetchUserData` again. If the first call's `setIsLoading(false)` runs before the second call starts, there's no issue — but if `getSession().then()` errors or hangs (network), `isLoading` stays `true` forever. The watchdog is the only safety net.
+### What changes
 
-### 2. UnitContext: fetchUnits recreated mid-flight
-`fetchUnits` has `[user, isSuperAdmin]` as `useCallback` dependencies. Auth resolves in two phases: first `user` is set (triggering fetchUnits), then `isSuperAdmin` changes when profile loads (recreating `fetchUnits` → effect re-runs → `setIsLoading(true)` again). This second run races with the first, and the `effectiveLoading` compound check `(!!user && fetchedForUserRef.current !== user.id)` adds a third condition that can keep loading stuck if any fetch path misses updating the ref.
+**1. `src/index.css` — Unify `.gradient-primary` (light) with the navy gradient**
+- Replace the current muted dark-grey gradient in `.gradient-primary` (line 264) with the same animated navy gradient used by `.finance-hero-card` (lines 391-402)
+- Use `navyCardFlow` animation instead of `darkCardShimmer`
+- Keep the same `--foreground`, `--muted-foreground` token overrides for white-on-dark contrast
 
-### 3. No deduplication or abort on concurrent fetches
-Neither context guards against overlapping async calls. A slow first fetch + fast second fetch can leave stale state.
+**2. `src/index.css` — Align `.finance-hero-card` (light) to match**
+- Ensure `.finance-hero-card` uses the exact same gradient stops, animation, and border as `.gradient-primary` so they look identical
 
----
+**3. `src/pages/Auth.tsx` — Apply gradient to login brand panel and mobile header**
+- Update `BrandPanel` background (line 27) from the static dark gradient to the new animated navy gradient (same stops as finance-hero-card)
+- Update `MobileBrandHeader` to include a navy gradient background card behind the logo
 
-## Implementation Plan
-
-### Step 1: Fix AuthContext — eliminate watchdog, add deterministic completion
-
-- Remove the 12s watchdog `useEffect` (lines 66-75)
-- Add `.catch()` to `getSession()` so network failures always call `setIsLoading(false)`
-- Use an `isMounted` ref to prevent state updates after unmount
-- Track fetch-in-progress via ref to avoid double `fetchUserData` calls from both `onAuthStateChange` and `getSession`
-- Ensure `fetchUserData` always resolves `isLoading` to false (already does via `finally`)
-
-### Step 2: Fix UnitContext — eliminate watchdog, stabilize dependencies
-
-- Remove the 12s watchdog `useEffect` (lines 41-51)
-- Read `isSuperAdmin` via a ref instead of as a `useCallback` dependency, so `fetchUnits` is only recreated when `user` changes (not when role loads)
-- Add a fetch sequence counter (`fetchIdRef`) — each call increments it; when async work completes, only the latest call applies state updates. This deduplicates concurrent runs.
-- Simplify `effectiveLoading`: remove the `fetchedForUserRef` compound check. Instead, just use `isLoading || authLoading`. The fetch counter ensures loading is only set to false by the last fetch.
-- Add `.catch()` guards on all Supabase calls within `fetchUnits` to ensure `setIsLoading(false)` always runs (already has try/finally, but inner branches need protection)
-
-### Step 3: Add getSession error handling
-
-- In `AuthContext`, wrap the `getSession().then(...)` with a `.catch()` that logs the error and calls `setIsLoading(false)` + `clearCachedAuth()`, preventing the app from hanging on network failures during initial load.
-
----
+**4. `src/components/PageLoader.tsx` — Apply navy gradient background**
+- Change the loader's background from `bg-background` to the navy gradient so the loading screen matches the branded look
+- Adjust spinner and logo ring colors for contrast on dark background
 
 ### Files to modify
-- `src/contexts/AuthContext.tsx`
-- `src/contexts/UnitContext.tsx`
+- `src/index.css` (gradient-primary + finance-hero-card alignment)
+- `src/pages/Auth.tsx` (brand panel + mobile header)
+- `src/components/PageLoader.tsx` (loader background)
 
