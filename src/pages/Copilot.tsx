@@ -4,6 +4,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useManagementAI } from '@/hooks/useManagementAI';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { cn } from '@/lib/utils';
 import mascotImg from '@/assets/garden-mascot.png';
 import CopilotMessageContent from '@/components/copilot/CopilotMessageContent';
