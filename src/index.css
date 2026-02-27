@@ -687,6 +687,24 @@
     @apply px-4 py-3 space-y-4;
   }
 
+  /* ========== TYPOGRAPHY UTILITIES ========== */
+  /* Display font with tight tracking — use for section titles, hero numbers */
+  .text-display-tight {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.03em;
+  }
+  /* Display font with moderate tracking — use for subtitles, labels */
+  .text-display {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  /* Numeric display — tabular nums for values, balances, counters */
+  .text-numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+    letter-spacing: -0.01em;
+  }
+
   /* ========== ICON GLOW SYSTEM ========== */
 
   .icon-glow {
