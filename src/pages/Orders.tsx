@@ -492,23 +492,21 @@ export default function OrdersPage() {
             </SheetHeader>
             <div className="space-y-3">
               {selectedSupplier && itemsBySupplier[selectedSupplier.id]?.map(item => (
-                <div key={item.id} className="flex items-center justify-between p-3 rounded-2xl bg-secondary/50 border border-border/50">
+                <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50 border border-border/50">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm truncate">{item.name}</p>
                     <p className="text-xs text-muted-foreground">
                       Atual: {item.current_stock} · Mín: {item.min_stock}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Input
-                      type="number"
-                      min="0"
-                      value={quantities[item.id] || 0}
-                      onChange={(e) => setQuantities(prev => ({ ...prev, [item.id]: Number(e.target.value) }))}
-                      className="w-20 h-10 text-center rounded-xl"
-                    />
-                    <span className="text-xs text-muted-foreground w-6">{item.unit_type}</span>
-                  </div>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={quantities[item.id] || 0}
+                    onChange={(e) => setQuantities(prev => ({ ...prev, [item.id]: Number(e.target.value) }))}
+                    className="w-16 h-10 text-center rounded-xl shrink-0"
+                  />
+                  <span className="text-xs text-muted-foreground w-14 text-right shrink-0">{item.unit_type}</span>
                 </div>
               ))}
               <Button
