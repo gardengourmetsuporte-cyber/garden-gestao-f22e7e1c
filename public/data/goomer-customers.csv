@@ -1,0 +1,1302 @@
+"Nome";"Telefone";"E-mail";"Data de Nascimento";"Pedidos delivery";"Valor vitalício";"Quantidade de pedidos";"Primeiro pedido";"Último pedido";"Endereço"
+"Isabel Faggionato";"5511985707004";;;"1";"84.00";"1";"06/04/2024, 21:09:55";"06/04/2024, 21:09:55";
+"Jessica Bordum";"5541988408900";;;"1";"127.50";"1";"10/01/2026, 18:19:35";"10/01/2026, 18:19:35";
+"Lia Tranjan";"5519991543218";;;"1";"116.00";"1";"24/09/2023, 20:00:09";"24/09/2023, 20:00:09";"Rua Joel Lisboa Biotto, 781, (Residencial valle da prat) Terras de São José, 13874822, São João da Boa Vista/SP"
+"Yasmin lucas ";"5519994685152";;;"2";"100.00";"2";"12/05/2024, 21:08:18";"02/06/2024, 21:31:26";
+"Francine Rinke ";"5519991608445";;;"1";"99.00";"1";"13/01/2024, 20:32:11";"13/01/2024, 20:32:11";
+"Letícia Morais";"5519981065036";"leticiabergamasso@gmail.com";"23/03/1992";"4";"652.00";"4";"23/02/2024, 19:23:38";"26/01/2025, 20:14:09";"Rua Antônio Batista, 170, Vila Valentin, 13873053, São João da Boa Vista/SP"
+"Maria Eduarda";"5519983638102";;;"1";"53.00";"1";"01/03/2025, 21:16:24";"01/03/2025, 21:16:24";
+"Karine Mizasse ";"5519992659453";;;"1";"136.00";"1";"22/06/2024, 20:11:37";"22/06/2024, 20:11:37";
+"Marília Mendes de Luca ";"5535997508240";"mariliamdeluca@gmail.com";"01/04/1998";"2";"192.00";"2";"16/09/2023, 21:11:56";"10/12/2023, 20:22:12";"Rua Hemenegildo Dalcol, 387, Jardim Santa Clara, 13874154, São João da Boa Vista/SP"
+"Fabiana bonfante";"5519982511461";;;"1";"107.00";"1";"01/05/2024, 19:51:43";"01/05/2024, 19:51:43";
+"Jemima Candido";"5519995405487";"jemimacandido@gmail.com";"10/04/1992";"5";"199.00";"5";"18/08/2023, 19:02:15";"06/09/2024, 21:03:05";"Rua Maria Inês da S Oliveira, 306, (Casa) Vila Valentin, 13873038, São João da Boa Vista/SP"
+"Camila Bergamasco ";"5519989872714";"casbp10@icloud.com";;"1";"88.00";"1";"05/06/2024, 22:06:51";"05/06/2024, 22:06:51";"Rua doutor carolino campos salles, 900, (casa) jardim universitário , 13990000, Espírito Santo do Pinhal/SP"
+"Cecília marcondes";"5535991043686";"ceciliamarcondesm@gmail.com";;"1";"62.00";"1";"28/04/2024, 19:58:03";"28/04/2024, 19:58:03";"Maria José caridade Carneiro , 90, Jardim panorama, 37508000, Piranguinho/MG"
+"Pedro Paulo Briccoli";"5519991310011";"pedropaulobriccoli@gmail.com";;"12";"1722.50";"12";"01/12/2023, 21:11:11";"13/08/2025, 21:03:16";"Rua João Batista da Silva, 142, Jardim Canadá, 13874309, São João da Boa Vista/SP"
+"Gustavo ";"5519992129742";;;"1";"93.50";"1";"26/11/2024, 20:50:37";"26/11/2024, 20:50:37";
+"Maryana";"5519982300719";;;"1";"465.00";"1";"10/05/2025, 20:08:35";"10/05/2025, 20:08:35";
+"Adriana Belloto";"5519982090111";"dribelloto@gmail.com";;"16";"974.00";"16";"15/10/2023, 19:41:08";"07/12/2025, 20:15:37";"Rua Milton Nogueira, 57, Jardim Priscila, 13874120, São João da Boa Vista/SP"
+"Andressa Cabral ";"5534991678464";;"19/08/1994";"1";"148.00";"1";"30/04/2024, 21:01:03";"30/04/2024, 21:01:03";
+"Larissa Giovana Leite de Oliveira";"5519994589336";"larissagiovanal@outlook.com";"05/12/1998";"1";"19.99";"1";"19/12/2025, 12:37:55";"19/12/2025, 12:37:55";"Rua Prudente de Moraes, 368, (Laboratório São João) Centro, 13870050, São João da Boa Vista/SP"
+"Lucas";"5519994491964";;;"2";"128.00";"2";"18/10/2024, 19:42:41";"13/06/2025, 19:41:39";
+"Flavia ";"5511974024076";;;"5";"666.00";"5";"04/11/2023, 20:31:12";"23/01/2024, 19:47:44";
+"Lucinete Biggi";"5519992361809";;;"5";"356.50";"5";"18/08/2023, 19:21:57";"24/08/2024, 19:39:53";
+"Rafael Oliveira Chang";"5535998199037";"changrafa01@gmail.com";"03/07/2001";"1";"43.00";"1";"05/05/2024, 19:46:12";"05/05/2024, 19:46:12";"Rua Floriano Peixoto, 30, (apto 71) Centro, 13870060, São João da Boa Vista/SP"
+"Franciele Gomes ";"5519983035432";;;"1";"105.90";"1";"23/07/2025, 18:33:58";"23/07/2025, 18:33:58";
+"Ana Carolina Assis";"5519991303489";"anajulika26@gmail.com";"13/12/1983";"1";"43.00";"1";"07/09/2024, 20:09:40";"07/09/2024, 20:09:40";"Av Lazaro Pio Magalhaes, 394, Jd Nova Sao Joao, São João da Boa Vista/SP"
+"ianca marreiro";"5519989216446";"iancamarreiro12@gmail.com";"12/12/1996";"2";"222.50";"2";"05/11/2025, 19:14:03";"19/12/2025, 19:10:22";
+"Emerson";"5519996049333";;;"34";"1887.00";"34";"03/10/2023, 21:27:41";"14/12/2025, 20:57:34";
+"Luciana Fernandes Morais Gama";"5519988155882";"lucianamoraisgama@gmail.com";"13/09/1971";"8";"770.00";"8";"26/11/2023, 20:09:07";"29/01/2026, 19:35:20";"Rua Felipe Celestino, 30, (Bloco N apto 02) Jardim Guanabara, 13873088, São João da Boa Vista/SP"
+"Bruna Santos ";"5519998087841";"brunapan.25@gmail.com";"25/04/2003";"1";"121.00";"1";"06/08/2023, 18:20:38";"06/08/2023, 18:20:38";"Avenida Lázaro Pio Magalhães, 460, (Apartamento 15B (215) ) Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Carlos Augusto Oliveira Neves Neto";"5511958329566";"oneves.carlosaugusto@gmail.com";"18/02/1981";"4";"333.00";"4";"11/06/2024, 20:23:41";"07/10/2025, 21:57:55";"Rua Miguel Vieira Ferreira, 20, Vila Oriental, 13870678, São João da Boa Vista/SP"
+"Jefferson Leandro dos Reis Silva ";"5519992589667";"jeffersondosreis2009@hotmail.com";"12/07/1989";"12";"1265.80";"12";"13/01/2024, 19:59:16";"05/11/2025, 20:18:42";"Rua Ricarte Martins Araújo, 386, Jardim São Salvador, 13876661, São João da Boa Vista/SP"
+"Marta";"5516991373830";;;"1";"311.00";"1";"12/07/2025, 19:04:31";"12/07/2025, 19:04:31";
+"Otávio";"5519971564270";;;"1";"132.80";"1";"03/01/2026, 20:04:28";"03/01/2026, 20:04:28";
+"Gabriel";"5519992035663";;;"6";"624.50";"6";"21/09/2023, 21:24:04";"09/05/2025, 19:22:13";
+"Sabrina Brunhoroto ";"5519989329670";"sabrinabrunhoroto@hotmail.com";"19/08/1993";"19";"2087.00";"19";"15/08/2023, 21:03:50";"30/05/2025, 20:02:02";"Rua Ricarte Martins Araújo, 386, Jardim São Salvador, 13876661, São João da Boa Vista/SP"
+"Fernando Rossetti";"5519991017488";;;"7";"668.50";"7";"23/07/2023, 19:23:55";"07/02/2026, 18:52:15";
+"carla";"5519994516471";;;"5";"739.00";"5";"07/09/2024, 19:18:30";"30/08/2025, 19:02:02";
+"Nero";"5519981196161";;;"1";"133.00";"1";"10/12/2023, 20:28:55";"10/12/2023, 20:28:55";
+"Karoline Sassaron ";"5519994588967";;"04/03/1983";"1";"105.00";"1";"23/08/2023, 20:14:34";"23/08/2023, 20:14:34";"Rua Joel Lisboa Biotto, 781, Terras de São José, 13874822, São João da Boa Vista/SP"
+"Mariane";"5519991458116";;;"8";"372.00";"8";"04/08/2023, 19:28:50";"18/06/2025, 19:05:28";
+"Ket";"5519991086537";;;"11";"577.00";"11";"23/11/2023, 22:13:36";"29/05/2025, 22:41:51";
+"Djalma ";"5517997228550";;;"2";"214.00";"2";"14/10/2023, 19:42:24";"15/10/2023, 19:24:27";
+"Fernanda";"5519992255384";;;"1";"66.00";"1";"30/03/2024, 22:17:57";"30/03/2024, 22:17:57";
+"Arieli ";"5519995579339";;;"6";"964.50";"6";"01/08/2023, 18:56:21";"27/06/2025, 19:25:51";
+"Marcelo Léo";"5519981571032";;"25/06/1968";"4";"432.50";"4";"26/01/2024, 18:53:01";"21/02/2026, 19:21:45";
+"Fernando Souza";"5519997979975";"Fzsouza@hotmail.com";"03/02/1981";"1";"136.90";"1";"25/01/2026, 18:51:15";"25/01/2026, 18:51:15";
+"Tamires Heloisa dos reis ";"5519991975666";;"08/11/2003";"3";"361.50";"3";"31/03/2024, 20:08:59";"28/11/2025, 22:14:13";"Rua Getúlio Vargas, 119, Centro, 13870100, São João da Boa Vista/SP"
+"Livia Mendonça";"5519982795906";;;"1";"90.00";"1";"11/10/2025, 18:52:21";"11/10/2025, 18:52:21";
+"Raphaela Mansanares ";"5519999126686";;"16/11/1990";"1";"126.50";"1";"30/11/2025, 20:54:27";"30/11/2025, 20:54:27";
+"Julia ";"5519999981430";;;"1";"50.50";"1";"09/11/2024, 20:34:22";"09/11/2024, 20:34:22";
+"Luiz Gustavo ";"5519992641001";;;"1";"113.00";"1";"13/09/2025, 20:22:08";"13/09/2025, 20:22:08";
+"Aidê cabelo branco";"5511912341234";;;"1";"4.50";"1";"29/04/2025, 21:16:12";"29/04/2025, 21:16:12";
+"Felipe Morais Bergamasso";"5519981494894";"fmbergamasso@gmail.com";;"2";"172.00";"2";"26/11/2023, 20:29:38";"15/09/2024, 20:29:32";"Rua Professora Julieta da Silva Barreto, 37, Jardim Santa Rita, 13871088, São João da Boa Vista/SP"
+"Alessandro Dantas dos Santos";"5519997982155";"alessandro.santos@cimentolandia.com.br";"16/09/1974";"4";"394.00";"4";"27/04/2025, 21:18:19";"02/07/2025, 20:24:37";"Rua Amélia Michelazzo Penha, 750, Jardim dos Reis, 13873206, São João da Boa Vista/SP"
+"Ana Carolina Galli ";"5519981445212";"anacarolinagalli@hotmail.com";"25/03/1978";"4";"522.00";"4";"08/10/2024, 19:10:42";"25/07/2025, 22:08:29";"Rua Wildensor Rodrigues Milton, 155, (Chácara) Jardim Aeroporto Eldorado, 13875305, São João da Boa Vista/SP"
+"Fernanda";"5519991706333";;;"2";"75.90";"2";"16/11/2025, 20:11:25";"15/01/2026, 19:11:52";
+"Ana Carolina Salvático ";"5519998321121";"anacarolsalvatico@gmail.com";"10/09/1988";"1";"70.00";"1";"31/05/2025, 19:35:17";"31/05/2025, 19:35:17";"Rua Lucio dos Santos, 116, (Casa) Jardim Santa Clara, 13874158, São João da Boa Vista/SP"
+"Giovani Barbosa";"5519981643646";;;"2";"157.00";"2";"14/11/2023, 20:56:44";"05/05/2024, 18:55:49";"Rua Vereador João Olívio Garbossa, 272, Terras de São José, 13874814, São João da Boa Vista/SP"
+"Lígia Barreto ";"5519992540014";;;"1";"32.00";"1";"04/05/2025, 19:35:08";"04/05/2025, 19:35:08";
+"Onofre Gonçalves ";"5512982194897";"onofrelgoncalves@gmail.com";"29/07/1986";"2";"190.00";"2";"30/09/2023, 19:41:08";"06/02/2025, 19:47:52";"Rua Josepha Zanello Missassi, 118, (Casa) Jardim Primavera, 13876811, São João da Boa Vista/SP"
+"Rafaela Cabral Burato ";"5519981894010";;;"2";"147.00";"2";"11/05/2024, 18:59:07";"21/06/2024, 19:28:38";"Rua Lindolfo Mesquita, 571, Terras de São José, 13874800, São João da Boa Vista/SP"
+"Fernando Peres";"5511962607520";"gestaofinanceira.peres@gmail.com";;"1";"96.00";"1";"23/08/2025, 22:46:55";"23/08/2025, 22:46:55";"Rua Giacomo Cauini, 396, Jardim dos Reis, 13873209, São João da Boa Vista/SP"
+"Rafael Assalin Gonçalves ";"5519992996030";"rafaelassalin@hotmail.com";"14/09/1991";"1";"107.90";"1";"10/10/2025, 20:42:59";"10/10/2025, 20:42:59";"Rua Rosalvo Jorge da Rosa, 278, Jardim Recanto do Jaguari, 13872246, São João da Boa Vista/SP"
+"Larissa";"5519971325371";;;"1";"95.00";"1";"21/07/2024, 21:17:18";"21/07/2024, 21:17:18";
+"Aline Grilo";"5519996429408";"alineegrilo97@gmail.com";"05/05/1997";"3";"160.00";"3";"25/07/2023, 22:43:36";"02/01/2024, 20:17:06";"Alameda das Hortências, 1574, Condomínio Fechado Morro Azul II, 13874405, São João da Boa Vista/SP"
+"Aline Ferrari";"5532999400131";"Aferrarinunes@yahoo.com.br";"14/11/1983";"40";"4444.50";"40";"28/07/2023, 19:06:42";"08/11/2025, 18:10:47";"Rua Bernardino de Campos, 597, (Apto 31) Centro, 13870248, São João da Boa Vista/SP"
+"Alcebides Castro";"5519993369768";;;"3";"200.50";"3";"02/02/2024, 21:25:04";"23/02/2024, 19:13:02";"Rua Osvaldo Luiz Ferraro, 25, Jardim Del Plata, 13873141, São João da Boa Vista/SP"
+"Fabiana lima";"5519996647498";"Edinhooff@icloud.com";"09/07/1984";"7";"968.50";"7";"05/01/2024, 18:15:00";"15/02/2026, 18:22:54";"Rua Professor Humberto David, 112, Jardim Magalhães, 13876452, São João da Boa Vista/SP"
+"Marcella";"5519993169088";;;"1";"99.00";"1";"14/10/2023, 19:37:55";"14/10/2023, 19:37:55";
+"Letícia Gabriel Ciacco";"5519981311226";;;"2";"292.00";"2";"25/07/2025, 19:38:10";"20/08/2025, 19:20:57";
+"Fernanda";"5519998000404";;;"1";"107.00";"1";"22/02/2026, 20:20:37";"22/02/2026, 20:20:37";
+"Priscila oliva ";"5511982077500";;"02/09/1986";"1";"59.00";"1";"27/12/2023, 20:45:37";"27/12/2023, 20:45:37";
+"Maria Fernanda Silotto";"5519999373287";"silottomariafernanda@gmail.com";;"2";"284.00";"2";"13/01/2024, 19:13:45";"01/08/2025, 19:35:11";"Rua Mauro Alfredo dos Santos, 441, Jardim Santa Cruz, 13846713, Mogi Guaçu/SP"
+"Camila Oliveira";"5519992101749";;"25/08/1988";"1";"55.00";"1";"04/01/2024, 18:24:19";"04/01/2024, 18:24:19";
+"Michelle Bruscagin ";"5519991199953";;"08/01/1996";"2";"173.00";"2";"21/12/2023, 22:01:26";"19/03/2024, 19:51:05";
+"Aline De Moraes rosa pires";"5519988208640";;"27/06/1989";"1";"71.00";"1";"30/04/2024, 20:50:34";"30/04/2024, 20:50:34";
+"Kettlen Alipio";"5519992624972";"kettlen.marcondesalipio@gmail.com";;"1";"121.00";"1";"04/12/2024, 19:50:32";"04/12/2024, 19:50:32";"Antonio Cerao de lima, 795, Residencial Boa Vista 2, 13890000, Águas da Prata/SP"
+"Eduarda sumie ";"5519983947964";;"21/12/2002";"1";"38.00";"1";"18/08/2023, 18:59:16";"18/08/2023, 18:59:16";
+"Sandy Arguelo";"5519995328376";;;"1";"136.00";"1";"29/09/2023, 19:26:02";"29/09/2023, 19:26:02";
+"Rafael Bruscato ";"5519994884047";"rafaellbruscato@gmail.com";"03/03/1990";"1";"102.00";"1";"29/11/2025, 21:21:42";"29/11/2025, 21:21:42";"Rua Manoel Molina Martins, 285, (Casa) Vila Brasil, 13875040, São João da Boa Vista/SP"
+"André Luiz";"5519988028841";"alp.reis@yahoo.com.br";;"1";"58.50";"1";"03/01/2026, 18:30:12";"03/01/2026, 18:30:12";"Rua Antônio Ciancalio, 130, (Casa) Parque Jequitibás, 13874445, São João da Boa Vista/SP"
+"Eliana Prado Santos Marcoto";"5519981591425";;"26/06/1984";"1";"87.00";"1";"14/03/2024, 18:18:20";"14/03/2024, 18:18:20";
+"Thalita Duarte";"5519987483051";;"13/04/1995";"2";"98.00";"2";"21/07/2023, 19:41:22";"22/07/2023, 20:43:08";"Rua Eduardo Lopes Castilho, 76, (Casa) Vila Brasil, 13875000, São João da Boa Vista/SP"
+"Juliana Camargo";"5519998194693";"jcrevendabijoux@gmail.com";"26/03/1986";"2";"123.00";"2";"15/11/2023, 20:36:41";"17/07/2024, 19:49:40";"Rua José Dalla Rosa, 85, (Jardim pousada do sol) Pousada do Sol, 13874580, São João da Boa Vista/SP"
+"Beatriz Sozzo";"5519991066925";;;"1";"113.00";"1";"30/12/2023, 21:06:51";"30/12/2023, 21:06:51";
+"Luara Quemel";"5535999755438";;;"1";"45.00";"1";"23/10/2025, 18:23:30";"23/10/2025, 18:23:30";
+"Guilherme";"5514998838447";;;"8";"576.99";"8";"16/03/2024, 18:55:42";"18/01/2025, 19:10:58";
+"Juliana";"5519982084041";;;"1";"77.00";"1";"27/09/2024, 19:59:18";"27/09/2024, 19:59:18";
+"Luciana Backstron";"5519991388183";;"27/11/1974";"1";"91.00";"1";"31/03/2024, 18:50:01";"31/03/2024, 18:50:01";
+"Jessica Dota";"5519994319798";"jehh_dota@hotmail.com";"14/04/1993";"1";"24.00";"1";"02/11/2024, 22:37:17";"02/11/2024, 22:37:17";"Rua Armando Moretto, 59, Jardim Aurora, 13877054, São João da Boa Vista/SP"
+"Vanessa nunes";"5519989542661";;;"2";"227.00";"2";"18/11/2023, 18:51:31";"16/11/2024, 21:58:39";
+"Júlia ";"5519981026776";;;"1";"79.99";"1";"04/01/2026, 20:41:47";"04/01/2026, 20:41:47";
+"Rodrigo Biasi";"5519997477327";;;"1";"116.00";"1";"29/08/2023, 22:50:19";"29/08/2023, 22:50:19";
+"Lubiana ";"5519992347211";;;"1";"195.00";"1";"28/06/2024, 18:25:44";"28/06/2024, 18:25:44";
+"Ernane Sabino";"5519993483397";"ernanexs@gmail.com";"02/02/1984";"15";"1413.30";"15";"21/07/2023, 19:15:52";"01/01/2026, 19:42:41";"Rua Manoel Ponciano das Chagas, 264, (Apto 12) Jardim Santa Clara, 13874152, São João da Boa Vista/SP"
+"Rodolfo Zibordi Gião";"5511970171632";"rodolfogiao@gmail.com";"28/07/1983";"2";"135.90";"2";"06/05/2025, 21:57:25";"19/06/2025, 20:46:42";"Rua Dirce Rozzi Batista, 517, Terras de São José, 13874806, São João da Boa Vista/SP"
+"Mariana";"5519999712543";;;"1";"103.00";"1";"15/10/2023, 19:27:30";"15/10/2023, 19:27:30";
+"Gustavo Garcez";"5519991398556";"lifeequilibrio@gmail.com";"25/07/1987";"5";"704.50";"5";"31/03/2024, 20:10:32";"18/01/2026, 20:57:32";"Rua Benedita Augusta da Silva, 139, (Casa) Jardim Santa Clara, 13874150, São João da Boa Vista/SP"
+"Maria Paula Carvalho Tódero ";"5519994247619";"mariapaulatodero@gmail.com";;"6";"666.99";"6";"27/04/2025, 18:35:59";"25/01/2026, 21:21:51";"Rua Pereira Machado, 349, Centro, 13870241, São João da Boa Vista/SP"
+"Rhayssa Maciel";"5519995552306";;;"1";"48.00";"1";"27/01/2024, 18:05:07";"27/01/2024, 18:05:07";"Rua Benedito Mello, 377, Jardim Magalhães, 13876470, São João da Boa Vista/SP"
+"Marcus Toledo";"5519999271249";"marcusvftoledo@gmail.com";;"2";"174.00";"2";"12/05/2024, 21:29:12";"28/06/2024, 19:03:44";"Rua Maria Lúcia Matielo Nogueira, 714, Jardim Aurora, 13877025, São João da Boa Vista/SP"
+"Isabela Cristensen";"5519991951068";"isabelacristensen@gmail.com";;"1";"94.00";"1";"24/11/2024, 21:42:16";"24/11/2024, 21:42:16";"Rua Moufid Georges Nasr, 51, Jardim São Nicolau, 13876140, São João da Boa Vista/SP"
+"Beatriz ";"5519993380306";;;"1";"90.00";"1";"02/02/2024, 20:49:05";"02/02/2024, 20:49:05";
+"Ronaldo Mazi";"5519997751236";;;"1";"188.00";"1";"30/04/2025, 20:32:20";"30/04/2025, 20:32:20";
+"Barbara Ferrari";"5519997794224";"bgferrari001@gmail.com";;"26";"1677.00";"26";"26/12/2023, 20:05:06";"10/12/2025, 21:01:27";"Rua João Batista da Silva, 10, (casa) Jardim Canadá, 13874309, São João da Boa Vista/SP"
+"Isabella Pasquini";"5519981277259";;;"1";"97.00";"1";"08/12/2024, 21:45:06";"08/12/2024, 21:45:06";"Rua Newton Alvarez, 322, (Casa em frente as árvores) Jardim Santa Águida, 13873131, São João da Boa Vista/SP"
+"Luana";"5519983212218";;;"7";"633.00";"7";"31/03/2024, 20:20:26";"08/10/2025, 19:23:19";
+"Samantha Bonifácio ";"5511971694801";"jeniffersamantha@icloud.com";"14/09/1986";"40";"4154.00";"40";"20/01/2024, 19:51:17";"13/01/2026, 21:49:24";"Rua Eulalia Maria de Jesus, 65, (Casa amarela) Jardim Santa Clara, 13874217, São João da Boa Vista/SP"
+"Alex ";"5519988488553";;;"1";"83.00";"1";"17/09/2023, 20:38:57";"17/09/2023, 20:38:57";
+"Lucas Figueiró";"5519982888062";"figueiro12@gmail.com";"12/09/1991";"2";"75.00";"2";"17/02/2024, 19:11:23";"10/12/2024, 20:16:43";"Rua Antônio Ciancalio, 135, Parque Jequitibás, 13874445, São João da Boa Vista/SP"
+"Priscila";"5519991018587";;;"3";"316.00";"3";"09/01/2024, 20:08:39";"15/08/2025, 19:30:31";
+"Larissa Dias ";"5519991713819";"laryenei@hotmail.com";;"3";"232.50";"3";"05/08/2023, 20:31:34";"26/03/2025, 19:54:13";"Rua Amalia Vicente Antoniazzi, 870, Jardim Recanto dos Pássaros, 13873506, São João da Boa Vista/SP"
+"Arthur";"5522974055225";;;"1";"70.00";"1";"23/01/2024, 21:50:07";"23/01/2024, 21:50:07";
+"Odracir ";"5519998795025";;;"1";"66.00";"1";"07/07/2024, 20:11:14";"07/07/2024, 20:11:14";
+"Raquel Nora";"5519981704669";"raquelferreiranora@gmail.com";"04/11/1998";"2";"84.50";"2";"28/06/2025, 20:19:10";"09/08/2025, 19:02:36";"Rua Osvaldo Gonçalves, 192, (Casa) Jardim São Nicolau, 13876149, São João da Boa Vista/SP"
+"Rita de Cassia da Silva Ferreira ";"5519999578928";"ritacsilvaferreira@gmail.com";;"1";"46.00";"1";"04/10/2023, 19:43:33";"04/10/2023, 19:43:33";"Rua Francisco Dotta, 334, Jardim do Trevo, 13871502, São João da Boa Vista/SP"
+"Suelen Nascimento ";"5519992513721";"nascimentosuelen442@gmail.com";"08/02/1987";"2";"197.00";"2";"18/10/2024, 21:52:25";"13/11/2024, 20:58:20";"Rua Racticliff, 301, (Casa) Pratinha, 13873010, São João da Boa Vista/SP"
+"Maria izabella ";"5519987129973";;;"1";"111.80";"1";"03/10/2025, 20:27:52";"03/10/2025, 20:27:52";
+"Angelica Germano Da Silva ";"5519997273033";;;"1";"78.00";"1";"24/11/2023, 22:36:27";"24/11/2023, 22:36:27";
+"Carlos Tomé";"5519999876724";"caarlostome777@gmail.com";"30/12/2001";"4";"416.79";"4";"24/10/2023, 21:31:06";"13/02/2026, 21:48:50";"Rua Orlando Andrade Rezende, 189, (Casa de esquina) Jardim Maestro Mourão, 13872580, São João da Boa Vista/SP"
+"Thalyssa";"5519995920641";;;"3";"692.50";"3";"09/11/2023, 21:49:03";"17/01/2025, 21:12:14";
+"Thalita";"5519994840602";;;"1";"67.00";"1";"01/11/2023, 19:59:38";"01/11/2023, 19:59:38";
+"Fábio Fantini";"5519997176062";"fcfantini@hotmail.com";"07/09/1979";"25";"1334.90";"25";"13/10/2023, 21:17:00";"31/07/2025, 19:31:27";"Rua José Jacinto de Oliveira Andrade, 308, (CASS) Parque Colina da Mantiqueira, 13874390, São João da Boa Vista/SP"
+"Victor moscardo serra";"5519989767797";"Victor.mserra95@gmail.com";"23/12/1995";"1";"60.00";"1";"28/07/2023, 19:30:16";"28/07/2023, 19:30:16";
+"Edgar";"5519974139103";;;"1";"170.00";"1";"06/09/2025, 20:08:05";"06/09/2025, 20:08:05";
+"Diana Lima ";"5519993897381";"shinuesally@gmail.com";"01/12/1977";"1";"100.00";"1";"13/10/2023, 19:29:11";"13/10/2023, 19:29:11";"Rua Sidalino Vicente, 316, Parque dos Resedás, 13876268, São João da Boa Vista/SP"
+"Pâmela";"5519982695357";;;"3";"342.00";"3";"30/03/2024, 21:03:56";"07/11/2025, 22:19:55";
+"Michele ";"5519999306474";;;"2";"266.90";"2";"06/05/2025, 19:16:35";"13/05/2025, 21:06:06";
+"Lucas Henrique Bonifácio ";"5519982194498";"lucas88181@gmail.com";;"2";"146.00";"2";"06/01/2024, 19:45:52";"20/06/2025, 19:21:03";"Rua Maria da Glória Mazzi Zorgetto, 170, (Casa) Jardim das Rosas, 13876648, São João da Boa Vista/SP"
+"Gabrielle Paulino";"5519997381979";"gabrielleepaulino@gmail.com";;"1";"54.00";"1";"19/04/2025, 20:46:08";"19/04/2025, 20:46:08";"Rua Elza Valim Mendes, 343, (Casa) Jardim das Hortências, 13876783, São João da Boa Vista/SP"
+"Marina Sousa";"5519996865344";;"04/12/1984";"1";"85.00";"1";"19/11/2023, 20:24:19";"19/11/2023, 20:24:19";"Rua Santo Antônio, 575, Vila Braz, 13632000, Pirassununga/SP"
+"Vitor souza";"5519996456087";;;"1";"62.00";"1";"02/07/2025, 20:26:34";"02/07/2025, 20:26:34";"Rua doutor Carolino Campos Salles , 900, (Casa de esquina) Jardim universitário , 13990000, Espírito Santo do Pinhal/SP"
+"Scheilla Cavalheiro";"5519982150649";;"10/10/1987";"2";"147.00";"2";"03/09/2023, 19:09:30";"30/10/2024, 20:46:58";"Rua João Azevedo Sobrinho, 421, Solário da Mantiqueira, 13875360, São João da Boa Vista/SP"
+"Jessica Cândido";"5519992187009";"jcandido261@gmail.com";;"1";"103.00";"1";"30/12/2023, 19:31:09";"30/12/2023, 19:31:09";"Rua José Menin, 131, Jardim dos Ipês III, 13876619, São João da Boa Vista/SP"
+"Fabiano ";"5519983426595";;;"4";"227.50";"4";"06/12/2023, 19:43:10";"13/06/2025, 19:56:46";
+"Jessica Mayara Sabino de Souza";"5519982210121";;"19/10/1998";"1";"55.00";"1";"12/10/2024, 20:12:59";"12/10/2024, 20:12:59";
+"Nayara valverde";"5519998539635";"nay_valverde@hotmail.com";;"1";"121.00";"1";"18/07/2025, 21:34:59";"18/07/2025, 21:34:59";"Rua Azulão, 162, Jardim Recanto dos Pássaros, 13873502, São João da Boa Vista/SP"
+"Jussi Vasconcellos Silva";"5519988285174";;"12/01/1988";"3";"279.80";"3";"05/05/2024, 20:40:17";"11/10/2025, 20:46:34";"Avenida Dona Gertrudes, 114, (Loja) Centro, 13870110, São João da Boa Vista/SP"
+"Giovana Marcela Batista";"5519982238299";;"23/03/1990";"1";"79.00";"1";"04/07/2025, 18:16:17";"04/07/2025, 18:16:17";"Rua Carolina Malheiros, 90, (Banco de Sangue) Centro, São João da Boa Vista/SP"
+"Beatriz Bielsa";"5519993532550";;;"1";"102.00";"1";"14/10/2025, 22:24:31";"14/10/2025, 22:24:31";"Rua Gabriel Ferreira, 304, (Casa laranja de esquina) Centro, 13870180, São João da Boa Vista/SP"
+"Beatriz Luciano";"5519982814291";"beatriz.ferreira@sou.unifeob.edu.br";;"1";"69.00";"1";"09/12/2023, 18:11:30";"09/12/2023, 18:11:30";
+"Jose Da Silva Poveda Junior";"5519981563634";"ze_poveda@hotmail.com";"29/01/1981";"1";"39.00";"1";"27/12/2023, 20:28:09";"27/12/2023, 20:28:09";"José Monfardini, 3845, (Na Empresa APTIV) Distrito Industrial Waldemar Pereira, 13990000, Espírito Santo do Pinhal/SP"
+"Roseani";"5519998147794";;;"1";"90.00";"1";"06/01/2024, 19:50:31";"06/01/2024, 19:50:31";
+"Thais Helena Tripodore Ferreira";"5511987972609";"thais.htf@gmail.com";"27/03/1987";"1";"55.00";"1";"08/02/2024, 22:32:21";"08/02/2024, 22:32:21";"Rua Manoel Ponciano das Chagas, 45, Jardim Santa Clara, 13874152, São João da Boa Vista/SP"
+"Laís Pirajá";"5519982506613";;;"2";"355.00";"2";"21/04/2025, 18:19:13";"12/06/2025, 20:02:45";
+"kathlyn poveda";"5519992966222";"poveda_8@hotmail.com";"14/11/1990";"3";"376.00";"3";"30/07/2024, 20:45:34";"04/01/2026, 22:18:02";"Rua Lindolfo Mesquita, 514, Terras de São José, 13874800, São João da Boa Vista/SP"
+"Maria Fernanda Souza";"5519997753311";"maferbsouza@gmail.com";"13/01/1981";"3";"266.50";"3";"04/11/2023, 19:54:10";"11/07/2025, 19:06:57";"Avenida Dona Gertrudes, 343, (C1) Centro, 13870110, São João da Boa Vista/SP"
+"Mateus Marcondes ";"5519998502335";"mateussmarcondes@icloud.com";"29/01/1994";"2";"244.00";"2";"07/06/2025, 19:26:33";"22/11/2025, 19:21:29";
+"Marina";"5516981672213";;;"1";"153.00";"1";"27/06/2025, 18:42:42";"27/06/2025, 18:42:42";
+"Thayana Carvalho";"5519981761247";"callid2@uol.com.br";"07/05/1979";"1";"81.00";"1";"15/10/2023, 20:08:26";"15/10/2023, 20:08:26";"Rua Santiago Penha, 75, Jardim Santiago Penha, 13870359, São João da Boa Vista/SP"
+"Elaine ";"5519992185637";;;"8";"516.00";"8";"06/08/2025, 20:59:22";"07/09/2025, 19:38:11";
+"Luiz Sibin ";"5519995208022";"Luiz.sibin@hotmail.com";"07/06/1995";"2";"222.00";"2";"14/10/2023, 20:30:09";"16/05/2024, 18:30:30";"Rua Luís Carlos Bonaretto, 1956, Jardim dos Ipês I, 13876596, São João da Boa Vista/SP"
+"Cristiane Sacardi";"5519971459187";;;"9";"882.50";"9";"09/02/2024, 20:33:08";"15/06/2024, 20:30:23";
+"Marcela Muniz";"5519996677984";;"23/10/1981";"1";"59.00";"1";"18/02/2024, 18:42:25";"18/02/2024, 18:42:25";
+"João Vitor ";"5519991718260";;;"1";"103.00";"1";"21/10/2023, 20:01:49";"21/10/2023, 20:01:49";
+"Luidgi Alessandro Proença ";"5515991240266";;"25/04/1987";"6";"434.40";"6";"25/06/2025, 20:27:50";"17/10/2025, 21:40:13";
+"Gustavo";"5519996721601";;;"2";"200.00";"2";"10/12/2023, 20:22:41";"27/12/2023, 20:29:44";
+"Cris Quebradas";"5519997570480";;"24/03/1978";"1";"98.00";"1";"26/01/2025, 19:54:50";"26/01/2025, 19:54:50";
+"Amanda Molina";"5535992633490";;"17/04/1999";"2";"232.00";"2";"22/08/2025, 20:49:27";"31/08/2025, 18:33:29";"Rua Vitório Michelazzo, 100, (Ap 21) Jardim Michelazzo, 13870253, São João da Boa Vista/SP"
+"Natalia ";"5519996056062";;;"1";"108.00";"1";"23/12/2023, 20:35:25";"23/12/2023, 20:35:25";
+"Edevaldo Barbosa";"5531973066801";"edevaldohbfilho@gmail.com";;"1";"74.00";"1";"28/04/2024, 20:15:40";"28/04/2024, 20:15:40";"Rua João Paulo II, 55, (Mansão dos Nobres - 231) Santo Antônio, 13871202, São João da Boa Vista/SP"
+"Matheus";"5519999063031";;;"1";"57.00";"1";"03/09/2025, 22:15:53";"03/09/2025, 22:15:53";
+"Carol Pavani";"5519991801647";;"17/10/1995";"1";"32.00";"1";"16/11/2023, 19:52:00";"16/11/2023, 19:52:00";"Rua Julia Peres Aparecido, 89, (Casa, sobrado) Vila Valentin, 13873049, São João da Boa Vista/SP"
+"Carina Scanavachi";"5519997753204";;;"2";"196.50";"2";"21/11/2024, 19:37:12";"07/02/2025, 18:59:50";
+"Beatriz Campos ";"5518981858441";"beatriz.ccardoso@outlook.com";"14/10/1992";"1";"47.00";"1";"22/08/2023, 18:52:49";"22/08/2023, 18:52:49";"Rua João Paulo II, 55, (Quarto 235) Santo Antônio, 13871202, São João da Boa Vista/SP"
+"Renata ";"5519999162626";;;"1";"82.00";"1";"12/11/2024, 18:19:20";"12/11/2024, 18:19:20";
+"Renan";"5511986515433";;;"1";"32.00";"1";"29/11/2024, 21:44:36";"29/11/2024, 21:44:36";
+"Soraia";"5519981643650";;;"2";"110.00";"2";"28/07/2024, 22:25:57";"04/03/2025, 22:12:40";
+"Giovanna Amaro";"5515998445843";;;"1";"76.00";"1";"13/02/2024, 19:38:54";"13/02/2024, 19:38:54";"Rua Augusta Moretti Picco, 70, (Colégio Objetivo) Residencial Vicente Laureano, 18550542, Boituva/SP"
+"Gilvania  gil ";"5511998707189";;;"1";"59.00";"1";"27/12/2023, 21:37:01";"27/12/2023, 21:37:01";
+"Mônica Antunes";"5515996174317";"movaantunes@gmail.com";"14/05/1988";"1";"46.00";"1";"20/01/2026, 20:29:34";"20/01/2026, 20:29:34";"Rua José Jacinto de Oliveira Andrade, 276, (Casa) Colinas da Mantiqueira, São João da Boa Vista/SP"
+"Danitiele Laranja";"5517981318883";"danitiele.cfl@gmail.com";;"1";"68.00";"1";"02/08/2024, 21:56:17";"02/08/2024, 21:56:17";"Rua José Limongi, 48, Jardim Regente, 13336325, Indaiatuba/SP"
+"Luisa Valim";"5519998003810";;;"1";"205.00";"1";"26/11/2023, 19:22:41";"26/11/2023, 19:22:41";"Avenida Antonio Inacio de Araujo, 501, (Casa) Nova Aparecida, Jaboticabal/Sp"
+"Daniel Cintra";"5516992545259";;"26/11/1978";"1";"76.00";"1";"08/10/2025, 18:17:37";"08/10/2025, 18:17:37";"Rua Romualdo Magalhães Pirro, 1861, (Casa) Jardim do Éden, 14402130, Franca/SP"
+"Sarah cristini ";"5519992289521";;;"1";"47.98";"1";"29/01/2026, 18:54:25";"29/01/2026, 18:54:25";"Rua Eunice Costa do Valle, 86, (Casa de esquina) Parque dos Resedás, 13876281, São João da Boa Vista/SP"
+"Glacy ";"5519995574651";;;"1";"55.00";"1";"02/08/2024, 19:37:34";"02/08/2024, 19:37:34";
+"Fabiana braga";"5519991644303";;"21/12/1985";"1";"187.00";"1";"30/05/2024, 18:38:42";"30/05/2024, 18:38:42";
+"Flávia Ferreira ";"5516992098487";;;"1";"59.00";"1";"30/01/2025, 20:01:24";"30/01/2025, 20:01:24";
+"Carolina Sorci ";"5519997078722";"carolsorci@hotmail.com";"14/03/1990";"1";"56.00";"1";"22/07/2023, 22:11:21";"22/07/2023, 22:11:21";"Rua Teixeira Rios , 210, (Hospital Francisco rosas ) Centro , Espírito Santo do Pinhal /Sp"
+"Yuri Rafael Thiago Landim";"5516996034516";;"03/12/1993";"1";"136.90";"1";"21/07/2023, 21:37:17";"21/07/2023, 21:37:17";
+"Bianca Castilho ";"5519982078007";;"10/11/1978";"3";"472.00";"3";"05/11/2023, 20:38:01";"20/04/2024, 22:00:44";"Rua Joel Lisboa Biotto, 781, (Condomínio Valle da prata) Terras de São José, 13874822, São João da Boa Vista/SP"
+"Letícia Araujo";"5535988051321";"leediasara@gmail.com";"19/10/1998";"1";"104.00";"1";"23/03/2024, 23:18:15";"23/03/2024, 23:18:15";"Rua Joaquim Nunes Filho, 171, (Bloco C ap 04) Jardim Nova São João, 13874132, São João da Boa Vista/SP"
+"Daniela Floriano Barbeitos";"5519991872019";"barbeitoserodrigues.daniela@gmail.com";"23/01/1979";"11";"1132.40";"11";"13/04/2024, 20:28:15";"06/01/2026, 20:08:03";"Rua João Ciacco, 74, Jardim Leonor, 13870555, São João da Boa Vista/SP"
+"Renata Valim";"5519992580908";"renata_fioretti@hotmail.com";"09/06/1996";"2";"212.00";"2";"15/11/2024, 19:40:23";"16/02/2025, 19:33:01";"Rua Moufid Georges Nasr, 100, Jardim São Nicolau, 13876140, São João da Boa Vista/SP"
+"MARCOSPRO moreira";"5519994878557";"tiagovidrich@gmail.com";;"2";"320.00";"2";"30/09/2023, 20:35:03";"26/04/2024, 19:35:50";"Rua Luiz Mathias Fernandes, 164, (Casa) Jardim Aurora, 13877058, São João da Boa Vista/SP"
+"Aline Corrêa ";"5519983641323";;"01/10/1991";"1";"100.01";"1";"30/08/2025, 18:47:18";"30/08/2025, 18:47:18";"Rua Albina Vieira Claro, 291, (Apto 111) Parque das nações, São João da Boa Vista/SP"
+"Lilian";"5519981711126";;;"1";"68.90";"1";"24/09/2023, 21:41:51";"24/09/2023, 21:41:51";
+"Fernanda ";"5519992599758";;;"1";"65.00";"1";"26/03/2025, 19:10:26";"26/03/2025, 19:10:26";
+"Gabriel silva ";"5519989652448";"gabrielsilva.b.l.m@gmail.com";"23/07/1998";"1";"89.00";"1";"22/11/2023, 21:28:24";"22/11/2023, 21:28:24";"Edesio todero, 954, Tulipas, São João da Boa Vista/SP"
+"Cristiane Taliba Aurilietti ";"5519997177336";"cristaliba@gmail.com";;"21";"1582.50";"21";"17/09/2023, 19:19:07";"05/02/2026, 19:19:10";"Rua Nagib Miguel, 4115, (Alameda Diamante, 68) Jardim Recanto do Bosque, 13874439, São João da Boa Vista/SP"
+"Marystela";"5519994021333";;;"1";"106.00";"1";"28/01/2024, 18:29:07";"28/01/2024, 18:29:07";
+"Danila Helena Ramos";"5519991499313";;;"1";"103.50";"1";"08/06/2025, 21:39:34";"08/06/2025, 21:39:34";
+"Felipe Nora";"5519992428602";"felipenora@gmail.com";"10/03/1990";"3";"188.00";"3";"13/08/2024, 18:36:50";"05/03/2025, 19:10:22";"Rua Benedito Araújo, 607, Centro, 13870090, São João da Boa Vista/SP"
+"Ana Paula Brichi";"5519997097599";;;"2";"177.00";"2";"21/02/2025, 19:54:35";"23/05/2025, 20:16:11";
+"Rodrigo Fonseca";"5519971127669";"fonseca.rodrigo815@gmail.com";;"26";"1039.00";"26";"06/09/2024, 20:07:35";"29/06/2025, 18:11:27";"Rua Getúlio Vargas, 51, (Apartamento 22) Centro, 13870100, São João da Boa Vista/SP"
+"Letícia ";"5519999826856";;;"3";"350.00";"3";"10/08/2024, 21:02:22";"22/03/2025, 22:00:41";
+"Alfredo ";"5519994576758";;;"2";"195.00";"2";"15/06/2025, 21:47:01";"08/07/2025, 21:58:31";
+"Victor florencio ";"5519971016148";"mcfieldssolucoesagricolas@gmail.com";"18/04/1991";"1";"85.00";"1";"07/06/2024, 21:00:23";"07/06/2024, 21:00:23";
+"Lilian Chaves dos Santos ";"5519991074627";;"26/03/1990";"3";"147.00";"3";"15/09/2023, 20:40:56";"16/12/2023, 21:57:33";"Rua Nasri Paulo Zogbi, 22, (Casa) Jardim São Nicolau, 13876104, São João da Boa Vista/SP"
+"Cassandra Pereira ";"5519991928407";"snookcbrazil@yahoo.com";"20/03/1972";"4";"170.00";"4";"06/06/2024, 22:11:02";"21/11/2025, 21:18:20";"Rua Eden José Simon, 32, São Lázaro, 13870469, São João da Boa Vista/SP"
+"Caio Dogo";"5519996574008";"caiodogo@gmail.com";;"1";"134.00";"1";"28/03/2025, 21:30:26";"28/03/2025, 21:30:26";"Rua David de Carvalho, 1055, (44) Vila Valentin, 13873020, São João da Boa Vista/SP"
+"Eduardo Simões ";"5519971570103";"edsimoes.es@gmail.com";"18/08/1971";"1";"168.00";"1";"11/10/2023, 19:55:16";"11/10/2023, 19:55:16";"Alameda das Hortências, 1750, Condomínio Fechado Morro Azul II, 13874405, São João da Boa Vista/SP"
+"Renata Borba";"5519983580173";"renatadamasceno69@gmail.com";"30/11/1973";"7";"656.01";"7";"09/09/2023, 20:42:03";"09/08/2025, 18:45:05";"Rua Maria Polvani da Silva, 92, Colinas do Alegre, 13874624, São João da Boa Vista/SP"
+"Renato";"5519982211113";;;"1";"47.00";"1";"10/11/2023, 19:55:37";"10/11/2023, 19:55:37";
+"Carolina Uliana";"5519996855614";;"05/08/1996";"1";"101.00";"1";"24/09/2023, 19:40:01";"24/09/2023, 19:40:01";
+"Beatriz Franccioli Docema";"5519994207278";"beatrizfranccioli@hotmail.com";;"5";"335.50";"5";"23/03/2024, 18:10:34";"20/12/2025, 23:00:32";"Rua José Inácio Diniz, 183, Pousada do Sol, 13874579, São João da Boa Vista/SP"
+"Marco Antonio Polizio";"5519992550118";"dr.mpolizio@gmail.com";;"5";"328.50";"5";"04/01/2024, 20:14:42";"17/09/2024, 21:13:49";"Rua João Artem, 32, Jardim Recanto do Bosque, 13874425, São João da Boa Vista/SP"
+"Lia Bissoli";"5519997376425";"liabissoli@gmail.com";;"2";"136.00";"2";"15/02/2025, 22:06:06";"15/08/2025, 19:41:08";"Rua Nagib Miguel, 4035, (360) Jardim Recanto do Bosque, 13874439, São João da Boa Vista/SP"
+"João pedro";"5519992466980";;;"1";"106.00";"1";"24/08/2024, 19:56:46";"24/08/2024, 19:56:46";
+"Pri Simões";"5513997451825";"priscilamuccio@gmail.com";;"1";"140.00";"1";"01/08/2025, 20:58:47";"01/08/2025, 20:58:47";"Rua Santa Elisa, 252, Alto da Boa Vista, 13873120, São João da Boa Vista/SP"
+"Luciana Reis";"5519991172957";;;"1";"106.00";"1";"09/03/2024, 19:51:57";"09/03/2024, 19:51:57";
+"Rita Coelho";"5519996499935";;;"5";"535.00";"5";"02/09/2023, 18:52:32";"17/09/2025, 18:41:31";
+"Silvia oliveira ";"5519997377582";"Silviambarauna@gmail.com";"23/06/1966";"2";"259.50";"2";"10/05/2024, 20:53:44";"11/02/2025, 20:47:22";"Rua José Ribeiro da Silva, 240, Jardim Recanto do Bosque, 13874421, São João da Boa Vista/SP"
+"Amanda Ciacco Gaspar ";"5519992210168";"amandaciacco@gmail.com";;"12";"1451.50";"12";"04/08/2024, 19:02:58";"19/11/2025, 19:20:42";"Rua Onofre Borges dos Santos, 243, Recanto do Lago, São João da Boa Vista/SP"
+"Fernanda Martins";"5519993047447";"fermartin_s@icloud.com";;"5";"366.00";"5";"17/10/2023, 19:47:21";"18/03/2025, 20:21:21";"Rua Lauro Godoy, 504, (Portão social branco) São Benedito, São João da Boa Vista/SP"
+"Gabriel Nogues";"5519996517115";;;"1";"90.00";"1";"13/06/2025, 21:22:23";"13/06/2025, 21:22:23";
+"Márcia vidal";"5519997156866";;;"1";"72.00";"1";"27/06/2025, 19:37:24";"27/06/2025, 19:37:24";
+"Nathalia Ciacco ";"5519982254708";;;"8";"756.40";"8";"25/07/2024, 18:05:56";"01/02/2026, 18:59:49";
+"Andreza Mucin ";"5519997602210";"andrezzamucin@gmail.com";;"5";"590.50";"5";"16/12/2023, 19:27:20";"17/12/2025, 18:47:28";"Rua Antonio Barbosa de Oliveira, 1642, Jardim Europa, 13872774, São João da Boa Vista/SP"
+"Ana Amelia Andrade ";"5516997486088";"anaandradeprojetos@gmail.com";;"1";"89.00";"1";"26/04/2024, 21:22:52";"26/04/2024, 21:22:52";"Rua Getúlio Vargas, 391, (Ap 202) Centro, 13870100, São João da Boa Vista/SP"
+"Flávio Zanerato ";"5519996939979";;;"3";"207.00";"3";"17/12/2023, 21:16:10";"20/04/2024, 21:22:05";
+"William maximo de souza";"5519982249269";"mundwill123@gmail.com";"20/03/1989";"2";"152.00";"2";"21/12/2023, 21:21:08";"17/01/2024, 19:50:40";"Rua Maria da Glória Mazzi Zorgetto, 20, (Casa) Jardim das Rosas, 13876648, São João da Boa Vista/SP"
+"Patricia lopes moreira";"5519983143318";;;"2";"202.00";"2";"03/11/2023, 19:28:57";"22/05/2025, 18:15:48";
+"Emanuel de Souza Felisberto dos Reis";"5519997109041";"reisemanuel08@gmail.com";"17/12/2001";"4";"212.00";"4";"01/09/2023, 20:39:50";"03/05/2024, 19:36:33";"Rua Dino Renan Gianelli, 14, (Apartamento 21) Vila Santa Adélia, 13870336, São João da Boa Vista/SP"
+"Eduardo Felipe EleDele";"5515991878548";;"01/10/1990";"1";"23.00";"1";"21/07/2023, 14:44:34";"21/07/2023, 14:44:34";
+"Fernanda rui";"5519997173886";;;"1";"135.50";"1";"11/07/2025, 20:08:43";"11/07/2025, 20:08:43";
+"Lívia Campos";"5519996481713";;;"1";"139.00";"1";"09/06/2024, 19:42:49";"09/06/2024, 19:42:49";
+"Luciana Vieira";"5519992838701";;;"1";"44.00";"1";"29/06/2024, 18:20:49";"29/06/2024, 18:20:49";"Rua santo Antônio, 47, (Apartamento 11) Centro, São João da boa vista/Sp"
+"Alex Nascimento dos Santos";"5511980895174";"alex.individu@gmail.com";"04/02/1986";"1";"132.50";"1";"15/11/2025, 20:28:37";"15/11/2025, 20:28:37";"Avenida Boa Nova, 129, Jardim Presidente Dutra, 07172020, Guarulhos/SP"
+"Carolina Milan";"5519999367178";;;"1";"176.00";"1";"27/07/2024, 19:54:55";"27/07/2024, 19:54:55";
+"Lucas Bernardes ";"5519986050112";;;"1";"90.00";"1";"25/02/2024, 20:55:11";"25/02/2024, 20:55:11";
+"Francisco Malagutti";"5519996345488";;;"1";"85.50";"1";"01/09/2023, 21:06:02";"01/09/2023, 21:06:02";
+"Bruna Feitosa";"5511944207753";;"31/12/1993";"1";"46.00";"1";"28/07/2023, 21:04:10";"28/07/2023, 21:04:10";"Rua Presidente Franklin Roosevelt, 251, (Apto 102) Perpétuo Socorro, 13870540, São João da Boa Vista/SP"
+"Gustavo Trevizan ";"5519996034568";"gustavotrevizan@icloud.com";"06/03/2001";"1";"108.00";"1";"24/05/2025, 20:56:08";"24/05/2025, 20:56:08";
+"Victor Hermann Neto";"5519983445859";;;"3";"435.00";"3";"30/03/2025, 20:52:35";"16/08/2025, 22:21:27";
+"Isabella Jordao";"5519995021962";;;"1";"76.00";"1";"08/10/2023, 20:15:19";"08/10/2023, 20:15:19";"Rua Roberto de Freitas, 252, (Casa) Loteamento Portal da Aliança, 13876694, São João da Boa Vista/SP"
+"Rodolfo Noronha";"5535998530946";;;"1";"49.00";"1";"20/12/2023, 21:09:38";"20/12/2023, 21:09:38";
+"Rafaela Manco";"5519994943018";"rafamanco2@gmail.com";;"1";"92.00";"1";"29/12/2023, 23:01:43";"29/12/2023, 23:01:43";"Rua Orlando Matielo, 196, Jardim Del Plata II, 13873172, São João da Boa Vista/SP"
+"Paula Lherbach ";"5519981998347";"paulalherbach6@gmail.com";"19/04/1987";"1";"66.00";"1";"26/04/2024, 22:28:22";"26/04/2024, 22:28:22";"Rua Doutor Ari Fialho, 10, Jardim Primeiro de Maio, 13872046, São João da Boa Vista/SP"
+"Gisella anacleto";"5519998268618";;;"1";"141.00";"1";"18/04/2024, 18:49:11";"18/04/2024, 18:49:11";
+"Everton Combe";"5519999564788";;;"24";"1714.00";"24";"29/12/2023, 21:29:11";"07/02/2026, 19:29:28";
+"Bruna Nascimento Barboza ";"5519982548335";;"14/05/1993";"1";"127.00";"1";"13/07/2024, 21:48:58";"13/07/2024, 21:48:58";"Rua Ricarte Martins Araújo, 236, Jardim São Salvador, 13876661, São João da Boa Vista/SP"
+"Simone Rabelo";"5535987170166";;;"1";"90.00";"1";"02/07/2025, 21:13:32";"02/07/2025, 21:13:32";
+"Lucas Borges";"5519994680022";"lulu7070borges@gmail.com";;"1";"103.00";"1";"13/09/2024, 19:47:13";"13/09/2024, 19:47:13";"Rua Aparecida de Fátima Cordeiro Moraes, 178, Jardim Aurora, 13877057, São João da Boa Vista/SP"
+"Letícia Ferreira ";"5519992587229";;;"1";"80.00";"1";"16/01/2026, 18:26:49";"16/01/2026, 18:26:49";"Alameda das Rosas, 50, (Apto 32 ) Cidade Jardim, 13566560, São Carlos/SP"
+"Vanessa Bilarva";"5519981580615";;;"1";"98.00";"1";"22/09/2024, 21:35:38";"22/09/2024, 21:35:38";
+"Luiz fernando Souza";"5532984217643";;;"1";"76.00";"1";"26/07/2025, 20:05:29";"26/07/2025, 20:05:29";
+"Lethicia Antero";"5519994361373";"lethiciaantero@hotmail.com";"02/07/1996";"1";"116.50";"1";"28/12/2024, 18:10:33";"28/12/2024, 18:10:33";"Rua Giacomo Cauini, 446, (Casa  sem portao) Jardim dos Reis, 13873209, São João da Boa Vista/SP"
+"Emanuel Correa";"5519982198289";"emanueldascorrea@gmail.com";"04/11/2000";"2";"111.00";"2";"22/05/2024, 19:39:00";"14/06/2024, 21:47:04";"Rua Graziela de Vasconcelos Godoy, 20, (BLOCO 20A APTO 24A) Solário da Mantiqueira, 13875330, São João da Boa Vista/SP"
+"Vivian Cancian";"5519998629696";;;"1";"84.00";"1";"31/08/2025, 19:00:05";"31/08/2025, 19:00:05";
+"Nayane Fernandes";"5519991070140";"nayane031002@gmail.com";;"3";"239.50";"3";"06/04/2025, 19:57:21";"21/08/2025, 21:19:56";"Rua Turqueza, 90, Vila Gomes, 13870681, São João da Boa Vista/SP"
+"Mariana Sardelli";"5519996588582";"mahsardelli@gmail.com";"14/04/1995";"1";"52.00";"1";"04/04/2025, 18:40:10";"04/04/2025, 18:40:10";"Rua Ênio Gonçalves Mayrene, 234, (Casa) Jardim Amoreiras, 13876740, São João da Boa Vista/SP"
+"Gisele Naves";"5519997978949";;;"5";"513.00";"5";"26/11/2023, 21:18:16";"05/07/2025, 20:02:07";
+"Mayara Emmanuelly Morais";"5519995282525";"mayaraemmanuelly.morais@gmail.com";;"1";"109.00";"1";"01/11/2023, 20:28:40";"01/11/2023, 20:28:40";"Rua Geraldo Estevan Rodrigues, 238, Jardim Maestro Mourão, 13872585, São João da Boa Vista/SP"
+"Camila Bergamasco ";"5519991350554";;;"2";"95.00";"2";"03/10/2023, 18:15:36";"15/09/2024, 20:01:59";
+"Alexandre Benevides";"5519991331118";"alex.benevides011@gmail.com";;"3";"474.00";"3";"20/07/2024, 22:29:21";"04/07/2025, 18:29:27";"Rua Hélio Correa da Fonseca, 221, (Casa) Jardim Santa Rita, 13871059, São João da Boa Vista/SP"
+"Guilherme Bócoli ";"5519993787358";;;"1";"74.00";"1";"17/02/2024, 20:38:02";"17/02/2024, 20:38:02";
+"Ronei Oliveira ";"5519982501046";"rone-i@outlook.com";"03/10/1989";"4";"257.50";"4";"22/12/2023, 20:13:57";"02/06/2024, 21:23:43";"Rua Coronel José Procópio, 360, (374 A) Perpétuo Socorro, 13870730, São João da Boa Vista/SP"
+"Dani Lima";"5519998021616";;;"1";"123.00";"1";"17/10/2023, 21:01:16";"17/10/2023, 21:01:16";"Rua Adolfo José Bernardo, 19, (Casa da esquina) Parque Colina da Mantiqueira, 13874380, São João da Boa Vista/SP"
+"Frederico Ruocco";"5519993525655";;;"1";"54.00";"1";"23/02/2024, 19:29:48";"23/02/2024, 19:29:48";"Rua Doutor José Augusto de Arruda Botelho, 145, (Casa) Parque do Lago, 13990000, Espírito Santo do Pinhal/SP"
+"Maria Lúcia Carvalho";"5519992527746";;;"5";"487.60";"5";"20/04/2025, 19:09:47";"13/02/2026, 18:31:12";
+"Edilene Panicatti";"5519983552130";;;"1";"52.00";"1";"07/11/2025, 19:54:24";"07/11/2025, 19:54:24";"Rua Bernardino de Campos, 596, Centro, 13870248, São João da Boa Vista/SP"
+"Isabelle Campanha";"5519996830784";"isabelle.campanha@sou.unifeob.edu.br";"21/09/2000";"1";"50.00";"1";"28/08/2025, 18:55:58";"28/08/2025, 18:55:58";"Rua das Acácias, 66, (Apartamento 6) Flamboyant, 37590000, Jacutinga/MG"
+"Debora Gabriela";"5519994545673";"deboragabriela47@gmail.com";;"1";"47.00";"1";"10/01/2024, 20:42:29";"10/01/2024, 20:42:29";"Rua Generosa Maria Souza, 409, Jardim das Rosas, 13876647, São João da Boa Vista/SP"
+"Gabriela Pigato ";"5519997961854";"pigatogabriela95@gmail.com";;"10";"1006.00";"10";"05/08/2023, 20:09:48";"19/12/2025, 20:06:33";"Rua Nicolau Rehder, 151, (A) Jardim São Paulo, 13875079, São João da Boa Vista/SP"
+"Gabryel Andrioti";"5519994161832";"gabryel.violante.andrioti@gmail.com";;"1";"103.80";"1";"12/10/2025, 20:13:00";"12/10/2025, 20:13:00";"Rua Gabriel Ferreira, 285, (Apto 3) Centeo, São João da Boa Vista/SP"
+"Ester santos";"5519995148031";;;"1";"133.00";"1";"25/01/2024, 19:20:53";"25/01/2024, 19:20:53";"Rua dona Gabriela , 48, (Casa) Jardim satélite , SÃO JOÃO DA BOA VISTA/Ca"
+"Heytor da hora";"5519982721248";"tor-sao@hotmail.com";"01/07/1993";"1";"106.00";"1";"21/02/2026, 19:37:39";"21/02/2026, 19:37:39";
+"Leonardo Marsaioli";"5519998681885";;;"1";"38.00";"1";"06/01/2025, 20:35:44";"06/01/2025, 20:35:44";
+"Carol Estevam";"5519999365059";;;"1";"114.00";"1";"27/07/2024, 20:56:04";"27/07/2024, 20:56:04";"Rua Nagib Miguel, 4035, (Morro Azul 1) Jardim Recanto do Bosque, 13874439, São João da Boa Vista/SP"
+"Canal do Slim";"5519998209591";;;"1";"94.50";"1";"14/11/2025, 20:05:37";"14/11/2025, 20:05:37";
+"Luís Combe ";"5519997767886";;;"8";"314.00";"8";"25/02/2024, 19:57:51";"17/01/2025, 18:25:00";
+"AryanE Gomes da hora fontes";"5519992052601";;;"1";"72.00";"1";"10/01/2025, 20:24:40";"10/01/2025, 20:24:40";"Rua Emílio Cereja, 308, Vila Conceição, 13872012, São João da Boa Vista/SP"
+"Giovana Angelini ";"5519981917863";;;"1";"113.50";"1";"03/09/2023, 19:47:11";"03/09/2023, 19:47:11";
+"Claudioneia Fontana";"5519993376697";"claudioneia.fontana@gmail.com";;"7";"574.50";"7";"04/07/2024, 18:17:35";"15/07/2025, 19:50:55";"Avenida Lázaro Pio Magalhães, 127, Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"INGRID REIS";"5515981308881";;;"1";"91.00";"1";"16/09/2023, 19:52:46";"16/09/2023, 19:52:46";
+"Cristiane Pícoli poiano";"5519997379422";;;"1";"42.00";"1";"14/10/2023, 18:19:26";"14/10/2023, 18:19:26";"Rua Julio Borges de Carvalho, 577, (Terras de São José ) Terras de São José, 13874804, São João da Boa Vista/SP"
+"Rafael Tome";"5519991087488";;;"1";"49.90";"1";"16/10/2025, 18:32:38";"16/10/2025, 18:32:38";
+"Diogo Araujo";"5519982740742";"diogofda@hotmail.com";"06/07/1987";"2";"197.00";"2";"13/08/2023, 19:44:45";"09/07/2024, 18:15:22";"Rua Julio Borges de Carvalho, 649, Terras de São José, 13874804, São João da Boa Vista/SP"
+"Henri Guimaraes ";"5519997774976";;;"2";"90.00";"2";"10/08/2023, 21:17:45";"27/07/2024, 22:55:53";
+"Adriana Tonon ";"5519994648059";;;"1";"47.00";"1";"04/10/2024, 19:20:48";"04/10/2024, 19:20:48";"Rua Ida Gabriela da Silva Marcondes, 96, Riviera de São João, 13874784, São João da Boa Vista/SP"
+"Katia Guimarães";"5519991707724";;;"1";"78.00";"1";"26/01/2024, 18:26:43";"26/01/2024, 18:26:43";
+"Rubens Nogueira de Mundo";"5519994584443";;;"1";"106.00";"1";"01/03/2025, 19:41:43";"01/03/2025, 19:41:43";
+"Mariah Stefano Goulardins";"5519971075137";;;"1";"65.00";"1";"31/05/2025, 21:08:02";"31/05/2025, 21:08:02";"Rua João Michelazzo, 234, (Casa) Jardim Boa Vista, 13874118, São João da Boa Vista/SP"
+"Felipe Fonseca ";"5535997632214";"luizfeliipedafonseca@gmail.com";;"1";"56.00";"1";"29/12/2024, 18:16:44";"29/12/2024, 18:16:44";"Rua Joaquim Nunes Filho, 461, (Ap 27) Jardim Nova São João, 13874132, São João da Boa Vista/SP"
+"Bruno Costa ";"5519994019726";;;"1";"48.00";"1";"21/05/2025, 22:05:45";"21/05/2025, 22:05:45";
+"Karolina Cupini";"5516997463538";"karolinacupini@hotmail.com";;"1";"46.00";"1";"14/06/2024, 22:40:12";"14/06/2024, 22:40:12";"Avenida Lázaro Pio Magalhães, 460, (Ap 6 bloco F) Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Nicole Candido";"5519997437518";"candidonicole@gmail.com";;"1";"105.00";"1";"17/05/2025, 21:47:31";"17/05/2025, 21:47:31";"Rua Itália Bovo, 132, Núcleo Residencial Durval Nicolau 3, 13872302, São João da Boa Vista/SP"
+"Euripedes Junqueira";"5519992790609";;;"1";"94.00";"1";"04/05/2024, 21:24:53";"04/05/2024, 21:24:53";"Rua Antônio Ciancalio, 53, Parque Jequitibás, 13874445, São João da Boa Vista/SP"
+"Maria Vitória Nascimento Andrade";"5535999447117";;"21/02/2002";"1";"26.00";"1";"10/11/2023, 20:19:40";"10/11/2023, 20:19:40";"Rua Érico buzato , 197, (Casa) Bairro buzato, 37795000, Andradas/MG"
+"Rodrigo Paiva ";"5519999261994";;;"4";"361.00";"4";"11/08/2024, 18:40:08";"30/03/2025, 18:16:44";
+"Domaris Campos";"5548996093784";"domarisc@gmail.com";"31/12/1992";"1";"56.00";"1";"04/07/2025, 18:02:45";"04/07/2025, 18:02:45";"Rua Angelino Campos, 64, Jardim do Trevo, 13871509, São João da Boa Vista/SP"
+"Manuela Adão ";"5519995787098";;;"1";"126.00";"1";"09/05/2025, 21:33:50";"09/05/2025, 21:33:50";
+"Eduardo César Gianozelli Gianozelli";"5519993715637";"eduardogianozelli11@gmail.com";"11/09/1970";"16";"1653.50";"16";"08/05/2024, 19:10:30";"01/01/2026, 18:17:17";"Rua Capitão Baselidio José Teixeira, 12, Jardim Primeiro de Maio, 13872048, São João da Boa Vista/SP"
+"Rafaela Lopes ";"5519992856856";"Rafa-gumauch@hotmail.com";"10/05/1995";"8";"810.00";"8";"01/10/2023, 19:43:00";"15/08/2025, 21:11:43";"Rua Manoel de Abreu, 70, Parque das Bromélias, 13875569, São João da Boa Vista/SP"
+"Vanessa Fabris";"5519996788782";"vanessafcoraca@gmail.com";"12/11/1981";"21";"2793.50";"21";"16/02/2024, 19:11:42";"25/12/2025, 19:07:06";"Rua Capitão Samuel Ferreira, 116, (Condomínio Vale da prata) Loteamento Residencial Valle da Prata, 13874886, São João da Boa Vista/SP"
+"Lary Pereira";"5519996460508";"larylary417@gmail.com";"21/10/1986";"1";"144.00";"1";"11/02/2024, 19:47:21";"11/02/2024, 19:47:21";"Rua Gabriel José de Andrade, 105, Jardim das Hortências, 13876786, São João da Boa Vista/SP"
+"Dayana Bertones ";"5519992187534";"dayanabertones11@gmail.com";;"2";"249.40";"2";"05/01/2025, 20:41:37";"01/01/2026, 20:51:27";"Rua Major Juca Neto, 140, Jardim Santo André, 13874030, São João da Boa Vista/SP"
+"Sheyla Nhola ";"5535991233350";;;"1";"98.00";"1";"11/06/2024, 19:30:52";"11/06/2024, 19:30:52";
+"Carol Palhares";"5519982340827";"carolp.nutri@gmail.com";"26/09/1990";"2";"179.00";"2";"26/04/2025, 20:02:39";"30/09/2025, 20:25:31";
+"Guilherme Henrique";"5519991340414";"gh2576085@gmail.com";"18/05/1995";"1";"109.50";"1";"07/06/2025, 22:22:20";"07/06/2025, 22:22:20";"Rua José Ralfh de Oliveira Westin, 137, (Casa) Vila Zanetti, 13870597, São João da Boa Vista/SP"
+"Mateus Rehder ";"5519983484040";;;"1";"204.00";"1";"03/11/2024, 20:20:20";"03/11/2024, 20:20:20";
+"Renata Gonçalves";"5519998747575";"renata200110@gmail.com";;"2";"246.00";"2";"30/03/2024, 19:15:28";"12/03/2025, 19:57:29";"Rua Nagib Miguel, 4035, (Condomínio Morro Azul 1) Jardim Recanto do Bosque, 13874439, São João da Boa Vista/SP"
+"Junior Donni";"5519992083535";"juninhodonni2017@gmail.com";"04/06/1984";"9";"755.50";"9";"24/05/2024, 20:23:39";"08/01/2026, 20:33:27";"Luiz Antônio rosina, 136, (136) Jardim Canadá, São João da Boa Vista/SP"
+"BARBARA COSTA";"5519992013853";;;"1";"89.00";"1";"08/03/2024, 20:48:58";"08/03/2024, 20:48:58";
+"Nykolas Fornaziero";"5519991855813";"nyfornaziero@gmail.com";"03/06/1993";"4";"344.50";"4";"03/11/2023, 21:54:36";"29/03/2025, 20:53:05";
+"Geovanna Gabrício Pessoa ";"5519981276792";;;"10";"435.00";"10";"22/07/2023, 18:57:05";"30/01/2024, 19:09:37";
+"Ana Luiza Ferreira";"5519995326645";"anaahferreira29@gmail.com";"29/05/2003";"2";"90.00";"2";"23/07/2023, 22:22:30";"27/06/2025, 20:17:58";"Rua Herminio Assalim, 611, Jardim das Tulipas, 13876874, São João da Boa Vista/SP"
+"Cláudia Baena";"5511985213464";;;"5";"348.00";"5";"30/07/2023, 20:25:47";"21/04/2025, 20:29:30";
+"Evandro Pagani";"5519993171292";;;"1";"95.00";"1";"01/11/2023, 21:22:02";"01/11/2023, 21:22:02";
+"joão junior";"5519993117272";;"10/05/1980";"1";"98.00";"1";"14/10/2023, 20:10:23";"14/10/2023, 20:10:23";"Rua Clemente Fermoselli, 312, (Casa ) Parque das Bromélias, 13875568, São João da Boa Vista/SP"
+"Leonardo Mafra";"5519993372601";"leo.mafrazanetti@gmail.com";"12/10/1998";"15";"1743.89";"15";"30/07/2023, 20:16:24";"17/02/2026, 21:24:24";"Rua Gerônimo Milan, 90, Jardim Bela Vista, 13871112, São João da Boa Vista/SP"
+"Alexandre Bertoluzzi Fernandes";"5519996820496";;;"1";"91.00";"1";"16/08/2024, 19:22:15";"16/08/2024, 19:22:15";
+"Paula von Gossler";"5534992677507";;"02/06/1995";"3";"301.50";"3";"29/10/2023, 19:40:20";"07/09/2025, 18:57:24";"Rua Honório Maestrello, 183, (Lote E9) Village Moutonnée, 13324509, Salto/SP"
+"Alexandre Nogueira ";"5527992422789";"alenogueira8321@gmail.com";"27/04/1975";"1";"90.00";"1";"04/01/2025, 22:01:48";"04/01/2025, 22:01:48";"Av. Dante Michelini , 435, (Apto 104) Jd. Da Penha, Vitória/ES"
+"potira arzani";"5519993148546";"potiarzani@gmail.com";"19/04/1996";"1";"114.00";"1";"27/02/2024, 21:36:53";"27/02/2024, 21:36:53";"Rua Boa Vista, 105, (portao marrom) Vila Conceição, 13872007, São João da Boa Vista/SP"
+"Giuliano Cesar Casline";"5519998003357";"giuliano.casline@sou.unifeob.edu.br";"30/10/1981";"14";"1344.50";"14";"12/08/2023, 21:48:53";"01/08/2025, 22:32:44";"Rua Dorival Blota, 85, (Apto 24) Jardim Nova São João, 13874134, São João da Boa Vista/SP"
+"Laine Nagai";"5519991691755";"lainenagai@gmail.com";"24/05/1991";"1";"34.00";"1";"25/01/2025, 23:01:21";"25/01/2025, 23:01:21";
+"Kaique Oliveira ";"5519988729528";;;"4";"338.00";"4";"21/01/2024, 20:30:53";"11/10/2025, 20:20:19";
+"Joyce Palmieri ";"5519993663115";;;"1";"84.00";"1";"26/12/2023, 19:51:24";"26/12/2023, 19:51:24";
+"Ana Paula ";"5519997704811";;;"1";"92.00";"1";"13/07/2025, 20:35:04";"13/07/2025, 20:35:04";
+"Aline costa";"5519998929268";"alinecosta3700@hotmail.com";"25/11/1998";"1";"84.00";"1";"07/07/2024, 22:43:02";"07/07/2024, 22:43:02";"Rua Nelson Anselmo, 64, Jardim Aurora, 13877038, São João da Boa Vista/SP"
+"Leandro Júnior ";"5519982818827";;"17/09/1999";"1";"60.50";"1";"02/05/2025, 20:02:00";"02/05/2025, 20:02:00";"Avenida José dos Reis pontes , 250, (Empresa ) Jardim das rosas , 13990000, Espírito Santo do Pinhal/SP"
+"Joao Grilo";"5519997394646";"bazoogrilo@gmail.com";"28/09/1992";"8";"615.00";"8";"10/03/2024, 22:37:30";"20/06/2025, 20:53:52";"Rua Jairo Cabral de Vasconcelos, 118, Parque Universitário, 13874606, São João da Boa Vista/SP"
+"Wanessa Corrêa ";"5519981616633";;;"1";"116.00";"1";"03/01/2025, 20:22:18";"03/01/2025, 20:22:18";
+"Narriman Massaroto ";"5519999549009";;"14/02/1998";"2";"250.00";"2";"29/10/2023, 19:50:28";"08/10/2025, 20:22:25";
+"João Pedro Louretti";"5519987521237";;"12/10/2004";"1";"45.00";"1";"06/01/2024, 22:30:00";"06/01/2024, 22:30:00";"Rua Professor Humberto David, 112, Jardim Magalhães, 13876452, São João da Boa Vista/SP"
+"André Gonçalves";"5519993003855";;"01/12/1980";"1";"43.00";"1";"14/09/2024, 18:04:31";"14/09/2024, 18:04:31";
+"Maria Vitória Roteli ";"5519993466252";;;"1";"44.00";"1";"29/11/2023, 18:30:52";"29/11/2023, 18:30:52";
+"gabrielly domingos ";"5519993626577";;;"1";"36.00";"1";"14/11/2025, 23:04:55";"14/11/2025, 23:04:55";
+"Cínara Aparecida Cândido de Souza Peres";"5519991250050";"cinarasouzaperes@gmail.com";"29/12/1977";"1";"56.90";"1";"17/10/2025, 19:08:21";"17/10/2025, 19:08:21";"Rua Antonio Torres, 255, Jardim Recanto dos Pássaros, 13873522, São João da Boa Vista/SP"
+"Beatriz Almeida";"5519994180137";"balmeidaestetica@gmail.com";"04/01/1988";"2";"81.00";"2";"30/08/2024, 20:51:50";"30/08/2024, 20:55:12";"Rua Doutor Bernardino de Campos, 1250, (Casa) Parque Universitário, 14404611, Franca/SP"
+"Agnes Agatha";"5519995570903";"agnes.agathaa22@gmail.com";"10/01/1996";"5";"581.00";"5";"10/09/2023, 22:46:31";"03/08/2025, 21:11:31";"Rua Gerônimo Milan, 90, Jardim Bela Vista, 13871112, São João da Boa Vista/SP"
+"Sérgio Júnior";"5519994841222";;"26/11/1997";"1";"114.00";"1";"12/06/2025, 19:49:04";"12/06/2025, 19:49:04";"Rua Gabriel Ferreira, 304, Centro, 13870180, São João da Boa Vista/SP"
+"Vinicius Bernardes ";"5519992371439";;;"1";"93.90";"1";"11/10/2025, 19:48:29";"11/10/2025, 19:48:29";
+"Lettícia Fiorini Neves";"5519999000320";"letticianeves@gmail.com";;"6";"429.00";"6";"04/03/2025, 19:28:10";"04/02/2026, 18:11:14";"Rua Doutor Júlio de Freitas, 651, Vila Conceição, 13872010, São João da Boa Vista/SP"
+"Julia sardeli";"5519981010814";"juliamoraes97@hotmail.com";"05/05/1997";"9";"1152.50";"9";"28/07/2023, 20:00:58";"16/08/2025, 19:34:59";"Rua Henrique Cabral de Vasconcelos, 1783, (Em frente ao tavares) Jardim São Nicolau, 13876100, São João da Boa Vista/SP"
+"Isabelle Oliveira";"5519981259220";"isa.fernandes.rcc@gmail.com";;"1";"58.00";"1";"15/06/2025, 20:01:40";"15/06/2025, 20:01:40";"Rua David de Carvalho, 1055, (Apartamento 15) Vila Valentin, 13873020, São João da Boa Vista/SP"
+"Júlia Poiano";"5519998117651";;;"3";"414.00";"3";"25/06/2024, 19:11:12";"14/06/2025, 20:30:31";
+"José Eduardo ";"5519993344038";;;"1";"68.00";"1";"16/08/2024, 20:21:23";"16/08/2024, 20:21:23";"Avenida Pedro Botesi, 2555, (App 112, bloco 67) Jardim Scomparim, 13806635, Mogi Mirim/SP"
+"Taís Pedro";"5519986069211";;"14/06/1992";"1";"42.00";"1";"20/09/2023, 20:06:00";"20/09/2023, 20:06:00";"Rua Santa Filomena, 398, (Casa) Vila Brasil, 13875032, São João da Boa Vista/SP"
+"Alexandre Orru";"5519997074829";;"12/01/1975";"1";"123.50";"1";"12/09/2025, 20:50:29";"12/09/2025, 20:50:29";"Rua Vereador João Olívio Garbossa, 584, Terras de São José, 13874814, São João da Boa Vista/SP"
+"Mariana Helena ";"5519993823340";"mariana.helena3@gmail.com";"15/10/1993";"2";"115.00";"2";"15/11/2025, 20:23:56";"30/11/2025, 22:30:07";"Rua José Damiani, 179, (Apto 183) Ponte Grande, 07030240, Guarulhos/SP"
+"Jackeline Custódio ";"5519989950347";"jacki.custodio@gmail.com";;"3";"225.00";"3";"22/07/2023, 21:12:07";"25/08/2023, 20:10:11";
+"Márcia Dias";"5519998348494";;"22/02/1960";"1";"101.90";"1";"19/10/2025, 18:32:25";"19/10/2025, 18:32:25";"Avenida Doutor Octávio da Silva Bastos, 1485, (Condomínio Lago da Prata ) Jardim Nova São João, 13874149, São João da Boa Vista/SP"
+"Andre Braz";"5519981968722";"eletrobrazsj@gmail.com";;"6";"703.90";"6";"07/10/2023, 19:26:57";"21/02/2026, 20:34:48";
+"Ketlyn Azeredo";"5519991680647";"ketlynazeredo01@gmail.com";"26/06/1997";"3";"525.00";"3";"01/11/2023, 21:35:58";"10/12/2023, 21:13:43";"Rua João Pereira dos Santos, 37, Jardim Industrial, 13872340, São João da Boa Vista/SP"
+"Bruno Melo";"5519993506988";"Brunoifsp@hotmail.com";"28/03/1990";"2";"105.50";"2";"29/03/2024, 18:03:05";"18/08/2024, 18:53:54";"Rua Julia Peres Aparecido, 61, Vila Valentin, 13873049, São João da Boa Vista/SP"
+"Henrique Castilho";"5512988687089";;"03/04/1989";"1";"109.90";"1";"06/09/2024, 18:25:33";"06/09/2024, 18:25:33";
+"Eloiza Moraes";"5519991241703";;;"2";"93.00";"2";"17/10/2025, 19:32:27";"18/10/2025, 18:20:54";
+"Ana ribeiro";"5519992134753";;;"1";"84.00";"1";"03/10/2024, 19:38:25";"03/10/2024, 19:38:25";
+"André Luis Montouro";"5519998600717";;"17/07/1980";"1";"68.00";"1";"18/06/2024, 22:44:40";"18/06/2024, 22:44:40";"Rua Chico Xavier, 197, Residencial Fazenda das Areias, 13876195, São João da Boa Vista/SP"
+"Marcelo Gonçalves";"5519997193333";"marcelogoncalvescorreia@gmail.com";"02/03/1979";"7";"617.30";"7";"04/05/2025, 18:58:04";"02/11/2025, 19:06:48";"Rua Atilio Barão, 150, Núcleo Durval Nicolau (Etapa 1), 13872420, São João da Boa Vista/SP"
+"Debira thome ";"5519992784205";;;"1";"92.00";"1";"06/06/2024, 20:30:58";"06/06/2024, 20:30:58";
+"Leticia Brandao";"5519991795904";"leticia.giaob@gmail.com";"16/05/1996";"3";"185.00";"3";"25/07/2024, 19:35:35";"02/10/2025, 19:18:35";"Rua Julia Peres Aparecido, 222, (Casa) Vila Valentin, 13873049, São João da Boa Vista/SP"
+"Janna Contreras ";"5584991227925";"jannatoscano@hotmail.com";"17/02/1983";"1";"132.00";"1";"10/02/2024, 22:08:36";"10/02/2024, 22:08:36";"Rua João Paulo II, 55, (Apartamento 245) Santo Antônio, 13871202, São João da Boa Vista/SP"
+"Thalita Oliveira";"5519998540770";;"09/02/1992";"1";"55.00";"1";"28/09/2023, 20:01:35";"28/09/2023, 20:01:35";"Rua João Costa Hentz, 96, Jardim Recanto dos Pássaros II, 13873484, São João da Boa Vista/SP"
+"Andreza Campos";"5519989951726";;"21/02/2003";"1";"59.00";"1";"29/06/2024, 22:22:23";"29/06/2024, 22:22:23";
+"Abigahil Silva";"5519994224270";;;"1";"67.50";"1";"01/05/2025, 21:07:35";"01/05/2025, 21:07:35";"Rua Orlando Fracari, 730, (Hospital Unimed) Jardim Recanto do Bosque, 13874423, São João da Boa Vista/SP"
+"Leticia kempe";"5519988066145";;"26/03/1996";"3";"236.00";"3";"13/01/2024, 20:32:54";"06/10/2024, 19:15:46";"Rua Benedito Mello, 235, Jardim Magalhães, 13876470, São João da Boa Vista/SP"
+"Claudete Andrade ";"5519983832292";;;"2";"223.00";"2";"28/10/2023, 20:13:18";"29/03/2024, 19:53:06";
+"Fernanda Frizo";"5535999922452";"fer.frizo@gmail.com";"14/07/1997";"2";"194.00";"2";"20/10/2023, 20:46:39";"21/04/2024, 20:32:02";"R Teixeira Rios, 210, (Hospital francisco rosas) Centro, 13990000, Espírito Santo do Pinhal/SP"
+"Arthur Donizetti ";"5519981282459";"arthur.donizetti@gmail.com";;"1";"37.90";"1";"23/09/2023, 21:17:28";"23/09/2023, 21:17:28";"Rua Laurinda Mariotto Amâncio, 141, Recanto do Lago, 13874660, São João da Boa Vista/SP"
+"Danilo Giraldi";"5519991706112";"danilogiraldi13@gmail.com";"13/12/1982";"1";"132.00";"1";"07/06/2025, 19:20:49";"07/06/2025, 19:20:49";"Rua Tereza Nora Ciancaglio, 276, (Danilo Giraldi) Residencial Fazenda das Areias, 13876190, São João da Boa Vista/SP"
+"Matheus Silva";"5519999545845";"matheus.s.souza2020@gmail.com";;"1";"108.00";"1";"16/02/2024, 22:27:31";"16/02/2024, 22:27:31";"Rua Geraldo Rosa de Lima, 158, Jardim Nova União, 13876300, São João da Boa Vista/SP"
+"Estella Belizario ";"5519998826268";;;"1";"110.00";"1";"26/05/2024, 21:17:10";"26/05/2024, 21:17:10";
+"Filipe Souza";"5511951593507";"filipesouza14@hotmail.com";"19/03/1991";"2";"264.00";"2";"01/09/2023, 21:09:31";"18/10/2024, 20:29:04";"Rua Elias Gonçalves, 121, Jardim Progresso, 13876410, São João da Boa Vista/SP"
+"Raphael Borato";"5519998610822";;;"1";"86.00";"1";"05/01/2024, 19:34:07";"05/01/2024, 19:34:07";
+"Fabiana gutierres";"5517991035454";;;"1";"96.00";"1";"10/12/2023, 19:27:40";"10/12/2023, 19:27:40";
+"Cesar augusto";"5519989186200";;;"2";"98.00";"2";"15/03/2024, 19:30:13";"04/04/2024, 20:01:57";
+"Mariana Diniz ";"5519993527087";;;"1";"64.00";"1";"10/10/2023, 19:52:31";"10/10/2023, 19:52:31";
+"Mirelly Carolini";"5519995546261";;;"3";"146.00";"3";"04/08/2023, 23:29:59";"07/12/2024, 22:30:05";
+"Giovana Lemos";"5519999753638";;"05/02/2006";"1";"76.00";"1";"27/12/2023, 19:37:35";"27/12/2023, 19:37:35";"Rua José Carlos Campos, 250, Recanto do Lago, 13874665, São João da Boa Vista/SP"
+"Larissa Pereira Braido ";"5519998882709";;;"4";"481.00";"4";"21/07/2023, 19:18:08";"07/09/2023, 18:57:58";
+"Nathália Zacarias ";"551999174648";;;"1";"131.00";"1";"21/07/2023, 20:49:56";"21/07/2023, 20:49:56";
+"Marilia Dardi";"5519994033591";"dardimarilia@gmail.com";"03/08/1993";"3";"313.90";"3";"21/07/2023, 21:01:20";"10/11/2023, 21:59:19";"Rua Wilson Ferreira Costa, 64, (Portão de madeira) Jardim dos Jacarandás Fase 1, 13877081, São João da Boa Vista/SP"
+"Jonathan de Jesus";"5519999206346";"jonathanjesus71@gmail.com";;"6";"265.40";"6";"22/07/2023, 18:30:36";"27/01/2024, 20:19:14";"Rua Dona Gabriela, 169, (Ap 3) São Lázaro, 13870432, São João da Boa Vista/SP"
+"Sarah Galhardo ";"5519994067795";;;"2";"162.00";"2";"22/07/2023, 18:33:30";"19/08/2023, 18:58:47";
+"Sarah Galhardo ";"5519993259877";;"26/08/1980";"21";"1193.00";"21";"12/08/2023, 18:50:54";"05/10/2025, 18:51:35";
+"Larissa Proeti ";"5519974150202";;;"1";"163.50";"1";"22/07/2023, 19:57:16";"22/07/2023, 19:57:16";
+"Juliana Amorim";"5519981824272";;;"1";"55.90";"1";"22/07/2023, 20:49:36";"22/07/2023, 20:49:36";
+"Mateus Carvalho";"5519991314711";"mateusfuba44@gmail.com";"24/08/2001";"1";"99.00";"1";"22/07/2023, 21:15:11";"22/07/2023, 21:15:11";"Rua José Inácio Diniz, 183, (Casa) Pousada do Sol, 13874579, São João da Boa Vista/SP"
+"Kethellin Caroline Honório ";"5519989468451";"kethy._caroline@hotmail.com";"21/11/2001";"1";"54.00";"1";"23/07/2023, 19:02:45";"23/07/2023, 19:02:45";"Rua Benjamim Bueno de Lima, 121, (Sobrado de esquina) Jardim Primavera, 13876804, São João da Boa Vista/SP"
+"Sergio Oliveira ";"5567998133548";;;"3";"148.00";"3";"23/07/2023, 21:22:21";"23/07/2023, 21:35:25";
+"Letícia Moreira ";"5519994174459";;;"1";"55.90";"1";"26/07/2023, 18:24:21";"26/07/2023, 18:24:21";
+"João Gabriel Camargo Bragagnole ";"5519994350212";;;"1";"66.00";"1";"26/07/2023, 21:34:25";"26/07/2023, 21:34:25";
+"Wladimir Grilo ";"5519992999757";"Vanautopecas@uol.com.br";"09/09/1977";"72";"6778.80";"72";"27/07/2023, 19:56:51";"22/02/2026, 19:08:37";"Alameda das Hortências, 1574, (Morro azul 2) Condomínio Fechado Morro Azul II, 13874405, São João da Boa Vista/SP"
+"Aureane Denadai";"5519983387202";"aurydenadai@hotmail.com";;"35";"2414.00";"35";"11/08/2023, 19:58:02";"10/10/2025, 18:28:28";"Rua Silverio Rinaldi, 150, Jardim Flamboyant, 13876620, São João da Boa Vista/SP"
+"Júlio Meireles";"5519981133220";"juliomeireles91@gmail.com";"05/03/1991";"2";"149.00";"2";"28/07/2023, 20:32:14";"19/09/2025, 22:54:02";"Rua Maria Aparecida Lisboa, 230, (Esquina com a 9 de julho) Jardim Recanto do Jaguari, 13872217, São João da Boa Vista/SP"
+"Marcelo Tomé";"5519993887190";"marcelo.tome00@gmail.com";"26/01/2000";"1";"113.00";"1";"28/07/2023, 20:50:29";"28/07/2023, 20:50:29";"Rua Dorival Blota, 65, (Apartamento 67) Jardim Nova São João, 13874134, São João da Boa Vista/SP"
+"Giovane Cicone ";"5519971614711";;;"1";"74.00";"1";"28/07/2023, 21:48:01";"28/07/2023, 21:48:01";
+"Arthur Fornaziero ";"5519993900073";;;"1";"59.00";"1";"28/07/2023, 21:54:33";"28/07/2023, 21:54:33";
+"Fabrício Martins Santos";"5519993667971";"fabriciosantospinguim@gmail.com";"23/06/1999";"1";"86.00";"1";"29/07/2023, 19:27:11";"29/07/2023, 19:27:11";"Rua Capitão José Jacintho de Andrade, 566, Rosário, 13870334, São João da Boa Vista/SP"
+"Márcia Silva";"5519995627820";;;"2";"195.00";"2";"29/07/2023, 19:21:33";"29/09/2023, 19:31:19";
+"Larissa Vieira ";"5519992293031";;;"1";"47.00";"1";"29/07/2023, 21:10:05";"29/07/2023, 21:10:05";
+"Leticia Bonareti Lorette";"5519996041748";;;"1";"53.90";"1";"29/07/2023, 22:00:13";"29/07/2023, 22:00:13";
+"Isabella blazzi";"5519991185150";;;"1";"34.00";"1";"30/07/2023, 20:04:29";"30/07/2023, 20:04:29";
+"Daniel Hashimoto ";"5519998646571";;;"1";"111.00";"1";"01/08/2023, 19:11:36";"01/08/2023, 19:11:36";
+"Jéssica Zacareli Costa";"5519994577199";"jeh.zacareli@gmail.com";"09/03/1993";"1";"106.00";"1";"01/08/2023, 19:34:15";"01/08/2023, 19:34:15";"Rua Emílio Cereja, 15, Vila Conceição, 13872012, São João da Boa Vista/SP"
+"Danilo Barbosa";"5532998216462";"danilofranck@hotmail.com";"13/12/1982";"1";"410.00";"1";"01/08/2023, 20:58:25";"01/08/2023, 20:58:25";"Rua Celeste das Neves, 21, Núcleo Durval Nicolau (Etapa 1), 13872418, São João da Boa Vista/SP"
+"Higor Lima";"5519998938637";;;"1";"84.00";"1";"02/08/2023, 20:26:23";"02/08/2023, 20:26:23";
+"Amanda Magalhães ";"5519999365560";;"23/04/1994";"3";"262.00";"3";"19/12/2023, 22:33:53";"19/01/2024, 19:45:52";
+"Ellen Moreira Novaes";"5518997851690";"ellen.moreira273@gmail.com";"16/02/1990";"1";"55.00";"1";"05/08/2023, 19:46:06";"05/08/2023, 19:46:06";"Rua Amélia Michelazzo Penha, 687, (Sobrado) Jardim Recanto dos Pássaros, 13873505, São João da Boa Vista/SP"
+"Mariana De Luca";"5519992046170";;;"1";"86.00";"1";"12/11/2023, 20:18:08";"12/11/2023, 20:18:08";
+"María Isabel Tobias Mendes De Luca";"5519997953884";"belmendesdeluca@gmail.com";"28/11/1963";"2";"242.00";"2";"05/08/2023, 21:26:24";"12/08/2023, 19:56:27";"Rua Hemenegildo Dalcol, 387, (Casa de esquina) Jardim Santa Clara, 13874154, São João da Boa Vista/SP"
+"Rodrigo sbrissa";"5519996348503";;;"1";"78.50";"1";"06/08/2023, 18:37:31";"06/08/2023, 18:37:31";
+"Bernadete Maggi Esbrile Moraes ";"551997057877";"bernadetemaggi@gmail.com";"02/02/1958";"7";"628.00";"7";"08/08/2023, 18:48:32";"26/12/2023, 18:30:56";"Avenida Rodrigues Alves, 1320, (Quadra J Lote 28) Jardim Santo André, 13874040, São João da Boa Vista/SP"
+"Fabiana Bellini";"5519992558568";"fafa.bellini@gmail.com";"18/06/1975";"3";"392.00";"3";"08/08/2023, 20:46:32";"01/08/2024, 21:43:21";"Rua Armando Geraldo Massaro, 621, Jardim Lucas Teixeira, 13876858, São João da Boa Vista/SP"
+"Tânia Lucas de Barros ";"5519989143450";;;"5";"426.00";"5";"11/08/2023, 19:36:07";"07/10/2023, 19:59:53";
+"Fabiola Nery facchin";"5511915674837";"By_facchin@hotmail.com";"26/02/1988";"1";"137.00";"1";"11/08/2023, 20:24:32";"11/08/2023, 20:24:32";"Rua Tancredo de Almeida Neves, 216, (Casa da esquina) Vila Brasil, 13875041, São João da Boa Vista/SP"
+"Patrícia Bento";"5519992446078";;;"2";"84.00";"2";"11/08/2023, 22:29:10";"11/11/2023, 19:19:40";
+"Charlene Caroline";"5519992739220";"dcharlene374@gmail.com";"28/08/1991";"1";"144.00";"1";"17/01/2025, 20:02:44";"17/01/2025, 20:02:44";"Rua José Carlos Estevão, 32, Loteamento Portal da Aliança, 13876690, São João da Boa Vista/SP"
+"Ronaldo Rinaldi";"5519992200428";;;"1";"115.00";"1";"12/08/2023, 19:01:04";"12/08/2023, 19:01:04";
+"Douglas Antunes";"5519989273817";"sjboavista80@gmail.com";;"24";"1897.00";"24";"12/08/2023, 19:38:25";"20/07/2025, 20:45:49";"Rua Wilson Bértoli, 42, Jardim Amélia, 13876442, São João da Boa Vista/SP"
+"Rafaele Juliari ";"5519993051513";;;"3";"198.00";"3";"12/08/2023, 20:24:44";"18/11/2023, 19:34:09";
+"Dirceu Dutra";"5519996540066";"dirceudutrajr@gmail.com";"10/04/1974";"1";"120.00";"1";"13/08/2023, 18:47:59";"13/08/2023, 18:47:59";"Alameda das Tipuanas, 137, Loteamento Fechado Morro Azul, 13874858, São João da Boa Vista/SP"
+"Larii Amaral";"5519994738290";"larissaamaral011@gmail.com";"27/03/2003";"1";"49.00";"1";"13/08/2023, 20:58:26";"13/08/2023, 20:58:26";"Rua Madre Maria Inês, 538, Jardim dos Reis, 13873212, São João da Boa Vista/SP"
+"Adriana dos Santos ";"5519989629437";;"24/07/1980";"1";"129.00";"1";"16/08/2023, 18:32:20";"16/08/2023, 18:32:20";
+"João Paulo Longuini ";"5519992187780";;;"1";"259.00";"1";"15/08/2023, 21:44:16";"15/08/2023, 21:44:16";
+"Jacinta Rodrigues ";"5519981747734";"Antonia.jacinta@icloud.com";"14/03/2004";"1";"45.00";"1";"22/08/2023, 19:40:55";"22/08/2023, 19:40:55";"Rua Afonso Finazzi, 36, (Casa) Jardim Recanto do Jaguari, 13872268, São João da Boa Vista/SP"
+"Luana Amaro Araújo";"5519993561194";"luamaro_789@hotmail.com";"22/12/2001";"2";"102.00";"2";"16/08/2023, 18:57:03";"13/06/2025, 18:48:39";"Rua João Pan, 940, Jardim Europa, 13872784, São João da Boa Vista/SP"
+"Paulo Cesar";"5519997777799";;;"2";"109.50";"2";"17/08/2023, 18:58:34";"19/11/2023, 18:42:27";
+"Gustavo Mauch ";"5519993725252";"Imperial_marmoraria@outlook.com";"14/07/1993";"3";"272.00";"3";"18/08/2023, 20:26:05";"12/12/2025, 19:56:39";"Rua Manoel de Abreu, 70, (Casa) Bromelias, São João da Boa Vista/SP"
+"Kelly Cristina ";"5519993953697";;;"1";"71.00";"1";"18/08/2023, 20:27:47";"18/08/2023, 20:27:47";
+"Bruno Patroni";"5519996674146";;"08/06/1991";"1";"113.00";"1";"05/09/2025, 20:01:53";"05/09/2025, 20:01:53";
+"Ianara karoline Gomes ";"5519999279724";;;"1";"42.00";"1";"19/08/2023, 18:55:12";"19/08/2023, 18:55:12";
+"Mariana Alves";"5519991616637";"marianaribeiro3119@yahoo.com.br";"03/11/1999";"2";"216.50";"2";"19/08/2023, 19:25:24";"07/10/2023, 19:20:16";"Rua Osires Braz, 286, Jardim Almeida, 13876349, São João da Boa Vista/SP"
+"Gabriela palomo";"5519992190878";;;"1";"47.00";"1";"19/08/2023, 19:19:32";"19/08/2023, 19:19:32";
+"Jean ferraz ";"5519995072103";"Jean.vitor8552@yahoo.com";"07/07/1999";"1";"50.00";"1";"19/08/2023, 20:54:11";"19/08/2023, 20:54:11";
+"Amanda Tabarim cavino";"5519989798504";"amanda_tabarim@hotmail.com";;"3";"265.00";"3";"20/08/2023, 18:41:14";"30/08/2024, 20:16:48";"Rua Lázaro Estevam Rodrigues, 607, (Casa portão branco) Jardim das Tulipas, 13876873, São João da Boa Vista/SP"
+"Júlia Zorzeto ";"5519999570888";;;"2";"201.00";"2";"20/08/2023, 19:10:16";"13/09/2024, 21:30:12";
+"Rafaela Marcelino ";"5519994441301";;;"5";"425.00";"5";"20/08/2023, 19:12:21";"07/01/2024, 22:42:41";
+"Leticia Parreira";"5519995246797";"leticia.parreira46@gmail.com";"29/06/1996";"2";"79.00";"2";"20/08/2023, 19:20:04";"28/01/2024, 19:39:20";
+"Miriane BILHEIRA ";"5519992625793";"mirianebmtj@gmail.com";"01/11/1990";"2";"322.00";"2";"13/01/2024, 20:34:46";"08/05/2025, 19:08:02";"Rua Cotovia, 56, Jardim Recanto dos Pássaros, 13873512, São João da Boa Vista/SP"
+"Tony Allan Tavares";"5519994224894";;;"1";"36.00";"1";"22/08/2023, 20:03:33";"22/08/2023, 20:03:33";
+"Priscila Asturiano oliveira";"5519999380207";;;"13";"894.00";"13";"25/08/2023, 21:03:37";"09/05/2025, 22:48:50";
+"Bruno Felipe";"5519992372609";"brunofelipelima2021@gmail.com";"07/03/1996";"2";"260.00";"2";"26/08/2023, 19:00:10";"01/09/2023, 21:13:30";"Rua João Batista Salomão, 304, Jardim Almeida, 13876343, São João da Boa Vista/SP"
+"Luana Reis";"5519998707872";;"06/05/1984";"1";"48.00";"1";"26/08/2023, 19:25:49";"26/08/2023, 19:25:49";
+"Luis Gustavo marcelino ";"5519997680572";;;"1";"87.00";"1";"26/08/2023, 19:29:30";"26/08/2023, 19:29:30";
+"Mariane Dias";"5519999178752";;;"5";"341.00";"5";"26/08/2023, 19:36:45";"13/07/2025, 18:50:42";
+"Lucas Rubini";"5519992910065";"luccasgfx@gmail.com";"17/02/2000";"1";"98.00";"1";"27/08/2023, 19:02:45";"27/08/2023, 19:02:45";"Avenida Lázaro Pio Magalhães, 460, (Apto 112A) Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Gustavo pagar qrcodepix";"5519971306404";;;"1";"64.00";"1";"27/08/2023, 20:02:41";"27/08/2023, 20:02:41";
+"Edmilson ferreira";"5519991563923";;;"1";"78.00";"1";"27/08/2023, 21:03:07";"27/08/2023, 21:03:07";
+"Juliana Carvalho seco ";"5535997454401";;;"2";"108.00";"2";"27/08/2023, 21:27:02";"09/11/2023, 20:27:50";
+"Ygor Vinicius de Luca Moreira ";"5519995515310";;;"2";"127.50";"2";"27/08/2023, 22:07:41";"13/12/2024, 21:53:37";
+"Priscilla Souza ";"5519997172212";;;"1";"81.00";"1";"29/08/2023, 19:14:47";"29/08/2023, 19:14:47";
+"Rodrigo Martins ";"5519995727007";;;"1";"85.00";"1";"29/08/2023, 20:35:28";"29/08/2023, 20:35:28";
+"Joana Frainer ";"5547992566974";;;"2";"102.00";"2";"01/09/2023, 18:47:59";"10/09/2023, 19:01:18";
+"Patricia freire";"5519996846125";;;"4";"388.00";"4";"01/09/2023, 20:31:36";"23/02/2024, 20:59:50";
+"Maria Cleuza de Oliveira Barbieri ";"5519996224191";;;"2";"205.00";"2";"01/09/2023, 20:51:17";"20/09/2023, 20:52:34";
+"Caroline Manzotti Rabello";"5519989883132";;;"1";"104.00";"1";"01/09/2023, 21:50:25";"01/09/2023, 21:50:25";
+"Beatriz Aguiar ";"5519998013696";;;"1";"57.90";"1";"23/09/2023, 21:56:32";"23/09/2023, 21:56:32";
+"Raquel Gonçalves ";"5519994366961";;;"2";"232.80";"2";"02/09/2023, 19:08:56";"26/04/2025, 18:58:49";
+"Valdirene chaves ";"5519991699424";;;"1";"55.00";"1";"02/09/2023, 19:32:13";"02/09/2023, 19:32:13";
+"João Carlos Roman Theodoro ";"5519981217197";;;"1";"102.00";"1";"03/09/2023, 18:12:57";"03/09/2023, 18:12:57";
+"Gisele Campanaro ";"5519991931514";;;"2";"415.00";"2";"03/09/2023, 19:33:11";"08/12/2023, 20:30:34";
+"Larissa parreira";"5519978162572";;;"1";"92.50";"1";"03/09/2023, 19:49:49";"03/09/2023, 19:49:49";
+"Bruno Hauschild";"5511992702949";"brunohalls13@gmail.com";;"1";"53.00";"1";"03/09/2023, 21:22:54";"03/09/2023, 21:22:54";"Rua Benedito Araújo, 233, (Apto 13) Centro, 13870090, São João da Boa Vista/SP"
+"Lilian bernardes";"5519995611646";;;"1";"58.00";"1";"05/09/2023, 22:11:47";"05/09/2023, 22:11:47";
+"Thays Rodrigues ";"5519994198319";"thaysladler@gmail.com";;"9";"724.00";"9";"06/09/2023, 18:23:33";"19/04/2025, 18:22:05";"Rua João Lopes Messias, 357, Jardim Amélia, 13876440, São João da Boa Vista/SP"
+"Eduarda Dudaa";"5519993165281";"eduardadudaa204@gmail.com";"17/02/2003";"1";"49.00";"1";"06/09/2023, 22:10:50";"06/09/2023, 22:10:50";"Rua Bernadete Aparecida Sette, 81, Jardim Nova União, 13876289, São João da Boa Vista/SP"
+"Luiz felipe";"5519991760784";;;"13";"490.00";"13";"07/09/2023, 18:33:38";"18/02/2024, 20:00:35";
+"Gabrielle Couto";"5511969014641";;;"1";"38.00";"1";"07/09/2023, 21:36:34";"07/09/2023, 21:36:34";
+"Jefferson Oliveira ";"5519989131770";;;"1";"82.00";"1";"08/09/2023, 19:29:28";"08/09/2023, 19:29:28";
+"Eliana Vidal Stefano Goulardins ";"5519993141213";;;"1";"151.00";"1";"08/09/2023, 20:06:35";"08/09/2023, 20:06:35";
+"Fernanda Narciso ";"5519978175312";"fernan.dagatiinha@hotmail.com";"19/02/1998";"12";"390.50";"12";"09/09/2023, 18:57:45";"09/03/2024, 19:52:08";"Rua Acyr Gião, 96, Jardim Flamboyant, 13876630, São João da Boa Vista/SP"
+"Ingrid santos ";"5535984532551";;"20/01/2000";"1";"74.00";"1";"09/09/2023, 20:36:45";"09/09/2023, 20:36:45";"Avenida Lázaro Pio Magalhães, 460, (126) Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Michelli Bollos";"5519996223015";;;"1";"86.00";"1";"09/09/2023, 20:57:33";"09/09/2023, 20:57:33";
+"LUIZ zanelo ";"5519994606005";;;"16";"1044.50";"16";"09/09/2023, 22:36:41";"10/02/2026, 21:14:10";
+"Jessika Petroni ";"5519982123250";;;"1";"47.00";"1";"10/09/2023, 19:57:41";"10/09/2023, 19:57:41";
+"Camila borelli ";"5519997570944";"camilatatoo001@gmail.com";;"6";"874.50";"6";"10/09/2023, 20:11:44";"06/09/2025, 20:20:47";"Rua Vereador João Olívio Garbossa, 584, (Casa) Terras de São José, 13874814, São João da Boa Vista/SP"
+"Vanessa De Jesus Ginez";"5519993224423";"vanessa-ginez@hotmail.com";"15/08/1994";"4";"302.00";"4";"10/09/2023, 21:07:12";"21/09/2025, 19:23:16";"Rua Santa Filomena, 457, Vila Brasil, 13875032, São João da Boa Vista/SP"
+"Philipe Negri";"5535999488936";"philipe123.negri@gmail.com";"04/02/1991";"2";"154.00";"2";"10/09/2023, 21:03:27";"20/10/2024, 19:51:57";
+"Hisadora Lopes";"5535984291009";;;"1";"134.00";"1";"12/09/2023, 19:12:07";"12/09/2023, 19:12:07";
+"Luiz Guilherme ";"5519988301135";"luizguilhermerossi@outlook.com";"14/02/2002";"8";"820.00";"8";"15/09/2023, 20:56:08";"08/03/2024, 21:46:04";"Santo Afonso Maria ligori, 101, (Perpétuo Socorro) Perpétuo Socorro, 13875050, São João da Boa Vista/SP"
+"Gabriela Esbrisse ";"5519989349932";;;"1";"91.00";"1";"16/09/2023, 20:20:38";"16/09/2023, 20:20:38";
+"Gabriela Soares ";"5511972442445";;;"1";"55.00";"1";"16/09/2023, 20:50:52";"16/09/2023, 20:50:52";
+"Adjailson Silva";"5516996373123";;"04/02/2000";"8";"805.00";"8";"16/09/2023, 21:57:33";"06/04/2025, 20:50:34";"R: Valdomiro Santos, 36, (Hotel Rio de Contas) Centro, 45570000, Ipiaú/BA"
+"Adrielle Ribeiro ";"5519988577702";"Lopesadrielle27@gmail.com";;"2";"161.00";"2";"17/09/2023, 19:27:47";"19/01/2024, 23:09:32";"Rua Sidalino Vicente, 295, (Casa) Parque dos Resedás, 13876268, São João da Boa Vista/SP"
+"Luiz Bomfá";"5519992265525";;;"4";"409.00";"4";"17/09/2023, 20:00:01";"10/03/2024, 19:16:53";
+"Gustavo Rubbo";"5519991304396";;;"2";"236.00";"2";"17/09/2023, 20:48:52";"13/08/2025, 20:18:33";
+"Dielida Brito";"5519992311136";;"24/02/1992";"9";"605.00";"9";"12/10/2023, 21:51:38";"18/12/2023, 22:20:43";
+"Lis Rocha ";"5519982321313";;;"2";"170.00";"2";"19/09/2023, 20:21:37";"08/10/2024, 21:34:52";
+"Rodrigo damalio esbrilli";"5519992616845";"digosme@gmail.com";"06/04/1991";"9";"491.00";"9";"20/09/2023, 19:44:39";"30/01/2025, 19:38:47";"Rua Marechal Deodoro, 319, (Ap 32) Centro, 13870223, São João da Boa Vista/SP"
+"Rita Alves ";"5511997674909";;;"3";"159.00";"3";"21/09/2023, 20:09:53";"19/11/2023, 20:08:45";
+"Amanda Silvério ";"5519994044646";;;"31";"1460.00";"31";"22/09/2023, 18:32:27";"02/08/2025, 19:32:02";
+"Bruno Henrique Morales ";"5511998755819";;;"1";"63.90";"1";"22/09/2023, 20:19:09";"22/09/2023, 20:19:09";
+"JULIANA Santana ";"5519995575007";;;"1";"92.00";"1";"22/09/2023, 20:24:36";"22/09/2023, 20:24:36";
+"Edilaine Bruno ";"5519992089558";"edi.bruno80@gmail.com";"23/08/1980";"2";"317.00";"2";"22/09/2023, 22:36:58";"05/03/2024, 19:19:49";"R. Orlando fracari, 730, Recanto do bosque, São João da Boa Vista/SP"
+"Beatriz Peres ";"5519995145741";;;"1";"135.00";"1";"23/09/2023, 20:15:33";"23/09/2023, 20:15:33";
+"Letícia Rainere ";"5519994789112";;;"3";"196.00";"3";"23/09/2023, 20:24:34";"12/11/2023, 19:21:36";
+"Alcimara da silva ";"5519982657979";;;"2";"177.00";"2";"23/09/2023, 23:27:33";"01/08/2024, 22:08:18";
+"Kelly Hellen ";"5519991403576";;;"2";"161.00";"2";"24/09/2023, 18:30:20";"18/08/2024, 21:43:21";
+"Patrícia Lopes ";"5511987819589";;;"1";"46.00";"1";"24/09/2023, 20:31:37";"24/09/2023, 20:31:37";
+"Maristela Borges de Andrade Lima";"5519982440051";;;"4";"396.00";"4";"29/09/2023, 19:48:27";"20/09/2025, 19:40:02";
+"Nathalie Gregório ";"5519989367884";"pinheiroisabela316@gmail.com";"09/08/1998";"2";"303.00";"2";"29/09/2023, 20:24:53";"17/10/2024, 22:10:17";"Rua Turqueza, 160, Vila Gomes, 13870681, São João da Boa Vista/SP"
+"inayê neto";"5519982348633";;;"3";"298.00";"3";"29/09/2023, 20:35:14";"15/12/2023, 20:28:40";
+"Vinicius Polidoro ";"5519998488634";;;"1";"69.00";"1";"30/09/2023, 20:57:02";"30/09/2023, 20:57:02";
+"Ana Carolina Giacomelli";"5519983210737";"anacarolinagiacomelli1@gmail.com";"13/07/1979";"21";"2156.50";"21";"30/09/2023, 21:55:03";"26/10/2025, 19:03:26";"Rua Nagib Miguel, 4035, (Morro azul 1) Jardim Recanto do Bosque, 13874439, São João da Boa Vista/SP"
+"Priscila Rodrigues ";"5519996766161";;;"1";"94.00";"1";"01/10/2023, 18:49:49";"01/10/2023, 18:49:49";
+"Carlos Roberto Rehder ";"5519997610115";"Carlosrrehder@hotmail.com";"12/04/1966";"1";"32.00";"1";"01/10/2023, 19:41:57";"01/10/2023, 19:41:57";"Rua Rangel Pestana, 232, (Casa) Centro, 13870228, São João da Boa Vista/SP"
+"Damaris neri";"5519994373057";;;"1";"181.00";"1";"01/10/2023, 21:46:19";"01/10/2023, 21:46:19";
+"Lucas Antonio dos Santos Rosa";"5519989510002";;;"1";"51.00";"1";"03/10/2023, 19:02:42";"03/10/2023, 19:02:42";
+"Beatriz Inácio Monteiro ";"5519993686700";;;"3";"245.00";"3";"04/10/2023, 19:36:16";"06/01/2024, 22:03:52";
+"Marcos Correa";"5519981098351";;;"1";"117.00";"1";"04/10/2023, 20:46:17";"04/10/2023, 20:46:17";
+"Caio Henrique ";"5519993978992";"caioh5455@gmail.com";;"2";"182.00";"2";"06/10/2023, 19:48:04";"24/11/2023, 23:26:34";"Rua José Maria de Carvalho, 1651, (Casa) Jardim dos Ipês I, 13876595, São João da Boa Vista/SP"
+"Tiago Trevisan ";"5535991652191";;;"1";"110.00";"1";"06/10/2023, 20:39:47";"06/10/2023, 20:39:47";
+"Anna Uchôa ";"5519996341602";"anna.carvalhomendes@hotmail.com";"12/10/1974";"1";"154.80";"1";"06/10/2023, 21:27:11";"06/10/2023, 21:27:11";"Rua Maria Cândida Rodrigues Peres, 152, Jardim Recanto do Bosque, 13874430, São João da Boa Vista/SP"
+"Luiza Fonseca";"5519991977326";"fonsecaluiza97@gmail.com";;"1";"101.00";"1";"06/10/2023, 22:32:59";"06/10/2023, 22:32:59";"Avenida Guilherme Guerreiro, 0, Jardim Novo Horizonte, 13872400, São João da Boa Vista/SP"
+"Daniela Pereira Valentim Sette dos Santos ";"5519994671294";;;"1";"124.00";"1";"07/10/2023, 18:30:44";"07/10/2023, 18:30:44";
+"Ellen Oliveira";"5519989304789";"eo03011997@gmail.com";"03/01/1997";"3";"218.00";"3";"07/10/2023, 19:57:52";"26/02/2025, 21:35:52";
+"Antônio Cesar ";"5519981850684";;;"1";"127.00";"1";"07/10/2023, 21:28:22";"07/10/2023, 21:28:22";
+"Gustavo ojeda dos Santos ";"5519993573446";;"23/02/1994";"1";"80.00";"1";"07/10/2023, 22:52:39";"07/10/2023, 22:52:39";
+"Thainara Todero Gomes ";"5519993535056";;;"1";"34.00";"1";"08/10/2023, 18:06:10";"08/10/2023, 18:06:10";
+"Juliana Ribeiro";"5519996558860";;;"1";"74.00";"1";"08/10/2023, 19:20:10";"08/10/2023, 19:20:10";
+"Marcelo marconi ";"5519998762042";;;"1";"216.00";"1";"08/10/2023, 20:32:07";"08/10/2023, 20:32:07";
+"Lucas Oliveira ";"5519994568053";"lucas.oliver.987@gmail.com";"21/04/1993";"2";"259.00";"2";"10/10/2023, 21:47:43";"11/05/2024, 20:46:46";"Rua Roberto Rocha da Silva, 486, (Casa) Jardim Aurora, 13877052, São João da Boa Vista/SP"
+"Patrícia Stanguini ";"5519994482142";"Path-fernanda@hotmail.com.br";"10/10/1993";"2";"249.00";"2";"11/10/2023, 19:55:30";"20/12/2023, 19:47:38";"Rua Jucelia Helena da Silva Rodrigues, 520, Jardim dos Jacarandás Fase 1, 13877077, São João da Boa Vista/SP"
+"Karolyne Silva ";"5519935008239";;;"4";"378.00";"4";"11/10/2023, 22:15:09";"05/07/2024, 18:35:06";
+"Dayane Juliari ";"5519982710852";;;"5";"264.00";"5";"13/10/2023, 20:22:44";"14/03/2025, 21:01:20";
+"Jayme Augusto ";"5519996120722";;;"1";"129.00";"1";"13/10/2023, 20:37:22";"13/10/2023, 20:37:22";
+"Eliabe Guilherme Garcia ";"5519992803725";"contato.classicstudio@gmail.com";"06/06/2001";"6";"494.00";"6";"14/10/2023, 20:34:56";"15/03/2025, 23:16:05";"Avenida Mauá, 265, Vila Nossa Senhora de Fátima, 13872640, São João da Boa Vista/SP"
+"Joao Rodrigo Curle";"5519981630222";"jrmcurle@gmail.com";"08/09/1978";"3";"308.00";"3";"14/10/2023, 20:50:23";"20/08/2024, 18:51:33";"Alameda dos Lírios, 28, (Morro azul 2) Condomínio Fechado Morro Azul II, 13874409, São João da Boa Vista/SP"
+"João Reinato";"5519981433387";;;"2";"183.00";"2";"14/10/2023, 20:58:25";"02/02/2024, 19:46:21";
+"Gustavo Simione ";"5519997294848";;;"1";"38.00";"1";"15/10/2023, 18:00:37";"15/10/2023, 18:00:37";
+"Maria Beatriz ";"5519995412142";;;"1";"108.00";"1";"20/10/2023, 23:23:49";"20/10/2023, 23:23:49";
+"Paula Candido";"5519995716367";"paula-candido@outlook.com";"05/06/1997";"3";"286.00";"3";"21/10/2023, 18:40:08";"30/04/2025, 18:33:42";
+"Priscila Edilaine";"5519991856232";"pri.edilaine27@gmail.com";"08/06/1989";"1";"93.00";"1";"21/10/2023, 19:30:06";"21/10/2023, 19:30:06";"Rua Edson Antônio de Carvalho, 185, (Casa) Jardim Novo Horizonte, 13872490, São João da Boa Vista/SP"
+"Ana Luiza ";"5519992146344";;;"1";"31.00";"1";"22/10/2023, 20:21:59";"22/10/2023, 20:21:59";
+"Tâmara Negri";"5511947612159";;;"7";"475.00";"7";"24/10/2023, 19:59:21";"27/05/2025, 19:44:45";
+"Thaís Faria";"5519993867584";;;"1";"82.00";"1";"25/10/2023, 20:22:30";"25/10/2023, 20:22:30";
+"Cecília Quinzani ";"5519997579999";"quinzani@gmail.com";;"5";"470.00";"5";"27/10/2023, 20:13:53";"08/08/2025, 18:36:43";"Praça Graciliano Ramos, 00, (Ap 91 C) Vila Mariana, 04120140, São Paulo/SP"
+"Guilherme Fernandes ";"5519989654214";;;"1";"117.00";"1";"27/10/2023, 21:12:19";"27/10/2023, 21:12:19";
+"Eduardo Valim";"5535999199503";;;"3";"238.00";"3";"28/10/2023, 19:41:13";"18/06/2025, 19:07:02";
+"Alessandra Teles";"5516987477189";;;"1";"104.00";"1";"28/10/2023, 20:37:46";"28/10/2023, 20:37:46";
+"José Afonso da Silva Junior";"5519971343640";"joseafonso_s@yahoo.com.br";"14/12/1993";"3";"470.00";"3";"28/10/2023, 21:03:21";"29/07/2024, 21:15:55";"Rua Arara, 121, Jardim Recanto dos Pássaros, 13873520, São João da Boa Vista/SP"
+"Gabriele Germine";"5519999385101";"gabrielegb1@hotmail.com";;"3";"264.00";"3";"28/10/2023, 21:13:29";"16/06/2024, 19:47:02";"Rua Francisco Luiz de Oliveira, 630, Jardim dos Jacarandás Fase 1, 13877074, São João da Boa Vista/SP"
+"LUIS Guilherme Ramos Sabino Pereira";"5519994368580";;;"1";"52.00";"1";"28/10/2023, 21:12:41";"28/10/2023, 21:12:41";
+"Andressa Concentine";"5519996495943";"deda_cdias@hotmail.com";"24/06/1987";"2";"211.00";"2";"01/10/2024, 20:46:11";"09/10/2024, 20:25:00";"Rua Doutor Pereira Lima, 85, (Rodoviária) Vila Industrial, 13035505, Campinas/SP"
+"Nery Signorini";"5519999110701";;;"1";"106.00";"1";"29/10/2023, 19:15:20";"29/10/2023, 19:15:20";
+"Ghassan Haddad";"5519997474449";;;"2";"146.00";"2";"31/10/2023, 18:44:09";"16/11/2023, 20:43:14";
+"Geraldo Fernandes ";"5519992369353";;;"1";"112.00";"1";"31/10/2023, 19:34:42";"31/10/2023, 19:34:42";
+"Jhonata Macedo";"5519994073481";"jhonatamacedo2016@gmail.com";"09/07/2001";"1";"94.00";"1";"01/11/2023, 20:53:55";"01/11/2023, 20:53:55";"Praça Coronel Joaquim José, 124, (Ap51) Centro, 13870120, São João da Boa Vista/SP"
+"Letícia Santos ";"5528981137335";"lfsantos267@gmail.com";;"1";"129.00";"1";"14/01/2024, 19:17:08";"14/01/2024, 19:17:08";
+"Flávia Almeida ";"5519999579885";;;"1";"41.00";"1";"03/11/2023, 19:07:46";"03/11/2023, 19:07:46";
+"Gabriel Ribeiro";"5516996206396";;;"1";"60.00";"1";"03/11/2023, 21:04:02";"03/11/2023, 21:04:02";
+"Carla Fabri";"5519995854070";"carlacfabri@yahoo.com.br";"17/05/1993";"12";"1496.00";"12";"04/11/2023, 19:43:34";"18/01/2026, 20:26:06";"Rua Godofredo Barauna, 605, (Casa em construcao sem n•) Vila Nossa Senhora de Fátima, 13872630, São João da Boa Vista/SP"
+"Vinicius Daniel";"5519999886616";"viniciusdani303@gmail.com";"12/06/2000";"2";"222.50";"2";"04/11/2023, 20:56:42";"24/05/2025, 19:45:58";"Rua Irineu Simioni Bezan, 1667, Jardim Europa, 13872770, São João da Boa Vista/SP"
+"Débora Raquel Vallim ";"5519991940696";;;"1";"85.00";"1";"04/11/2023, 21:11:32";"04/11/2023, 21:11:32";
+"Murilo Imbruniz de Carvalho";"5519994769196";"muriloimbruniz@gmail.com";"17/01/1978";"1";"81.00";"1";"19/11/2023, 19:59:05";"19/11/2023, 19:59:05";
+"Michelle Amorim ";"5519998309343";;;"1";"107.00";"1";"10/11/2023, 22:48:34";"10/11/2023, 22:48:34";
+"Rodrigo Lima";"5577998067752";"agrolima.to@hotmail.com";"25/12/1980";"1";"55.00";"1";"12/11/2023, 19:14:28";"12/11/2023, 19:14:28";"Rua General Osório, 55, (Apt 214) São Lázaro, 13870431, São João da Boa Vista/SP"
+"Andreia Felicio";"5519982750801";;;"1";"72.00";"1";"12/11/2023, 19:12:18";"12/11/2023, 19:12:18";
+"Vivian Franciscato ";"5519971100796";;;"1";"109.00";"1";"12/11/2023, 20:57:00";"12/11/2023, 20:57:00";
+"Paulo Rubens Consentino";"5519998217236";"gerencia@cofar.com.br";"25/12/1955";"9";"586.00";"9";"12/11/2023, 21:30:11";"05/10/2025, 20:29:07";"Rua Joaquim José da Costa Oliveira, 85, Jardim Priscila, 13874129, São João da Boa Vista/SP"
+"Elisandra Cândido ";"5519995357446";;;"1";"53.00";"1";"12/11/2023, 22:39:40";"12/11/2023, 22:39:40";
+"Dyulia Gabrieli de Souza Silva ";"5519993315622";"dyuliasouza1997@gmail.com";"12/09/1997";"1";"53.00";"1";"14/11/2023, 18:50:50";"14/11/2023, 18:50:50";"Rua Alberto Zerbeto, 119, Jardim Maestro Mourão, 13872588, São João da Boa Vista/SP"
+"Luís Fernando";"5519984094582";;;"4";"463.50";"4";"14/11/2023, 19:58:17";"14/11/2025, 19:19:48";
+"Carla Germinari ";"5519981386162";;;"1";"71.00";"1";"15/11/2023, 19:21:20";"15/11/2023, 19:21:20";
+"Ana Paula fornazieiro ";"5519974263980";;;"1";"65.00";"1";"17/11/2023, 20:13:39";"17/11/2023, 20:13:39";
+"Ingrid Lima";"5519992650432";;;"6";"605.00";"6";"18/11/2023, 20:19:23";"15/06/2025, 20:09:24";
+"Caio monreal cereja";"5519992687333";;;"2";"114.00";"2";"18/11/2023, 20:50:44";"01/06/2024, 19:45:15";
+"Ariane da Silva";"5519993681229";"acerraioccodasilva@gmail.com";"09/06/1997";"1";"51.00";"1";"18/11/2023, 22:21:08";"18/11/2023, 22:21:08";"Rua Monsenhor João Ramalho, 93, (Fundo) Vila Brasil, 13875035, São João da Boa Vista/SP"
+"Pitbull do Vale";"551999669887";;;"1";"149.00";"1";"18/11/2023, 22:26:10";"18/11/2023, 22:26:10";
+"Eduardo Jorge ";"5519992581705";"eduardojorge1703@gmail.com";"17/03/1973";"2";"126.50";"2";"18/11/2023, 22:44:18";"05/04/2025, 20:51:35";"Rua Abílio Ferreira, 1, (Jd Guanabara) Jardim Guanabara, 13873095, São João da Boa Vista/SP"
+"Kemeli Stinn de Oliveira ";"5511947550626";"kemeli.stim@gmail.com";"11/07/1990";"2";"112.00";"2";"19/11/2023, 18:54:14";"16/04/2025, 18:37:21";"Rua Namen Hakim, 39, Alegre, 13874538, São João da Boa Vista/SP"
+"Julia moraes";"5519981040814";;;"1";"100.00";"1";"19/11/2023, 20:23:21";"19/11/2023, 20:23:21";
+"Sérgio Bittencourt Noronha";"5519971593488";"sergionoronhamandioca@gmail.com";"29/03/1969";"2";"170.00";"2";"19/11/2023, 20:51:59";"14/09/2024, 19:35:46";"Rua Bernadino Galhardi, 351, Jardim Serra da Paulista, 13873550, São João da Boa Vista/SP"
+"Felipe Frisanco";"5519992900343";"felipe.frisanco@gmail.com";"09/05/1992";"2";"162.00";"2";"19/11/2023, 20:55:11";"05/04/2025, 20:41:16";"Rua Pedro Bertoncelli, 771, Jardim Monte Verde, 13874842, São João da Boa Vista/SP"
+"Mariely Tonon";"5519996922031";"marielytsvet@gmail.com";"28/03/1993";"1";"75.00";"1";"19/11/2023, 21:26:47";"19/11/2023, 21:26:47";
+"Alex José de Castro";"5519992028415";"ajcbas@yahoo.com.br";"29/04/1974";"1";"48.00";"1";"20/11/2023, 20:44:59";"20/11/2023, 20:44:59";"Rua José Pradella, 6, Jardim Primeiro de Maio, 13872077, São João da Boa Vista/SP"
+"Marcos Serraiocco ";"5519992124392";;;"1";"28.00";"1";"22/11/2023, 20:43:41";"22/11/2023, 20:43:41";
+"Patricia freire ";"5519997060781";;;"1";"89.00";"1";"23/11/2023, 20:40:14";"23/11/2023, 20:40:14";
+"Fernando doval";"5519991426005";;;"1";"86.00";"1";"24/11/2023, 20:35:09";"24/11/2023, 20:35:09";
+"Marelisa Marques";"5519994145696";"marelisa.lm@gmail.com";"30/12/1999";"2";"206.00";"2";"24/11/2023, 21:04:09";"04/07/2024, 20:57:46";
+"Ana Paula Martins";"5519996003479";"anapaulajacintomartins@gmail.com";;"14";"1145.90";"14";"25/11/2023, 18:48:37";"07/02/2026, 18:55:28";"Alameda das Hortências, 1647, (Casa da Ana Paula Martins) Condomínio Fechado Morro Azul II, 13874405, São João da Boa Vista/SP"
+"Israel Dias de freitas ";"5519997821548";"israeltresirmaos@gmail.com";"31/12/1979";"3";"460.00";"3";"02/08/2024, 20:26:20";"05/10/2025, 19:05:39";"Rua Nelma Ferreira da Costa, 107, Recanto do Lago, 13874673, São João da Boa Vista/SP"
+"Bruna saavedra ";"5519989726463";;;"1";"146.00";"1";"26/11/2023, 21:54:26";"26/11/2023, 21:54:26";
+"Anna Helena Junqueira";"5519998027008";"annahjct@gmail.com";"24/08/2000";"5";"682.50";"5";"26/11/2023, 21:56:24";"19/06/2025, 19:13:36";"Rua Albina Vieira Claro, 291, (Apto 14B) Parque das Nações, 13870580, São João da Boa Vista/SP"
+"Daniela Menezes Ferreira";"5535999602006";;;"2";"85.00";"2";"29/11/2023, 18:55:49";"26/06/2025, 19:31:18";
+"Denise Cereja";"5519999007690";"decereja22@gmail.com";"22/03/1965";"42";"2734.80";"42";"01/12/2023, 20:00:30";"30/01/2026, 19:56:13";
+"Luma Cardoso ";"5519983715574";"lumahcardoso@gmail.com";;"1";"42.00";"1";"01/12/2023, 23:30:28";"01/12/2023, 23:30:28";"Rua Cristiano Osório, 140, São Lázaro, 13870430, São João da Boa Vista/SP"
+"Mateus Camargo";"5519989650298";;;"1";"91.00";"1";"02/12/2023, 19:07:13";"02/12/2023, 19:07:13";
+"Giovana alves ";"5519978246693";;;"2";"128.00";"2";"02/12/2023, 21:51:12";"08/12/2023, 22:30:55";
+"João Caetano";"5519989365275";;;"1";"118.00";"1";"02/12/2023, 22:00:10";"02/12/2023, 22:00:10";
+"Amanda Caroline de Souza";"5519994010395";"a_carolines@hotmail.com";;"4";"413.00";"4";"05/12/2023, 20:33:06";"01/01/2026, 20:44:56";"Josefina sargaco de Abreu, 40, (Casa) Reviera, São João da Boa Vista/SP"
+"Caio Reis Dias ";"5519991758744";;;"1";"96.00";"1";"05/12/2023, 21:33:48";"05/12/2023, 21:33:48";
+"Wladimir grilo ";"5519999299241";;;"11";"1566.00";"11";"06/12/2023, 20:40:10";"12/10/2025, 20:18:04";
+"Ismael Esteves";"5532999021656";;;"3";"145.00";"3";"07/12/2023, 19:21:07";"20/07/2024, 20:22:14";
+"Enzo Ferreira";"5519989969060";"fenzo894@gmail.com";"04/04/2002";"1";"85.00";"1";"07/12/2023, 20:26:39";"07/12/2023, 20:26:39";
+"Juliana Serrate";"5519988802442";"juserrate@hotmail.com";"08/02/1986";"9";"315.00";"9";"09/12/2023, 20:45:25";"18/06/2024, 19:52:39";"Rua Presidente Franklin Roosevelt, 251, (Apt 24) Perpétuo Socorro, 13870540, São João da Boa Vista/SP"
+"Cláudia Flora Degrava";"5519991929273";"claudiafloradegrava@gmail.com";;"4";"377.00";"4";"10/12/2023, 18:32:34";"28/07/2024, 18:41:50";"Rua Alberto Zerbeto, 179, Jardim Maestro Mourão, 13872588, São João da Boa Vista/SP"
+"Jhonatan lincon ";"5519996751207";;;"2";"193.00";"2";"10/12/2023, 19:38:22";"06/01/2024, 20:29:34";
+"Miguel Gomes Gouveia";"5519992886217";"miguelgomesgouveia5798@gmail.com";;"18";"1728.50";"18";"10/12/2023, 20:05:23";"06/04/2025, 19:25:58";"Rua Benedito Cavalheiro, 122, (Casa) Parque Residencial Tereza Cristina, 13876489, São João da Boa Vista/SP"
+"Marília Cassiano ";"5519981414808";;;"1";"107.00";"1";"13/12/2023, 21:10:42";"13/12/2023, 21:10:42";
+"Aline Couto ";"5519996313419";;;"1";"137.00";"1";"14/12/2023, 19:13:50";"14/12/2023, 19:13:50";
+"Rosana Silva";"5519981271749";"rodecolonha@gmail.com";"22/09/1988";"1";"110.00";"1";"14/12/2023, 19:25:59";"14/12/2023, 19:25:59";"Avenida Professora Isette Corrêa Fontão, 1711, Jardim das Flores, 13876750, São João da Boa Vista/SP"
+"Carlos Eugênio ";"5519996111982";"carloshjunior1914@hotmail.com";"14/08/1993";"9";"995.00";"9";"14/12/2023, 21:01:23";"27/10/2024, 21:46:25";"Rua Faustino Sibin, 116, Jardim Santa Helena, 13874059, São João da Boa Vista/SP"
+"Luana Maldonado ";"5519981546028";;;"2";"140.00";"2";"19/04/2025, 18:29:48";"17/10/2025, 19:44:21";
+"Leandra pereira ";"5519983175360";"leandrapereira257@gmail.com";"26/07/2000";"1";"62.00";"1";"15/12/2023, 19:45:11";"15/12/2023, 19:45:11";"Rua Manoel Molina Martins, 543, (Esquina) Vila Brasil, 13875040, São João da Boa Vista/SP"
+"Renata DAmore";"5519983055447";"renatadamore@gmail.com";"29/03/1985";"5";"726.00";"5";"15/12/2023, 19:38:21";"13/09/2024, 18:49:37";"Rua Benedito Araújo, 568, Centro, 13870090, São João da Boa Vista/SP"
+"Julia Lima";"5519992497594";;;"3";"236.00";"3";"16/12/2023, 20:33:33";"27/12/2024, 21:25:37";
+"Andryeli Vaccari";"5519992933662";"Andryelidosantos@gmail.com";"30/11/2001";"8";"634.00";"8";"16/12/2023, 21:21:16";"18/07/2025, 23:06:03";"Rua Josué Francisco Castilho, 318, Jardim Nova União, 13876288, São João da Boa Vista/SP"
+"Aline freitas ";"5519999886748";"aline_freitasoutlook.com@outlook.com";"03/05/1994";"3";"434.00";"3";"02/03/2024, 20:13:52";"08/09/2024, 19:21:43";"Rua Luiz Mathias Fernandes, 164, (Casa) Jardim Aurora, 13877058, São João da Boa Vista/SP"
+"Vinicius Ghedini";"5511986413937";;;"1";"129.00";"1";"17/12/2023, 19:28:25";"17/12/2023, 19:28:25";
+"Lucas Rubini";"5519992610065";;;"1";"55.00";"1";"17/12/2023, 20:23:48";"17/12/2023, 20:23:48";
+"Cliciane sette ";"5519991262917";;;"24";"3136.50";"24";"17/12/2023, 20:52:37";"24/06/2025, 19:16:13";
+"Thayne Lima";"5519978283191";"thayne.limas@gmail.com";"13/10/1997";"2";"164.00";"2";"17/12/2023, 21:55:10";"12/06/2024, 19:44:24";"Rua Maria de Lourdes Valim Campos, 105, Jardim Aurora, 13877056, São João da Boa Vista/SP"
+"Matheus Dogo";"5519999278248";;;"7";"475.00";"7";"18/12/2023, 22:00:40";"14/02/2026, 21:30:05";
+"Cássia Rossi ";"5519994219596";"Cassiaromera@hotmail.com";"04/06/1979";"1";"76.00";"1";"19/12/2023, 20:26:01";"19/12/2023, 20:26:01";"Rua Alfredo Censine, 42, Lagoa dos Patos, 13874099, São João da Boa Vista/SP"
+"Gilberto hussar";"5519993154382";;;"2";"72.00";"2";"20/12/2023, 19:28:50";"03/01/2024, 18:43:56";
+"Rosana Reis";"5535991895202";;;"1";"74.00";"1";"20/12/2023, 21:19:26";"20/12/2023, 21:19:26";
+"Ana Laura Forti ";"5519998765035";;;"1";"85.00";"1";"21/12/2023, 22:08:58";"21/12/2023, 22:08:58";
+"vitor palermo";"5519989564527";"vitorpalermo88@gmail.com";"05/12/1997";"4";"231.00";"4";"21/12/2023, 22:10:05";"10/08/2025, 20:55:17";"Rua Antônio Diogo de Souza, 60, Solário da Mantiqueira, 13875331, São João da Boa Vista/SP"
+"Danielle Barbosa ";"5519999537713";;;"1";"56.00";"1";"22/12/2023, 20:07:14";"22/12/2023, 20:07:14";
+"Ivanna de Souza ";"5519993028405";"ivannadesouza7@gmail.com";"26/07/1987";"1";"53.00";"1";"09/01/2024, 19:56:04";"09/01/2024, 19:56:04";"Rua Severo Augusto Pereira, 185, Vila Zanetti, 13870600, São João da Boa Vista/SP"
+"Amanda Oliveira ";"5519996246099";;;"1";"82.00";"1";"23/12/2023, 20:12:21";"23/12/2023, 20:12:21";
+"Emilly Parreira";"5519994415883";;;"1";"63.00";"1";"23/12/2023, 20:20:34";"23/12/2023, 20:20:34";
+"Micaela Fernanda ";"5519971138002";"micaelafernanda10@icloud.com";"09/04/1997";"1";"96.00";"1";"23/12/2023, 21:52:01";"23/12/2023, 21:52:01";"Rua Felipe Celestino, 30, (Apto 13 bloco D) Jardim Guanabara, 13873088, São João da Boa Vista/SP"
+"Bruno faria";"5519995356000";;;"1";"121.00";"1";"23/12/2023, 23:01:40";"23/12/2023, 23:01:40";
+"Alexandre Areão Tavares";"5519982550033";;;"1";"52.00";"1";"26/12/2023, 19:41:19";"26/12/2023, 19:41:19";
+"luciana borges";"5519991415127";"lucianazanata77@hotmail.com";"16/11/1977";"2";"179.00";"2";"26/12/2023, 20:45:04";"06/01/2024, 19:58:40";"Rua Amélia Michelazzo Penha, 921, (Casa) Jardim dos Reis, 13873206, São João da Boa Vista/SP"
+"Marília betito";"5519998619876";;;"1";"148.00";"1";"26/12/2023, 20:54:06";"26/12/2023, 20:54:06";
+"Larissa Casline";"5519999240448";;;"1";"112.00";"1";"27/12/2023, 20:00:01";"27/12/2023, 20:00:01";
+"Marilia Pinheiro";"5511942492214";"Mariliamelke@gmail.com";;"1";"66.00";"1";"27/12/2023, 20:27:24";"27/12/2023, 20:27:24";"Rua Antônio Teobaldo, 81, Jardim Boa Vista, 13874109, São João da Boa Vista/SP"
+"Camila Blazzi";"5519991103830";;;"1";"78.00";"1";"27/12/2023, 22:00:36";"27/12/2023, 22:00:36";
+"Maria Gabriela Todero Beraldo";"5519992474956";"mgabrielatb1@gmail.com";"15/03/1994";"2";"197.00";"2";"28/12/2023, 18:36:03";"07/12/2024, 21:39:07";
+"FLÁVIA BERNARDES ";"5519997752577";;;"19";"1740.40";"19";"28/12/2023, 19:33:51";"31/01/2026, 20:32:23";
+"Nina Ferreira ";"5519986122152";;;"1";"58.00";"1";"28/12/2023, 20:38:08";"28/12/2023, 20:38:08";
+"Gabrieli Silverio Hipolito";"5511995766418";"gabrielisilverio51@gmail.com";"15/05/2000";"2";"102.00";"2";"16/11/2025, 18:36:57";"03/02/2026, 22:27:00";"Rua Coronel Procópio, 255, Cristiano Ozório, 37701032, Poços de Caldas/MG"
+"Jucelia Oliveira Constantino";"5519992255323";"juolicon@hotmail.com";"15/02/1971";"1";"68.00";"1";"29/12/2023, 20:15:17";"29/12/2023, 20:15:17";"Rua Palmira Maria de Souza, 2045, Jardim dos Ipês I, 13876593, São João da Boa Vista/SP"
+"Carol Berganholo ";"5519989137377";;;"1";"85.00";"1";"29/12/2023, 19:13:07";"29/12/2023, 19:13:07";"Rua Henrique Martarello, 3091, (Casa) Loteamento Portal da Aliança, 13876682, São João da Boa Vista/SP"
+"Lucas Sarra";"5543999248268";;;"1";"95.00";"1";"29/12/2023, 19:23:02";"29/12/2023, 19:23:02";
+"Emanuele Santos ";"5519993310399";"manuzinha029@gmail.com";;"6";"664.00";"6";"29/12/2023, 19:38:23";"05/12/2024, 19:56:21";"Rodovia São João Águas da Prata, Antiga Serta Colchões, 00, (00) 00, São João da Boa Vista/SP"
+"Kessy anne Gomes";"5519997357575";"kessy.gomes0604@gmail.com";"06/01/1992";"2";"300.00";"2";"29/12/2023, 21:39:19";"06/06/2024, 20:51:37";"Rua Orlando Fracari, 730, (Pronto socorro) Jardim Recanto do Bosque, 13874423, São João da Boa Vista/SP"
+"Luciano Souza";"5519993682708";;;"2";"235.00";"2";"29/12/2023, 22:21:15";"06/01/2024, 22:50:23";
+"Eliziane Castilho ";"5519993453777";"eliziane@peixesmeggs.com.br";"08/12/1974";"3";"466.97";"3";"30/12/2023, 22:13:31";"17/02/2026, 21:14:41";"Rua Joel Lisboa Biotto, 781, (Condomínio Valle do Prata) Terras de São José, 13874822, São João da Boa Vista/SP"
+"Vinicius Guedes";"5519999885202";;;"1";"106.00";"1";"30/12/2023, 23:10:31";"30/12/2023, 23:10:31";
+"Karoline Borges";"5519989670575";"karolzinha.500@gmail.com";"14/03/1995";"2";"237.00";"2";"02/01/2024, 18:45:23";"26/09/2024, 18:28:27";"Rua Santa Maria, 584, (Portão preto) Vila Brasil, 13875029, São João da Boa Vista/SP"
+"Abner marques ";"5519993590776";;;"1";"84.00";"1";"02/01/2024, 20:22:46";"02/01/2024, 20:22:46";
+"Natan Sousa ";"5535984726095";;;"1";"94.00";"1";"03/01/2024, 22:02:16";"03/01/2024, 22:02:16";
+"Danielle Brandão";"5512988065147";;;"1";"34.00";"1";"04/01/2024, 18:30:00";"04/01/2024, 18:30:00";
+"Michelle Bruscagin";"5519911999953";;;"2";"170.00";"2";"04/01/2024, 20:01:04";"12/01/2024, 20:48:01";
+"Luiz Otávio Lopes ruela ";"5519983632478";;;"2";"155.00";"2";"05/01/2024, 19:52:27";"28/03/2024, 21:27:25";
+"Rafael quintino ";"5519982797700";;;"1";"115.00";"1";"06/01/2024, 19:44:25";"06/01/2024, 19:44:25";
+"Willian Almeida";"5511967824138";;;"1";"89.00";"1";"06/01/2024, 20:24:45";"06/01/2024, 20:24:45";
+"Ana Paula de Souza ";"5519994471585";;;"2";"316.00";"2";"07/01/2024, 19:14:06";"26/05/2024, 18:04:33";
+"Rosangela Bernardes ";"5519999230260";;;"3";"179.00";"3";"07/01/2024, 19:47:32";"05/02/2026, 18:30:12";
+"Patrícia Rosarin Alves";"5519981388650";"rosarinalvespatricia@gmail.com";"03/08/1989";"2";"79.00";"2";"09/01/2024, 19:48:49";"11/04/2025, 21:05:33";"Arlindo Morandini, 218, (Apto 03) Já Santiago, São João da Boa Vista/SP"
+"Nubia Rafaela ";"5519995151832";;;"5";"190.00";"5";"09/01/2024, 20:34:37";"09/08/2024, 21:59:20";
+"thomas fernandes";"5519991272763";;;"1";"68.00";"1";"09/01/2024, 21:42:22";"09/01/2024, 21:42:22";
+"Sílvia Silva ";"5519995829872";;;"2";"237.00";"2";"12/01/2024, 20:30:59";"21/04/2024, 19:18:00";
+"Vanessa Pesoti ";"5535984575961";;;"1";"47.00";"1";"12/01/2024, 21:48:21";"12/01/2024, 21:48:21";
+"João Batista Domingos Filho ";"5519984271772";;;"1";"92.00";"1";"13/01/2024, 18:53:37";"13/01/2024, 18:53:37";
+"Elisabeth Grilo";"5519991050343";;;"1";"53.00";"1";"13/01/2024, 19:34:16";"13/01/2024, 19:34:16";
+"Fernanda Juliari";"5519994930903";"fernandajuliari70@gmail.com";"16/07/1998";"1";"119.00";"1";"13/01/2024, 21:28:01";"13/01/2024, 21:28:01";"Rua Benedito Vaz Rodrigues, 158, Jardim Nova República (2ª Etapa), 13875260, São João da Boa Vista/SP"
+"Heloísa Forti ";"5519996304222";;;"3";"322.50";"3";"13/01/2024, 21:32:08";"01/02/2024, 19:29:53";
+"Philipe Cardozo";"5511983693441";"phi.lopes@gmail.com";"30/10/1987";"1";"84.00";"1";"13/01/2024, 22:55:01";"13/01/2024, 22:55:01";"Rua Quatorze de Julho, 331, Vila Conrado, 13870742, São João da Boa Vista/SP"
+"Giovanna Carolini Pereira ";"5519995153749";;;"4";"523.00";"4";"14/01/2024, 21:43:00";"20/12/2024, 19:47:58";
+"Poliane Silva ";"5511962532035";"polianemsilva01@gmail.com";"09/05/1998";"18";"1763.40";"18";"17/01/2024, 20:49:28";"13/02/2026, 20:57:46";"Rua Benedito Peres Castro, 682, Jardim Aurora, 13877026, São João da Boa Vista/SP"
+"Marcia Alvarez";"5519996481989";;;"2";"175.00";"2";"19/01/2024, 18:20:31";"12/05/2024, 18:26:26";
+"Natália Cunha";"5519981352558";;;"1";"110.00";"1";"19/01/2024, 19:45:24";"19/01/2024, 19:45:24";
+"Marcella Pavim ";"5519992274603";"marcella.pavim@gmail.com";"08/02/1992";"1";"48.00";"1";"19/01/2024, 21:04:48";"19/01/2024, 21:04:48";"Rua Sebastião Pessoa de Almeida, 87, Jardim Primavera, 13876818, São João da Boa Vista/SP"
+"Bruno Masteguin";"5519997795819";;;"1";"42.00";"1";"19/01/2024, 20:46:11";"19/01/2024, 20:46:11";
+"Sandra Pinheiro de Carvalho ";"5511985557669";;;"4";"318.00";"4";"20/01/2024, 19:31:56";"20/07/2024, 20:23:10";
+"Leandro Gimenes ";"5519993095844";;;"1";"74.00";"1";"20/01/2024, 20:25:52";"20/01/2024, 20:25:52";
+"Vinicius Rocha ";"5527996000608";;;"1";"48.00";"1";"20/01/2024, 20:34:31";"20/01/2024, 20:34:31";
+"Stephany Carolane ";"5519993523093";;;"1";"110.00";"1";"20/01/2024, 20:37:17";"20/01/2024, 20:37:17";
+"Jaqueline Valentim ";"5519993780650";;;"1";"131.00";"1";"20/01/2024, 20:39:46";"20/01/2024, 20:39:46";
+"Lucas teuxeira";"5519981411752";;;"3";"278.00";"3";"01/02/2024, 21:18:43";"26/03/2024, 20:54:47";
+"Cristiane Menato";"5519991490445";"crisam_cons@yahoo.com.br";"23/06/1984";"1";"98.00";"1";"21/07/2024, 19:22:01";"21/07/2024, 19:22:01";"Rua Valter Nora Teodoro, 15, (C13) Residencial das Macaubeiras, 13874068, São João da Boa Vista/SP"
+"Cristiane Menato";"551991490445";;;"1";"195.00";"1";"21/01/2024, 19:51:41";"21/01/2024, 19:51:41";
+"Renan Lacerda";"5519971233586";;;"1";"105.00";"1";"21/01/2024, 21:31:37";"21/01/2024, 21:31:37";
+"Gelder Matielo";"5519992112183";"gelder.matielo@gmail.com";"21/11/1988";"3";"190.00";"3";"21/01/2024, 21:57:00";"14/04/2024, 21:03:07";"Rua José Teodoro de Faria, 43, Parque Residencial Jardim São Domingos, 13874242, São João da Boa Vista/SP"
+"Cynthia miranda";"5535998744257";;;"2";"144.00";"2";"23/01/2024, 18:33:43";"17/02/2024, 18:18:39";
+"Simone Jonas";"5519976054780";"simonejonas@gmail.com";;"1";"106.00";"1";"23/01/2024, 19:42:28";"23/01/2024, 19:42:28";"Rua Elvira Fanelli Galli, 583, Jardim Vila Rica, 13876151, São João da Boa Vista/SP"
+"Lucas Amorim ";"5519993198307";;;"1";"55.00";"1";"24/01/2024, 19:19:39";"24/01/2024, 19:19:39";
+"Stephany Fernandes ";"5519996242398";;;"2";"100.00";"2";"24/01/2024, 21:13:58";"06/03/2024, 22:38:02";
+"Laura Rehder ";"5519997792728";;;"1";"42.00";"1";"26/01/2024, 18:43:18";"26/01/2024, 18:43:18";
+"Fausto Lourenco";"5519987472456";;;"1";"78.00";"1";"26/01/2024, 20:13:01";"26/01/2024, 20:13:01";
+"Mary Viana ";"5519991169243";;;"1";"98.00";"1";"26/01/2024, 20:28:16";"26/01/2024, 20:28:16";
+"Bruna Rodrigues";"5519971664708";"brunappr.rodrigues@gmail.com";"12/10/2006";"6";"699.00";"6";"26/01/2024, 20:53:22";"09/02/2025, 18:44:56";"Rua Chico Xavier, 178, Residencial Fazenda das Areias, 13876195, São João da Boa Vista/SP"
+"Fernando Pessuti ";"5512991807081";;;"3";"149.00";"3";"26/01/2024, 20:54:02";"28/01/2024, 20:35:10";
+"Beatriz Paulino";"5519998479234";"paulinobeatriz64@gmail.com";"22/12/2004";"1";"128.00";"1";"26/01/2024, 21:27:46";"26/01/2024, 21:27:46";
+"Danilo Evaristo";"5519981537303";;;"1";"65.00";"1";"28/01/2024, 18:30:46";"28/01/2024, 18:30:46";
+"Bianca Besse";"5519992143314";;;"1";"38.00";"1";"28/01/2024, 19:33:28";"28/01/2024, 19:33:28";
+"Suelen Vital";"5519998996865";;;"1";"76.00";"1";"28/01/2024, 19:35:03";"28/01/2024, 19:35:03";
+"Luiz Eduardo Aurilietti ";"5519998426162";;;"1";"63.50";"1";"28/01/2024, 20:03:23";"28/01/2024, 20:03:23";
+"Netto Souza";"5519996348809";;;"1";"81.00";"1";"28/01/2024, 20:15:24";"28/01/2024, 20:15:24";
+"Pamela Passoni ";"5519991857706";"pamelapassoni@icloud.com";"16/02/1989";"29";"3254.50";"29";"28/01/2024, 21:00:17";"14/12/2025, 21:52:05";"Rua Vitório Nalli, 163, (Casa) Jardim Vila Rica, 13876170, São João da Boa Vista/SP"
+"Elder Sousa";"5519982714809";;;"1";"123.00";"1";"30/01/2024, 19:53:22";"30/01/2024, 19:53:22";
+"Juliana Borges";"5519994569005";"juborges07@gmail.com";"02/05/1990";"2";"239.50";"2";"31/01/2024, 20:56:23";"21/02/2026, 20:26:22";
+"Thamires Teodoro ";"5519992345115";;;"1";"97.00";"1";"31/01/2024, 21:09:30";"31/01/2024, 21:09:30";
+"Pe Henrique";"5513997713283";;;"1";"60.00";"1";"02/02/2024, 19:54:18";"02/02/2024, 19:54:18";
+"Deborah Zema";"5519999710009";"zemapsicologiainfantil@gmail.com";"17/03/1981";"1";"36.00";"1";"03/02/2024, 20:31:08";"03/02/2024, 20:31:08";"Rua Doutor João Batista Figueiredo Costa, 433, Jardim Canadá, 13874280, São João da Boa Vista/SP"
+"Joao Gabriel ";"551999942470";"gabrieljoao1998@gmail.com";;"1";"82.00";"1";"03/02/2024, 21:54:08";"03/02/2024, 21:54:08";
+"Elton Garcia ";"5519993834585";;;"1";"138.00";"1";"04/02/2024, 19:06:22";"04/02/2024, 19:06:22";
+"Roberson Aparecido ";"553599952158";;;"1";"60.00";"1";"04/02/2024, 19:45:41";"04/02/2024, 19:45:41";
+"Guilherme Bernardes ";"5519991053348";;;"1";"153.00";"1";"04/02/2024, 19:57:07";"04/02/2024, 19:57:07";
+"verônica zanetti";"5519989881401";"vzanetti386@gmail.com";"18/08/2004";"1";"127.00";"1";"04/02/2024, 22:13:04";"04/02/2024, 22:13:04";"Rua Coronel José Procópio, 1393, (casa) Santo Antônio, 13871205, São João da Boa Vista/SP"
+"Carmen Hess Pereira ";"5519996942928";;;"1";"71.00";"1";"09/02/2024, 19:17:21";"09/02/2024, 19:17:21";
+"Bruno Nogueira";"5519994510505";;;"1";"117.00";"1";"09/02/2024, 20:51:39";"09/02/2024, 20:51:39";
+"Susan Junqueira ";"5519992871815";"susan_junqueira@yahoo.com.br";"09/11/1981";"1";"42.00";"1";"10/02/2024, 20:49:29";"10/02/2024, 20:49:29";"Rua São Marcos, 200, Jardim Bela Vista, 13871108, São João da Boa Vista/SP"
+"Daniela Reis";"5519982853030";"danielavalla.reis@gmail.com";;"3";"278.00";"3";"13/02/2024, 19:14:27";"20/06/2024, 18:14:15";"Rua Valentim Peres, 49, (Casa) Parque das Nações, 13870581, São João da Boa Vista/SP"
+"Tania Buscariolli";"5519981695503";;;"1";"119.00";"1";"13/02/2024, 20:38:49";"13/02/2024, 20:38:49";
+"Evandro Toledo";"5519997208337";"evandroluiztoledo@gmail.com";"14/08/1987";"1";"107.00";"1";"17/02/2024, 19:33:11";"17/02/2024, 19:33:11";"Rua Azulão, 239, Recanto da Serra, 13873461, São João da Boa Vista/SP"
+"Waldi Binatti Júnior";"5519983111312";"waldijr@gmail.com";"11/09/1972";"1";"111.00";"1";"17/02/2024, 20:11:59";"17/02/2024, 20:11:59";"Rua Frederico Blasi, 59, Jardim Primeiro de Maio, 13872030, São João da Boa Vista/SP"
+"Ana Carolina Guerreiro Garcia";"5519981652867";;;"1";"119.80";"1";"17/10/2025, 19:24:17";"17/10/2025, 19:24:17";
+"Eduardo Juliare";"5519992695928";;;"1";"86.00";"1";"18/02/2024, 20:01:54";"18/02/2024, 20:01:54";
+"Jhow Jesus";"5519999206349";;;"1";"14.00";"1";"20/02/2024, 20:10:42";"20/02/2024, 20:10:42";
+"isabella castro";"5519997188939";;;"1";"24.00";"1";"22/02/2024, 19:34:34";"22/02/2024, 19:34:34";
+"Jonathas Batista ";"5519989149424";;;"1";"59.00";"1";"22/02/2024, 20:20:56";"22/02/2024, 20:20:56";
+"Maria Eduarda Gabriel";"5519992451936";"gabrielmariaeduarda16@gmail.com";"18/05/2001";"2";"169.00";"2";"10/08/2024, 20:21:17";"19/10/2024, 20:31:14";
+"Maria Clara Seffrin";"5512981516050";"mcseffrin@gmail.com";;"1";"167.00";"1";"01/06/2024, 18:34:51";"01/06/2024, 18:34:51";"Rua Victório Peneluppi, 115, Jardim das Colinas, 12242150, São José dos Campos/SP"
+"Isabella Damasceno ";"5519992326576";"isadamaseno@gmail.com";"02/07/1999";"9";"822.00";"9";"24/02/2024, 18:55:18";"21/12/2025, 18:56:04";"Rua Claudinei Antonio Pereira, 322, (Casa) Jardim dos Jacarandás Fase 1, 13877080, São João da Boa Vista/SP"
+"Isabela Purcino";"5535984440844";;"14/10/1991";"2";"172.49";"2";"29/02/2024, 18:35:28";"24/01/2026, 19:28:04";
+"Tainá Romeiro ";"5519986093731";;;"3";"222.50";"3";"01/03/2024, 20:00:56";"21/08/2024, 20:40:02";
+"Ana Lívia Reis ";"5519997060030";;;"1";"91.00";"1";"02/03/2024, 19:26:16";"02/03/2024, 19:26:16";
+"Sônia reis";"5519998088507";;;"24";"1141.99";"24";"02/03/2024, 19:54:16";"12/01/2026, 20:42:45";
+"Felipe silva de barros";"5519994181543";"felipe.siilva0118@gmail.com";"22/05/1996";"1";"100.00";"1";"02/03/2024, 21:14:27";"02/03/2024, 21:14:27";"Rua Armando Moretto, 121, (Casa de esquina) Jardim Aurora, 13877054, São João da Boa Vista/SP"
+"Julya da Silva Cruz";"5519997204973";"julyadasilvacruzsilva@gmail.com";"10/05/2007";"1";"41.00";"1";"03/03/2024, 19:41:53";"03/03/2024, 19:41:53";"Rua José Luis Yasbeck David, 217, (Casa) Jardim Almeida, 13876351, São João da Boa Vista/SP"
+"Fernando rodrigues";"5519993220452";"Fr470815@gmail.com";"27/09/2002";"1";"56.00";"1";"03/03/2024, 21:06:16";"03/03/2024, 21:06:16";"Rua Monsenhor João Ramalho, 802, Vila Brasil, 13875035, São João da Boa Vista/SP"
+"DIANE Borges ";"5519997939268";"dianeborges737@gmail.com";;"7";"360.00";"7";"07/03/2024, 18:06:31";"08/11/2025, 20:30:40";
+"Gustavo Castro";"5519994427505";"gustavocastro.gcf@gmail.com";"04/06/1993";"2";"114.00";"2";"07/03/2024, 19:43:45";"16/02/2025, 19:24:17";"Rua Dorival Blota, 85, (Apto 04) Jardim Nova São João, 13874134, São João da Boa Vista/SP"
+"Janaina paina ";"5519992562323";;;"3";"209.50";"3";"08/03/2024, 20:59:57";"17/02/2026, 18:21:18";
+"Letusa Valero";"5519993259916";"letusa.valero@gmail.com";"27/11/1986";"1";"98.00";"1";"03/08/2025, 20:11:16";"03/08/2025, 20:11:16";"Rua Comendador Antônio Nagib Ibrahim, 140, (83C) Núcleo Habitacional Brigadeiro Faria Lima, 13345350, Indaiatuba/SP"
+"Beatriz Aguiar ";"5519994543522";;;"1";"108.00";"1";"09/03/2024, 21:33:59";"09/03/2024, 21:33:59";
+"Égles Viana";"5519997637866";;;"1";"39.00";"1";"13/03/2024, 18:46:22";"13/03/2024, 18:46:22";
+"Alexandre Mariano ";"5511973464020";;;"1";"121.00";"1";"15/03/2024, 19:45:53";"15/03/2024, 19:45:53";
+"Isabela Rezende";"5519991026969";"isabelareende8@gmail.com";"25/11/2001";"13";"1442.00";"13";"15/03/2024, 21:20:41";"16/04/2025, 21:38:39";"Avenida Guilherme Guerreiro, 381, Jardim Industrial, 13872334, São João da Boa Vista/SP"
+"Anna Julia Moreira Lopes";"5519999861523";;;"1";"97.00";"1";"17/03/2024, 21:50:36";"17/03/2024, 21:50:36";
+"Dani Bordão ";"5519988404017";;"20/08/1985";"1";"67.50";"1";"29/11/2025, 20:39:26";"29/11/2025, 20:39:26";"Rua Alceu Batista, 771, (casa) Jardim das Tulipas, 13876875, São João da Boa Vista/SP"
+"Vanessa Aulicinio";"5519982907541";;;"1";"139.00";"1";"21/03/2024, 19:16:00";"21/03/2024, 19:16:00";
+"Stephanie balbino";"5519994045852";"balbinoteh@gmail.com";"27/12/1994";"1";"105.00";"1";"22/03/2024, 19:13:16";"22/03/2024, 19:13:16";"Rua Lauro Godoy, 96, São Benedito, 13871003, São João da Boa Vista/SP"
+"Letícia Gonçalves Costa";"5519993608834";;;"1";"117.00";"1";"22/03/2024, 19:33:38";"22/03/2024, 19:33:38";
+"Ana Paula Ferreira ";"5519982110148";;;"5";"732.50";"5";"22/03/2024, 19:46:14";"24/10/2025, 19:24:32";
+"Lenita Camargo";"5519992720027";"Lenita.verdurico@unifeob.pro.br";"08/03/1985";"1";"100.00";"1";"21/04/2024, 18:49:02";"21/04/2024, 18:49:02";"Rua José Orlando, 255, Parque Jequitibás, 13874449, São João da Boa Vista/SP"
+"Patrícia Lourenço ";"5519994514423";;;"1";"103.00";"1";"23/03/2024, 19:06:20";"23/03/2024, 19:06:20";
+"Nathalia Vaz de lima";"5519981390977";;;"1";"61.00";"1";"23/03/2024, 19:32:58";"23/03/2024, 19:32:58";
+"Rogerio Votick";"5519992704120";;"03/03/1987";"1";"59.00";"1";"23/03/2024, 21:29:17";"23/03/2024, 21:29:17";
+"Iris Tomaz";"5519989789047";"iristomaz77@gmail.com";"07/07/2000";"1";"104.00";"1";"19/07/2024, 22:32:56";"19/07/2024, 22:32:56";
+"Orlando Cecilio";"5519996421513";;;"1";"66.00";"1";"26/03/2024, 20:18:04";"26/03/2024, 20:18:04";
+"Francielli Lopes ";"5519981623672";;;"1";"85.00";"1";"26/03/2024, 20:32:23";"26/03/2024, 20:32:23";
+"Renato tauil de Sousa ";"5519982749144";;;"1";"91.00";"1";"26/03/2024, 20:37:27";"26/03/2024, 20:37:27";
+"Jorge Luís braz";"5519996288555";;;"1";"99.50";"1";"30/03/2024, 19:00:55";"30/03/2024, 19:00:55";
+"Roberto Chaves";"5519983135021";;;"3";"273.00";"3";"30/03/2024, 19:28:22";"06/04/2025, 19:31:10";
+"Luana aranha";"5511986717716";"luanarossi.sp@gmail.com";"09/04/1978";"1";"96.00";"1";"31/03/2024, 18:28:00";"31/03/2024, 18:28:00";"Rua Colibri, 83, Jardim Recanto dos Pássaros, 13873504, São João da Boa Vista/SP"
+"Rafael Henrique Rodrigues Marcelino";"5519991979769";"rafael.marcelino@sou.fae.br";;"2";"270.00";"2";"31/03/2024, 20:17:30";"12/05/2024, 20:47:57";"Rua João Tonizza, 76, Jardim São Nicolau, 13876139, São João da Boa Vista/SP"
+"Fabio Serraiocco";"5519982423300";"serraioccojr@gmail.com";"18/05/1988";"8";"654.00";"8";"31/03/2024, 21:34:08";"11/10/2024, 21:15:44";"Rua Antenor Diogo de Souza, 2165, (Atenção ao número da casa) Jardim Itália, 13872550, São João da Boa Vista/SP"
+"Bruna da Silva ";"5519992791518";;;"3";"225.00";"3";"21/06/2024, 22:25:05";"10/08/2024, 22:33:27";
+"Tatiane Cristina da Silva ";"5519995413652";;;"2";"195.00";"2";"05/04/2024, 19:19:53";"21/09/2024, 20:45:12";
+"Laura Valim ";"5519991297541";;;"2";"417.90";"2";"06/04/2024, 20:22:14";"10/08/2025, 19:25:45";
+"Henrique soares";"5519983383658";"rickmantiqueira@icloud.com";"28/04/1985";"5";"362.00";"5";"06/04/2024, 22:05:21";"02/06/2024, 21:34:15";"Rua João Azevedo Sobrinho, 363, (Casa) Solário da Mantiqueira, 13875360, São João da Boa Vista/SP"
+"Tais Gonçalves ";"5519993109865";"taishelena1903@gmail.com";;"1";"85.00";"1";"07/04/2024, 20:27:44";"07/04/2024, 20:27:44";"Rua Benedito Borges de Carvalho, 32, (Apto 15) Loteamento Parque Alvorada, 13874870, São João da Boa Vista/SP"
+"Emily Tassoni ";"5519983453204";"tassoniemily@gmail.com";"11/12/2000";"3";"266.00";"3";"27/10/2024, 20:08:46";"04/01/2025, 20:52:54";"Rua João Pessoa, 161, Vila Oriental, 13870676, São João da Boa Vista/SP"
+"Mary Silva";"5519987522356";"cristinedesouzaesilva@gmail.com";"20/03/1991";"3";"212.50";"3";"07/04/2024, 21:54:48";"24/10/2024, 22:01:25";"Rua Ângelo Roqueto, 221, (Fundos) Jardim Recanto do Jaguari, 13872218, São João da Boa Vista/SP"
+"Yasmin Taú ";"5519995359349";;;"1";"38.00";"1";"09/04/2024, 19:51:31";"09/04/2024, 19:51:31";
+"Gabriel santos";"5535991311416";"gce9550@gmail.com";;"2";"176.00";"2";"12/04/2024, 23:03:03";"06/06/2024, 21:21:20";"Rua Benedito Borges de Carvalho, 32, (Interfonar 205) Loteamento Parque Alvorada, 13874870, São João da Boa Vista/SP"
+"Aline Lemes";"5519991025843";"alinelemes370@gmail.com";"12/10/1989";"5";"510.00";"5";"12/04/2024, 19:14:52";"14/09/2025, 21:58:54";"Rua Osvaldo Cruz de Paiva Oliveira, 360, (Casa da esquina está sem) Jardim Nova União, 13876287, São João da Boa Vista/SP"
+"Noely Parreira";"5519982466214";;"14/07/1976";"1";"41.00";"1";"12/04/2024, 19:56:23";"12/04/2024, 19:56:23";"Rua Dimas Lopes Rezende, 122, Recanto da Serra, São João da Boa Vista/SP"
+"Carolina Ferreira ";"5519993663087";;;"1";"87.00";"1";"12/04/2024, 21:36:02";"12/04/2024, 21:36:02";
+"Thaís Trevisani";"5519997696104";;"07/01/1993";"1";"79.00";"1";"20/07/2025, 19:58:42";"20/07/2025, 19:58:42";"Rua Pedro Dragão Cristaneli, 220, (casa) Jardim Monte Verde, 13874838, São João da Boa Vista/SP"
+"Silvia Alves ";"5535988079490";;;"1";"102.00";"1";"13/04/2024, 19:29:27";"13/04/2024, 19:29:27";
+"Eduardo Rodrigues ";"5519982338469";;"12/08/1999";"9";"601.50";"9";"25/10/2024, 22:48:14";"27/09/2025, 22:45:08";
+"Arturo Kelmer";"5519993849306";;;"14";"623.00";"14";"13/04/2024, 22:32:37";"08/03/2025, 22:43:42";
+"Ricardo Carvalho";"5519998600209";;"02/01/1980";"1";"42.00";"1";"13/04/2024, 22:57:54";"13/04/2024, 22:57:54";
+"Thais Tavares ";"5519992785465";;;"3";"315.00";"3";"13/04/2024, 23:09:27";"09/07/2025, 20:04:19";
+"Anderson Ferro";"5511973512866";;;"2";"152.00";"2";"16/04/2024, 20:19:58";"05/07/2025, 20:34:25";
+"Ana Lívia Reis São Pedro";"5555997060030";"analiviareissp@gmail.com";;"1";"62.00";"1";"17/04/2024, 19:04:59";"17/04/2024, 19:04:59";"Rua 8, 2148, Zona Central, 13500210, Rio Claro/SP"
+"Maria Eduarda Gasparim ";"5519986011688";"gasparimmariaeduarda@gmail.com";"15/12/2003";"1";"117.00";"1";"18/04/2024, 20:04:02";"18/04/2024, 20:04:02";"Rua José Luis Yasbeck David, 634, Jardim Flamboyant, 13876622, São João da Boa Vista/SP"
+"Luciano dos Santos Zanetti ";"5519997862086";;"15/08/1977";"1";"114.00";"1";"19/04/2024, 23:12:42";"19/04/2024, 23:12:42";"Rua Leonildes Chaves, 126, Recanto da Serra, 13873469, São João da Boa Vista/SP"
+"Silvia Maria Viana";"5519992680350";;;"1";"114.00";"1";"20/04/2024, 18:32:32";"20/04/2024, 18:32:32";
+"Paulo Magalhães ";"5519997615386";;;"1";"118.00";"1";"20/04/2024, 19:45:52";"20/04/2024, 19:45:52";
+"Heloísa Helena ";"5519992007222";;;"3";"218.00";"3";"21/04/2024, 18:09:15";"01/09/2024, 19:29:02";
+"Maria Júlia ";"5519995946366";"Massocamariajulia@gmail.com";"04/04/2002";"1";"40.00";"1";"23/04/2024, 18:50:59";"23/04/2024, 18:50:59";"Rua Prudente de Moraes, 511, Centro, 13870050, São João da Boa Vista/SP"
+"Matheus Batista ";"5519982963367";;;"3";"356.00";"3";"26/04/2024, 18:41:01";"28/03/2025, 19:05:23";
+"Regina Vasconcellos ";"5519997278101";"regina.vasconcellos@uol.com.br";"30/09/1960";"1";"206.00";"1";"27/04/2024, 20:15:55";"27/04/2024, 20:15:55";"Rua Nagib Miguel, 4115, (Alameda Diamante 128) Jardim Recanto do Bosque, 13874439, São João da Boa Vista/SP"
+"Caio Cassiano ";"5519998341300";"caio11.cassiano@hotmail.com";"14/06/1996";"1";"98.00";"1";"27/04/2024, 20:17:05";"27/04/2024, 20:17:05";"Rua José Teodoro de Faria, 50, (Casa) Parque Residencial Jardim São Domingos, 13874242, São João da Boa Vista/SP"
+"Ivan Clientelegal";"5519997111909";;;"1";"38.00";"1";"27/04/2024, 20:56:17";"27/04/2024, 20:56:17";
+"André Bittar";"5519998378960";;;"7";"693.00";"7";"27/04/2024, 21:03:38";"26/04/2025, 19:29:49";
+"Susan Audrie";"5519981445618";;"06/09/1980";"1";"84.00";"1";"30/04/2024, 20:37:09";"30/04/2024, 20:37:09";"Rua Edésio Tódero, 987, (Chácara) Jardim das Tulipas, 13876880, São João da Boa Vista/SP"
+"Luana Courel";"5519983512210";;;"1";"42.00";"1";"30/04/2024, 22:18:23";"30/04/2024, 22:18:23";
+"Giovana Santos";"5519992798411";;;"1";"56.00";"1";"02/05/2024, 18:09:36";"02/05/2024, 18:09:36";
+"Michelle Moraes";"5519998681963";"mizinha.cmm@gmail.com";;"1";"189.99";"1";"03/05/2024, 19:31:53";"03/05/2024, 19:31:53";"Rua Custódio Ribeiro Borges, 295, Jardim Nova São João, 13874145, São João da Boa Vista/SP"
+"Augusto Silva ";"5519997090405";;;"1";"84.00";"1";"04/05/2024, 19:18:50";"04/05/2024, 19:18:50";
+"Guilherme Suano Silva";"5519993045074";;;"1";"38.00";"1";"05/05/2024, 20:01:48";"05/05/2024, 20:01:48";
+"Francielly Turati";"5519994041860";;"23/02/1995";"3";"329.50";"3";"05/05/2024, 20:02:35";"05/04/2025, 21:20:33";
+"Aline siqueira";"5535999196438";;;"1";"84.00";"1";"16/03/2025, 18:24:38";"16/03/2025, 18:24:38";
+"Leandro Betti";"5519983187562";;;"3";"304.00";"3";"10/05/2024, 18:42:47";"23/11/2024, 20:27:41";
+"Kamila lima";"5519993527173";;;"1";"90.00";"1";"11/05/2024, 21:28:09";"11/05/2024, 21:28:09";
+"Solange da Silva Cassemiro Santos ";"5519983985269";"solangecassemiro2017@gmail.com";"03/06/1978";"1";"104.00";"1";"12/05/2024, 18:39:45";"12/05/2024, 18:39:45";
+"Flávia grilo ";"5519998342320";;;"2";"202.97";"2";"16/05/2024, 20:03:07";"08/01/2026, 10:50:17";
+"Paulo zanelli ";"5519995976804";;;"2";"182.00";"2";"16/05/2024, 21:15:19";"26/07/2024, 22:28:48";
+"Bernadete Maggi Esbrile Moraes ";"5519997057877";;;"3";"563.00";"3";"19/05/2024, 18:06:41";"14/09/2024, 18:52:21";
+"Julia Rizzo";"5519988750204";;;"1";"53.00";"1";"19/05/2024, 20:17:54";"19/05/2024, 20:17:54";
+"Raphael Rodrigues ";"5519994157825";"rprodrigues92@gmail.com";"27/01/1992";"4";"517.00";"4";"19/05/2024, 20:21:45";"30/05/2025, 20:11:14";"Avenida Lázaro Pio Magalhães, 164, Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Jessica Silva";"5519993030967";;"16/09/1992";"1";"89.00";"1";"19/05/2024, 21:07:45";"19/05/2024, 21:07:45";"Estrada Luiz Renato Nascimento, 530, (Salão 3) Jardim Mirandola, 13478840, Americana/SP"
+"Gabriela Menegatti";"5519988939669";;"02/07/2003";"1";"122.00";"1";"22/05/2024, 19:57:57";"22/05/2024, 19:57:57";"Rua Maurílio Álvares, 123, (Fundos) Vila Valentin, 13873060, São João da Boa Vista/SP"
+"Júnior Combe ";"551997767886";;;"1";"43.00";"1";"24/05/2024, 18:33:24";"24/05/2024, 18:33:24";
+"Maria Emília Das Neves";"5519992375300";"mariamariadasneves19@gmail.com";;"1";"87.00";"1";"25/05/2024, 18:53:20";"25/05/2024, 18:53:20";"Rua Orlando Andrade Rezende, 366, (Casa) Jardim Maestro Mourão, 13872580, São João da Boa Vista/SP"
+"Thiago Osmar";"5519992772597";;;"1";"124.00";"1";"25/05/2024, 20:50:53";"25/05/2024, 20:50:53";
+"Larissa Oliveira";"5573991972445";;"18/03/1999";"1";"129.00";"1";"26/05/2024, 19:03:37";"26/05/2024, 19:03:37";"Rua Mato Grosso, 45, (Apt) Vila Fleming, 13876040, São João da Boa Vista/SP"
+"Kelly Ribeiro";"5512981466645";"cdkellyribeiro@gmail.com";"03/07/1992";"1";"61.90";"1";"10/10/2025, 19:04:16";"10/10/2025, 19:04:16";"Rua Padre José, 30, Centeo, São João da Boa Vista/SP"
+"Patrick Nicezi";"5519993912304";"patrickk0806@gmail.com";"08/06/1998";"1";"68.00";"1";"09/09/2025, 19:21:06";"09/09/2025, 19:21:06";"Rua Sebastião Camargo, 69, Jardim Crepúsculo, 13875286, São João da Boa Vista/SP"
+"Janaina Piovesana ";"5519981866670";;;"1";"148.00";"1";"29/05/2024, 21:02:54";"29/05/2024, 21:02:54";
+"Andrea Voltareli";"5519974126507";"andreavoltareli81@gmail.com";"18/02/1988";"9";"1154.00";"9";"30/05/2024, 19:19:34";"05/07/2025, 20:53:10";"Rua Maria de Lourdes de Abreu Canela, 23, (Casa) Loteamento Portal da Aliança, 13876692, São João da Boa Vista/SP"
+"Rodolfo Herrera";"5519994455708";;;"1";"129.00";"1";"30/05/2024, 19:21:35";"30/05/2024, 19:21:35";
+"Ramon Alex Garcia";"5541992146885";;;"1";"249.50";"1";"30/05/2024, 19:25:04";"30/05/2024, 19:25:04";
+"Geysi madielly";"5515991241328";;;"2";"335.00";"2";"30/05/2024, 19:29:44";"11/08/2024, 19:03:39";
+"Letícia Duarte ";"5519994339825";"leticiacdmarques@gmail.com";"31/03/1997";"4";"190.00";"4";"30/05/2024, 20:02:12";"06/12/2025, 19:24:52";
+"Leticia Gutierres ";"5519987058486";"Leticiagutierres626@gmail.com";"02/06/1995";"1";"96.00";"1";"01/06/2024, 20:01:34";"01/06/2024, 20:01:34";"Rua Mauricio Monteiro da Silva, 199, Jardim Aurora, 13877022, São João da Boa Vista/SP"
+"Isabella Diogo";"5519991378274";"isabellacarolinediogo@hotmail.com";"04/08/1991";"1";"100.00";"1";"01/06/2024, 21:12:03";"01/06/2024, 21:12:03";"Rua João Pessoa, 339, Vila Oriental, 13870676, São João da Boa Vista/SP"
+"RICARDO TAVARES ORRU";"5519991080880";;;"6";"630.00";"6";"02/06/2024, 18:44:17";"25/03/2025, 20:28:00";
+"Pedro Henrique ";"5519995477106";"Pedrohjoga06734@gmail.com";"10/01/2005";"1";"96.99";"1";"04/06/2024, 19:12:50";"04/06/2024, 19:12:50";
+"Danilo Nogara";"5519998250286";;;"1";"282.00";"1";"06/06/2024, 21:06:13";"06/06/2024, 21:06:13";
+"Bruna Breda";"5519987462177";;;"1";"64.00";"1";"06/06/2024, 21:45:54";"06/06/2024, 21:45:54";
+"Miguel Escudero";"5519994587403";"miguelescuderosoares97@gmail.com";"15/05/1997";"2";"86.00";"2";"08/06/2024, 21:12:22";"08/08/2024, 19:55:52";"Rua Orlando Andrade Rezende, 366, Jardim Maestro Mourão, 13872580, São João da Boa Vista/SP"
+"Wilker Silva";"5519992382315";;;"1";"56.00";"1";"09/06/2024, 20:09:12";"09/06/2024, 20:09:12";
+"Samantha Gamba";"5519996569960";;;"1";"48.00";"1";"11/06/2024, 18:39:41";"11/06/2024, 18:39:41";
+"Ana Karla Pitarelo ";"5535998531768";;;"1";"137.00";"1";"12/06/2024, 19:59:09";"12/06/2024, 19:59:09";
+"Larissa Camilo de Sousa";"5519991828702";;;"1";"134.00";"1";"14/06/2024, 19:19:40";"14/06/2024, 19:19:40";
+"Sergio Luis Damalio ";"5519991976111";;;"1";"82.00";"1";"14/06/2024, 20:27:58";"14/06/2024, 20:27:58";
+"Matheus Oliveira";"5519982323794";;;"2";"183.00";"2";"14/06/2024, 20:34:20";"16/08/2024, 20:54:31";
+"Sofia Mariano";"5519995130227";;;"2";"179.00";"2";"14/06/2024, 20:40:33";"25/01/2025, 20:50:29";
+"Yasmin Goulardins Mansanares ";"5519992475877";;;"2";"144.00";"2";"14/06/2024, 21:44:54";"03/11/2024, 20:06:11";
+"Ederson Oliveira vieira";"5519994415970";"oliveiraederson422@gmail.com";"09/02/1993";"2";"130.00";"2";"16/06/2024, 18:46:38";"21/07/2024, 18:42:21";"Rua José Maria de Carvalho, 1634, Jardim dos Ipês I, 13876595, São João da Boa Vista/SP"
+"Celso de Oliveira Farbo ";"5519988214223";"cofarbo@gmail.com";"12/09/1970";"1";"60.00";"1";"18/06/2024, 19:13:17";"18/06/2024, 19:13:17";"Rua Pastora Eunice da Quadrangular, 763, Jardim Lucas Teixeira, 13876854, São João da Boa Vista/SP"
+"JULIA CAROLINA DA COSTA";"5519995297227";;;"1";"93.00";"1";"18/06/2024, 22:27:11";"18/06/2024, 22:27:11";
+"Gabriel Menato Consentino";"5519999657571";;;"1";"155.50";"1";"22/06/2024, 20:53:02";"22/06/2024, 20:53:02";
+"Douglas mizael";"5519995605776";;;"1";"47.00";"1";"22/06/2024, 22:43:14";"22/06/2024, 22:43:14";
+"Leandro prado";"5519999915539";;;"1";"98.00";"1";"28/06/2024, 18:41:37";"28/06/2024, 18:41:37";
+"Telma Freitas";"5519992399235";"telmah01@hotmail.com";"30/10/1982";"1";"58.00";"1";"28/06/2024, 20:39:42";"28/06/2024, 20:39:42";"Rua Ministro Santiago Dantas, 230, (Casa) Jardim Boa Vista, 13874117, São João da Boa Vista/SP"
+"Silvana Madrini";"5519991555592";"silvanamadrini@gmail.com";"06/12/1983";"4";"442.90";"4";"29/06/2024, 19:02:04";"03/12/2025, 19:15:58";"Rua Biagio Angelo Dotta, 209, Jardim do Trevo, 13871506, São João da Boa Vista/SP"
+"Ana Costa ";"5519994588434";;;"1";"30.00";"1";"29/06/2024, 19:40:19";"29/06/2024, 19:40:19";
+"Bruno Felipe";"5519986090428";"brunotamires96@gmail.com";"07/03/1996";"1";"154.00";"1";"29/06/2024, 21:24:08";"29/06/2024, 21:24:08";"Avenida Professora Isette Corrêa Fontão, 1815, Jardim dos Ipês III, 13876612, São João da Boa Vista/SP"
+"Daiane Moi";"5519995892229";;;"2";"174.00";"2";"30/06/2024, 18:32:19";"20/07/2024, 18:54:43";
+"Verônica Stanguini Corso";"5519998194867";;;"1";"95.00";"1";"30/06/2024, 20:09:54";"30/06/2024, 20:09:54";
+"Vitória sipolini ";"559991357323";;;"1";"64.00";"1";"30/06/2024, 21:35:55";"30/06/2024, 21:35:55";
+"Tarcisio Guarnieri";"5519999942616";"targuarnieri@gmail.com";"01/02/1994";"1";"146.00";"1";"04/07/2024, 19:34:58";"04/07/2024, 19:34:58";"Rua Monteiro Lobato, 173, Vila Oriental, 13870675, São João da Boa Vista/SP"
+"Stela Prado ";"5519993130684";;;"6";"941.00";"6";"05/07/2024, 22:11:17";"20/12/2024, 22:42:04";
+"Caio Novais ";"5519986030540";;;"1";"124.00";"1";"07/07/2024, 20:08:31";"07/07/2024, 20:08:31";
+"Nathalia Leal";"5519999133208";;"24/07/1990";"1";"84.00";"1";"09/07/2024, 21:01:54";"09/07/2024, 21:01:54";"Rua Antônio Ângelo Passiani, 107, (Casa) Jardim Nova União, São João da Boa Vista/SP"
+"Daniela Silva";"5519978172217";;;"1";"69.40";"1";"27/11/2025, 19:04:22";"27/11/2025, 19:04:22";
+"Leandro Anadao";"5519989084746";"leanadao85@gmail.com";"05/09/1985";"1";"224.00";"1";"12/07/2024, 19:23:07";"12/07/2024, 19:23:07";"Rua Giuseppe de Rosa, 912, Jardim Europa, 13872780, São João da Boa Vista/SP"
+"Marcela Vasconcelos ";"5519997117710";;;"1";"74.00";"1";"12/07/2024, 19:51:46";"12/07/2024, 19:51:46";
+"Dayane Maria ";"5519993645427";"mdayane269@gmail.com";"15/05/2005";"1";"247.00";"1";"13/07/2024, 19:44:45";"13/07/2024, 19:44:45";"Rua Octávio Andrade Ferreira, 1534, Jardim dos Ipês I, 13876592, São João da Boa Vista/SP"
+"Brenda Melissa Mangarotti ";"5519993780583";;;"1";"76.00";"1";"13/07/2024, 22:59:01";"13/07/2024, 22:59:01";
+"Juninho pamonheiro";"5519992092343";;;"1";"106.00";"1";"16/07/2024, 20:25:13";"16/07/2024, 20:25:13";
+"Denise Azevedo Simões Barbosa";"5519993980004";"dehasbarbosa@gmail.com";"15/08/1962";"1";"89.00";"1";"07/08/2024, 18:30:16";"07/08/2024, 18:30:16";"Rua Jubileu Quadrangular, 85, (Casa) Riviera de São João, 13874782, São João da Boa Vista/SP"
+"Marcia Garzo Damalio ";"5519992398967";;;"1";"84.00";"1";"19/07/2024, 18:43:36";"19/07/2024, 18:43:36";
+"Cecil Ramalho ";"5519983166226";"cecilramalho@yahoo.com";"29/12/1971";"1";"102.00";"1";"20/07/2024, 18:40:54";"20/07/2024, 18:40:54";"Rua Amélia Michelazzo Penha, 837, Jardim dos Reis, 13873206, São João da Boa Vista/SP"
+"Gabi Sozo";"551998988639";"gabriela_sozo@hotmail.com";"13/11/2001";"1";"102.00";"1";"20/07/2024, 19:32:36";"20/07/2024, 19:32:36";
+"Janaina Buson";"5519992684383";;;"1";"60.00";"1";"22/07/2024, 21:53:21";"22/07/2024, 21:53:21";
+"Marcela Romero";"5519993088266";"mr7775718@gmail.com";"20/09/1997";"1";"131.00";"1";"23/07/2024, 19:06:34";"23/07/2024, 19:06:34";"Rua Américo de Campos, 372, Rosário, 13870317, São João da Boa Vista/SP"
+"Maique Neves Rocha de Brito";"5519992541101";"maiqueneves@hotmail.com";"16/09/1978";"2";"127.00";"2";"24/07/2024, 19:23:31";"25/10/2024, 19:57:50";"Rua Edmo Ruga, 13, Núcleo Residencial Durval Nicolau 3, 13872310, São João da Boa Vista/SP"
+"Livia Valim Zilli";"5519981489963";"liviazilli@gmail.com";"07/07/1984";"11";"1567.00";"11";"26/07/2024, 18:43:46";"10/10/2025, 19:16:19";"Rua Jácomo Untura, 227, Jardim Boa Vista, 13874119, São João da Boa Vista/SP"
+"João Vitor ";"5519997978111";;;"1";"46.00";"1";"26/07/2024, 22:00:03";"26/07/2024, 22:00:03";
+"Rodrigo Vanzella";"5519998112950";;;"1";"76.00";"1";"28/07/2024, 19:40:33";"28/07/2024, 19:40:33";
+"Bárbara Klein ";"5531999961268";;;"1";"86.00";"1";"16/08/2024, 20:28:47";"16/08/2024, 20:28:47";
+"Matheus dos Santos froza ";"5519992199722";"ramoosmatheus05@gmail.com";"28/07/2000";"1";"74.00";"1";"03/01/2025, 21:20:25";"03/01/2025, 21:20:25";"Rua Alpheu Fiorim, 173, (Portão verde) Jardim Crepúsculo, 13875278, São João da Boa Vista/SP"
+"Paula Rossi";"5519981006703";"paulasorcirossi@gmail.com";"29/03/2005";"1";"96.00";"1";"28/07/2024, 20:13:11";"28/07/2024, 20:13:11";"Rua Palmira Maria de Souza, 1676, Jardim dos Ipês I, 13876593, São João da Boa Vista/SP"
+"Paulo Sérgio ";"5519981823351";;;"2";"125.00";"2";"28/07/2024, 20:22:28";"28/12/2024, 20:30:07";
+"Fernando Tairoviche";"5511985061202";;;"2";"160.00";"2";"29/07/2024, 18:13:39";"30/07/2024, 19:19:11";
+"Claudia Zapparoli ";"5519992045073";;;"1";"58.00";"1";"01/08/2024, 18:23:26";"01/08/2024, 18:23:26";
+"Isabela Marcondes";"5535992760141";"isabelahinzmmj@gmail.com";"23/09/1995";"2";"182.30";"2";"01/08/2024, 18:55:59";"07/01/2026, 20:46:36";"Rua Anísio Valim, 110, Recanto do Lago, 13874668, São João da Boa Vista/SP"
+"Karim Maluf";"5519993839753";;;"1";"125.00";"1";"02/08/2024, 19:32:57";"02/08/2024, 19:32:57";
+"Isabela pereira";"5535998592646";;;"1";"118.00";"1";"02/08/2024, 22:48:58";"02/08/2024, 22:48:58";
+"Maria Andrade";"5519992838319";;;"1";"155.00";"1";"03/08/2024, 23:25:34";"03/08/2024, 23:25:34";
+"Matheus Renesto";"5519997935288";;;"1";"98.00";"1";"04/08/2024, 19:07:05";"04/08/2024, 19:07:05";
+"Lucio ocete ";"5519998879373";;;"1";"51.00";"1";"04/08/2024, 21:20:44";"04/08/2024, 21:20:44";
+"Gabriel Vieira ";"5519991563003";;;"1";"100.00";"1";"01/01/2026, 20:10:10";"01/01/2026, 20:10:10";
+"Paulo Sérgio Fernandes ";"5519991881077";;;"1";"167.00";"1";"07/08/2024, 19:26:39";"07/08/2024, 19:26:39";
+"Waldecy Cabrera";"5519988940830";"waldekcabrera@gmail.com";"20/11/1971";"1";"49.00";"1";"19/01/2025, 22:28:24";"19/01/2025, 22:28:24";"Rua Capitão José Alexandre, 392, (Esquina) Centro, 13871000, São João da Boa Vista/SP"
+"Ryan Cavenaghi";"5519997110196";"ryan.cavenaghi25@gmail.com";"25/03/2006";"1";"55.00";"1";"10/08/2024, 20:26:44";"10/08/2024, 20:26:44";"Rua Benjamin Constant, 510, (Apartamento) Centro, 13870220, São João da Boa Vista/SP"
+"Emily Caslini ";"5519997906480";;;"1";"79.00";"1";"11/08/2024, 19:43:53";"11/08/2024, 19:43:53";
+"Admilson Madureira";"5519997415033";;;"1";"59.00";"1";"11/08/2024, 20:50:59";"11/08/2024, 20:50:59";
+"Kleber Gonzalez ";"5519991978999";"kleber.gonzalez@hotmail.com";"15/10/1982";"1";"44.00";"1";"14/08/2024, 19:34:53";"14/08/2024, 19:34:53";"Rua Dona Gabriela, 431, (Casa fundos) Jardim Satélite, 13870421, São João da Boa Vista/SP"
+"Laura Belmuded";"5519982871255";"laurabelmudes2@gmail.com";"09/08/1998";"1";"90.00";"1";"14/08/2024, 21:03:56";"14/08/2024, 21:03:56";"Rua Senador Saraiva, 274, (Casa) Centro, 13870020, São João da Boa Vista/SP"
+"Kelli Morais";"5519981712323";;;"2";"212.00";"2";"15/08/2024, 19:41:44";"12/09/2024, 18:56:35";
+"Gabriel Masteguin";"5519984020815";;;"2";"183.00";"2";"16/08/2024, 18:21:13";"01/12/2024, 19:25:59";
+"Euni Ribeiro ";"5519995746488";;;"1";"46.00";"1";"17/08/2024, 19:40:49";"17/08/2024, 19:40:49";
+"Joice Alaion";"5519997958189";;;"2";"242.00";"2";"17/08/2024, 20:50:43";"12/06/2025, 18:37:09";
+"Vlad Fontana";"5519978205808";;;"1";"110.50";"1";"18/08/2024, 18:55:01";"18/08/2024, 18:55:01";
+"Marcela Silverio ";"5519992103402";;;"1";"92.00";"1";"20/08/2024, 19:01:27";"20/08/2024, 19:01:27";
+"Wagner Cerboncini ";"5519991552319";;"28/10/1993";"1";"97.00";"1";"24/08/2024, 20:46:32";"24/08/2024, 20:46:32";
+"Luiza Hoffmann";"5519989313314";;"26/06/2000";"1";"53.00";"1";"29/08/2024, 19:26:52";"29/08/2024, 19:26:52";
+"Mirian Bernardes";"5519997973918";;;"1";"48.00";"1";"31/08/2024, 19:58:29";"31/08/2024, 19:58:29";
+"Maria Sarah Valentini ";"5519998271705";"maria_valentini17@icloud.com";"17/05/2001";"1";"62.00";"1";"31/08/2024, 21:57:11";"31/08/2024, 21:57:11";"Rua Osvaldo Vieira, 372, (Casa) Loteamento Parque Alvorada, 13874869, São João da Boa Vista/SP"
+"Renata de Carvalho Correia Gião";"5519992735068";;"03/12/1983";"1";"190.00";"1";"12/06/2025, 18:52:38";"12/06/2025, 18:52:38";
+"Vitória Carvalho ";"5519989047944";;;"1";"56.00";"1";"05/09/2024, 20:21:29";"05/09/2024, 20:21:29";
+"Renata de Oliveira ";"5519997904745";;;"1";"54.00";"1";"06/09/2024, 19:44:45";"06/09/2024, 19:44:45";
+"Renan Santos";"5519989643911";;;"1";"105.00";"1";"07/09/2024, 18:20:09";"07/09/2024, 18:20:09";
+"Cássia Theobaldo ";"5511983015158";;;"2";"219.00";"2";"07/09/2024, 20:10:20";"08/12/2024, 21:27:19";
+"Dora Yasbeck ";"5519982901781";;;"1";"44.00";"1";"08/09/2024, 19:13:10";"08/09/2024, 19:13:10";
+"Livia Yasbeck";"5519981385623";"livia_yasbeck@hotmail.com";"18/05/1995";"5";"315.00";"5";"09/09/2024, 20:32:02";"22/02/2026, 19:15:53";"Rua Engenheiro Amado dos Santos, 02, (Apto 02) Vila Clayton, 13871020, São João da Boa Vista/SP"
+"Cynthia Rocha";"5535999008566";;;"6";"293.00";"6";"12/09/2024, 18:20:51";"19/11/2024, 20:01:18";
+"Gislaine Borges";"5519993384024";"borgesgislaine802@gmail.com";"14/07/1990";"2";"241.00";"2";"13/09/2024, 20:53:30";"21/12/2024, 20:18:37";"Rua Antenor Diogo de Souza, 2175, Jardim Itália, 13872550, São João da Boa Vista/SP"
+"Ianara Karoline Gomes";"5519992797244";;;"3";"127.00";"3";"14/09/2024, 20:17:17";"04/01/2025, 20:43:16";
+"Caroline Moriya";"5519991540424";"carolmoriya@hotmail.com";"17/12/1992";"1";"145.00";"1";"14/09/2024, 20:29:54";"14/09/2024, 20:29:54";"Rua Orlando Fracari, 730, (Hospital Unimed) Jardim Recanto do Bosque, 13874423, São João da Boa Vista/SP"
+"Felipe bertolucci ";"5519999083195";;;"1";"129.00";"1";"14/09/2024, 22:43:10";"14/09/2024, 22:43:10";
+"Renan Diniz";"5519991680531";;"21/07/2003";"1";"128.00";"1";"15/09/2024, 19:33:27";"15/09/2024, 19:33:27";
+"Vinicius Munhoz ";"5519991197654";;;"2";"135.00";"2";"15/09/2024, 19:58:39";"28/09/2024, 20:35:52";
+"André Bortolussi ";"5519971381242";;;"1";"238.00";"1";"17/09/2024, 19:37:24";"17/09/2024, 19:37:24";
+"Lucas Silva";"5519995661717";"lucasqualidade@gmail.com";"08/03/1988";"2";"78.00";"2";"21/09/2024, 18:31:19";"16/08/2025, 18:06:05";"Rua Dorival Blota, 263, (Casa) Jardim Nova São João, 13874134, São João da Boa Vista/SP"
+"Bruno Pereira";"5519992549566";;;"1";"110.00";"1";"21/09/2024, 19:50:41";"21/09/2024, 19:50:41";
+"Stefani Corrêa ";"5519971707013";;;"4";"325.00";"4";"21/09/2024, 19:51:45";"22/02/2026, 20:41:38";
+"maria eduarda matiello ";"5519996796749";;;"1";"62.00";"1";"21/09/2024, 20:50:45";"21/09/2024, 20:50:45";
+"pedro calil";"5519995781837";;;"1";"94.00";"1";"26/09/2024, 20:23:44";"26/09/2024, 20:23:44";
+"Leandro Pontes";"5562994065226";"leandro-pontesfernandes@hotmail.com";"31/07/1988";"3";"217.00";"3";"02/10/2024, 22:25:59";"14/12/2025, 21:12:09";"Avenida Lázaro Pio Magalhães, 460, (Bloco E ap 26) Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Roselma Lino Vieira ";"5519994393928";"roselmared@gmail.com";"30/01/1985";"5";"248.00";"5";"04/10/2024, 18:39:19";"11/09/2025, 18:44:00";
+"Victor Zanelo";"5519981221697";"victorzanelo4@gmail.com";;"3";"282.00";"3";"04/10/2024, 22:55:08";"25/07/2025, 23:27:37";"Rua Joaquim Silvério Valim, 26, Jardim das Azaléias, 13876836, São João da Boa Vista/SP"
+"Maynara Ribeiro";"5519999030593";;;"7";"432.00";"7";"05/10/2024, 19:17:47";"10/05/2025, 19:04:42";
+"Guilherme Ozelim";"5519997509852";;;"1";"131.00";"1";"05/10/2024, 19:35:18";"05/10/2024, 19:35:18";
+"Ketrin Esteves ";"5519996517601";;;"1";"79.00";"1";"06/10/2024, 19:52:18";"06/10/2024, 19:52:18";
+"Guilherme Borges ";"5519999383471";;;"2";"327.00";"2";"09/10/2024, 18:46:54";"02/11/2024, 18:28:10";
+"Patricia Rickheim";"5519991492866";"patriciarickheim@gmail.com";"17/02/1996";"3";"194.90";"3";"11/10/2024, 19:05:47";"04/02/2026, 18:34:32";"Rua Osvaldo Américo Carneiro, 747, (Casa azul de esquina) Jardim Magalhães, 13876451, São João da Boa Vista/SP"
+"Grazi Domingos ";"5519989072826";;"10/09/1993";"1";"43.00";"1";"20/10/2024, 21:23:53";"20/10/2024, 21:23:53";
+"Wesley dos Santos Teixeira";"5511989889437";"wesley.teixeira.2327@gmail.com";;"1";"234.00";"1";"12/10/2024, 19:22:35";"12/10/2024, 19:22:35";"Via r professora Maria m Cteles, Usp, Ribeirão Preto/SP"
+"Igor souza";"5519996516503";;;"1";"90.00";"1";"11/10/2024, 21:14:28";"11/10/2024, 21:14:28";
+"Carla Salmasso ";"5519994032210";;;"3";"235.00";"3";"12/10/2024, 19:50:39";"28/02/2025, 19:50:40";
+"Ma Sardelli";"5519989316565";"msperformah@gmail.com";;"3";"182.00";"3";"12/10/2024, 20:29:07";"18/07/2025, 20:33:56";"Rua Ênio Gonçalves Mayrene, 234, Jardim Amoreiras, 13876740, São João da Boa Vista/SP"
+"Paulo Nogueira ";"5519993305705";"paulinho.paulinho.29@gmail.com";"29/11/1993";"1";"42.00";"1";"12/10/2024, 21:25:19";"12/10/2024, 21:25:19";"Rua Alipio de Almeida, 943, Jardim Europa, 13872778, São João da Boa Vista/SP"
+"Júlia Nogueira ";"5519991439687";;"17/11/2003";"1";"102.00";"1";"06/04/2025, 21:46:59";"06/04/2025, 21:46:59";
+"Thaís Leite ";"5535998689420";"Thaisleitedesouza2@gmail.com";"03/01/2001";"1";"107.00";"1";"17/10/2024, 22:02:47";"17/10/2024, 22:02:47";
+"Chiara Del Rosal";"5519992537682";"Chiaradelrosal887@gmail.com";"21/11/2003";"2";"187.00";"2";"17/10/2024, 22:07:57";"14/11/2025, 21:56:30";"Rua Antonio Torres, 215, (Rua do mercadinho armazém) Jardim Recanto dos Pássaros, 13873522, São João da Boa Vista/SP"
+"Felipe inacio domingos";"5519993780943";"Inaciodomingosfelipe@gmail.com";"20/11/2002";"1";"115.00";"1";"18/10/2024, 19:38:29";"18/10/2024, 19:38:29";"Rua Maria José Gallo Lopes, 85, Vila Brasil, 13875037, São João da Boa Vista/SP"
+"Henrique Cardoso ";"551993202539";;;"1";"106.00";"1";"18/10/2024, 20:18:53";"18/10/2024, 20:18:53";
+"Giovanna Metzker";"5519994708113";;;"1";"50.00";"1";"19/10/2024, 19:38:15";"19/10/2024, 19:38:15";
+"Nathália Cirilo Galvão ";"5519992706980";;;"1";"64.00";"1";"19/10/2024, 19:55:02";"19/10/2024, 19:55:02";
+"Victoria marin ";"5519935003764";"marinviih991@gmail.com";;"2";"137.00";"2";"19/10/2024, 21:02:22";"21/06/2025, 23:15:16";"Rua Elvira Fanelli Galli, 795, Jardim Vila Rica, 13876151, São João da Boa Vista/SP"
+"Eduardo Barbosa ";"5519997052476";;;"1";"95.00";"1";"22/10/2024, 21:45:28";"22/10/2024, 21:45:28";
+"Vivian Godoy";"5519991119228";"viviangodoy.godoy@gmail.com";"26/05/2004";"1";"54.50";"1";"15/03/2025, 19:51:40";"15/03/2025, 19:51:40";"Rua Padre Donizetti Tavares de Lima, 124, (Apto 7) Vila Santa Adélia, 13870337, São João da Boa Vista/SP"
+"Fernando pastore";"5519996351910";;;"1";"156.00";"1";"27/10/2024, 19:19:45";"27/10/2024, 19:19:45";
+"Bruna Gimenez";"5519997020482";"brunagalliego@gmail.com";"22/05/1996";"2";"163.00";"2";"04/01/2026, 20:50:23";"15/01/2026, 22:11:57";"Rua Antero José de Lima, 212, Vila Três Irmãos, 13893220, Águas da Prata/SP"
+"Marcelo Rodrigues ";"5535984271235";;;"1";"75.00";"1";"31/10/2024, 21:05:44";"31/10/2024, 21:05:44";
+"Tatiane Souza";"5519971032961";"tatianedeoliveira84@gmail.com";"04/12/1992";"1";"193.50";"1";"01/11/2024, 20:13:48";"01/11/2024, 20:13:48";"Rua Noemi Ruth Soares Neves, 148, (Sobrado) Jardim Amoreiras, 13876735, São João da Boa Vista/SP"
+"Dhiogo Souza";"5519987124424";"dizin303@gmail.com";"29/09/2008";"2";"80.00";"2";"03/11/2024, 22:10:04";"10/04/2025, 20:00:09";"Rua Ângelo Roqueto, 221, (Casa) Jardim Recanto do Jaguari, 13872218, São João da Boa Vista/SP"
+"Camila Rodrigues ";"551993441021";;;"4";"448.00";"4";"08/11/2024, 19:35:36";"20/07/2025, 18:52:38";
+"Julio Cesar nascimento Raymundo júnior";"5519994397626";;;"4";"339.00";"4";"09/11/2024, 19:19:03";"23/08/2025, 19:36:01";
+"Camila Mancano Jacob ";"5519981486402";"camilamancano@yahoo.com.br";"09/06/1983";"1";"46.00";"1";"09/11/2024, 20:08:15";"09/11/2024, 20:08:15";"Alameda das Violetas, 101, (Morro azul 2) Condomínio Fechado Morro Azul II, 13874402, São João da Boa Vista/SP"
+"Felipe Bozelli";"5519993304010";;;"1";"84.00";"1";"09/11/2024, 20:21:40";"09/11/2024, 20:21:40";
+"Lucas Griebeler";"5519997443136";"lucas_griebeler@live.com";"08/07/1990";"2";"279.00";"2";"09/11/2024, 20:51:32";"11/10/2025, 22:46:47";"Rua José de Oliveira Azevedo, 285, (Casa) Parque Jequitibás, 13874444, São João da Boa Vista/SP"
+"Melissa Garbuio ";"5519989474882";;;"1";"116.50";"1";"14/11/2024, 19:35:38";"14/11/2024, 19:35:38";
+"Sabrina alves ";"5519971296251";;;"1";"205.00";"1";"05/09/2025, 20:55:14";"05/09/2025, 20:55:14";
+"João Justino";"5519999120642";;;"1";"87.00";"1";"15/11/2024, 22:28:35";"15/11/2024, 22:28:35";
+"Guilherme Dias ";"5519971124858";;;"1";"64.00";"1";"16/11/2024, 19:09:58";"16/11/2024, 19:09:58";
+"Andréa Santos ";"5519991591886";;;"7";"1013.00";"7";"16/11/2024, 19:43:45";"20/09/2025, 19:27:29";
+"Kelvim Dias";"5519998085681";;;"2";"86.00";"2";"19/11/2024, 20:05:41";"29/11/2024, 21:38:01";
+"Dárika carvalho";"5519983788713";;;"2";"99.00";"2";"22/11/2024, 21:02:41";"17/01/2025, 21:49:05";
+"Ana Paula Malheiros ";"5519982807676";"apmalheirosromeiro@gmail.com";;"5";"488.80";"5";"11/07/2025, 19:09:08";"28/11/2025, 20:17:32";"Rua Antônio Fernandes, 424, Recanto do Lago, 13874685, São João da Boa Vista/SP"
+"Lukas Roberto";"5519983649981";;;"1";"52.00";"1";"23/11/2024, 23:13:59";"23/11/2024, 23:13:59";
+"Victor Antonio de Campos Calzavara ";"5519999725848";"victor.a.calzavara@gmail.com";"26/09/2005";"13";"635.20";"13";"24/11/2024, 20:55:54";"25/02/2026, 20:21:19";"Rua Doutor Teófilo Ribeiro de Andrade, 972, (Apto 6) Centro, 13870210, São João da Boa Vista/SP"
+"Gabryel Faislon Chaves";"5519994517474";;;"1";"88.00";"1";"24/11/2024, 21:19:10";"24/11/2024, 21:19:10";
+"Pedro henrique ";"5534984174151";;;"1";"40.00";"1";"26/11/2024, 22:12:20";"26/11/2024, 22:12:20";
+"Lucas Freitas ";"5519994711621";;;"1";"41.00";"1";"08/12/2024, 19:38:49";"08/12/2024, 19:38:49";
+"Monique Constantino ";"5519994709520";;;"1";"38.00";"1";"30/11/2024, 19:48:42";"30/11/2024, 19:48:42";
+"Elisabete trentino";"5519992339411";;;"1";"52.00";"1";"30/11/2024, 20:38:59";"30/11/2024, 20:38:59";
+"Taina feltran ";"5519992373967";;;"2";"172.00";"2";"30/11/2024, 21:24:59";"30/11/2024, 22:40:34";
+"Klivia Fabiana Martins da Silva ";"5519996647247";"kliviamar@hotmail.com";"13/12/1975";"1";"79.00";"1";"01/12/2024, 18:54:57";"01/12/2024, 18:54:57";"Rua da Saudade, 195, Vila Conrado, 13870700, São João da Boa Vista/SP"
+"Monique Nunes";"5535991824235";;"12/12/1992";"7";"755.50";"7";"01/12/2024, 19:24:15";"28/09/2025, 18:43:40";
+"Marcos Buozi Madrini";"5519999183574";;"24/10/1982";"1";"145.00";"1";"05/12/2024, 18:33:40";"05/12/2024, 18:33:40";"Rua Biagio Angelo Dotta, 209, Jardim do Trevo, 13871506, São João da Boa Vista/SP"
+"Otavio Belli";"5519993720735";;;"1";"19.00";"1";"06/12/2024, 19:38:13";"06/12/2024, 19:38:13";
+"Helen Keller ";"5519981794049";"hkellersilvan@icloud.com";"31/07/1969";"6";"678.00";"6";"06/12/2024, 20:17:28";"16/01/2026, 19:38:52";
+"Giovana Lopes ";"5519994020679";;"26/05/2000";"1";"86.00";"1";"06/12/2024, 21:47:53";"06/12/2024, 21:47:53";
+"Nickoly campos";"5519993679923";;;"2";"97.00";"2";"06/12/2024, 22:20:33";"17/01/2025, 21:27:04";
+"Selma ou Paulo";"5519992267991";;;"1";"59.00";"1";"07/12/2024, 18:13:51";"07/12/2024, 18:13:51";
+"João Batista Neto";"5519989401176";"joaobatistaneto2005@outlook.com";"03/02/2005";"4";"324.40";"4";"07/12/2024, 20:04:40";"24/01/2026, 22:18:26";"Alameda Brasilídio José de Lima, 120, (Casa C) Bairro do Lago, 13893024, Águas da Prata/SP"
+"Felipe Sayegh";"5519997491123";;;"1";"76.00";"1";"07/12/2024, 20:28:00";"07/12/2024, 20:28:00";
+"Elaine Pancracio";"5519981332033";;;"1";"102.00";"1";"07/12/2024, 21:50:09";"07/12/2024, 21:50:09";
+"Carlos Henrique ";"5514997020779";;;"1";"238.00";"1";"07/12/2024, 22:20:55";"07/12/2024, 22:20:55";
+"Lucas Silva";"5519983085305";;;"1";"216.00";"1";"09/12/2024, 19:23:19";"09/12/2024, 19:23:19";
+"Michele Figueira ";"5535991376226";;;"1";"44.00";"1";"10/12/2024, 19:53:52";"10/12/2024, 19:53:52";
+"Ana Victória";"5519982565656";"anavictoria151193@gmail.com";"01/06/2000";"1";"170.00";"1";"11/12/2024, 22:08:03";"11/12/2024, 22:08:03";"Rua Anor Valim, 1094, (Casa de esquina) Parque dos Resedás, 13876274, São João da Boa Vista/SP"
+"Carla Villas Boas";"5519999605818";;;"1";"68.00";"1";"14/12/2024, 18:13:33";"14/12/2024, 18:13:33";
+"David Guilherme ";"5519996941905";;;"1";"142.00";"1";"14/12/2024, 19:54:24";"14/12/2024, 19:54:24";
+"Carlos Cantos";"5519997074144";;;"6";"931.80";"6";"14/12/2024, 20:23:16";"18/12/2025, 20:23:39";
+"Daniela Garcia";"5519993902418";;;"1";"127.00";"1";"14/12/2024, 20:49:03";"14/12/2024, 20:49:03";
+"Marília Zanelli ";"5519981107948";"marinleite10@gmail.com";"05/04/1988";"2";"113.00";"2";"15/12/2024, 18:19:53";"30/05/2025, 18:40:50";"Rua Izabel Carvalho Bastos, 380, (Casa frente) Vila Isabel, 13871121, São João da Boa Vista/SP"
+"Welyton Coutinho";"5519997953387";;;"1";"102.50";"1";"15/12/2024, 20:03:55";"15/12/2024, 20:03:55";
+"Maria Carolina Camilo";"5519992446898";;;"1";"94.00";"1";"20/12/2024, 19:28:30";"20/12/2024, 19:28:30";
+"Rogério Pancini ";"5519991286384";"rogeriopancini@yahoo.com.br";"04/02/1981";"2";"141.00";"2";"20/12/2024, 19:43:21";"29/03/2025, 20:08:49";"Rua Vicente Farias, 108, Jardim do Trevo, 13871503, São João da Boa Vista/SP"
+"Juliana Elias Ferreira ";"5519995702393";"Julianaferreira08421@gmail.com";"27/03/2004";"1";"95.00";"1";"21/12/2024, 21:49:54";"21/12/2024, 21:49:54";
+"Mirian maldoin ";"5519993560952";;;"1";"156.00";"1";"27/12/2024, 20:32:24";"27/12/2024, 20:32:24";
+"Nathalia Cipola";"5519991577465";"nathaliacipola8@gmail.com";"01/11/2003";"1";"90.00";"1";"28/12/2024, 21:02:59";"28/12/2024, 21:02:59";"Rua Lauro Godoy, 171, São Benedito, 13871003, São João da Boa Vista/SP"
+"Rodrigo Borba";"5519991748892";;;"1";"61.00";"1";"30/12/2024, 20:56:36";"30/12/2024, 20:56:36";
+"Eduarda Rodrigues ";"5519989575327";;;"1";"42.00";"1";"03/01/2025, 20:14:02";"03/01/2025, 20:14:02";
+"Marcelo Gimeno ";"5519981506716";;;"1";"116.00";"1";"03/01/2025, 21:50:21";"03/01/2025, 21:50:21";
+"Bernardo de Souza Santana ";"5533991335334";;;"1";"93.00";"1";"04/01/2025, 20:07:29";"04/01/2025, 20:07:29";
+"Rodolfo Gabriel ";"5519991716512";;;"1";"127.00";"1";"06/01/2025, 21:12:13";"06/01/2025, 21:12:13";
+"Eduarda de Paula Carvalho ";"5519992803670";"eduardacarvalholvt1@gmail.com";"25/11/2002";"2";"194.00";"2";"07/01/2025, 21:18:18";"02/02/2025, 20:43:37";"Rua Atilio João Betinarde, 21, Jardim Primavera, 13876817, São João da Boa Vista/SP"
+"Anderson de Moraes ";"5519994669912";;;"1";"91.00";"1";"12/01/2025, 20:47:27";"12/01/2025, 20:47:27";
+"Vivian maia";"5519995230772";;;"1";"48.00";"1";"12/01/2025, 20:51:06";"12/01/2025, 20:51:06";
+"Monique Gomes";"5519997200802";"dramoniquegomesm@gmail.com";"20/08/2002";"2";"148.90";"2";"12/01/2025, 22:25:01";"25/01/2026, 20:50:50";
+"Danusa Garlipp ";"5519993638374";;"18/03/1992";"1";"62.50";"1";"19/09/2025, 20:35:39";"19/09/2025, 20:35:39";
+"Ana Júlia Viana ";"5519993193490";"anajuliaviana1809@gmail.com";"18/09/2006";"1";"269.00";"1";"30/05/2025, 21:32:05";"30/05/2025, 21:32:05";
+"William Marreiro";"5519995476765";;;"1";"150.00";"1";"18/01/2025, 19:54:27";"18/01/2025, 19:54:27";
+"Jessé Gonçalves ";"5519981318529";;;"1";"60.00";"1";"21/01/2025, 20:39:08";"21/01/2025, 20:39:08";
+"Claudio Cantos";"551999627078";"claudiocantos1985@gmail.com";"09/08/1985";"1";"75.00";"1";"23/01/2025, 18:30:19";"23/01/2025, 18:30:19";"Rua Ernesto Bassi, 181, Jardim Amélia, 13876439, São João da Boa Vista/SP"
+"Luis Carlos Teixeira de Aguiar";"5519974161942";"luisctaguiar@gmail.com";"21/06/1981";"17";"1849.69";"17";"29/01/2025, 20:49:58";"20/02/2026, 20:20:48";"Rua Camila Monise Ferreira Barbosa Iamamoto, 210, Jardim Belvedere, 13876480, São João da Boa Vista/SP"
+"Bruna Dias";"5519981309523";"bdpsouza@gmail.com";"08/08/1995";"2";"211.50";"2";"20/06/2025, 19:45:36";"31/01/2026, 22:00:09";"Rua Orlando Matielo, 389, (Sobrado de portão preto) Jardim del Plata II, 13873172, São João da Boa Vista/SP"
+"Marcelo Vaz de lima";"5519997752482";;;"16";"987.00";"16";"31/01/2025, 19:20:22";"13/02/2026, 19:07:29";
+"Rubens tiense";"5519982055361";;;"2";"491.00";"2";"31/01/2025, 22:39:48";"05/09/2025, 18:47:39";
+"Lesley Minorello ";"5519997163738";;"26/09/1970";"1";"97.00";"1";"01/02/2025, 19:41:32";"01/02/2025, 19:41:32";"Travessa Santa Cecília, 67, (Casa) São Benedito, 13871008, São João da Boa Vista/SP"
+"Kaick marcos";"5519986083143";"kaick.marcos@gmail.com";"24/03/1995";"1";"53.50";"1";"11/01/2026, 20:05:20";"11/01/2026, 20:05:20";"Rua Capitão Bronze, 9, Centro, 13870130, São João da Boa Vista/SP"
+"Marcio Luis Pires Galetti ";"5519997659242";"marcio.galetti@hotmail.com";"04/03/1973";"8";"401.00";"8";"02/02/2025, 19:34:47";"03/08/2025, 19:15:36";"Rua Getúlio Vargas, 519, (Apto, 71) Centro, 13870100, São João da Boa Vista/SP"
+"Matheus Marcolino";"5519998893451";"matheusmarcolino225@gmail.com";;"1";"48.50";"1";"05/02/2025, 19:33:13";"05/02/2025, 19:33:13";
+"Jonatan Neves";"5519991423785";"jhoninha093@gmail.com";"27/03/1997";"2";"181.00";"2";"05/02/2025, 20:51:07";"04/07/2025, 20:26:45";"Avenida Guilherme Guerreiro, 381, Jardim Industrial, 13872334, São João da Boa Vista/SP"
+"Andre pinheiro";"5511972802949";;;"4";"432.50";"4";"06/02/2025, 19:25:36";"21/02/2026, 20:19:02";
+"Karen Trafani ";"5519971128882";;;"2";"182.00";"2";"07/02/2025, 21:52:09";"06/04/2025, 22:16:23";
+"Júlia Catini";"5519995784135";"juliacatini2@gmail.com";"10/12/2002";"1";"192.00";"1";"18/06/2025, 18:51:22";"18/06/2025, 18:51:22";"Antônio Milan sobrinho, 1583, (Casa) Jardim Ipe, São João da Boa Vista/SP"
+"Eduardo Catini";"5519989422249";"educatini@gmail.com";;"6";"1122.20";"6";"08/02/2025, 19:34:02";"20/02/2026, 19:36:43";"Rua Antonio Milan Sobrinho, 1583, Jardim dos Ipês I, 13876594, São João da Boa Vista/SP"
+"Mario Modesto ";"5519994389912";"marinmodestin@gmail.com";"27/02/2001";"2";"302.50";"2";"08/02/2025, 20:54:14";"05/12/2025, 21:27:22";"Avenida Lázaro Pio Magalhães, 460, (Apto13, Bloco A) Jardim Nova São João, 13874137, São João da Boa Vista/SP"
+"Jhonifer Alvarado Plaza";"5535997011003";"jhnnifr@gmail.com";"11/05/1990";"8";"1066.40";"8";"08/02/2025, 21:07:37";"14/02/2026, 21:01:53";"Rua Padre Josué, 331, (Casa esquina) São Lázaro, 13870490, São João da Boa Vista/SP"
+"Gabriel Ferriolli ";"5511956596696";"gabrielferriolli@hotmail.com";"06/04/1996";"1";"87.00";"1";"09/02/2025, 22:44:05";"09/02/2025, 22:44:05";"Rua Juvenal Nogueira, 335, (Ap 1) Vila Conceição, 13872014, São João da Boa Vista/SP"
+"Carolina Andrade";"5511964943762";"carolina.andrade166@gmail.com";"22/01/2006";"1";"52.50";"1";"12/08/2025, 18:08:17";"12/08/2025, 18:08:17";
+"Ivan Rhis ";"5519992424243";;;"1";"115.00";"1";"15/02/2025, 19:18:15";"15/02/2025, 19:18:15";
+"Moises oliveira";"5519991472546";;;"2";"174.00";"2";"15/02/2025, 20:14:36";"15/03/2025, 20:15:03";
+"Elisabeth Matheus ";"5519993829901";;;"1";"50.00";"1";"16/02/2025, 20:03:37";"16/02/2025, 20:03:37";
+"Victor André";"5519991962042";"victorandre121@hotmail.com";"29/09/1998";"2";"184.50";"2";"18/02/2025, 21:30:44";"27/02/2025, 20:13:51";"Rua Maria Polvani da Silva, 170, Colinas do Alegre, 13874624, São João da Boa Vista/SP"
+"Francine Magalhaes Silveira Dias ";"5535991189769";"francinemsdias@gmail.com";;"1";"53.00";"1";"20/02/2025, 20:36:50";"20/02/2025, 20:36:50";"Rua São João, 221, (Apto 33) Centro, 13870222, São João da Boa Vista/SP"
+"Nathalia Pasquini";"5519992633635";;"03/02/2004";"1";"61.00";"1";"26/04/2025, 19:58:38";"26/04/2025, 19:58:38";"Avenida Doutor Durval Nicolau, 1883, Riviera de São João, 13874789, São João da Boa Vista/SP"
+"Felipe Augusto ";"5519993350781";"fellipecosta1705@gmail.com";"17/05/2003";"1";"100.00";"1";"21/02/2025, 19:50:58";"21/02/2025, 19:50:58";"Rua Newton Alvarez, 223, Jardim Santa Águida, 13873131, São João da Boa Vista/SP"
+"Carol Lopes ";"5519971583457";;;"2";"140.00";"2";"22/02/2025, 20:58:36";"27/02/2025, 20:41:48";
+"Karina Souza";"5519986067276";"karinasouza.1@hotmail.com";"15/07/1994";"1";"169.00";"1";"23/02/2025, 20:49:38";"23/02/2025, 20:49:38";"Rua Nicolau Rehder, 139, (Casa) Jardim São Paulo, 13875079, São João da Boa Vista/SP"
+"Carol falda";"5519991587553";;;"1";"86.50";"1";"02/03/2025, 21:17:04";"02/03/2025, 21:17:04";
+"Amanda molina ";"5535992633498";;;"1";"104.00";"1";"28/02/2025, 19:16:01";"28/02/2025, 19:16:01";
+"Aline Ferrari";"5532999408131";"aferrarinunes6@gmail.com";"14/11/1983";"1";"109.50";"1";"28/02/2025, 19:59:27";"28/02/2025, 19:59:27";"Rua Bernardino de Campos, 597, (Apto 31) Centro, 13870248, São João da Boa Vista/SP"
+"Alan Delgado";"5519991891543";;;"1";"82.00";"1";"01/03/2025, 21:08:57";"01/03/2025, 21:08:57";
+"Aline Cristina Borges da silva ";"5519987331216";"aborges2023@outlook.com";"30/05/1989";"12";"823.50";"12";"01/03/2025, 22:08:40";"11/02/2026, 21:45:28";"Rua Prudente de Moraes, 865, Centro, 13870050, São João da Boa Vista/SP"
+"André Luis Pereira do Prado";"5519996480715";;"17/07/1988";"1";"123.00";"1";"04/03/2025, 19:23:14";"04/03/2025, 19:23:14";"Rua José Osório, 52, São Lázaro, 13870450, São João da Boa Vista/SP"
+"Gabriela Rodrigues";"5519992900644";"gabirodriguesh20@gmail.com";"20/05/2005";"1";"84.00";"1";"08/03/2025, 21:10:34";"08/03/2025, 21:10:34";"rua, José Amaro da Cruz, 118, (Casa) São benedito, São João da Boa Vista/SP"
+"Rafael Henrique Delgado Pereira ";"5519988534777";;;"1";"133.00";"1";"09/03/2025, 19:42:35";"09/03/2025, 19:42:35";
+"Julia Vidal ";"5519994700875";;;"1";"96.00";"1";"09/03/2025, 22:52:31";"09/03/2025, 22:52:31";
+"Isabelli Borges De Souza";"5519995571539";;"31/01/2001";"2";"109.00";"2";"24/08/2025, 20:17:17";"22/11/2025, 21:17:57";"Washington Luis, 487, (Empresa) Jardim das Rosas, Espírito Santo do Pinhal/SP"
+"Túlio Maciel ";"5535998639363";;;"1";"48.00";"1";"14/03/2025, 21:06:26";"14/03/2025, 21:06:26";
+"Danilo Luiz Cavini";"5519983684572";;;"1";"92.00";"1";"14/03/2025, 22:26:36";"14/03/2025, 22:26:36";
+"Luciana Almeida";"5519971019182";"oitudobem2267@gmail.com";;"1";"145.00";"1";"15/03/2025, 19:04:07";"15/03/2025, 19:04:07";"Rua Melvin Jones, 19, (Casa) Perpétuo Socorro, 13870547, São João da Boa Vista/SP"
+"Eluana Nogueira";"5519999165211";"eluana.a.n@gmail.com";"24/04/1991";"1";"112.00";"1";"20/04/2025, 20:19:39";"20/04/2025, 20:19:39";"Rua Octávio Parreira, 280, Jardim das Paineiras, 13874720, São João da Boa Vista/SP"
+"Fernanda Nascimento ";"5541991930803";;;"2";"318.00";"2";"15/03/2025, 21:04:04";"17/06/2025, 18:58:48";
+"Anmilly Sebrian ";"5511933636620";;;"1";"189.50";"1";"15/03/2025, 22:23:43";"15/03/2025, 22:23:43";
+"Maria Eduarda Ferreira";"5519992672375";;;"1";"146.00";"1";"21/03/2025, 20:10:46";"21/03/2025, 20:10:46";
+"Michaella Venâncio Arduino";"5516991016757";;"17/09/1995";"1";"60.00";"1";"21/03/2025, 23:21:08";"21/03/2025, 23:21:08";"Rua Antônio Machado, 306, Centro, 13870226, São João da Boa Vista/SP"
+"Clezer Giao";"5519997075100";"contato.livesound@gmail.com";"06/08/1973";"1";"34.00";"1";"22/03/2025, 20:09:05";"22/03/2025, 20:09:05";
+"Charles Mendes";"5519971415396";;"01/03/2000";"1";"67.00";"1";"23/03/2025, 19:38:18";"23/03/2025, 19:38:18";
+"Afonso Henrique ";"5519992336328";;;"1";"54.00";"1";"23/03/2025, 20:22:52";"23/03/2025, 20:22:52";
+"Leticia Matiello";"5519995449134";"leematiello@gmail.com";"22/08/2007";"1";"56.00";"1";"25/03/2025, 19:08:01";"25/03/2025, 19:08:01";"Rua Antonio Milan Sobrinho, 1591, Jardim dos Ipês I, 13876594, São João da Boa Vista/SP"
+"Fernando Zanetti ";"5519995104018";;;"2";"88.00";"2";"27/03/2025, 20:05:27";"02/12/2025, 19:57:30";
+"Guilherme Martins";"5519992069881";;;"1";"81.00";"1";"28/03/2025, 20:41:55";"28/03/2025, 20:41:55";
+"Vitória Zampieri ";"5519993299826";;;"1";"92.00";"1";"29/03/2025, 19:33:57";"29/03/2025, 19:33:57";
+"Aline Salvador ";"5519998102909";"alinessilveiraa@hotmail.com";"29/09/1989";"2";"139.00";"2";"30/03/2025, 18:43:03";"23/11/2025, 20:25:10";"Rua Valter Nora Teodoro, 146, (Condomínio) Residencial das Macaubeiras, 13874068, São João da Boa Vista/SP"
+"Giovanna mora ";"5519995408281";;;"1";"72.00";"1";"30/03/2025, 18:44:15";"30/03/2025, 18:44:15";
+"Leandro Cassiano";"5519981506001";"loztrezhermanoz@gmail.com";"08/10/1988";"1";"115.00";"1";"30/03/2025, 20:59:15";"30/03/2025, 20:59:15";
+"Vanessa Possidonio";"5519995915759";"vanessapossidonio30@gmail.com";"15/05/2000";"1";"86.00";"1";"04/04/2025, 20:12:08";"04/04/2025, 20:12:08";"Rua Antonio Celeghini, 13, (Casa) Jardim Almeida, 13876347, São João da Boa Vista/SP"
+"Nelson Antonio";"5519964486290";;;"1";"94.00";"1";"04/04/2025, 22:27:59";"04/04/2025, 22:27:59";
+"Geysi madielly";"5519992291551";;;"1";"182.00";"1";"05/04/2025, 19:22:21";"05/04/2025, 19:22:21";
+"Ivan Rhis";"5519994915366";"ivan.rhis@icloud.com";"09/05/1993";"1";"135.00";"1";"05/04/2025, 19:51:28";"05/04/2025, 19:51:28";"Rua Antenor Viana, 70, (Casa) Núcleo Durval Nicolau (Etapa 2), 13872322, São João da Boa Vista/SP"
+"Victor Altran Soares";"5511959443494";;;"1";"47.50";"1";"05/04/2025, 20:45:36";"05/04/2025, 20:45:36";
+"Marcos Ruan";"5519994179772";"ruanmarcos12.7@gmail.com";"12/07/1991";"1";"47.00";"1";"12/04/2025, 21:32:46";"12/04/2025, 21:32:46";"Rua Lino Roberto Galli de Paiva, 334, (Casa com portão madeira) Loteamento Portal da Aliança, 13876688, São João da Boa Vista/SP"
+"Alessandro Konzen";"5554999220790";"Alessandrokonzen@gmail.com";"28/02/1989";"1";"46.00";"1";"13/04/2025, 19:44:25";"13/04/2025, 19:44:25";"Rua João Paulo II, 55, (Hotel Mansão dos Nobres) Santo Antônio, 13871202, São João da Boa Vista/SP"
+"Everton Ferreira ";"5519992474097";"evim2215@gmail.com";;"2";"98.00";"2";"16/04/2025, 20:42:18";"29/04/2025, 19:53:07";
+"Yasmin Bicesto";"5519996842181";"yasminbicesto0@gmail.com";"09/05/1997";"1";"104.00";"1";"17/04/2025, 21:45:46";"17/04/2025, 21:45:46";"Rua Gerônimo Milan, 171, Jardim Bela Vista, 13871112, São João da Boa Vista/SP"
+"Laryssa Cavalcante ";"5519982574694";;;"1";"82.00";"1";"19/04/2025, 21:02:27";"19/04/2025, 21:02:27";
+"Carolina Malek";"5519999640454";;;"6";"899.40";"6";"21/04/2025, 19:59:35";"20/11/2025, 20:54:42";
+"Gabriela Xavier ";"5538998482974";;;"1";"90.00";"1";"23/04/2025, 22:20:28";"23/04/2025, 22:20:28";
+"Guilherme Nascimento ";"5519999258447";;;"5";"434.00";"5";"24/04/2025, 19:07:13";"23/11/2025, 18:20:45";
+"Lucas FARIA ";"5519982652407";;;"1";"139.00";"1";"25/04/2025, 21:38:36";"25/04/2025, 21:38:36";
+"Claudia Voltareli ";"5519991252940";;;"4";"499.00";"4";"27/04/2025, 20:51:03";"14/06/2025, 19:12:00";
+"Victor escandon";"5519995326750";"victescan821@gmail.com";"20/04/1985";"15";"1524.70";"15";"01/05/2025, 20:16:07";"14/02/2026, 20:34:24";"Rua Professora Julieta da Silva Barreto, 296, (Casa) Jardim Santa Rita, 13871088, São João da Boa Vista/SP"
+"Mário Castilho";"5511993715037";"mariomcastilho@gmail.com";"26/03/1990";"1";"72.90";"1";"02/05/2025, 20:19:00";"02/05/2025, 20:19:00";"Praça Coronel Joaquim José, 176, (Apto 8) Centro, 13870120, São João da Boa Vista/SP"
+"Ana Julia Sette Emygdio";"5519993202639";"anajulia7emygdio@gmail.com";;"1";"99.00";"1";"02/05/2025, 20:16:18";"02/05/2025, 20:16:18";"Rua Getúlio Vargas, 519, (Apto 82) Centro, 13870100, São João da Boa Vista/SP"
+"Vinicius Garcia";"5519995205767";"vinicius7401@gmail.com";"01/10/2003";"6";"489.50";"6";"02/05/2025, 21:03:15";"17/01/2026, 22:36:48";"Rua Santa Maria, 728, (The best hot dog) Jardim São Paulo, 13875082, São João da Boa Vista/SP"
+"Priscila Augusto ";"5519995168440";;;"4";"430.30";"4";"02/05/2025, 21:11:12";"14/02/2026, 21:09:36";
+"Marcelo Vasconcelos ";"5511940120588";;;"1";"54.00";"1";"02/05/2025, 22:57:54";"02/05/2025, 22:57:54";
+"Erika pereira";"5519999936485";"erika.parreira3@gmail.com";"05/08/1986";"1";"46.00";"1";"03/05/2025, 19:32:51";"03/05/2025, 19:32:51";
+"Vitoria Gamba";"5519995103684";;;"1";"34.00";"1";"03/05/2025, 19:59:27";"03/05/2025, 19:59:27";
+"Lucas campos";"5519990031867";;;"1";"47.00";"1";"03/05/2025, 20:25:06";"03/05/2025, 20:25:06";
+"Ronaldo Francisco Mapelli Junior";"5519992427496";;;"1";"34.00";"1";"03/05/2025, 20:26:27";"03/05/2025, 20:26:27";
+"Claudia Degrava ";"5519996093417";;;"1";"176.00";"1";"04/05/2025, 18:38:08";"04/05/2025, 18:38:08";
+"Mariana Aparecida Moraes Domingos ";"5519981692590";"Mariana.domingod@gmail.com";"19/10/2001";"1";"156.00";"1";"07/05/2025, 18:28:35";"07/05/2025, 18:28:35";"Sebastina moreno francisco, 124, Jardim das flores, São João da Boa Vista/SP"
+"Paulo Godoy";"5519997497863";;;"2";"224.00";"2";"07/05/2025, 18:47:45";"20/08/2025, 19:15:02";
+"Monique Muniz ";"5519987529261";;;"5";"438.00";"5";"08/05/2025, 22:05:41";"07/06/2025, 21:24:14";
+"Janaina Gomes leite monteiro ";"5519993985990";"gomesleitejana@gmail.com";;"1";"122.00";"1";"09/05/2025, 18:53:04";"09/05/2025, 18:53:04";"Rua Claudinei Antonio Pereira, 274, (Casa) Jardim dos Jacarandás Fase 1, 13877080, São João da Boa Vista/SP"
+"Isadora leal";"5519993533805";"isadora.ibanhez@gmail.com";"01/06/2006";"2";"170.00";"2";"10/05/2025, 21:59:47";"24/05/2025, 22:24:00";
+"Julio Valentim ";"5519971341689";;;"1";"50.00";"1";"13/05/2025, 21:00:08";"13/05/2025, 21:00:08";
+"Sergio junior ";"5519994841225";"sergiorvjunior97@gmail.com";"26/11/1997";"1";"112.00";"1";"13/05/2025, 22:03:03";"13/05/2025, 22:03:03";"Rua Gabriel Ferreira, 304, Centro, 13870180, São João da Boa Vista/SP"
+"Gisele Ribeiro ";"5519989371357";"gi29.ribeiro@gmail.com";"12/03/1989";"3";"385.00";"3";"14/05/2025, 19:11:26";"08/06/2025, 22:43:18";"Avenida Doutor Luiz Gambeta Sarmento, 466, Santo Antônio, 13871200, São João da Boa Vista/SP"
+"Jessica kempe ";"5519994203962";;;"1";"114.50";"1";"16/05/2025, 19:49:45";"16/05/2025, 19:49:45";
+"Emerson Cunha";"5512988174679";;;"1";"67.50";"1";"18/05/2025, 20:24:12";"18/05/2025, 20:24:12";
+"Rayane Silva ";"5519994757520";;;"1";"49.00";"1";"21/05/2025, 22:09:12";"21/05/2025, 22:09:12";
+"Luís Cláudio ";"5519981012290";"luisclaudiocamargo766@gmail.com";"05/01/2004";"1";"51.00";"1";"22/05/2025, 21:27:36";"22/05/2025, 21:27:36";
+"Leonardo Bruscadin";"5519989172438";;;"1";"102.00";"1";"22/05/2025, 21:35:54";"22/05/2025, 21:35:54";
+"Guilherme Shibata";"5519994968211";"Guilhermeshibata123@gmail.com";"25/09/1998";"1";"85.00";"1";"22/05/2025, 22:33:20";"22/05/2025, 22:33:20";
+"Erica Pedro Bom ";"5519998162865";;"05/12/1979";"1";"42.00";"1";"23/05/2025, 19:21:28";"23/05/2025, 19:21:28";
+"Thuane Rojas ";"5519989130045";;;"1";"87.00";"1";"23/05/2025, 20:29:55";"23/05/2025, 20:29:55";
+"Tarcísio Pires ";"5548992050427";;"05/09/1998";"1";"97.00";"1";"23/05/2025, 21:52:56";"23/05/2025, 21:52:56";"Avenida Wilson Castelo Branco, 700, (Casa 299) Beira Rio, 88164220, Biguaçu/SC"
+"Carlos Candido ";"5519971659404";"carloseduardo19122005@gmail.com";"19/12/2005";"3";"293.40";"3";"24/05/2025, 19:22:06";"16/01/2026, 18:30:07";"Rua Nadir Dias Molina, 173, Parque dos Resedás, 13876279, São João da Boa Vista/SP"
+"Henrique Menegatti";"5519991902199";"henrique.pmenegatti@gmail.com";"12/09/2000";"1";"46.00";"1";"28/05/2025, 19:44:50";"28/05/2025, 19:44:50";
+"Letícia Franciole ";"5535992094039";;;"1";"54.00";"1";"29/05/2025, 18:10:24";"29/05/2025, 18:10:24";
+"Eduardo Lopes";"5519990004037";;;"1";"100.00";"1";"30/05/2025, 21:37:30";"30/05/2025, 21:37:30";
+"Marco Antônio ";"5519997278154";;;"1";"132.00";"1";"31/05/2025, 18:45:17";"31/05/2025, 18:45:17";
+"Mariana Machado Marcondes ";"5535998241025";"mariana-3-m@hotmail.com";"07/11/1988";"1";"81.00";"1";"01/06/2025, 18:46:19";"01/06/2025, 18:46:19";
+"Janaina Flor";"5519992064760";;;"1";"91.00";"1";"01/06/2025, 20:09:23";"01/06/2025, 20:09:23";
+"Vinicius Rui";"5519996269502";"duzanivinicius@gmail.com";;"1";"118.00";"1";"05/06/2025, 18:59:59";"05/06/2025, 18:59:59";"Rua Lucina Raposo de Vasconcellos, 26, Jardim São Manoel, 13872090, São João da Boa Vista/SP"
+"Emili Ribeiro ";"5535998328618";;;"3";"239.40";"3";"05/06/2025, 20:53:46";"28/11/2025, 18:57:16";
+"maria vitória ";"559992614811";;;"1";"48.00";"1";"05/06/2025, 22:15:44";"05/06/2025, 22:15:44";
+"Keliton Oliveira";"5519996107497";;;"1";"116.00";"1";"06/06/2025, 20:16:27";"06/06/2025, 20:16:27";
+"Pamela De oliveira";"5519994999530";"pd866602@gmail.com";"05/09/1989";"1";"204.00";"1";"06/06/2025, 22:38:40";"06/06/2025, 22:38:40";"Rua Wilson Bértoli, 42, (Casa) Jardim Amélia, 13876442, São João da Boa Vista/SP"
+"Victor Soares";"5511959473494";;"14/07/2006";"2";"82.00";"2";"07/06/2025, 20:27:03";"08/07/2025, 20:53:08";
+"Maiara Carolina";"5519999830649";"maidavmarcola24@gmail.com";;"1";"52.50";"1";"08/06/2025, 19:32:47";"08/06/2025, 19:32:47";"Rua Carolina Malheiros, 92, (Quarto 204) Vila Conrado, 13870720, São João da Boa Vista/SP"
+"Eli Barbeiro";"5519971183343";"barbeiroeli2000@gmail.com";"06/06/2001";"1";"83.00";"1";"08/06/2025, 22:31:00";"08/06/2025, 22:31:00";"Rua Ângelo Roqueto, 53, Jardim Recanto do Jaguari, 13872218, São João da Boa Vista/SP"
+"Marcia Maria romero vidal ";"5519997155866";;;"1";"77.00";"1";"10/06/2025, 19:17:47";"10/06/2025, 19:17:47";
+"Luiz Roque";"5535991139398";;;"1";"103.50";"1";"12/06/2025, 18:05:10";"12/06/2025, 18:05:10";
+"Kaique Alves";"5519971678306";;;"1";"261.00";"1";"12/06/2025, 20:27:20";"12/06/2025, 20:27:20";
+"Zaqueu li";"5511993055115";;;"1";"93.00";"1";"12/06/2025, 22:06:09";"12/06/2025, 22:06:09";
+"Alexandre Benevides";"5519999751486";"alex.benevides@hotmail.com";"03/07/1995";"13";"1525.20";"13";"13/06/2025, 20:04:42";"17/01/2026, 21:51:11";"Rua Hélio Correa da Fonseca, 200, (Casa) Jardim Santa Rita, 13871059, São João da Boa Vista/SP"
+"André carlos";"5519991964368";;;"2";"228.50";"2";"14/06/2025, 19:18:59";"05/07/2025, 20:04:05";
+"deyvid rytchelli";"5543988525708";"d.rytchelli@gmail.com";;"1";"60.00";"1";"15/06/2025, 19:30:56";"15/06/2025, 19:30:56";"Rua Getúlio Vargas, 38, (Hotel Líbero) Centro, 13870100, São João da Boa Vista/SP"
+"Leonardo Costa";"5555996123321";;;"1";"88.00";"1";"15/06/2025, 22:02:12";"15/06/2025, 22:02:12";
+"Alex Oliveira ";"5516981176232";"perdidoin@gmail.com";"17/06/1987";"1";"94.00";"1";"17/06/2025, 18:17:22";"17/06/2025, 18:17:22";"Rua Linconl Budri, 60, (Sobrado amarelo) Jardim dos Eucaliptos, 13874526, São João da Boa Vista/SP"
+"Larissa Tavares";"5519991862846";;;"1";"115.00";"1";"02/08/2025, 20:23:40";"02/08/2025, 20:23:40";
+"Germano Elias";"5519991246029";"germano.elias2019@gmail.com";"24/08/1986";"2";"78.00";"2";"18/06/2025, 21:38:05";"10/12/2025, 20:53:22";"Rua Prudente de Moraes, 865, (Casa) Centro, 13870050, São João da Boa Vista/SP"
+"Lucas Padilha";"5531996962508";;;"1";"112.00";"1";"20/06/2025, 20:30:08";"20/06/2025, 20:30:08";
+"Wesley Souza";"5519983843985";"souzawesley703@gmail.com";"18/11/1993";"2";"188.00";"2";"20/06/2025, 20:30:21";"20/07/2025, 19:59:20";"Rua Capitão José Alexandre, 232, (Apartamento 33) Centro, 13871000, São João da Boa Vista/SP"
+"Thalison silva";"5519996862761";"thalisonfelisberto@gmail.com";"16/10/1993";"1";"34.00";"1";"24/06/2025, 21:01:15";"24/06/2025, 21:01:15";
+"Adriana Pavanelli";"5511988701843";;;"1";"100.00";"1";"26/06/2025, 18:39:44";"26/06/2025, 18:39:44";
+"Daniel caldana ";"5519995771330";;;"1";"46.00";"1";"26/06/2025, 19:57:15";"26/06/2025, 19:57:15";
+"Sabrina Rissardi ";"5519994723628";;;"1";"47.00";"1";"27/06/2025, 19:12:25";"27/06/2025, 19:12:25";
+"Beatriz vilela";"5533988175600";;;"1";"85.00";"1";"06/07/2025, 20:23:41";"06/07/2025, 20:23:41";
+"Vanessa Souza";"5519997699797";;;"1";"93.00";"1";"29/06/2025, 18:10:05";"29/06/2025, 18:10:05";
+"David Pipano Junior ";"5519991187438";"dapipajr@gmail.com";"18/03/1959";"1";"48.00";"1";"29/06/2025, 19:00:02";"29/06/2025, 19:00:02";"Rua Joel Lisboa Biotto, 781, (Condomínio Valle da Prata) Terras de São José, 13874822, São João da Boa Vista/SP"
+"waltim neto";"5519992820660";"wneto605@gmail.com";"02/03/2001";"3";"266.00";"3";"03/07/2025, 18:45:17";"04/01/2026, 21:17:22";"Rua João Marcondes Neto, 97, (Casa com cerca eletrica) Jardim Progresso, 13876408, São João da Boa Vista/SP"
+"tamires heloísa ";"551999195666";;;"1";"112.00";"1";"04/07/2025, 19:35:34";"04/07/2025, 19:35:34";
+"Ana Lúcia Lopes ";"5519991480029";;;"9";"936.40";"9";"05/07/2025, 19:13:28";"25/01/2026, 19:12:04";
+"Paulo Henrique Cipollini gomes ";"5511996912122";"pcipollini@hotmail.com";"25/05/1982";"1";"83.50";"1";"05/07/2025, 20:37:06";"05/07/2025, 20:37:06";"Rua Anísio Valim, 225, Recanto do Lago, 13874668, São João da Boa Vista/SP"
+"Rodrigo Vazquez";"5511991003113";"rvgomes.sp@gmail.com";;"1";"79.00";"1";"06/07/2025, 20:28:21";"06/07/2025, 20:28:21";"Rua João Paulo II, 55, (Quarto 220) Santo Antônio, 13871202, São João da Boa Vista/SP"
+"Lucas Trentin ";"5519982053521";"lucas.trentin@hotmail.com";"15/07/1996";"2";"233.90";"2";"08/07/2025, 21:41:23";"26/07/2025, 19:01:00";"Rua Dom Duarte Leopoldo e Silva, 556, Jardim Bela Vista, 13871110, São João da Boa Vista/SP"
+"Rafaela Cabral Burato ";"5519999551959";;;"1";"67.00";"1";"09/07/2025, 18:24:20";"09/07/2025, 18:24:20";
+"Gustavo Elias";"5519992818476";"gustavodacostaelias@gmail.com";"21/12/2006";"1";"43.00";"1";"12/07/2025, 18:44:25";"12/07/2025, 18:44:25";"Rua Vicente Lombardi, 169, (Casa) Parque das Nações, 13874222, São João da Boa Vista/SP"
+"Mateus Henrique ";"5519994632506";;;"1";"68.00";"1";"12/07/2025, 19:53:25";"12/07/2025, 19:53:25";
+"Beatriz Maximo";"5519992232047";"biamaximo0321@gmail.com";"20/12/2001";"1";"86.00";"1";"15/07/2025, 19:54:43";"15/07/2025, 19:54:43";
+"Filipe Rubbo";"5519999955142";;;"1";"47.00";"1";"15/07/2025, 20:51:08";"15/07/2025, 20:51:08";
+"Vinícius Melo";"5519993833328";"vini.simoesmelo@gmail.com";;"1";"47.50";"1";"18/07/2025, 20:00:25";"18/07/2025, 20:00:25";"Rua Julio Borges de Carvalho, 589, (Casa) Terras de São José, 13874804, São João da Boa Vista/SP"
+"Rafaela Pella";"5519997606963";"rafaelapella236@gmail.com";"09/10/2004";"1";"206.80";"1";"18/07/2025, 20:19:50";"18/07/2025, 20:19:50";"Rua José Borato, 380, (Casa) Terras de São José, 13874808, São João da Boa Vista/SP"
+"Mel Faconi Cunha";"5535996703011";"melfcunha@icloud.com";"30/11/2005";"1";"120.50";"1";"18/07/2025, 20:06:47";"18/07/2025, 20:06:47";
+"Maria Isadora ";"5535998244521";;;"1";"103.90";"1";"22/07/2025, 19:32:29";"22/07/2025, 19:32:29";
+"Julia Isabelle Ridolfi";"5519971296059";"julia.ridolfi@hotmail.com";"15/08/1995";"1";"168.00";"1";"23/07/2025, 21:08:03";"23/07/2025, 21:08:03";"R Orlando fracari, 730, (Hospital unimed) Jardim recanto do bosque, São João da Boa Vista/SP"
+"Bianca Vicente ";"5519996212402";"biancacv2018@gmail.com";"24/02/1998";"1";"98.00";"1";"25/07/2025, 18:35:43";"25/07/2025, 18:35:43";"Rua Atílio André Rubbo, 135, (ap 21) Parque das Nações, 13870583, São João da Boa Vista/SP"
+"Rafaela Cremasco";"5519992167422";;;"2";"179.00";"2";"25/07/2025, 19:12:34";"08/08/2025, 19:57:19";
+"Gabriel Rocha ";"5519998546768";;;"1";"47.00";"1";"25/07/2025, 20:35:43";"25/07/2025, 20:35:43";
+"Douglas Agostinho ";"5519997151286";;;"1";"79.00";"1";"26/07/2025, 18:24:27";"26/07/2025, 18:24:27";
+"Cristina Canevari";"5519998486133";;;"1";"161.90";"1";"26/07/2025, 19:33:34";"26/07/2025, 19:33:34";
+"Leticia Alcantara";"5519995521831";"leticiaalcantara757@gmail.com";"23/05/1997";"1";"59.00";"1";"26/07/2025, 21:28:19";"26/07/2025, 21:28:19";"Pelio José Gianelli, 27, (Casa) Jd Santa Helena/Vila do Sapo, São João da Boa Vista/SP"
+"Larissa Thome ";"5519995156778";;;"1";"116.00";"1";"27/07/2025, 19:48:18";"27/07/2025, 19:48:18";
+"Ana Livia Thomaz ";"5535997506713";"liviaanathomaz1503@gmail.com";"15/03/2004";"1";"52.00";"1";"27/07/2025, 20:30:43";"27/07/2025, 20:30:43";"Rua Joaquim Nunes filho, 491, (Casa 2) Jardim nova São João, São João da Boa Vista/SP"
+"Anor Souza";"5519991168603";"anorsassaron@gmail.com";"28/03/1987";"1";"189.50";"1";"27/07/2025, 20:49:10";"27/07/2025, 20:49:10";"Rua Benedita Pereira da Fonseca, 162, (casa) Parque dos Resedás, 13876275, São João da Boa Vista/SP"
+"Emerson Padilha ";"5519994647517";;;"1";"55.00";"1";"29/07/2025, 20:46:23";"29/07/2025, 20:46:23";
+"Neto Henrique";"5515998495933";"ehfneto@gmail.com";"17/04/1990";"1";"167.00";"1";"02/08/2025, 21:32:02";"02/08/2025, 21:32:02";"Rua Joel Lisboa Biotto, 781, (Casa 89) Terras de São José, 13874822, São João da Boa Vista/SP"
+"Suélen Vital";"5519989968655";"contatovitalsuelen@gmail.com";"17/12/1995";"2";"143.00";"2";"05/08/2025, 19:48:17";"24/02/2026, 21:11:43";"Rua Agostinho Pires de Aguiar, 162, (Casa) São Lázaro, São João da Boa Vista/SP"
+"Víviani Varzim ";"5519992449266";;;"2";"170.00";"2";"07/08/2025, 18:22:43";"07/02/2026, 19:42:56";
+"Stephanie Lima";"5519983058163";;;"1";"92.00";"1";"08/08/2025, 18:17:02";"08/08/2025, 18:17:02";"Rua Quinze de Novembro, 52, (Casa) Centro, 13870233, São João da Boa Vista/SP"
+"Danilo cardozo ";"5519999512267";;;"1";"50.00";"1";"08/08/2025, 19:26:05";"08/08/2025, 19:26:05";
+"Fernanda Miranda ";"5519987040948";;;"1";"48.00";"1";"10/08/2025, 18:37:01";"10/08/2025, 18:37:01";
+"Rayane Gomes";"5519989374026";;"05/06/1999";"1";"145.00";"1";"13/08/2025, 19:29:09";"13/08/2025, 19:29:09";
+"Mirelly Cola";"5519989833019";;;"1";"130.00";"1";"10/08/2025, 22:12:10";"10/08/2025, 22:12:10";
+"Preto souza";"5519995189789";;;"1";"74.00";"1";"12/08/2025, 18:30:46";"12/08/2025, 18:30:46";
+"Marcella Garcia ";"5519982411481";"marcella.soliv@gmail.com";;"1";"195.00";"1";"15/08/2025, 18:41:43";"15/08/2025, 18:41:43";"Rua Linconl Budri, 60, Jardim dos Eucaliptos, 13874526, São João da Boa Vista/SP"
+"Sophia Cavalcante";"5519971179899";"sophiafcavalcante08@gmail.com";"08/01/2002";"1";"56.90";"1";"05/10/2025, 18:33:50";"05/10/2025, 18:33:50";"Rua João Artem, 320, Jardim Recanto do Bosque, 13874425, São João da Boa Vista/SP"
+"larissa prado ";"5519993175235";;;"1";"179.00";"1";"16/08/2025, 22:28:35";"16/08/2025, 22:28:35";
+"Ana Paula Guarche Hess Vaz de Lima ";"5519997315012";"paula-hess@hotmail.com";"10/10/1968";"1";"55.00";"1";"22/08/2025, 18:09:55";"22/08/2025, 18:09:55";"Rua José de Oliveira Azevedo, 380, Parque Jequitibás, 13874444, São João da Boa Vista/SP"
+"Ana Milanez Almeida";"5519994312772";"ana.milalme@gmail.com";;"1";"88.00";"1";"22/08/2025, 22:51:06";"22/08/2025, 22:51:06";"Rua João Ferreira Varzim, 130, Vila Valentim, São João da Boa Vista/SP"
+"Thiago Rodrigues Dos Santos";"5519998185531";;;"1";"106.90";"1";"22/08/2025, 22:54:33";"22/08/2025, 22:54:33";
+"Rosemary Galvão Borges";"5519997480691";;;"2";"170.00";"2";"23/08/2025, 19:32:01";"13/12/2025, 20:26:59";
+"Milleny Delcaro";"5519994878676";;"04/02/1993";"1";"81.00";"1";"31/08/2025, 20:04:12";"31/08/2025, 20:04:12";
+"Gelder Matielo";"551999211283";;;"1";"76.00";"1";"31/08/2025, 20:58:20";"31/08/2025, 20:58:20";
+"Eduardo Gomes ";"5519971209809";;;"1";"92.00";"1";"03/09/2025, 20:02:07";"03/09/2025, 20:02:07";
+"Alberto Cardoso Almeida ";"5594991010303";;;"1";"76.00";"1";"03/09/2025, 20:40:53";"03/09/2025, 20:40:53";
+"Alfredo bovo";"5519999457675";;;"1";"95.00";"1";"03/09/2025, 22:11:49";"03/09/2025, 22:11:49";
+"Ana Clara";"5519994839449";"anaclaramarcondes96@gmail.com";"02/02/2006";"1";"91.00";"1";"06/09/2025, 23:23:59";"06/09/2025, 23:23:59";
+"Odracir Peitl";"5519995500892";"josianedeoliveira_19@hotmail.com";"14/06/1987";"1";"106.90";"1";"07/09/2025, 18:18:34";"07/09/2025, 18:18:34";"Rua Messias Diogo de Souza, 939, (Casa) Jardim Europa, 13872786, São João da Boa Vista/SP"
+"Volga Caldas";"5519992186697";;;"3";"330.80";"3";"07/09/2025, 20:43:32";"30/10/2025, 21:37:25";
+"Isabela Sachetto";"5519991035567";"sachettoisabela16@gmail.com";"09/09/2003";"1";"92.00";"1";"09/09/2025, 21:09:04";"09/09/2025, 21:09:04";
+"Nicolly Valim";"5519995617361";"nicollyvalim0410@gmail.com";"04/10/2005";"4";"407.50";"4";"13/09/2025, 21:13:34";"09/11/2025, 21:38:48";"Rua Sebastião Pessoa de Almeida, 310, (Casa) Jardim Primavera, 13876818, São João da Boa Vista/SP"
+"Guilherme Batista ";"5519999284010";;;"1";"107.40";"1";"01/01/2026, 19:49:36";"01/01/2026, 19:49:36";
+"Willian Lima ";"5519998521608";"Willianl_@hotmail.com";"04/03/1992";"1";"99.00";"1";"21/09/2025, 19:44:10";"21/09/2025, 19:44:10";"Rua Pedro Costa, 239, (Sobrado) Jardim nova prata, Águas da Prata/SP"
+"Ygor trafani ";"5519999307519";;;"1";"69.00";"1";"21/09/2025, 22:52:08";"21/09/2025, 22:52:08";
+"Murilo Ciuffa Ciuffa";"5519990071331";"murilociuffa29@gmail.com";;"5";"558.28";"5";"26/09/2025, 22:53:51";"22/12/2025, 21:28:16";"Avenida Lazaro Pio Magalhães, 460, (Apartamento 22 Bloco D) Jardim nova são João, São João da Boa Vista/SP"
+"Ana Milena ";"5519989892922";;;"1";"93.00";"1";"26/09/2025, 20:45:29";"26/09/2025, 20:45:29";
+"MATHEUS HONORATO";"5543991134559";"matheushonorato9819@gmail.com";"19/01/1998";"1";"99.00";"1";"26/09/2025, 22:34:07";"26/09/2025, 22:34:07";"Avenida ademir gomes de lima, 817, (Empresa) Distrito industrial, São João da Boa Vista/SP"
+"Monique Muniz";"5519989569324";;;"1";"92.00";"1";"28/09/2025, 22:46:34";"28/09/2025, 22:46:34";
+"Mateus Sanches";"5519981557223";;;"1";"117.00";"1";"30/09/2025, 20:04:12";"30/09/2025, 20:04:12";
+"Isabele Oliveira ";"5519999147551";;;"1";"48.00";"1";"02/10/2025, 20:24:15";"02/10/2025, 20:24:15";
+"Vinicius Garcia ";"5519996301801";;;"2";"135.00";"2";"03/10/2025, 20:40:58";"08/10/2025, 21:35:11";
+"Raphael Rondelli Camargo";"5519984447042";"raphaelrondellicamargo@gmail.com";"12/03/1985";"1";"26.53";"1";"04/10/2025, 18:25:22";"04/10/2025, 18:25:22";"Rua Clertan Valin, 224, Jardim São Salvador, 13876662, São João da Boa Vista/SP"
+"Monique Constantino ";"5519997961805";"moohconstantino@gmail.com";"18/05/2001";"1";"118.00";"1";"04/10/2025, 20:49:42";"04/10/2025, 20:49:42";
+"Carlos Santiago Rehder ";"5519997910210";"c.santiagorehder@gmail.com";"12/03/1968";"1";"95.50";"1";"04/10/2025, 22:10:09";"04/10/2025, 22:10:09";"Praça Coronel Joaquim José, 84, Centro, 13870120, São João da Boa Vista/SP"
+"lorena dourado";"5519971052013";"lorenadourado2013@gmail.com";"11/04/2013";"1";"66.50";"1";"05/10/2025, 19:38:11";"05/10/2025, 19:38:11";"Condomínio morro azul 2, 1507, (Casa) Alameda das orquídeas 1507, São João da Boa Vista/SP"
+"Giovanna Franciscato";"5519995551871";;"24/08/2003";"1";"100.00";"1";"08/10/2025, 21:28:24";"08/10/2025, 21:28:24";
+"Mônica Macário Portela de Oliveira ";"5519994469937";"monica.portela94@gmail.com";"26/08/1994";"2";"224.80";"2";"10/10/2025, 19:48:20";"06/12/2025, 18:23:50";"Rua Bernadete Aparecida Sette, 58, Jardim Nova União, 13876289, São João da Boa Vista/SP"
+"Leandro dos Santos ";"5519998393732";"leguinchoseautosocorro10@outlook.com";"03/05/1986";"2";"250.00";"2";"10/10/2025, 21:52:29";"11/10/2025, 22:18:00";"Rua Carmela Liberali, 312, Parque das Bromélias, 13875567, São João da Boa Vista/SP"
+"Thais Barion";"5519982320079";;;"1";"50.00";"1";"11/10/2025, 19:42:18";"11/10/2025, 19:42:18";
+"Sandra Marcon";"5519991129153";"kalemyadm@gmail.com";;"1";"92.00";"1";"11/10/2025, 20:14:11";"11/10/2025, 20:14:11";"Rua Benjamin Constant, 333, Centro, 13870220, São João da Boa Vista/SP"
+"Fernando silva";"5519995580144";;;"1";"91.90";"1";"11/10/2025, 22:14:49";"11/10/2025, 22:14:49";
+"Gustavo Costa";"5519994218481";"gustavofellipe101@gmail.com";"08/01/1997";"1";"99.80";"1";"12/10/2025, 19:12:02";"12/10/2025, 19:12:02";
+"Priscila mattos";"5519995858357";;;"1";"44.50";"1";"12/10/2025, 19:46:50";"12/10/2025, 19:46:50";
+"Raissa Teodoro";"5519989091483";"rahteodoro12345@gmail.com";"25/05/2006";"1";"112.00";"1";"29/10/2025, 20:01:21";"29/10/2025, 20:01:21";"Alameda Brasilídio José de Lima, 120, (Casa C) Bairro do Lago, 13893024, Águas da Prata/SP"
+"Thales Marques";"5519997095709";"thalesmarquessantos@gmail.com";"30/10/1989";"1";"72.00";"1";"17/10/2025, 19:32:47";"17/10/2025, 19:32:47";"Rua Estevão de Souza, 46, Jardim Industrial, 13872347, São João da Boa Vista/SP"
+"Patrícia Sims ";"5519992214507";;;"1";"82.00";"1";"18/10/2025, 18:19:10";"18/10/2025, 18:19:10";
+"Tamara Gabriela ";"5531998374221";;;"1";"55.00";"1";"18/10/2025, 18:48:28";"18/10/2025, 18:48:28";
+"Danielly Sassaron";"5519999878860";;;"1";"58.00";"1";"18/10/2025, 20:40:19";"18/10/2025, 20:40:19";
+"Isabella castro";"551999718939";;;"1";"26.00";"1";"18/10/2025, 22:20:32";"18/10/2025, 22:20:32";
+"Stela prado";"5519985997084";;;"1";"172.00";"1";"18/10/2025, 22:38:34";"18/10/2025, 22:38:34";
+"Vinicius Garcia ";"5511943574115";"Grauearte019oficial@gmail.com";"01/10/2003";"1";"88.00";"1";"24/10/2025, 22:58:23";"24/10/2025, 22:58:23";
+"Roberta moreira Rodrigues ";"5519997300053";"robertamoreira81@hotmail.com";"04/07/1981";"1";"109.00";"1";"26/10/2025, 20:05:16";"26/10/2025, 20:05:16";"Rua Maria Pavani Parolin, 89, (Casa do robesio) Loteamento Residencial Valle da Prata, 13874893, São João da Boa Vista/SP"
+"Mariana Ribeiro ";"5519995301177";;"10/01/2005";"1";"58.50";"1";"31/10/2025, 19:44:38";"31/10/2025, 19:44:38";
+"Barbara Martins ";"5519996217483";"bah.alice@hotmail.com";;"4";"381.00";"4";"22/01/2026, 18:22:03";"20/02/2026, 19:28:24";"Rua Helton Salvi Freire, 10, Colinas do Alegre, 13874627, São João da Boa Vista/SP"
+"André Luís Gonçalves ";"5519982161557";;;"1";"102.00";"1";"01/11/2025, 21:32:42";"01/11/2025, 21:32:42";
+"Anderson Luiz Menato Florentino";"551996113566";"andersonmenato@gmail.com";"21/01/1994";"1";"122.00";"1";"07/11/2025, 20:51:00";"07/11/2025, 20:51:00";"Rua Maria Amélia Martins Carneiro, 119, (Casa) Jardim Aurora, 13877049, São João da Boa Vista/SP"
+"José do prado";"5519992784408";"josedoprado26@gmail.com";;"1";"89.00";"1";"07/11/2025, 22:01:11";"07/11/2025, 22:01:11";"Rua Luiz Previeiro, 23, Jardim Santa Clara, 13874210, São João da Boa Vista/SP"
+"Giovana Sibin";"5519995799725";;;"1";"113.50";"1";"08/11/2025, 21:02:40";"08/11/2025, 21:02:40";
+"Nickoly paina ";"5519994084059";;;"1";"106.00";"1";"09/11/2025, 20:05:40";"09/11/2025, 20:05:40";
+"Gustavo Cardoso ";"5519992794470";;"22/08/1988";"1";"36.90";"1";"15/11/2025, 20:39:45";"15/11/2025, 20:39:45";"Rua João Costa Hentz, 236, (Casa) Jardim Recanto dos Pássaros II, 13873484, São João da Boa Vista/SP"
+"Keli Adriana Marques Martins";"5519999801977";;;"1";"156.30";"1";"15/11/2025, 22:06:54";"15/11/2025, 22:06:54";
+"Bárbara Tomé ";"5519994580764";;;"1";"72.50";"1";"16/11/2025, 19:10:22";"16/11/2025, 19:10:22";
+"Karolayne Fernanda";"5519991314653";"karolayne1914@gmail.com";"22/04/1997";"4";"250.50";"4";"16/11/2025, 22:40:01";"25/12/2025, 21:46:11";
+"Rafaela Gruli";"5519994247956";;;"1";"38.50";"1";"20/11/2025, 21:03:43";"20/11/2025, 21:03:43";
+"Dawison Romeiro ";"5519982807878";"deromeiro2@gmail.com";;"3";"253.50";"3";"22/11/2025, 19:39:20";"26/12/2025, 20:07:02";"Rua Antônio Fernandes, 424, Recanto do Lago, 13874685, São João da Boa Vista/SP"
+"Kauany prado";"5519993721339";;;"1";"92.00";"1";"22/11/2025, 21:35:11";"22/11/2025, 21:35:11";
+"Alfredo Bovo Neto";"559994576758";"bovoneto@gmail.com";;"1";"100.50";"1";"26/11/2025, 21:33:01";"26/11/2025, 21:33:01";"Rua Henrique Augusto da Silva, 205, Jardim Nova São João, 13874189, São João da Boa Vista/SP"
+"Samanta de Mello";"5519991847660";;;"1";"54.50";"1";"30/12/2025, 19:30:38";"30/12/2025, 19:30:38";
+"Rafaela Marcelino ";"5519995714982";;;"1";"120.49";"1";"14/02/2026, 21:04:59";"14/02/2026, 21:04:59";
+"Vinicius Brunello";"5519982257235";;;"1";"242.30";"1";"29/11/2025, 21:00:30";"29/11/2025, 21:00:30";
+"João Francisco Silveira Montouro";"5519987068480";"jfsilveira.jfs@gmail.com";;"2";"297.00";"2";"29/11/2025, 22:37:15";"11/01/2026, 19:05:57";"Rua Tereza Nora Ciancaglio, 325, Residencial Fazenda das Areias, 13876190, São João da Boa Vista/SP"
+"Cauã Martins Ribeiro";"5519981765975";"martins.caua711@gmail.com";"06/04/1997";"1";"59.50";"1";"30/11/2025, 19:54:09";"30/11/2025, 19:54:09";"Rua Lucimar Rocha Combe Júnior, 210, Parque dos Resedás, 13876263, São João da Boa Vista/SP"
+"Vinicius da lavinya ";"5519993717409";;;"2";"199.90";"2";"02/12/2025, 22:17:59";"21/12/2025, 21:36:43";
+"marcella tramonte";"5519981786406";"ma.sweetheresy@gmail.com";"05/08/1989";"1";"101.00";"1";"06/12/2025, 22:19:49";"06/12/2025, 22:19:49";"Rua Tereza Nora Ciancaglio, 325, Residencial Fazenda das Areias, 13876190, São João da Boa Vista/SP"
+"Vinícius Pa";"5519991684693";;;"1";"31.00";"1";"05/12/2025, 22:49:25";"05/12/2025, 22:49:25";
+"Clara Caruzo";"5519998567536";;;"1";"59.80";"1";"09/12/2025, 22:31:10";"09/12/2025, 22:31:10";
+"Maicon Gonçalves";"5519982587528";"maicongoncalves356@gmail.com";"27/06/2001";"1";"111.90";"1";"13/12/2025, 23:15:22";"13/12/2025, 23:15:22";"Rua Coronel José Procópio, 905, (Casa) Santo Antônio, 13871205, São João da Boa Vista/SP"
+"Cibelle melo";"5511945662916";;;"1";"128.80";"1";"14/12/2025, 20:47:45";"14/12/2025, 20:47:45";
+"Juliana Sesana";"5519996940342";;;"1";"117.90";"1";"19/12/2025, 18:29:59";"19/12/2025, 18:29:59";
+"Izaquiel Dias ";"5519994106556";;;"1";"88.50";"1";"19/12/2025, 20:42:25";"19/12/2025, 20:42:25";
+"Bruno Gomes de Morais";"5519999787302";;;"1";"109.00";"1";"19/12/2025, 20:45:02";"19/12/2025, 20:45:02";
+"Jozue filho ";"5518991058031";;;"1";"50.50";"1";"20/12/2025, 19:36:55";"20/12/2025, 19:36:55";
+"Márcia Silva ";"5519996448607";;;"3";"344.90";"3";"21/12/2025, 19:33:42";"04/01/2026, 20:57:10";
+"Beatriz franccioli ";"5519994287278";;;"1";"170.00";"1";"21/12/2025, 22:36:46";"21/12/2025, 22:36:46";
+"Gustavo otaviano ";"5519982376117";;;"1";"99.90";"1";"25/12/2025, 19:38:34";"25/12/2025, 19:38:34";
+"Nicoly Lima";"5519991852051";"nicolylima13062005@gmail.com";"13/06/2005";"1";"54.50";"1";"28/12/2025, 21:13:25";"28/12/2025, 21:13:25";"Rua Geraldo Magela Silva, 453, Jardim dos Jacarandás Fase 1, 13877075, São João da Boa Vista/SP"
+"Thalia Felipe ";"5519991849721";"jorgethalia3@gmail.com";"18/12/1996";"2";"201.50";"2";"30/12/2025, 22:27:06";"30/01/2026, 20:22:34";
+"Julia Chavegati";"5519998956678";;"03/03/1999";"1";"62.50";"1";"02/01/2026, 19:40:28";"02/01/2026, 19:40:28";"Rua Carlos Paiva, 857, Jardim Sol Nascente II, 13874480, São João da Boa Vista/SP"
+"Djhonatthan Venceslau de Oliveira ";"5519992430330";;;"1";"105.00";"1";"03/01/2026, 18:11:09";"03/01/2026, 18:11:09";
+"Beatriz Dotta";"5519991845059";;;"1";"81.49";"1";"03/01/2026, 19:12:39";"03/01/2026, 19:12:39";
+"José Augusto Cordeiro";"5519992266681";"jacordeiro218@gmail.com";"29/03/1956";"2";"238.98";"2";"03/01/2026, 20:38:19";"20/02/2026, 19:53:58";"Rua Hélio Correa da Fonseca, 200, (Casa) Jardim Santa Rita, 13871059, São João da Boa Vista/SP"
+"Bruna Costa";"5519993216519";;;"1";"92.90";"1";"04/01/2026, 20:43:36";"04/01/2026, 20:43:36";
+"cibelle melo";"5511945669216";;;"1";"232.70";"1";"04/01/2026, 21:37:12";"04/01/2026, 21:37:12";
+"Mara Vicentina ";"5519971225406";"maravicentina73@gmail.com";"13/05/2000";"1";"118.90";"1";"04/01/2026, 22:33:10";"04/01/2026, 22:33:10";"Rua Hélio Correa da Fonseca, 221, (Casa) Jardim Santa Rita, 13871059, São João da Boa Vista/SP"
+"Rafael Augusto Ribeiro";"5519990138669";"rarmagro@gmail.com";"29/05/2000";"1";"94.40";"1";"06/01/2026, 19:20:27";"06/01/2026, 19:20:27";"Rua Francisco Luiz de Oliveira, 493, (Casa) Jardim dos Jacarandás Fase 1, 13877074, São João da Boa Vista/SP"
+"Tairis vitoria";"5519971200203";;"02/09/2001";"1";"107.00";"1";"18/01/2026, 19:36:30";"18/01/2026, 19:36:30";"Rua Ênio Gonçalves Mayrene, 214, (Casa) Jardim Amoreiras, 13876740, São João da Boa Vista/SP"
+"Alexandre Romera";"5519992580977";;;"1";"151.30";"1";"09/01/2026, 21:19:05";"09/01/2026, 21:19:05";
+"Caio sabino";"5519993889984";;;"1";"90.50";"1";"09/01/2026, 22:09:03";"09/01/2026, 22:09:03";
+"Thaís Carvalho ";"5519984198909";"thaiscarvalho.af276@gmail.com";"27/09/2002";"1";"131.00";"1";"10/01/2026, 20:05:16";"10/01/2026, 20:05:16";"Rua Mario Prado Mendes Júnior, 1753, (Casa nova - construção) Jardim Aurora, 13877028, São João da Boa Vista/SP"
+"Thiago Nogueira ";"5519981181492";"thiagosfnogueira@outlook.com";"22/08/1986";"2";"280.50";"2";"10/01/2026, 21:08:44";"13/02/2026, 18:29:27";"Rua David de Carvalho, 1055, (Ap 36) Vila Valentin, 13873020, São João da Boa Vista/SP"
+"Lucas Grilo";"5519993215115";;;"1";"99.00";"1";"11/01/2026, 19:29:47";"11/01/2026, 19:29:47";
+"Sergio Brenand";"5511983888841";"gsergju@gmail.com";"22/03/1990";"1";"140.90";"1";"11/01/2026, 19:34:58";"11/01/2026, 19:34:58";"Rua Luís Carlos Bonaretto, 1687, (Casa) Jardim dos Ipês I, 13876596, São João da Boa Vista/SP"
+"Rogerio Serraiocco";"5519971429836";"serraiocco1@gmail.com";"29/06/1981";"1";"115.00";"1";"11/01/2026, 20:21:55";"11/01/2026, 20:21:55";"Rua José Teodoro de Faria, 53, Parque Residencial Jardim São Domingos, 13874242, São João da Boa Vista/SP"
+"Paulo Tonon";"5519992369799";"paulo.gabriel.tonon02@gmail.com";;"1";"42.50";"1";"17/01/2026, 19:22:11";"17/01/2026, 19:22:11";
+"Laura Estevam ";"5531987154225";;;"1";"152.00";"1";"14/01/2026, 21:07:00";"14/01/2026, 21:07:00";
+"Henrique Ferreira Monteiro ";"5535998793020";"henriqueferreiramonteiro8@gmail.com";"20/10/2009";"1";"109.89";"1";"16/01/2026, 20:21:31";"16/01/2026, 20:21:31";"Rua Padre Josué, 210, (Casa) São Lázaro, São João da Boa Vista/SP"
+"luciano lucas";"5567999367954";"lucianoucas142712@gmail.com";;"1";"55.00";"1";"21/01/2026, 20:05:48";"21/01/2026, 20:05:48";"Rua João Cassiano Neto, 110, (hotel Giordano Matiqueira) Centro, São João da Boa Vista/SP"
+"Juliana Sesana ";"5519996940312";;;"1";"107.90";"1";"22/01/2026, 18:55:23";"22/01/2026, 18:55:23";
+"Elaine Ribeiro";"5519984500110";;;"1";"138.50";"1";"22/01/2026, 19:53:19";"22/01/2026, 19:53:19";
+"Josi Mariano ";"5519996139624";;;"1";"220.48";"1";"22/01/2026, 22:34:58";"22/01/2026, 22:34:58";
+"Alef Souza";"5519994332800";"alefadm39@gmail.com";"31/07/1994";"1";"94.50";"1";"23/01/2026, 19:42:41";"23/01/2026, 19:42:41";"Rua Bernardino de Campos, 832, (Casa) Centro, 13870248, São João da Boa Vista/SP"
+"Tarcilo Diogo Messias da Silva";"5516997951110";"tarcilodiogo@gmail.com";;"1";"119.50";"1";"24/01/2026, 19:24:46";"24/01/2026, 19:24:46";"Alameda das Hortências, 1190, Condomínio Fechado Morro Azul II, 13874405, São João da Boa Vista/SP"
+"Daniela Muniz ";"5519997094024";"daniela.psicologa.muniz@gmail.com";;"1";"107.00";"1";"24/01/2026, 20:38:19";"24/01/2026, 20:38:19";"Laurinda Mariotto Amancio, 144, (Casa) Recanto do lago, São João da Boa Vista/SP"
+"João Vicente Hentz";"5519997889600";"jvchentz@gmail.com";"01/05/2003";"2";"228.46";"2";"24/01/2026, 21:12:42";"18/02/2026, 18:55:55";"Avenida Presidente João Belchior Marques Goulart, 302, Parque das Nações, 13870579, São João da Boa Vista/SP"
+"Juliana Pereira ";"5519995301359";"juju2002bee@gmail.com";"04/08/2002";"1";"72.50";"1";"27/01/2026, 18:35:00";"27/01/2026, 18:35:00";"Rua Pedro Bertoncelli, 830, Jardim Monte Verde, São João da Boa Vista/SP"
+"Maria Eduarda Bartolomeu ";"5519982189674";"dudabartolomeu2005@gmail.com";"05/07/2005";"1";"180.00";"1";"28/01/2026, 19:46:03";"28/01/2026, 19:46:03";"Alameda ipês rosa, 58, (Casa) Condomínio Morro azul 1, São João da Boa Vista/SP"
+"Veridiana Ribeiro";"5519996568114";;;"1";"123.90";"1";"04/02/2026, 20:43:09";"04/02/2026, 20:43:09";
+"Guilherme Juste";"5519971530360";;;"1";"75.49";"1";"06/02/2026, 20:35:03";"06/02/2026, 20:35:03";
+"Amábile Da Silva Pereira ";"5519987066577";"amabilesilva@outlook.com";"23/01/2005";"1";"53.50";"1";"07/02/2026, 18:59:29";"07/02/2026, 18:59:29";
+"Pedro souza";"5519971501904";;;"1";"133.90";"1";"07/02/2026, 19:16:56";"07/02/2026, 19:16:56";
+"Isabella Bovo";"5519989213493";"isabovo2005@gmail.com";"06/04/2005";"1";"118.50";"1";"07/02/2026, 20:01:49";"07/02/2026, 20:01:49";"Rua Eugina Rosa de Lima, 145, (casa) jardim aurora, São João da Boa Vista/SP"
+"Letícia Alves ";"5519981614660";;;"1";"89.00";"1";"08/02/2026, 19:53:18";"08/02/2026, 19:53:18";
+"Carlos Henrique ";"5519995586317";;;"1";"40.50";"1";"08/02/2026, 21:58:01";"08/02/2026, 21:58:01";
+"Daiane Mói ";"551995892229";;;"1";"23.99";"1";"11/02/2026, 18:09:49";"11/02/2026, 18:09:49";
+"Vanessa França de Oliveira";"5519992038158";;;"2";"272.80";"2";"12/02/2026, 20:46:57";"19/02/2026, 21:26:07";
+"Leandro de Assis ";"5519996720148";;;"1";"67.40";"1";"12/02/2026, 22:30:44";"12/02/2026, 22:30:44";
+"Ana Carolina Gomes ";"5519982306794";;;"1";"286.19";"1";"13/02/2026, 21:04:14";"13/02/2026, 21:04:14";
+"Vânia Faria";"5519995333068";;;"2";"155.00";"2";"14/02/2026, 19:51:20";"15/02/2026, 21:06:42";
+"Lorena Souza";"5519994677859";;;"1";"45.00";"1";"14/02/2026, 22:01:32";"14/02/2026, 22:01:32";
+"Thais azarias Bocinatti ";"5519992732452";;;"1";"114.00";"1";"15/02/2026, 18:49:09";"15/02/2026, 18:49:09";
+"Manuela Nalli ";"5519999476262";;;"1";"46.99";"1";"17/02/2026, 19:33:56";"17/02/2026, 19:33:56";
+"Catherine Pellegrino ";"5519994561262";;;"1";"69.50";"1";"17/02/2026, 21:17:21";"17/02/2026, 21:17:21";
+"Jorge Luiz de Souza Camargo ";"5519991665880";;;"1";"61.00";"1";"20/02/2026, 21:36:46";"20/02/2026, 21:36:46";
+"Diego Relvas ";"5519999166657";;;"1";"226.50";"1";"21/02/2026, 19:08:56";"21/02/2026, 19:08:56";
+"Gabriel Cecilio";"5519998327578";;;"1";"106.00";"1";"21/02/2026, 20:17:35";"21/02/2026, 20:17:35";
+"Stephanie Souza ";"5519989401470";;;"1";"75.99";"1";"22/02/2026, 22:46:36";"22/02/2026, 22:46:36";
+"Rafaela Santos";"5519999466978";"uveda.rafa@gmail.com";"07/11/2001";"1";"45.00";"1";"25/02/2026, 19:18:44";"25/02/2026, 19:18:44";"Capitão José Jacinto de Andrade, 654, (Apto 209) Rosário, São João da Boa Vista/SP"
+"José Ricardo";"5519981931785";;;"1";"144.99";"1";"26/02/2026, 19:40:36";"26/02/2026, 19:40:36";
+"Gabriel Lettiere";"5519992035666";;;"1";"103.80";"1";"26/02/2026, 19:44:04";"26/02/2026, 19:44:04";
+"Camila Marcondes Paioleti";"5535998623588";;;"1";"80.00";"1";"26/02/2026, 21:07:11";"26/02/2026, 21:07:11";
