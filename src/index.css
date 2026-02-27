@@ -290,16 +290,18 @@
   }
 
   .dark .gradient-primary {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(145deg, 
       hsl(0 0% 97%) 0%, 
       hsl(0 0% 95%) 25%,
-      hsl(234 35% 90%) 50%, 
-      hsl(234 50% 87%) 65%,
+      hsl(220 50% 88%) 50%, 
+      hsl(220 55% 85%) 65%,
       hsl(0 0% 96%) 80%,
       hsl(0 0% 98%) 100%
     );
     background-size: 200% 200%;
-    animation: darkCardShimmer 120s ease-in-out infinite;
+    animation: darkCardShimmer 8s ease-in-out infinite;
     color: hsl(234 30% 15%);
     box-shadow: 
       0 4px 24px hsl(0 0% 0% / 0.15),
@@ -316,6 +318,25 @@
     --gp-icon: hsl(234 15% 45%);
     --gp-positive: hsl(142 60% 38%);
     --gp-negative: hsl(0 70% 50%);
+  }
+
+  /* Shine sweep overlay for gradient-primary in dark */
+  .dark .gradient-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 25%,
+      hsl(220 80% 70% / 0.08) 45%,
+      hsl(220 100% 90% / 0.14) 50%,
+      hsl(220 80% 70% / 0.08) 55%,
+      transparent 75%
+    );
+    background-size: 250% 100%;
+    animation: cardShineSwipe 6s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: inherit;
   }
 
   .gradient-primary:hover {
@@ -458,13 +479,13 @@
     background: linear-gradient(145deg, 
       hsl(0 0% 97%) 0%, 
       hsl(0 0% 95%) 25%,
-      hsl(234 35% 90%) 50%, 
-      hsl(234 50% 87%) 65%,
+      hsl(220 50% 88%) 50%, 
+      hsl(220 55% 85%) 65%,
       hsl(0 0% 96%) 80%,
       hsl(0 0% 98%) 100%
     );
     background-size: 200% 200%;
-    animation: darkCardShimmer 120s ease-in-out infinite;
+    animation: darkCardShimmer 8s ease-in-out infinite;
     color: hsl(234 30% 15%);
     box-shadow: 
       0 4px 24px hsl(0 0% 0% / 0.15),
