@@ -224,7 +224,7 @@ export default function Agenda() {
         <>
           {/* Category sections */}
           {tasksByCategory.map(({ category, tasks: catTasks }) => {
-            const isExpanded = expandedCategories[category.id] !== false;
+            const isExpanded = expandedCategories[category.id] === true;
             return (
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl hover:bg-secondary/50 transition-all">
