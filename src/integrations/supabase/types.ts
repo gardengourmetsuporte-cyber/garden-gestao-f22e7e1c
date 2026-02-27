@@ -408,6 +408,7 @@ export type Database = {
           is_skipped: boolean
           item_id: string
           notes: string | null
+          photo_url: string | null
           points_awarded: number
           unit_id: string | null
         }
@@ -425,6 +426,7 @@ export type Database = {
           is_skipped?: boolean
           item_id: string
           notes?: string | null
+          photo_url?: string | null
           points_awarded?: number
           unit_id?: string | null
         }
@@ -442,6 +444,7 @@ export type Database = {
           is_skipped?: boolean
           item_id?: string
           notes?: string | null
+          photo_url?: string | null
           points_awarded?: number
           unit_id?: string | null
         }
@@ -514,6 +517,7 @@ export type Database = {
           is_active: boolean
           name: string
           points: number
+          requires_photo: boolean
           sort_order: number
           subcategory_id: string
           unit_id: string | null
@@ -529,6 +533,7 @@ export type Database = {
           is_active?: boolean
           name: string
           points?: number
+          requires_photo?: boolean
           sort_order?: number
           subcategory_id: string
           unit_id?: string | null
@@ -544,6 +549,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           points?: number
+          requires_photo?: boolean
           sort_order?: number
           subcategory_id?: string
           unit_id?: string | null

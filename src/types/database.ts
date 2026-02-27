@@ -139,6 +139,7 @@ export interface ChecklistItem {
   is_active: boolean;
   deleted_at: string | null;
   points: number; // 0 = no points, 1-4 = configurable points
+  requires_photo: boolean;
   created_at: string;
   updated_at: string;
   // Joined data
@@ -156,6 +157,7 @@ export interface ChecklistCompletion {
   awarded_points: boolean;
   points_awarded: number; // 1-4 stars, 0 means "already done"
   is_skipped: boolean; // "Não fiz" — marked but not done
+  photo_url: string | null;
   is_contested: boolean;
   contested_by: string | null;
   contested_reason: string | null;
