@@ -1,67 +1,52 @@
 
 
-# Plano: CRM Inteligente — Score, Segmentação, Fidelização e Dashboard
+## Plan: Smart Marketing Ideas Generator
 
-## Estado Atual
-- Tabela `customers` tem: name, phone, email, origin, total_spent, total_orders, last_purchase_at, birthday, notes
-- Sem score, sem segmentação, sem regras de fidelidade, sem dashboard de relacionamento
-- UI é uma lista simples com 3 stats genéricos
+The current AI ideas generator is a simple prompt-in/suggestions-out tool. The user wants it to be contextually intelligent: it should pull data from the system (menu products, recipes, customers) to generate relevant suggestions, and each suggestion should include photo guidance.
 
-## Mudanças no Banco de Dados
+### Architecture
 
-### 1. Adicionar colunas à tabela `customers`
-```sql
-ALTER TABLE customers ADD COLUMN segment text DEFAULT 'new';
--- segment: 'vip' | 'frequent' | 'occasional' | 'inactive' | 'new'
-ALTER TABLE customers ADD COLUMN score integer DEFAULT 0;
-ALTER TABLE customers ADD COLUMN loyalty_points integer DEFAULT 0;
-ALTER TABLE customers ADD COLUMN visit_frequency_days numeric DEFAULT null;
+**Backend (edge function)**: Before calling the AI, the edge function will query the database for contextual data from the unit: menu products (with prices, categories), recipes, and customer stats. This context is injected into the AI system prompt so suggestions are grounded in real business data.
+
+**Frontend**: 
+1. Replace the free-text prompt with smart "topic chips" (e.g., "Produto destaque", "Promoção", "Novidade do cardápio", "Data comemorativa") plus an optional custom prompt field
+2. Pass `unit_id` to the edge function so it can fetch context
+3. Expand the suggestion card to include a `photo_tip` field with guidance on what photo to take/use
+4. Show existing product images when available, or display the photo tip
+
+### Changes
+
+#### 1. Edge function `marketing-suggestions/index.ts`
+- Accept `unit_id` and `topic` alongside `prompt`
+- Query `tablet_products` (top products with images, prices, categories), `recipes` (names, costs), and `customers` (count) from the database using the service role key
+- Build a rich system prompt that includes: product names & prices, categories, recipe names, customer count
+- Add `photo_tip` and `product_name` fields to the tool schema so the AI can reference specific products and suggest photos
+- Add `has_image` boolean field so frontend knows if a product image exists
+
+#### 2. Component `MarketingIdeasAI.tsx`
+- Add topic chips at the top (quick-select buttons like "Produto em destaque", "Promoção da semana", "Novidade", "Engajamento")
+- Clicking a chip auto-fills a smart prompt and triggers generation (no need to type)
+- Keep the custom text area as secondary option ("Ou descreva seu tema")
+- Pass `unit_id` from `useUnit()` to the edge function call
+- Render expanded suggestion cards with:
+  - Photo section: if product has an image, show it; otherwise show the `photo_tip` as a styled hint card
+  - Product reference badge when suggestion is about a specific product
+- Remove the old purple color from the button, use `bg-foreground text-background`
+
+#### 3. Suggestion card structure (updated)
+Each AI suggestion will return:
+```
+title, caption, hashtags, best_time, photo_tip, product_name (optional)
 ```
 
-### 2. Criar tabela `loyalty_rules` (regras de fidelidade por unidade)
-- unit_id, rule_type ('orders_for_free' | 'points_per_real' | 'birthday_discount'), threshold, reward_value, is_active
+The `photo_tip` gives actionable guidance like "Fotografe o hambúrguer de cima com fundo escuro e iluminação lateral" or "Use uma foto do cliente satisfeito com o prato."
 
-### 3. Criar tabela `loyalty_events` (histórico de pontos/resgates)
-- customer_id, unit_id, type ('earn' | 'redeem' | 'birthday_bonus'), points, description, created_at
+### Technical Details
 
-### 4. Criar função DB `recalculate_customer_score` (trigger ou manual)
-Score baseado em: recência (0-30), frequência (0-30), valor monetário (0-40) — modelo RFM simplificado. Calcula segment automaticamente.
-
-## Mudanças no Frontend
-
-### 5. Redesign completo da página `Customers.tsx`
-- **Dashboard de Relacionamento** no topo: Total clientes, Ativos no mês, Inativos, Ticket médio, Taxa de retorno (5 cards compactos)
-- **Filtro por segmento**: Chips coloridos (🟢 VIP, 🔵 Frequente, 🟡 Ocasional, 🔴 Inativo, ⚪ Novo)
-- **CustomerCard redesenhado**: Badge de segmento colorido, barra de score visual, pontos de fidelidade, dias desde última compra
-
-### 6. Novo componente `CustomerDetail` (sheet expandido)
-- Ao clicar no cliente, abre detalhes com: score RFM visual, histórico de fidelidade, regras aplicáveis, ações rápidas (enviar cupom placeholder, registrar compra)
-
-### 7. Aba de Fidelidade nas Settings (`LoyaltySettings.tsx`)
-- Configurar regras: "A cada X pedidos = 1 grátis", "X pontos por R$1 gasto", "Desconto de aniversário"
-- Toggle ativo/inativo por regra
-
-### 8. Hook `useCustomerCRM` 
-- Calcula stats do dashboard (ativos, inativos, ticket médio, taxa de retorno) client-side
-- Gerencia loyalty_events e loyalty_rules
-
-### 9. Atualizar tipo `Customer` 
-- Adicionar segment, score, loyalty_points, visit_frequency_days
-
-## Componentes
-
-| Arquivo | Ação |
-|---|---|
-| Migration SQL | Criar — colunas + tabelas + função score |
-| `src/types/customer.ts` | Editar — novos campos |
-| `src/pages/Customers.tsx` | Reescrever — dashboard + filtros + segmentos |
-| `src/components/customers/CustomerCard.tsx` | Reescrever — badge segmento + score bar |
-| `src/components/customers/CustomerDetail.tsx` | Criar — detalhes expandidos |
-| `src/hooks/useCustomers.ts` | Editar — incluir stats + loyalty |
-| `src/hooks/useCustomerCRM.ts` | Criar — stats dashboard + segmentação |
-| `src/components/settings/LoyaltySettings.tsx` | Criar — regras de fidelidade |
-| `src/pages/Settings.tsx` | Editar — adicionar aba Fidelidade |
-
-## Sobre Automação (WhatsApp/cupons automáticos)
-Não será implementado nesta etapa — depende de integrações externas (WhatsApp API) que já existem parcialmente no sistema. A estrutura de dados (loyalty_events, segments) preparará o terreno para automações futuras.
+- The edge function creates a Supabase client using `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (both already available in edge function environment) to query unit data
+- Products query: `SELECT name, price, category, image_url, is_highlighted FROM tablet_products WHERE unit_id = $1 AND is_active = true LIMIT 30`
+- Recipes query: `SELECT name, total_cost FROM recipes WHERE unit_id = $1 AND is_active = true LIMIT 20`
+- Customer count: `SELECT count(*) FROM customers WHERE unit_id = $1`
+- Context is truncated to keep under token limits
+- The system prompt instructs the AI to reference actual product names/prices and give specific photo directions
 
