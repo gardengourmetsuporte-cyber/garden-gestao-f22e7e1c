@@ -169,13 +169,27 @@ export function MenuCategoryTree({
                           style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
                         />
                         <span className="flex-1 text-left truncate">{grp.name}</span>
-                        <div className="flex items-center gap-1.5">
-                          {avail?.tablet && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Mesa</span>
-                          )}
-                          {avail?.delivery && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">Delivery</span>
-                          )}
+                        <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
+                            }}
+                            className={cn(
+                              "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                              avail?.tablet ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground/50 line-through"
+                            )}
+                          >Mesa</button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
+                            }}
+                            className={cn(
+                              "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                              avail?.delivery ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground/50 line-through"
+                            )}
+                          >Delivery</button>
                           <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
                         </div>
                       </button>
