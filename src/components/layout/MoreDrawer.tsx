@@ -188,7 +188,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
             >
               <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
               <span className="text-sm font-semibold text-foreground">Planos</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(220 70% 25%)' }}>{plan}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider ml-auto text-primary">{plan}</span>
             </button>
           )}
 
