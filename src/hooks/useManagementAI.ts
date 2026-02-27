@@ -146,12 +146,6 @@ export function useManagementAI() {
     }));
   }, [stats]);
 
-  // Enrich contextStats in background with full data (tasks, invoices, checklist)
-  useEffect(() => {
-    if (!user || !activeUnitId) return;
-    fetchFullContext().catch(() => {});
-  }, [user, activeUnitId, fetchFullContext]);
-
   // Save a message to the database
   const saveMessage = useCallback(async (convId: string, msg: AIMessage) => {
     await supabase.from('copilot_messages').insert({
