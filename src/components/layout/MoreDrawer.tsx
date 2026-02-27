@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'UserRound', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'ContactRound', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
@@ -197,7 +197,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           {/* Module grid — adaptive cards */}
           {groupedNav.map(group => {
             const count = group.items.length;
-            const gridCols = count <= 2 ? `grid-cols-${count}` : count === 3 ? 'grid-cols-3' : count === 4 ? 'grid-cols-2' : 'grid-cols-3';
+            const gridCols = count <= 2 ? `grid-cols-2` : count === 4 ? 'grid-cols-2' : 'grid-cols-3';
 
             return (
               <div key={group.label} className="mb-3">
