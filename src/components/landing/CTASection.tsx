@@ -1,44 +1,34 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section className="py-20 md:py-28 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.1), hsl(var(--background)))",
-          }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 60%)" }}
-        />
-      </div>
-
-      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-          Criado por quem entende sua operação.
-        </h2>
-        <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-          Nasceu dentro de uma hamburgueria de verdade. Comece hoje, veja resultado essa semana.
-        </p>
-        <Link
-          to="/auth?plan=free"
-          className="inline-flex items-center gap-2 h-14 px-10 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
-            color: "hsl(var(--primary-foreground))",
-            boxShadow: "0 0 40px hsl(var(--primary) / 0.3), 0 4px 20px hsl(var(--accent) / 0.3)",
-          }}
-        >
-          Criar minha conta grátis
-          <ArrowRight className="w-5 h-5" />
-        </Link>
-        <p className="text-sm text-muted-foreground mt-5">
-          14 dias grátis • Sem cartão • Cancele quando quiser
-        </p>
+    <section className="py-20 md:py-28">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="landing-card-highlight p-10 md:p-14 text-center relative overflow-hidden">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Criado por quem entende sua operação.
+          </h2>
+          <p className="opacity-60 text-lg mb-10 max-w-xl mx-auto">
+            Nasceu dentro de uma hamburgueria de verdade. Comece hoje, veja resultado essa semana.
+          </p>
+          <Link
+            to="/auth?plan=free"
+            className="inline-flex items-center gap-2 h-14 px-10 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: "var(--gradient-brand)",
+              color: "white",
+              boxShadow: "0 4px 20px hsl(220 45% 18% / 0.4)",
+            }}
+          >
+            Criar minha conta grátis
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <div className="flex items-center justify-center gap-1.5 text-sm opacity-50 mt-5">
+            <Shield className="w-3.5 h-3.5" />
+            <span>14 dias grátis • Sem cartão • Cancele quando quiser</span>
+          </div>
+        </div>
       </div>
     </section>
   );

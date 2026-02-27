@@ -33,11 +33,11 @@ export function ProblemSection() {
           {problems.map((p) => (
             <div
               key={p.title}
-              className="card-surface p-8 text-center"
+              className="landing-card p-8 text-center"
             >
               <div className="text-4xl mb-5">{p.emoji}</div>
-              <h3 className="text-base font-bold text-foreground mb-3">{p.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{p.desc}</p>
+              <h3 className="text-base font-bold mb-3">{p.title}</h3>
+              <p className="text-sm leading-relaxed opacity-70">{p.desc}</p>
             </div>
           ))}
         </div>
