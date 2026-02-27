@@ -75,7 +75,7 @@ const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
 const Gamification = lazy(() => lazyRetry(() => import("./pages/Gamification")));
 const GamificationPlay = lazy(() => lazyRetry(() => import("./pages/GamificationPlay")));
 const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
-const Onboarding = lazy(() => lazyRetry(() => import("./pages/Onboarding")));
+
 const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
 const QuotationPublic = lazy(() => lazyRetry(() => import("./pages/QuotationPublic")));
 const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")));
@@ -159,11 +159,6 @@ function AppRoutes() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/invite" element={<Invite />} />
-          <Route path="/onboarding" element={
-            <ProtectedRoute skipOnboarding>
-              <Onboarding />
-            </ProtectedRoute>
-          } />
           <Route path="/" element={<ProtectedRoute><RouteErrorBoundary><DashboardNew /></RouteErrorBoundary></ProtectedRoute>} />
           <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
           <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
