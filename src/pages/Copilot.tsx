@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useManagementAI } from '@/hooks/useManagementAI';
+import { useManagementAI, CopilotContextStats } from '@/hooks/useManagementAI';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { cn } from '@/lib/utils';
 import mascotImg from '@/assets/garden-mascot.png';
@@ -12,6 +12,65 @@ import CopilotSuggestionChips from '@/components/copilot/CopilotSuggestionChips'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+function BriefingCard({ stats, contextStats, visible }: {
+  stats: ReturnType<typeof useDashboardStats>['stats'];
+  contextStats: CopilotContextStats | null;
+  visible: boolean;
+}) {
+  if (!visible || (!stats && !contextStats)) return null;
+  // pendingExpenses in stats is total R$, use > 0 as boolean. Count comes from contextStats.
+  const hasPendingExp = contextStats ? contextStats.pendingExpensesCount > 0 : (stats?.pendingExpenses ?? 0) > 0;
+  const pendingExpCount = contextStats?.pendingExpensesCount ?? null;
+  const lowStock = contextStats?.lowStockCount ?? (stats?.criticalItems ?? 0);
+  const pendingTasks = contextStats?.pendingTasksCount ?? 0;
+  const invoices = contextStats?.upcomingInvoicesCount ?? 0;
+  const checklistPct = contextStats?.checklistPct ?? 0;
+  const allGood = !hasPendingExp && lowStock === 0 && pendingTasks === 0;
+  return (
+    <div className="rounded-2xl border border-border/30 bg-secondary/30 px-4 py-3 space-y-2">
+      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Resumo agora</p>
+      <div className="flex flex-wrap gap-2">
+        {hasPendingExp && (
+          <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+            <AppIcon name="Clock" size={12} />
+            <span>{pendingExpCount !== null ? `${pendingExpCount} despesa${pendingExpCount > 1 ? 's' : ''} pendente${pendingExpCount > 1 ? 's' : ''}` : 'Despesas pendentes'}</span>
+          </div>
+        )}
+        {lowStock > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-red-500">
+            <AppIcon name="AlertTriangle" size={12} />
+            <span>{lowStock} item{lowStock > 1 ? 'ns' : ''} em baixo estoque</span>
+          </div>
+        )}
+        {pendingTasks > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-blue-500">
+            <AppIcon name="ListChecks" size={12} />
+            <span>{pendingTasks} tarefa{pendingTasks > 1 ? 's' : ''} hoje</span>
+          </div>
+        )}
+        {invoices > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-orange-500">
+            <AppIcon name="FileText" size={12} />
+            <span>{invoices} boleto{invoices > 1 ? 's' : ''} vencendo</span>
+          </div>
+        )}
+        {checklistPct > 0 && checklistPct < 100 && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <AppIcon name="CheckSquare" size={12} />
+            <span>Checklist {checklistPct}%</span>
+          </div>
+        )}
+        {allGood && (
+          <div className="flex items-center gap-1.5 text-xs text-green-500">
+            <AppIcon name="CheckCircle" size={12} />
+            <span>Tudo em dia 🎉</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function isActionMessage(content: string) {
   return content.startsWith('[ACTION]');
@@ -195,57 +254,7 @@ export default function CopilotPage() {
         onTouchMove={(e) => e.stopPropagation()}
       >
         {/* Briefing card — usa stats (sync) com fallback para contextStats */}
-        {(stats || contextStats) && messages.length <= 2 && (() => {
-          const pendingExp = contextStats?.pendingExpensesCount ?? (stats?.pendingExpenses ?? 0);
-          const lowStock = contextStats?.lowStockCount ?? (stats?.criticalItems ?? 0);
-          const pendingTasks = contextStats?.pendingTasksCount ?? 0;
-          const invoices = contextStats?.upcomingInvoicesCount ?? 0;
-          const checklistPct = contextStats?.checklistPct ?? 0;
-          const allGood = pendingExp === 0 && lowStock === 0 && pendingTasks === 0;
-          return (
-            <div className="rounded-2xl border border-border/30 bg-secondary/30 px-4 py-3 space-y-2">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Resumo agora</p>
-              <div className="flex flex-wrap gap-2">
-                {pendingExp > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                    <AppIcon name="Clock" size={12} />
-                    <span>{pendingExp} despesa{pendingExp > 1 ? 's' : ''} pendente{pendingExp > 1 ? 's' : ''}</span>
-                  </div>
-                )}
-                {lowStock > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-red-500">
-                    <AppIcon name="AlertTriangle" size={12} />
-                    <span>{lowStock} item{lowStock > 1 ? 'ns' : ''} em baixo estoque</span>
-                  </div>
-                )}
-                {pendingTasks > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-blue-500">
-                    <AppIcon name="ListChecks" size={12} />
-                    <span>{pendingTasks} tarefa{pendingTasks > 1 ? 's' : ''} hoje</span>
-                  </div>
-                )}
-                {invoices > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-orange-500">
-                    <AppIcon name="FileText" size={12} />
-                    <span>{invoices} boleto{invoices > 1 ? 's' : ''} vencendo</span>
-                  </div>
-                )}
-                {checklistPct > 0 && checklistPct < 100 && (
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <AppIcon name="CheckSquare" size={12} />
-                    <span>Checklist {checklistPct}%</span>
-                  </div>
-                )}
-                {allGood && (
-                  <div className="flex items-center gap-1.5 text-xs text-green-500">
-                    <AppIcon name="CheckCircle" size={12} />
-                    <span>Tudo em dia 🎉</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })()}
+        <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
 
         {messages.map((msg, i) => {
           const isAction = msg.role === 'assistant' && isActionMessage(msg.content);
