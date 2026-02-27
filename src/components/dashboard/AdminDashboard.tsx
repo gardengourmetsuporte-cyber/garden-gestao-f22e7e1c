@@ -13,6 +13,7 @@ import { useLazyVisible } from '@/hooks/useLazyVisible';
 import { SetupChecklistWidget } from './SetupChecklistWidget';
 import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
+import { PendingOrdersWidget } from './PendingOrdersWidget';
 
 // Lazy-load heavy below-fold widgets
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
@@ -85,6 +86,10 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
   'agenda': ({ hasAccess }) => {
     if (!hasAccess('agenda')) return null;
     return <LazySection className="card-press min-w-0 overflow-hidden"><LazyAgenda /></LazySection>;
+  },
+  'pending-orders': ({ hasAccess }) => {
+    if (!hasAccess('orders')) return null;
+    return <PendingOrdersWidget />;
   },
   'pending-actions': ({ hasAccess, stats, navigate }) => {
     if (!hasAccess('rewards') || stats.pendingRedemptions <= 0) return null;
