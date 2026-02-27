@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'ContactRound', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'UserSearch', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
@@ -197,81 +197,76 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           {/* Module grid — adaptive cards */}
           {groupedNav.map(group => {
             const count = group.items.length;
-            const gridCols = count <= 2 ? `grid-cols-2` : count === 4 ? 'grid-cols-2' : 'grid-cols-3';
+            const useCols3 = count >= 3 && count !== 4;
+            const cols = useCols3 ? 3 : 2;
+            const remainder = count % cols;
+            const fullRowItems = remainder > 0 ? group.items.slice(0, count - remainder) : group.items;
+            const lastRowItems = remainder > 0 ? group.items.slice(count - remainder) : [];
+
+            const renderItem = (item: typeof group.items[0]) => {
+              const active = location.pathname === item.href;
+              const locked = isModuleLocked(item.href);
+              const planLabel = getRequiredPlanLabel(item.href);
+              const isProd = isProductionModule(item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  to={locked ? (isAdmin ? '/plans' : '#') : item.href}
+                  onClick={(e) => {
+                    if (locked && !isAdmin) {
+                      e.preventDefault();
+                      toast.info(`Este módulo requer plano ${planLabel}.`, {
+                        description: 'Fale com o administrador da loja para fazer o upgrade.',
+                      });
+                    }
+                    onOpenChange(false);
+                  }}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
+                    active
+                      ? "bg-primary/10 dark:bg-white dark:shadow-md"
+                      : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
+                  )}
+                  style={{ opacity: locked ? 0.55 : 1 }}
+                >
+                  {isProd && (
+                    <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
+                      Beta
+                    </span>
+                  )}
+                  <div className="relative">
+                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", active ? "bg-primary" : "bg-muted")}>
+                      <AppIcon name={item.icon} size={18} fill={active ? 1 : 0} className={active ? "text-primary-foreground" : "text-foreground/70"} />
+                    </div>
+                    {locked && (
+                      <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
+                    )}
+                  </div>
+                  <span className={cn("text-[11px] font-medium leading-tight text-center truncate max-w-full", active ? "text-foreground dark:text-[hsl(220_30%_20%)]" : locked ? "text-muted-foreground" : "text-foreground/80")}>
+                    {item.label}
+                  </span>
+                  {locked && planLabel && (
+                    <span className="text-[8px] font-bold uppercase tracking-wider -mt-1" style={{ color: 'hsl(45 90% 55%)' }}>
+                      {planLabel}
+                    </span>
+                  )}
+                </Link>
+              );
+            };
 
             return (
               <div key={group.label} className="mb-3">
                 <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2 block text-muted-foreground/50 font-display">
                   {group.label}
                 </span>
-                <div className={cn("grid gap-2", gridCols)}>
-                  {group.items.map(item => {
-                    const active = location.pathname === item.href;
-                    const locked = isModuleLocked(item.href);
-                    const planLabel = getRequiredPlanLabel(item.href);
-
-                    const isProduction = isProductionModule(item.href);
-
-                    return (
-                      <Link
-                        key={item.href}
-                        to={locked ? (isAdmin ? '/plans' : '#') : item.href}
-                        onClick={(e) => {
-                          if (locked && !isAdmin) {
-                            e.preventDefault();
-                            toast.info(`Este módulo requer plano ${planLabel}.`, {
-                              description: 'Fale com o administrador da loja para fazer o upgrade.',
-                            });
-                          }
-                          onOpenChange(false);
-                        }}
-                        className={cn(
-                          "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
-                          active
-                            ? "bg-primary/10 dark:bg-white dark:shadow-md"
-                            : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
-                        )}
-                        style={{ opacity: locked ? 0.55 : 1 }}
-                      >
-                        {isProduction && (
-                          <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
-                            Beta
-                          </span>
-                        )}
-                        <div className="relative">
-                          <div
-                            className={cn(
-                              "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
-                              active ? "bg-primary" : "bg-muted"
-                            )}
-                          >
-                            <AppIcon
-                              name={item.icon}
-                              size={18}
-                              fill={active ? 1 : 0}
-                              className={active ? "text-primary-foreground" : "text-foreground/70"}
-                            />
-                          </div>
-                          {locked && (
-                            <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
-                          )}
-                        </div>
-                        <span
-                          className={cn(
-                            "text-[11px] font-medium leading-tight text-center truncate max-w-full",
-                            active ? "text-foreground dark:text-[hsl(220_30%_20%)]" : locked ? "text-muted-foreground" : "text-foreground/80"
-                          )}
-                        >
-                          {item.label}
-                        </span>
-                        {locked && planLabel && (
-                          <span className="text-[8px] font-bold uppercase tracking-wider -mt-1" style={{ color: 'hsl(45 90% 55%)' }}>
-                            {planLabel}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
+                <div className={cn("grid gap-2", useCols3 ? 'grid-cols-3' : 'grid-cols-2')}>
+                  {fullRowItems.map(renderItem)}
+                  {lastRowItems.length > 0 && (
+                    <div className={cn("grid gap-2 col-span-full", `grid-cols-${lastRowItems.length}`)}>
+                      {lastRowItems.map(renderItem)}
+                    </div>
+                  )}
                 </div>
               </div>
             );
