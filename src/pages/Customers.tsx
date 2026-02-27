@@ -51,11 +51,15 @@ export default function Customers() {
   const monthStart = startOfMonth(new Date()).toISOString();
   const newThisMonth = customers.filter(c => c.created_at >= monthStart).length;
 
-  const handleSave = (data: Partial<Customer>) => {
+  const handleSave = async (data: Partial<Customer>) => {
     if (data.id) {
-      updateCustomer.mutate(data as any, { onSuccess: () => { setSheetOpen(false); setEditing(null); } });
+      updateCustomer.mutate(data as any, {
+        onSuccess: () => { setSheetOpen(false); setEditing(null); },
+      });
     } else {
-      createCustomer.mutate(data, { onSuccess: () => { setSheetOpen(false); } });
+      createCustomer.mutateAsync(data).then(() => {
+        setSheetOpen(false);
+      }).catch(() => {});
     }
   };
 
