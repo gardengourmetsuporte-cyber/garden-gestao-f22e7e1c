@@ -136,12 +136,6 @@ export function MedalWinners() {
                   {group.title}
                 </span>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span
-                    className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-                    style={{ background: `${tier.color}20`, color: tier.color }}
-                  >
-                    {tier.label.toUpperCase()}
-                  </span>
                   <span className="text-[10px] text-muted-foreground">
                     {group.winners.length} premiação{group.winners.length !== 1 ? 'ões' : ''}
                   </span>
