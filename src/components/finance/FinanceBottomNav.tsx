@@ -116,14 +116,12 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
       )}
 
       <nav
-        className="fixed bottom-0 left-0 right-0 lg:left-[260px] z-[60]"
+        className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
       >
-        {/* Top neon glow — 3-layer animated */}
-        <div className="absolute top-0 left-[8%] right-[8%] h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.7), hsl(var(--primary) / 0.9), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-        <div className="absolute -top-[1px] left-[3%] right-[3%] h-[4px] blur-[6px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.6), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
-        <div className="absolute -top-[3px] left-[12%] right-[12%] h-[8px] blur-[12px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25), hsl(var(--primary) / 0.35), transparent)', backgroundSize: '200% 100%', animation: 'headerGlowShift 4s ease-in-out infinite' }} />
+        {/* Subtle top separator */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
 
-        {/* Bar background — full width, edge to edge, same as main */}
+        {/* Bar background */}
         <div
           className="relative"
           style={{
@@ -137,15 +135,8 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
               <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
             ))}
 
-            {/* Center FAB "+" — matches global bar style */}
+            {/* Center FAB "+" */}
             <div className="flex items-center justify-center" style={{ width: '20%' }}>
-              <div
-                className="absolute -top-8 w-[68px] h-[68px] rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.1) 50%, transparent 70%)',
-                  filter: 'blur(8px)',
-                }}
-              />
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
@@ -153,10 +144,10 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
-                  boxShadow: '0 4px 20px hsl(234 89% 67% / 0.15), 0 8px 32px hsl(0 0% 0% / 0.1), 0 0 0 1px hsl(234 50% 80% / 0.2)',
+                  boxShadow: '0 4px 20px hsl(220 70% 16% / 0.4), 0 8px 32px hsl(0 0% 0% / 0.15)',
                 }}
               >
-                <AppIcon name="Plus" size={26} className="relative z-10" style={{ color: 'hsl(234 40% 30%)' }} />
+                <AppIcon name="Plus" size={26} className="relative z-10 text-white" />
               </button>
             </div>
 
