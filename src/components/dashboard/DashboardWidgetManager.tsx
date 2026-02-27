@@ -42,20 +42,21 @@ function SortableItem({ widget, onToggle }: { widget: DashboardWidget; onToggle:
     <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
       className={cn(
-        'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50',
-        isDragging && 'opacity-60 shadow-lg z-50'
+        'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-none select-none',
+        isDragging && 'opacity-60 shadow-lg z-50 scale-[1.02]'
       )}
     >
-      <button {...attributes} {...listeners} className="touch-none text-muted-foreground/50 cursor-grab active:cursor-grabbing p-1 -ml-1">
-        <AppIcon name="DragIndicator" size={20} />
-      </button>
-      <AppIcon name={widget.icon} size={20} className="text-muted-foreground" />
+      <AppIcon name={widget.icon} size={20} className="text-muted-foreground shrink-0" />
       <span className="flex-1 text-sm font-medium text-foreground">{widget.label}</span>
-      <Switch
-        checked={widget.visible}
-        onCheckedChange={() => onToggle(widget.key)}
-      />
+      <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
+        <Switch
+          checked={widget.visible}
+          onCheckedChange={() => onToggle(widget.key)}
+        />
+      </div>
     </div>
   );
 }
