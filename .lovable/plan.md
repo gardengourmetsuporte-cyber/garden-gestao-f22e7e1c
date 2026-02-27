@@ -1,128 +1,98 @@
 
 
-## Analise do Sistema Atlas/Garden - Profissionalização
+## Plano de Padronização Visual — Landing Page ao Sistema
 
-Após uma análise completa do codebase, identifiquei o sistema como uma plataforma SaaS madura para gestão de restaurantes, com ~30 páginas, ~100+ componentes, sistema financeiro robusto, gamificação, multi-tenant e monetização via Stripe. Abaixo, os pontos de melhoria organizados por impacto.
-
----
-
-### 1. Onboarding e Primeira Experiência (Alto Impacto)
-
-**Problema**: O setup progress (`useSetupProgress`) existe mas não aparece no Dashboard. Usuários novos caem num dashboard vazio sem orientação.
-
-**Plano**:
-- Criar widget de **Onboarding Checklist** no `AdminDashboard` que aparece apenas quando `allCompleted === false`
-- Card com progress bar, steps clicáveis que navegam para o módulo correto
-- Auto-ocultar com animação quando 100% completo
-- Persistir dismissal no localStorage para não reaparecer
+Após auditoria completa do codebase, identifiquei as inconsistências e organizei as correções em blocos de impacto.
 
 ---
 
-### 2. Tratamento de Estados Vazios (Alto Impacto)
+### 1. Landing Navbar — Botões Desktop com `rounded-lg` (devem ser `rounded-xl`)
 
-**Problema**: Vários módulos não tratam adequadamente o estado vazio (zero transações, zero itens de estoque, zero checklists). O componente `EmptyState` existe mas não é usado consistentemente.
+**Arquivo**: `src/components/landing/LandingNavbar.tsx`
 
-**Plano**:
-- Auditar cada página principal e adicionar `EmptyState` com ação primária (CTA) em: Finance, Inventory, Orders, Recipes, Employees, Marketing
-- Ilustrações ou ícones contextuais + texto orientativo
+Os botões desktop "Entrar" (linha 53) e "Teste grátis" (linha 59) usam `rounded-lg`. Todo o sistema usa `rounded-xl` como padrão para botões. Corrigir ambos para `rounded-xl`.
 
 ---
 
-### 3. Feedback e Confirmações (Médio Impacto)
+### 2. Landing — Cards da ProblemSection usando `style={}` inline avulso
 
-**Problema**: Ações destrutivas (deletar transação, remover funcionário, excluir item) usam `window.confirm()` nativo em alguns locais em vez do `AlertDialog` do Radix já disponível no projeto.
+**Arquivo**: `src/components/landing/ProblemSection.tsx`
 
-**Plano**:
-- Substituir todos os `window.confirm()` por `AlertDialog` com design consistente
-- Adicionar confirmação de saída em formulários com dados não salvos (dirty state)
+Os 3 cards de problema usam estilos inline (`style={{ background: "hsl(var(--card))", border: ... }}`). Devem usar a classe `card-surface` do design system, que já aplica `bg-card`, `rounded-2xl`, `shadow-card` e borda automática no dark mode. Isso garante consistência com o resto do app.
 
 ---
 
-### 4. Botão de Teste no Dashboard (Alto Impacto - Profissionalismo)
+### 3. Landing — FAQ items usando estilos inline em vez de classes do sistema
 
-**Problema**: O botão "🔔 Testar lembrete de contas" está visível no Dashboard de produção (`AdminDashboard.tsx` linha 166-179). Isso é claramente uma ferramenta de debug exposta ao usuário final.
+**Arquivo**: `src/components/landing/FAQSection.tsx`
 
-**Plano**:
-- Remover o botão de teste do dashboard ou movê-lo para Configurações > Debug (visível apenas para super_admin)
-
----
-
-### 5. Consistência Visual no Dark Mode (Médio Impacto)
-
-**Problema**: Já foram feitas várias correções pontuais (dia do calendário, MonthSelector, MoreDrawer) mas a abordagem é reativa. Ainda podem existir inconsistências em outros componentes.
-
-**Plano**:
-- Auditoria visual completa do dark mode em: Checklists date strip, Finance cards, Inventory stats cards, Cash Closing cards
-- Criar utility classes reutilizáveis (ex: `card-dark-inverse`) para padronizar o padrão "fundo branco com texto escuro no dark mode" em hero cards
+Os `AccordionItem` usam `style={{ background: "hsl(var(--card))", border: ... }}` inline. Devem usar `card-surface` para padronizar com o resto.
 
 ---
 
-### 6. Skeleton Loading Consistente (Médio Impacto)
+### 4. Landing — PricingSection cards com estilos inline
 
-**Problema**: Algumas páginas usam `PageSkeleton`, outras usam `Skeleton` avulsos, e o `Finance` monta skeletons ad-hoc inline. Não há padrão.
+**Arquivo**: `src/components/landing/PricingSection.tsx`
 
-**Plano**:
-- Criar variantes de `PageSkeleton` para cada tipo de página (lista, formulário, dashboard)
-- Substituir skeletons inline por componentes reutilizáveis
+Os cards de plano usam estilos inline mistos. O card não-highlighted deve usar `card-surface`. O card highlighted pode manter o estilo especial mas usando a classe base + override.
 
 ---
 
-### 7. Acessibilidade e SEO (Médio Impacto)
+### 5. Landing — Espaçamento vertical inconsistente entre seções
 
-**Problema**: 
-- `index.html` provavelmente não tem meta tags de SEO/OG para a landing page
-- Botões sem `aria-label` em vários locais (FAB, tab bar icons)
-- Falta de `<title>` dinâmico por rota
-
-**Plano**:
-- Adicionar meta tags OG na landing (title, description, image)
-- Implementar hook `useDocumentTitle` que atualiza `document.title` por rota
-- Adicionar `aria-label` nos botões de ícone do BottomTabBar e header
+Cada seção da landing usa `py-20 md:py-28`, exceto o Hero que usa `pt-28 pb-16 md:pt-36 md:pb-24`. Padronizar o Hero para `pt-28 pb-20 md:pt-36 md:pb-28` para manter ritmo.
 
 ---
 
-### 8. Performance (Baixo Impacto - Já Bom)
+### 6. Landing — Section headers sem padrão
 
-O sistema já implementa boas práticas: lazy loading de rotas com retry, `useLazyVisible` para widgets below-fold, `preloadRoute` no hover/touch, `staleTime` de 5min no React Query. Pontos menores:
-
-**Plano**:
-- Adicionar `React.memo` nos componentes de lista pesados (TransactionItem, ItemCard, ChecklistItem) se não tiverem
-- Considerar virtualização (`react-window`) para listas de transações com 100+ itens
+As seções Problem, Solution, Pricing e FAQ têm um padrão de `<p>` tag + `<h2>` como header. O espaçamento `mb-14`, `mb-16`, `mb-12`, `mb-4` varia entre eles. Padronizar todos para `mb-14`.
 
 ---
 
-### 9. Tratamento de Erros em Edge Functions (Médio Impacto)
+### 7. Inventory — Skeleton loading usa `py-4` enquanto a página real usa `py-3`
 
-**Problema**: O `ErrorBoundary` existe mas é genérico. Erros de Edge Functions (stripe-checkout, management-ai) mostram mensagens técnicas ao usuário.
+**Arquivo**: `src/pages/Inventory.tsx`  
 
-**Plano**:
-- Criar mapeamento de erros conhecidos para mensagens amigáveis em português
-- Toast com ação de "Tentar novamente" para erros de rede
+O estado de loading (linha 124) usa `px-4 py-4` enquanto o estado carregado (linha 154) usa `px-4 py-3 lg:px-6`. Padronizar para `px-4 py-3 lg:px-6`.
 
 ---
 
-### 10. PWA e Experiência Offline (Baixo Impacto)
+### 8. PersonalFinance — Skeleton loading usa `py-4` sem `lg:px-6`
 
-**Problema**: O `vite-plugin-pwa` está instalado e `push-sw.js` existe, mas a experiência offline provavelmente mostra tela em branco.
+**Arquivo**: `src/pages/PersonalFinance.tsx`
 
-**Plano**:
-- Adicionar página offline fallback no service worker
-- Indicador visual de "sem conexão" no header
+Mesma inconsistência: loading state com `px-4 py-4` em vez de `px-4 py-3 lg:px-6`.
 
 ---
 
-### Prioridade de Implementação
+### 9. GamificationMetrics — Usa `<Card>` component em vez de `card-surface`
 
-| # | Item | Impacto | Esforço |
-|---|------|---------|---------|
-| 4 | Remover botão de teste | Alto | Baixo |
-| 1 | Onboarding widget | Alto | Médio |
-| 2 | Empty states | Alto | Médio |
-| 5 | Dark mode audit | Médio | Médio |
-| 3 | AlertDialog confirmações | Médio | Baixo |
-| 7 | Acessibilidade/SEO | Médio | Médio |
-| 6 | Skeleton padronizado | Médio | Baixo |
-| 9 | Erros amigáveis | Médio | Baixo |
-| 8 | Performance | Baixo | Médio |
-| 10 | PWA offline | Baixo | Médio |
+**Arquivo**: `src/components/gamification/GamificationMetrics.tsx`
+
+Os 3 metric cards usam `<Card className="p-3">`. O sistema padronizou cards de stats usando a classe `card-surface`. Converter para `<div className="card-surface p-3">` para consistência visual (sombra, borda, border-radius).
+
+---
+
+### 10. Footer — Logo com `rounded-full` enquanto navbar usa `rounded-full` mas com tamanhos diferentes
+
+**Arquivo**: `src/components/landing/FooterSection.tsx`
+
+O logo do footer usa `h-11 w-11` enquanto a navbar usa `h-12 w-12`. Padronizar para `h-10 w-10` em ambos (footer e navbar) ou manter `h-12 w-12` consistente.
+
+---
+
+### Resumo de arquivos afetados
+
+| Arquivo | Tipo de correção |
+|---------|-----------------|
+| `LandingNavbar.tsx` | `rounded-lg` → `rounded-xl` nos botões desktop |
+| `ProblemSection.tsx` | Inline styles → `card-surface` class |
+| `FAQSection.tsx` | Inline styles → `card-surface` class |
+| `PricingSection.tsx` | Inline styles → classes do design system |
+| `HeroSection.tsx` | Ajuste de padding bottom |
+| `FooterSection.tsx` | Tamanho do logo padronizado |
+| `Inventory.tsx` | Skeleton padding `py-4` → `py-3 lg:px-6` |
+| `PersonalFinance.tsx` | Skeleton padding `py-4` → `py-3 lg:px-6` |
+| `GamificationMetrics.tsx` | `<Card>` → `card-surface` div |
 
