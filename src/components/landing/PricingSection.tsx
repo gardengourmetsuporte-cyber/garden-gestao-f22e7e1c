@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Star } from "lucide-react";
+import { Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { PlanCheckoutDialog } from "@/components/landing/PlanCheckoutDialog";
 
@@ -52,69 +52,48 @@ export function PricingSection() {
   return (
     <section id="planos" className="py-20 md:py-28">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--neon-cyan))" }}>
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
             Planos
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             Planos para cada fase do seu restaurante
           </h2>
+          <p className="text-sm text-muted-foreground">
+            14 dias grátis em qualquer plano. Sem cartão de crédito.
+          </p>
         </div>
 
-        <p
-          className="text-center text-sm font-semibold mb-10 py-2 px-4 rounded-full inline-flex mx-auto"
-          style={{
-            background: "hsl(var(--primary) / 0.1)",
-            border: "1px solid hsl(var(--primary) / 0.25)",
-            color: "hsl(var(--primary))",
-            display: "table",
-            margin: "0 auto 2.5rem",
-          }}
-        >
-          14 dias grátis em qualquer plano. Sem cartão de crédito.
-        </p>
-
-        <div className="flex items-center justify-center gap-3 mb-10">
+        {/* Toggle */}
+        <div className="flex items-center justify-center gap-3 mb-12">
           <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Mensal</span>
           <Switch checked={yearly} onCheckedChange={setYearly} />
           <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
             Anual{" "}
-            <span
-              className="inline-block ml-1 px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ background: "hsl(var(--primary) / 0.15)", color: "hsl(var(--primary))" }}
-            >
+            <span className="inline-block ml-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-secondary text-foreground">
               -20%
             </span>
           </span>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        {/* Cards */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative p-8 transition-all duration-300 ${
-                plan.highlight ? "card-surface scale-[1.02]" : "card-surface"
+              className={`relative rounded-2xl border p-8 transition-all ${
+                plan.highlight
+                  ? "border-foreground/20 bg-card shadow-lg"
+                  : "border-border/40 bg-card"
               }`}
-              style={plan.highlight ? {
-                background: "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))",
-                border: "2px solid hsl(var(--primary) / 0.5)",
-                boxShadow: "0 0 40px hsl(var(--primary) / 0.15), var(--shadow-elevated)",
-              } : undefined}
             >
               {plan.highlight && (
-                <div
-                  className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
-                  style={{
-                    background: "var(--gradient-brand)",
-                    color: "white",
-                    boxShadow: "0 4px 12px hsl(220 45% 18% / 0.4)",
-                  }}
-                >
-                  <Star className="w-3 h-3" /> Mais popular
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold bg-foreground text-background">
+                  Mais popular
                 </div>
               )}
 
-              <h3 className="text-xl font-bold text-foreground">{plan.name}</h3>
+              <h3 className="text-lg font-bold text-foreground">{plan.name}</h3>
               <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
 
               <div className="mt-6 mb-8">
@@ -126,23 +105,19 @@ export function PricingSection() {
 
               <button
                 onClick={() => setSelectedPlan(plan)}
-                className="block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-all hover:scale-[1.01] active:scale-[0.98]"
-                style={plan.highlight ? {
-                  background: "var(--gradient-brand)",
-                  color: "white",
-                  boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
-                } : {
-                  background: "hsl(var(--secondary))",
-                  color: "hsl(var(--foreground))",
-                }}
+                className={`block w-full text-center h-11 rounded-xl font-semibold text-sm transition-all hover:opacity-90 ${
+                  plan.highlight
+                    ? "bg-foreground text-background"
+                    : "bg-secondary text-foreground"
+                }`}
               >
                 {plan.cta}
               </button>
 
               <ul className="mt-8 space-y-3">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "hsl(var(--primary))" }} />
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                    <Check className="w-4 h-4 mt-0.5 shrink-0 text-foreground" />
                     {f}
                   </li>
                 ))}

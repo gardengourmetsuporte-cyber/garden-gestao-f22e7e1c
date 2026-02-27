@@ -3,13 +3,13 @@ import logoImg from "@/assets/logo.png";
 
 export function FooterSection() {
   return (
-    <footer className="py-12 bg-card border-t border-border/30">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="py-12 border-t border-border/30">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <img src={logoImg} alt="Garden Gestão" className="h-10 w-10 rounded-full object-contain" />
+            <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
             <span className="text-sm text-muted-foreground">
-              Garden Gestão — Feito por restaurante, para restaurantes
+              Garden Gestão
             </span>
           </div>
 
@@ -20,7 +20,7 @@ export function FooterSection() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t text-center text-xs text-muted-foreground" style={{ borderColor: "hsl(var(--border) / 0.3)" }}>
+        <div className="mt-8 pt-6 border-t border-border/20 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} Garden Gestão
         </div>
       </div>

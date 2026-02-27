@@ -18,7 +18,7 @@ function FadeInSection({ children, className = "" }: { children: ReactNode; clas
       ([entry]) => {
         if (entry.isIntersecting) {
           el.classList.add("opacity-100", "translate-y-0");
-          el.classList.remove("opacity-0", "translate-y-8");
+          el.classList.remove("opacity-0", "translate-y-6");
           observer.unobserve(el);
         }
       },
@@ -31,7 +31,7 @@ function FadeInSection({ children, className = "" }: { children: ReactNode; clas
   return (
     <div
       ref={ref}
-      className={`opacity-0 translate-y-8 transition-all duration-700 ease-out ${className}`}
+      className={`opacity-0 translate-y-6 transition-all duration-700 ease-out ${className}`}
     >
       {children}
     </div>
