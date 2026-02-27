@@ -197,7 +197,7 @@ export function ItemFormSheetNew({
                   onClick={() => setUnitType(option.value as 'unidade' | 'kg' | 'litro')}
                   className={`h-14 rounded-xl font-medium transition-all ${
                     unitType === option.value
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'gradient-primary text-white'
                       : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                   }`}
                 >
