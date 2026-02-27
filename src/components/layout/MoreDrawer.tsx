@@ -121,79 +121,86 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[80vh] overflow-hidden">
-        <div className="overflow-y-auto px-4 pb-8 pt-2 space-y-3" style={{ maxHeight: '75vh' }}>
-          {/* Profile card */}
-          <div className="flex items-center gap-3 w-full py-3">
-            <button
-              onClick={() => { navigate('/profile/me'); onOpenChange(false); }}
-              className="flex items-center gap-3 flex-1 min-w-0 active:scale-[0.98] transition-transform"
-            >
-              <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
-              <div className="text-left min-w-0 flex-1">
-                <p className="text-sm font-bold text-foreground truncate font-display">{profile?.full_name || 'Usuário'}</p>
-                <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
+        <div className="overflow-y-auto pb-8" style={{ maxHeight: '75vh' }}>
+          {/* Navy gradient header area */}
+          <div
+            className="relative px-4 pt-2 pb-4 space-y-3"
+            style={{
+              background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+            }}
+          >
+            {/* Profile card */}
+            <div className="flex items-center gap-3 w-full py-3">
+              <button
+                onClick={() => { navigate('/profile/me'); onOpenChange(false); }}
+                className="flex items-center gap-3 flex-1 min-w-0 active:scale-[0.98] transition-transform"
+              >
+                <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
+                <div className="text-left min-w-0 flex-1">
+                  <p className="text-sm font-bold text-white truncate font-display">{profile?.full_name || 'Usuário'}</p>
+                  <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
+                </div>
+              </button>
+              <ThemeToggle className="p-1.5 shrink-0 text-white/70 hover:text-white" />
+            </div>
+
+            {/* Store selector — compact inline */}
+            {units.length > 1 && (
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar px-0.5">
+                {units.map(unit => {
+                  const isActive = unit.id === activeUnit?.id;
+                  return (
+                    <button
+                      key={unit.id}
+                      onClick={() => {
+                        setActiveUnitId(unit.id);
+                        onOpenChange(false);
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
+                        isActive
+                          ? "bg-white/20 text-white border border-white/30"
+                          : "bg-white/10 text-white/60 hover:bg-white/15"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "w-2 h-2 rounded-full shrink-0",
+                          isActive ? "bg-white" : "bg-white/40"
+                        )}
+                      />
+                      {unit.name}
+                    </button>
+                  );
+                })}
               </div>
-            </button>
-            <ThemeToggle className="p-1.5 shrink-0" />
+            )}
+
+            {/* Plans button */}
+            {(plan === 'free') && (
+              <button
+                onClick={() => { navigate('/plans'); onOpenChange(false); }}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+              >
+                <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
+                <span className="text-sm font-semibold text-white">Upgrade de Plano</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
+              </button>
+            )}
+            {(plan !== 'free' && isAdmin) && (
+              <button
+                onClick={() => { navigate('/plans'); onOpenChange(false); }}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+              >
+                <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
+                <span className="text-sm font-semibold text-white">Planos</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>{plan?.toUpperCase()}</span>
+              </button>
+            )}
           </div>
 
-          {/* Store selector — compact inline */}
-          {units.length > 1 && (
-            <div className="flex gap-1.5 overflow-x-auto no-scrollbar px-0.5">
-              {units.map(unit => {
-                const isActive = unit.id === activeUnit?.id;
-                const themeColor = getThemeColor(unit.slug);
-                return (
-                  <button
-                    key={unit.id}
-                    onClick={() => {
-                      setActiveUnitId(unit.id);
-                      onOpenChange(false);
-                    }}
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
-                      isActive
-                        ? "text-white"
-                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
-                    )}
-                    style={isActive ? { background: 'var(--gradient-brand)' } : undefined}
-                  >
-                    <span
-                      className={cn(
-                        "w-2 h-2 rounded-full shrink-0",
-                        isActive ? "bg-white" : "bg-muted-foreground/40"
-                      )}
-                    />
-                    {unit.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Plans button — visible for all users on free plan */}
-          {(plan === 'free') && (
-            <button
-              onClick={() => { navigate('/plans'); onOpenChange(false); }}
-              className="flex items-center gap-3 w-full px-3 py-2.5 mb-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all"
-            >
-              <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
-              <span className="text-sm font-semibold text-foreground">Upgrade de Plano</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
-            </button>
-          )}
-          {(plan !== 'free' && isAdmin) && (
-            <button
-              onClick={() => { navigate('/plans'); onOpenChange(false); }}
-              className="flex items-center gap-3 w-full px-3 py-2.5 mb-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all"
-            >
-              <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
-              <span className="text-sm font-semibold text-foreground">Planos</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider ml-auto text-primary">{plan}</span>
-            </button>
-          )}
-
           {/* Module grid — adaptive cards */}
+          <div className="px-4 pt-4 space-y-3">
           {groupedNav.map(group => {
             const count = group.items.length;
             const useCols3 = count >= 3 && count !== 4;
@@ -297,6 +304,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
               </div>
               <span className="text-sm font-medium text-muted-foreground">Sair da conta</span>
             </button>
+          </div>
           </div>
         </div>
       </DrawerContent>
