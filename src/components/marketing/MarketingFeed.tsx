@@ -62,44 +62,42 @@ export function MarketingFeed({ posts, onEdit, onDelete, onPublish }: Props) {
         />
       </div>
 
-      {/* Status filters with counts */}
+      {/* Unified filter row */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {statusFilters.map(f => {
           const count = f.value === 'all' ? posts.length : counts[f.value as keyof typeof counts] || 0;
+          const isActive = statusFilter === f.value;
           return (
             <button
               key={f.value}
               onClick={() => setStatusFilter(f.value)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                statusFilter === f.value
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-muted-foreground'
+              className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                isActive
+                  ? 'bg-foreground text-background'
+                  : 'bg-card text-muted-foreground border border-border/50'
               }`}
             >
-              {f.label}
-              <span className={`text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center ${
-                statusFilter === f.value ? 'bg-primary-foreground/20' : 'bg-muted'
-              }`}>
-                {count}
-              </span>
+              {f.label} {count > 0 && <span className="opacity-60 ml-0.5">{count}</span>}
             </button>
           );
         })}
-      </div>
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {channelFilters.map(f => (
-          <button
-            key={f.value}
-            onClick={() => setChannelFilter(f.value)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-              channelFilter === f.value
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary text-muted-foreground'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+        <span className="shrink-0 w-px h-6 self-center bg-border/50" />
+        {channelFilters.map(f => {
+          const isActive = channelFilter === f.value;
+          return (
+            <button
+              key={f.value}
+              onClick={() => setChannelFilter(f.value)}
+              className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                isActive
+                  ? 'bg-foreground text-background'
+                  : 'bg-card text-muted-foreground border border-border/50'
+              }`}
+            >
+              {f.label}
+            </button>
+          );
+        })}
       </div>
 
       {filtered.length === 0 ? (
