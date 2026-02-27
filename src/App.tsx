@@ -177,10 +177,10 @@ function AppRoutes() {
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
           <Route path="/cotacao/:token" element={<QuotationPublic />} />
           <Route path="/m/:unitId" element={<DigitalMenu />} />
-          <Route path="/tablet/:unitId" element={<TabletSelect />} />
-          <Route path="/tablet/:unitId/menu" element={<TabletMenu />} />
+          <Route path="/tablet/:unitId" element={<DigitalMenu />} />
+          <Route path="/tablet/:unitId/menu" element={<DigitalMenu />} />
           <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
-          <Route path="/gamification/:unitId" element={<GamificationPlay />} />
+          <Route path="/gamification/:unitId" element={<DigitalMenu />} />
           <Route path="/tablet-admin" element={<ProtectedRoute><TabletAdmin /></ProtectedRoute>} />
           <Route path="/cardapio" element={<ProtectedRoute><MenuAdmin /></ProtectedRoute>} />
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />

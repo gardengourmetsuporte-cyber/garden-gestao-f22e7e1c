@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useState, useEffect } from 'react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { AppIcon } from '@/components/ui/app-icon';
 import { DMProduct, DMOptionGroup, CartItem } from '@/hooks/useDigitalMenu';
+import { cn } from '@/lib/utils';
 
 interface Props {
   product: DMProduct | null;
@@ -22,12 +22,26 @@ export function MenuProductDetail({ product, optionGroups, open, onClose, onAddT
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
+  const [showNotes, setShowNotes] = useState(false);
+
+  // Reset on product change
+  useEffect(() => {
+    if (open) {
+      setQuantity(1);
+      setNotes('');
+      setSelectedOptions({});
+      setShowNotes(false);
+    }
+  }, [open, product?.id]);
 
   if (!product) return null;
 
   const toggleOption = (groupId: string, optionId: string, maxSelections: number) => {
     setSelectedOptions(prev => {
       const current = prev[groupId] || [];
+      if (maxSelections === 1) {
+        return { ...prev, [groupId]: current.includes(optionId) ? [] : [optionId] };
+      }
       if (current.includes(optionId)) {
         return { ...prev, [groupId]: current.filter(id => id !== optionId) };
       }
@@ -38,7 +52,6 @@ export function MenuProductDetail({ product, optionGroups, open, onClose, onAddT
     });
   };
 
-  const allOptions = optionGroups.flatMap(og => og.options.map(o => ({ ...o, groupTitle: og.title })));
   const selectedOptionsList = Object.entries(selectedOptions).flatMap(([groupId, optionIds]) => {
     const group = optionGroups.find(og => og.id === groupId);
     return optionIds.map(optId => {
@@ -51,20 +64,10 @@ export function MenuProductDetail({ product, optionGroups, open, onClose, onAddT
   const itemTotal = (product.price + optionsTotal) * quantity;
 
   const handleAdd = () => {
-    onAddToCart({
-      product,
-      quantity,
-      notes,
-      selectedOptions: selectedOptionsList,
-    });
-    // Reset
-    setQuantity(1);
-    setNotes('');
-    setSelectedOptions({});
+    onAddToCart({ product, quantity, notes, selectedOptions: selectedOptionsList });
     onClose();
   };
 
-  // Validate required option groups
   const isValid = optionGroups.every(og => {
     const selected = (selectedOptions[og.id] || []).length;
     return selected >= og.min_selections;
@@ -72,88 +75,144 @@ export function MenuProductDetail({ product, optionGroups, open, onClose, onAddT
 
   return (
     <Sheet open={open} onOpenChange={v => !v && onClose()}>
-      <SheetContent side="bottom" className="rounded-t-3xl max-h-[90dvh] overflow-y-auto p-0">
+      <SheetContent side="bottom" className="rounded-t-3xl max-h-[92dvh] overflow-hidden p-0 flex flex-col">
         {/* Image */}
-        {product.image_url && (
-          <div className="w-full aspect-video relative overflow-hidden">
+        {product.image_url ? (
+          <div className="w-full h-56 relative overflow-hidden shrink-0">
             <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/60 backdrop-blur-xl flex items-center justify-center"
+            >
+              <AppIcon name="X" size={18} className="text-foreground" />
+            </button>
           </div>
+        ) : (
+          <div className="w-full h-4 shrink-0" />
         )}
 
-        <div className="px-4 pt-4 pb-6 space-y-4">
-          <SheetHeader className="text-left">
-            <SheetTitle className="text-xl">{product.name}</SheetTitle>
-          </SheetHeader>
-
-          {product.description && (
-            <p className="text-sm text-muted-foreground">{product.description}</p>
-          )}
-
-          <p className="text-lg font-bold text-primary">{formatPrice(product.price)}</p>
-
-          {/* Option groups */}
-          {optionGroups.map(og => (
-            <div key={og.id} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-foreground">{og.title}</h3>
-                <span className="text-xs text-muted-foreground">
-                  {og.min_selections > 0 ? `Obrigatório (${og.min_selections}-${og.max_selections})` : `Até ${og.max_selections}`}
-                </span>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
+          <div className="space-y-5 pt-3">
+            {/* Title + Price */}
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <h2 className="text-xl font-bold text-foreground leading-tight">{product.name}</h2>
+                {product.is_highlighted && (
+                  <span className="shrink-0 px-2 py-1 rounded-lg bg-[hsl(var(--neon-amber)/0.12)] text-[hsl(var(--neon-amber))] text-[10px] font-bold">
+                    🔥 Popular
+                  </span>
+                )}
               </div>
-              <div className="space-y-1.5">
-                {og.options.map(opt => {
-                  const isChecked = (selectedOptions[og.id] || []).includes(opt.id);
-                  return (
-                    <label
-                      key={opt.id}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 cursor-pointer active:scale-[0.98] transition-transform"
-                    >
-                      <Checkbox
-                        checked={isChecked}
-                        onCheckedChange={() => toggleOption(og.id, opt.id, og.max_selections)}
-                      />
-                      <span className="flex-1 text-sm text-foreground">{opt.name}</span>
-                      {opt.price > 0 && (
-                        <span className="text-xs text-muted-foreground">+ {formatPrice(opt.price)}</span>
-                      )}
-                    </label>
-                  );
-                })}
-              </div>
+              {product.description && (
+                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{product.description}</p>
+              )}
+              <p className="text-lg font-bold text-primary mt-3">{formatPrice(product.price)}</p>
             </div>
-          ))}
 
-          {/* Notes */}
-          <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Observações</label>
-            <Textarea
-              placeholder="Ex: sem cebola, bem passado..."
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              rows={2}
-              className="resize-none"
-            />
+            {/* Option groups */}
+            {optionGroups.map(og => {
+              const isRadio = og.max_selections === 1;
+              const selectedCount = (selectedOptions[og.id] || []).length;
+              return (
+                <div key={og.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-sm text-foreground">{og.title}</h3>
+                    <div className="flex items-center gap-1.5">
+                      {og.min_selections > 0 && (
+                        <span className="px-2 py-0.5 rounded-md bg-destructive/12 text-destructive text-[10px] font-bold">
+                          Obrigatório
+                        </span>
+                      )}
+                      <span className="text-[11px] text-muted-foreground">
+                        {selectedCount}/{og.max_selections}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    {og.options.map(opt => {
+                      const isChecked = (selectedOptions[og.id] || []).includes(opt.id);
+                      return (
+                        <label
+                          key={opt.id}
+                          className={cn(
+                            'flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all active:scale-[0.98]',
+                            isChecked
+                              ? 'bg-primary/8 border border-primary/30'
+                              : 'bg-secondary/40 border border-transparent'
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              'w-5 h-5 flex items-center justify-center shrink-0 transition-colors',
+                              isRadio ? 'rounded-full border-2' : 'rounded-md border-2',
+                              isChecked
+                                ? 'bg-primary border-primary text-primary-foreground'
+                                : 'border-muted-foreground/30'
+                            )}
+                            onClick={(e) => { e.preventDefault(); toggleOption(og.id, opt.id, og.max_selections); }}
+                          >
+                            {isChecked && <AppIcon name="Check" size={12} />}
+                          </div>
+                          <div className="flex-1 min-w-0 flex items-center gap-2">
+                            {opt.image_url && (
+                              <img src={opt.image_url} alt={opt.name} className="w-8 h-8 rounded-lg object-cover shrink-0" />
+                            )}
+                            <span className="text-sm text-foreground">{opt.name}</span>
+                          </div>
+                          {opt.price > 0 && (
+                            <span className="text-xs text-muted-foreground shrink-0">+ {formatPrice(opt.price)}</span>
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Notes toggle */}
+            <button
+              onClick={() => setShowNotes(!showNotes)}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <AppIcon name="MessageSquare" size={16} />
+              {showNotes ? 'Ocultar observações' : 'Adicionar observação'}
+              <AppIcon name={showNotes ? 'ChevronUp' : 'ChevronDown'} size={14} />
+            </button>
+            {showNotes && (
+              <Textarea
+                placeholder="Ex: sem cebola, bem passado..."
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            )}
           </div>
+        </div>
 
-          {/* Quantity + Add */}
+        {/* Fixed bottom action bar */}
+        <div className="shrink-0 px-4 py-3 border-t border-border/30 bg-card/90 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-secondary rounded-xl">
+            <div className="flex items-center bg-secondary rounded-xl">
               <button
                 onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                className="w-10 h-10 flex items-center justify-center text-foreground"
+                className="w-11 h-11 flex items-center justify-center text-foreground active:scale-90 transition-transform"
               >
                 <AppIcon name="Minus" size={18} />
               </button>
-              <span className="w-8 text-center font-bold text-foreground">{quantity}</span>
+              <span className="w-8 text-center font-bold text-foreground text-lg">{quantity}</span>
               <button
                 onClick={() => setQuantity(q => q + 1)}
-                className="w-10 h-10 flex items-center justify-center text-foreground"
+                className="w-11 h-11 flex items-center justify-center text-foreground active:scale-90 transition-transform"
               >
                 <AppIcon name="Plus" size={18} />
               </button>
             </div>
             <Button
-              className="flex-1 h-12 text-base"
+              className="flex-1 h-12 text-base font-bold rounded-xl"
               onClick={handleAdd}
               disabled={!isValid}
             >

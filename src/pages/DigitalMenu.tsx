@@ -20,6 +20,7 @@ export default function DigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
   const [searchParams] = useSearchParams();
   const mesa = searchParams.get('mesa');
+  const initialTab = (searchParams.get('tab') as MenuTab) || 'home';
 
   const {
     unit, categories, groups, products, loading,
@@ -27,9 +28,10 @@ export default function DigitalMenu() {
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId);
 
-  const [activeTab, setActiveTab] = useState<MenuTab>('menu');
+  const [activeTab, setActiveTab] = useState<MenuTab>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<DMProduct | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Gamification
   const { prizes, prizesLoading, isEnabled, checkAlreadyPlayed, checkDailyCostExceeded, recordPlay } = useGamification(unitId);
@@ -71,29 +73,113 @@ export default function DigitalMenu() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background max-w-lg mx-auto">
-      {/* Landing header - always visible */}
-      <MenuLanding unit={unit} />
+    <div className="min-h-[100dvh] bg-background max-w-lg mx-auto relative">
+      {/* Home tab: Landing + search + featured */}
+      {activeTab === 'home' && (
+        <div>
+          <MenuLanding unit={unit} />
 
-      {/* Tab content */}
-      <div className="mt-4">
-        {activeTab === 'menu' && (
-          <MenuProductList
-            categories={categories}
-            groups={groups}
-            products={products}
-            getGroupProducts={getGroupProducts}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            onSelectProduct={handleProductSelect}
-          />
-        )}
+          {/* Quick search bar */}
+          <div className="px-4 mt-5">
+            <button
+              onClick={() => { setSearchOpen(true); setActiveTab('menu'); }}
+              className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl bg-card border border-border/40 text-muted-foreground text-sm"
+            >
+              <AppIcon name="Search" size={16} />
+              Buscar no cardápio...
+            </button>
+          </div>
 
-        {activeTab === 'search' && (
-          <MenuSearch products={products} onSelectProduct={handleProductSelect} />
-        )}
+          {/* Featured products */}
+          {products.filter(p => p.is_highlighted).length > 0 && (
+            <div className="mt-6 px-4">
+              <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
+                <AppIcon name="Flame" size={14} className="text-[hsl(var(--neon-amber))]" />
+                Destaques
+              </h3>
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                {products.filter(p => p.is_highlighted).slice(0, 8).map(product => (
+                  <button
+                    key={product.id}
+                    onClick={() => handleProductSelect(product)}
+                    className="shrink-0 w-36 rounded-2xl bg-card border border-border/30 overflow-hidden active:scale-[0.97] transition-transform text-left"
+                  >
+                    {product.image_url ? (
+                      <img src={product.image_url} alt={product.name} className="w-full h-24 object-cover" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-24 bg-secondary/50 flex items-center justify-center">
+                        <AppIcon name="Image" size={24} className="text-muted-foreground/20" />
+                      </div>
+                    )}
+                    <div className="p-2.5">
+                      <p className="text-xs font-semibold text-foreground truncate">{product.name}</p>
+                      <p className="text-xs font-bold text-primary mt-1">
+                        {product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-        {activeTab === 'cart' && unitId && (
+          {/* Quick category access */}
+          {categories.length > 0 && (
+            <div className="mt-6 px-4 pb-28">
+              <h3 className="text-sm font-bold text-foreground mb-3">Categorias</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setSelectedCategory(cat.id); setActiveTab('menu'); }}
+                    className="flex items-center gap-2.5 p-3.5 rounded-xl bg-card border border-border/30 active:scale-[0.97] transition-transform text-left"
+                  >
+                    {cat.icon && <AppIcon name={cat.icon} size={18} className="text-primary" />}
+                    <span className="text-sm font-semibold text-foreground truncate">{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Menu tab */}
+      {activeTab === 'menu' && (
+        <div className="pt-4">
+          {/* Inline search */}
+          {searchOpen ? (
+            <div className="px-4 mb-4">
+              <MenuSearch products={products} onSelectProduct={handleProductSelect} />
+            </div>
+          ) : (
+            <>
+              <div className="px-4 mb-3 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Cardápio</h2>
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="w-9 h-9 rounded-xl bg-card border border-border/40 flex items-center justify-center"
+                >
+                  <AppIcon name="Search" size={16} className="text-muted-foreground" />
+                </button>
+              </div>
+              <MenuProductList
+                categories={categories}
+                groups={groups}
+                products={products}
+                getGroupProducts={getGroupProducts}
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+                onSelectProduct={handleProductSelect}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Cart tab */}
+      {activeTab === 'cart' && unitId && (
+        <div className="pt-4">
           <MenuCart
             cart={cart}
             cartTotal={cartTotal}
@@ -103,46 +189,54 @@ export default function DigitalMenu() {
             onRemove={removeFromCart}
             onClear={clearCart}
           />
-        )}
+        </div>
+      )}
 
-        {activeTab === 'game' && (
-          <div className="px-4 pb-20 flex flex-col items-center gap-6">
-            <h2 className="text-lg font-bold text-foreground">🎰 Roleta Garden</h2>
-            <p className="text-sm text-muted-foreground text-center">
+      {/* Game tab */}
+      {activeTab === 'game' && (
+        <div className="px-4 pt-6 pb-28 flex flex-col items-center gap-6">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-foreground">🎰 Roleta da Sorte</h2>
+            <p className="text-sm text-muted-foreground mt-1">
               Gire a roleta e concorra a prêmios!
             </p>
+          </div>
 
-            {gamePhase === 'input' && (
-              <div className="w-full max-w-sm space-y-4">
+          {gamePhase === 'input' && (
+            <div className="w-full max-w-sm space-y-4">
+              <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
                 <Input
                   placeholder="Número do pedido *"
                   value={gameOrderId}
                   onChange={e => setGameOrderId(e.target.value)}
-                  className="text-center h-12"
+                  className="text-center h-13 text-base rounded-xl"
                 />
                 <Input
                   placeholder="Seu nome (opcional)"
                   value={gameName}
                   onChange={e => setGameName(e.target.value)}
-                  className="text-center h-12"
+                  className="text-center h-13 text-base rounded-xl"
                 />
-                <Button size="lg" className="w-full" onClick={handleGameStart} disabled={validating || !isEnabled}>
-                  {validating ? <AppIcon name="Loader2" size={20} className="animate-spin mr-2" /> : <AppIcon name="Dices" size={20} className="mr-2" />}
-                  GIRAR ROLETA
-                </Button>
               </div>
-            )}
+              <Button size="lg" className="w-full h-14 text-base font-bold rounded-xl" onClick={handleGameStart} disabled={validating || !isEnabled}>
+                {validating ? <AppIcon name="Loader2" size={20} className="animate-spin mr-2" /> : <AppIcon name="Dices" size={20} className="mr-2" />}
+                GIRAR ROLETA
+              </Button>
+              {!isEnabled && (
+                <p className="text-xs text-muted-foreground text-center">A roleta está desativada no momento</p>
+              )}
+            </div>
+          )}
 
-            {gamePhase === 'wheel' && (
-              <SlotMachine prizes={prizes} onResult={handleGameResult} />
-            )}
+          {gamePhase === 'wheel' && (
+            <SlotMachine prizes={prizes} onResult={handleGameResult} />
+          )}
 
-            {gamePhase === 'result' && wonPrize && (
-              <PrizeResult prize={wonPrize} onFinish={() => { setGamePhase('input'); setGameOrderId(''); setGameName(''); setWonPrize(null); }} />
-            )}
-          </div>
-        )}
-      </div>
+          {gamePhase === 'result' && wonPrize && (
+            <PrizeResult prize={wonPrize} onFinish={() => { setGamePhase('input'); setGameOrderId(''); setGameName(''); setWonPrize(null); }} />
+          )}
+        </div>
+      )}
 
       {/* Product detail sheet */}
       <MenuProductDetail
@@ -154,7 +248,7 @@ export default function DigitalMenu() {
       />
 
       {/* Bottom nav */}
-      <MenuBottomNav active={activeTab} onTabChange={setActiveTab} cartCount={cartCount} />
+      <MenuBottomNav active={activeTab} onTabChange={(tab) => { setActiveTab(tab); setSearchOpen(false); }} cartCount={cartCount} />
     </div>
   );
 }
