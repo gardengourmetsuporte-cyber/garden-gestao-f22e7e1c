@@ -7,8 +7,8 @@ const ROUTE_KEY = 'garden_last_route';
 const IGNORE_ROUTES = ['/auth', '/landing', '/invite', '/onboarding'];
 
 /**
- * Persists the current route to localStorage so the PWA can restore it
- * when iOS kills and restarts the app from background.
+ * Persists the current route (path + search params) to localStorage so the PWA
+ * can restore it when iOS kills and restarts the app from background.
  */
 export function useRoutePersist() {
   const location = useLocation();
@@ -17,10 +17,11 @@ export function useRoutePersist() {
     const path = location.pathname;
     if (!IGNORE_ROUTES.some(r => path.startsWith(r))) {
       try {
-        localStorage.setItem(ROUTE_KEY, path);
+        const full = path + (location.search || '');
+        localStorage.setItem(ROUTE_KEY, full);
       } catch {}
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 }
 
 /**
