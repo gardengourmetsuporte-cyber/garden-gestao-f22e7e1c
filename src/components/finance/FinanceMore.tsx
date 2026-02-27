@@ -43,26 +43,19 @@ export function FinanceMore({
 
   return (
     <>
-      <div className="px-4 py-3 lg:px-6 space-y-2 pb-32">
-        <h1 className="text-xl font-bold mb-4">Mais Opções</h1>
-        
-        {menuItems.map((item, index) => (
-          <button
-            key={index}
-            onClick={item.onClick}
-            className="list-command w-full flex items-center gap-3 p-4 text-left animate-slide-up"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ backgroundColor: `${item.color}12`, color: item.color }}
+      <div className="px-4 py-3 lg:px-6 space-y-4 pb-32">
+        <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
+          {menuItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={item.onClick}
+              className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
             >
-              <AppIcon name={item.icon} size={20} />
-            </div>
-            <span className="flex-1 font-medium">{item.label}</span>
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
-          </button>
-        ))}
+              <span className="font-medium text-sm text-foreground">{item.label}</span>
+              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+            </button>
+          ))}
+        </div>
       </div>
 
       <AccountManagement
