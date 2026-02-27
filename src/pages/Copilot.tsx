@@ -46,7 +46,6 @@ function getActionNavigation(content: string): { label: string; href: string; ic
   }
   return null;
 }
-}
 
 export default function CopilotPage() {
   const navigate = useNavigate();
