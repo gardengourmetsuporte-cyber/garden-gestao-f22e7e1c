@@ -1,9 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { PlanTier } from '@/lib/plans';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -67,7 +66,21 @@ const PLAN_LABELS: Record<PlanTier, string> = {
 export default function SettingsPage() {
   const { isAdmin, isSuperAdmin, hasPlan } = useAuth();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeSection, setActiveSection] = useState<string | null>(
+    searchParams.get('tab')
+  );
+
+  // Sync active section to URL so it persists across navigation
+  useEffect(() => {
+    if (activeSection) {
+      setSearchParams({ tab: activeSection }, { replace: true });
+    } else {
+      if (searchParams.has('tab')) {
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [activeSection]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'plan') return true;
