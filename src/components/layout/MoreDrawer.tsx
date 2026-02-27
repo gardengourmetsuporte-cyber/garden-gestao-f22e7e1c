@@ -218,10 +218,10 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         className={cn(
                           "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
                           active
-                            ? "bg-primary/10"
+                            ? ""
                             : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
                         )}
-                        style={{ opacity: locked ? 0.55 : 1 }}
+                        style={{ opacity: locked ? 0.55 : 1, ...(active ? { background: 'hsl(220 70% 16% / 0.1)' } : {}) }}
                       >
                         {isProduction && (
                           <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
@@ -232,11 +232,12 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                           <div
                             className={cn(
                               "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
-                              active ? "bg-primary" : "bg-muted"
+                              active ? "" : "bg-muted"
                             )}
-                            style={{
-                              boxShadow: active ? '0 4px 12px hsl(var(--primary) / 0.3)' : undefined,
-                            }}
+                            style={active ? {
+                              background: 'linear-gradient(135deg, hsl(220 70% 16%), hsl(234 75% 28%), hsl(220 65% 18%))',
+                              boxShadow: '0 4px 12px hsl(220 60% 15% / 0.3)',
+                            } : undefined}
                           >
                             <AppIcon
                               name={item.icon}
