@@ -257,35 +257,35 @@ export default function CardapioHub() {
           </div>
         </header>
 
-        {/* Internal tabs: Produtos / Opcionais */}
-        <div className="px-4 pt-3 lg:px-6">
-          <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
-            {([
-              { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-              { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
-              { id: 'config' as CardapioTab, label: 'Config', icon: 'Settings', count: undefined },
-            ]).map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setCardapioTab(tab.id)}
-                className={cn(
-                  "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                  cardapioTab === tab.id
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <AppIcon name={tab.icon} size={15} />
-                {tab.label}
-                {tab.count !== undefined && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            ))}
+        {cardapioTab !== 'config' && (
+          <div className="px-4 pt-3 lg:px-6">
+            <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
+              {([
+                { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
+                { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
+              ]).map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setCardapioTab(tab.id)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                    cardapioTab === tab.id
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <AppIcon name={tab.icon} size={15} />
+                  {tab.label}
+                  {tab.count !== undefined && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="px-4 py-3 lg:px-6 space-y-4">
           {/* ==================== PRODUTOS ==================== */}
