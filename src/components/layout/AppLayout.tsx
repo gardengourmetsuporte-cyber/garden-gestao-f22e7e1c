@@ -1,5 +1,6 @@
 import gardenLogo from '@/assets/logo.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
+import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PageTransition } from './PageTransition';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -74,8 +75,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { leaderboard } = useLeaderboard();
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
+    setIsSigningOut(true);
     await signOut();
     navigate('/auth');
   };
@@ -151,6 +154,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
     const name = profile?.full_name || 'U';
     return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   }, [profile?.full_name]);
+
+  if (isSigningOut) {
+    return (
+      <div className="animate-fade-in">
+        <PageLoader />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
