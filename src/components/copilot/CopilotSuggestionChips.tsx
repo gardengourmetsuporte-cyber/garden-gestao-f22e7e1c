@@ -10,13 +10,32 @@ const DEFAULT_CHIPS = [
   { label: 'Criar tarefa', icon: 'Plus' as const, badge: undefined as number | undefined },
 ];
 
+interface QuickStats {
+  pendingExpenses?: number;
+  criticalItems?: number;
+}
+
 interface CopilotSuggestionChipsProps {
   onChipClick: (text: string) => void;
   contextStats?: CopilotContextStats | null;
+  quickStats?: QuickStats | null;
 }
 
-export default function CopilotSuggestionChips({ onChipClick, contextStats }: CopilotSuggestionChipsProps) {
-  const chips = contextStats ? buildDynamicChips(contextStats) : DEFAULT_CHIPS;
+export default function CopilotSuggestionChips({ onChipClick, contextStats, quickStats }: CopilotSuggestionChipsProps) {
+  // Merge quickStats (sync) into contextStats fields when contextStats hasn't loaded yet
+  const mergedStats: CopilotContextStats | null = contextStats
+    ? contextStats
+    : quickStats
+    ? {
+        pendingExpensesCount: quickStats.pendingExpenses ?? 0,
+        pendingExpensesTotal: 0,
+        lowStockCount: quickStats.criticalItems ?? 0,
+        pendingTasksCount: 0,
+        upcomingInvoicesCount: 0,
+        checklistPct: 0,
+      }
+    : null;
+  const chips = mergedStats ? buildDynamicChips(mergedStats) : DEFAULT_CHIPS;
 
   return (
     <div className="flex flex-wrap gap-2 pt-2">
