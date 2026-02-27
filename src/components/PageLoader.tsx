@@ -8,11 +8,11 @@ export function PageLoader() {
         <div
           className="absolute inset-0 rounded-full animate-spin"
           style={{
-            border: '2px solid transparent',
-            borderTopColor: 'hsl(var(--primary))',
-            borderRightColor: 'hsl(var(--primary) / 0.3)',
+          border: '2px solid transparent',
+            borderTopColor: 'hsl(215 50% 24%)',
+            borderRightColor: 'hsl(215 50% 24% / 0.3)',
             animationDuration: '1.2s',
-            filter: 'drop-shadow(0 0 6px hsl(var(--primary) / 0.4))',
+            filter: 'drop-shadow(0 0 6px hsl(215 50% 24% / 0.4))',
           }}
         />
         {/* Logo */}
