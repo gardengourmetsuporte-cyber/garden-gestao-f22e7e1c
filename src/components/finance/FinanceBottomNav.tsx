@@ -60,8 +60,20 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleTabChange = useCallback((tab: FinanceTab) => {
-    if (tab === 'home' && activeTab === 'home') {
-      navigate('/');
+    if (tab === activeTab) {
+      if (tab === 'home') {
+        navigate('/');
+        return;
+      }
+      // Already on this tab — scroll to top
+      const scrollable = document.querySelector('[data-scroll-container]')
+        || document.querySelector('.flex-1.overflow-y-auto')
+        || document.querySelector('main');
+      if (scrollable && scrollable.scrollTop > 0) {
+        scrollable.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
     onTabChange(tab);
