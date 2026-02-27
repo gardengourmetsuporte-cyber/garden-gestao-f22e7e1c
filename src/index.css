@@ -1557,7 +1557,7 @@
     }
   }
 
-  /* Spring stagger delays */
+  /* Spring stagger — aliases for unified stagger system */
   .spring-stagger-1 { animation-delay: 0ms; }
   .spring-stagger-2 { animation-delay: 80ms; }
   .spring-stagger-3 { animation-delay: 160ms; }
