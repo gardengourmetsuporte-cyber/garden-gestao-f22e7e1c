@@ -82,20 +82,6 @@ export function AdminDashboard() {
         </p>
       </div>
 
-      {/* Claude AI Banner */}
-      <div className="animate-spring-in spring-stagger-1 rounded-2xl px-4 py-3 flex items-center gap-3 bg-primary/5 border border-primary/15">
-        <div className="flex items-center justify-center w-8 h-8 rounded-xl shrink-0 bg-gradient-to-br from-primary to-accent">
-          <span className="text-primary-foreground text-sm">✦</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-primary">Assistido por Claude IA</p>
-          <p className="text-xs text-muted-foreground truncate">Sistema operando normalmente · Última atualização agora</p>
-        </div>
-        <span className="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-          ativo
-        </span>
-      </div>
-
       {/* === FINANCE BLOCK (above fold) === */}
       <div className="space-y-7 animate-spring-in spring-stagger-2">
         {hasAccess('finance') ? (
