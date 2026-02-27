@@ -1,50 +1,38 @@
 
 
-## Plan: Envio de Mensagens em Massa para Clientes por Segmento
+## Plano: Modernizar Layout do Cardápio Digital (estilo Checklist)
 
-### Objetivo
-Permitir enviar mensagens WhatsApp (promoções, convites de retorno, etc.) para clientes filtrados por segmento (inativos, VIP, etc.) diretamente do módulo de Clientes.
+### Problemas Identificados
+- Categorias usam `cat.color` (padrão `#6366f1` = roxo/indigo) nos ícones e fundo
+- Cada categoria tem cor diferente, criando visual inconsistente
+- Ícones de categoria usam emojis hardcoded (`🍴`, `☕`, etc.) ao invés do `AppIcon`
+- Layout dos cards de categoria/grupo não segue o padrão moderno do Checklist (cards com `finance-hero-card`, progress bars, hierarquia visual clara)
+- Cor padrão de novas categorias é `#6366f1` (roxo)
 
-### Arquitetura
+### Mudanças
 
-```text
-Customers Page
-  └─ [Botão "Enviar mensagem"] (aparece quando segmento está filtrado)
-       └─ MessageCampaignSheet (novo componente)
-            ├── Mostra destinatários (clientes com telefone no filtro ativo)
-            ├── Campo de mensagem com templates rápidos
-            ├── Preview da mensagem
-            └── Botão enviar
-                 └─ Edge Function "whatsapp-bulk-send" (nova)
-                      ├── Recebe: unit_id, phones[], message
-                      ├── Busca canal WhatsApp ativo da unidade
-                      ├── Envia mensagem para cada telefone via provider
-                      ├── Salva log de campanha (nova tabela)
-                      └── Retorna resultado (enviados/erros)
-```
+**1. `MenuCategoryTree.tsx` — Redesign completo dos cards de categoria**
+- Remover fundo colorido individual por categoria (eliminar `cat.color` nos ícones)
+- Usar ícone navy uniforme via `AppIcon` com `icon-glow-primary` (padrão do sistema)
+- Substituir emojis hardcoded por ícones Material Symbols mapeados
+- Aplicar estilo de card expandido inspirado no Checklist: bordas sutis, separadores limpos
+- Mudar cor padrão de nova categoria de `#6366f1` para navy do sistema
+- Grupo selecionado usa `finance-hero-card` ao invés de `hsl(var(--primary) / 0.1)`
+- Botão "Nova Categoria" com estilo mais discreto e alinhado
 
-### Etapas de Implementação
+**2. `MenuGroupContent.tsx` — Header do grupo modernizado**
+- Substituir `icon-glow-primary` por estilo compacto navy consistente
+- Badges Mesa/Delivery com estilo unificado usando `--primary` ao invés de `--neon-cyan`/`--neon-green`
 
-1. **Criar tabela `customer_campaigns`** para registrar campanhas enviadas (unit_id, segment, message, total_sent, created_at, created_by)
+**3. `ProductCard.tsx` — Limpeza de cores**
+- Badges Mesa/Delivery usando `--primary` ao invés de cores neon individuais
+- Preço usando `text-primary` ao invés de `--neon-green`
+- Estrela de destaque usando `text-primary` ao invés de `--neon-amber`
 
-2. **Criar edge function `whatsapp-bulk-send`** que:
-   - Recebe lista de telefones + mensagem + unit_id
-   - Busca o canal WhatsApp ativo da unidade
-   - Envia mensagem para cada telefone via Evolution/Z-API
-   - Registra campanha na tabela
-   - Inclui delay entre envios para evitar bloqueio
+**4. `CardapioHub.tsx` — Tabs internas modernizadas**
+- Tabs Produtos/Opcionais/Config usando estilo consistente navy (sem contadores com cores diferentes)
+- Badges de contagem com estilo uniforme
 
-3. **Criar componente `MessageCampaignSheet`** com:
-   - Resumo dos destinatários (ex: "12 clientes inativos com telefone")
-   - Templates rápidos (ex: "Sentimos sua falta!", "Promoção especial para você!")
-   - Campo editável para personalizar a mensagem
-   - Botão de envio com confirmação
-
-4. **Integrar na página Customers** adicionando botão de ação quando houver filtro de segmento ativo, abrindo o sheet de campanha
-
-### Detalhes Técnicos
-- A edge function reutiliza a mesma lógica de envio do `whatsapp-send` existente (Evolution API / Z-API)
-- Clientes sem telefone são excluídos automaticamente
-- Rate limiting: delay de 1s entre cada envio para evitar ban do WhatsApp
-- RLS: apenas usuários autenticados com acesso à unidade podem criar campanhas
+### Resultado
+Visual limpo, monocromático navy, consistente com Checklist e demais módulos do sistema. Zero roxo, zero cores aleatórias por categoria.
 
