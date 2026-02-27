@@ -18,7 +18,7 @@ export function FAQSection() {
     <section id="faq" className="py-20 md:py-28">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
             FAQ
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
@@ -31,7 +31,7 @@ export function FAQSection() {
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="rounded-2xl border border-border/40 bg-card px-6 transition-shadow"
+              className="rounded-2xl border border-border/40 bg-card px-6 transition-all duration-200 hover:border-primary/20 hover:shadow-card data-[state=open]:border-primary/25 data-[state=open]:shadow-card"
             >
               <AccordionTrigger className="text-left text-foreground font-medium text-sm hover:no-underline">
                 {faq.q}
