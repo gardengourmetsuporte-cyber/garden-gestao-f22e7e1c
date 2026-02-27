@@ -22,9 +22,9 @@ export function LandingNavbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm"
+          ? "bg-background/85 backdrop-blur-2xl border-b border-border/30 shadow-sm"
           : "bg-transparent"
       }`}
     >
@@ -36,7 +36,11 @@ export function LandingNavbar() {
 
         <div className="hidden md:flex items-center gap-8">
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+            >
               {l.label}
             </a>
           ))}
@@ -44,43 +48,51 @@ export function LandingNavbar() {
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link to="/auth" className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/auth"
+            className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.02]"
-            style={{
-              background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%))',
-              border: '1px solid hsl(234 40% 35% / 0.4)',
-            }}
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold gradient-primary text-primary-foreground"
           >
             Começar grátis
           </Link>
 
-          <button onClick={() => setOpen(!open)} className="md:hidden p-2 text-muted-foreground hover:text-foreground">
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+          >
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {open && (
-        <div className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border/40 px-4 pb-6 pt-2 space-y-1 animate-fade-in">
+        <div className="md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 px-4 pb-6 pt-2 space-y-1 animate-fade-in">
           {links.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="block py-3 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               {l.label}
             </a>
           ))}
-          <Link to="/auth" onClick={() => setOpen(false)} className="block py-3 text-sm text-muted-foreground">
+          <Link
+            to="/auth"
+            onClick={() => setOpen(false)}
+            className="block py-3 text-sm text-muted-foreground"
+          >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold text-white"
-            style={{
-              background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%))',
-            }}
+            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold gradient-primary text-primary-foreground"
           >
             Começar grátis
           </Link>

@@ -1,11 +1,10 @@
-import { 
-  DollarSign, ClipboardCheck, Package, BarChart3, 
-  Users, Calendar, Bot, ShoppingCart, Gamepad2, UtensilsCrossed 
+import {
+  DollarSign, ClipboardCheck, Package, BarChart3,
+  Users, Calendar, Bot, ShoppingCart, Gamepad2, UtensilsCrossed,
 } from "lucide-react";
 import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
 import screenshotChecklist from "@/assets/screenshot-checklist.png";
 import screenshotEstoque from "@/assets/screenshot-estoque.png";
-import screenshotRelatorios from "@/assets/screenshot-relatorios.png";
 
 const steps = [
   {
@@ -32,93 +31,23 @@ const steps = [
 ];
 
 const modules = [
-  {
-    icon: DollarSign,
-    title: "Financeiro",
-    desc: "Receitas, despesas, contas e fechamento de caixa integrado.",
-    color: "text-success",
-    bg: "bg-success/10",
-    border: "border-success/20",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Checklists",
-    desc: "Abertura, fechamento e rotina com progresso em tempo real.",
-    color: "text-primary",
-    bg: "bg-primary/10",
-    border: "border-primary/20",
-  },
-  {
-    icon: Package,
-    title: "Estoque",
-    desc: "Controle de ingredientes com alertas de estoque mínimo.",
-    color: "text-warning",
-    bg: "bg-warning/10",
-    border: "border-warning/20",
-  },
-  {
-    icon: BarChart3,
-    title: "Relatórios",
-    desc: "DRE, custos por categoria e resumo semanal automático.",
-    color: "text-accent",
-    bg: "bg-accent/10",
-    border: "border-accent/20",
-  },
-  {
-    icon: Users,
-    title: "Gestão de Equipe",
-    desc: "Escala, ponto, folha de pagamento e ranking de desempenho.",
-    color: "text-primary",
-    bg: "bg-primary/10",
-    border: "border-primary/20",
-  },
-  {
-    icon: UtensilsCrossed,
-    title: "Fichas Técnicas",
-    desc: "Monte receitas com custo automático baseado no estoque.",
-    color: "text-warning",
-    bg: "bg-warning/10",
-    border: "border-warning/20",
-  },
-  {
-    icon: Calendar,
-    title: "Agenda & Marketing",
-    desc: "Calendário de tarefas, campanhas e datas comemorativas.",
-    color: "text-success",
-    bg: "bg-success/10",
-    border: "border-success/20",
-  },
-  {
-    icon: Bot,
-    title: "IA Copiloto",
-    desc: "Assistente inteligente que analisa dados e sugere ações.",
-    color: "text-accent",
-    bg: "bg-accent/10",
-    border: "border-accent/20",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Pedidos Online",
-    desc: "Cardápio digital com pedidos via tablet e WhatsApp.",
-    color: "text-destructive",
-    bg: "bg-destructive/10",
-    border: "border-destructive/20",
-  },
-  {
-    icon: Gamepad2,
-    title: "Gamificação",
-    desc: "Roleta de prêmios e ranking para engajar clientes e equipe.",
-    color: "text-accent",
-    bg: "bg-accent/10",
-    border: "border-accent/20",
-  },
+  { icon: DollarSign, title: "Financeiro", desc: "Receitas, despesas, contas e fechamento de caixa integrado.", color: "text-success", bg: "bg-success/10", border: "border-success/20" },
+  { icon: ClipboardCheck, title: "Checklists", desc: "Abertura, fechamento e rotina com progresso em tempo real.", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
+  { icon: Package, title: "Estoque", desc: "Controle de ingredientes com alertas de estoque mínimo.", color: "text-warning", bg: "bg-warning/10", border: "border-warning/20" },
+  { icon: BarChart3, title: "Relatórios", desc: "DRE, custos por categoria e resumo semanal automático.", color: "text-accent", bg: "bg-accent/10", border: "border-accent/20" },
+  { icon: Users, title: "Gestão de Equipe", desc: "Escala, ponto, folha de pagamento e ranking de desempenho.", color: "text-primary", bg: "bg-primary/10", border: "border-primary/20" },
+  { icon: UtensilsCrossed, title: "Fichas Técnicas", desc: "Monte receitas com custo automático baseado no estoque.", color: "text-warning", bg: "bg-warning/10", border: "border-warning/20" },
+  { icon: Calendar, title: "Agenda & Marketing", desc: "Calendário de tarefas, campanhas e datas comemorativas.", color: "text-success", bg: "bg-success/10", border: "border-success/20" },
+  { icon: Bot, title: "IA Copiloto", desc: "Assistente inteligente que analisa dados e sugere ações.", color: "text-accent", bg: "bg-accent/10", border: "border-accent/20" },
+  { icon: ShoppingCart, title: "Pedidos Online", desc: "Cardápio digital com pedidos via tablet e WhatsApp.", color: "text-destructive", bg: "bg-destructive/10", border: "border-destructive/20" },
+  { icon: Gamepad2, title: "Gamificação", desc: "Roleta de prêmios e ranking para engajar clientes e equipe.", color: "text-accent", bg: "bg-accent/10", border: "border-accent/20" },
 ];
 
 export function SolutionSection() {
   return (
     <section id="como-funciona" className="py-24 md:py-32 relative">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
-      
+
       {/* Ambient glows */}
       <div className="absolute top-1/3 left-0 w-[400px] h-[400px] rounded-full bg-primary/4 blur-[140px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-0 w-[300px] h-[300px] rounded-full bg-success/4 blur-[120px] pointer-events-none" />
@@ -139,14 +68,13 @@ export function SolutionSection() {
         {/* Steps */}
         <div className="space-y-24 md:space-y-32">
           {steps.map((step, i) => (
-            <div key={step.number} className={`grid md:grid-cols-2 gap-12 md:gap-16 items-center ${i % 2 === 1 ? "md:[direction:rtl]" : ""}`}>
+            <div
+              key={step.number}
+              className={`grid md:grid-cols-2 gap-12 md:gap-16 items-center ${i % 2 === 1 ? "md:[direction:rtl]" : ""}`}
+            >
               <div className="md:[direction:ltr] space-y-5">
                 <div className="inline-flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold text-sm text-white"
-                    style={{
-                      background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%))',
-                    }}
-                  >
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold text-sm gradient-primary text-primary-foreground">
                     {step.number}
                   </div>
                   <div className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-primary/30 to-transparent" />
@@ -157,7 +85,7 @@ export function SolutionSection() {
               <div className="md:[direction:ltr]">
                 <div className="relative group">
                   <div className="absolute -inset-3 bg-gradient-to-b from-primary/8 via-primary/4 to-transparent blur-[40px] rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  <div className="rounded-2xl overflow-hidden border border-border/40 shadow-card bg-card group-hover:shadow-elevated transition-all duration-500 group-hover:-translate-y-1">
+                  <div className="card-surface overflow-hidden !rounded-2xl group-hover:shadow-elevated transition-all duration-500 group-hover:-translate-y-1">
                     {/* Mini browser bar */}
                     <div className="flex items-center gap-1.5 px-3 py-2 bg-secondary/50 border-b border-border/30">
                       <div className="w-2 h-2 rounded-full bg-destructive/40" />
@@ -184,11 +112,10 @@ export function SolutionSection() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
             {modules.map((m) => (
-              <div
-                key={m.title}
-                className="group rounded-2xl border border-border/40 bg-card p-6 flex gap-4 items-start hover:-translate-y-1 transition-all duration-300 hover:shadow-card-hover hover:border-border/60"
-              >
-                <div className={`w-12 h-12 rounded-2xl border ${m.border} ${m.bg} flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110`}>
+              <div key={m.title} className="card-interactive p-6 flex gap-4 items-start">
+                <div
+                  className={`w-12 h-12 rounded-2xl border ${m.border} ${m.bg} flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110`}
+                >
                   <m.icon className={`w-5.5 h-5.5 ${m.color}`} />
                 </div>
                 <div>

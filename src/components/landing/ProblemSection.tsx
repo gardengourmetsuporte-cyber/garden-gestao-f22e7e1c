@@ -31,7 +31,7 @@ export function ProblemSection() {
   return (
     <section className="py-24 md:py-32 relative">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
-      
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/8 px-3 py-1.5 rounded-full mb-5">
@@ -46,9 +46,11 @@ export function ProblemSection() {
           {problems.map((p) => (
             <div
               key={p.title}
-              className="group rounded-2xl border border-border/40 bg-card p-8 text-center transition-all duration-400 hover:-translate-y-2 hover:shadow-card-hover hover:border-border/60"
+              className="card-interactive p-8 text-center"
             >
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${p.bg} border ${p.iconBorder} mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+              <div
+                className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${p.bg} border ${p.iconBorder} mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
+              >
                 <p.icon className={`w-7 h-7 ${p.color}`} />
               </div>
               <h3 className="text-base font-bold text-foreground mb-3">{p.title}</h3>
