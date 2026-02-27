@@ -76,7 +76,7 @@ export function LandingNavbar() {
       </div>
 
       {open && (
-        <div className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border/40 px-4 pb-6 pt-2 space-y-1">
+        <div className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border/40 px-4 pb-6 pt-2 space-y-1 animate-fade-in">
           {links.map((l) => (
             <a
               key={l.href}
@@ -90,17 +90,18 @@ export function LandingNavbar() {
           <Link
             to="/auth"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-lg text-sm font-semibold border border-border/60 text-muted-foreground"
+            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold border border-border/60 text-muted-foreground"
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-1 rounded-lg text-sm font-semibold"
+            className="block w-full text-center py-3 mt-1 rounded-xl text-sm font-semibold"
             style={{
               background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
               color: "hsl(var(--primary-foreground))",
+              boxShadow: "0 0 20px hsl(var(--primary) / 0.3)",
             }}
           >
             Teste grátis
