@@ -842,6 +842,53 @@ export type Database = {
           },
         ]
       }
+      customer_campaigns: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          message: string
+          segment: string | null
+          status: string
+          total_errors: number
+          total_recipients: number
+          total_sent: number
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          message: string
+          segment?: string | null
+          status?: string
+          total_errors?: number
+          total_recipients?: number
+          total_sent?: number
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          message?: string
+          segment?: string | null
+          status?: string
+          total_errors?: number
+          total_recipients?: number
+          total_sent?: number
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_campaigns_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           birthday: string | null

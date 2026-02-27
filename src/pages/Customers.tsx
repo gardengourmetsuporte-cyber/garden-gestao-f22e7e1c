@@ -11,6 +11,7 @@ import { CustomerCard } from '@/components/customers/CustomerCard';
 import { CustomerSheet } from '@/components/customers/CustomerSheet';
 import { CustomerDetail } from '@/components/customers/CustomerDetail';
 import { CustomerImportCSV } from '@/components/customers/CustomerImportCSV';
+import { MessageCampaignSheet } from '@/components/customers/MessageCampaignSheet';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useCustomerCRM, useCustomerEvents } from '@/hooks/useCustomerCRM';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -45,6 +46,7 @@ export default function Customers() {
   const [editing, setEditing] = useState<Customer | null>(null);
   const [detailCustomer, setDetailCustomer] = useState<Customer | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [campaignOpen, setCampaignOpen] = useState(false);
 
   const { data: detailEvents = [], isLoading: eventsLoading } = useCustomerEvents(detailCustomer?.id || null);
 
@@ -176,6 +178,11 @@ export default function Customers() {
             </span>
             <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11" />
           </div>
+          {segmentFilter && (
+            <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => setCampaignOpen(true)} title="Enviar mensagem em massa">
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
+            </Button>
+          )}
           <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => setCsvOpen(true)}>
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
           </Button>
@@ -228,6 +235,13 @@ export default function Customers() {
         customer={editing}
         onSave={handleSave}
         isSaving={createCustomer.isPending || updateCustomer.isPending}
+      />
+
+      <MessageCampaignSheet
+        open={campaignOpen}
+        onOpenChange={setCampaignOpen}
+        customers={filtered}
+        segment={segmentFilter}
       />
 
       <CustomerImportCSV
