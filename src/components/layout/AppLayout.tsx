@@ -168,27 +168,28 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ======= Simplified Mobile Header (3 elements) ======= */}
+      {/* ======= Mobile Header with Navy Brand Strip ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
+        {/* Navy gradient brand bar */}
         <div
-          className="transition-all duration-300 backdrop-blur-xl"
+          className="relative overflow-hidden"
           style={{
-            background: 'hsl(var(--background) / 0.8)',
+            background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
           }}
         >
-          <div className="flex items-center justify-between h-14 px-3">
+          <div className="flex items-center justify-between h-14 px-3 relative z-10">
             {/* Left: Logo + Unit Name */}
             <button
               onClick={() => navigate('/')}
               className="flex items-center gap-2 active:scale-95 transition-transform min-w-0"
             >
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 border border-border/20 shrink-0">
-                <img alt="Garden Gestão" className="w-full h-full object-contain rounded-full p-0.5" src={gardenLogo} />
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
+                <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
               </div>
-              <span className="text-sm font-bold text-foreground truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
+              <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
                 {activeUnit?.name || 'Garden'}
               </span>
             </button>
@@ -197,8 +198,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <div className="flex items-center gap-1">
               <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
                 <DrawerTrigger asChild>
-                  <button className="relative p-2.5 rounded-lg hover:bg-secondary transition-all">
-                    <AppIcon name="Bell" size={22} className="text-muted-foreground" />
+                  <button className="relative p-2.5 rounded-lg hover:bg-white/10 transition-all">
+                    <AppIcon name="Bell" size={22} className="text-white/70" />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -216,11 +217,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 onClick={() => navigate('/profile/me')}
                 className="p-1 rounded-full active:scale-90 transition-transform"
               >
-                <Avatar className="w-8 h-8 border border-border/30">
+                <Avatar className="w-8 h-8 border-2 border-white/20">
                   {profile?.avatar_url ? (
                     <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Avatar'} />
                   ) : null}
-                  <AvatarFallback className="text-[11px] font-bold bg-primary/15 text-primary">
+                  <AvatarFallback className="text-[11px] font-bold bg-white/15 text-white">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -228,24 +229,30 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </div>
         </div>
-        {/* Subtle separator */}
-        <div className="absolute left-0 right-0 bottom-0 h-px bg-border/10" />
       </header>
 
-      {/* ======= Desktop Sidebar (unchanged) ======= */}
+      {/* ======= Desktop Sidebar ======= */}
       <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card border-r border-border/20">
-        {/* Logo + Unit */}
-        <div className="flex items-center gap-3 px-4 h-16 border-b border-border/15 shrink-0">
-          <button
-            onClick={() => navigate('/')}
-            className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 border border-border/20 active:scale-95 transition-transform shrink-0"
-          >
-            <img alt="Garden Gestão" className="w-full h-full object-contain rounded-full p-0.5" src={gardenLogo} />
-          </button>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
+        {/* Navy brand header */}
+        <div
+          className="relative overflow-hidden shrink-0"
+          style={{
+            background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+          }}
+        >
+          <div className="flex items-center gap-3 px-4 h-16 relative z-10">
+            <button
+              onClick={() => navigate('/')}
+              className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
+            >
+              <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} />
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
+              <p className="text-[10px] text-white/40 font-medium tracking-wide">Gestão Inteligente</p>
+            </div>
+            <ThemeToggle className="p-1.5 shrink-0 text-white/60 hover:text-white" />
           </div>
-          <ThemeToggle className="p-1.5 shrink-0" />
         </div>
 
         {/* User card */}
