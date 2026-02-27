@@ -906,7 +906,7 @@ export function TransactionSheet({
 
           {/* Calculator overlay */}
           {showCalculator && (
-            <div className="absolute inset-x-0 bottom-0 z-50 animate-fade-in">
+            <div className="absolute inset-x-0 bottom-0 z-50" style={{ animation: 'calcSlideUp 200ms cubic-bezier(0.16,1,0.3,1) both' }}>
               <CalculatorKeypad
                 value={amount}
                 onChange={(v) => {
