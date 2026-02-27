@@ -1,4 +1,5 @@
 import { useCallback, useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   ChecklistSector, 
@@ -425,19 +426,25 @@ export function useChecklists() {
       .eq('id', completionId);
     if (error) throw error;
 
-    // Notify the employee
-    await supabase.from('notifications').insert({
-      user_id: completion.completed_by,
-      title: 'Item contestado',
-      body: `Seu item foi contestado: "${reason.trim()}"`,
-      type: 'checklist',
-      unit_id: activeUnitId,
-    } as any);
-
+    // Invalidate queries immediately so UI updates
     queryClient.invalidateQueries({ queryKey: ['checklist-completions'] });
     queryClient.invalidateQueries({ queryKey: ['points'] });
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+
+    // Notify the employee (fire-and-forget, don't block UI)
+    supabase.from('notifications').insert({
+      user_id: completion.completed_by,
+      title: 'Item contestado',
+      description: `Seu item foi contestado: "${reason.trim()}"`,
+      type: 'alert',
+      origin: 'checklist',
+      unit_id: activeUnitId,
+    } as any).then(({ error: notifErr }) => {
+      if (notifErr) console.warn('Failed to send contest notification:', notifErr);
+    });
+
+    toast.success('Item contestado com sucesso');
   }, [completions, user?.id, queryClient, activeUnitId]);
 
   const isItemCompleted = useCallback((itemId: string) => {
