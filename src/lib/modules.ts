@@ -57,7 +57,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'customers', label: 'Clientes', icon: 'ContactRound', route: '/customers', routes: ['/customers'], group: 'Gestão',
+    key: 'customers', label: 'Clientes', icon: 'UserSearch', route: '/customers', routes: ['/customers'], group: 'Gestão',
     children: [
       { key: 'customers.view', label: 'Ver clientes', icon: 'Eye' },
       { key: 'customers.create', label: 'Criar/editar clientes', icon: 'PenSquare' },
