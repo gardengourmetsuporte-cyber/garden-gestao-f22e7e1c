@@ -51,27 +51,33 @@ function BrandPanel() {
         style={{ background: 'hsl(234 80% 60%)' }}
       />
 
-      <div className="relative z-10 flex flex-col items-center gap-10 px-12 max-w-lg">
+      <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
         {/* Logo */}
         <div
-          className="relative w-32 h-32 rounded-3xl overflow-hidden flex items-center justify-center"
+          className="relative w-36 h-36 rounded-[2rem] overflow-hidden flex items-center justify-center"
           style={{
-            background: 'linear-gradient(135deg, hsl(220 50% 15%), hsl(234 60% 22%))',
-            border: '1px solid hsl(220 60% 30% / 0.4)',
-            boxShadow: '0 0 80px hsl(220 80% 50% / 0.15), 0 20px 60px hsl(224 45% 6% / 0.5)',
+            background: 'linear-gradient(145deg, hsl(220 55% 18%), hsl(234 65% 26%), hsl(220 50% 14%))',
+            border: '1px solid hsl(220 60% 35% / 0.35)',
+            boxShadow: '0 0 100px hsl(220 80% 50% / 0.2), 0 25px 70px hsl(224 45% 6% / 0.6), inset 0 1px 0 hsl(220 60% 40% / 0.15)',
           }}
         >
-          <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white flex items-center justify-center">
-            <img alt="Garden Gestão" className="w-[82%] h-[82%] object-contain" src={gardenLogo} />
+          <div
+            className="w-[5.5rem] h-[5.5rem] rounded-2xl overflow-hidden flex items-center justify-center"
+            style={{
+              background: 'white',
+              boxShadow: '0 4px 20px hsl(224 45% 6% / 0.3)',
+            }}
+          >
+            <img alt="Garden Gestão" className="w-[80%] h-[80%] object-contain" src={gardenLogo} />
           </div>
         </div>
 
         {/* Headline */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-2">
           <h1 className="text-5xl font-extrabold tracking-tight text-white font-display">
             Garden
           </h1>
-          <p className="text-sm text-white/40 tracking-[0.25em] uppercase font-medium">
+          <p className="text-[11px] text-white/35 tracking-[0.3em] uppercase font-semibold">
             Gestão Inteligente
           </p>
         </div>
@@ -126,28 +132,35 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="flex lg:hidden flex-col items-center gap-3 mx-4 rounded-2xl px-6 py-8 mb-6"
+      className="flex lg:hidden flex-col items-center gap-4 mx-4 rounded-3xl px-6 py-10 mb-6"
       style={{
         background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
         backgroundSize: '350% 350%',
         animation: 'navyCardFlow 12s ease-in-out infinite',
+        boxShadow: '0 20px 60px hsl(224 45% 6% / 0.4), 0 0 40px hsl(220 80% 50% / 0.08)',
       }}
     >
       <div
-        className="w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center"
+        className="w-28 h-28 rounded-[1.5rem] overflow-hidden flex items-center justify-center"
         style={{
-          background: 'linear-gradient(135deg, hsl(220 50% 15%), hsl(234 60% 22%))',
-          border: '1px solid hsl(220 60% 30% / 0.3)',
-          boxShadow: '0 8px 32px hsl(224 45% 6% / 0.4)',
+          background: 'linear-gradient(145deg, hsl(220 55% 18%), hsl(234 65% 26%), hsl(220 50% 14%))',
+          border: '1px solid hsl(220 60% 35% / 0.3)',
+          boxShadow: '0 0 60px hsl(220 80% 50% / 0.15), 0 12px 40px hsl(224 45% 6% / 0.5), inset 0 1px 0 hsl(220 60% 40% / 0.12)',
         }}
       >
-        <div className="w-16 h-16 rounded-xl overflow-hidden bg-white flex items-center justify-center">
-          <img alt="Garden Gestão" className="w-[82%] h-[82%] object-contain" src={gardenLogo} />
+        <div
+          className="w-[4.5rem] h-[4.5rem] rounded-xl overflow-hidden flex items-center justify-center"
+          style={{
+            background: 'white',
+            boxShadow: '0 4px 16px hsl(224 45% 6% / 0.25)',
+          }}
+        >
+          <img alt="Garden Gestão" className="w-[80%] h-[80%] object-contain" src={gardenLogo} />
         </div>
       </div>
-      <div className="text-center space-y-1">
-        <h1 className="text-2xl font-extrabold text-white tracking-tight font-display">Garden</h1>
-        <p className="text-[10px] text-white/40 tracking-[0.2em] uppercase font-medium">Gestão Inteligente</p>
+      <div className="text-center space-y-1.5">
+        <h1 className="text-3xl font-extrabold text-white tracking-tight font-display">Garden</h1>
+        <p className="text-[10px] text-white/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
       </div>
     </div>
   );
