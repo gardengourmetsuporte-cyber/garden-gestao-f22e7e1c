@@ -3,10 +3,8 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -26,30 +24,29 @@ export function TimeTracking() {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
+        <Skeleton className="h-40 w-full rounded-2xl" />
+        <Skeleton className="h-16 w-full rounded-2xl" />
+        <Skeleton className="h-16 w-full rounded-2xl" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Employee: Check-in/out Card */}
+    <div className="space-y-5">
       {!isAdmin && <EmployeeCheckInCard todayRecord={todayRecord} onCheckIn={checkIn} onCheckOut={checkOut} />}
 
-      {/* Admin: Today summary + manual entry */}
       {isAdmin && (
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={() => setShowManualSheet(true)}>
+          <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowManualSheet(true)}>
             <AppIcon name="PenLine" size={16} className="mr-2" />
             Lançamento Manual
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setShowSettingsSheet(true)}>
+          <Button variant="outline" size="icon" className="rounded-xl h-11 w-11" onClick={() => setShowSettingsSheet(true)}>
             <AppIcon name="Settings" size={16} />
           </Button>
         </div>
       )}
 
-      {/* Records list */}
       <RecordsList records={records} isAdmin={isAdmin} />
 
       {/* Manual Entry Sheet */}
@@ -110,75 +107,121 @@ export function EmployeeCheckInCard({
     setLoading(false);
   };
 
+  // ── Completed ──
   if (todayRecord?.status === 'completed') {
     return (
-      <Card className="card-unified border-success/30 bg-success/5">
-        <CardContent className="p-5 text-center">
-          <div className="w-14 h-14 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-3">
-            <AppIcon name="CheckCircle2" size={28} className="text-success" />
+      <div className="rounded-2xl bg-card border border-border/60 p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+            <AppIcon name="CheckCircle2" size={20} className="text-success" />
           </div>
-          <h3 className="font-semibold text-lg mb-1">Ponto Completo</h3>
-          <p className="text-sm text-muted-foreground">
-            Entrada: {todayRecord.check_in?.substring(0, 5)} • Saída: {todayRecord.check_out?.substring(0, 5)}
-          </p>
+          <div>
+            <p className="font-semibold text-sm">Ponto Completo</p>
+            <p className="text-xs text-muted-foreground">Jornada encerrada</p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <TimeBlock label="Entrada" value={todayRecord.check_in?.substring(0, 5) ?? '--:--'} />
+          <TimeBlock label="Saída" value={todayRecord.check_out?.substring(0, 5) ?? '--:--'} />
           {todayRecord.points_awarded !== 0 && (
-            <Badge variant="outline" className={cn(
-              'mt-2',
-              todayRecord.points_awarded > 0 ? 'border-success/30 text-success' : 'border-destructive/30 text-destructive'
-            )}>
-              {todayRecord.points_awarded > 0 ? '+' : ''}{todayRecord.points_awarded} pontos
-            </Badge>
+            <TimeBlock
+              label="Pontos"
+              value={`${todayRecord.points_awarded > 0 ? '+' : ''}${todayRecord.points_awarded}`}
+              accent={todayRecord.points_awarded > 0 ? 'success' : 'destructive'}
+            />
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
+  // ── Checked In (working) ──
   if (todayRecord?.status === 'checked_in') {
     return (
-      <Card className="card-unified border-primary/30 bg-primary/5">
-        <CardContent className="p-5 text-center">
-          <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3">
-            <AppIcon name="Clock" size={28} className="text-primary" />
+      <div className="rounded-2xl bg-card border border-primary/20 p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <AppIcon name="Clock" size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold text-lg mb-1">Trabalhando</h3>
-          <p className="text-sm text-muted-foreground mb-1">
-            Entrada registrada às {todayRecord.check_in?.substring(0, 5)}
-          </p>
-          {todayRecord.late_minutes > 0 && (
-            <p className="text-xs text-destructive mb-2">{todayRecord.late_minutes}min de atraso</p>
-          )}
-          <p className="text-xs text-muted-foreground mb-4">
-            Saída prevista: {todayRecord.expected_end?.substring(0, 5)}
-          </p>
-          <Button onClick={handleCheckOut} disabled={loading} className="w-full" variant="destructive">
-            {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="LogOut" size={16} className="mr-2" />}
-            Registrar Saída ({currentTime})
-          </Button>
-        </CardContent>
-      </Card>
+          <div className="flex-1">
+            <p className="font-semibold text-sm">Trabalhando</p>
+            <p className="text-xs text-muted-foreground">
+              Desde {todayRecord.check_in?.substring(0, 5)}
+              {todayRecord.late_minutes > 0 && (
+                <span className="text-destructive ml-1">• {todayRecord.late_minutes}min atraso</span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <TimeBlock label="Entrada" value={todayRecord.check_in?.substring(0, 5) ?? '--:--'} />
+          <TimeBlock label="Saída prevista" value={todayRecord.expected_end?.substring(0, 5) ?? '--:--'} muted />
+        </div>
+
+        <Button onClick={handleCheckOut} disabled={loading} className="w-full h-11 rounded-xl" variant="destructive">
+          {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="LogOut" size={16} className="mr-2" />}
+          Registrar Saída • {currentTime}
+        </Button>
+      </div>
     );
   }
 
-  const greeting = now.getHours() < 12 ? 'Bom dia!' : now.getHours() < 18 ? 'Boa tarde!' : 'Boa noite!';
+  // ── No record — Check In ──
+  const greeting = now.getHours() < 12 ? 'Bom dia' : now.getHours() < 18 ? 'Boa tarde' : 'Boa noite';
 
-  // No record yet — show check-in
   return (
-    <Card className="card-unified">
-      <CardContent className="p-5 text-center">
-        <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3">
-          <AppIcon name="Clock" size={28} className="text-primary" />
+    <div className="rounded-2xl bg-card border border-border/60 p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <AppIcon name="Clock" size={20} className="text-primary" />
         </div>
-        <h3 className="font-semibold text-lg mb-1">{greeting}</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          {format(now, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-        </p>
-        <Button onClick={handleCheckIn} disabled={loading} className="w-full">
-          {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="LogIn" size={16} className="mr-2" />}
-          Registrar Entrada ({currentTime})
-        </Button>
-      </CardContent>
-    </Card>
+        <div>
+          <p className="font-semibold text-sm">{greeting} 👋</p>
+          <p className="text-xs text-muted-foreground capitalize">
+            {format(now, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+          </p>
+        </div>
+      </div>
+
+      <Button onClick={handleCheckIn} disabled={loading} className="w-full h-11 rounded-xl">
+        {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="LogIn" size={16} className="mr-2" />}
+        Registrar Entrada • {currentTime}
+      </Button>
+    </div>
+  );
+}
+
+// ---- Time Block (mini stat) ----
+function TimeBlock({
+  label,
+  value,
+  accent,
+  muted,
+}: {
+  label: string;
+  value: string;
+  accent?: 'success' | 'destructive';
+  muted?: boolean;
+}) {
+  return (
+    <div className={cn(
+      "flex-1 rounded-xl px-3 py-2.5 text-center",
+      accent === 'success' ? 'bg-success/8' :
+      accent === 'destructive' ? 'bg-destructive/8' :
+      'bg-muted/50'
+    )}>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">{label}</p>
+      <p className={cn(
+        "text-sm font-semibold tabular-nums",
+        accent === 'success' ? 'text-success' :
+        accent === 'destructive' ? 'text-destructive' :
+        muted ? 'text-muted-foreground' : 'text-foreground'
+      )}>
+        {value}
+      </p>
+    </div>
   );
 }
 
@@ -186,67 +229,67 @@ export function EmployeeCheckInCard({
 function RecordsList({ records, isAdmin }: { records: TimeRecord[]; isAdmin: boolean }) {
   if (records.length === 0) {
     return (
-      <div className="text-center text-muted-foreground py-8">
-        <AppIcon name="Clock" size={32} className="mx-auto mb-2 opacity-50" />
-        <p className="text-sm">Nenhum registro de ponto encontrado</p>
+      <div className="text-center text-muted-foreground py-10">
+        <AppIcon name="Clock" size={28} className="mx-auto mb-2 opacity-40" />
+        <p className="text-sm">Nenhum registro encontrado</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-semibold text-muted-foreground px-1">Histórico</h3>
-      {records.map(record => (
-        <Card key={record.id} className="card-unified">
-          <CardContent className="p-3 flex items-center gap-3">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">Histórico</p>
+      <div className="space-y-1.5">
+        {records.map(record => (
+          <div
+            key={record.id}
+            className="flex items-center gap-3 rounded-xl bg-card border border-border/40 px-3.5 py-3 transition-colors"
+          >
+            {/* Status dot */}
             <div className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
-              record.status === 'completed' ? 'bg-success/10' :
-              record.status === 'checked_in' ? 'bg-primary/10' :
-              record.status === 'absent' ? 'bg-destructive/10' : 'bg-muted'
-            )}>
-              <AppIcon
-                name={record.status === 'completed' ? 'CheckCircle2' : record.status === 'checked_in' ? 'Clock' : record.status === 'absent' ? 'XCircle' : 'CalendarOff'}
-                size={18}
-                className={cn(
-                  record.status === 'completed' ? 'text-success' :
-                  record.status === 'checked_in' ? 'text-primary' :
-                  record.status === 'absent' ? 'text-destructive' : 'text-muted-foreground'
-                )}
-              />
-            </div>
+              'w-2 h-2 rounded-full shrink-0',
+              record.status === 'completed' ? 'bg-success' :
+              record.status === 'checked_in' ? 'bg-primary' :
+              record.status === 'absent' ? 'bg-destructive' : 'bg-muted-foreground/40'
+            )} />
 
+            {/* Date & name */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {isAdmin && record.profile && (
                   <span className="text-sm font-medium truncate">{record.profile.full_name}</span>
                 )}
                 <span className="text-xs text-muted-foreground">
-                  {format(parseISO(record.date), 'dd/MM', { locale: ptBR })}
+                  {format(parseISO(record.date), 'dd/MM')}
                 </span>
                 {record.manual_entry && (
-                  <Badge variant="secondary" className="text-[10px] px-1 py-0">Manual</Badge>
+                  <span className="text-[10px] text-muted-foreground bg-muted/60 rounded px-1 py-px">manual</span>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {record.check_in && <span>Entrada: {record.check_in.substring(0, 5)}</span>}
-                {record.check_out && <span>• Saída: {record.check_out.substring(0, 5)}</span>}
-                {record.late_minutes > 0 && <span className="text-destructive">• {record.late_minutes}min atraso</span>}
-                {record.early_departure_minutes > 0 && <span className="text-destructive">• {record.early_departure_minutes}min antecipado</span>}
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                {record.check_in && <span>{record.check_in.substring(0, 5)}</span>}
+                {record.check_out && <span>→ {record.check_out.substring(0, 5)}</span>}
+                {record.late_minutes > 0 && (
+                  <span className="text-destructive">{record.late_minutes}min atraso</span>
+                )}
+                {record.early_departure_minutes > 0 && (
+                  <span className="text-destructive">{record.early_departure_minutes}min antecipado</span>
+                )}
               </div>
             </div>
 
+            {/* Points */}
             {record.points_awarded !== 0 && (
-              <Badge variant="outline" className={cn(
-                'shrink-0 text-xs',
-                record.points_awarded > 0 ? 'border-success/30 text-success' : 'border-destructive/30 text-destructive'
+              <span className={cn(
+                'text-xs font-semibold tabular-nums shrink-0',
+                record.points_awarded > 0 ? 'text-success' : 'text-destructive'
               )}>
                 {record.points_awarded > 0 ? '+' : ''}{record.points_awarded}
-              </Badge>
+              </span>
             )}
-          </CardContent>
-        </Card>
-      ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -271,9 +314,7 @@ function ManualEntryForm({
   const activeEmployees = employees.filter(e => e.is_active && e.user_id);
 
   const handleSubmit = async () => {
-    if (!userId || !checkInTime || !checkOutTime) {
-      return;
-    }
+    if (!userId || !checkInTime || !checkOutTime) return;
     setLoading(true);
     await onSubmit({
       user_id: userId,
@@ -333,7 +374,7 @@ function ManualEntryForm({
         <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Opcional..." rows={2} />
       </div>
 
-      <Button onClick={handleSubmit} disabled={loading || !userId || !checkInTime || !checkOutTime} className="w-full h-12">
+      <Button onClick={handleSubmit} disabled={loading || !userId || !checkInTime || !checkOutTime} className="w-full h-12 rounded-xl">
         {loading && <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" />}
         Salvar Registro
       </Button>
@@ -388,7 +429,7 @@ function SettingsForm({
       </div>
 
       <Button
-        className="w-full h-12"
+        className="w-full h-12 rounded-xl"
         disabled={loading}
         onClick={async () => {
           setLoading(true);
