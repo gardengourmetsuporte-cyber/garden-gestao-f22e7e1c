@@ -254,9 +254,7 @@ const TabButton = forwardRef<
           className={active ? 'tab-icon-galaxy' : ''}
         />
         {locked && (
-          <span className="absolute -top-1 -right-2 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: 'hsl(45 90% 55% / 0.25)', border: '1px solid hsl(45 90% 55% / 0.6)' }}>
-            <AppIcon name="Gem" size={7} style={{ color: 'hsl(45 90% 55%)' }} />
-          </span>
+          <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2" style={{ color: 'hsl(45 90% 55%)' }} />
         )}
       </div>
       <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>
