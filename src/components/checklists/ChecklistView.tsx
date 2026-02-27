@@ -23,6 +23,7 @@ import { ICON_MAP } from '@/lib/iconMap';
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
+import { useUnit } from '@/contexts/UnitContext';
 // Inline expandable options — no Popover/Portal to avoid scroll issues
 import { getPointsColors, getBonusPointsColors } from '@/lib/points';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,6 +98,7 @@ export function ChecklistView({
   deadlinePassed = false,
 }: ChecklistViewProps) {
   const { triggerCoin } = useCoinAnimation();
+  const { activeUnitId } = useUnit();
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set());
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
   const [openPopover, setOpenPopover] = useState<string | null>(null);
@@ -114,14 +116,30 @@ export function ChecklistView({
   const [splitLoading, setSplitLoading] = useState(false);
 
   useEffect(() => {
+    if (!activeUnitId) return;
+    
+    // Step 1: get user_ids for this unit
     supabase
-      .from('profiles')
-      .select('user_id, full_name')
-      .order('full_name')
-      .then(({ data }) => {
-        if (data) setProfiles(data);
+      .from('user_units')
+      .select('user_id')
+      .eq('unit_id', activeUnitId)
+      .then(({ data: unitMembers }) => {
+        if (!unitMembers || unitMembers.length === 0) {
+          setProfiles([]);
+          return;
+        }
+        const userIds = unitMembers.map(m => m.user_id);
+        // Step 2: fetch only profiles belonging to this unit
+        supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds)
+          .order('full_name')
+          .then(({ data }) => {
+            if (data) setProfiles(data);
+          });
       });
-  }, []);
+  }, [activeUnitId]);
 
   // Reset collapsed state when sectors change (keep collapsed)
   // No need to auto-expand
