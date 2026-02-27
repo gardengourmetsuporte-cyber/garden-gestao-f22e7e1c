@@ -850,14 +850,18 @@ export type Database = {
           email: string | null
           id: string
           last_purchase_at: string | null
+          loyalty_points: number | null
           name: string
           notes: string | null
           origin: string
           phone: string | null
+          score: number | null
+          segment: string | null
           total_orders: number | null
           total_spent: number | null
           unit_id: string
           updated_at: string | null
+          visit_frequency_days: number | null
         }
         Insert: {
           birthday?: string | null
@@ -866,14 +870,18 @@ export type Database = {
           email?: string | null
           id?: string
           last_purchase_at?: string | null
+          loyalty_points?: number | null
           name: string
           notes?: string | null
           origin?: string
           phone?: string | null
+          score?: number | null
+          segment?: string | null
           total_orders?: number | null
           total_spent?: number | null
           unit_id: string
           updated_at?: string | null
+          visit_frequency_days?: number | null
         }
         Update: {
           birthday?: string | null
@@ -882,14 +890,18 @@ export type Database = {
           email?: string | null
           id?: string
           last_purchase_at?: string | null
+          loyalty_points?: number | null
           name?: string
           notes?: string | null
           origin?: string
           phone?: string | null
+          score?: number | null
+          segment?: string | null
           total_orders?: number | null
           total_spent?: number | null
           unit_id?: string
           updated_at?: string | null
+          visit_frequency_days?: number | null
         }
         Relationships: [
           {
@@ -1730,6 +1742,92 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "invites_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loyalty_events: {
+        Row: {
+          created_at: string
+          customer_id: string
+          description: string | null
+          id: string
+          points: number
+          type: string
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          id?: string
+          points?: number
+          type: string
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          id?: string
+          points?: number
+          type?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_events_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_events_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loyalty_rules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          reward_value: number
+          rule_type: string
+          threshold: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          reward_value?: number
+          rule_type: string
+          threshold?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          reward_value?: number
+          rule_type?: string
+          threshold?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_rules_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
@@ -4374,6 +4472,14 @@ export type Database = {
           p_unit_id: string
           p_user_id: string
         }
+        Returns: undefined
+      }
+      recalculate_all_customer_scores: {
+        Args: { p_unit_id: string }
+        Returns: undefined
+      }
+      recalculate_customer_score: {
+        Args: { p_customer_id: string }
         Returns: undefined
       }
       user_has_unit_access: {

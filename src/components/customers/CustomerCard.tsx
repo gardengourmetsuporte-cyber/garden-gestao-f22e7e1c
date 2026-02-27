@@ -1,16 +1,10 @@
 import { AppIcon } from '@/components/ui/app-icon';
+import { Progress } from '@/components/ui/progress';
 import type { Customer } from '@/types/customer';
-import { format } from 'date-fns';
+import { SEGMENT_CONFIG } from '@/types/customer';
+import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-const ORIGIN_LABELS: Record<string, { label: string; icon: string }> = {
-  manual: { label: 'Manual', icon: 'PenSquare' },
-  pdv: { label: 'PDV', icon: 'Monitor' },
-  mesa: { label: 'Mesa', icon: 'Armchair' },
-  ifood: { label: 'iFood', icon: 'Bike' },
-  whatsapp: { label: 'WhatsApp', icon: 'MessageCircle' },
-  csv: { label: 'CSV', icon: 'FileSpreadsheet' },
-};
+import { cn } from '@/lib/utils';
 
 interface Props {
   customer: Customer;
@@ -19,23 +13,30 @@ interface Props {
 }
 
 export function CustomerCard({ customer, onEdit, onDelete }: Props) {
-  const originInfo = ORIGIN_LABELS[customer.origin] || ORIGIN_LABELS.manual;
+  const seg = SEGMENT_CONFIG[customer.segment] || SEGMENT_CONFIG.new;
+  const daysSince = customer.last_purchase_at
+    ? differenceInDays(new Date(), new Date(customer.last_purchase_at))
+    : null;
 
   return (
-    <div className="rounded-xl bg-card border p-4 space-y-2 active:scale-[0.98] transition-transform" onClick={onEdit}>
+    <div
+      className="rounded-xl bg-card border p-4 space-y-2.5 active:scale-[0.98] transition-transform"
+      onClick={onEdit}
+    >
+      {/* Header */}
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-sm truncate">{customer.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-semibold text-sm truncate">{customer.name}</p>
+            <span className={cn('inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full', seg.bg, seg.color)}>
+              <AppIcon name={seg.icon} size={10} />
+              {seg.label}
+            </span>
+          </div>
           {customer.phone && (
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
               <AppIcon name="Phone" size={12} />
               {customer.phone}
-            </p>
-          )}
-          {customer.email && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-              <AppIcon name="Mail" size={12} />
-              {customer.email}
             </p>
           )}
         </div>
@@ -47,19 +48,31 @@ export function CustomerCard({ customer, onEdit, onDelete }: Props) {
         </button>
       </div>
 
-      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/60">
-          <AppIcon name={originInfo.icon} size={11} />
-          {originInfo.label}
-        </span>
-        {customer.total_orders > 0 && (
+      {/* Score bar */}
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-muted-foreground w-10">Score</span>
+        <Progress value={Math.min(customer.score, 100)} className="h-1.5 flex-1" />
+        <span className="text-[10px] font-bold text-foreground w-6 text-right">{customer.score}</span>
+      </div>
+
+      {/* Bottom stats */}
+      <div className="flex items-center gap-3 text-[11px] text-muted-foreground flex-wrap">
+        {customer.loyalty_points > 0 && (
+          <span className="flex items-center gap-1">
+            <AppIcon name="Star" size={11} className="text-amber-500" />
+            {customer.loyalty_points} pts
+          </span>
+        )}
+        {(Number(customer.total_orders) || 0) > 0 && (
           <span>{customer.total_orders} pedidos</span>
         )}
-        {customer.total_spent > 0 && (
-          <span>R$ {Number(customer.total_spent).toFixed(2)}</span>
+        {(Number(customer.total_spent) || 0) > 0 && (
+          <span>R$ {Number(customer.total_spent).toFixed(0)}</span>
         )}
-        {customer.last_purchase_at && (
-          <span>Última: {format(new Date(customer.last_purchase_at), "dd/MM/yy", { locale: ptBR })}</span>
+        {daysSince !== null && (
+          <span className={cn(daysSince > 60 && 'text-red-400')}>
+            {daysSince === 0 ? 'Hoje' : `${daysSince}d atrás`}
+          </span>
         )}
       </div>
     </div>
