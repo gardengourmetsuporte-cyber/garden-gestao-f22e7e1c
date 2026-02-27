@@ -24,46 +24,44 @@ export function LandingNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-background/90 backdrop-blur-xl border-b border-border/40"
+          ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm"
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src={logoImg} alt="Garden Gestão" className="h-10 w-10 rounded-full object-contain" />
-          <span className="font-bold text-lg text-foreground">Garden</span>
-        </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
+          <span className="font-bold text-base text-foreground">Garden</span>
+        </Link>
 
+        {/* Center links */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {l.label}
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5">
+        {/* Right */}
+        <div className="flex items-center gap-3">
           <ThemeToggle />
           <Link
             to="/auth"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold border border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+            className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold transition-all"
-            style={{
-              background: "var(--gradient-brand)",
-              color: "white",
-              boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
-            }}
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold bg-foreground text-background hover:opacity-90 transition-all"
           >
-            Teste grátis
+            Começar grátis
           </Link>
 
           <button
@@ -82,7 +80,7 @@ export function LandingNavbar() {
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="block py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {l.label}
             </a>
@@ -90,21 +88,16 @@ export function LandingNavbar() {
           <Link
             to="/auth"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold border border-border/60 text-muted-foreground"
+            className="block py-3 text-sm text-muted-foreground"
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-1 rounded-xl text-sm font-semibold"
-            style={{
-              background: "var(--gradient-brand)",
-              color: "white",
-              boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
-            }}
+            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold bg-foreground text-background"
           >
-            Teste grátis
+            Começar grátis
           </Link>
         </div>
       )}

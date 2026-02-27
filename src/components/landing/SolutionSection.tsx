@@ -1,100 +1,104 @@
-import { Check } from "lucide-react";
+import { DollarSign, ClipboardCheck, Package, BarChart3 } from "lucide-react";
 import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
 import screenshotChecklist from "@/assets/screenshot-checklist.png";
 import screenshotEstoque from "@/assets/screenshot-estoque.png";
-import screenshotRelatorios from "@/assets/screenshot-relatorios.png";
 
-const blocks = [
+const steps = [
   {
-    title: "Saiba exatamente quanto você lucrou",
-    text: "Receitas, despesas, lucro líquido e pendências em tempo real. Veja para onde vai cada real do seu restaurante, com gráficos por categoria.",
-    tag: "Fechamento de caixa integrado",
+    number: "01",
+    title: "Cadastre suas contas e categorias",
+    desc: "Em minutos, configure suas contas bancárias, categorias de despesas e receitas. O sistema já vem com sugestões prontas para restaurantes.",
     image: screenshotFinanceiro,
-    alt: "Tela financeira com saldo e gráficos",
+    alt: "Configuração financeira do Garden",
   },
   {
-    title: "Abertura e fechamento sem esquecimentos",
-    text: "Checklists digitais para sua equipe. Cada setor, cada tarefa, com progresso em tempo real. Você vê tudo pelo celular, de onde estiver.",
-    tag: "Cozinha, salão, limpeza — tudo monitorado",
+    number: "02",
+    title: "Configure os checklists da sua equipe",
+    desc: "Crie tarefas para abertura, fechamento e rotina. Cada funcionário sabe exatamente o que fazer — e você acompanha de qualquer lugar.",
     image: screenshotChecklist,
-    alt: "Checklist com progresso de abertura e fechamento",
+    alt: "Checklist de abertura e fechamento",
   },
   {
-    title: "Nunca mais falte ingrediente",
-    text: "Alertas automáticos de estoque baixo. Movimentações rastreadas. Saiba o que comprar antes que acabe.",
-    tag: "Alerta de estoque mínimo automático",
+    number: "03",
+    title: "Acompanhe tudo em tempo real",
+    desc: "Dashboard com lucro, estoque, equipe e alertas. Sem surpresas no final do mês.",
     image: screenshotEstoque,
-    alt: "Tela de estoque com alertas",
+    alt: "Dashboard com visão geral",
+  },
+];
+
+const modules = [
+  {
+    icon: DollarSign,
+    title: "Financeiro",
+    desc: "Receitas, despesas, contas e fechamento de caixa integrado.",
   },
   {
-    title: "Entenda seus custos sem ser contador",
-    text: "Matéria-prima, folha de pagamento, despesas administrativas — tudo categorizado automaticamente. Resumo semanal com total de vendas em cada canal.",
-    tag: "iFood, delivery e cartão separados",
-    image: screenshotRelatorios,
-    alt: "Gráfico de despesas por categoria e resumo semanal",
+    icon: ClipboardCheck,
+    title: "Checklists",
+    desc: "Abertura, fechamento e rotina com progresso em tempo real.",
+  },
+  {
+    icon: Package,
+    title: "Estoque",
+    desc: "Controle de ingredientes com alertas de estoque mínimo.",
+  },
+  {
+    icon: BarChart3,
+    title: "Relatórios",
+    desc: "DRE, custos por categoria e resumo semanal automático.",
   },
 ];
 
 export function SolutionSection() {
   return (
     <section id="como-funciona" className="py-20 md:py-28">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--neon-cyan))" }}>
-            Funcionalidades
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+            Como funciona
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-            Nasceu na operação, resolve de verdade
+            Comece em 3 passos simples
           </h2>
         </div>
 
+        {/* Steps */}
         <div className="space-y-20">
-          {blocks.map((b, i) => {
-            const reversed = i % 2 === 1;
-            return (
-              <div
-                key={b.title}
-                className={`grid md:grid-cols-2 gap-10 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
-              >
-                {/* Image - phone mockup */}
-                <div className="md:[direction:ltr] flex justify-center">
-                  <div
-                    className="relative w-[240px] sm:w-[260px] rounded-[2.5rem] overflow-hidden p-2"
-                    style={{
-                      background: "linear-gradient(145deg, hsl(var(--border) / 0.6), hsl(var(--border) / 0.2))",
-                      boxShadow: "0 0 30px hsl(var(--primary) / 0.1), 0 20px 50px rgba(0,0,0,0.4)",
-                    }}
-                  >
-                    <div className="rounded-[2rem] overflow-hidden bg-background">
-                      <img
-                        src={b.image}
-                        alt={b.alt}
-                        className="w-full"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Text */}
-                <div className="md:[direction:ltr]">
-                  <h3 className="text-2xl font-bold text-foreground mb-4">{b.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed mb-5">{b.text}</p>
-                  <div
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
-                    style={{
-                      background: "hsl(var(--primary) / 0.1)",
-                      border: "1px solid hsl(var(--primary) / 0.25)",
-                      color: "hsl(var(--primary))",
-                    }}
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    {b.tag}
-                  </div>
+          {steps.map((step, i) => (
+            <div key={step.number} className={`grid md:grid-cols-2 gap-10 items-center ${i % 2 === 1 ? "md:[direction:rtl]" : ""}`}>
+              <div className="md:[direction:ltr]">
+                <span className="text-5xl font-extrabold text-muted-foreground/20">{step.number}</span>
+                <h3 className="text-xl font-bold text-foreground mt-2 mb-3">{step.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
+              </div>
+              <div className="md:[direction:ltr]">
+                <div className="rounded-2xl overflow-hidden border border-border/40 shadow-lg bg-card">
+                  <img src={step.image} alt={step.alt} className="w-full" loading="lazy" />
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
+        </div>
+
+        {/* Modules grid */}
+        <div className="mt-24">
+          <h3 className="text-center text-2xl font-bold text-foreground mb-10">
+            Tudo que você precisa, em um só lugar
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {modules.map((m) => (
+              <div key={m.title} className="rounded-2xl border border-border/40 bg-card p-6 flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+                  <m.icon className="w-5 h-5 text-foreground" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-foreground text-sm">{m.title}</h4>
+                  <p className="text-muted-foreground text-sm mt-1 leading-relaxed">{m.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

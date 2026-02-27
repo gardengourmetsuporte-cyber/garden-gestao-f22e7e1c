@@ -3,21 +3,8 @@ import { ArrowRight } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section className="py-20 md:py-28 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--accent) / 0.1), hsl(var(--background)))",
-          }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 60%)" }}
-        />
-      </div>
-
-      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section className="py-20 md:py-28">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
           Criado por quem entende sua operação.
         </h2>
@@ -26,18 +13,13 @@ export function CTASection() {
         </p>
         <Link
           to="/auth?plan=free"
-          className="inline-flex items-center gap-2 h-14 px-10 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
-            color: "hsl(var(--primary-foreground))",
-            boxShadow: "0 0 40px hsl(var(--primary) / 0.3), 0 4px 20px hsl(var(--accent) / 0.3)",
-          }}
+          className="inline-flex items-center gap-2 h-12 px-8 rounded-xl font-semibold text-base bg-foreground text-background hover:opacity-90 transition-all"
         >
           Criar minha conta grátis
-          <ArrowRight className="w-5 h-5" />
+          <ArrowRight className="w-4 h-4" />
         </Link>
         <p className="text-sm text-muted-foreground mt-5">
-          14 dias grátis • Sem cartão • Cancele quando quiser
+          14 dias grátis · Sem cartão · Cancele quando quiser
         </p>
       </div>
     </section>
