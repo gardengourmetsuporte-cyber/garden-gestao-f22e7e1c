@@ -7,6 +7,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { getCurrentChecklistType, getDeadlineInfo, getTodayDateStr } from '@/lib/checklistTiming';
+import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
 
 type ChecklistType = 'abertura' | 'fechamento';
 
@@ -15,14 +16,15 @@ export function ChecklistDashboardWidget() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const today = getTodayDateStr();
-  const activeType = getCurrentChecklistType();
+  const { settings: deadlineSettings } = useChecklistDeadlines();
+  const activeType = getCurrentChecklistType(deadlineSettings);
 
   // Countdown labels, updated every 30s
   const [countdowns, setCountdowns] = useState<Record<string, string>>({});
   useEffect(() => {
     const update = () => {
-      const ab = getDeadlineInfo(today, 'abertura');
-      const fe = getDeadlineInfo(today, 'fechamento');
+      const ab = getDeadlineInfo(today, 'abertura', deadlineSettings);
+      const fe = getDeadlineInfo(today, 'fechamento', deadlineSettings);
       setCountdowns({
         abertura: ab?.label || '',
         fechamento: fe?.label || '',
@@ -31,7 +33,7 @@ export function ChecklistDashboardWidget() {
     update();
     const iv = setInterval(update, 30_000);
     return () => clearInterval(iv);
-  }, [today]);
+  }, [today, deadlineSettings]);
 
   const { data: sectors = [] } = useQuery({
     queryKey: ['dashboard-checklist-sectors', activeUnitId],
@@ -128,7 +130,7 @@ export function ChecklistDashboardWidget() {
       {cards.map((card) => {
         const isActive = card.type === activeType;
         const isComplete = card.progress.percent === 100;
-        const deadlineInfo = getDeadlineInfo(today, card.type);
+        const deadlineInfo = getDeadlineInfo(today, card.type, deadlineSettings);
 
         return (
           <button

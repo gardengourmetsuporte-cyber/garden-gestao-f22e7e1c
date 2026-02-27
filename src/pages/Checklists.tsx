@@ -16,6 +16,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { getDeadlineInfo, shouldAutoClose } from '@/lib/checklistTiming';
+import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
+import { DeadlineSettingPopover } from '@/components/checklists/DeadlineSettingPopover';
 
 function DateStrip({ days, selectedDate, onSelectDate }: {
   days: Date[];
@@ -100,6 +102,7 @@ export default function ChecklistsPage() {
 
   const queryClient = useQueryClient();
   const { activeUnitId } = useUnit();
+  const { settings: deadlineSettings, updateDeadline, removeDeadline, isSaving: isSavingDeadline } = useChecklistDeadlines();
   const [settingsMode, setSettingsMode] = useState(false);
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -168,22 +171,24 @@ export default function ChecklistsPage() {
   // Update countdown every 30s
   useEffect(() => {
     const update = () => {
-      const ab = getDeadlineInfo(currentDate, 'abertura');
-      const fe = getDeadlineInfo(currentDate, 'fechamento');
+      const ab = getDeadlineInfo(currentDate, 'abertura', deadlineSettings);
+      const fe = getDeadlineInfo(currentDate, 'fechamento', deadlineSettings);
+      const bo = getDeadlineInfo(currentDate, 'bonus', deadlineSettings);
       setDeadlineLabel({
         abertura: ab?.label || '',
         fechamento: fe?.label || '',
+        bonus: bo?.label || '',
       });
     };
     update();
     const iv = setInterval(update, 30_000);
     return () => clearInterval(iv);
-  }, [currentDate]);
+  }, [currentDate, deadlineSettings]);
 
   const deadlinePassed = useMemo(() => {
-    const info = getDeadlineInfo(currentDate, checklistType);
+    const info = getDeadlineInfo(currentDate, checklistType, deadlineSettings);
     return info?.passed ?? false;
-  }, [currentDate, checklistType, deadlineLabel]); // deadlineLabel dep forces re-eval
+  }, [currentDate, checklistType, deadlineLabel, deadlineSettings]);
 
   // ── Auto-close: mark pending items as skipped after deadline ──
   const autoClosedRef = useRef<string>('');
@@ -201,7 +206,7 @@ export default function ChecklistsPage() {
     // Only admins run auto-close to avoid concurrent writes
     if (!isAdmin) { autoClosedRef.current = key; return; }
     // Only auto-close for valid operational windows (today/yesterday)
-    if (!shouldAutoClose(currentDate, checklistType)) { autoClosedRef.current = key; return; }
+    if (!shouldAutoClose(currentDate, checklistType, deadlineSettings)) { autoClosedRef.current = key; return; }
 
     // Gather all active item IDs for this type
     const activeItemIds: string[] = [];
@@ -388,6 +393,14 @@ export default function ChecklistsPage() {
                     : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                 )}
               >
+                {settingsMode && isAdmin && (
+                  <DeadlineSettingPopover
+                    type="abertura"
+                    currentSetting={deadlineSettings.find(s => s.checklist_type === 'abertura') || null}
+                    onSave={updateDeadline}
+                    isSaving={isSavingDeadline}
+                  />
+                )}
                 <div className="flex items-center gap-3 mb-3">
                   <AppIcon
                     name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
@@ -417,8 +430,8 @@ export default function ChecklistsPage() {
                       <span className="text-[10px] text-muted-foreground">
                         {getTypeProgress.abertura.completed}/{getTypeProgress.abertura.total}
                         {deadlineLabel.abertura && (
-                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'abertura')?.passed ? "text-destructive/70" : "")}>
-                            · {getDeadlineInfo(currentDate, 'abertura')?.passed ? 'Encerrado' : deadlineLabel.abertura}
+                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'abertura', deadlineSettings)?.passed ? "text-destructive/70" : "")}>
+                            · {getDeadlineInfo(currentDate, 'abertura', deadlineSettings)?.passed ? 'Encerrado' : deadlineLabel.abertura}
                           </span>
                         )}
                       </span>
@@ -446,6 +459,14 @@ export default function ChecklistsPage() {
                     : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
                 )}
               >
+                {settingsMode && isAdmin && (
+                  <DeadlineSettingPopover
+                    type="fechamento"
+                    currentSetting={deadlineSettings.find(s => s.checklist_type === 'fechamento') || null}
+                    onSave={updateDeadline}
+                    isSaving={isSavingDeadline}
+                  />
+                )}
                 <div className="flex items-center gap-3 mb-3">
                   <AppIcon
                     name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
@@ -475,8 +496,8 @@ export default function ChecklistsPage() {
                       <span className="text-[10px] text-muted-foreground">
                         {getTypeProgress.fechamento.completed}/{getTypeProgress.fechamento.total}
                         {deadlineLabel.fechamento && (
-                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'fechamento')?.passed ? "text-destructive/70" : "")}>
-                            · {getDeadlineInfo(currentDate, 'fechamento')?.passed ? 'Encerrado' : deadlineLabel.fechamento}
+                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'fechamento', deadlineSettings)?.passed ? "text-destructive/70" : "")}>
+                            · {getDeadlineInfo(currentDate, 'fechamento', deadlineSettings)?.passed ? 'Encerrado' : deadlineLabel.fechamento}
                           </span>
                         )}
                       </span>
@@ -508,6 +529,15 @@ export default function ChecklistsPage() {
                 border: '1px solid hsl(160 60% 45% / 0.15)',
               } : undefined}
             >
+              {settingsMode && isAdmin && (
+                <DeadlineSettingPopover
+                  type="bonus"
+                  currentSetting={deadlineSettings.find(s => s.checklist_type === 'bonus') || null}
+                  onSave={updateDeadline}
+                  onRemove={removeDeadline}
+                  isSaving={isSavingDeadline}
+                />
+              )}
               <div className="flex items-center gap-4">
                 <div className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
