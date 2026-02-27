@@ -66,7 +66,7 @@ export function MenuProductList({
       </ScrollArea>
 
       {/* Grouped products */}
-      <div className="px-4 space-y-6 pb-28">
+      <div className="px-4 md:px-8 space-y-6 pb-28">
         {visibleGroups.map(group => {
           const groupProducts = getGroupProducts(group.id);
           if (groupProducts.length === 0) return null;
@@ -78,7 +78,7 @@ export function MenuProductList({
                   <p className="text-xs text-muted-foreground mt-0.5">{group.description}</p>
                 )}
               </div>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {groupProducts.map(product => (
                   <ProductCard key={product.id} product={product} onSelect={onSelectProduct} />
                 ))}
@@ -92,7 +92,7 @@ export function MenuProductList({
             {visibleGroups.length > 0 && (
               <h2 className="text-base font-bold text-foreground mb-3">Outros</h2>
             )}
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {ungroupedProducts.map(product => (
                 <ProductCard key={product.id} product={product} onSelect={onSelectProduct} />
               ))}

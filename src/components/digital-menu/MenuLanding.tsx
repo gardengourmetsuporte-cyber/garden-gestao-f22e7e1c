@@ -30,7 +30,7 @@ export function MenuLanding({ unit }: Props) {
   return (
     <div className="relative">
       {/* Banner */}
-      <div className="h-44 w-full overflow-hidden relative">
+      <div className="h-44 md:h-64 w-full overflow-hidden relative rounded-b-none md:rounded-b-3xl">
         {bannerUrl ? (
           <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover" />
         ) : (
@@ -40,9 +40,9 @@ export function MenuLanding({ unit }: Props) {
       </div>
 
       {/* Logo + Info */}
-      <div className="px-4 -mt-14 relative z-10">
-        <div className="flex items-end gap-3">
-          <div className="w-24 h-24 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
+      <div className="px-4 md:px-8 -mt-14 relative z-10">
+        <div className="flex items-end gap-4">
+          <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
@@ -52,9 +52,9 @@ export function MenuLanding({ unit }: Props) {
             )}
           </div>
           <div className="pb-1 min-w-0">
-            <h1 className="text-xl font-bold text-foreground truncate">{unit.name}</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">{unit.name}</h1>
             {cuisineType && (
-              <p className="text-xs text-muted-foreground mt-0.5">{cuisineType}</p>
+              <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{cuisineType}</p>
             )}
           </div>
         </div>
@@ -87,7 +87,7 @@ export function MenuLanding({ unit }: Props) {
 
         {/* Address */}
         {(city || address) && (
-          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+          <p className="text-xs md:text-sm text-muted-foreground mt-2 flex items-center gap-1">
             <AppIcon name="MapPin" size={12} className="shrink-0" />
             {[address, city].filter(Boolean).join(' • ')}
           </p>
