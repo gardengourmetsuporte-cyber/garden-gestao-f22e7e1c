@@ -7,10 +7,10 @@ export function FooterSection() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
-            <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
-            <span className="text-sm font-semibold text-foreground">
-              Garden Gestão
-            </span>
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shadow-sm">
+              <img src={logoImg} alt="Garden" className="w-6 h-6 object-contain" />
+            </div>
+            <span className="text-sm font-bold text-foreground font-display">Garden Gestão</span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
@@ -21,7 +21,7 @@ export function FooterSection() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border/20 text-center text-xs text-muted-foreground">
+        <div className="mt-8 pt-6 border-t border-border/20 text-center text-xs text-muted-foreground/60">
           © {new Date().getFullYear()} Garden Gestão · Todos os direitos reservados
         </div>
       </div>

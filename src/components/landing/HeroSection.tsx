@@ -1,42 +1,76 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, DollarSign, ClipboardCheck, Package } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { AppIcon } from "@/components/ui/app-icon";
 import dashboardMockup from "@/assets/dashboard-mockup.png";
+import logoImg from "@/assets/logo.png";
 
-const badges = [
-  {
-    icon: DollarSign,
-    title: "Controle Financeiro",
-    desc: "Receitas, despesas e fluxo de caixa em tempo real.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Checklists Inteligentes",
-    desc: "Abertura, fechamento e rotina com pontuação.",
-  },
-  {
-    icon: Package,
-    title: "Estoque Automático",
-    desc: "Alertas de mínimo e sugestão de pedidos por IA.",
-  },
+const features = [
+  { icon: "BarChart3", label: "Financeiro" },
+  { icon: "Package", label: "Estoque" },
+  { icon: "Users", label: "Equipe" },
+  { icon: "ListChecks", label: "Checklists" },
+  { icon: "Bot", label: "IA Copiloto" },
+  { icon: "ShoppingCart", label: "Pedidos" },
 ];
 
 export function HeroSection() {
   return (
-    <section className="finance-hero-card !rounded-none !cursor-default !border-0" style={{ transform: "none" }}>
-      {/* Main hero content */}
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16 md:pt-40 md:pb-24">
+    <section className="relative overflow-hidden">
+      {/* Navy gradient background */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
+          backgroundSize: '350% 350%',
+          animation: 'navyCardFlow 12s ease-in-out infinite',
+        }}
+      />
+
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+
+      {/* Glow orbs */}
+      <div
+        className="absolute top-[20%] left-[10%] w-[400px] h-[400px] rounded-full blur-[150px] opacity-15 pointer-events-none"
+        style={{ background: 'hsl(220 80% 50%)', animation: 'float-orb-1 8s ease-in-out infinite' }}
+      />
+      <div
+        className="absolute bottom-[10%] right-[10%] w-[350px] h-[350px] rounded-full blur-[120px] opacity-10 pointer-events-none"
+        style={{ background: 'hsl(234 80% 60%)', animation: 'float-orb-2 10s ease-in-out infinite' }}
+      />
+      <div
+        className="absolute top-[60%] left-[50%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-10 pointer-events-none"
+        style={{ background: 'hsl(210 90% 55%)', animation: 'float-orb-3 6s ease-in-out infinite' }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 md:pt-40 pb-20 md:pb-28">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* Left — Text */}
-          <div className="space-y-7">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-white">
+          <div className="space-y-7 animate-[fade-up_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold"
+              style={{ background: 'hsl(220 60% 50% / 0.12)', color: 'hsl(220 80% 70%)', border: '1px solid hsl(220 60% 50% / 0.2)' }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Feito por restaurante, para restaurantes
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-white font-display">
               A gestão completa{" "}
               <br className="hidden sm:block" />
               que seu restaurante{" "}
               <br className="hidden sm:block" />
-              <span className="text-white/60">precisa pra crescer</span>
+              <span className="text-white/50">precisa pra crescer</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-white/55 max-w-md leading-relaxed">
+            <p className="text-base sm:text-lg text-white/50 max-w-md leading-relaxed">
               Financeiro, estoque, equipe e IA — tudo em um app criado por quem vive a rotina de food service.
             </p>
 
@@ -50,96 +84,83 @@ export function HeroSection() {
               </Link>
               <Link
                 to="/auth"
-                className="text-sm font-medium text-white/50 hover:text-white/80 transition-colors pt-3 sm:pt-0 sm:self-center"
+                className="text-sm font-medium text-white/45 hover:text-white/70 transition-colors pt-3 sm:pt-0 sm:self-center"
               >
                 Já tenho conta →
               </Link>
             </div>
 
-            <div className="flex items-center gap-4 sm:gap-6 text-xs text-white/40 pt-1">
+            <div className="flex items-center gap-4 sm:gap-6 text-xs text-white/35 pt-1">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 14 dias grátis
               </span>
-              <span className="text-white/20">·</span>
+              <span className="text-white/15">·</span>
               <span>Sem cartão</span>
-              <span className="text-white/20">·</span>
+              <span className="text-white/15">·</span>
               <span>Setup em 5min</span>
             </div>
           </div>
 
-          {/* Right — Screenshot */}
-          <div className="relative hidden md:block">
+          {/* Right — Screenshot (desktop) */}
+          <div className="relative hidden md:block animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_0.3s_both]">
             <div
               className="relative"
-              style={{
-                transform: "perspective(1200px) rotateY(-6deg) rotateX(2deg)",
-              }}
+              style={{ transform: "perspective(1200px) rotateY(-6deg) rotateX(2deg)" }}
             >
-              {/* Glow behind */}
-              <div className="absolute -inset-6 bg-[hsl(234,80%,50%/0.15)] blur-[60px] rounded-3xl" />
+              <div className="absolute -inset-6 rounded-3xl blur-[60px]" style={{ background: 'hsl(234 80% 50% / 0.12)' }} />
               <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                {/* Browser chrome */}
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-[hsl(220,30%,8%)] border-b border-white/5">
+                <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5" style={{ background: 'hsl(220 30% 8%)' }}>
                   <div className="flex gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
                     <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
                   </div>
                   <div className="flex-1 mx-8">
-                    <div className="h-5 rounded-md bg-white/5 max-w-[200px] mx-auto flex items-center justify-center">
+                    <div className="h-5 rounded-md max-w-[200px] mx-auto flex items-center justify-center" style={{ background: 'hsl(220 20% 12%)' }}>
                       <span className="text-[10px] text-white/25 font-medium">app.gardengestao.com.br</span>
                     </div>
                   </div>
                 </div>
-                <img
-                  src={dashboardMockup}
-                  alt="Dashboard do Garden Gestão — visão geral do sistema"
-                  className="w-full"
-                  loading="eager"
-                />
+                <img src={dashboardMockup} alt="Dashboard do Garden Gestão" className="w-full" loading="eager" />
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Feature badges */}
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-20">
-        <div className="grid sm:grid-cols-3 gap-4">
-          {badges.map((b) => (
+        {/* Feature pills row */}
+        <div className="mt-14 md:mt-20 flex flex-wrap items-center justify-center gap-3 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.5s_both]">
+          {features.map(({ icon, label }) => (
             <div
-              key={b.title}
-              className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.06] border border-white/[0.08] backdrop-blur-sm"
+              key={label}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all hover:scale-[1.04]"
+              style={{
+                background: 'hsl(220 60% 50% / 0.08)',
+                color: 'hsl(220 80% 72%)',
+                border: '1px solid hsl(220 60% 50% / 0.12)',
+              }}
             >
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                <b.icon className="w-5 h-5 text-white/70" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white/90">{b.title}</h3>
-                <p className="text-xs text-white/45 leading-relaxed mt-1">{b.desc}</p>
-              </div>
+              <AppIcon name={icon} size={16} />
+              {label}
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Mobile screenshot */}
-      <div className="md:hidden px-4 pb-12">
-        <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl">
-          <div className="flex items-center gap-1.5 px-3 py-2 bg-[hsl(220,30%,8%)] border-b border-white/5">
-            <div className="w-2 h-2 rounded-full bg-red-400/60" />
-            <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-            <div className="w-2 h-2 rounded-full bg-green-400/60" />
+        {/* Mobile screenshot */}
+        <div className="md:hidden mt-12 animate-[fade-up_0.6s_cubic-bezier(0.16,1,0.3,1)_0.4s_both]">
+          <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl">
+            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5" style={{ background: 'hsl(220 30% 8%)' }}>
+              <div className="w-2 h-2 rounded-full bg-red-400/60" />
+              <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
+              <div className="w-2 h-2 rounded-full bg-green-400/60" />
+            </div>
+            <img src={dashboardMockup} alt="Dashboard do Garden Gestão" className="w-full" loading="eager" />
           </div>
-          <img
-            src={dashboardMockup}
-            alt="Dashboard do Garden Gestão"
-            className="w-full"
-            loading="eager"
-          />
         </div>
       </div>
+
+      {/* Bottom curve transition */}
+      <div className="absolute bottom-0 left-0 right-0 h-8 bg-background rounded-t-[2rem]" />
     </section>
   );
 }
