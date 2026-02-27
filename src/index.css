@@ -31,11 +31,11 @@
     --garden-green: 150 28% 22%;
 
     /* Neon glow tokens */
-    --neon-cyan: 220 70% 55%;
+    --neon-cyan: 215 65% 52%;
     --neon-green: 142 71% 45%;
     --neon-red: 0 84% 60%;
     --neon-amber: 38 92% 50%;
-    --neon-purple: 225 70% 50%;
+    --neon-purple: 215 65% 48%;
 
     /* Semantic finance tokens */
     --color-income: 142 71% 45%;
@@ -80,7 +80,7 @@
     --popover: 240 5% 9%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 220 70% 55%;
+    --primary: 215 65% 52%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 240 4% 14%;
@@ -89,7 +89,7 @@
     --muted: 240 4% 16%;
     --muted-foreground: 0 0% 50%;
 
-    --accent: 220 70% 48%;
+    --accent: 215 65% 45%;
     --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84% 60%;
@@ -103,28 +103,28 @@
 
     --border: 240 4% 20%;
     --input: 240 4% 12%;
-    --ring: 220 70% 55%;
+    --ring: 215 65% 52%;
 
     /* Glow & Shadow tokens */
-    --glow-primary: 0 0 20px hsl(220 70% 55% / 0.25), 0 0 48px hsl(220 70% 55% / 0.12);
-    --glow-accent: 0 0 16px hsl(225 70% 50% / 0.18), 0 0 40px hsl(225 70% 50% / 0.08);
+    --glow-primary: 0 0 20px hsl(215 65% 52% / 0.25), 0 0 48px hsl(215 65% 52% / 0.12);
+    --glow-accent: 0 0 16px hsl(215 65% 48% / 0.18), 0 0 40px hsl(215 65% 48% / 0.08);
     --glow-success: 0 0 16px hsl(142 71% 45% / 0.15), 0 0 32px hsl(142 71% 45% / 0.08);
     --glow-destructive: 0 0 16px hsl(0 84% 60% / 0.15), 0 0 32px hsl(0 84% 60% / 0.08);
     --glow-warning: 0 0 16px hsl(38 92% 50% / 0.15), 0 0 32px hsl(38 92% 50% / 0.08);
-    --glow-cyan: 0 0 16px hsl(220 70% 55% / 0.2), 0 0 32px hsl(220 70% 55% / 0.12);
+    --glow-cyan: 0 0 16px hsl(215 65% 52% / 0.2), 0 0 32px hsl(215 65% 52% / 0.12);
 
     /* Gradient tokens */
-    --gradient-brand: linear-gradient(135deg, hsl(220 45% 18%), hsl(225 55% 22%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(220 45% 18% / 0.12), hsl(225 55% 22% / 0.08));
+    --gradient-brand: linear-gradient(135deg, hsl(215 45% 18%), hsl(218 55% 22%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(215 45% 18% / 0.12), hsl(218 55% 22% / 0.08));
     --gradient-surface: linear-gradient(180deg, hsl(240 5% 12%), hsl(240 6% 5%));
-    --gradient-gold: linear-gradient(135deg, hsl(220 40% 15%), hsl(225 55% 20%), hsl(230 45% 16%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(220 45% 18% / 0.15), hsl(225 55% 22% / 0.08));
+    --gradient-gold: linear-gradient(135deg, hsl(215 40% 15%), hsl(218 55% 20%), hsl(220 45% 16%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(215 45% 18% / 0.15), hsl(218 55% 22% / 0.08));
 
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.5), 0 6px 20px hsl(0 0% 0% / 0.35);
     --shadow-card-hover: 0 6px 24px hsl(0 0% 0% / 0.6), 0 12px 40px hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 8px 32px hsl(0 0% 0% / 0.7), 0 16px 56px hsl(0 0% 0% / 0.35);
     --shadow-floating: 0 8px 32px hsl(0 0% 0% / 0.25), 0 2px 8px hsl(0 0% 0% / 0.15);
-    --shadow-glow: 0 0 24px hsl(220 70% 55% / 0.3), 0 0 48px hsl(220 70% 55% / 0.15);
+    --shadow-glow: 0 0 24px hsl(215 65% 52% / 0.3), 0 0 48px hsl(215 65% 52% / 0.15);
   }
 
   /* ===== LIGHT THEME ===== */
@@ -146,7 +146,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 15% 6%;
 
-    --primary: 220 65% 45%;
+    --primary: 215 60% 42%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 234 12% 93%;
@@ -155,7 +155,7 @@
     --muted: 234 8% 94%;
     --muted-foreground: 240 6% 35%;
 
-    --accent: 220 65% 40%;
+    --accent: 215 60% 38%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 48%;
@@ -169,14 +169,14 @@
 
     --border: 234 12% 88%;
     --input: 234 8% 93%;
-    --ring: 220 65% 45%;
+    --ring: 215 60% 42%;
 
     /* Neon overrides for light — darker so they read well */
-    --neon-cyan: 220 65% 45%;
+    --neon-cyan: 215 60% 42%;
     --neon-green: 142 71% 32%;
     --neon-red: 0 72% 48%;
     --neon-amber: 38 92% 42%;
-    --neon-purple: 220 60% 42%;
+    --neon-purple: 215 55% 40%;
 
     /* Light glow & shadow tokens — minimal, no colored glow */
     --glow-primary: 0 0 0 transparent;
