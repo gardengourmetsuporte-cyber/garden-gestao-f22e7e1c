@@ -1,46 +1,124 @@
 
 
-## Bug: `refreshSubscription` sobrescreve o plano herdado da unidade
+# Plano: Módulo CRM — Banco de Clientes
 
-### Causa raiz
+## Visao Geral
 
-Existe uma condição de corrida entre dois sistemas:
+Criar o módulo "Clientes" completo: tabela no banco, hook de dados, página com listagem/cadastro/importação CSV, e integrar na árvore de módulos e rotas.
 
-1. **UnitContext** carrega a unidade ativa → chama `get_unit_plan` RPC → retorna `'business'` (plano do dono) → chama `setEffectivePlan('business')` → plano = business ✓
+## 1. Migration: Criar tabela `customers`
 
-2. **5 segundos depois**: AuthContext chama `refreshSubscription()` → edge function `check-subscription` verifica o Stripe do **funcionário logado** (não do dono) → funcionário não tem assinatura Stripe → retorna `plan: 'free'` → `setPlan('free')` → **sobrescreve** o plano herdado ✗
+```sql
+CREATE TABLE public.customers (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  unit_id uuid NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  phone text,
+  email text,
+  origin text NOT NULL DEFAULT 'manual', -- 'manual' | 'pdv' | 'mesa' | 'ifood' | 'whatsapp' | 'csv'
+  notes text,
+  total_spent numeric DEFAULT 0,
+  total_orders integer DEFAULT 0,
+  last_purchase_at timestamptz,
+  birthday date,
+  created_by uuid REFERENCES auth.users(id),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
 
-3. **A cada 5 minutos**: o polling repete isso, garantindo que o plano sempre volta para `free`.
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 
-O `check-subscription` verifica a assinatura do **usuário logado**, não do dono da loja. Para funcionários (que não têm assinatura própria), isso sempre retorna `free`, desfazendo a herança configurada pelo UnitContext.
+-- RLS: unit access
+CREATE POLICY "Users can view customers of their unit"
+  ON public.customers FOR SELECT
+  USING (public.user_has_unit_access(auth.uid(), unit_id));
 
-### Solução
+CREATE POLICY "Users can insert customers"
+  ON public.customers FOR INSERT
+  WITH CHECK (public.user_has_unit_access(auth.uid(), unit_id));
 
-Modificar `AuthContext.tsx` para que o `refreshSubscription` **não sobrescreva** o plano quando existe um plano efetivo definido pelo UnitContext. A lógica:
+CREATE POLICY "Users can update customers"
+  ON public.customers FOR UPDATE
+  USING (public.user_has_unit_access(auth.uid(), unit_id));
 
-- Guardar em uma ref se o plano efetivo foi setado via `setEffectivePlan` (ou seja, pelo UnitContext)
-- No `refreshSubscription`, após receber o resultado do `check-subscription`, comparar: se o plano do usuário individual é `free` mas já existe um plano efetivo da unidade, manter o plano efetivo
-- Alternativa mais simples: no `refreshSubscription`, após setar o plano do Stripe, re-disparar o `get_unit_plan` para a unidade ativa
+CREATE POLICY "Users can delete customers"
+  ON public.customers FOR DELETE
+  USING (public.user_has_unit_access(auth.uid(), unit_id));
 
-**Abordagem escolhida**: Usar uma ref `effectivePlanRef` em AuthContext. Quando `setEffectivePlan` é chamado, marca que o plano veio da unidade. No `refreshSubscription`, se o Stripe retorna `free` mas a ref indica um plano de unidade, ignorar o resultado do Stripe.
+-- Updated_at trigger
+CREATE TRIGGER update_customers_updated_at
+  BEFORE UPDATE ON public.customers
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-### Arquivo a modificar
-
-| Arquivo | Mudança |
-|---------|---------|
-| `src/contexts/AuthContext.tsx` | Adicionar `effectivePlanRef` para rastrear plano herdado da unidade. No `refreshSubscription`, não sobrescrever quando plano efetivo existe. No `fetchUserData`, idem — o plano do perfil individual não deve sobrescrever o plano da unidade se este já foi resolvido. |
-
-### Detalhe técnico
-
+-- Index
+CREATE INDEX idx_customers_unit_id ON public.customers(unit_id);
+CREATE INDEX idx_customers_phone ON public.customers(phone);
 ```
-Fluxo atual (bugado):
-AuthContext.fetchUserData → plan = profile.plan ('free')
-UnitContext.useEffect   → setEffectivePlan('business')  ← correto
-AuthContext.refreshSub  → plan = stripe result ('free')  ← sobrescreve!
 
-Fluxo corrigido:
-AuthContext.fetchUserData → plan = profile.plan ('free')
-UnitContext.useEffect   → setEffectivePlan('business'), effectivePlanRef = 'business'
-AuthContext.refreshSub  → stripe = 'free', mas effectivePlanRef = 'business' → mantém 'business'
+## 2. Hook `useCustomers`
+
+Arquivo: `src/hooks/useCustomers.ts`
+
+- CRUD completo via Supabase (listagem com filtro por unit_id, criação, edição, exclusão)
+- Função `importCSV` que parseia CSV (nome, telefone, email) e faz bulk insert
+- useQuery + useMutation com invalidação
+
+## 3. Página `Customers.tsx`
+
+Arquivo: `src/pages/Customers.tsx`
+
+- Listagem com busca por nome/telefone
+- Stats no topo: total de clientes, novos este mes, origens
+- Botao de adicionar cliente manualmente (sheet/dialog)
+- Botao de importar CSV
+- Card de cada cliente com nome, telefone, origem, total gasto, ultima compra
+
+## 4. Componentes
+
+- `src/components/customers/CustomerSheet.tsx` — Form de criar/editar cliente
+- `src/components/customers/CustomerImportCSV.tsx` — Upload e preview de CSV antes de importar
+- `src/components/customers/CustomerCard.tsx` — Card de listagem
+
+## 5. Integração na navegação
+
+- Adicionar módulo `customers` em `src/lib/modules.ts` no grupo "Gestão" com sub-módulos:
+  - `customers.view` — Ver clientes
+  - `customers.create` — Criar/editar clientes
+  - `customers.import` — Importar CSV
+  - `customers.delete` — Excluir clientes
+- Adicionar rota `/customers` em `App.tsx`
+- Adicionar lazy import da página
+- Adicionar item no `MoreDrawer` / `BottomTabBar`
+
+## 6. Tipo TypeScript
+
+Arquivo: `src/types/customer.ts`
+
+```typescript
+export interface Customer {
+  id: string;
+  unit_id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  origin: 'manual' | 'pdv' | 'mesa' | 'ifood' | 'whatsapp' | 'csv';
+  notes: string | null;
+  total_spent: number;
+  total_orders: number;
+  last_purchase_at: string | null;
+  birthday: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
 ```
+
+## Ordem de implementação
+
+1. Migration do banco
+2. Tipo TypeScript
+3. Hook useCustomers
+4. Componentes (Sheet, ImportCSV, Card)
+5. Página Customers
+6. Rotas e navegação (App.tsx, modules.ts, MoreDrawer)
 
