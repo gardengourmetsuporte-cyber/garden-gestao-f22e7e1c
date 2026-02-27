@@ -215,8 +215,10 @@ const TabButton = forwardRef<
     setBouncing(true);
     if (active) {
       // Already on this page — scroll to top
-      const scrollable = document.querySelector('.flex-1.overflow-y-auto') || document.querySelector('main');
-      if (scrollable) {
+      const scrollable = document.querySelector('[data-scroll-container]')
+        || document.querySelector('.flex-1.overflow-y-auto')
+        || document.querySelector('main');
+      if (scrollable && scrollable.scrollTop > 0) {
         scrollable.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
