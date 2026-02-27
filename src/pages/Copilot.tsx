@@ -193,9 +193,55 @@ export default function CopilotPage() {
         className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain"
         onTouchMove={(e) => e.stopPropagation()}
       >
+        {/* Briefing card — aparece só quando há dados e ainda não houve conversa */}
+        {contextStats && messages.length <= 2 && (
+          <div className="rounded-2xl border border-border/30 bg-secondary/30 px-4 py-3 space-y-2">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Resumo agora</p>
+            <div className="flex flex-wrap gap-2">
+              {contextStats.pendingExpensesCount > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                  <AppIcon name="Clock" size={12} />
+                  <span>{contextStats.pendingExpensesCount} despesa{contextStats.pendingExpensesCount > 1 ? 's' : ''} pendente{contextStats.pendingExpensesCount > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {contextStats.lowStockCount > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-red-500">
+                  <AppIcon name="AlertTriangle" size={12} />
+                  <span>{contextStats.lowStockCount} item{contextStats.lowStockCount > 1 ? 'ns' : ''} em baixo estoque</span>
+                </div>
+              )}
+              {contextStats.pendingTasksCount > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-blue-500">
+                  <AppIcon name="ListChecks" size={12} />
+                  <span>{contextStats.pendingTasksCount} tarefa{contextStats.pendingTasksCount > 1 ? 's' : ''} hoje</span>
+                </div>
+              )}
+              {contextStats.upcomingInvoicesCount > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-orange-500">
+                  <AppIcon name="FileText" size={12} />
+                  <span>{contextStats.upcomingInvoicesCount} boleto{contextStats.upcomingInvoicesCount > 1 ? 's' : ''} vencendo</span>
+                </div>
+              )}
+              {contextStats.checklistPct > 0 && contextStats.checklistPct < 100 && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <AppIcon name="CheckSquare" size={12} />
+                  <span>Checklist {contextStats.checklistPct}%</span>
+                </div>
+              )}
+              {contextStats.pendingExpensesCount === 0 && contextStats.lowStockCount === 0 && contextStats.pendingTasksCount === 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-green-500">
+                  <AppIcon name="CheckCircle" size={12} />
+                  <span>Tudo em dia 🎉</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {messages.map((msg, i) => {
           const isAction = msg.role === 'assistant' && isActionMessage(msg.content);
           const displayContent = isAction ? stripActionMarker(msg.content) : msg.content;
+          const navAction = isAction ? getActionNavigation(displayContent) : null;
 
           return (
             <div
@@ -213,8 +259,19 @@ export default function CopilotPage() {
                 />
               )}
               {isAction ? (
-                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
-                  <CopilotMessageContent content={displayContent} />
+                <div className="max-w-[85%] space-y-2">
+                  <div className="rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
+                    <CopilotMessageContent content={displayContent} />
+                  </div>
+                  {navAction && (
+                    <button
+                      onClick={() => navigate(navAction.href)}
+                      className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+                    >
+                      <AppIcon name={navAction.icon as any} size={12} />
+                      {navAction.label} →
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div
