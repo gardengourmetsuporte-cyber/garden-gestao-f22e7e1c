@@ -85,7 +85,7 @@ export function TimeTracking() {
 }
 
 // ---- Employee Check-In Card ----
-function EmployeeCheckInCard({
+export function EmployeeCheckInCard({
   todayRecord,
   onCheckIn,
   onCheckOut,
