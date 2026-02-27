@@ -1,7 +1,7 @@
 import { AppIcon } from '@/components/ui/app-icon';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RewardProduct } from '@/hooks/useRewards';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
   product: RewardProduct;
@@ -16,8 +16,18 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
   const isDisabled = !canAfford || isOutOfStock || isRedeeming;
 
   return (
-    <div className="card-base overflow-hidden transition-all hover:shadow-lg hover:border-primary/20">
-      <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+    <button
+      type="button"
+      disabled={isDisabled}
+      onClick={() => onRedeem(product)}
+      className={cn(
+        "card-base w-full flex items-center gap-4 p-3 text-left transition-all",
+        "active:scale-[0.98] hover:shadow-lg hover:border-primary/20",
+        isDisabled && "opacity-60 pointer-events-none"
+      )}
+    >
+      {/* Image */}
+      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
         {product.image_url ? (
           <img 
             src={product.image_url} 
@@ -25,49 +35,49 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
             className="w-full h-full object-cover"
           />
         ) : (
-          <AppIcon name="Package" size={48} className="text-primary/40" />
+          <AppIcon name="Gift" size={32} className="text-primary/40" />
         )}
       </div>
-      
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-semibold text-foreground line-clamp-1">{product.name}</h3>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <h3 className="font-semibold text-foreground text-sm line-clamp-1">{product.name}</h3>
           {isOutOfStock && (
-            <Badge variant="secondary" className="shrink-0">Esgotado</Badge>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">Esgotado</Badge>
           )}
         </div>
         
         {product.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          <p className="text-xs text-muted-foreground line-clamp-1 mb-1.5">
             {product.description}
           </p>
         )}
-        
-        <div className="flex items-center gap-1.5">
-          <AppIcon name="Star" size={16} className="text-amber-500" />
-          <span className="font-bold text-lg text-foreground">{product.points_cost}</span>
-          <span className="text-sm text-muted-foreground">pontos</span>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-amber-500/15 text-amber-500 dark:text-amber-400 rounded-full px-2 py-0.5">
+            <AppIcon name="Star" size={12} />
+            <span className="font-bold text-xs">{product.points_cost}</span>
+          </div>
+          
+          {product.stock !== null && product.stock > 0 && (
+            <span className="text-[10px] text-muted-foreground">
+              {product.stock} restantes
+            </span>
+          )}
+
+          {!canAfford && !isOutOfStock && (
+            <span className="text-[10px] text-muted-foreground ml-auto">
+              Faltam {product.points_cost - userBalance}
+            </span>
+          )}
         </div>
-        
-        {product.stock !== null && product.stock > 0 && (
-          <p className="text-xs text-muted-foreground mt-1">
-            {product.stock} disponíveis
-          </p>
-        )}
       </div>
-      
-      <div className="p-4 pt-0">
-        <Button 
-          className="w-full" 
-          disabled={isDisabled}
-          onClick={() => onRedeem(product)}
-        >
-          {isRedeeming ? 'Resgatando...' : 
-           isOutOfStock ? 'Esgotado' :
-           !canAfford ? `Faltam ${product.points_cost - userBalance} pontos` :
-           'Resgatar'}
-        </Button>
-      </div>
-    </div>
+
+      {/* Arrow */}
+      {canAfford && !isOutOfStock && (
+        <AppIcon name="ChevronRight" size={18} className="text-muted-foreground/50 shrink-0" />
+      )}
+    </button>
   );
 }
