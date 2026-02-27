@@ -277,12 +277,11 @@ export default function CardapioHub() {
               >
                 <AppIcon name={tab.icon} size={15} />
                 {tab.label}
-                <span className={cn(
-                  "text-[10px] px-1.5 py-0.5 rounded-full font-semibold",
-                  cardapioTab === tab.id ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
-                )}>
-                  {tab.count}
-                </span>
+                {tab.count !== undefined && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
+                    {tab.count}
+                  </span>
+                )}
               </button>
             ))}
           </div>
