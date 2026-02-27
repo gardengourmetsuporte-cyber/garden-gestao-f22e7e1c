@@ -105,7 +105,31 @@ export function UnitProvider({ children }: { children: ReactNode }) {
               }
             } catch (err) {
               console.error('Auto-provision failed:', err);
-              setUnits([]);
+              // Fallback: try to fetch any units the user's profile might already own
+              try {
+                const { data: ownedUnits } = await supabase
+                  .from('units')
+                  .select('*')
+                  .eq('created_by', user.id)
+                  .eq('is_active', true)
+                  .order('name')
+                  .limit(5);
+                if (ownedUnits && ownedUnits.length > 0) {
+                  // Re-link user to unit
+                  await supabase.from('user_units').upsert({
+                    user_id: user.id,
+                    unit_id: ownedUnits[0].id,
+                    is_default: true,
+                  }, { onConflict: 'user_id,unit_id' });
+                  setUnits(ownedUnits as Unit[]);
+                  setActiveUnitIdState(ownedUnits[0].id);
+                  localStorage.setItem(ACTIVE_UNIT_KEY, ownedUnits[0].id);
+                } else {
+                  setUnits([]);
+                }
+              } catch {
+                setUnits([]);
+              }
             }
           }
         }
