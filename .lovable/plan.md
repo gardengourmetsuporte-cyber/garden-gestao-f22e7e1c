@@ -1,47 +1,33 @@
 
 
-## Plano: Configuração de horário limite por card de checklist
+## Diagnóstico: Ícones renderizando como texto nos cards de setor
 
-### Contexto
-Os horários limite estão hardcoded em `checklistTiming.ts` (Abertura: 19:30, Fechamento: 02:00, Bônus: sem limite). O usuário quer poder configurar esses horários diretamente na página de checklists, com um ícone de relógio visível em cada card quando o modo configuração está ativo.
+O problema visível no screenshot é que os ícones Material Symbols estão sendo renderizados como texto bruto (ex: "storefront" aparece como "ARMQ" atrás do card "Salão"). Isso acontece quando a fonte Material Symbols Rounded ainda não carregou — o browser exibe o nome do ícone como texto normal.
 
-### Alterações
+O `display=block` no link da fonte deveria bloquear a renderização até o carregamento, mas em conexões lentas ou em certos browsers isso falha.
 
-#### 1. Nova tabela `checklist_deadline_settings`
-Migração para criar tabela que armazena os horários limite por unidade:
-```sql
-CREATE TABLE checklist_deadline_settings (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  unit_id uuid NOT NULL REFERENCES units(id) ON DELETE CASCADE,
-  checklist_type text NOT NULL, -- 'abertura', 'fechamento', 'bonus'
-  deadline_hour int NOT NULL DEFAULT 19,
-  deadline_minute int NOT NULL DEFAULT 30,
-  is_next_day boolean NOT NULL DEFAULT false, -- true para fechamento (02:00 do dia seguinte)
-  updated_at timestamptz DEFAULT now(),
-  UNIQUE(unit_id, checklist_type)
-);
+### Correção
+
+#### 1. `src/index.css` — Ocultar ícones até a fonte carregar
+Adicionar regra CSS que esconde o texto dos ícones Material Symbols enquanto a fonte não estiver carregada, usando `document.fonts.ready`:
+
+```css
+/* Hide material symbols text until font is loaded */
+.material-symbols-rounded {
+  overflow: hidden;
+  max-width: 1em;
+  max-height: 1em;
+  display: inline-block;
+}
 ```
-Com RLS policies para leitura por membros da unidade e escrita por admins. Valores default: abertura=19:30, fechamento=02:00 (next_day=true), bonus=null.
 
-#### 2. `src/lib/checklistTiming.ts` — Tornar dinâmico
-- Exportar nova função `getChecklistDeadlineCustom(dateStr, type, settings)` que aceita os horários configurados ao invés dos hardcoded
-- Manter as funções originais como fallback quando `settings` é `null`
+#### 2. `index.html` — Trocar `display=block` para `display=swap` + preload
+- Adicionar `<link rel="preload">` para a fonte Material Symbols com `as="style"`
+- Usar `display=swap` ao invés de `display=block` para melhor experiência (a fonte já está sendo preloaded)
 
-#### 3. `src/hooks/useChecklistDeadlines.ts` — Novo hook
-- Query na tabela `checklist_deadline_settings` filtrada por `activeUnitId`
-- Função `updateDeadline(type, hour, minute, isNextDay)` para salvar
-- Retorna os settings ou defaults hardcoded se não houver registro
+#### 3. `src/components/ui/app-icon.tsx` — Adicionar overflow hidden
+- Garantir que o `<span>` do ícone tenha `overflow: hidden`, `width` e `height` fixos baseados no `size`, impedindo que o texto vaze visualmente mesmo se a fonte não carregou
 
-#### 4. `src/pages/Checklists.tsx` — Ícone de relógio nos cards
-- No modo configuração (`settingsMode === true`), exibir um ícone de relógio (`Schedule`) no canto superior direito de cada card (Abertura, Fechamento, Bônus)
-- Ao clicar no ícone, abrir um mini-sheet/popover inline com:
-  - Seletor de hora (0-23) e minuto (0, 15, 30, 45)
-  - Toggle "Dia seguinte" (para fechamento)
-  - Botão salvar
-- Integrar o hook `useChecklistDeadlines` para carregar/salvar
-- Passar os settings customizados para `getDeadlineInfo` no cálculo de countdown e auto-close
-
-#### 5. Integração com dashboard e auto-close
-- `ChecklistDashboardWidget.tsx` também consumirá o hook para usar os horários corretos
-- A lógica de auto-close em `Checklists.tsx` usará os horários configurados
+### Resultado
+Os ícones ficam invisíveis (em vez de mostrar texto bugado) até a fonte carregar, e quando carrega renderizam normalmente.
 
