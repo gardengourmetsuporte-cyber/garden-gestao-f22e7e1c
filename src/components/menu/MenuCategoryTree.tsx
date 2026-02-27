@@ -19,12 +19,13 @@ interface Props {
   onSaveGroup: (grp: Partial<MenuGroup> & { name: string; category_id: string }) => void;
   onDeleteGroup: (id: string) => void;
   getProductCount: (groupId: string) => number;
+  renderGroupContent?: (groupId: string) => React.ReactNode;
 }
 
 export function MenuCategoryTree({
   categories, groups, selectedGroupId,
   onSelectGroup, onSaveCategory, onDeleteCategory,
-  onSaveGroup, onDeleteGroup, getProductCount,
+  onSaveGroup, onDeleteGroup, getProductCount, renderGroupContent,
 }: Props) {
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
   const [catDialog, setCatDialog] = useState(false);
@@ -154,60 +155,67 @@ export function MenuCategoryTree({
                   const avail = grp.availability as any;
                   const isAvailable = grp.is_active !== false && (avail?.tablet || avail?.delivery);
                   return (
-                    <div key={grp.id} className="flex items-center gap-1">
-                      <button
-                        onClick={() => onSelectGroup(grp.id)}
-                        className={cn(
-                          "flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 active:scale-[0.98]",
-                          isSelected
-                            ? "finance-hero-card text-foreground font-medium"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent"
-                        )}
-                      >
-                        <div
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
-                        />
-                        <span className="flex-1 text-left truncate">{grp.name}</span>
-                        <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
-                            }}
-                            className={cn(
-                              "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                              avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
-                            )}
-                          >Mesa</button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
-                            }}
-                            className={cn(
-                              "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                              avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
-                            )}
-                          >Delivery</button>
-                          <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                    <div key={grp.id}>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => onSelectGroup(grp.id)}
+                          className={cn(
+                            "flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 active:scale-[0.98]",
+                            isSelected
+                              ? "finance-hero-card text-foreground font-medium"
+                              : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent"
+                          )}
+                        >
+                          <div
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
+                          />
+                          <span className="flex-1 text-left truncate">{grp.name}</span>
+                          <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
+                              }}
+                              className={cn(
+                                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                                avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                              )}
+                            >Mesa</button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
+                              }}
+                              className={cn(
+                                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                                avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                              )}
+                            >Delivery</button>
+                            <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                          </div>
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1.5 rounded-lg hover:bg-secondary/60">
+                              <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEditGroup(grp)}>
+                              <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
+                              <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      {isSelected && renderGroupContent && (
+                        <div className="mt-2 mb-1">
+                          {renderGroupContent(grp.id)}
                         </div>
-                      </button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1.5 rounded-lg hover:bg-secondary/60">
-                            <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEditGroup(grp)}>
-                            <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
-                            <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      )}
                     </div>
                   );
                 })}

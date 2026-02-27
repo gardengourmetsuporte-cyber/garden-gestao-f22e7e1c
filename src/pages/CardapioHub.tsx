@@ -55,13 +55,8 @@ export default function CardapioHub() {
   useEffect(() => {
     if (isConfigFromUrl) setCardapioTab('config');
   }, [isConfigFromUrl]);
-  const productsRef = useRef<HTMLDivElement>(null);
-
   const handleSelectGroup = useCallback((groupId: string) => {
-    setSelectedGroupId(groupId);
-    setTimeout(() => {
-      productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    setSelectedGroupId(prev => prev === groupId ? null : groupId);
   }, []);
 
   // Product sheet
@@ -301,23 +296,27 @@ export default function CardapioHub() {
                 onSaveGroup={saveGroup}
                 onDeleteGroup={deleteGroup}
                 getProductCount={(gid) => getProductsByGroup(gid).length}
-              />
-              <div ref={productsRef}>
-              <MenuGroupContent
-                group={selectedGroup}
-                products={groupProducts}
-                getOptionCount={(pid) => getLinkedOptionGroupIds(pid).length}
-                onNewProduct={openNewProduct}
-                onEditProduct={openEditProduct}
-                onDeleteProduct={deleteProduct}
-                onLinkOptions={() => setCardapioTab('opcionais')}
-                onImageUpload={(productId, file) => uploadProductImage(productId, file)}
-                onToggleProductAvailability={(prod, channel) => {
-                  const avail = (prod.availability as any) || { tablet: true, delivery: true };
-                  saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
+                renderGroupContent={(gid) => {
+                  const grp = groups.find(g => g.id === gid) || null;
+                  const prods = getProductsByGroup(gid);
+                  return (
+                    <MenuGroupContent
+                      group={grp}
+                      products={prods}
+                      getOptionCount={(pid) => getLinkedOptionGroupIds(pid).length}
+                      onNewProduct={openNewProduct}
+                      onEditProduct={openEditProduct}
+                      onDeleteProduct={deleteProduct}
+                      onLinkOptions={() => setCardapioTab('opcionais')}
+                      onImageUpload={(productId, file) => uploadProductImage(productId, file)}
+                      onToggleProductAvailability={(prod, channel) => {
+                        const avail = (prod.availability as any) || { tablet: true, delivery: true };
+                        saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
+                      }}
+                    />
+                  );
                 }}
               />
-              </div>
             </div>
           )}
 
