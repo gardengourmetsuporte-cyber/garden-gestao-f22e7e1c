@@ -120,11 +120,14 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[80vh] overflow-hidden [&>div:first-child]:bg-white/20" style={{ background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)', borderColor: 'hsl(220 70% 16%)' }}>
-        <div className="overflow-y-auto pb-8" style={{ maxHeight: '75vh' }}>
+      <DrawerContent className="max-h-[80vh] overflow-hidden [&>div:first-child]:bg-white/20" style={{ borderColor: 'hsl(220 70% 16%)', background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 260px, hsl(var(--background)) 260px)' }}>
+        <div className="overflow-y-auto" style={{ maxHeight: '75vh' }}>
           {/* Navy gradient header area */}
           <div
-            className="relative px-4 pt-2 pb-4 space-y-3"
+            className="relative px-4 pt-2 pb-6 space-y-3"
+            style={{
+              background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+            }}
           >
             {/* Profile card */}
             <div className="flex items-center gap-3 w-full py-3">
@@ -197,7 +200,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           </div>
 
           {/* Module grid — adaptive cards */}
-          <div className="px-4 pt-5 pb-2 space-y-3 bg-background rounded-t-[20px] -mt-3 relative z-10">
+          <div className="px-4 pt-5 pb-8 space-y-3 bg-background rounded-t-[20px] -mt-3 relative z-10">
           {groupedNav.map(group => {
             const count = group.items.length;
             const useCols3 = count >= 3 && count !== 4;
