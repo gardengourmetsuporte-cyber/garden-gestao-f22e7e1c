@@ -3372,6 +3372,7 @@ export type Database = {
           error_message: string | null
           id: string
           pdv_response: Json | null
+          retry_count: number | null
           status: string
           table_number: number
           total: number
@@ -3383,6 +3384,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           pdv_response?: Json | null
+          retry_count?: number | null
           status?: string
           table_number: number
           total?: number
@@ -3394,6 +3396,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           pdv_response?: Json | null
+          retry_count?: number | null
           status?: string
           table_number?: number
           total?: number
@@ -3417,6 +3420,7 @@ export type Database = {
           hub_url: string
           id: string
           is_active: boolean
+          payment_code: string | null
           unit_id: string
           updated_at: string
         }
@@ -3426,6 +3430,7 @@ export type Database = {
           hub_url: string
           id?: string
           is_active?: boolean
+          payment_code?: string | null
           unit_id: string
           updated_at?: string
         }
@@ -3435,6 +3440,7 @@ export type Database = {
           hub_url?: string
           id?: string
           is_active?: boolean
+          payment_code?: string | null
           unit_id?: string
           updated_at?: string
         }

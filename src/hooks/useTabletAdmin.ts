@@ -193,7 +193,7 @@ export function useTabletAdmin() {
   };
 
   // PDV Config
-  const savePDVConfig = async (config: { hub_url: string; auth_key: string; is_active: boolean }) => {
+  const savePDVConfig = async (config: { hub_url: string; auth_key: string; is_active: boolean; payment_code?: string }) => {
     if (!activeUnitId) return;
     setLoading(true);
     try {

@@ -67,4 +67,3 @@ O Colibri **não possui uma API REST pública na nuvem**. A comunicação passa 
 - Adicionar coluna `retry_count` na tabela `tablet_orders`
 - Atualizar `src/pages/TabletAdmin.tsx` com os novos componentes de configuração e status
 - Criar Edge Function `colibri-health` para teste de conexão
-
