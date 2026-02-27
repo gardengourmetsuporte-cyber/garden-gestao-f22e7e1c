@@ -284,6 +284,19 @@ export function useManagementAI() {
       };
 
       contextCacheRef.current = { data: contextData, timestamp: Date.now() };
+
+      // Populate contextStats for UI chips/briefing
+      const aberturaItems = checklistItemsRes.data?.filter((i: any) => i.checklist_type === 'abertura') || [];
+      const aberturaCompleted = checklistCompletionsRes.data?.filter((c: any) => c.checklist_type === 'abertura').length || 0;
+      setContextStats({
+        pendingExpensesCount: (pendingExpRes.data || []).length,
+        pendingExpensesTotal: totalPending,
+        lowStockCount: lowStockItems.length,
+        pendingTasksCount: (tasksRes.data || []).filter((t: any) => !t.is_completed).length,
+        upcomingInvoicesCount: (supplierInvoicesRes.data || []).length,
+        checklistPct: aberturaItems.length > 0 ? Math.round((aberturaCompleted / aberturaItems.length) * 100) : 0,
+      });
+
       return contextData;
     } catch (err) {
       console.error('Error fetching AI context:', err);
