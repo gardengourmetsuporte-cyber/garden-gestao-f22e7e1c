@@ -1,4 +1,4 @@
-import { useState, useMemo, lazy, Suspense } from 'react';
+import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
@@ -51,6 +51,14 @@ export default function CardapioHub() {
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const productsRef = useRef<HTMLDivElement>(null);
+
+  const handleSelectGroup = useCallback((groupId: string) => {
+    setSelectedGroupId(groupId);
+    setTimeout(() => {
+      productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }, []);
 
   // Product sheet
   const [productSheetOpen, setProductSheetOpen] = useState(false);
@@ -284,13 +292,14 @@ export default function CardapioHub() {
                 categories={categories}
                 groups={groups}
                 selectedGroupId={selectedGroupId}
-                onSelectGroup={setSelectedGroupId}
+                onSelectGroup={handleSelectGroup}
                 onSaveCategory={saveCategory}
                 onDeleteCategory={deleteCategory}
                 onSaveGroup={saveGroup}
                 onDeleteGroup={deleteGroup}
                 getProductCount={(gid) => getProductsByGroup(gid).length}
               />
+              <div ref={productsRef}>
               <MenuGroupContent
                 group={selectedGroup}
                 products={groupProducts}
@@ -301,6 +310,7 @@ export default function CardapioHub() {
                 onLinkOptions={() => setCardapioTab('opcionais')}
                 onImageUpload={(productId, file) => uploadProductImage(productId, file)}
               />
+              </div>
             </div>
           )}
 
