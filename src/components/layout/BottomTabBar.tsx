@@ -167,7 +167,7 @@ export function BottomTabBar() {
                 tab={tab}
                 active={isActive(tab.path)}
                 locked={isTabLocked(tab.path)}
-                onClick={() => isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path)}
+                onClick={() => { setMoreOpen(false); isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path); }}
               />
             ))}
 
@@ -207,7 +207,7 @@ export function BottomTabBar() {
                 tab={tab}
                 active={isActive(tab.path)}
                 locked={isTabLocked(tab.path)}
-                onClick={() => isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path)}
+                onClick={() => { setMoreOpen(false); isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path); }}
               />
             ))}
 
@@ -224,7 +224,7 @@ export function BottomTabBar() {
               </button>
             ) : (
             <button
-              onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
+              onClick={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }}
               aria-label="Mais opções"
               className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
               style={{ width: '20%' }}
