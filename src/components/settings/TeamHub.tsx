@@ -564,12 +564,12 @@ function LevelsTab() {
 
   const openCreate = () => {
     setEditingLevel(null); setIsCreating(true); setFormName(''); setFormDescription(''); setFormModules([]);
-    setExpandedModules(new Set(allExpandableKeys));
+    setExpandedModules(new Set());
   };
 
   const openEdit = (level: AccessLevel) => {
     setEditingLevel(level); setIsCreating(true); setFormName(level.name); setFormDescription(level.description || ''); setFormModules([...level.modules]);
-    setExpandedModules(new Set(allExpandableKeys));
+    setExpandedModules(new Set());
   };
 
   const toggleExpand = useCallback((key: string) => {
