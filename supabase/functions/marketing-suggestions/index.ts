@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,9 +13,68 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { prompt, unit_id, topic } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Build business context from database
+    let businessContext = "";
+    if (unit_id) {
+      try {
+        const supabase = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        );
+
+        const [productsRes, customersRes] = await Promise.all([
+          supabase
+            .from("tablet_products")
+            .select("name, price, category, image_url, is_highlighted, description")
+            .eq("unit_id", unit_id)
+            .eq("is_active", true)
+            .order("is_highlighted", { ascending: false })
+            .limit(30),
+          supabase
+            .from("customers")
+            .select("id", { count: "exact", head: true })
+            .eq("unit_id", unit_id),
+        ]);
+
+        const products = productsRes.data || [];
+        const customerCount = customersRes.count || 0;
+
+        if (products.length > 0) {
+          const highlighted = products.filter((p: any) => p.is_highlighted);
+          const categories = [...new Set(products.map((p: any) => p.category))];
+          const withImage = products.filter((p: any) => p.image_url);
+
+          businessContext += `\n\n--- DADOS DO NEGÓCIO ---`;
+          businessContext += `\nTotal de produtos no cardápio: ${products.length}`;
+          businessContext += `\nCategorias: ${categories.join(", ")}`;
+          if (highlighted.length > 0) {
+            businessContext += `\nProdutos em destaque: ${highlighted.map((p: any) => `${p.name} (R$${p.price.toFixed(2)})`).join(", ")}`;
+          }
+          businessContext += `\nProdutos com foto: ${withImage.length}/${products.length}`;
+          businessContext += `\nLista de produtos:`;
+          products.slice(0, 20).forEach((p: any) => {
+            businessContext += `\n- ${p.name}: R$${p.price.toFixed(2)} [${p.category}]${p.image_url ? " ✅foto" : " ❌sem foto"}${p.description ? ` — ${p.description.slice(0, 60)}` : ""}`;
+          });
+          businessContext += `\nTotal de clientes cadastrados: ${customerCount}`;
+        }
+      } catch (err) {
+        console.error("Context fetch error (non-fatal):", err);
+      }
+    }
+
+    const effectivePrompt = topic
+      ? `Gere 3-4 sugestões de posts sobre o tema: "${topic}". ${prompt ? `Contexto adicional: ${prompt}` : ""}`
+      : `Gere 3-4 sugestões de posts sobre: ${prompt}`;
+
+    const systemPrompt = `Você é um especialista em marketing para pequenos negócios brasileiros (restaurantes, bares, cafeterias, lojas).
+Gere sugestões de posts para redes sociais com linguagem brasileira natural, emojis, e hashtags relevantes.
+${businessContext ? `\nUse os dados reais do negócio abaixo para criar sugestões personalizadas. SEMPRE referencie produtos reais pelo nome e preço quando apropriado. Quando o produto não tem foto, sugira como tirar uma boa foto dele.` : ""}
+${businessContext}
+\nSempre responda usando a ferramenta suggest_posts.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -25,16 +85,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          {
-            role: "system",
-            content: `Você é um especialista em marketing para pequenos negócios brasileiros (restaurantes, bares, cafeterias, lojas). 
-Gere sugestões de posts para redes sociais com linguagem brasileira natural, emojis, e hashtags relevantes.
-Sempre responda usando a ferramenta suggest_posts.`,
-          },
-          {
-            role: "user",
-            content: `Gere 3-4 sugestões de posts sobre: ${prompt}`,
-          },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: effectivePrompt },
         ],
         tools: [
           {
@@ -61,8 +113,16 @@ Sempre responda usando a ferramenta suggest_posts.`,
                           type: "string",
                           description: "Melhor horário para postar (ex: '11h-12h' ou '18h-20h')",
                         },
+                        photo_tip: {
+                          type: "string",
+                          description: "Dica específica de foto: como fotografar, ângulo, fundo, iluminação. Se o produto não tem foto, sugira como tirar uma.",
+                        },
+                        product_name: {
+                          type: "string",
+                          description: "Nome exato do produto do cardápio referenciado (se aplicável, senão vazio)",
+                        },
                       },
-                      required: ["title", "caption", "hashtags", "best_time"],
+                      required: ["title", "caption", "hashtags", "best_time", "photo_tip"],
                       additionalProperties: false,
                     },
                   },
