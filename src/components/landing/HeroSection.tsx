@@ -37,7 +37,7 @@ export function HeroSection() {
               <span
                 className="bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
+                  backgroundImage: "var(--gradient-brand)",
                 }}
               >
                 por falta de controle
@@ -55,9 +55,9 @@ export function HeroSection() {
                 to="/auth?plan=free"
                 className="inline-flex items-center gap-2 h-12 px-8 rounded-xl font-semibold text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
-                  color: "hsl(var(--primary-foreground))",
-                  boxShadow: "0 0 30px hsl(var(--primary) / 0.3), 0 4px 20px hsl(var(--accent) / 0.3)",
+                  background: "var(--gradient-brand)",
+                  color: "white",
+                  boxShadow: "0 4px 20px hsl(220 45% 18% / 0.4)",
                 }}
               >
                 Começar grátis agora

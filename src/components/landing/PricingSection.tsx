@@ -105,9 +105,9 @@ export function PricingSection() {
                 <div
                   className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
                   style={{
-                    background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
-                    color: "hsl(var(--primary-foreground))",
-                    boxShadow: "0 0 15px hsl(var(--primary) / 0.4)",
+                    background: "var(--gradient-brand)",
+                    color: "white",
+                    boxShadow: "0 4px 12px hsl(220 45% 18% / 0.4)",
                   }}
                 >
                   <Star className="w-3 h-3" /> Mais popular
@@ -128,9 +128,9 @@ export function PricingSection() {
                 onClick={() => setSelectedPlan(plan)}
                 className="block w-full text-center h-12 leading-[3rem] rounded-xl font-semibold text-sm transition-all hover:scale-[1.01] active:scale-[0.98]"
                 style={plan.highlight ? {
-                  background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
-                  color: "hsl(var(--primary-foreground))",
-                  boxShadow: "0 0 20px hsl(var(--primary) / 0.3)",
+                  background: "var(--gradient-brand)",
+                  color: "white",
+                  boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
                 } : {
                   background: "hsl(var(--secondary))",
                   color: "hsl(var(--foreground))",
