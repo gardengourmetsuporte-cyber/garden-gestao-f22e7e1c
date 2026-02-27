@@ -66,6 +66,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Track the effective plan set by UnitContext so refreshSubscription doesn't overwrite it
   const effectivePlanRef = useRef<PlanTier | null>(null);
 
+  const resolveInheritedUnitPlan = useCallback(async (userId: string): Promise<PlanTier | null> => {
+    try {
+      const { data: userUnits, error: userUnitsError } = await supabase
+        .from('user_units')
+        .select('unit_id, is_default')
+        .eq('user_id', userId);
+
+      if (userUnitsError || !userUnits?.length) return null;
+
+      const preferredUnitId = userUnits.find((u) => u.is_default)?.unit_id ?? userUnits[0].unit_id;
+      if (!preferredUnitId) return null;
+
+      const { data: unitPlan, error: unitPlanError } = await supabase.rpc('get_unit_plan', {
+        p_unit_id: preferredUnitId,
+      });
+
+      if (unitPlanError || !unitPlan) return null;
+
+      const inheritedPlan = unitPlan as PlanTier;
+      if (inheritedPlan !== 'free') {
+        effectivePlanRef.current = inheritedPlan;
+      }
+
+      return inheritedPlan;
+    } catch (err) {
+      console.error('[AuthContext] Failed to resolve inherited unit plan:', err);
+      return null;
+    }
+  }, []);
+
   const refreshSubscription = useCallback(async () => {
     try {
       const { data, error } = await supabase.functions.invoke('check-subscription');
@@ -77,13 +107,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stripePlan = (data.plan as PlanTier) || 'free';
         const stripeStatus = data.subscribed ? 'active' : 'canceled';
 
-        // If Stripe says 'free' but UnitContext already set a higher plan, keep the unit plan
-        console.log('[AuthContext] refreshSubscription result:', { stripePlan, effectivePlan: effectivePlanRef.current });
-        if (stripePlan === 'free' && effectivePlanRef.current && effectivePlanRef.current !== 'free') {
-          // Only update status, don't downgrade plan
-          setPlanStatus(stripeStatus);
-          console.log('[AuthContext] Keeping unit plan:', effectivePlanRef.current);
-          return;
+        if (stripePlan === 'free') {
+          const currentEffective = effectivePlanRef.current;
+          const inheritedPlan = !currentEffective || currentEffective === 'free'
+            ? (user?.id ? await resolveInheritedUnitPlan(user.id) : null)
+            : currentEffective;
+
+          if (inheritedPlan && inheritedPlan !== 'free') {
+            setPlan(inheritedPlan);
+            setPlanStatus(stripeStatus);
+            setSubscriptionEnd(data.subscription_end || null);
+            setCachedAuth(profile, role, inheritedPlan, stripeStatus);
+            return;
+          }
         }
 
         setPlan(stripePlan);
@@ -94,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Failed to check subscription:', err);
     }
-  }, [profile, role]);
+  }, [profile, role, user?.id, resolveInheritedUnitPlan]);
 
   useEffect(() => {
     let isMounted = true;
@@ -133,13 +169,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(p as Profile | null);
         setRole(r);
 
-        // Don't overwrite plan if UnitContext already set a higher effective plan
-        console.log('[AuthContext] fetchUserData plan:', { profilePlan, effectivePlan: effectivePlanRef.current });
+        let nextPlan = profilePlan;
         if (!effectivePlanRef.current || effectivePlanRef.current === 'free') {
-          setPlan(profilePlan);
+          const inheritedPlan = await resolveInheritedUnitPlan(userId);
+          if (inheritedPlan && inheritedPlan !== 'free') {
+            nextPlan = inheritedPlan;
+          }
+          setPlan(nextPlan);
           setPlanStatus(profilePlanStatus);
+        } else {
+          nextPlan = effectivePlanRef.current;
         }
-        setCachedAuth(p, r, effectivePlanRef.current || profilePlan, profilePlanStatus);
+
+        setCachedAuth(p, r, nextPlan, profilePlanStatus);
       } catch (err) {
         console.error('Failed to fetch user data:', err);
       } finally {
@@ -176,6 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setPlan('free');
             setPlanStatus('active');
             setSubscriptionEnd(null);
+            effectivePlanRef.current = null;
             setIsLoading(false);
           }
         }
@@ -275,7 +318,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setEffectivePlan = useCallback((newPlan: PlanTier) => {
     effectivePlanRef.current = newPlan;
     setPlan(newPlan);
-  }, []);
+    setCachedAuth(profile, role, newPlan, planStatus);
+  }, [profile, role, planStatus]);
 
   return (
     <AuthContext.Provider
