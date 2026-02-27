@@ -197,9 +197,21 @@ export default function ChecklistsPage() {
     return () => clearInterval(iv);
   }, [currentDate, deadlineSettings]);
 
-  const deadlinePassed = useMemo(() => {
+  // deadlinePassed recalculated alongside the label timer (every 30s)
+  const [deadlinePassed, setDeadlinePassed] = useState(() => {
     const info = getDeadlineInfo(currentDate, checklistType, deadlineSettings);
     return info?.passed ?? false;
+  });
+
+  // Keep deadlinePassed in sync with the 30s timer
+  useEffect(() => {
+    const update = () => {
+      const info = getDeadlineInfo(currentDate, checklistType, deadlineSettings);
+      setDeadlinePassed(info?.passed ?? false);
+    };
+    update();
+    const iv = setInterval(update, 30_000);
+    return () => clearInterval(iv);
   }, [currentDate, checklistType, deadlineSettings]);
 
   // ── Auto-close: mark pending items as skipped after deadline ──
