@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Switch } from '@/components/ui/switch';
@@ -7,26 +7,31 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Button } from '@/components/ui/button';
+import { useUserModules } from '@/hooks/useAccessLevels';
 
 interface NotifCategory {
   key: string;
   label: string;
   description: string;
   icon: string;
+  /** Module key used for access control */
+  moduleKey: string;
 }
 
 const CATEGORIES: NotifCategory[] = [
-  { key: 'estoque', label: 'Estoque', description: 'Alertas de estoque baixo ou zerado', icon: 'Package' },
-  { key: 'financeiro', label: 'Financeiro', description: 'Contas a pagar, vencidas e saldo negativo', icon: 'DollarSign' },
-  { key: 'checklist', label: 'Checklists', description: 'Lembretes de tarefas pendentes', icon: 'ClipboardCheck' },
-  { key: 'caixa', label: 'Fechamento de Caixa', description: 'Alertas de caixa não fechado', icon: 'Calculator' },
-  { key: 'agenda', label: 'Agenda', description: 'Compromissos e eventos próximos', icon: 'CalendarDays' },
-  { key: 'sistema', label: 'Sistema', description: 'Atualizações e avisos gerais', icon: 'Bell' },
+  { key: 'estoque', label: 'Estoque', description: 'Alertas de estoque baixo ou zerado', icon: 'Package', moduleKey: 'inventory' },
+  { key: 'financeiro', label: 'Financeiro', description: 'Contas a pagar, vencidas e saldo negativo', icon: 'DollarSign', moduleKey: 'finance' },
+  { key: 'checklist', label: 'Checklists', description: 'Lembretes de tarefas pendentes', icon: 'ClipboardCheck', moduleKey: 'checklists' },
+  { key: 'caixa', label: 'Fechamento de Caixa', description: 'Alertas de caixa não fechado', icon: 'Calculator', moduleKey: 'cash-closing' },
+  { key: 'agenda', label: 'Agenda', description: 'Compromissos e eventos próximos', icon: 'CalendarDays', moduleKey: 'agenda' },
+  { key: 'sistema', label: 'Sistema', description: 'Atualizações e avisos gerais', icon: 'Bell', moduleKey: 'dashboard' },
 ];
 
 export function NotificationSettings() {
   const { user } = useAuth();
   const { isSupported, isSubscribed, permission, subscribe, unsubscribe, isLoading: pushLoading } = usePushNotifications();
+  const { hasAccess, isLoading: accessLoading } = useUserModules();
+  const visibleCategories = useMemo(() => CATEGORIES.filter(c => hasAccess(c.moduleKey)), [hasAccess]);
   const [prefs, setPrefs] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -135,7 +140,7 @@ export function NotificationSettings() {
         <p className="text-[11px] text-muted-foreground">Escolha quais tipos de notificação você deseja receber.</p>
 
         <div className="space-y-1">
-          {CATEGORIES.map(cat => (
+          {visibleCategories.map(cat => (
             <div
               key={cat.key}
               className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/20 transition-colors"
