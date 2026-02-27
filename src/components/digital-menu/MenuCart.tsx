@@ -27,16 +27,22 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
 
   if (orderSent) {
     return (
-      <div className="flex flex-col items-center justify-center px-4 py-12 text-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center">
-          <AppIcon name="Check" size={32} className="text-[hsl(var(--success))]" />
+      <div className="flex flex-col items-center justify-center px-6 py-16 text-center gap-5">
+        <div className="w-20 h-20 rounded-full bg-[hsl(var(--neon-green)/0.12)] flex items-center justify-center">
+          <AppIcon name="CheckCircle2" size={40} className="text-[hsl(var(--neon-green))]" />
         </div>
-        <h2 className="text-xl font-bold text-foreground">Pedido enviado!</h2>
-        <p className="text-muted-foreground text-sm">
-          Pedido #{orderSent} • Mesa {tableNumber || 'Balcão'}
-        </p>
-        <Button variant="outline" onClick={() => { setOrderSent(null); onClear(); }}>
-          Novo pedido
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Pedido enviado!</h2>
+          <p className="text-muted-foreground text-sm mt-2">
+            Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
+          </p>
+          <p className="text-muted-foreground text-xs mt-1">
+            Mesa {tableNumber || 'Balcão'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); }}>
+          <AppIcon name="Plus" size={18} className="mr-2" />
+          Fazer novo pedido
         </Button>
       </div>
     );
@@ -44,10 +50,14 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
 
   if (cart.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center px-4 py-16 text-center gap-3">
-        <AppIcon name="ShoppingBag" size={48} className="text-muted-foreground/30" />
-        <p className="text-muted-foreground">Seu pedido está vazio</p>
-        <p className="text-xs text-muted-foreground/60">Adicione itens do cardápio</p>
+      <div className="flex flex-col items-center justify-center px-4 py-20 text-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-secondary/50 flex items-center justify-center">
+          <AppIcon name="ShoppingBag" size={32} className="text-muted-foreground/30" />
+        </div>
+        <div>
+          <p className="text-foreground font-semibold">Seu pedido está vazio</p>
+          <p className="text-xs text-muted-foreground mt-1">Volte ao cardápio e adicione itens</p>
+        </div>
       </div>
     );
   }
@@ -83,7 +93,7 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      toast.success('Pedido enviado!');
+      toast.success('Pedido enviado com sucesso!');
       setOrderSent((order as any).id.slice(0, 8));
     } catch (err: any) {
       toast.error(err.message || 'Erro ao enviar pedido');
@@ -93,66 +103,98 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
   };
 
   return (
-    <div className="px-4 pb-20 space-y-4">
-      <h2 className="text-lg font-bold text-foreground">Seu Pedido</h2>
+    <div className="px-4 pb-28 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-foreground">
+          Seu Pedido
+          <span className="text-sm font-normal text-muted-foreground ml-2">
+            ({cart.reduce((s, i) => s + i.quantity, 0)} itens)
+          </span>
+        </h2>
+        <button onClick={onClear} className="text-xs text-destructive font-medium">
+          Limpar
+        </button>
+      </div>
 
       <div className="space-y-2">
-        {cart.map((item, i) => (
-          <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/50">
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground">{item.product.name}</p>
-              {item.selectedOptions.length > 0 && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {item.selectedOptions.map(o => o.name).join(', ')}
-                </p>
+        {cart.map((item, i) => {
+          const unitPrice = item.product.price + item.selectedOptions.reduce((s, o) => s + o.price, 0);
+          return (
+            <div key={i} className="flex items-start gap-3 p-3 rounded-2xl bg-card border border-border/30">
+              {item.product.image_url ? (
+                <img src={item.product.image_url} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
+              ) : (
+                <div className="w-14 h-14 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0">
+                  <AppIcon name="Package" size={18} className="text-muted-foreground/30" />
+                </div>
               )}
-              {item.notes && <p className="text-xs text-muted-foreground italic">{item.notes}</p>}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">{item.product.name}</p>
+                {item.selectedOptions.length > 0 && (
+                  <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                    {item.selectedOptions.map(o => o.name).join(', ')}
+                  </p>
+                )}
+                {item.notes && <p className="text-[11px] text-muted-foreground/70 italic truncate">{item.notes}</p>}
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onUpdateQuantity(i, item.quantity - 1)}
+                      className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform"
+                    >
+                      <AppIcon name={item.quantity === 1 ? 'Trash2' : 'Minus'} size={13} className={item.quantity === 1 ? 'text-destructive' : ''} />
+                    </button>
+                    <span className="w-7 text-center text-sm font-bold text-foreground">{item.quantity}</span>
+                    <button
+                      onClick={() => onUpdateQuantity(i, item.quantity + 1)}
+                      className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform"
+                    >
+                      <AppIcon name="Plus" size={13} />
+                    </button>
+                  </div>
+                  <p className="text-sm font-bold text-foreground">{formatPrice(unitPrice * item.quantity)}</p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <button onClick={() => onUpdateQuantity(i, item.quantity - 1)} className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center">
-                <AppIcon name="Minus" size={14} />
-              </button>
-              <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
-              <button onClick={() => onUpdateQuantity(i, item.quantity + 1)} className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center">
-                <AppIcon name="Plus" size={14} />
-              </button>
-            </div>
-            <p className="text-sm font-bold text-foreground w-16 text-right">
-              {formatPrice((item.product.price + item.selectedOptions.reduce((s, o) => s + o.price, 0)) * item.quantity)}
-            </p>
-            <button onClick={() => onRemove(i)} className="text-destructive">
-              <AppIcon name="Trash2" size={16} />
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="flex items-center justify-between py-3 border-t border-border">
-        <span className="font-semibold text-foreground">Total</span>
-        <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+      {/* Summary */}
+      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Subtotal</span>
+          <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
+        </div>
+        <div className="border-t border-border/30" />
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-foreground">Total</span>
+          <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+        </div>
       </div>
 
+      {/* Table input */}
       {!mesa && (
-        <div>
-          <label className="text-sm text-muted-foreground mb-1 block">Número da mesa</label>
+        <div className="rounded-2xl bg-card border border-border/30 p-4">
+          <label className="text-sm font-semibold text-foreground mb-2 block">Número da mesa</label>
           <Input
             placeholder="Ex: 5"
             value={tableNumber}
             onChange={e => setTableNumber(e.target.value)}
-            className="text-center h-12 text-lg"
+            className="text-center h-14 text-xl font-bold rounded-xl"
             type="number"
             inputMode="numeric"
           />
         </div>
       )}
 
-      <Button className="w-full h-12 text-base" onClick={handleSend} disabled={sending}>
+      <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Enviar Pedido
+        Finalizar Pedido • {formatPrice(cartTotal)}
       </Button>
     </div>
   );

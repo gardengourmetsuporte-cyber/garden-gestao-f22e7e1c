@@ -13,8 +13,9 @@ import {
 import {
   Package, Plus, Trash2, RefreshCw, Monitor, Settings2, LayoutGrid,
   AlertCircle, CheckCircle2, Clock, Send, QrCode, ExternalLink,
-  Wifi, WifiOff, Loader2, Info, ArrowRight, Zap,
+  Wifi, WifiOff, Loader2, Info, ArrowRight, Zap, Download, Copy,
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useUnit } from '@/contexts/UnitContext';
 import { useToast } from '@/hooks/use-toast';
@@ -293,8 +294,89 @@ export default function TabletAdmin() {
             ))}
           </TabsContent>
 
-          {/* TABLES TAB */}
-          <TabsContent value="tables" className="space-y-3 mt-4">
+          <TabsContent value="tables" className="space-y-4 mt-4">
+            {/* QR Code Section */}
+            {activeUnit && (
+              <div className="card-base p-4 space-y-4">
+                <h3 className="font-bold text-foreground flex items-center gap-2">
+                  <QrCode className="w-4 h-4" />
+                  Cardápio Digital (QR Code)
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Gere QR Codes para que seus clientes acessem o cardápio digital pelo celular.
+                </p>
+
+                {/* Generic QR */}
+                <div className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30 border border-border/30">
+                  <QRCodeSVG
+                    value={`${window.location.origin}/m/${activeUnit.id}`}
+                    size={80}
+                    bgColor="transparent"
+                    fgColor="currentColor"
+                    className="text-foreground shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">QR Genérico</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Balcão / Delivery (sem mesa)</p>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`);
+                          toast({ title: 'Link copiado!' });
+                        }}
+                      >
+                        <Copy className="w-3 h-3 mr-1" /> Copiar
+                      </Button>
+                      <a
+                        href={`/m/${activeUnit.id}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="inline-flex items-center gap-1 text-xs text-primary font-medium"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Abrir
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Per-table QR codes */}
+                {tables.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-foreground">QR por mesa:</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {tables.map(t => (
+                        <div key={t.id} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/20 border border-border/20">
+                          <QRCodeSVG
+                            value={`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`}
+                            size={48}
+                            bgColor="transparent"
+                            fgColor="currentColor"
+                            className="text-foreground shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-foreground">Mesa {t.number}</p>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`);
+                                toast({ title: `Link mesa ${t.number} copiado!` });
+                              }}
+                              className="text-[10px] text-primary font-medium mt-0.5"
+                            >
+                              Copiar link
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Add table */}
             <div className="flex gap-2">
               <Input
                 type="number"

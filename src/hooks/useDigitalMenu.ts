@@ -54,8 +54,11 @@ export interface DMUnit {
   name: string;
   store_info: {
     logo_url?: string;
+    banner_url?: string;
     cuisine_type?: string;
     city?: string;
+    address?: string;
+    delivery_time?: string;
     opening_hours?: { open: string; close: string }[];
   } | null;
 }
