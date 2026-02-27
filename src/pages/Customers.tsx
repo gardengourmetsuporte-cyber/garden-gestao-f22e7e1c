@@ -1,4 +1,8 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -31,6 +35,8 @@ const STAT_ITEMS = [
 
 export default function Customers() {
   const { customers, isLoading, createCustomer, updateCustomer, deleteCustomer, importCSV } = useCustomers();
+  const { activeUnit } = useUnit();
+  const qc = useQueryClient();
   const { stats, addEvent } = useCustomerCRM(customers);
   const [search, setSearch] = useState('');
   const [segmentFilter, setSegmentFilter] = useState<CustomerSegment | null>(null);
@@ -48,6 +54,37 @@ export default function Customers() {
   }, []);
 
   useFabAction({ icon: 'Plus', label: 'Novo cliente', onClick: openNewSheet }, [openNewSheet]);
+
+  // One-time auto-import of Goomer customers CSV
+  useEffect(() => {
+    const IMPORT_KEY = 'goomer_customers_imported_v1';
+    if (localStorage.getItem(IMPORT_KEY) || !activeUnit) return;
+    
+    const doImport = async () => {
+      try {
+        const res = await fetch('/data/goomer-customers.csv');
+        if (!res.ok) return;
+        const csvText = await res.text();
+        if (!csvText.includes('"Nome"') || !csvText.includes(';')) return;
+        
+        localStorage.setItem(IMPORT_KEY, 'pending');
+        const { error, data } = await supabase.functions.invoke('import-customers-csv', {
+          body: { csvText, unitId: activeUnit.id },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        
+        localStorage.setItem(IMPORT_KEY, 'done');
+        toast.success(`${data.inserted} clientes importados do Goomer!`);
+        qc.invalidateQueries({ queryKey: ['customers'] });
+      } catch (err: any) {
+        console.error('Auto-import failed:', err);
+        localStorage.removeItem(IMPORT_KEY);
+      }
+    };
+    
+    doImport();
+  }, [activeUnit, qc]);
 
   const filtered = useMemo(() => {
     let list = customers;
