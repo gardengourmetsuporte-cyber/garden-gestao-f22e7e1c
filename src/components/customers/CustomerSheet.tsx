@@ -60,18 +60,18 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
-        <SheetHeader>
+      <SheetContent side="bottom" className="max-h-[90vh] rounded-t-2xl flex flex-col">
+        <SheetHeader className="shrink-0">
           <SheetTitle>{customer ? 'Editar Cliente' : 'Novo Cliente'}</SheetTitle>
         </SheetHeader>
-        <div className="space-y-4 mt-4">
+        <div className="flex-1 overflow-y-auto space-y-4 mt-4 pb-8">
           <div>
             <Label>Nome *</Label>
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Nome do cliente" />
           </div>
           <div>
             <Label>Telefone</Label>
-            <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(00) 00000-0000" />
+            <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(00) 00000-0000" type="tel" />
           </div>
           <div>
             <Label>Email</Label>
@@ -92,11 +92,13 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
           </div>
           <div>
             <Label>Observações</Label>
-            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas sobre o cliente..." />
+            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas sobre o cliente..." rows={3} />
           </div>
-          <Button className="w-full" onClick={handleSubmit} disabled={!name.trim() || isSaving}>
-            {isSaving ? 'Salvando...' : customer ? 'Salvar' : 'Cadastrar'}
-          </Button>
+          <div className="pt-2 pb-4">
+            <Button className="w-full" size="lg" onClick={handleSubmit} disabled={!name.trim() || isSaving}>
+              {isSaving ? 'Salvando...' : customer ? 'Salvar' : 'Cadastrar'}
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
