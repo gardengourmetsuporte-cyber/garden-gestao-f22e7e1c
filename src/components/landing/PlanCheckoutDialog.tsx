@@ -60,9 +60,9 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
             onClick={handleStart}
             className="w-full h-12 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
             style={{
-              background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))",
-              color: "hsl(var(--primary-foreground))",
-              boxShadow: "0 0 20px hsl(var(--primary) / 0.3)",
+              background: "var(--gradient-brand)",
+              color: "white",
+              boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
             }}
           >
             Começar 14 dias grátis
