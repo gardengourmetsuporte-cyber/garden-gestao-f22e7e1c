@@ -273,6 +273,7 @@ export function ChecklistView({
       setContestReason('');
     } catch (err: any) {
       console.error('Contest error:', err);
+      toast.error('Erro ao contestar item');
     } finally {
       setContestLoading(false);
     }
