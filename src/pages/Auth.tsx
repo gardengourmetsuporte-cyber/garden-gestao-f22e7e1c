@@ -119,20 +119,25 @@ function BrandPanel() {
   );
 }
 
-// ── Mobile Brand Header ────────────────────────────────────────────
+// ── Mobile Brand Header (full-width banner like desktop) ───────────
 function MobileBrandHeader() {
   return (
     <div
-      className="flex lg:hidden flex-col items-center gap-4 mx-4 rounded-3xl px-6 py-10 mb-6"
+      className="flex lg:hidden flex-col items-center gap-5 w-full px-6 py-12 -mx-6 -mt-8 mb-6"
       style={{
         background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
         backgroundSize: '350% 350%',
         animation: 'navyCardFlow 12s ease-in-out infinite',
-        boxShadow: '0 20px 60px hsl(224 45% 6% / 0.4), 0 0 40px hsl(220 80% 50% / 0.08)',
       }}
     >
+      {/* Glow orb */}
       <div
-        className="w-28 h-28 rounded-[1.5rem] overflow-hidden flex items-center justify-center"
+        className="absolute top-8 left-1/3 w-[200px] h-[200px] rounded-full blur-[80px] opacity-15 pointer-events-none"
+        style={{ background: 'hsl(220 80% 50%)' }}
+      />
+
+      <div
+        className="w-24 h-24 rounded-[1.25rem] overflow-hidden flex items-center justify-center relative z-10"
         style={{
           background: 'white',
           boxShadow: '0 0 60px hsl(220 80% 50% / 0.15), 0 12px 40px hsl(224 45% 6% / 0.5)',
@@ -140,9 +145,46 @@ function MobileBrandHeader() {
       >
         <img alt="Garden Gestão" className="w-[75%] h-[75%] object-contain" src={gardenLogo} />
       </div>
-      <div className="text-center space-y-1.5">
+      <div className="text-center space-y-1.5 relative z-10">
         <h1 className="text-3xl font-extrabold text-white tracking-tight font-display">Garden</h1>
         <p className="text-[10px] text-white/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
+      </div>
+
+      {/* Feature pills */}
+      <div className="flex flex-wrap items-center justify-center gap-2 relative z-10">
+        {[
+          { icon: 'BarChart3', label: 'Financeiro' },
+          { icon: 'Package', label: 'Estoque' },
+          { icon: 'Users', label: 'Equipe' },
+          { icon: 'ListChecks', label: 'Checklists' },
+          { icon: 'Sparkles', label: 'IA' },
+        ].map(({ icon, label }) => (
+          <div
+            key={label}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
+            style={{
+              background: 'hsl(220 60% 50% / 0.1)',
+              color: 'hsl(220 80% 70%)',
+              border: '1px solid hsl(220 60% 50% / 0.15)',
+            }}
+          >
+            <AppIcon name={icon} size={12} />
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Social proof */}
+      <div className="flex items-center justify-center gap-5 text-white/20 text-[10px] relative z-10 mt-1">
+        <div className="flex items-center gap-1">
+          <AppIcon name="Shield" size={12} />
+          <span>Dados seguros</span>
+        </div>
+        <div className="w-px h-3 bg-white/10" />
+        <div className="flex items-center gap-1">
+          <AppIcon name="Zap" size={12} />
+          <span>Setup rápido</span>
+        </div>
       </div>
     </div>
   );
@@ -308,17 +350,17 @@ export default function Auth() {
       <BrandPanel />
 
       {/* ── RIGHT: Form Panel ── */}
-      <div className="flex-1 flex flex-col relative overflow-y-auto" style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}>
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-5 pt-4 relative z-20">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-muted-foreground hover:text-foreground -ml-2">
+      <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0" style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}>
+        {/* Top bar - absolute on mobile to overlay the banner */}
+        <div className="flex items-center justify-between px-5 pt-4 relative z-20 lg:relative absolute top-0 left-0 right-0" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/70 hover:text-white lg:text-muted-foreground lg:hover:text-foreground -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
           <ThemeToggle />
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 relative z-10">
+        <div className="flex-1 flex flex-col items-center lg:justify-center px-6 py-8 relative z-10">
           {/* Mobile brand header */}
           <MobileBrandHeader />
 
