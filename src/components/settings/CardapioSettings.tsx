@@ -91,30 +91,22 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
     { id: 'config', label: 'Geral', icon: 'Cog', description: 'Delivery, retirada e horários' },
   ];
 
-  // Hub menu view
+  // Hub menu view — matches Settings page pattern
   if (!activeTab) {
     return (
-      <div className="space-y-2">
-        <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <AppIcon name={tab.icon} size={16} className="text-primary" />
-                </div>
-                <div>
-                  <span className="font-medium text-sm text-foreground">{tab.label}</span>
-                  <p className="text-[11px] text-muted-foreground">{tab.description}</p>
-                </div>
-              </div>
-              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-            </button>
-          ))}
-        </div>
+      <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span className="font-medium text-sm text-foreground">{tab.label}</span>
+            </span>
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+          </button>
+        ))}
       </div>
     );
   }
