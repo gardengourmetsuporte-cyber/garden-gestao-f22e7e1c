@@ -107,9 +107,10 @@ export default function Ranking() {
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
                       rankingScope === 'unit'
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "text-white shadow-sm"
                         : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                     )}
+                    style={rankingScope === 'unit' ? { background: 'linear-gradient(135deg, hsl(220 70% 16%), hsl(234 75% 28%), hsl(220 65% 18%))' } : undefined}
                   >
                     <AppIcon name="Home" size={12} />
                     {activeUnit?.name || 'Minha Unidade'}
@@ -119,9 +120,10 @@ export default function Ranking() {
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
                       rankingScope === 'global'
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "text-white shadow-sm"
                         : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                     )}
+                    style={rankingScope === 'global' ? { background: 'linear-gradient(135deg, hsl(220 70% 16%), hsl(234 75% 28%), hsl(220 65% 18%))' } : undefined}
                   >
                     <AppIcon name="Globe" size={12} />
                     Global
