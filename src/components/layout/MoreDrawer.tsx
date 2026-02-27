@@ -218,7 +218,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         className={cn(
                           "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
                           active
-                            ? "bg-primary/10"
+                            ? "bg-primary/10 dark:bg-white dark:shadow-md"
                             : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
                         )}
                         style={{ opacity: locked ? 0.55 : 1 }}
@@ -249,7 +249,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         <span
                           className={cn(
                             "text-[11px] font-medium leading-tight text-center truncate max-w-full",
-                            active ? "text-foreground" : locked ? "text-muted-foreground" : "text-foreground/80"
+                            active ? "text-foreground dark:text-[hsl(220_30%_20%)]" : locked ? "text-muted-foreground" : "text-foreground/80"
                           )}
                         >
                           {item.label}
