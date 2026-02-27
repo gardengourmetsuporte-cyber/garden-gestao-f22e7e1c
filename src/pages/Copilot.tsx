@@ -54,6 +54,7 @@ export default function CopilotPage() {
     conversations, conversationId, switchConversation, newConversation,
     contextStats,
   } = useManagementAI();
+  const { stats } = useDashboardStats();
   const [question, setQuestion] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
