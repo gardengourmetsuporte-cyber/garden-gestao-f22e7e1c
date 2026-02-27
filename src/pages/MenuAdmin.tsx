@@ -14,7 +14,7 @@ export default function MenuAdmin() {
     categories, groups, products, optionGroups, loading,
     saveCategory, deleteCategory,
     saveGroup, deleteGroup,
-    saveProduct, deleteProduct,
+    saveProduct, deleteProduct, uploadProductImage,
     saveOptionGroup, deleteOptionGroup,
     getProductsByGroup, getLinkedProductIds, getLinkedOptionGroupIds,
     setProductOptionLinks,
@@ -166,6 +166,7 @@ export default function MenuAdmin() {
         groups={groups}
         onSave={saveProduct}
         onDelete={deleteProduct}
+        onImageUpload={(productId, file) => uploadProductImage(productId, file)}
       />
 
       {/* Option Group Sheet */}
