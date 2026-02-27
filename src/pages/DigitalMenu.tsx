@@ -73,14 +73,14 @@ export default function DigitalMenu() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background max-w-lg mx-auto relative">
+    <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative">
       {/* Home tab: Landing + search + featured */}
       {activeTab === 'home' && (
         <div>
           <MenuLanding unit={unit} />
 
           {/* Quick search bar */}
-          <div className="px-4 mt-5">
+          <div className="px-4 md:px-8 mt-5">
             <button
               onClick={() => { setSearchOpen(true); setActiveTab('menu'); }}
               className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl bg-card border border-border/40 text-muted-foreground text-sm"
@@ -92,7 +92,7 @@ export default function DigitalMenu() {
 
           {/* Featured products */}
           {products.filter(p => p.is_highlighted).length > 0 && (
-            <div className="mt-6 px-4">
+            <div className="mt-6 px-4 md:px-8">
               <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
                 <AppIcon name="Flame" size={14} className="text-[hsl(var(--neon-amber))]" />
                 Destaques
@@ -125,9 +125,9 @@ export default function DigitalMenu() {
 
           {/* Quick category access */}
           {categories.length > 0 && (
-            <div className="mt-6 px-4 pb-28">
+            <div className="mt-6 px-4 md:px-8 pb-28">
               <h3 className="text-sm font-bold text-foreground mb-3">Categorias</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {categories.map(cat => (
                   <button
                     key={cat.id}
@@ -149,12 +149,12 @@ export default function DigitalMenu() {
         <div className="pt-4">
           {/* Inline search */}
           {searchOpen ? (
-            <div className="px-4 mb-4">
+            <div className="px-4 md:px-8 mb-4">
               <MenuSearch products={products} onSelectProduct={handleProductSelect} />
             </div>
           ) : (
             <>
-              <div className="px-4 mb-3 flex items-center justify-between">
+              <div className="px-4 md:px-8 mb-3 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground">Cardápio</h2>
                 <button
                   onClick={() => setSearchOpen(true)}
