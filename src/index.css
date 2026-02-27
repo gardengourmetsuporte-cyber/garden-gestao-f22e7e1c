@@ -10,6 +10,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent Material Symbols from flashing as raw text before font loads */
+.material-symbols-rounded {
+  overflow: hidden;
+  max-width: 1em;
+  max-height: 1em;
+  display: inline-block;
+}
+
 /* =========================================================
    DESIGN SYSTEM - Garden Gestão (Dark Command Center)
    ========================================================= */
