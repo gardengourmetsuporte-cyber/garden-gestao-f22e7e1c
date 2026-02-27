@@ -118,10 +118,10 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
     return <Navigate to="/auth" replace />;
   }
 
-  // If units are still empty after loading finished, show a brief loader
-  // but cap it — don't block forever (auto-provision may have failed)
+  // Do not block forever when auto-provision/recovery cannot attach a unit.
+  // Let downstream screens handle empty-unit states instead of infinite loader.
   if (!skipOnboarding && units.length === 0) {
-    return <PageLoader />;
+    console.warn('[ProtectedRoute] No units available after load; continuing without blocking');
   }
 
   // Check module access (skip during loading to avoid flash)

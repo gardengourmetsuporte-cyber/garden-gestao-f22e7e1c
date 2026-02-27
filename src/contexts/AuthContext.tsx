@@ -62,6 +62,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const subIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchUserDataRef = useRef<(userId: string) => Promise<void>>();
 
+  // Safety net: never keep auth loading forever on app resume/network edge-cases
+  useEffect(() => {
+    if (!isLoading) return;
+
+    const timeoutId = window.setTimeout(() => {
+      console.warn('[AuthContext] Loading watchdog released after timeout');
+      setIsLoading(false);
+    }, 12000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isLoading]);
+
   const refreshSubscription = useCallback(async () => {
     try {
       const { data, error } = await supabase.functions.invoke('check-subscription');

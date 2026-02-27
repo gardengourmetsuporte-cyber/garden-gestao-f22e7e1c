@@ -37,6 +37,19 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const hasInitialized = useRef(false);
   const fetchedForUserRef = useRef<string | null>(null);
 
+  // Safety net: avoid infinite loading if unit fetch stalls after app resume
+  useEffect(() => {
+    if (!isLoading || !user) return;
+
+    const timeoutId = window.setTimeout(() => {
+      console.warn('[UnitContext] Loading watchdog released after timeout');
+      fetchedForUserRef.current = user.id;
+      setIsLoading(false);
+    }, 12000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isLoading, user]);
+
   const fetchUnits = useCallback(async () => {
     if (!user) {
       setUnits([]);
