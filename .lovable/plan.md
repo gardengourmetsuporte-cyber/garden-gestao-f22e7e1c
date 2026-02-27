@@ -1,50 +1,40 @@
 
 
-## Redesign da Landing Page — Layout Inspirado na Referencia (Dark Navy Hero)
+## Diagnóstico: Dois Sistemas Separados
 
-A referencia mostra um padrao claro: **hero com fundo navy gradiente full-width**, texto a esquerda + screenshot flutuante a direita, e feature badges abaixo. O layout atual e centralizado generico. Vou reformular para seguir esse padrao.
+Os cadeados que voce ve em "Fechamento" e "Recompensas" NAO sao do sistema de niveis de acesso. Sao bloqueios de **plano de assinatura** (Free/Pro/Business).
 
-### Mudancas por componente:
+Existem dois sistemas independentes:
 
-**1. `HeroSection.tsx` — Rewrite completo**
-- Fundo `finance-hero-card` cobrindo toda a secao hero (navy gradiente animado com shine sweep)
-- Layout split: texto alinhado a esquerda + screenshot real (`dashboard-mockup.png`) flutuando a direita com perspectiva/rotacao 3D sutil
-- Navbar sobre fundo escuro (texto branco)
-- 3 feature badges abaixo do hero (icone + titulo + desc) em cards com fundo `bg-white/10` translucido
-- Botao CTA branco sobre fundo escuro (como na referencia)
-- Remover screenshot generico separado, integrar no hero
+1. **Niveis de Acesso** (Configuracoes > Equipe > aba "Niveis de Acesso") — controla quais modulos aparecem/somem no menu. "Acesso completo" = todos os modulos visiveis. Isso esta funcionando corretamente.
 
-**2. `LandingNavbar.tsx` — Ajustar para hero escuro**
-- Quando nao scrollado: texto branco (`text-white/80`) sobre hero navy
-- Quando scrollado: manter blur backdrop atual
-- Botao CTA no navbar: `bg-white text-navy` (invertido sobre fundo escuro)
+2. **Plano de assinatura** (Free/Pro/Business) — bloqueia modulos premium com o icone de diamante dourado. "Fechamento", "Recompensas", "Financeiro", "Fichas Tecnicas" etc exigem plano Pro. Funcionarios herdam o plano do dono da loja.
 
-**3. `ProblemSection.tsx` — Cards modernos**
-- Manter `card-interactive` mas com layout horizontal (icone a esquerda, texto a direita)
-- Fundo com gradiente sutil
+O que acontece: a loja esta no plano **Free**, entao mesmo com "acesso completo", os modulos Pro ficam bloqueados com cadeado. Isso e esperado — acesso completo libera visibilidade, mas o plano limita funcionalidade.
 
-**4. `SolutionSection.tsx` — Passos numerados modernos**
-- Manter os 3 passos com screenshots reais mas usar cards mais modernos com cantos maiores e sombras mais profundas
-- Grid de modulos com `card-surface` e hover elevado
+---
 
-**5. `PricingSection.tsx` — Ja esta ok, manter**
+### Onde gerenciar niveis de acesso
 
-**6. `CTASection.tsx` — Ja usa `finance-hero-card`, manter**
+**Configuracoes > Equipe > aba "Niveis de Acesso"**. La voce pode:
+- Criar niveis customizados (ex: "Gerente Operacional") selecionando quais modulos ficam visiveis
+- Atribuir niveis a cada usuario
 
-**7. `FAQSection.tsx` — Ja esta ok, manter**
+---
 
-### Arquivos a modificar:
+### Melhoria de UX proposta
+
+Para evitar essa confusao, posso melhorar a interface:
+
+1. **`MoreDrawer.tsx`** — Diferenciar visualmente bloqueios de plano vs acesso. Modulos bloqueados por plano mostram "PRO" ou "BUSINESS" em amarelo. Modulos bloqueados por acesso simplesmente nao aparecem (ja funciona assim).
+
+2. **`MoreDrawer.tsx`** — Quando o usuario clica num modulo bloqueado por plano, mostrar um toast explicativo ("Este modulo requer plano Pro. Fale com o administrador.") em vez de redirecionar direto para /plans (que nao faz sentido para funcionarios).
+
+3. **`AccessLevelSettings.tsx`** — Adicionar um aviso visual nos modulos que exigem plano pago, para que o admin saiba que mesmo liberando no nivel de acesso, o plano precisa cobrir.
+
+### Arquivos a modificar
 | Arquivo | Mudanca |
 |---------|---------|
-| `src/components/landing/HeroSection.tsx` | Rewrite: fundo navy full-width, split layout texto+screenshot, feature badges |
-| `src/components/landing/LandingNavbar.tsx` | Texto branco no hero, invertido no scroll |
-| `src/components/landing/ProblemSection.tsx` | Cards horizontais modernos |
-| `src/components/landing/SolutionSection.tsx` | Screenshots com frame moderno, modulos grid atualizado |
-
-### Detalhes do Hero (mudanca principal):
-- Container: `finance-hero-card` como classe no section inteiro (navy animado + shine)
-- Grid: `md:grid-cols-2` com texto left + imagem right
-- Screenshot: `dashboard-mockup.png` com `transform: perspective(1000px) rotateY(-5deg)` e sombra profunda
-- Feature badges: 3 cards inline com icone, titulo e descricao curta (`bg-white/10 border-white/15`)
-- Botao: `bg-white text-[hsl(220,30%,15%)]` com hover scale
+| `src/components/layout/MoreDrawer.tsx` | Toast explicativo para funcionarios em modulos bloqueados por plano |
+| `src/components/settings/AccessLevelSettings.tsx` | Badge "PRO"/"BUSINESS" ao lado dos modulos que exigem plano pago |
 
