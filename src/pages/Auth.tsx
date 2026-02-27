@@ -161,6 +161,14 @@ export default function Auth() {
     }
   }, []);
 
+  // Auto-switch to signup mode after Stripe payment
+  useEffect(() => {
+    if (paymentSuccess === 'success' && planFromUrl) {
+      setIsLogin(false);
+      toast.success(`Pagamento confirmado! Crie sua conta para ativar o plano ${planFromUrl.charAt(0).toUpperCase() + planFromUrl.slice(1)}.`);
+    }
+  }, []);
+
   useEffect(() => {
     if (user && !isLoading && !isNewPassword) {
       navigate('/', { replace: true });
