@@ -29,7 +29,7 @@ const UnitContext = createContext<UnitContextType | undefined>(undefined);
 const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
-  const { user, isSuperAdmin, isLoading: authLoading } = useAuth();
+  const { user, isSuperAdmin, isLoading: authLoading, setEffectivePlan } = useAuth();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -196,6 +196,18 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const effectiveLoading = isLoading || authLoading;
 
   const activeUnit = units.find(u => u.id === activeUnitId) || null;
+
+  // Resolve effective plan from unit owner whenever activeUnitId changes
+  useEffect(() => {
+    if (!activeUnitId) return;
+    let cancelled = false;
+    supabase.rpc('get_unit_plan', { p_unit_id: activeUnitId }).then(({ data }) => {
+      if (!cancelled && data) {
+        setEffectivePlan(data as any);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [activeUnitId, setEffectivePlan]);
 
   // Apply theme when activeUnit changes
   useEffect(() => {

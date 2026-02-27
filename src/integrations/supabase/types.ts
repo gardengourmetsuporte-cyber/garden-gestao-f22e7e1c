@@ -4279,6 +4279,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_unit_plan: { Args: { p_unit_id: string }; Returns: string }
       get_user_unit_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {

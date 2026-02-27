@@ -20,6 +20,7 @@ interface AuthContextType {
   isBusiness: boolean;
   isFree: boolean;
   hasPlan: (required: PlanTier) => boolean;
+  setEffectivePlan: (plan: PlanTier) => void;
   refreshSubscription: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string, redirectTo?: string) => Promise<{ error: Error | null }>;
@@ -252,6 +253,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hasPlan = useCallback((required: PlanTier) => planSatisfies(plan, required), [plan]);
 
+  const setEffectivePlan = useCallback((newPlan: PlanTier) => {
+    setPlan(newPlan);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -269,6 +274,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isBusiness,
         isFree,
         hasPlan,
+        setEffectivePlan,
         refreshSubscription,
         signIn,
         signUp,
