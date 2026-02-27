@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { useEffect } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -118,9 +118,32 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
     navigate('/auth');
   };
 
+  // Lock body scroll when open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [open]);
+
+  if (!open) return null;
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-[calc(100dvh-72px-env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-72px-env(safe-area-inset-bottom,0px))] overflow-hidden rounded-none border-0 [&>div:first-child]:hidden" style={{ background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)', bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}>
+    <>
+      {/* Overlay */}
+      <div
+        className="fixed inset-0 z-40 bg-black/60 animate-fade-in"
+        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
+        onClick={() => onOpenChange(false)}
+      />
+      {/* Panel */}
+      <div
+        className="fixed inset-x-0 top-0 z-50 overflow-hidden flex flex-col animate-fade-in"
+        style={{
+          bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
+          background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)',
+        }}
+      >
         <div className="overflow-y-auto h-full">
           {/* Navy gradient header area */}
           <div
@@ -315,7 +338,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           </div>
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </>
   );
 }
