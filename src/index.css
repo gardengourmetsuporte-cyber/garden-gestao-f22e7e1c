@@ -416,9 +416,28 @@
     --gp-negative: hsl(0 70% 65%);
   }
 
+  /* Shine sweep overlay */
+  .finance-hero-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 25%,
+      hsl(234 100% 85% / 0.05) 45%,
+      hsl(220 100% 95% / 0.10) 50%,
+      hsl(234 100% 85% / 0.05) 55%,
+      transparent 75%
+    );
+    background-size: 250% 100%;
+    animation: cardShineSwipe 6s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
   .finance-hero-card:hover {
     transform: scale(1.01);
-    box-shadow: 0 8px 32px hsl(240 10% 8% / 0.35);
+    box-shadow: 0 8px 36px hsl(234 60% 15% / 0.5), 0 0 50px hsl(234 70% 35% / 0.18);
   }
 
   .finance-hero-card:active {
