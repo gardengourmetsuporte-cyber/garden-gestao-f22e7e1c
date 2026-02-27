@@ -1,24 +1,6 @@
 import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
-import { 
-  Plus, 
-  Trash2, 
-  Edit2, 
-  ChevronDown, 
-  ChevronRight,
-  
-  Folder,
-  FileText,
-  Calendar,
-  CalendarDays,
-  CalendarRange,
-  Sun,
-  Moon,
-  Star,
-  Zap,
-  Check,
-  X
-} from 'lucide-react';
+import { ChevronDown as SelectChevron } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -43,7 +25,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ListPicker, ListPickerItem } from '@/components/ui/list-picker';
-import { ChevronDown as SelectChevron } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getPointsColors, clampPoints, getBonusPointsColors } from '@/lib/points';
 
@@ -60,16 +41,16 @@ const sectorIconOptions = [
   'Heart', 'Shield', 'Settings', 'Leaf',
 ];
 
-const frequencyOptions: { value: ItemFrequency; label: string; icon: typeof Calendar }[] = [
-  { value: 'daily', label: 'Diária', icon: Calendar },
-  { value: 'weekly', label: 'Semanal', icon: CalendarDays },
-  { value: 'monthly', label: 'Mensal', icon: CalendarRange },
+const frequencyOptions: { value: ItemFrequency; label: string; iconName: string }[] = [
+  { value: 'daily', label: 'Diária', iconName: 'calendar_today' },
+  { value: 'weekly', label: 'Semanal', iconName: 'date_range' },
+  { value: 'monthly', label: 'Mensal', iconName: 'calendar_month' },
 ];
 
-const checklistTypeOptions: { value: ChecklistType; label: string; icon: typeof Sun }[] = [
-  { value: 'abertura', label: 'Abertura', icon: Sun },
-  { value: 'fechamento', label: 'Fechamento', icon: Moon },
-  { value: 'bonus', label: 'Bônus', icon: Zap },
+const checklistTypeOptions: { value: ChecklistType; label: string; iconName: string }[] = [
+  { value: 'abertura', label: 'Abertura', iconName: 'wb_sunny' },
+  { value: 'fechamento', label: 'Fechamento', iconName: 'dark_mode' },
+  { value: 'bonus', label: 'Bônus', iconName: 'bolt' },
 ];
 
 const pointsOptions = [
@@ -226,11 +207,11 @@ export function ChecklistSettings({
     return checklistTypeOptions.find(t => t.value === type)?.label || 'Abertura';
   };
 
-  const getChecklistTypeIcon = (type: ChecklistType) => {
+  const getChecklistTypeIconName = (type: ChecklistType) => {
     switch (type) {
-      case 'abertura': return Sun;
-      case 'fechamento': return Moon;
-      default: return Sun;
+      case 'abertura': return 'wb_sunny';
+      case 'fechamento': return 'dark_mode';
+      default: return 'wb_sunny';
     }
   };
 
@@ -394,7 +375,7 @@ export function ChecklistSettings({
         className="w-full gap-2"
         variant="outline"
       >
-        <Plus className="w-4 h-4" />
+        <AppIcon name="add" size={16} />
         Novo Setor
       </Button>
 
@@ -442,7 +423,7 @@ export function ChecklistSettings({
                           className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary"
                           title="Adicionar subcategoria"
                         >
-                          <Plus className="w-4 h-4" />
+                          <AppIcon name="add" size={16} />
                         </button>
                       )}
                       {isBonusMode && (
@@ -457,25 +438,25 @@ export function ChecklistSettings({
                           className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary"
                           title="Adicionar tarefa"
                         >
-                          <Plus className="w-4 h-4" />
+                          <AppIcon name="add" size={16} />
                         </button>
                       )}
                       <button
                         onClick={() => handleOpenSectorSheet(sector)}
                         className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <AppIcon name="edit" size={16} />
                       </button>
                       <button
                         onClick={() => onDeleteSector(sector.id)}
                         className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <AppIcon name="delete" size={16} />
                       </button>
                       {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        <AppIcon name="expand_more" size={16} className="text-muted-foreground" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        <AppIcon name="chevron_right" size={16} className="text-muted-foreground" />
                       )}
                     </div>
                   </div>
@@ -525,7 +506,7 @@ export function ChecklistSettings({
                                           }}
                                         >
                                           {item.points > 0 ? (
-                                            <span className="flex items-center gap-0.5"><Zap className="w-3 h-3" />{item.points}</span>
+                                            <span className="flex items-center gap-0.5"><AppIcon name="bolt" size={12} />{item.points}</span>
                                           ) : (
                                             <span className="text-muted-foreground">—</span>
                                           )}
@@ -547,21 +528,21 @@ export function ChecklistSettings({
                                             )}
                                             title={item.is_active ? 'Desativar' : 'Ativar'}
                                           >
-                                            {item.is_active ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                                          {item.is_active ? <AppIcon name="check" size={14} /> : <AppIcon name="close" size={14} />}
                                           </button>
                                           <button
                                             onClick={() => handleOpenItemSheet((item as any)._subcategoryId, item)}
                                             className="w-7 h-7 rounded-lg flex items-center justify-center bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                                             title="Editar"
                                           >
-                                            <Edit2 className="w-3.5 h-3.5" />
+                                            <AppIcon name="edit" size={14} />
                                           </button>
                                           <button
                                             onClick={() => onDeleteItem(item.id)}
                                             className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                                             title="Excluir"
                                           >
-                                            <Trash2 className="w-3.5 h-3.5" />
+                                            <AppIcon name="delete" size={14} />
                                           </button>
                                         </div>
                                       </SortableItem>
@@ -605,10 +586,10 @@ export function ChecklistSettings({
                                           </span>
                                         </button>
                                         <div className="flex items-center gap-1">
-                                          <button onClick={() => handleOpenItemSheet(subcategory.id)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-primary" title="Adicionar item"><Plus className="w-3 h-3" /></button>
-                                          <button onClick={() => handleOpenSubcategorySheet(sector.id, subcategory)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground"><Edit2 className="w-3 h-3" /></button>
-                                          <button onClick={() => onDeleteSubcategory(subcategory.id)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"><Trash2 className="w-3 h-3" /></button>
-                                          {isSubExpanded ? <ChevronDown className="w-3 h-3 text-muted-foreground" /> : <ChevronRight className="w-3 h-3 text-muted-foreground" />}
+                                          <button onClick={() => handleOpenItemSheet(subcategory.id)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-primary" title="Adicionar item"><AppIcon name="add" size={12} /></button>
+                                          <button onClick={() => handleOpenSubcategorySheet(sector.id, subcategory)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground"><AppIcon name="edit" size={12} /></button>
+                                          <button onClick={() => onDeleteSubcategory(subcategory.id)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"><AppIcon name="delete" size={12} /></button>
+                                          {isSubExpanded ? <AppIcon name="expand_more" size={12} className="text-muted-foreground" /> : <AppIcon name="chevron_right" size={12} className="text-muted-foreground" />}
                                         </div>
                                       </div>
 
@@ -646,7 +627,7 @@ export function ChecklistSettings({
                                                         }}
                                                       >
                                                         {item.points > 0 ? (
-                                                          <span className="flex items-center gap-0.5"><Star className="w-3 h-3" />{item.points}</span>
+                                                          <span className="flex items-center gap-0.5"><AppIcon name="star" size={12} />{item.points}</span>
                                                         ) : (
                                                           <span className="text-muted-foreground">—</span>
                                                         )}
@@ -668,21 +649,21 @@ export function ChecklistSettings({
                                                           )}
                                                           title={item.is_active ? 'Desativar' : 'Ativar'}
                                                         >
-                                                          {item.is_active ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                                                          {item.is_active ? <AppIcon name="check" size={14} /> : <AppIcon name="close" size={14} />}
                                                         </button>
                                                         <button
                                                           onClick={() => handleOpenItemSheet(subcategory.id, item)}
                                                           className="w-7 h-7 rounded-lg flex items-center justify-center bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                                                           title="Editar"
                                                         >
-                                                          <Edit2 className="w-3.5 h-3.5" />
+                                                          <AppIcon name="edit" size={14} />
                                                         </button>
                                                         <button
                                                           onClick={() => onDeleteItem(item.id)}
                                                           className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                                                           title="Excluir"
                                                         >
-                                                          <Trash2 className="w-3.5 h-3.5" />
+                                                          <AppIcon name="delete" size={14} />
                                                         </button>
                                                       </div>
                                                     </SortableItem>
@@ -718,7 +699,7 @@ export function ChecklistSettings({
 
       {sectors.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
-          <Folder className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <AppIcon name="folder" size={48} className="mx-auto mb-3 opacity-50" />
           <p className="font-medium">Nenhum setor configurado</p>
           <p className="text-sm mt-1">Clique em "Novo Setor" para começar</p>
         </div>
@@ -860,7 +841,7 @@ export function ChecklistSettings({
                 className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
               >
                 <div className="flex items-center gap-2">
-                  {(() => { const opt = frequencyOptions.find(f => f.value === itemFrequency); return opt ? <><opt.icon className="w-4 h-4" />{opt.label}</> : 'Selecione'; })()}
+                  {(() => { const opt = frequencyOptions.find(f => f.value === itemFrequency); return opt ? <><AppIcon name={opt.iconName} size={16} />{opt.label}</> : 'Selecione'; })()}
                 </div>
                 <SelectChevron className="w-4 h-4 text-muted-foreground" />
               </button>
@@ -883,7 +864,7 @@ export function ChecklistSettings({
                 className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
               >
                 <div className="flex items-center gap-2">
-                  {(() => { const opt = checklistTypeOptions.find(t => t.value === itemChecklistType); return opt ? <><opt.icon className="w-4 h-4" />{opt.label}</> : 'Selecione'; })()}
+                  {(() => { const opt = checklistTypeOptions.find(t => t.value === itemChecklistType); return opt ? <><AppIcon name={opt.iconName} size={16} />{opt.label}</> : 'Selecione'; })()}
                 </div>
                 <SelectChevron className="w-4 h-4 text-muted-foreground" />
               </button>
@@ -914,7 +895,7 @@ export function ChecklistSettings({
                       className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
                     >
                       <div className="flex items-center gap-2" style={style}>
-                        <Star className="w-4 h-4" style={{ ...style, fill: style.color as string }} />
+                        <AppIcon name="star" size={16} style={{ ...style, fill: style.color as string }} />
                         {currentOptions.find(p => p.value === itemPoints)?.label || `${itemPoints} pontos`}
                       </div>
                       <SelectChevron className="w-4 h-4 text-muted-foreground" />
