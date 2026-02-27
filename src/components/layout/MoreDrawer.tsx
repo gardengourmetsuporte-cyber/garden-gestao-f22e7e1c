@@ -15,6 +15,7 @@ import { getModuleKeyFromRoute } from '@/lib/modules';
 import { MODULE_REQUIRED_PLAN, PRODUCTION_MODULES, planSatisfies } from '@/lib/plans';
 import type { PlanTier } from '@/lib/plans';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { toast } from 'sonner';
 
 interface NavItem {
   icon: string;
@@ -213,8 +214,16 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                     return (
                       <Link
                         key={item.href}
-                        to={locked ? '/plans' : item.href}
-                        onClick={() => onOpenChange(false)}
+                        to={locked ? (isAdmin ? '/plans' : '#') : item.href}
+                        onClick={(e) => {
+                          if (locked && !isAdmin) {
+                            e.preventDefault();
+                            toast.info(`Este módulo requer plano ${planLabel}.`, {
+                              description: 'Fale com o administrador da loja para fazer o upgrade.',
+                            });
+                          }
+                          onOpenChange(false);
+                        }}
                         className={cn(
                           "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
                           active

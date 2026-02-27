@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAccessLevels, AccessLevel } from '@/hooks/useAccessLevels';
 import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { ALL_MODULES } from '@/lib/modules';
+import { MODULE_REQUIRED_PLAN } from '@/lib/plans';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -284,6 +285,11 @@ export function AccessLevelSettings() {
                           <Checkbox checked={formModules.includes(mod.key)} className="h-3.5 w-3.5 pointer-events-none" />
                           <AppIcon name={mod.icon} size={14} />
                           <span className="truncate">{mod.label}</span>
+                          {MODULE_REQUIRED_PLAN[mod.key] && (
+                            <span className="text-[8px] font-bold uppercase tracking-wider ml-auto shrink-0" style={{ color: 'hsl(45 90% 55%)' }}>
+                              {MODULE_REQUIRED_PLAN[mod.key] === 'business' ? 'BIZ' : 'PRO'}
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
