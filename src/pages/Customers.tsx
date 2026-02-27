@@ -120,9 +120,9 @@ export default function Customers() {
     <AppLayout>
       <div className="px-4 py-3 lg:px-6 space-y-4 pb-24">
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-5 gap-2">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
           {STAT_ITEMS.map(s => (
-            <div key={s.key} className="card-surface rounded-xl p-3 flex flex-col items-center gap-1">
+            <div key={s.key} className="shrink-0 min-w-[72px] flex-1 card-surface rounded-xl p-3 flex flex-col items-center gap-1">
               <span className="material-symbols-rounded text-muted-foreground" style={{ fontSize: 18 }}>
                 {s.icon}
               </span>
@@ -191,7 +191,7 @@ export default function Customers() {
             subtitle={search || segmentFilter ? 'Nenhum resultado para os filtros.' : 'Cadastre seu primeiro cliente ou importe um CSV.'}
           />
         ) : (
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
             {filtered.map(c => (
               <CustomerCard
                 key={c.id}
