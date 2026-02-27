@@ -183,36 +183,30 @@ export default function Recipes() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-4">
-          {/* Action row */}
-          <div className="flex items-center justify-end">
-            <button onClick={handleCreate} className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform">
-              <AppIcon name="Plus" size={20} />
-            </button>
-          </div>
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2">
-            <div className="stat-command stat-command-purple">
-              <div className="flex flex-col items-center text-center">
-                <div className="stat-icon bg-primary/10 mb-1">
-                  <AppIcon name="ChefHat" size={20} className="text-primary" />
+            <div className="rounded-2xl border bg-card p-3">
+              <div className="flex flex-col items-center text-center gap-1">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="ChefHat" size={18} className="text-primary" />
                 </div>
                 <p className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{stats.total}</p>
                 <p className="text-[10px] text-muted-foreground">Receitas</p>
               </div>
             </div>
-            <div className="stat-command stat-command-green">
-              <div className="flex flex-col items-center text-center">
-                <div className="stat-icon bg-success/10 mb-1">
-                  <AppIcon name="DollarSign" size={20} className="text-success" />
+            <div className="rounded-2xl border bg-card p-3">
+              <div className="flex flex-col items-center text-center gap-1">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                  <AppIcon name="DollarSign" size={18} className="text-emerald-500" />
                 </div>
                 <p className="text-lg font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{formatCurrency(stats.avgCost)}</p>
                 <p className="text-[10px] text-muted-foreground">Custo Médio</p>
               </div>
             </div>
-            <div className="stat-command">
-              <div className="flex flex-col items-center text-center">
-                <div className="stat-icon bg-muted mb-1">
-                  <AppIcon name="Archive" size={20} className="text-muted-foreground" />
+            <div className="rounded-2xl border bg-card p-3">
+              <div className="flex flex-col items-center text-center gap-1">
+                <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
+                  <AppIcon name="Archive" size={18} className="text-muted-foreground" />
                 </div>
                 <p className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>{stats.inactive}</p>
                 <p className="text-[10px] text-muted-foreground">Inativas</p>
