@@ -57,22 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<PlanTier>((cached?.plan as PlanTier) ?? 'free');
   const [planStatus, setPlanStatus] = useState<string>(cached?.planStatus ?? 'active');
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  // Always start loading until initial session check completes
   const [isLoading, setIsLoading] = useState(true);
   const subIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchUserDataRef = useRef<(userId: string) => Promise<void>>();
-
-  // Safety net: never keep auth loading forever on app resume/network edge-cases
-  useEffect(() => {
-    if (!isLoading) return;
-
-    const timeoutId = window.setTimeout(() => {
-      console.warn('[AuthContext] Loading watchdog released after timeout');
-      setIsLoading(false);
-    }, 12000);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isLoading]);
+  // Track whether a fetchUserData call is in-flight to prevent double calls
+  const fetchingRef = useRef(false);
 
   const refreshSubscription = useCallback(async () => {
     try {
@@ -86,7 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setPlan(newPlan);
         setPlanStatus(data.subscribed ? 'active' : 'canceled');
         setSubscriptionEnd(data.subscription_end || null);
-        // Update cache
         setCachedAuth(profile, role, newPlan, data.subscribed ? 'active' : 'canceled');
       }
     } catch (err) {
@@ -95,49 +83,92 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [profile, role]);
 
   useEffect(() => {
-    let initialSessionHandled = false;
+    let isMounted = true;
+
+    async function fetchUserData(userId: string) {
+      // Deduplicate: skip if already fetching
+      if (fetchingRef.current) return;
+      fetchingRef.current = true;
+
+      try {
+        const [profileResult, roleResult] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .maybeSingle(),
+          supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', userId),
+        ]);
+
+        if (!isMounted) return;
+
+        const p = profileResult.data as any;
+
+        const ROLE_PRIORITY: Record<string, number> = { super_admin: 3, admin: 2, funcionario: 1 };
+        const rolesData = (roleResult.data as { role: AppRole }[] | null) ?? [];
+        const r: AppRole = rolesData.length > 0
+          ? rolesData.reduce((best, cur) => (ROLE_PRIORITY[cur.role] ?? 0) > (ROLE_PRIORITY[best.role] ?? 0) ? cur : best).role
+          : 'funcionario';
+
+        const profilePlan = (p?.plan as PlanTier) || 'free';
+        const profilePlanStatus = p?.plan_status || 'active';
+
+        setProfile(p as Profile | null);
+        setRole(r);
+        setPlan(profilePlan);
+        setPlanStatus(profilePlanStatus);
+        setCachedAuth(p, r, profilePlan, profilePlanStatus);
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+      } finally {
+        fetchingRef.current = false;
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    // Keep ref in sync for visibilitychange handler
+    fetchUserDataRef.current = fetchUserData;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'INITIAL_SESSION' && initialSessionHandled) return;
-
-        if (event === 'TOKEN_REFRESHED') {
-          setSession(session);
-          setUser(session?.user ?? null);
+        if (event === 'TOKEN_REFRESHED' || event === 'PASSWORD_RECOVERY') {
+          if (isMounted) {
+            setSession(session);
+            setUser(session?.user ?? null);
+          }
           return;
         }
 
-        if (event === 'PASSWORD_RECOVERY') {
+        if (isMounted) {
           setSession(session);
           setUser(session?.user ?? null);
-          return;
         }
 
-        setSession(session);
-        setUser(session?.user ?? null);
-        
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserData(session.user.id);
-          }, 0);
+          // Use setTimeout to avoid Supabase deadlock warning
+          setTimeout(() => fetchUserData(session.user.id), 0);
         } else if (event === 'SIGNED_OUT') {
-          setProfile(null);
-          setRole(null);
-          setPlan('free');
-          setPlanStatus('active');
-          setSubscriptionEnd(null);
-          setIsLoading(false);
+          if (isMounted) {
+            setProfile(null);
+            setRole(null);
+            setPlan('free');
+            setPlanStatus('active');
+            setSubscriptionEnd(null);
+            setIsLoading(false);
+          }
         }
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      initialSessionHandled = true;
+      if (!isMounted) return;
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
-        // If we have cached profile data, stop loading immediately (profile fetch is background)
         if (cached) {
           setIsLoading(false);
         }
@@ -146,12 +177,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearCachedAuth();
         setIsLoading(false);
       }
+    }).catch((err) => {
+      console.error('[AuthContext] getSession failed:', err);
+      if (isMounted) {
+        clearCachedAuth();
+        setIsLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  // Poll subscription every 60s when logged in
+  // Poll subscription every 5min when logged in
   useEffect(() => {
     if (user) {
       const timeout = setTimeout(() => refreshSubscription(), 5000);
@@ -175,47 +215,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [user]);
-
-  async function fetchUserData(userId: string) {
-    try {
-      const [profileResult, roleResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', userId)
-          .maybeSingle(),
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId),
-      ]);
-      
-      const p = profileResult.data as any;
-      
-      // Pick highest priority role from all roles
-      const ROLE_PRIORITY: Record<string, number> = { super_admin: 3, admin: 2, funcionario: 1 };
-      const rolesData = (roleResult.data as { role: AppRole }[] | null) ?? [];
-      const r: AppRole = rolesData.length > 0
-        ? rolesData.reduce((best, cur) => (ROLE_PRIORITY[cur.role] ?? 0) > (ROLE_PRIORITY[best.role] ?? 0) ? cur : best).role
-        : 'funcionario';
-      
-      const profilePlan = (p?.plan as PlanTier) || 'free';
-      const profilePlanStatus = p?.plan_status || 'active';
-      
-      setProfile(p as Profile | null);
-      setRole(r);
-      setPlan(profilePlan);
-      setPlanStatus(profilePlanStatus);
-      setCachedAuth(p, r, profilePlan, profilePlanStatus);
-    } catch (err) {
-      console.error('Failed to fetch user data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  // Keep ref in sync for visibilitychange handler
-  fetchUserDataRef.current = fetchUserData;
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
