@@ -24,7 +24,9 @@ function BrandPanel() {
     <div
       className="hidden md:flex md:w-1/2 relative flex-col items-center justify-center overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, hsl(222 47% 6%), hsl(222 47% 11%), hsl(234 50% 14%))',
+        background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
+        backgroundSize: '350% 350%',
+        animation: 'navyCardFlow 12s ease-in-out infinite',
       }}
     >
       {/* Orb top-left */}
@@ -105,7 +107,12 @@ function BrandPanel() {
 // ── Mobile Brand Header ────────────────────────────────────────────
 function MobileBrandHeader() {
   return (
-    <div className="flex md:hidden flex-col items-center gap-4 pt-14 pb-2">
+    <div className="flex md:hidden flex-col items-center gap-4 pt-14 pb-2 mx-4 rounded-2xl px-6 py-6"
+      style={{
+        background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
+        backgroundSize: '350% 350%',
+        animation: 'navyCardFlow 12s ease-in-out infinite',
+      }}>
       <div
         className="relative w-20 h-20 rounded-full overflow-hidden flex items-center justify-center"
         style={{
@@ -126,8 +133,8 @@ function MobileBrandHeader() {
         </div>
       </div>
       <div className="text-center space-y-1">
-        <h1 className="text-2xl font-extrabold text-foreground tracking-tight font-display">Garden</h1>
-        <p className="text-xs text-muted-foreground tracking-widest uppercase">Gestão Inteligente</p>
+        <h1 className="text-2xl font-extrabold text-white tracking-tight font-display">Garden</h1>
+        <p className="text-xs text-white/60 tracking-widest uppercase">Gestão Inteligente</p>
       </div>
     </div>
   );
