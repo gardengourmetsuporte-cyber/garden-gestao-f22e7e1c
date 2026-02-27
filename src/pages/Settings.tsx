@@ -1,21 +1,26 @@
+import { lazy, Suspense } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
-import { ProfileSettings } from '@/components/settings/ProfileSettings';
-import { CategorySettings } from '@/components/settings/CategorySettings';
-import { SupplierSettings } from '@/components/settings/SupplierSettings';
-import { ChecklistSettingsManager } from '@/components/settings/ChecklistSettingsManager';
-import { RewardSettings } from '@/components/settings/RewardSettings';
-import { PaymentMethodSettings } from '@/components/settings/PaymentMethodSettings';
-import { RecipeCostSettings } from '@/components/settings/RecipeCostSettings';
-import { UnitManagement } from '@/components/settings/UnitManagement';
-import { TeamHub } from '@/components/settings/TeamHub';
-import { MedalSettings } from '@/components/settings/MedalSettings';
-import { NotificationSettings } from '@/components/settings/NotificationSettings';
-import { AuditLogSettings } from '@/components/settings/AuditLogSettings';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { PlanTier } from '@/lib/plans';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Lazy-loaded setting components
+const ProfileSettings = lazy(() => import('@/components/settings/ProfileSettings').then(m => ({ default: m.ProfileSettings })));
+const CategorySettings = lazy(() => import('@/components/settings/CategorySettings').then(m => ({ default: m.CategorySettings })));
+const SupplierSettings = lazy(() => import('@/components/settings/SupplierSettings').then(m => ({ default: m.SupplierSettings })));
+const ChecklistSettingsManager = lazy(() => import('@/components/settings/ChecklistSettingsManager').then(m => ({ default: m.ChecklistSettingsManager })));
+const RewardSettings = lazy(() => import('@/components/settings/RewardSettings').then(m => ({ default: m.RewardSettings })));
+const PaymentMethodSettings = lazy(() => import('@/components/settings/PaymentMethodSettings').then(m => ({ default: m.PaymentMethodSettings })));
+const RecipeCostSettings = lazy(() => import('@/components/settings/RecipeCostSettings').then(m => ({ default: m.RecipeCostSettings })));
+const UnitManagement = lazy(() => import('@/components/settings/UnitManagement').then(m => ({ default: m.UnitManagement })));
+const TeamHub = lazy(() => import('@/components/settings/TeamHub').then(m => ({ default: m.TeamHub })));
+const MedalSettings = lazy(() => import('@/components/settings/MedalSettings').then(m => ({ default: m.MedalSettings })));
+const NotificationSettings = lazy(() => import('@/components/settings/NotificationSettings').then(m => ({ default: m.NotificationSettings })));
+const AuditLogSettings = lazy(() => import('@/components/settings/AuditLogSettings').then(m => ({ default: m.AuditLogSettings })));
 
 interface MenuItem {
   value: string;
@@ -24,34 +29,43 @@ interface MenuItem {
   description: string;
   variant: string;
   section: string;
+  requiredPlan: PlanTier;
 }
 
 const allMenuItems: MenuItem[] = [
-  { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta' },
-  { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta' },
-  { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta' },
-  { value: 'team', icon: 'Users', label: 'Equipe', description: 'Membros, convites e níveis de acesso', variant: 'cyan', section: 'Conta' },
-  { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação' },
-  { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'amber', section: 'Operação' },
-  { value: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'amber', section: 'Operação' },
-  { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'amber', section: 'Operação' },
-  { value: 'costs', icon: 'Calculator', label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'amber', section: 'Operação' },
-  { value: 'rewards', icon: 'Gift', label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'purple', section: 'Sistema' },
-  { value: 'medals', icon: 'Award', label: 'Medalhas', description: 'Conceder medalhas de prestígio', variant: 'purple', section: 'Sistema' },
-  { value: 'units', icon: 'Store', label: 'Lojas', description: 'Gerenciar suas lojas', variant: 'purple', section: 'Sistema' },
-  { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema' },
+  { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  { value: 'team', icon: 'Users', label: 'Equipe', description: 'Membros, convites e níveis de acesso', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
+  { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
+  { value: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
+  { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
+  { value: 'costs', icon: 'Calculator', label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
+  { value: 'rewards', icon: 'Gift', label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
+  { value: 'medals', icon: 'Award', label: 'Medalhas', description: 'Conceder medalhas de prestígio', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
+  { value: 'units', icon: 'Store', label: 'Lojas', description: 'Gerenciar suas lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
+  { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
 ];
 
-const variantColors: Record<string, string> = {
-  cyan: 'hsl(var(--neon-cyan))',
-  green: 'hsl(var(--neon-green))',
-  red: 'hsl(var(--neon-red))',
-  amber: 'hsl(var(--neon-amber))',
-  purple: 'hsl(var(--neon-purple))',
+function SettingsFallback() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="h-10 w-48" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+    </div>
+  );
+}
+
+const PLAN_LABELS: Record<PlanTier, string> = {
+  free: '',
+  pro: 'PRO',
+  business: 'BUSINESS',
 };
 
 export default function SettingsPage() {
-  const { isAdmin, isSuperAdmin } = useAuth();
+  const { isAdmin, isSuperAdmin, hasPlan } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -65,8 +79,12 @@ export default function SettingsPage() {
     return isAdmin;
   });
 
-  const handleSectionClick = (value: string) => {
+  const handleSectionClick = (value: string, requiredPlan: PlanTier) => {
     if (value === 'plan') {
+      navigate('/plans');
+      return;
+    }
+    if (!hasPlan(requiredPlan)) {
       navigate('/plans');
       return;
     }
@@ -101,6 +119,7 @@ export default function SettingsPage() {
           </header>
 
           <div className="px-4 py-3 lg:px-6 pb-24">
+            <Suspense fallback={<SettingsFallback />}>
               {activeSection === 'profile' && <ProfileSettings />}
               {activeSection === 'categories' && <CategorySettings />}
               {activeSection === 'suppliers' && <SupplierSettings />}
@@ -113,6 +132,7 @@ export default function SettingsPage() {
               {activeSection === 'medals' && <MedalSettings />}
               {activeSection === 'notifications' && <NotificationSettings />}
               {activeSection === 'audit-log' && <AuditLogSettings />}
+            </Suspense>
           </div>
         </div>
       </AppLayout>
@@ -128,16 +148,30 @@ export default function SettingsPage() {
             <div key={section.label}>
               <h3 className="section-label mb-1 px-1">{section.label}</h3>
               <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
-                {section.items.map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => handleSectionClick(item.value)}
-                    className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
-                  >
-                    <span className="font-medium text-sm text-foreground">{item.label}</span>
-                    <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-                  </button>
-                ))}
+                {section.items.map((item) => {
+                  const locked = !hasPlan(item.requiredPlan);
+                  const planLabel = PLAN_LABELS[item.requiredPlan];
+                  return (
+                    <button
+                      key={item.value}
+                      onClick={() => handleSectionClick(item.value, item.requiredPlan)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors",
+                        locked && "opacity-50"
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className={cn("font-medium text-sm", locked ? "text-muted-foreground" : "text-foreground")}>{item.label}</span>
+                        {locked && planLabel && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-full">
+                            💎 {planLabel}
+                          </span>
+                        )}
+                      </span>
+                      <AppIcon name={locked ? "Lock" : "ChevronRight"} size={16} className="text-muted-foreground shrink-0" />
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
