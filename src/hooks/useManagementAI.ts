@@ -322,6 +322,13 @@ export function useManagementAI() {
     }
   }, [user, activeUnitId, stats, dayOfWeek, timeOfDay]);
 
+  // Enrich contextStats in background with full data (tasks, invoices, checklist)
+  // Must come AFTER fetchFullContext definition to avoid temporal dead zone
+  useEffect(() => {
+    if (!user || !activeUnitId) return;
+    fetchFullContext().catch(() => {});
+  }, [user, activeUnitId, fetchFullContext]);
+
   const sendMessage = useCallback(async (question?: string, imageBase64?: string) => {
     setIsLoading(true);
 
