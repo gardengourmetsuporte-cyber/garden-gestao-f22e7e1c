@@ -225,7 +225,7 @@ export function AccessLevelSettings() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isCreating} onOpenChange={setIsCreating}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto w-[calc(100%-2rem)] sm:w-full rounded-2xl">
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto w-[calc(100%-2rem)] sm:w-full rounded-2xl mx-auto">
           <DialogHeader>
             <DialogTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</DialogTitle>
           </DialogHeader>
@@ -270,21 +270,21 @@ export function AccessLevelSettings() {
                       />
                       {group.label}
                     </button>
-                    <div className="grid grid-cols-2 gap-1.5 pl-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pl-1">
                       {group.modules.map(mod => (
                         <button
                           key={mod.key}
                           onClick={() => toggleModule(mod.key)}
                           className={cn(
-                            "flex items-center gap-2 p-2 rounded-lg text-left transition-all text-xs",
+                            "flex items-center gap-2 p-2 rounded-lg text-left transition-all text-xs w-full",
                             formModules.includes(mod.key)
                               ? "bg-primary/10 border border-primary/30 text-foreground"
                               : "bg-secondary/40 border border-border/20 text-muted-foreground"
                           )}
                         >
-                          <Checkbox checked={formModules.includes(mod.key)} className="h-3.5 w-3.5 pointer-events-none" />
-                          <AppIcon name={mod.icon} size={14} />
-                          <span className="truncate">{mod.label}</span>
+                          <Checkbox checked={formModules.includes(mod.key)} className="h-3.5 w-3.5 pointer-events-none shrink-0" />
+                          <AppIcon name={mod.icon} size={14} className="shrink-0" />
+                          <span className="truncate flex-1">{mod.label}</span>
                           {MODULE_REQUIRED_PLAN[mod.key] && (
                             <span className="text-[8px] font-bold uppercase tracking-wider ml-auto shrink-0" style={{ color: 'hsl(45 90% 55%)' }}>
                               {MODULE_REQUIRED_PLAN[mod.key] === 'business' ? 'BIZ' : 'PRO'}
