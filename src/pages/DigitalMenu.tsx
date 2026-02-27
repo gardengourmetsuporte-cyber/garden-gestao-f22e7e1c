@@ -66,18 +66,36 @@ export default function DigitalMenu() {
 
   if (loading) {
     return (
-      <div className="min-h-[100dvh] bg-background flex items-center justify-center">
-        <AppIcon name="Loader2" size={32} className="animate-spin text-primary" />
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-card border border-border/40 shadow-lg flex items-center justify-center animate-pulse">
+          <AppIcon name="MenuBook" size={28} className="text-primary" />
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-sm font-semibold text-foreground">Carregando cardápio...</p>
+          <div className="flex gap-1 mt-2">
+            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
       </div>
     );
   }
+
+  // Derive logo initials for fallback
+  const unitInitials = unit?.name
+    ?.split(' ')
+    .slice(0, 2)
+    .map(w => w[0])
+    .join('')
+    .toUpperCase() || '?';
 
   return (
     <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative">
       {/* Home tab: Landing + search + featured */}
       {activeTab === 'home' && (
         <div>
-          <MenuLanding unit={unit} />
+          <MenuLanding unit={unit} unitInitials={unitInitials} />
 
           {/* Quick search bar */}
           <div className="px-4 md:px-8 mt-5">
@@ -94,7 +112,7 @@ export default function DigitalMenu() {
           {products.filter(p => p.is_highlighted).length > 0 && (
             <div className="mt-6 px-4 md:px-8">
               <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
-                <AppIcon name="Flame" size={14} className="text-[hsl(var(--neon-amber))]" />
+                <AppIcon name="Whatshot" size={14} className="text-primary" />
                 Destaques
               </h3>
               <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
@@ -134,7 +152,7 @@ export default function DigitalMenu() {
                     onClick={() => { setSelectedCategory(cat.id); setActiveTab('menu'); }}
                     className="flex items-center gap-2.5 p-3.5 rounded-xl bg-card border border-border/30 active:scale-[0.97] transition-transform text-left"
                   >
-                    {cat.icon && <AppIcon name={cat.icon} size={18} className="text-primary" />}
+                    {cat.icon && <AppIcon name={cat.icon} size={20} className="text-muted-foreground" />}
                     <span className="text-sm font-semibold text-foreground truncate">{cat.name}</span>
                   </button>
                 ))}
@@ -147,7 +165,6 @@ export default function DigitalMenu() {
       {/* Menu tab */}
       {activeTab === 'menu' && (
         <div className="pt-4">
-          {/* Inline search */}
           {searchOpen ? (
             <div className="px-4 md:px-8 mb-4">
               <MenuSearch products={products} onSelectProduct={handleProductSelect} />

@@ -9,18 +9,18 @@ interface Props {
   cartCount: number;
 }
 
-const tabs: { key: MenuTab; icon: string; label: string }[] = [
-  { key: 'home', icon: 'Store', label: 'Início' },
-  { key: 'menu', icon: 'UtensilsCrossed', label: 'Cardápio' },
-  { key: 'cart', icon: 'ShoppingBag', label: 'Pedido' },
-  { key: 'game', icon: 'Dices', label: 'Roleta' },
+const tabs: { key: MenuTab; icon: string; iconFilled: string; label: string }[] = [
+  { key: 'home', icon: 'Storefront', iconFilled: 'Storefront', label: 'Início' },
+  { key: 'menu', icon: 'RestaurantMenu', iconFilled: 'RestaurantMenu', label: 'Cardápio' },
+  { key: 'cart', icon: 'ShoppingBag', iconFilled: 'ShoppingBag', label: 'Pedido' },
+  { key: 'game', icon: 'Casino', iconFilled: 'Casino', label: 'Roleta' },
 ];
 
 export function MenuBottomNav({ active, onTabChange, cartCount }: Props) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 safe-area-pb">
       <div className="max-w-4xl mx-auto px-3 pb-2">
-        <div className="bg-card/80 backdrop-blur-2xl border border-border/40 rounded-2xl shadow-xl">
+        <div className="bg-card/90 backdrop-blur-2xl border border-border/40 rounded-2xl shadow-xl">
           <div className="flex items-center justify-around h-16">
             {tabs.map(tab => {
               const isActive = active === tab.key;
@@ -36,7 +36,7 @@ export function MenuBottomNav({ active, onTabChange, cartCount }: Props) {
                   )}
                 >
                   <div className="relative">
-                    <AppIcon name={tab.icon} size={22} />
+                    <AppIcon name={isActive ? tab.iconFilled : tab.icon} size={22} fill={isActive ? 1 : 0} />
                     {tab.key === 'cart' && cartCount > 0 && (
                       <span className="absolute -top-1.5 -right-3 min-w-[18px] h-[18px] bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                         {cartCount > 9 ? '9+' : cartCount}
