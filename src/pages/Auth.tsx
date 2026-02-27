@@ -123,10 +123,8 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full"
       style={{
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
         background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
         backgroundSize: '350% 350%',
         animation: 'navyCardFlow 12s ease-in-out infinite',
@@ -397,9 +395,11 @@ export default function Auth() {
           <ThemeToggle />
         </div>
 
-        <div className="flex-1 flex flex-col items-center lg:justify-center px-6 py-8 relative z-10">
+      <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
           {/* Mobile brand header */}
           <MobileBrandHeader />
+
+        <div className="w-full flex flex-col items-center px-6 py-8">
 
           <div className="w-full max-w-[380px] space-y-6">
             {/* Header */}
@@ -568,6 +568,7 @@ export default function Auth() {
               )}
             </div>
           </div>
+        </div>
         </div>
 
         {/* Footer */}
