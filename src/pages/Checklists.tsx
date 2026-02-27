@@ -66,7 +66,7 @@ function DateStrip({ days, selectedDate, onSelectDate }: {
                 )}>
                   <span className={cn(
                     "text-sm font-bold leading-none",
-                    isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
+                    isSelected ? "text-primary-foreground dark:text-[hsl(220_30%_20%)]" : isDayToday ? "text-primary" : "text-foreground"
                   )}>
                     {format(day, 'dd')}
                   </span>
