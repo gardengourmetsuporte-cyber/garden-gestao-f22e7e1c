@@ -64,14 +64,10 @@ export const marketingDates: MarketingDate[] = [
   { month: 12, day: 31, title: 'Réveillon', emoji: '🎇', suggestion: 'Encerre o ano com chave de ouro' },
 ];
 
-/** Recurring monthly commercial dates (vale, pagamento, etc.) */
+/** Recurring monthly commercial dates (vale, pagamento) */
 export const recurringCommercialDates: MarketingDate[] = [
-  { month: 0, day: 1, title: 'Início do mês', emoji: '📅', suggestion: 'Promoção de início de mês — cliente com dinheiro novo!', type: 'recurring' },
   { month: 0, day: 5, title: 'Dia do pagamento', emoji: '💰', suggestion: 'Muita gente recebeu! Hora de promoção especial', type: 'recurring' },
-  { month: 0, day: 10, title: 'Segundo pagamento', emoji: '💳', suggestion: 'Outra leva de salários — aproveite para atrair clientes', type: 'recurring' },
-  { month: 0, day: 15, title: 'Dia do vale/adiantamento', emoji: '🤑', suggestion: 'Vale caiu! Promoção para quem recebeu adiantamento', type: 'recurring' },
-  { month: 0, day: 20, title: 'Pré-pagamento', emoji: '💵', suggestion: 'Faltam poucos dias pro salário — promoção acessível', type: 'recurring' },
-  { month: 0, day: 25, title: 'Véspera de pagamento', emoji: '📊', suggestion: 'Semana do pagamento — antecipe promoções', type: 'recurring' },
+  { month: 0, day: 20, title: 'Dia do vale', emoji: '💵', suggestion: 'Vale caiu! Promoção para quem recebeu adiantamento', type: 'recurring' },
 ];
 
 export function getDatesForMonth(month: number): MarketingDate[] {
