@@ -489,15 +489,26 @@ async function initializeDefaultsCore(
   const { data: existingAccounts } = await accQuery;
 
   if (!existingAccounts || existingAccounts.length === 0) {
-    await supabase.from('finance_accounts').upsert({
-      user_id: userId,
-      name: unitId ? 'Carteira' : 'Carteira Pessoal',
-      type: 'wallet',
-      balance: 0,
-      color: unitId ? '#3b82f6' : '#8b5cf6',
-      icon: 'Wallet',
-      unit_id: unitId,
-    }, { onConflict: 'user_id,unit_id,name,type', ignoreDuplicates: true });
+    await supabase.from('finance_accounts').upsert([
+      {
+        user_id: userId,
+        name: unitId ? 'Carteira' : 'Carteira Pessoal',
+        type: 'wallet',
+        balance: 0,
+        color: unitId ? '#3b82f6' : '#8b5cf6',
+        icon: 'Wallet',
+        unit_id: unitId,
+      },
+      {
+        user_id: userId,
+        name: unitId ? 'Banco' : 'Banco Pessoal',
+        type: 'bank',
+        balance: 0,
+        color: '#22c55e',
+        icon: 'Building2',
+        unit_id: unitId,
+      },
+    ], { onConflict: 'user_id,unit_id,name,type', ignoreDuplicates: true });
   }
 
   let catQuery = supabase.from('finance_categories').select('id').eq('user_id', userId).limit(1);
