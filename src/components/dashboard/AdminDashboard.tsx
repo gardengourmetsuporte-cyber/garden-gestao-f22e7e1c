@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
@@ -10,8 +10,7 @@ import { ptBR } from 'date-fns/locale';
 import { FinanceChartWidget } from './FinanceChartWidget';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { useLazyVisible } from '@/hooks/useLazyVisible';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { SetupChecklistWidget } from './SetupChecklistWidget';
 
 // Lazy-load heavy below-fold widgets
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
@@ -42,20 +41,6 @@ export function AdminDashboard() {
   const { user, profile } = useAuth();
   const { hasAccess } = useUserModules();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const [testingReminder, setTestingReminder] = useState(false);
-
-  const handleTestReminder = async () => {
-    setTestingReminder(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('bill-reminders');
-      if (error) throw error;
-      toast.success(`Lembrete enviado! ${data?.notifications_sent || 0} notificação(ões) criada(s).`);
-    } catch (err: any) {
-      toast.error('Erro ao testar: ' + (err.message || 'Tente novamente'));
-    } finally {
-      setTestingReminder(false);
-    }
-  };
 
 
   const formatCurrency = (value: number) =>
@@ -81,6 +66,9 @@ export function AdminDashboard() {
           {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
         </p>
       </div>
+
+      {/* Setup Onboarding */}
+      <SetupChecklistWidget />
 
       {/* === FINANCE BLOCK (above fold) === */}
       <div className="space-y-7 animate-spring-in spring-stagger-2">
@@ -161,22 +149,6 @@ export function AdminDashboard() {
         </LazySection>
       )}
 
-      {/* Test reminder button */}
-      {hasAccess('finance') && (
-        <button
-          onClick={handleTestReminder}
-          disabled={testingReminder}
-          className={cn(
-            "w-full py-3 rounded-2xl text-xs font-semibold transition-all",
-            "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 active:scale-[0.98]",
-            "flex items-center justify-center gap-2",
-            testingReminder && "opacity-50 pointer-events-none"
-          )}
-        >
-          <AppIcon name="Bell" size={16} />
-          {testingReminder ? 'Enviando...' : '🔔 Testar lembrete de contas'}
-        </button>
-      )}
     </div>
   );
 }

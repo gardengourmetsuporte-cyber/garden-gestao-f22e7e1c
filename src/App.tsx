@@ -14,6 +14,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
 import { useRoutePersist, useRouteRestore } from "@/hooks/useRouteRestore";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const LAZY_RELOAD_KEY = 'lazy_reload_count';
 
@@ -151,6 +152,7 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   useRoutePersist();
   useRouteRestore();
+  useDocumentTitle();
 
   return (
     <>
