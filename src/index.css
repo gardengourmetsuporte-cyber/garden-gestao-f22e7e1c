@@ -89,7 +89,7 @@
     --muted: 240 4% 16%;
     --muted-foreground: 0 0% 50%;
 
-    --accent: 225 70% 50%;
+    --accent: 220 70% 48%;
     --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84% 60%;
@@ -155,7 +155,7 @@
     --muted: 234 8% 94%;
     --muted-foreground: 240 6% 35%;
 
-    --accent: 225 65% 45%;
+    --accent: 220 65% 40%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 48%;
@@ -176,7 +176,7 @@
     --neon-green: 142 71% 32%;
     --neon-red: 0 72% 48%;
     --neon-amber: 38 92% 42%;
-    --neon-purple: 225 60% 45%;
+    --neon-purple: 220 60% 42%;
 
     /* Light glow & shadow tokens — minimal, no colored glow */
     --glow-primary: 0 0 0 transparent;
