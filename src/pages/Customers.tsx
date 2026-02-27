@@ -99,7 +99,7 @@ export default function Customers() {
         c.email?.toLowerCase().includes(q)
       );
     }
-    return list;
+    return list.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }, [customers, search, segmentFilter]);
 
   const segCounts = useMemo(() => {
