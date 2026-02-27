@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# 🌿 Garden Gestão — SaaS de Gestão para Restaurantes
 
 ## Project info
 
