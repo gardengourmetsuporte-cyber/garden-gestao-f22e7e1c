@@ -200,7 +200,7 @@ export function ChecklistSettings({
   
   // Form states
   const [sectorName, setSectorName] = useState('');
-  const [sectorColor, setSectorColor] = useState('#6366f1');
+  const [sectorColor, setSectorColor] = useState('#3668b5');
   const [subcategoryName, setSubcategoryName] = useState('');
   const [sectorIcon, setSectorIcon] = useState('Folder');
   const [itemName, setItemName] = useState('');
@@ -302,7 +302,7 @@ export function ChecklistSettings({
     } else {
       setEditingSector(null);
       setSectorName('');
-      setSectorColor('#6366f1');
+      setSectorColor('#3668b5');
       setSectorIcon('Folder');
     }
     setSectorSheetOpen(true);
