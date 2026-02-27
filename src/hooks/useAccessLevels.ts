@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
+import { isSubModuleKey, getParentModuleKey, getSubModuleKeys } from '@/lib/modules';
 
 export interface AccessLevel {
   id: string;
@@ -136,7 +137,7 @@ export function useAccessLevels() {
   };
 }
 
-/** Hook to check current user's allowed modules */
+/** Hook to check current user's allowed modules (supports sub-modules) */
 export function useUserModules() {
   const { user, isSuperAdmin } = useAuth();
   const { activeUnitId } = useUnit();
@@ -151,15 +152,29 @@ export function useUserModules() {
   const hasAccess = (moduleKey: string): boolean => {
     // Super admins always have full access
     if (isSuperAdmin) return true;
-    // Dashboard and settings always accessible
-    if (moduleKey === 'dashboard' || moduleKey === 'settings') return true;
+    // Dashboard always accessible
+    if (moduleKey === 'dashboard') return true;
     // During loading, hide everything else to avoid flash of premium modules
     if (isLoading) return false;
     // If no access level assigned (null), user has full access
-    if (allowedModules === null) return true;
-    // If query hasn't returned yet but loading is done, default to full access
-    if (allowedModules === undefined) return true;
-    return allowedModules.includes(moduleKey);
+    if (allowedModules === null || allowedModules === undefined) return true;
+
+    // Direct match
+    if (allowedModules.includes(moduleKey)) return true;
+
+    // If checking a sub-module key (e.g. 'finance.view'),
+    // check if the parent is in the list (parent = full access to all children)
+    if (isSubModuleKey(moduleKey)) {
+      const parentKey = getParentModuleKey(moduleKey);
+      // If parent is allowed AND all its children are allowed → full parent access
+      const allSubKeys = getSubModuleKeys(parentKey);
+      const allChildrenAllowed = allSubKeys.every(k => allowedModules.includes(k));
+      if (allowedModules.includes(parentKey) && allChildrenAllowed) return true;
+      // Otherwise just check direct sub-module key
+      return allowedModules.includes(moduleKey);
+    }
+
+    return false;
   };
 
   return { allowedModules, isLoading, hasAccess };
