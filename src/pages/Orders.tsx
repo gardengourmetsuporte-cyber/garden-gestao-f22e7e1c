@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown, Scale } from 'lucide-react';
+import { ShoppingCart, Package, Plus, Trash2, MessageCircle, Clock, PackageCheck, FileText, Sparkles, ChevronRight, ChevronDown, Scale, ArrowLeft, Check } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -14,6 +14,7 @@ import { useSuppliers } from '@/hooks/useSuppliers';
 import { useOrders } from '@/hooks/useOrders';
 import { useSupplierInvoices } from '@/hooks/useSupplierInvoices';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuotations } from '@/hooks/useQuotations';
 import { ReceiveOrderSheet } from '@/components/inventory/ReceiveOrderSheet';
 import { RegisterInvoiceAfterReceive } from '@/components/inventory/RegisterInvoiceAfterReceive';
 import { SmartReceivingSheet } from '@/components/inventory/SmartReceivingSheet';
@@ -27,6 +28,7 @@ export default function OrdersPage() {
   const { suppliers } = useSuppliers();
   const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
   const { addInvoice } = useSupplierInvoices();
+  const { createQuotation } = useQuotations();
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -40,6 +42,9 @@ export default function OrdersPage() {
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
   const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
+  const [cotationStep, setCotationStep] = useState(false);
+  const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
+  const [isCreatingQuotation, setIsCreatingQuotation] = useState(false);
 
   const lowStockItems = useMemo(() => items.filter(item => item.current_stock <= item.min_stock), [items]);
 
@@ -64,8 +69,44 @@ export default function OrdersPage() {
       initialQuantities[item.id] = Math.max(0, item.min_stock - item.current_stock);
     });
     setQuantities(initialQuantities);
+    setCotationStep(false);
+    setExtraSuppliers([]);
     setSheetOpen(true);
   };
+
+  const handleStartQuotation = async () => {
+    if (!selectedSupplier || extraSuppliers.length === 0) return;
+    const orderItems = Object.entries(quantities)
+      .filter(([_, qty]) => qty > 0)
+      .map(([item_id, quantity]) => ({ item_id, quantity }));
+    if (orderItems.length === 0) {
+      toast.error('Adicione pelo menos 1 item com quantidade');
+      return;
+    }
+    setIsCreatingQuotation(true);
+    try {
+      await createQuotation({
+        title: `Cotação — ${selectedSupplier.name}`,
+        supplierIds: [selectedSupplier.id, ...extraSuppliers],
+        items: orderItems,
+      });
+      setSheetOpen(false);
+      setSelectedSupplier(null);
+      setQuantities({});
+      setCotationStep(false);
+      setExtraSuppliers([]);
+      setOrderTab('quotations');
+    } catch {
+      toast.error('Erro ao criar cotação');
+    } finally {
+      setIsCreatingQuotation(false);
+    }
+  };
+
+  const otherSuppliers = useMemo(() => {
+    if (!selectedSupplier) return [];
+    return suppliers.filter(s => s.id !== selectedSupplier.id);
+  }, [suppliers, selectedSupplier]);
 
   const handleCreateOrder = async () => {
     if (!selectedSupplier) return;
@@ -485,38 +526,109 @@ export default function OrdersPage() {
         />
 
         {/* Create Order Sheet */}
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <Sheet open={sheetOpen} onOpenChange={(open) => { setSheetOpen(open); if (!open) { setCotationStep(false); setExtraSuppliers([]); } }}>
           <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
             <SheetHeader className="pb-4">
-              <SheetTitle>Novo Pedido — {selectedSupplier?.name}</SheetTitle>
+              <SheetTitle>
+                {cotationStep
+                  ? `Cotação — ${selectedSupplier?.name} + ?`
+                  : `Novo Pedido — ${selectedSupplier?.name}`}
+              </SheetTitle>
             </SheetHeader>
-            <div className="space-y-3">
-              {selectedSupplier && itemsBySupplier[selectedSupplier.id]?.map(item => (
-                <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50 border border-border/50">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Atual: {item.current_stock} · Mín: {item.min_stock}
-                    </p>
+
+            {!cotationStep ? (
+              <div className="space-y-3">
+                {selectedSupplier && itemsBySupplier[selectedSupplier.id]?.map(item => (
+                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50 border border-border/50">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Atual: {item.current_stock} · Mín: {item.min_stock}
+                      </p>
+                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={quantities[item.id] || 0}
+                      onChange={(e) => setQuantities(prev => ({ ...prev, [item.id]: Number(e.target.value) }))}
+                      className="w-16 h-10 text-center rounded-xl shrink-0"
+                    />
+                    <span className="text-xs text-muted-foreground w-14 text-right shrink-0">{item.unit_type}</span>
                   </div>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={quantities[item.id] || 0}
-                    onChange={(e) => setQuantities(prev => ({ ...prev, [item.id]: Number(e.target.value) }))}
-                    className="w-16 h-10 text-center rounded-xl shrink-0"
-                  />
-                  <span className="text-xs text-muted-foreground w-14 text-right shrink-0">{item.unit_type}</span>
+                ))}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleCreateOrder}
+                    disabled={isSubmitting || Object.values(quantities).every(q => q === 0)}
+                    className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20"
+                  >
+                    {isSubmitting ? 'Criando...' : 'Criar Pedido'}
+                  </Button>
+                  {otherSuppliers.length > 0 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setCotationStep(true)}
+                      disabled={Object.values(quantities).every(q => q === 0)}
+                      className="h-12 rounded-xl gap-2"
+                    >
+                      <Scale className="w-4 h-4" />
+                      Cotar
+                    </Button>
+                  )}
                 </div>
-              ))}
-              <Button
-                onClick={handleCreateOrder}
-                disabled={isSubmitting || Object.values(quantities).every(q => q === 0)}
-                className="w-full h-12 rounded-xl shadow-lg shadow-primary/20"
-              >
-                {isSubmitting ? 'Criando...' : 'Criar Pedido'}
-              </Button>
-            </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Selecione fornecedores adicionais para comparar preços:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {otherSuppliers.map(s => {
+                    const isSelected = extraSuppliers.includes(s.id);
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setExtraSuppliers(prev =>
+                          isSelected ? prev.filter(id => id !== s.id) : [...prev, s.id]
+                        )}
+                        className={cn(
+                          "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all border",
+                          isSelected
+                            ? "bg-primary/10 border-primary/30 text-primary"
+                            : "bg-secondary/50 border-border/50 text-foreground hover:border-primary/20"
+                        )}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5" />}
+                        {s.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                {otherSuppliers.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Nenhum outro fornecedor cadastrado.
+                  </p>
+                )}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setCotationStep(false)}
+                    className="h-12 rounded-xl gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Voltar
+                  </Button>
+                  <Button
+                    onClick={handleStartQuotation}
+                    disabled={extraSuppliers.length === 0 || isCreatingQuotation}
+                    className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20 gap-2"
+                  >
+                    <Scale className="w-4 h-4" />
+                    {isCreatingQuotation ? 'Criando...' : 'Iniciar Cotação'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </SheetContent>
         </Sheet>
       </div>
