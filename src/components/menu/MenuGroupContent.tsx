@@ -13,11 +13,12 @@ interface Props {
   onDeleteProduct: (id: string) => void;
   onLinkOptions: (productId: string) => void;
   onImageUpload?: (productId: string, file: File) => void;
+  onToggleProductAvailability?: (product: MenuProduct, channel: 'tablet' | 'delivery') => void;
 }
 
 export function MenuGroupContent({
   group, products, getOptionCount,
-  onNewProduct, onEditProduct, onDeleteProduct, onLinkOptions, onImageUpload,
+  onNewProduct, onEditProduct, onDeleteProduct, onLinkOptions, onImageUpload, onToggleProductAvailability,
 }: Props) {
   if (!group) {
     return (
@@ -81,6 +82,7 @@ export function MenuGroupContent({
               onDelete={() => onDeleteProduct(p.id)}
               onLinkOptions={() => onLinkOptions(p.id)}
               onImageUpload={onImageUpload}
+              onToggleAvailability={onToggleProductAvailability}
             />
           ))}
         </div>

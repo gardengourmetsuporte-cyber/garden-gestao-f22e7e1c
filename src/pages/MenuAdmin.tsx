@@ -145,6 +145,10 @@ export default function MenuAdmin() {
               onEditProduct={openEditProduct}
               onDeleteProduct={deleteProduct}
               onLinkOptions={openLinkOptionsForProduct}
+              onToggleProductAvailability={(prod, channel) => {
+                const avail = (prod.availability as any) || { tablet: true, delivery: true };
+                saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
+              }}
             />
           </div>
         ) : (

@@ -312,6 +312,10 @@ export default function CardapioHub() {
                 onDeleteProduct={deleteProduct}
                 onLinkOptions={() => setCardapioTab('opcionais')}
                 onImageUpload={(productId, file) => uploadProductImage(productId, file)}
+                onToggleProductAvailability={(prod, channel) => {
+                  const avail = (prod.availability as any) || { tablet: true, delivery: true };
+                  saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
+                }}
               />
               </div>
             </div>
