@@ -19,6 +19,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { calculateMedals } from '@/lib/medals';
 import { cn } from '@/lib/utils';
+import { EmployeeCheckInCard } from '@/components/employees/TimeTracking';
+import { useTimeTracking } from '@/hooks/useTimeTracking';
 
 type TabKey = 'ranking' | 'elos' | 'medalhas';
 
@@ -56,6 +58,7 @@ export function EmployeeDashboard() {
   const { user, profile } = useAuth();
   const { activeUnitId, activeUnit } = useUnit();
   const { earned, balance, monthlyScore, refetch: refetchPoints } = usePoints();
+  const { todayRecord, checkIn, checkOut } = useTimeTracking();
   const [rankingScope, setRankingScope] = useState<LeaderboardScope>('unit');
   const { leaderboard, isLoading, selectedMonth, setSelectedMonth, refetch: refetchLeaderboard } = useLeaderboard(rankingScope);
   const { data: globalMedals } = useGlobalMedals(activeUnitId);
@@ -154,6 +157,10 @@ export function EmployeeDashboard() {
         </div>
       )}
 
+      {/* Time Clock Card */}
+      <div className="animate-spring-in spring-stagger-2">
+        <EmployeeCheckInCard todayRecord={todayRecord} onCheckIn={checkIn} onCheckOut={checkOut} />
+      </div>
 
       {/* Tabs: Ranking / Elos / Medalhas */}
       <div className="animate-spring-in spring-stagger-3">
