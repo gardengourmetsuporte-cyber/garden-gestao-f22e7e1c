@@ -156,7 +156,7 @@ export interface ChecklistCompletion {
   date: string;
   awarded_points: boolean;
   points_awarded: number; // 1-4 stars, 0 means "already done"
-  is_skipped: boolean; // "Não fiz" — marked but not done
+  is_skipped: boolean; // "Não concluído" — marked but not done
   photo_url: string | null;
   is_contested: boolean;
   contested_by: string | null;
