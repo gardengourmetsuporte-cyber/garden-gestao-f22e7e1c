@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { useCustomers } from '@/hooks/useCustomers';
 import { EmptyState } from '@/components/ui/empty-state';
 import { startOfMonth } from 'date-fns';
 import type { Customer } from '@/types/customer';
+import { useFabAction } from '@/contexts/FabActionContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,14 @@ export default function Customers() {
   const [csvOpen, setCsvOpen] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const openNewSheet = useCallback(() => {
+    setEditing(null);
+    setSheetOpen(true);
+  }, []);
+
+  // Register FAB action
+  useFabAction({ icon: 'Plus', label: 'Novo cliente', onClick: openNewSheet }, [openNewSheet]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return customers;
@@ -69,7 +78,7 @@ export default function Customers() {
           </div>
         </div>
 
-        {/* Search + Actions */}
+        {/* Search + Import */}
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -77,9 +86,6 @@ export default function Customers() {
           </div>
           <Button size="icon" variant="outline" onClick={() => setCsvOpen(true)}>
             <AppIcon name="Upload" size={16} />
-          </Button>
-          <Button size="icon" onClick={() => { setEditing(null); setSheetOpen(true); }}>
-            <AppIcon name="Plus" size={16} />
           </Button>
         </div>
 
