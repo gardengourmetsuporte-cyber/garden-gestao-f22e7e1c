@@ -138,7 +138,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
             {...(props as any)}
           >
             <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-muted-foreground/20" />
-            <div className="flex flex-1 flex-col overflow-hidden p-6">{children}</div>
+            <div className="flex flex-1 flex-col overflow-y-auto p-6">{children}</div>
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       );
