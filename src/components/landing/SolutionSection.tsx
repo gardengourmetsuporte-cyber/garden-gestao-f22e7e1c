@@ -1,7 +1,11 @@
-import { DollarSign, ClipboardCheck, Package, BarChart3, ArrowRight } from "lucide-react";
+import { 
+  DollarSign, ClipboardCheck, Package, BarChart3, 
+  Users, Calendar, Bot, ShoppingCart, Gamepad2, UtensilsCrossed 
+} from "lucide-react";
 import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
 import screenshotChecklist from "@/assets/screenshot-checklist.png";
 import screenshotEstoque from "@/assets/screenshot-estoque.png";
+import screenshotRelatorios from "@/assets/screenshot-relatorios.png";
 
 const steps = [
   {
@@ -35,7 +39,6 @@ const modules = [
     color: "text-success",
     bg: "bg-success/10",
     border: "border-success/20",
-    shadow: "group-hover:shadow-[0_8px_24px_-8px_hsl(var(--success)/0.15)]",
   },
   {
     icon: ClipboardCheck,
@@ -44,7 +47,6 @@ const modules = [
     color: "text-primary",
     bg: "bg-primary/10",
     border: "border-primary/20",
-    shadow: "group-hover:shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.15)]",
   },
   {
     icon: Package,
@@ -53,7 +55,6 @@ const modules = [
     color: "text-warning",
     bg: "bg-warning/10",
     border: "border-warning/20",
-    shadow: "group-hover:shadow-[0_8px_24px_-8px_hsl(var(--warning)/0.15)]",
   },
   {
     icon: BarChart3,
@@ -62,51 +63,103 @@ const modules = [
     color: "text-accent",
     bg: "bg-accent/10",
     border: "border-accent/20",
-    shadow: "group-hover:shadow-[0_8px_24px_-8px_hsl(var(--accent)/0.15)]",
+  },
+  {
+    icon: Users,
+    title: "Gestão de Equipe",
+    desc: "Escala, ponto, folha de pagamento e ranking de desempenho.",
+    color: "text-primary",
+    bg: "bg-primary/10",
+    border: "border-primary/20",
+  },
+  {
+    icon: UtensilsCrossed,
+    title: "Fichas Técnicas",
+    desc: "Monte receitas com custo automático baseado no estoque.",
+    color: "text-warning",
+    bg: "bg-warning/10",
+    border: "border-warning/20",
+  },
+  {
+    icon: Calendar,
+    title: "Agenda & Marketing",
+    desc: "Calendário de tarefas, campanhas e datas comemorativas.",
+    color: "text-success",
+    bg: "bg-success/10",
+    border: "border-success/20",
+  },
+  {
+    icon: Bot,
+    title: "IA Copiloto",
+    desc: "Assistente inteligente que analisa dados e sugere ações.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+    border: "border-accent/20",
+  },
+  {
+    icon: ShoppingCart,
+    title: "Pedidos Online",
+    desc: "Cardápio digital com pedidos via tablet e WhatsApp.",
+    color: "text-destructive",
+    bg: "bg-destructive/10",
+    border: "border-destructive/20",
+  },
+  {
+    icon: Gamepad2,
+    title: "Gamificação",
+    desc: "Roleta de prêmios e ranking para engajar clientes e equipe.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+    border: "border-accent/20",
   },
 ];
 
 export function SolutionSection() {
   return (
-    <section id="como-funciona" className="py-20 md:py-28 relative">
-      {/* Ambient */}
-      <div className="absolute top-1/3 left-0 w-[400px] h-[400px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-0 w-[300px] h-[300px] rounded-full bg-success/5 blur-[100px] pointer-events-none" />
+    <section id="como-funciona" className="py-24 md:py-32 relative">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+      
+      {/* Ambient glows */}
+      <div className="absolute top-1/3 left-0 w-[400px] h-[400px] rounded-full bg-primary/4 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-0 w-[300px] h-[300px] rounded-full bg-success/4 blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/8 px-3 py-1 rounded-full mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/8 px-3 py-1.5 rounded-full mb-5">
             Como funciona
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight">
             Comece em 3 passos simples
           </h2>
-          <p className="text-muted-foreground mt-3 text-base">
+          <p className="text-muted-foreground mt-4 text-base leading-relaxed">
             Do zero ao controle total em menos de 10 minutos.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="space-y-20 md:space-y-28">
+        <div className="space-y-24 md:space-y-32">
           {steps.map((step, i) => (
-            <div key={step.number} className={`grid md:grid-cols-2 gap-10 md:gap-14 items-center ${i % 2 === 1 ? "md:[direction:rtl]" : ""}`}>
-              <div className="md:[direction:ltr] space-y-4">
-                {/* Step number badge */}
+            <div key={step.number} className={`grid md:grid-cols-2 gap-12 md:gap-16 items-center ${i % 2 === 1 ? "md:[direction:rtl]" : ""}`}>
+              <div className="md:[direction:ltr] space-y-5">
                 <div className="inline-flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center">
-                    <span className="text-sm font-extrabold text-primary">{step.number}</span>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold text-sm text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%))',
+                    }}
+                  >
+                    {step.number}
                   </div>
-                  <div className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-primary/40 to-transparent" />
+                  <div className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-primary/30 to-transparent" />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">{step.title}</h3>
                 <p className="text-muted-foreground leading-relaxed text-base">{step.desc}</p>
               </div>
               <div className="md:[direction:ltr]">
                 <div className="relative group">
-                  <div className="absolute -inset-2 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent blur-[30px] rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="rounded-2xl overflow-hidden border border-border/50 shadow-card bg-card group-hover:shadow-card-hover transition-all duration-500 group-hover:-translate-y-1">
+                  <div className="absolute -inset-3 bg-gradient-to-b from-primary/8 via-primary/4 to-transparent blur-[40px] rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="rounded-2xl overflow-hidden border border-border/40 shadow-card bg-card group-hover:shadow-elevated transition-all duration-500 group-hover:-translate-y-1">
                     {/* Mini browser bar */}
-                    <div className="flex items-center gap-1.5 px-3 py-2 bg-secondary/40 border-b border-border/30">
+                    <div className="flex items-center gap-1.5 px-3 py-2 bg-secondary/50 border-b border-border/30">
                       <div className="w-2 h-2 rounded-full bg-destructive/40" />
                       <div className="w-2 h-2 rounded-full bg-warning/40" />
                       <div className="w-2 h-2 rounded-full bg-success/40" />
@@ -120,27 +173,27 @@ export function SolutionSection() {
         </div>
 
         {/* Modules grid */}
-        <div className="mt-28 md:mt-36">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+        <div className="mt-32 md:mt-40">
+          <div className="text-center mb-14">
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground mb-4">
               Tudo que você precisa, em um só lugar
             </h3>
-            <p className="text-muted-foreground max-w-lg mx-auto">
+            <p className="text-muted-foreground max-w-lg mx-auto text-base">
               Módulos integrados que conversam entre si para você ter uma visão completa.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4 md:gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
             {modules.map((m) => (
               <div
                 key={m.title}
-                className={`group rounded-2xl border border-border/40 bg-card p-6 flex gap-4 items-start hover:-translate-y-0.5 transition-all duration-300 ${m.shadow}`}
+                className="group rounded-2xl border border-border/40 bg-card p-6 flex gap-4 items-start hover:-translate-y-1 transition-all duration-300 hover:shadow-card-hover hover:border-border/60"
               >
-                <div className={`w-11 h-11 rounded-xl border ${m.border} ${m.bg} flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110`}>
-                  <m.icon className={`w-5 h-5 ${m.color}`} />
+                <div className={`w-12 h-12 rounded-2xl border ${m.border} ${m.bg} flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110`}>
+                  <m.icon className={`w-5.5 h-5.5 ${m.color}`} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-foreground text-sm">{m.title}</h4>
-                  <p className="text-muted-foreground text-sm mt-1 leading-relaxed">{m.desc}</p>
+                  <h4 className="font-bold text-foreground text-sm mb-1">{m.title}</h4>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{m.desc}</p>
                 </div>
               </div>
             ))}

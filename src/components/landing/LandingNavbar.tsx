@@ -29,45 +29,36 @@ export function LandingNavbar() {
       }`}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5">
           <img src={logoImg} alt="Garden Gestão" className="h-8 w-8 rounded-full object-contain" />
           <span className="font-display font-bold text-base text-foreground">Garden</span>
         </Link>
 
-        {/* Center links */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               {l.label}
             </a>
           ))}
         </div>
 
-        {/* Right */}
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link
-            to="/auth"
-            className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <Link to="/auth" className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors">
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:shadow-glow-primary transition-all duration-300"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-5 rounded-xl text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.02]"
+            style={{
+              background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%))',
+              border: '1px solid hsl(234 40% 35% / 0.4)',
+            }}
           >
             Começar grátis
           </Link>
 
-          <button
-            onClick={() => setOpen(!open)}
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
-          >
+          <button onClick={() => setOpen(!open)} className="md:hidden p-2 text-muted-foreground hover:text-foreground">
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
@@ -76,26 +67,20 @@ export function LandingNavbar() {
       {open && (
         <div className="md:hidden bg-background/95 backdrop-blur-xl border-t border-border/40 px-4 pb-6 pt-2 space-y-1 animate-fade-in">
           {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="block py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
               {l.label}
             </a>
           ))}
-          <Link
-            to="/auth"
-            onClick={() => setOpen(false)}
-            className="block py-3 text-sm text-muted-foreground"
-          >
+          <Link to="/auth" onClick={() => setOpen(false)} className="block py-3 text-sm text-muted-foreground">
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
             onClick={() => setOpen(false)}
-            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground"
+            className="block w-full text-center py-3 mt-2 rounded-xl text-sm font-semibold text-white"
+            style={{
+              background: 'linear-gradient(135deg, hsl(224 45% 12%), hsl(220 70% 20%), hsl(234 75% 30%))',
+            }}
           >
             Começar grátis
           </Link>
