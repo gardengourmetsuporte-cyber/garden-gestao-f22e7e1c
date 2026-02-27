@@ -402,10 +402,10 @@ export function useManagementAI() {
     hasGreeted,
     sendMessage,
     clearHistory,
-    // New: conversation management
     conversations,
     conversationId,
     switchConversation,
     newConversation,
+    contextStats,
   };
 }
