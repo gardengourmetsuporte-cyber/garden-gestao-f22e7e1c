@@ -37,7 +37,6 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
   return (
     <div
       className="card-interactive flex items-center gap-3 p-3 group"
-      onClick={onEdit}
     >
       {/* Image — clickable for upload */}
       <div
@@ -101,19 +100,19 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
       <div className="text-right shrink-0 flex items-center gap-1">
         <span className="font-bold text-sm text-primary">{formatPrice(product.price)}</span>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
+          <DropdownMenuTrigger asChild>
             <button className="p-1.5 rounded-lg hover:bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity">
               <AppIcon name="MoreVertical" size={16} className="text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={e => { e.stopPropagation(); onEdit(); }}>
+            <DropdownMenuItem onClick={onEdit}>
               <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={e => { e.stopPropagation(); onLinkOptions(); }}>
+            <DropdownMenuItem onClick={onLinkOptions}>
               <AppIcon name="Link" size={14} className="mr-2" /> Opcionais
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={e => { e.stopPropagation(); onDelete(); }} className="text-destructive">
+            <DropdownMenuItem onClick={onDelete} className="text-destructive">
               <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
             </DropdownMenuItem>
           </DropdownMenuContent>
