@@ -120,7 +120,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-[100dvh] max-h-[100dvh] overflow-hidden rounded-none border-0 [&>div:first-child]:hidden" style={{ background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)' }}>
+      <DrawerContent className="h-[calc(100dvh-72px-env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-72px-env(safe-area-inset-bottom,0px))] overflow-hidden rounded-none border-0 [&>div:first-child]:hidden" style={{ background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)', bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}>
         <div className="overflow-y-auto h-full">
           {/* Navy gradient header area */}
           <div
