@@ -1,9 +1,21 @@
 /**
  * Centralized checklist timing logic.
  * Supports custom deadline settings per unit.
+ * All calculations use fixed UTC-3 (BRT) to avoid browser timezone issues.
  */
 
 import { ChecklistType } from '@/types/database';
+
+/** Fixed offset: UTC-3 (São Paulo / BRT) */
+const BRT_OFFSET_MS = -3 * 60 * 60 * 1000;
+
+/** Get current time as if we were in BRT, regardless of browser timezone */
+function nowBRT(): Date {
+  const now = new Date();
+  // Convert to UTC ms, then apply BRT offset to get a Date whose getHours/getMinutes/etc reflect BRT
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60_000;
+  return new Date(utcMs + BRT_OFFSET_MS);
+}
 
 export interface DeadlineSetting {
   checklist_type: string;
@@ -41,6 +53,7 @@ export function getChecklistDeadline(dateStr: string, type: ChecklistType, setti
 
   const [y, m, d] = dateStr.split('-').map(Number);
   const dayOffset = setting.is_next_day ? 1 : 0;
+  // Build deadline in BRT-equivalent Date (local fields represent BRT)
   return new Date(y, m - 1, d + dayOffset, setting.deadline_hour, setting.deadline_minute, 0, 0);
 }
 
@@ -48,7 +61,8 @@ export function getDeadlineInfo(dateStr: string, type: ChecklistType, settings?:
   const deadline = getChecklistDeadline(dateStr, type, settings);
   if (!deadline) return null;
 
-  const now = new Date();
+  // Compare using BRT "now" so the comparison is timezone-safe
+  const now = nowBRT();
   const remainingMs = deadline.getTime() - now.getTime();
   const passed = remainingMs <= 0;
 
@@ -63,9 +77,9 @@ export function getDeadlineInfo(dateStr: string, type: ChecklistType, settings?:
   return { deadline, passed, remainingMs, label };
 }
 
-/** Get today's local date string yyyy-MM-dd */
+/** Get today's local date string yyyy-MM-dd in BRT */
 export function getTodayDateStr(): string {
-  const n = new Date();
+  const n = nowBRT();
   return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
 }
 
@@ -74,7 +88,7 @@ export function getTodayDateStr(): string {
  * Uses custom settings if available.
  */
 export function getCurrentChecklistType(settings?: DeadlineSetting[] | null): ChecklistType {
-  const now = new Date();
+  const now = nowBRT();
   const todayStr = getTodayDateStr();
   const abDeadline = getChecklistDeadline(todayStr, 'abertura', settings);
   if (abDeadline && now < abDeadline) return 'abertura';
@@ -97,7 +111,7 @@ export function shouldAutoClose(dateStr: string, type: ChecklistType, settings?:
   }
 
   if (type === 'fechamento' || type === 'bonus') {
-    const now = new Date();
+    const now = nowBRT();
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
