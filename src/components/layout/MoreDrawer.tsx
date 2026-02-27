@@ -158,7 +158,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         ? "text-white"
                         : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
                     )}
-                    style={isActive ? { background: 'linear-gradient(135deg, hsl(220 70% 16%), hsl(234 75% 28%), hsl(220 65% 18%))' } : undefined}
+                    style={isActive ? { background: 'var(--gradient-brand)' } : undefined}
                   >
                     <span
                       className={cn(
