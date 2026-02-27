@@ -69,7 +69,14 @@ export function AgendaDashboardWidget() {
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const pendingTasks = (displayTasks || [])
-    .filter(t => !t.is_completed);
+    .filter(t => !t.is_completed)
+    .sort((a, b) => {
+      // Tasks with due_date first, sorted ascending; then tasks without due_date
+      if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
+      if (a.due_date && !b.due_date) return -1;
+      if (!a.due_date && b.due_date) return 1;
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    });
 
   const handleEditTask = (task: ManagerTask) => {
     setEditingTask(task);
