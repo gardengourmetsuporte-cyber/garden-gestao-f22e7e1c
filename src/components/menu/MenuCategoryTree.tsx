@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
@@ -8,6 +8,59 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 import type { MenuCategory, MenuGroup } from '@/hooks/useMenuAdmin';
+
+const MENU_ICONS = [
+  'restaurant', 'lunch_dining', 'local_pizza', 'ramen_dining', 'bakery_dining',
+  'icecream', 'cake', 'coffee', 'local_bar', 'sports_bar',
+  'emoji_food_beverage', 'set_meal', 'kebab_dining', 'rice_bowl', 'tapas',
+  'brunch_dining', 'dinner_dining', 'liquor', 'fastfood', 'local_cafe',
+  'cookie', 'egg_alt', 'skillet', 'soup_kitchen', 'takeout_dining',
+  'grocery', 'nutrition', 'water_drop', 'wine_bar', 'nightlife',
+  'local_fire_department', 'outdoor_grill', 'blender', 'oven',
+  'kitchen', 'flatware', 'no_food', 'shopping_basket', 'storefront',
+  'delivery_dining', 'ac_unit', 'favorite', 'star', 'category',
+];
+
+function CategoryIconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [search, setSearch] = useState('');
+  const filtered = useMemo(() => {
+    if (!search) return MENU_ICONS;
+    return MENU_ICONS.filter(i => i.includes(search.toLowerCase()));
+  }, [search]);
+
+  return (
+    <div className="space-y-2">
+      <Label>Ícone</Label>
+      <Input
+        placeholder="Buscar ícone..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="mb-2"
+      />
+      <div className="grid grid-cols-6 gap-1.5 max-h-40 overflow-y-auto rounded-xl border border-border/40 p-2 bg-secondary/20">
+        {filtered.map(icon => (
+          <button
+            key={icon}
+            type="button"
+            onClick={() => onChange(icon)}
+            className={cn(
+              "flex items-center justify-center p-2 rounded-lg transition-colors",
+              value === icon
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-secondary/60 text-muted-foreground"
+            )}
+            title={icon}
+          >
+            <AppIcon name={icon} size={22} />
+          </button>
+        ))}
+        {filtered.length === 0 && (
+          <p className="col-span-6 text-xs text-muted-foreground text-center py-2">Nenhum ícone encontrado</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   categories: MenuCategory[];
@@ -242,10 +295,10 @@ export function MenuCategoryTree({
               <Label>Nome</Label>
               <Input value={editingCat.name || ''} onChange={e => setEditingCat({ ...editingCat, name: e.target.value })} />
             </div>
-            <div>
-              <Label>Ícone (Material Symbol)</Label>
-              <Input value={editingCat.icon || ''} onChange={e => setEditingCat({ ...editingCat, icon: e.target.value })} placeholder="UtensilsCrossed" />
-            </div>
+            <CategoryIconPicker
+              value={editingCat.icon || ''}
+              onChange={(icon) => setEditingCat({ ...editingCat, icon })}
+            />
           </div>
           <SheetFooter className="flex-row gap-2 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setCatDialog(false)}>Cancelar</Button>
