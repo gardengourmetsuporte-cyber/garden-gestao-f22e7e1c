@@ -123,8 +123,10 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center w-screen -ml-6 min-h-[52vh] px-6 overflow-hidden"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden"
       style={{
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
         background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
         backgroundSize: '350% 350%',
         animation: 'navyCardFlow 12s ease-in-out infinite',
