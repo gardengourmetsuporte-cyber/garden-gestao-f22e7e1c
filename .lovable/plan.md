@@ -1,79 +1,69 @@
 
 
-## Bug: Plano da conta não é herdado por funcionários
+## Redesign Completo da Landing Page — Alinhado ao Design Interno
 
-### Causa raiz
+O problema atual: a landing usa estilos genéricos (bordas finas, cores básicas) que não refletem a identidade premium do sistema interno (gradientes navy animados, `card-surface`, `finance-hero-card`, glows, shine sweeps).
 
-O `plan` é lido do **perfil individual do usuário** (`profiles.plan`). Maria tem `plan: 'free'` no perfil dela porque quem assina é o dono da conta. O sistema nunca consulta o plano do dono da unidade — cada usuário carrega seu próprio `profiles.plan`, resultando em módulos bloqueados para todos os funcionários.
+### Princípio: usar as MESMAS classes CSS e padrões visuais do sistema interno
 
-### Fluxo atual (quebrado)
+---
 
-```text
-Maria loga → AuthContext lê profiles.plan = 'free' → módulos PRO/BUSINESS bloqueados
-```
+### Arquivos a reescrever (7 componentes):
 
-### Fluxo correto
+**1. `LandingNavbar.tsx`**
+- Usar `gradient-primary` no botão CTA (mesma classe do sistema)
+- Logo com container estilizado (como no sistema)
+- Blur backdrop mais forte no scroll
+- Links com hover sutil usando `text-primary`
 
-```text
-Maria loga → Sistema identifica unidade ativa → Busca o plano do DONO da unidade → Usa esse plano
-```
+**2. `HeroSection.tsx`** — Visual premium
+- Headline com gradiente de texto animado mantido
+- Botão CTA usando classe `gradient-primary` (navy animado com shine sweep)
+- Screenshot real (`dashboard-mockup.png`) em container `card-surface` com browser chrome bar
+- Ambient glows maiores usando `bg-primary/8 blur-[160px]`
+- Adicionar badges animados de social proof com ícones
+- Layout mais impactante: tipografia maior, mais espaçamento
 
-### Solução
+**3. `ProblemSection.tsx`** — Cards como `card-interactive`
+- Usar classe `card-interactive` nos cards (mesmo hover do sistema)
+- Ícones dentro de containers com cores semânticas
+- Adicionar uma linha de gradiente sutil separando da seção anterior
 
-**1. Criar função no banco para resolver o plano efetivo da unidade**
+**4. `SolutionSection.tsx`** — Showcase do sistema real
+- 3 passos com screenshots reais (`screenshot-financeiro.png`, `screenshot-checklist.png`, `screenshot-estoque.png`) em containers `card-surface`
+- Screenshots com browser chrome bar (como no hero)
+- Grid de **10 módulos** em cards `card-interactive` com cores semânticas (success, warning, primary, accent, destructive)
+- Hover com scale e shadow usando as mesmas classes do sistema
 
-Nova migration SQL com uma função `get_unit_plan(p_unit_id UUID)` que:
-- Busca o `created_by` da tabela `units`
-- Retorna o `plan` do perfil do criador da unidade
-- É `SECURITY DEFINER` para evitar problemas de RLS
+**5. `PricingSection.tsx`** — Cards premium
+- Card "Pro" (destacado) usando `finance-hero-card` como container (o gradiente navy animado com shine sweep — a MESMA classe do card de saldo do financeiro)
+- Card "Business" usando `card-surface` com borda
+- Toggle mensal/anual mantido
+- Features com checkmarks coloridos
+- Botão CTA no card destacado: branco sobre navy. No outro: `gradient-primary`
 
-**2. Modificar `AuthContext.tsx`**
+**6. `CTASection.tsx`** — Hero card final
+- Container usando `finance-hero-card` (gradiente navy animado com shine)
+- Texto claro sobre fundo escuro
+- Botão CTA invertido (branco com texto navy)
+- Social proof badges inline
 
-Após carregar o perfil do usuário, **não usar** `profile.plan` diretamente. Em vez disso:
-- Adicionar um efeito que, quando `activeUnitId` mudar, chama a função `get_unit_plan` via RPC
-- Setar o `plan` com o resultado (plano do dono da unidade)
-- Para o próprio dono, o resultado será idêntico ao atual
+**7. `FAQSection.tsx`** — Ajustar accordion
+- Items com `card-surface` (arredondado, sombra do sistema)
+- Hover com `border-primary/25`
+- Manter accordion funcional
 
-Isso requer que o AuthContext receba o `activeUnitId` do UnitContext. Como AuthContext é pai do UnitContext, vamos:
-- Mover a lógica de resolução do plano para um **novo hook `useUnitPlan`** usado dentro do `UnitProvider` ou no `AppLayout`
-- Ou inverter: ler o plano efetivo dentro do `UnitContext` e expô-lo de lá
+### Classes CSS do sistema a reutilizar na landing
 
-**Abordagem escolhida**: Criar um hook `useEffectivePlan` que sobrescreve o plano no AuthContext quando o activeUnitId muda.
+| Classe | Onde usar |
+|--------|-----------|
+| `gradient-primary` | Botões CTA (navbar, hero) |
+| `finance-hero-card` | Card de pricing destacado, CTA final |
+| `card-surface` | Cards de problema, módulos, FAQ |
+| `card-interactive` | Cards de módulos (hover com scale + shadow) |
+| `navyCardFlow` animation | Já inclusa nas classes acima |
+| `cardShineSwipe` animation | Já inclusa em `finance-hero-card` |
 
-**3. Modificar `check-subscription` edge function**
-
-A edge function continua sincronizando o plano do **assinante** no perfil dele. Não precisa mudar — o problema é só no frontend que precisa resolver o plano da unidade, não do usuário logado.
-
-**4. Atualizar os consumidores do plano**
-
-Os locais que usam `plan` do AuthContext (AppLayout, MoreDrawer, BottomTabBar, Settings, UpgradeWall) já receberão o valor correto automaticamente se o AuthContext expor o plano efetivo.
-
-### Arquivos a modificar
-
-| Arquivo | Mudança |
-|---------|---------|
-| **Nova migration SQL** | Função `get_unit_plan(UUID)` |
-| `src/contexts/AuthContext.tsx` | Aceitar override de plano via setter, expor `setEffectivePlan` |
-| `src/contexts/UnitContext.tsx` | Chamar `get_unit_plan` quando `activeUnitId` mudar e setar no AuthContext |
-| `src/components/layout/MoreDrawer.tsx` | Ajustar exibição do badge "FREE" para usar plano efetivo (já usa `plan` do auth, resolve automaticamente) |
-
-### Detalhes técnicos
-
-**SQL Function:**
-```sql
-CREATE OR REPLACE FUNCTION public.get_unit_plan(p_unit_id UUID)
-RETURNS TEXT
-LANGUAGE sql STABLE SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT COALESCE(p.plan, 'free')
-  FROM units u
-  JOIN profiles p ON p.user_id = u.created_by
-  WHERE u.id = p_unit_id
-$$;
-```
-
-**AuthContext**: Adicionar `setEffectivePlan` para que o UnitContext possa sobrescrever o plano quando a unidade ativa mudar.
-
-**UnitContext**: Após resolver a unidade ativa, chamar `supabase.rpc('get_unit_plan', { p_unit_id })` e atualizar o plano no AuthContext.
+### Resultado esperado
+A landing page terá exatamente a mesma "cara" do sistema interno: gradientes navy animados, cards com sombras profundas, shine sweeps, cores semânticas (success, warning, destructive, primary), e screenshots reais — sem nada genérico.
 
