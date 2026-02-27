@@ -361,7 +361,7 @@ export function ChecklistView({
   });
 
   const deadlineBannerText = deadlinePassed
-    ? '⏰ Prazo encerrado — itens pendentes marcados como "não fiz"'
+    ? '⏰ Prazo encerrado — itens pendentes marcados como "não concluído"'
     : null;
 
   return (
@@ -527,7 +527,7 @@ export function ChecklistView({
                                   <User className="w-3 h-3" />
                                   <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
                                   {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
-                                  {!isContested && wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
+                                  {!isContested && wasSkipped && <span className="text-destructive ml-1">(não concluído)</span>}
                                   {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
                                   {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
                                 </div>
@@ -555,7 +555,7 @@ export function ChecklistView({
                               borderColor: getItemPointsColors(pointsAwarded).border,
                             } : undefined}>
                               {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
-                                : wasSkipped ? (<><X className="w-3 h-3" /><span>não fiz</span></>) 
+                                : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
                                 : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
                                 : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
                             </div>
@@ -790,7 +790,7 @@ export function ChecklistView({
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
                                   <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
-                                  <div><p className="font-semibold text-destructive">Não fiz</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                  <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                                 {configuredPoints > 0 && (
                                   <>
@@ -817,7 +817,7 @@ export function ChecklistView({
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
                                   <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
-                                  <div><p className="font-semibold text-destructive">Não fiz</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                  <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                               </>
                             )}
@@ -936,7 +936,7 @@ export function ChecklistView({
                                           <User className="w-3 h-3" />
                                           <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
                                           {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
-                                          {!isContested && wasSkipped && <span className="text-destructive ml-1">(não fiz)</span>}
+                                          {!isContested && wasSkipped && <span className="text-destructive ml-1">(não concluído)</span>}
                                           {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
                                           {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
                                         </div>
@@ -964,7 +964,7 @@ export function ChecklistView({
                                       borderColor: getItemPointsColors(pointsAwarded).border,
                                     } : undefined}>
                                       {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
-                                        : wasSkipped ? (<><X className="w-3 h-3" /><span>não fiz</span></>) 
+                                        : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
                                         : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
                                         : (<div className="flex items-center gap-0.5">
                                             {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
@@ -1210,7 +1210,7 @@ export function ChecklistView({
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
                                           <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
-                                          <div><p className="font-semibold text-destructive">Não fiz</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                          <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
                                         {configuredPoints > 0 && (
                                           <>
@@ -1237,7 +1237,7 @@ export function ChecklistView({
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
                                           <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
-                                          <div><p className="font-semibold text-destructive">Não fiz</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                          <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
                                       </>
                                     )}
