@@ -238,7 +238,7 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete, 
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
               {getCategoryIcon()}
               <span
-                className="truncate max-w-[100px] px-1.5 py-0.5 rounded-md text-[10px] font-medium"
+                className="truncate max-w-[100px] px-1.5 py-0.5 rounded-full text-[10px] font-medium"
                 style={{
                   backgroundColor: category?.color ? `${category.color}18` : 'hsl(var(--secondary))',
                   color: category?.color || 'hsl(var(--muted-foreground))',
