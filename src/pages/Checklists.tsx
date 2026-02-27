@@ -174,10 +174,22 @@ export default function ChecklistsPage() {
       const ab = getDeadlineInfo(currentDate, 'abertura', deadlineSettings);
       const fe = getDeadlineInfo(currentDate, 'fechamento', deadlineSettings);
       const bo = getDeadlineInfo(currentDate, 'bonus', deadlineSettings);
-      setDeadlineLabel({
+
+      const nextLabels = {
         abertura: ab?.label || '',
         fechamento: fe?.label || '',
         bonus: bo?.label || '',
+      };
+
+      setDeadlineLabel((prev) => {
+        if (
+          prev.abertura === nextLabels.abertura &&
+          prev.fechamento === nextLabels.fechamento &&
+          prev.bonus === nextLabels.bonus
+        ) {
+          return prev;
+        }
+        return nextLabels;
       });
     };
     update();
@@ -188,7 +200,7 @@ export default function ChecklistsPage() {
   const deadlinePassed = useMemo(() => {
     const info = getDeadlineInfo(currentDate, checklistType, deadlineSettings);
     return info?.passed ?? false;
-  }, [currentDate, checklistType, deadlineLabel, deadlineSettings]);
+  }, [currentDate, checklistType, deadlineSettings]);
 
   // ── Auto-close: mark pending items as skipped after deadline ──
   const autoClosedRef = useRef<string>('');
