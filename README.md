@@ -1,5 +1,9 @@
 # 🌿 Garden Gestão — SaaS de Gestão para Restaurantes
 
+## Sobre o projeto
+
+> Sistema completo de gestão para restaurantes — estoque, financeiro, equipe, IA e muito mais.
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
