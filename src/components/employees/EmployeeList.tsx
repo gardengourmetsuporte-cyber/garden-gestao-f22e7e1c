@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmployeeSheet } from './EmployeeSheet';
+import { DefaultAvatar } from '@/components/profile/DefaultAvatar';
+import { useFabAction } from '@/contexts/FabActionContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +38,13 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showInactive, setShowInactive] = useState(false);
+
+  // Register FAB action for adding new employee
+  useFabAction({
+    icon: 'Plus',
+    label: 'Novo funcionário',
+    onClick: () => { setEditingEmployee(null); setSheetOpen(true); },
+  }, []);
 
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -85,20 +94,15 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1">
-          <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar funcionário..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Button onClick={() => { setEditingEmployee(null); setSheetOpen(true); }}>
-          <AppIcon name="Plus" size={16} className="mr-2" />
-          Novo
-        </Button>
+      {/* Search bar */}
+      <div className="relative">
+        <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Buscar funcionário..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
       </div>
 
       <div className="flex items-center gap-2">
@@ -115,81 +119,98 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
       </div>
 
       <div className="space-y-2">
-        {filteredEmployees.map((employee) => (
-          <div
-            key={employee.id}
-            className="card-unified-interactive p-4 cursor-pointer"
-            onClick={() => onSelectEmployee(employee)}
-          >
-            <div className="flex items-center justify-between">
+        {filteredEmployees.map((employee) => {
+          const avatarUrl = (employee as any).avatar_url as string | null;
+          return (
+            <div
+              key={employee.id}
+              className="card-unified-interactive p-4 cursor-pointer"
+              onClick={() => onSelectEmployee(employee)}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <AppIcon name="User" size={20} className="text-primary" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold font-display">{employee.full_name}</span>
+                {/* Avatar */}
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={employee.full_name}
+                    className="w-11 h-11 rounded-full object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <div className="flex-shrink-0">
+                    <DefaultAvatar name={employee.full_name} size={44} userId={employee.user_id || undefined} />
+                  </div>
+                )}
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-semibold font-display truncate">{employee.full_name}</span>
                     {!employee.is_active && (
-                      <Badge variant="secondary" className="text-xs">Inativo</Badge>
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Inativo</Badge>
                     )}
                     {employee.user_id && (
-                      <Badge variant="outline" className="text-xs">
-                        <AppIcon name="UserCheck" size={12} className="mr-1" />
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        <AppIcon name="UserCheck" size={10} className="mr-0.5" />
                         Vinculado
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                     {employee.role && (
-                      <span className="flex items-center gap-1">
-                        <AppIcon name="Briefcase" size={12} />
-                        {employee.role}
-                      </span>
+                      <span className="truncate">{employee.role}</span>
                     )}
-                    <span className="flex items-center gap-1">
-                      <AppIcon name="DollarSign" size={12} />
-                      {formatCurrency(employee.base_salary)}
-                    </span>
+                    {employee.department && (
+                      <>
+                        <span className="text-border">•</span>
+                        <span className="truncate">{employee.department}</span>
+                      </>
+                    )}
                   </div>
                 </div>
+
+                {/* Salary + Menu */}
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <span className="text-sm font-medium text-muted-foreground hidden sm:block">
+                    {formatCurrency(employee.base_salary)}
+                  </span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <AppIcon name="MoreVertical" size={16} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(employee); }}>
+                        <AppIcon name="Pencil" size={16} className="mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); toggleActive(employee); }}>
+                        {employee.is_active ? (
+                          <>
+                            <AppIcon name="person_off" size={16} className="mr-2" />
+                            Desativar
+                          </>
+                        ) : (
+                          <>
+                            <AppIcon name="UserCheck" size={16} className="mr-2" />
+                            Ativar
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => { e.stopPropagation(); setDeleteId(employee.id); }}
+                        className="text-destructive"
+                      >
+                        <AppIcon name="Trash2" size={16} className="mr-2" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                  <Button variant="ghost" size="icon">
-                    <AppIcon name="MoreVertical" size={16} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(employee); }}>
-                    <AppIcon name="Pencil" size={16} className="mr-2" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); toggleActive(employee); }}>
-                    {employee.is_active ? (
-                      <>
-                        <AppIcon name="person_off" size={16} className="mr-2" />
-                        Desativar
-                      </>
-                    ) : (
-                      <>
-                        <AppIcon name="UserCheck" size={16} className="mr-2" />
-                        Ativar
-                      </>
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={(e) => { e.stopPropagation(); setDeleteId(employee.id); }}
-                    className="text-destructive"
-                  >
-                    <AppIcon name="Trash2" size={16} className="mr-2" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {filteredEmployees.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
