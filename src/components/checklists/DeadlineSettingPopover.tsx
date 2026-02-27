@@ -98,7 +98,7 @@ export function DeadlineSettingPopover({ type, currentSetting, onSave, onRemove,
         </div>
 
         <div className="flex gap-2">
-          {type === 'bonus' && currentSetting && onRemove && (
+          {currentSetting && onRemove && (
             <Button
               variant="outline"
               size="sm"

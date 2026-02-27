@@ -19,20 +19,10 @@ interface DeadlineInfo {
   label: string;
 }
 
-/** Default deadlines when no custom setting exists */
-const DEFAULTS: Record<string, DeadlineSetting> = {
-  abertura: { checklist_type: 'abertura', deadline_hour: 19, deadline_minute: 30, is_next_day: false },
-  fechamento: { checklist_type: 'fechamento', deadline_hour: 2, deadline_minute: 0, is_next_day: true },
-};
-
+/** No default deadlines — users opt-in by configuring one */
 function getSettingForType(type: ChecklistType, settings?: DeadlineSetting[] | null): DeadlineSetting | null {
-  if (type === 'bonus') {
-    // Bonus may have a custom setting, otherwise no deadline
-    const custom = settings?.find(s => s.checklist_type === 'bonus');
-    return custom || null;
-  }
   const custom = settings?.find(s => s.checklist_type === type);
-  return custom || DEFAULTS[type] || null;
+  return custom || null;
 }
 
 export function getChecklistDeadline(dateStr: string, type: ChecklistType, settings?: DeadlineSetting[] | null): Date | null {

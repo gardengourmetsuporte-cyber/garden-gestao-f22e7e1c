@@ -398,6 +398,7 @@ export default function ChecklistsPage() {
                     type="abertura"
                     currentSetting={deadlineSettings.find(s => s.checklist_type === 'abertura') || null}
                     onSave={updateDeadline}
+                    onRemove={removeDeadline}
                     isSaving={isSavingDeadline}
                   />
                 )}
@@ -464,6 +465,7 @@ export default function ChecklistsPage() {
                     type="fechamento"
                     currentSetting={deadlineSettings.find(s => s.checklist_type === 'fechamento') || null}
                     onSave={updateDeadline}
+                    onRemove={removeDeadline}
                     isSaving={isSavingDeadline}
                   />
                 )}
