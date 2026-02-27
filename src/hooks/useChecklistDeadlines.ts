@@ -5,12 +5,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DeadlineSetting } from '@/lib/checklistTiming';
 import { toast } from 'sonner';
 
+const EMPTY_DEADLINE_SETTINGS: DeadlineSetting[] = [];
+
 export function useChecklistDeadlines() {
   const { activeUnitId } = useUnit();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: settings = [], isLoading } = useQuery({
+  const { data: settings = EMPTY_DEADLINE_SETTINGS, isLoading } = useQuery({
     queryKey: ['checklist-deadline-settings', activeUnitId],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
