@@ -1,29 +1,26 @@
 
 
-## Plan: Modernize Employee List Layout
+## Plan: Modernizar Layout da Loja de Recompensas
+
+A tela atual usa cards verticais grandes com imagem aspect-video + botão "Resgatar" ocupando muito espaço. Vou redesenhar para um layout mais compacto e atraente, estilo app de delivery/loja premium.
 
 ### Changes
 
-#### 1. `src/hooks/useEmployees.ts` — Join profile avatar
-- After fetching employees, collect all `user_id`s and batch-query `profiles` table for `avatar_url`
-- Merge `avatar_url` into each employee record (same pattern used in `useTimeTracking`, `useCashClosing`)
+#### 1. `src/components/rewards/ProductCard.tsx` — Redesign completo
+- Layout horizontal compacto: imagem quadrada (80x80 rounded-xl) à esquerda, info à direita
+- Remover botão "Resgatar" do card — o clique no card inteiro abre o dialog de confirmação
+- Badge de pontos com estilo amber/dourado mais chamativo
+- Indicador visual de "pode resgatar" vs "pontos insuficientes" (opacidade + badge)
+- Estoque como badge sutil inline
+- Card com `card-unified-interactive` para consistência
 
-#### 2. `src/components/employees/EmployeeList.tsx` — Layout overhaul
-- **Remove "Novo" button** from the search bar area
-- **Register FAB action** via `useFabAction` to open the EmployeeSheet (consistent with other modules)
-- **Replace icon placeholder** with `DefaultAvatar` component using employee name + user_id for deterministic gradient colors (and `avatar_url` from profiles when available)
-- **Fix card layout**: Clean alignment — avatar left, name + role stacked, salary as a subtle badge on the right side instead of inline with role
-- **Badges**: Move "Vinculado" and "Inativo" inline after name, smaller and more subtle
-- **Cards**: Ensure proper `rounded-2xl` and consistent padding matching current design system
-- **Search bar**: Keep standalone without the "Novo" button crowding it
-- **Filter row**: Simplify the inactive toggle styling
+#### 2. `src/pages/Rewards.tsx` — Atualizar hero e grid
+- Hero card de saldo: usar padrão "inversão premium" (bg branco com shimmer no dark mode) conforme memória de design
+- Grid: mudar de `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` para `space-y-2` (lista vertical compacta), mais adequado para mobile
+- Adicionar progress bar mostrando quanto falta para o próximo prêmio mais barato (motivação)
+- Seção de resgates com título mais integrado
 
-#### 3. `src/pages/Employees.tsx` — Pass sheet control up
-- The FAB needs to open the EmployeeSheet, so the sheet state (`sheetOpen`, `setSheetOpen`) will be managed in `EmployeeList` but triggered by FAB via `useFabAction`
-
-### Summary of visual changes
-- Employee photos (DefaultAvatar with initials gradient, or real avatar from profiles)
-- Cleaner card alignment: avatar | name+role | salary
-- "Novo" button moved to central FAB
-- Consistent card radius and spacing with the rest of the app
+#### 3. `src/components/rewards/RedemptionHistory.tsx` — Ajuste menor
+- Trocar `card-base` por `card-unified-interactive` para consistência
+- Manter layout atual que já está bom
 
