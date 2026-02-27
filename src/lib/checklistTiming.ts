@@ -10,6 +10,7 @@ export interface DeadlineSetting {
   deadline_hour: number;
   deadline_minute: number;
   is_next_day: boolean;
+  is_active?: boolean;
 }
 
 interface DeadlineInfo {
@@ -22,7 +23,8 @@ interface DeadlineInfo {
 /** No default deadlines — users opt-in by configuring one */
 function getSettingForType(type: ChecklistType, settings?: DeadlineSetting[] | null): DeadlineSetting | null {
   const custom = settings?.find(s => s.checklist_type === type);
-  return custom || null;
+  if (!custom || custom.is_active === false) return null;
+  return custom;
 }
 
 export function getChecklistDeadline(dateStr: string, type: ChecklistType, settings?: DeadlineSetting[] | null): Date | null {

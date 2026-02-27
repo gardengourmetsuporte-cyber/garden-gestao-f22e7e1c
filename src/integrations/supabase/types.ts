@@ -468,6 +468,7 @@ export type Database = {
           deadline_hour: number
           deadline_minute: number
           id: string
+          is_active: boolean
           is_next_day: boolean
           unit_id: string
           updated_at: string | null
@@ -477,6 +478,7 @@ export type Database = {
           deadline_hour?: number
           deadline_minute?: number
           id?: string
+          is_active?: boolean
           is_next_day?: boolean
           unit_id: string
           updated_at?: string | null
@@ -486,6 +488,7 @@ export type Database = {
           deadline_hour?: number
           deadline_minute?: number
           id?: string
+          is_active?: boolean
           is_next_day?: boolean
           unit_id?: string
           updated_at?: string | null

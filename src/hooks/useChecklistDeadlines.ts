@@ -15,7 +15,7 @@ export function useChecklistDeadlines() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('checklist_deadline_settings')
-        .select('checklist_type, deadline_hour, deadline_minute, is_next_day')
+        .select('checklist_type, deadline_hour, deadline_minute, is_next_day, is_active')
         .eq('unit_id', activeUnitId!);
       if (error) throw error;
       return (data || []) as DeadlineSetting[];
@@ -34,6 +34,7 @@ export function useChecklistDeadlines() {
           deadline_hour: setting.deadline_hour,
           deadline_minute: setting.deadline_minute,
           is_next_day: setting.is_next_day,
+          is_active: setting.is_active ?? true,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'unit_id,checklist_type' });
       if (error) throw error;
