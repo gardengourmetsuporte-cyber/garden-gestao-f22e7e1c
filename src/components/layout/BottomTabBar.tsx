@@ -11,6 +11,8 @@ import { preloadRoute } from '@/lib/routePreload';
 import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
 import { useAuth } from '@/contexts/AuthContext';
 import { getModuleKeyFromRoute } from '@/lib/modules';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface TabDef {
   key: string;
@@ -46,6 +48,7 @@ const HIDDEN_ROUTES = ['/finance'];
 export function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { activeUnit } = useUnit();
   const { hasAccess } = useUserModules();
   const { fabAction } = useFabContext();
   const { plan } = useAuth();
@@ -209,7 +212,50 @@ export function BottomTabBar() {
               />
             ))}
 
-            {/* "Mais" tab */}
+            {/* "Mais" tab — 3-dot menu for cardápio, drawer for others */}
+            {isCardapioRoute ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    onClick={() => navigator.vibrate?.(10)}
+                    aria-label="Configurações"
+                    className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
+                    style={{ width: '20%' }}
+                  >
+                    <AppIcon name="MoreVert" size={22} fill={0} className="text-muted-foreground transition-colors" />
+                    <span className="text-[10px] font-normal text-muted-foreground">Config</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="top" className="mb-2 min-w-[200px]">
+                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
+                    <AppIcon name="Zap" size={16} className="mr-2 text-muted-foreground" />
+                    Integração PDV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
+                    <AppIcon name="QrCode" size={16} className="mr-2 text-muted-foreground" />
+                    Mesas & QR Code
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
+                    <AppIcon name="Dices" size={16} className="mr-2 text-muted-foreground" />
+                    Roleta / Gamificação
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/settings?tab=cardapio-digital')}>
+                    <AppIcon name="Cog" size={16} className="mr-2 text-muted-foreground" />
+                    Configurações do Cardápio
+                  </DropdownMenuItem>
+                  {activeUnit && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => window.open(`/m/${activeUnit.id}`, '_blank')}>
+                        <AppIcon name="ExternalLink" size={16} className="mr-2 text-muted-foreground" />
+                        Ver cardápio público
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
             <button
               onClick={() => { navigator.vibrate?.(10); setMoreOpen(true); }}
               aria-label="Mais opções"
@@ -219,6 +265,7 @@ export function BottomTabBar() {
               <AppIcon name="Menu" size={22} fill={0} className="text-muted-foreground transition-colors" />
               <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
             </button>
+            )}
           </div>
         </div>
       </nav>

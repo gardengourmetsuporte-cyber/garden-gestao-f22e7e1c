@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
+import { useFabAction } from '@/contexts/FabActionContext';
 
 // Menu components
 import { MenuCategoryTree } from '@/components/menu/MenuCategoryTree';
@@ -61,6 +62,34 @@ export default function CardapioHub() {
 
   const selectedGroup = groups.find(g => g.id === selectedGroupId) || null;
   const groupProducts = selectedGroupId ? getProductsByGroup(selectedGroupId) : [];
+
+  // Contextual FAB action based on current sub-view
+  const fabAction = useMemo(() => {
+    if (isPedidos) {
+      return null; // No primary action on orders
+    }
+    if (cardapioTab === 'opcionais') {
+      return { icon: 'Plus', label: 'Novo Opcional', onClick: () => {
+        setEditingOG({
+          title: '', min_selections: 0, max_selections: 1,
+          allow_repeat: false, is_active: true,
+          availability: { tablet: true, delivery: true }, options: [],
+        });
+        setOgSheetOpen(true);
+      }};
+    }
+    // Default: add product
+    return { icon: 'Plus', label: 'Novo Produto', onClick: () => {
+      setEditingProduct({
+        name: '', price: 0, category: 'Geral', group_id: selectedGroupId,
+        is_active: true, availability: { tablet: true, delivery: true },
+        price_type: 'fixed', is_highlighted: false, is_18_plus: false,
+      });
+      setProductSheetOpen(true);
+    }};
+  }, [isPedidos, cardapioTab, selectedGroupId]);
+
+  useFabAction(fabAction, [fabAction]);
 
   // Order stats
   const todayStats = useMemo(() => {
