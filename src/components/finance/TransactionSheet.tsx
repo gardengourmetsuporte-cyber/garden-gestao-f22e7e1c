@@ -868,7 +868,7 @@ export function TransactionSheet({
           </div>
 
           {/* Fixed bottom actions */}
-          <div className="shrink-0 border-t border-border/50 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-20">
+          <div className="shrink-0 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-20">
             {/* Save and Continue - only for new transactions */}
             {!editingTransaction && (
               <Button
