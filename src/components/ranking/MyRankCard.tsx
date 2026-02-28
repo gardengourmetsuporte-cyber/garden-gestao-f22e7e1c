@@ -35,8 +35,8 @@ export function MyRankCard({ fullName, avatarUrl, earnedPoints, monthlyScore, ac
               <span className="text-xs font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{animatedMonthly} pts/mês</span>
             </div>
             <div className="flex items-center gap-1">
-              <AppIcon name="Wallet" size={14} style={{ color: 'hsl(220 70% 25%)' }} />
-              <span className="text-xs font-bold" style={{ color: 'hsl(220 70% 25%)' }}>{animatedBalance} saldo</span>
+              <AppIcon name="Wallet" size={14} style={{ color: 'hsl(156 60% 35%)' }} />
+              <span className="text-xs font-bold" style={{ color: 'hsl(156 60% 35%)' }}>{animatedBalance} saldo</span>
             </div>
             {leaderboardPosition && (
               <div className="flex items-center gap-1">

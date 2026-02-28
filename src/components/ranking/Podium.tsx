@@ -73,7 +73,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
               {/* Position badge */}
               <div
                 className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-background"
-                style={{ background: crownColor, color: position === 1 ? '#1a1a2e' : '#fff' }}
+                style={{ background: crownColor, color: position === 1 ? '#0d1f14' : '#fff' }}
               >
                 {position}
               </div>

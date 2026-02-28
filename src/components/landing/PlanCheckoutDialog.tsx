@@ -62,7 +62,7 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
             style={{
               background: "var(--gradient-brand)",
               color: "white",
-              boxShadow: "0 4px 16px hsl(220 45% 18% / 0.3)",
+              boxShadow: "0 4px 16px hsl(156 50% 18% / 0.3)",
             }}
           >
             Começar 14 dias grátis

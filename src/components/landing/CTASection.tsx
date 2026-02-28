@@ -23,7 +23,7 @@ export function CTASection() {
           <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] rounded-full blur-[80px] opacity-[0.1] mix-blend-screen pointer-events-none" style={{ background: 'hsl(190 90% 50%)', animation: 'float-orb-2 10s ease-in-out infinite' }} />
 
           <div className="relative z-10">
-            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-8 shadow-lg" style={{ boxShadow: '0 0 60px hsl(220 80% 50% / 0.15)' }}>
+            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-8 shadow-lg" style={{ boxShadow: '0 0 60px hsl(156 72% 40% / 0.2)' }}>
               <img src={logoImg} alt="Garden" className="w-11 h-11 object-contain" />
             </div>
 
@@ -36,7 +36,7 @@ export function CTASection() {
 
             <Link
               to="/auth?plan=free"
-              className="group inline-flex items-center gap-2.5 h-14 px-10 rounded-2xl font-bold text-base bg-white text-[hsl(220,30%,15%)] shadow-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+              className="group inline-flex items-center gap-2.5 h-14 px-10 rounded-2xl font-bold text-base bg-white text-[hsl(156,30%,15%)] shadow-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
             >
               Criar minha conta grátis
               <AppIcon name="ArrowRight" size={18} className="group-hover:translate-x-1 transition-transform" />

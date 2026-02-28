@@ -31,11 +31,11 @@
     --garden-green: 156 72% 38%;
 
     /* Neon glow tokens - Enhanced for premium feel */
-    --neon-cyan: 190 90% 50%;
+    --neon-cyan: 160 70% 48%;
     --neon-green: 156 72% 45%;
     --neon-red: 348 83% 53%;
     --neon-amber: 43 96% 56%;
-    --neon-purple: 250 89% 65%;
+    --neon-purple: 156 50% 55%;
 
     /* Semantic finance tokens */
     --color-income: 156 72% 45%;
@@ -165,11 +165,11 @@
     --ring: 156 72% 38%;
 
     /* Neon overrides for light — darker so they read well */
-    --neon-cyan: 215 50% 20%;
+    --neon-cyan: 156 50% 30%;
     --neon-green: 142 71% 32%;
     --neon-red: 0 72% 48%;
     --neon-amber: 38 92% 42%;
-    --neon-purple: 218 50% 18%;
+    --neon-purple: 156 40% 35%;
 
     /* Light glow & shadow tokens — minimal, no colored glow */
     --glow-primary: 0 0 0 transparent;
@@ -532,8 +532,8 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(225 60% 50% / 0.1) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(220 50% 45% / 0.06) 0%, transparent 45%);
+    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(156 60% 40% / 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(156 50% 35% / 0.06) 0%, transparent 45%);
     pointer-events: none;
   }
 
