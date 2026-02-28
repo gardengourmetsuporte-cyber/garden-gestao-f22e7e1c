@@ -1985,15 +1985,15 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /* Dark mode: light gradient on light card */
+  /* Dark mode: vibrant emerald gradient on dark card */
   .dark .tab-icon-galaxy {
     background: linear-gradient(135deg,
-        #e2e8f0 0%,
-        #f8fafc 25%,
-        rgba(16, 185, 129, 0.4) 45%,
-        rgba(16, 185, 129, 0.3) 55%,
-        #f8fafc 70%,
-        #e2e8f0 100%);
+        rgba(16, 185, 129, 0.8) 0%,
+        rgba(52, 211, 153, 1) 25%,
+        rgba(16, 185, 129, 1) 45%,
+        rgba(4, 120, 87, 1) 55%,
+        rgba(52, 211, 153, 1) 70%,
+        rgba(16, 185, 129, 0.8) 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -2003,9 +2003,9 @@
 
   .dark .tab-icon-galaxy-text {
     background: linear-gradient(135deg,
-        #f8fafc 0%,
-        rgba(16, 185, 129, 0.6) 50%,
-        #f8fafc 100%);
+        rgba(52, 211, 153, 1) 0%,
+        rgba(16, 185, 129, 1) 50%,
+        rgba(52, 211, 153, 1) 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
