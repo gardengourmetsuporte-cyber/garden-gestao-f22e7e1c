@@ -144,7 +144,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
-                  boxShadow: '0 4px 20px hsl(220 70% 16% / 0.4), 0 8px 32px hsl(0 0% 0% / 0.15)',
+                  boxShadow: '0 4px 20px rgba(16,185,129,0.35), 0 8px 32px rgba(0,0,0,0.2)',
                 }}
               >
                 <AppIcon name="Plus" size={26} className="relative z-10 text-white" />

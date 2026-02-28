@@ -51,8 +51,8 @@ export function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorPro
             variant="ghost"
             className={cn(
               "text-sm font-semibold min-w-[150px] text-center capitalize gap-1.5 h-9 px-4 rounded-full",
-              "bg-gradient-to-r from-[hsl(222_50%_10%)] via-[hsl(228_60%_18%)] to-[hsl(222_50%_10%)] text-white/90 hover:text-white",
-              "dark:from-white dark:via-[hsl(220_50%_96%)] dark:to-white dark:text-[hsl(220_30%_20%)] dark:hover:text-[hsl(220_30%_10%)]"
+              "bg-gradient-to-r from-[hsl(156_40%_8%)] via-[hsl(156_50%_16%)] to-[hsl(156_40%_8%)] text-white/90 hover:text-white",
+              "dark:from-white dark:via-[hsl(156_30%_96%)] dark:to-white dark:text-[hsl(156_30%_20%)] dark:hover:text-[hsl(156_30%_10%)]"
             )}
           >
             <AppIcon name="Calendar" size={16} className="shrink-0" />

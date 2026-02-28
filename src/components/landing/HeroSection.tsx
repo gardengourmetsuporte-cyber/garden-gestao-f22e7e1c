@@ -22,7 +22,7 @@ export function HeroSection() {
           style={{
             backgroundImage: `
               radial-gradient(circle at 15% 50%, hsl(156 72% 35% / 0.15), transparent 25%),
-              radial-gradient(circle at 85% 30%, hsl(234 89% 50% / 0.15), transparent 25%)
+              radial-gradient(circle at 85% 30%, hsl(160 80% 40% / 0.12), transparent 25%)
             `
           }}
         />
@@ -34,7 +34,7 @@ export function HeroSection() {
         />
         <div
           className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[150px] mix-blend-screen opacity-20"
-          style={{ background: 'hsl(234 89% 65%)', animation: 'float-orb-2 15s ease-in-out infinite' }}
+          style={{ background: 'hsl(160 80% 45%)', animation: 'float-orb-2 15s ease-in-out infinite' }}
         />
         <div
           className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[800px] h-[400px] rounded-[100%] blur-[120px] mix-blend-screen opacity-10 pointer-events-none"
