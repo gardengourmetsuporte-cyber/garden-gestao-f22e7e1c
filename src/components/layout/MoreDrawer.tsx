@@ -174,7 +174,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                   <p className="text-[11px] font-medium text-white/70">{rank.title} · {earnedPoints} pts</p>
                 </div>
               </button>
-              <ThemeToggle className="p-1.5 shrink-0 text-white/70 hover:text-white" />
+              {/* ThemeToggle removido temporariamente */}
             </div>
 
             {/* Store selector — compact inline */}
