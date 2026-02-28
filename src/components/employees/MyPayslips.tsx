@@ -129,7 +129,7 @@ export function MyPayslips() {
                           </div>
                         </div>
                       )}
-                      {payment.fgts_amount > 0 && (<div className="text-sm p-2 bg-blue-500/10 rounded-lg"><div className="flex justify-between"><span className="text-blue-600">FGTS depositado</span><span className="text-blue-600 font-medium">{formatCurrency(payment.fgts_amount)}</span></div></div>)}
+                      {payment.fgts_amount > 0 && (<div className="text-sm p-2 bg-emerald-500/10 rounded-lg"><div className="flex justify-between"><span className="text-emerald-600">FGTS depositado</span><span className="text-emerald-600 font-medium">{formatCurrency(payment.fgts_amount)}</span></div></div>)}
                       <div className="p-3 bg-primary/10 rounded-lg"><div className="flex justify-between items-center"><span className="font-semibold">Líquido a Receber</span><span className="font-bold text-lg text-primary">{formatCurrency(payment.net_salary)}</span></div></div>
                     </div>
                   )}
