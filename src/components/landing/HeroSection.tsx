@@ -74,7 +74,7 @@ export function HeroSection() {
               Financeiro, estoque, equipe e IA — tudo em um app criado por quem vive a rotina de food service.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-start gap-4 pt-2">
+            <div className="flex items-center gap-3 pt-2">
               <Link
                 to="/auth?plan=free"
                 className="group inline-flex items-center gap-2.5 h-13 px-8 rounded-xl font-bold text-sm bg-white text-[hsl(220,30%,15%)] shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-200"
@@ -84,20 +84,18 @@ export function HeroSection() {
               </Link>
               <Link
                 to="/auth"
-                className="text-sm font-medium text-white/45 hover:text-white/70 transition-colors pt-3 sm:pt-0 sm:self-center"
+                className="inline-flex items-center gap-2 h-13 px-6 rounded-xl text-sm font-semibold text-white/70 hover:text-white border border-white/15 hover:border-white/30 hover:bg-white/5 transition-all duration-200"
               >
-                Já tenho conta →
+                Já tenho conta
               </Link>
             </div>
 
-            <div className="flex items-center gap-4 sm:gap-6 text-xs text-white/35 pt-1">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                14 dias grátis
-              </span>
-              <span className="text-white/15">·</span>
+            <div className="flex items-center gap-2 text-[11px] text-white/30 pt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
+              <span>14 dias grátis</span>
+              <span className="mx-1 text-white/10">•</span>
               <span>Sem cartão</span>
-              <span className="text-white/15">·</span>
+              <span className="mx-1 text-white/10">•</span>
               <span>Setup em 5min</span>
             </div>
           </div>
