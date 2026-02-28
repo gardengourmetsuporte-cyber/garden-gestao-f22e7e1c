@@ -22,7 +22,6 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { BottomTabBar } from './BottomTabBar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -170,17 +169,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Mobile Header with Navy Brand Strip ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-white/5"
         style={{
           paddingTop: 'env(safe-area-inset-top)',
-          background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+          background: 'linear-gradient(145deg, #050a05 0%, #0a150a 50%, #050a05 100%)',
         }}
       >
-        {/* Navy gradient brand bar */}
+        {/* Premium gradient brand bar */}
         <div
           className="relative overflow-hidden backdrop-blur-3xl"
           style={{
-            background: 'linear-gradient(135deg, hsl(224 45% 8% / 0.85) 0%, hsl(220 70% 16% / 0.85) 40%, hsl(234 75% 26% / 0.85) 70%, hsl(220 65% 16% / 0.85) 100%)',
+            background: 'linear-gradient(145deg, rgba(5,10,5,0.85) 0%, rgba(10,21,10,0.85) 50%, rgba(5,10,5,0.85) 100%)',
           }}
         >
           {/* Animated ambient glow */}
@@ -238,11 +237,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Desktop Sidebar ======= */}
       <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card/60 backdrop-blur-3xl border-r border-border/10">
-        {/* Navy brand header */}
+        {/* Premium brand header */}
         <div
           className="relative overflow-hidden shrink-0 border-b border-border/10"
           style={{
-            background: 'linear-gradient(135deg, hsl(224 45% 8% / 0.6) 0%, hsl(220 70% 16% / 0.6) 40%, hsl(234 75% 26% / 0.6) 70%, hsl(220 65% 16% / 0.6) 100%)',
+            background: 'linear-gradient(145deg, rgba(5,10,5,0.6) 0%, rgba(10,21,10,0.6) 50%, rgba(5,10,5,0.6) 100%)',
           }}
         >
           <div className="flex items-center gap-3 px-4 h-16 relative z-10">
@@ -256,7 +255,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
               <p className="text-[10px] text-white/40 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
-            <ThemeToggle className="p-1.5 shrink-0 text-white/60 hover:text-white" />
           </div>
         </div>
 

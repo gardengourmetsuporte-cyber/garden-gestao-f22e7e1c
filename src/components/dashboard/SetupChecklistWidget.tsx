@@ -40,7 +40,7 @@ export function SetupChecklistWidget() {
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border bg-card p-5 space-y-4 transition-all duration-400",
+        "card-surface p-5 space-y-4 transition-all duration-400",
         animatingOut ? "opacity-0 scale-95 -translate-y-2" : "animate-spring-in"
       )}
     >
