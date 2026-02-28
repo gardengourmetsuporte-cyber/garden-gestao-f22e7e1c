@@ -128,7 +128,7 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
     }
   }
 
-  return <>{children}</>;
+  return <RouteErrorBoundary>{children}</RouteErrorBoundary>;
 }
 
 function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
@@ -172,7 +172,7 @@ function AppRoutes() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/invite" element={<Invite />} />
-          <Route path="/" element={<ProtectedRoute><RouteErrorBoundary><DashboardNew /></RouteErrorBoundary></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><DashboardNew /></ProtectedRoute>} />
           <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
           <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
           <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
