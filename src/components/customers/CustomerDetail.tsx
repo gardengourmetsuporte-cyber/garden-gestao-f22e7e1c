@@ -16,10 +16,14 @@ interface Props {
   eventsLoading: boolean;
   onEdit: () => void;
   onAddPoints: (customerId: string) => void;
+  loyaltyRules?: import('@/types/customer').LoyaltyRule[];
 }
 
-export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoading, onEdit, onAddPoints }: Props) {
+export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoading, onEdit, onAddPoints, loyaltyRules = [] }: Props) {
   if (!customer) return null;
+
+  const activePointsRule = loyaltyRules.find(r => r.rule_type === 'points_per_real' && r.is_active);
+  const activeOrdersRule = loyaltyRules.find(r => r.rule_type === 'orders_for_free' && r.is_active);
 
   const seg = SEGMENT_CONFIG[customer.segment] || SEGMENT_CONFIG.new;
   const daysSince = customer.last_purchase_at
@@ -74,6 +78,34 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
               <p className="text-[10px] text-muted-foreground">Freq. Visita</p>
             </div>
           </div>
+
+          {/* Active loyalty rules */}
+          {(activePointsRule || activeOrdersRule) && (
+            <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 space-y-2">
+              <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                <span className="material-symbols-rounded" style={{ fontSize: 14 }}>loyalty</span>
+                Regras de Fidelidade Ativas
+              </p>
+              {activePointsRule && (
+                <p className="text-xs text-muted-foreground">
+                  ⭐ {activePointsRule.reward_value} pt{activePointsRule.reward_value > 1 ? 's' : ''} a cada R${activePointsRule.threshold} gasto
+                </p>
+              )}
+              {activeOrdersRule && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">
+                    🎁 A cada {activeOrdersRule.threshold} pedidos = {activeOrdersRule.reward_value} grátis
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Progress value={((customer.total_orders || 0) % activeOrdersRule.threshold) / activeOrdersRule.threshold * 100} className="h-1.5 flex-1" />
+                    <span className="text-[10px] font-bold text-primary">
+                      {(customer.total_orders || 0) % activeOrdersRule.threshold}/{activeOrdersRule.threshold}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Contact */}
           <div className="space-y-1.5">
