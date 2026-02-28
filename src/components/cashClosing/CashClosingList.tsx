@@ -21,19 +21,19 @@ import { AppIcon } from '@/components/ui/app-icon';
      switch (status) {
        case 'approved':
          return { 
-           icon: CheckCircle2, 
+           icon: 'CheckCircle2', 
            label: 'Aprovado', 
            color: 'bg-success/10 text-success border-success/20' 
          };
        case 'divergent':
          return { 
-           icon: AlertTriangle, 
+           icon: 'AlertTriangle', 
            label: 'Divergente', 
            color: 'bg-destructive/10 text-destructive border-destructive/20' 
          };
        default:
          return { 
-           icon: Clock, 
+           icon: 'Clock', 
            label: 'Pendente', 
            color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' 
          };
@@ -75,7 +75,6 @@ import { AppIcon } from '@/components/ui/app-icon';
              <div className="space-y-2">
                {dateClosings.map(closing => {
                  const status = getStatusConfig(closing.status);
-                 const StatusIcon = status.icon;
                  
                  return (
                    <Card 
@@ -110,7 +109,7 @@ import { AppIcon } from '@/components/ui/app-icon';
                             variant="outline" 
                             className={`${status.color} shrink-0`}
                           >
-                            <StatusIcon className="w-3 h-3 mr-1" />
+                            <AppIcon name={status.icon} className="w-3 h-3 mr-1" />
                             {status.label}
                           </Badge>
                           

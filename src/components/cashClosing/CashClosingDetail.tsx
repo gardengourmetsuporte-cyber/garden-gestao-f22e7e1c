@@ -89,35 +89,26 @@ import { AppIcon } from '@/components/ui/app-icon';
      switch (status) {
        case 'approved':
          return { 
-           icon: CheckCircle2, 
+           icon: 'CheckCircle2', 
            label: 'Aprovado', 
            color: 'bg-success/10 text-success border-success/20' 
          };
        case 'divergent':
          return { 
-           icon: AlertTriangle, 
+           icon: 'AlertTriangle', 
            label: 'Divergente', 
            color: 'bg-destructive/10 text-destructive border-destructive/20' 
          };
        default:
          return { 
-           icon: Clock, 
+           icon: 'Clock', 
            label: 'Pendente', 
            color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' 
          };
      }
    };
  
-   const getIcon = (iconName: string) => {
-     switch (iconName) {
-       case 'Banknote': return Banknote;
-       case 'CreditCard': return CreditCard;
-       case 'Smartphone': return Smartphone;
-      case 'Truck': return Truck;
-      case 'FileSignature': return Receipt;
-      default: return Banknote;
-     }
-   };
+   const getIcon = (iconName: string) => iconName;
  
    const handleApprove = async () => {
      setIsApproving(true);
@@ -145,7 +136,6 @@ import { AppIcon } from '@/components/ui/app-icon';
    };
  
    const status = getStatusConfig(closing.status);
-   const StatusIcon = status.icon;
 
    // Allow edit/delete for admin OR for the user who created (only pending)
    const canEdit = closing.status === 'pending';
@@ -160,7 +150,7 @@ import { AppIcon } from '@/components/ui/app-icon';
              variant="outline" 
              className={`${status.color} text-sm px-3 py-1`}
            >
-             <StatusIcon className="w-4 h-4 mr-1" />
+             <AppIcon name={status.icon} className="w-4 h-4 mr-1" />
              {status.label}
            </Badge>
            
@@ -263,7 +253,7 @@ import { AppIcon } from '@/components/ui/app-icon';
                       className="w-8 h-8 rounded-lg flex items-center justify-center"
                       style={{ backgroundColor: `${method.color}20` }}
                     >
-                      <Icon className="w-4 h-4" style={{ color: method.color }} />
+                      <AppIcon name={Icon} className="w-4 h-4" style={{ color: method.color }} />
                     </div>
                     <span className="text-sm">{method.label}</span>
                   </div>

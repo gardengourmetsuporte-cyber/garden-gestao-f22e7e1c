@@ -7,12 +7,12 @@ import { QuotationSheet } from './QuotationSheet';
 import { QuotationDetail } from './QuotationDetail';
 import { AppIcon } from '@/components/ui/app-icon';
 
-const statusConfig: Record<string, { label: string; bg: string; text: string; icon: any }> = {
-  draft: { label: 'Rascunho', bg: 'bg-muted', text: 'text-muted-foreground', icon: Clock },
-  sent: { label: 'Aguardando', bg: 'bg-warning/10', text: 'text-warning', icon: Clock },
-  comparing: { label: 'Comparando', bg: 'bg-primary/10', text: 'text-primary', icon: Scale },
-  contested: { label: 'Contestada', bg: 'bg-orange-500/10', text: 'text-orange-500', icon: AlertTriangle },
-  resolved: { label: 'Resolvida', bg: 'bg-success/10', text: 'text-success', icon: CheckCircle2 },
+const statusConfig: Record<string, { label: string; bg: string; text: string; icon: string }> = {
+  draft: { label: 'Rascunho', bg: 'bg-muted', text: 'text-muted-foreground', icon: 'Clock' },
+  sent: { label: 'Aguardando', bg: 'bg-warning/10', text: 'text-warning', icon: 'Clock' },
+  comparing: { label: 'Comparando', bg: 'bg-primary/10', text: 'text-primary', icon: 'ArrowLeftRight' },
+  contested: { label: 'Contestada', bg: 'bg-orange-500/10', text: 'text-orange-500', icon: 'AlertTriangle' },
+  resolved: { label: 'Resolvida', bg: 'bg-success/10', text: 'text-success', icon: 'CheckCircle2' },
 };
 
 export function QuotationList() {

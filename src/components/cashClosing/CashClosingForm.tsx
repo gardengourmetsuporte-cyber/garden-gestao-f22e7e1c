@@ -261,17 +261,7 @@ export function CashClosingForm({ onSuccess }: Props) {
     }
   };
 
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Banknote': return Banknote;
-      case 'CreditCard': return CreditCard;
-      case 'Smartphone': return Smartphone;
-      case 'Truck': return Truck;
-      case 'Utensils': return Utensils;
-      case 'FileSignature': return Receipt;
-      default: return Banknote;
-    }
-  };
+  const getIcon = (iconName: string) => iconName;
 
   return (
     <div className="space-y-4 pb-6">
@@ -384,7 +374,7 @@ export function CashClosingForm({ onSuccess }: Props) {
                   className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                   style={{ backgroundColor: `${method.color}20` }}
                 >
-                  <Icon className="w-5 h-5" style={{ color: method.color }} />
+                  <AppIcon name={Icon} className="w-5 h-5" style={{ color: method.color }} />
                 </div>
                 <Label className="flex-1 text-sm font-medium">{method.label}</Label>
                 <div className="relative w-32">

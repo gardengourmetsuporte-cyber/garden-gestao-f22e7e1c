@@ -52,7 +52,7 @@ export function AnimatedMockup() {
                                     }`}
                                 style={{ transitionDelay: `${200 + index * 100}ms` }}
                             >
-                                <AppIcon name={item.icon} size={18} strokeWidth={activeTab === item.id ? 2.5 : 2} />
+                                <AppIcon name={item.icon} size={18} />
                             </div>
                         ))}
                     </div>
