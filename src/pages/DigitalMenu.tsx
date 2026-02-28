@@ -38,6 +38,7 @@ export default function DigitalMenu() {
   const [gamePhase, setGamePhase] = useState<'input' | 'wheel' | 'result'>('input');
   const [gameOrderId, setGameOrderId] = useState('');
   const [gameName, setGameName] = useState('');
+  const [gamePhone, setGamePhone] = useState('');
   const [wonPrize, setWonPrize] = useState<GamificationPrize | null>(null);
   const [validating, setValidating] = useState(false);
 
@@ -47,11 +48,37 @@ export default function DigitalMenu() {
 
   const handleGameStart = async () => {
     if (!gameOrderId.trim()) { toast.error('Digite o número do pedido'); return; }
+    if (!gameName.trim()) { toast.error('Digite seu nome'); return; }
+    if (!gamePhone.trim() || gamePhone.replace(/\D/g, '').length < 10) { toast.error('Digite um telefone válido'); return; }
     setValidating(true);
     try {
       if (!isEnabled) { toast.error('Jogo desativado no momento'); return; }
       if (await checkAlreadyPlayed(gameOrderId.trim())) { toast.error('Este pedido já participou!'); return; }
       if (await checkDailyCostExceeded()) { toast.error('Limite diário atingido!'); return; }
+      // Upsert customer
+      if (unitId) {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const phone = gamePhone.replace(/\D/g, '');
+        const { data: existing } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('unit_id', unitId)
+          .eq('phone', phone)
+          .maybeSingle();
+        if (!existing) {
+          await supabase.from('customers').insert({
+            unit_id: unitId,
+            name: gameName.trim(),
+            phone,
+            origin: 'mesa',
+            score: 0,
+            segment: 'new',
+            loyalty_points: 0,
+            total_spent: 0,
+            total_orders: 0,
+          });
+        }
+      }
       setGamePhase('wheel');
     } catch { toast.error('Erro ao validar'); } finally { setValidating(false); }
   };
@@ -62,6 +89,13 @@ export default function DigitalMenu() {
       await recordPlay.mutateAsync({ order_id: gameOrderId.trim(), customer_name: gameName.trim() || undefined, prize });
     } catch {}
     setGamePhase('result');
+  };
+
+  const formatPhone = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
   if (loading) {
@@ -229,10 +263,17 @@ export default function DigitalMenu() {
                   className="text-center h-13 text-base rounded-xl"
                 />
                 <Input
-                  placeholder="Seu nome (opcional)"
+                  placeholder="Seu nome *"
                   value={gameName}
                   onChange={e => setGameName(e.target.value)}
                   className="text-center h-13 text-base rounded-xl"
+                />
+                <Input
+                  placeholder="Telefone *"
+                  value={gamePhone}
+                  onChange={e => setGamePhone(formatPhone(e.target.value))}
+                  className="text-center h-13 text-base rounded-xl"
+                  inputMode="tel"
                 />
               </div>
               <Button size="lg" className="w-full h-14 text-base font-bold rounded-xl" onClick={handleGameStart} disabled={validating || !isEnabled}>
@@ -250,7 +291,7 @@ export default function DigitalMenu() {
           )}
 
           {gamePhase === 'result' && wonPrize && (
-            <PrizeResult prize={wonPrize} onFinish={() => { setGamePhase('input'); setGameOrderId(''); setGameName(''); setWonPrize(null); }} />
+            <PrizeResult prize={wonPrize} onFinish={() => { setGamePhase('input'); setGameOrderId(''); setGameName(''); setGamePhone(''); setWonPrize(null); }} />
           )}
         </div>
       )}
