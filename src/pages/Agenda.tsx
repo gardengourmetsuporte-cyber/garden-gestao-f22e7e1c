@@ -227,15 +227,28 @@ export default function Agenda() {
             const isExpanded = expandedCategories[category.id] === true;
             return (
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl card-surface hover:bg-secondary/70 transition-all">
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-rounded shrink-0" style={{ fontSize: 20, color: category.color }}>{category.icon || 'folder'}</span>
-                    <span className="font-semibold text-sm text-foreground">{category.name}</span>
-                    <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">{catTasks.length}</span>
+                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-card border border-border/60 shadow-sm hover:shadow-md transition-all duration-200 group">
+                  <div className="flex items-center gap-3.5">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                      style={{ backgroundColor: category.color + '18', border: `1.5px solid ${category.color}30` }}
+                    >
+                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color }}>{category.icon || 'folder'}</span>
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
+                      <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'lembrete' : 'lembretes'}</span>
+                    </div>
                   </div>
-                  <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-180")} />
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: category.color, boxShadow: `0 0 6px ${category.color}60` }}
+                    />
+                    <AppIcon name="ChevronDown" size={18} className={cn("text-muted-foreground/60 transition-transform duration-300 ease-out", isExpanded && "rotate-180")} />
+                  </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-1.5 space-y-1 pl-2">
+                <CollapsibleContent className="mt-2 space-y-1 pl-1">
                   <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
                     <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                       {catTasks.map(task => renderTaskItem(task))}
