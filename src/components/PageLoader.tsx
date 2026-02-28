@@ -2,17 +2,17 @@ import gardenLogo from "@/assets/logo.png";
 
 export function PageLoader() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a1a12] relative">
       {/* Super subtle center glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150px] h-[150px] bg-primary/20 blur-[60px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150px] h-[150px] bg-emerald-500/20 blur-[60px] rounded-full pointer-events-none" />
 
       <div className="relative w-16 h-16 flex items-center justify-center">
         {/* Background track */}
-        <div className="absolute inset-0 rounded-full border-2 border-primary/10" />
+        <div className="absolute inset-0 rounded-full border-2 border-emerald-500/10" />
 
         {/* Rotating ring */}
         <div
-          className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-[spin_1s_ease-in-out_infinite]"
+          className="absolute inset-0 rounded-full border-2 border-emerald-500 border-t-transparent animate-[spin_1s_ease-in-out_infinite]"
         />
 
         {/* Circular Logo Mask */}
