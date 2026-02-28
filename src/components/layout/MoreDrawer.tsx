@@ -56,7 +56,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
   const { user, profile, isAdmin, isSuperAdmin, signOut, plan } = useAuth();
   const { units, activeUnit, setActiveUnitId } = useUnit();
   const { hasAccess, allowedModules, isLoading: accessLoading } = useUserModules();
-  
+
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
   const [tabPickerOpen, setTabPickerOpen] = useState(false);
@@ -143,15 +143,15 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
         className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
         style={{
           paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
-          background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)',
+          background: 'linear-gradient(to bottom, #050a05 0px, #102a1d 280px, hsl(var(--background)) 280px)',
         }}
       >
         <div className="overflow-y-auto h-full">
-          {/* Navy gradient header area */}
+          {/* Dark emerald gradient header area */}
           <div
             className="relative px-4 pt-[calc(env(safe-area-inset-top,12px)+12px)] pb-6 space-y-3"
             style={{
-              background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+              background: 'linear-gradient(135deg, #050a05 0%, #0a1a12 30%, #102a1d 70%, #050a05 100%)',
             }}
           >
             {/* Close button */}
@@ -234,120 +234,121 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
           {/* Module grid — adaptive cards */}
           <div className="px-4 pt-5 pb-8 space-y-3 bg-background rounded-t-[20px] -mt-3 relative z-10">
-          {groupedNav.map(group => {
-            const count = group.items.length;
-            const useCols3 = count >= 3 && count !== 4;
-            const cols = useCols3 ? 3 : 2;
-            const remainder = count % cols;
-            const fullRowItems = remainder > 0 ? group.items.slice(0, count - remainder) : group.items;
-            const lastRowItems = remainder > 0 ? group.items.slice(count - remainder) : [];
+            {groupedNav.map(group => {
+              const count = group.items.length;
+              const useCols3 = count >= 3 && count !== 4;
+              const cols = useCols3 ? 3 : 2;
+              const remainder = count % cols;
+              const fullRowItems = remainder > 0 ? group.items.slice(0, count - remainder) : group.items;
+              const lastRowItems = remainder > 0 ? group.items.slice(count - remainder) : [];
 
-            const renderItem = (item: typeof group.items[0]) => {
-              const active = location.pathname === item.href;
-              const locked = isModuleLocked(item.href);
-              const planLabel = getRequiredPlanLabel(item.href);
-              const isProd = isProductionModule(item.href);
+              const renderItem = (item: typeof group.items[0]) => {
+                const active = location.pathname === item.href;
+                const locked = isModuleLocked(item.href);
+                const planLabel = getRequiredPlanLabel(item.href);
+                const isProd = isProductionModule(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    to={locked ? (isAdmin ? '/plans' : '#') : item.href}
+                    onClick={(e) => {
+                      if (locked && !isAdmin) {
+                        e.preventDefault();
+                        toast.info(`Este módulo requer plano ${planLabel}.`, {
+                          description: 'Fale com o administrador da loja para fazer o upgrade.',
+                        });
+                      }
+                      onOpenChange(false);
+                    }}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative overflow-hidden",
+                      active
+                        ? "card-surface border-primary/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                        : "card-surface hover:bg-card/90"
+                    )}
+                    style={{
+                      opacity: locked ? 0.55 : 1,
+                    }}
+                  >
+                    {/* Active glow inside card */}
+                    {active && (
+                      <div className="absolute inset-0 bg-primary/10 -z-0 blur-xl"></div>
+                    )}
+                    {isProd && (
+                      <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
+                        Beta
+                      </span>
+                    )}
+                    <div className="relative z-10">
+                      <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors", active ? "bg-primary/20" : "bg-card")}>
+                        <AppIcon name={item.icon} size={18} fill={active ? 1 : 0} className={active ? "text-primary drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "text-foreground/70"} />
+                      </div>
+                      {locked && (
+                        <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
+                      )}
+                    </div>
+                    <span className={cn("text-[11px] font-medium leading-tight text-center truncate max-w-full relative z-10", active ? "text-white" : locked ? "text-muted-foreground" : "text-foreground/80")}>
+                      {item.label}
+                    </span>
+                    {locked && planLabel && (
+                      <span className="text-[8px] font-bold uppercase tracking-wider -mt-1" style={{ color: 'hsl(45 90% 55%)' }}>
+                        {planLabel}
+                      </span>
+                    )}
+                  </Link>
+                );
+              };
 
               return (
-                <Link
-                  key={item.href}
-                  to={locked ? (isAdmin ? '/plans' : '#') : item.href}
-                  onClick={(e) => {
-                    if (locked && !isAdmin) {
-                      e.preventDefault();
-                      toast.info(`Este módulo requer plano ${planLabel}.`, {
-                        description: 'Fale com o administrador da loja para fazer o upgrade.',
-                      });
-                    }
-                    onOpenChange(false);
-                  }}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 relative",
-                    active
-                      ? "text-primary-foreground shadow-md border border-primary/30"
-                      : "bg-secondary/50 hover:bg-secondary active:bg-secondary/80"
-                  )}
-                  style={{
-                    opacity: locked ? 0.55 : 1,
-                    ...(active ? { background: 'var(--gradient-brand)' } : {}),
-                  }}
-                >
-                  {isProd && (
-                    <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
-                      Beta
-                    </span>
-                  )}
-                  <div className="relative">
-                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", active ? "bg-primary-foreground/15" : "bg-muted")}>
-                      <AppIcon name={item.icon} size={18} fill={active ? 1 : 0} className={active ? "text-primary-foreground" : "text-foreground/70"} />
-                    </div>
-                    {locked && (
-                      <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
+                <div key={group.label} className="mb-3">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2 block text-muted-foreground/50 font-display">
+                    {group.label}
+                  </span>
+                  <div className={cn("grid gap-2", useCols3 ? 'grid-cols-3' : 'grid-cols-2')}>
+                    {fullRowItems.map(renderItem)}
+                    {lastRowItems.length > 0 && (
+                      <div className={cn("grid gap-2 col-span-full", `grid-cols-${lastRowItems.length}`)}>
+                        {lastRowItems.map(renderItem)}
+                      </div>
                     )}
                   </div>
-                  <span className={cn("text-[11px] font-medium leading-tight text-center truncate max-w-full", active ? "text-primary-foreground" : locked ? "text-muted-foreground" : "text-foreground/80")}>
-                    {item.label}
-                  </span>
-                  {locked && planLabel && (
-                    <span className="text-[8px] font-bold uppercase tracking-wider -mt-1" style={{ color: 'hsl(45 90% 55%)' }}>
-                      {planLabel}
-                    </span>
-                  )}
-                </Link>
-              );
-            };
-
-            return (
-              <div key={group.label} className="mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2 block text-muted-foreground/50 font-display">
-                  {group.label}
-                </span>
-                <div className={cn("grid gap-2", useCols3 ? 'grid-cols-3' : 'grid-cols-2')}>
-                  {fullRowItems.map(renderItem)}
-                  {lastRowItems.length > 0 && (
-                    <div className={cn("grid gap-2 col-span-full", `grid-cols-${lastRowItems.length}`)}>
-                      {lastRowItems.map(renderItem)}
-                    </div>
-                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
-          {/* Settings + Logout — Meta style */}
-          <div className="space-y-1.5 mt-2">
-            <button
-              onClick={() => setTabPickerOpen(true)}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
-            >
-              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-                <AppIcon name="Settings2" size={18} className="text-foreground/70" />
-              </div>
-              <span className="text-sm font-medium text-foreground">Personalizar barra inferior</span>
-              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
-            </button>
-            {(
+            {/* Settings + Logout */}
+            <div className="space-y-1.5 mt-2 px-4 pb-4">
+              <button
+                onClick={() => setTabPickerOpen(true)}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl card-surface hover:bg-card/90 active:scale-[0.98] transition-all"
+              >
+                <div className="w-9 h-9 rounded-full bg-black/40 border border-white/5 flex items-center justify-center shrink-0">
+                  <AppIcon name="Settings2" size={18} className="text-foreground/70" />
+                </div>
+                <span className="text-sm font-medium text-foreground">Personalizar barra inferior</span>
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
+              </button>
               <button
                 onClick={() => { navigate('/settings'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl card-surface hover:bg-card/90 active:scale-[0.98] transition-all"
               >
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-full bg-black/40 border border-white/5 flex items-center justify-center shrink-0">
                   <AppIcon name="Settings" size={18} className="text-foreground/70" />
                 </div>
                 <span className="text-sm font-medium text-foreground">Configurações</span>
                 <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
               </button>
-            )}
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
-            >
-              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-                <AppIcon name="LogOut" size={18} className="text-muted-foreground" />
-              </div>
-              <span className="text-sm font-medium text-muted-foreground">Sair da conta</span>
-            </button>
-          </div>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl card-surface hover:bg-card/90 active:scale-[0.98] transition-all"
+              >
+                <div className="w-9 h-9 rounded-full bg-black/40 border border-white/5 flex items-center justify-center shrink-0">
+                  <AppIcon name="LogOut" size={18} className="text-destructive" />
+                </div>
+                <span className="text-sm font-medium text-destructive">Sair da conta</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
