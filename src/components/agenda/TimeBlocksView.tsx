@@ -252,29 +252,71 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
             <SheetDescription>Selecione uma tarefa para este horário</SheetDescription>
           </SheetHeader>
           <div className="space-y-2 mt-3 pb-4">
-            {availableTasks.map(task => (
-              <button
-                key={task.id}
-                onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-secondary/50 border border-border/60 hover:border-primary/30 hover:bg-secondary/70 transition-all text-left"
-              >
-                {task.category && (
-                  <span
-                    className="w-3 h-3 rounded-full shrink-0"
-                    style={{ backgroundColor: task.category.color }}
-                  />
-                )}
-                <div className="min-w-0 flex-1">
-                  <span className="text-sm font-medium truncate block">{task.title}</span>
-                  {task.notes && (
-                    <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>
-                  )}
-                </div>
-                <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
-              </button>
-            ))}
-            {availableTasks.length === 0 && (
+            {availableTasks.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">Todas as tarefas já foram alocadas</p>
+            ) : (
+              (() => {
+                // Group by category
+                const grouped = new Map<string, { category: ManagerTask['category']; tasks: ManagerTask[] }>();
+                const uncategorized: ManagerTask[] = [];
+                availableTasks.forEach(task => {
+                  if (task.category) {
+                    const key = task.category.id || task.category.name;
+                    if (!grouped.has(key)) grouped.set(key, { category: task.category, tasks: [] });
+                    grouped.get(key)!.tasks.push(task);
+                  } else {
+                    uncategorized.push(task);
+                  }
+                });
+                return (
+                  <>
+                    {[...grouped.values()].map(({ category, tasks: catTasks }) => (
+                      <div key={category!.id || category!.name}>
+                        <div className="flex items-center gap-2 px-1 mb-1.5 mt-2 first:mt-0">
+                          <span className="material-symbols-rounded" style={{ fontSize: 16, color: category!.color }}>{(category as any)?.icon || 'folder'}</span>
+                          <span className="text-xs font-semibold text-muted-foreground">{category!.name}</span>
+                        </div>
+                        {catTasks.map(task => (
+                          <button
+                            key={task.id}
+                            onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-secondary/50 border border-border/60 hover:border-primary/30 hover:bg-secondary/70 transition-all text-left mb-1.5"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <span className="text-sm font-medium truncate block">{task.title}</span>
+                              {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
+                            </div>
+                            <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                    {uncategorized.length > 0 && (
+                      <div>
+                        {grouped.size > 0 && (
+                          <div className="flex items-center gap-2 px-1 mb-1.5 mt-2">
+                            <AppIcon name="Folder" size={14} className="text-muted-foreground" />
+                            <span className="text-xs font-semibold text-muted-foreground">Sem categoria</span>
+                          </div>
+                        )}
+                        {uncategorized.map(task => (
+                          <button
+                            key={task.id}
+                            onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-secondary/50 border border-border/60 hover:border-primary/30 hover:bg-secondary/70 transition-all text-left mb-1.5"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <span className="text-sm font-medium truncate block">{task.title}</span>
+                              {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
+                            </div>
+                            <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()
             )}
           </div>
         </SheetContent>
