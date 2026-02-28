@@ -160,6 +160,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
+          autoScroll={true}
           modifiers={[restrictToVerticalAxis]}
         >
           <SortableContext items={draft.map(w => w.key)} strategy={verticalListSortingStrategy}>
@@ -167,8 +168,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
               data-vaul-no-drag
               style={{ touchAction: isDragActive ? 'none' : 'pan-y' }}
               className={cn(
-                "space-y-2 max-h-[50vh] overflow-y-auto overscroll-contain pr-1",
-                isDragActive && "overflow-hidden"
+                "space-y-2 max-h-[50vh] overflow-y-auto overscroll-contain pr-1"
               )}
             >
               {draft.map(widget => (
