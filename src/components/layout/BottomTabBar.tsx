@@ -143,15 +143,24 @@ export function BottomTabBar() {
       <QuickActionSheet open={quickOpen} onOpenChange={setQuickOpen} />
 
       <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 pointer-events-none"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
       >
-        <div className="mx-4 mb-3 pointer-events-auto">
-          <div
-            ref={containerRef}
-            className="relative flex items-center h-[64px] max-w-lg mx-auto rounded-full shadow-[0_4px_30px_rgba(0,0,0,0.4)]"
-            style={{ background: 'rgba(26,26,26,0.92)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}
-          >
+        {/* Subtle top separator */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
+
+        {/* Bar background — full width, edge to edge */}
+        <div
+          className="relative"
+          style={{
+            background: 'hsl(var(--background))',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          {/* Animated ambient glow — clipped independently */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 tabbar-ambient-glow" />
+          </div>
+          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative">
             {/* No pill — active state is icon glow only */}
 
             {/* Left tabs */}
