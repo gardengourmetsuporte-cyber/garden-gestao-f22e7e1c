@@ -48,7 +48,7 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
     if (!hasAccess('finance')) return null;
     return (
       <div className="space-y-7 animate-spring-in spring-stagger-2">
-        <button onClick={() => navigate('/finance')} className="finance-hero-card w-full text-left card-press">
+        <button onClick={() => navigate('/finance')} className="finance-hero-card w-full text-left">
           <div className="finance-hero-inner p-5 pb-4">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>Saldo da empresa</span>
