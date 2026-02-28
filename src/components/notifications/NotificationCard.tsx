@@ -1,4 +1,4 @@
-import { Bell, AlertTriangle, Info, CheckCircle, Check, ChevronDown, ChevronUp, DollarSign, ExternalLink } from 'lucide-react';
+import { Bell, AlertTriangle, Info, CheckCircle, Check, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications, AppNotification } from '@/hooks/useNotifications';
@@ -53,101 +53,71 @@ function groupNotifications(notifications: AppNotification[]): GroupedNotificati
   return Array.from(groups.values()).sort((a, b) => b.latestDate.localeCompare(a.latestDate));
 }
 
-/** Highlights R$ values in bold */
-function formatDescription(text: string) {
-  const parts = text.split(/(R\$\s?[\d.,]+)/g);
-  return parts.map((part, i) =>
-    /R\$/.test(part) ? <strong key={i} className="font-bold text-foreground">{part}</strong> : part
-  );
+/** Clean, short summary for finance notifications */
+function cleanTitle(title: string): string {
+  return title
+    .replace(/[🔔💰🔴🟡📊🧾💳]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getActionRoute(group: GroupedNotification): string | null {
+  if (group.origin === 'financeiro') return '/finance';
+  if (group.origin === 'checklists') return '/checklists';
+  if (group.origin === 'estoque') return '/inventory';
+  if (group.origin === 'agenda') return '/agenda';
+  return null;
+}
+
+function getActionLabel(group: GroupedNotification): string {
+  if (group.origin === 'financeiro') return 'Ver financeiro';
+  if (group.origin === 'checklists') return 'Ver checklists';
+  if (group.origin === 'estoque') return 'Ver estoque';
+  if (group.origin === 'agenda') return 'Ver agenda';
+  return 'Abrir';
 }
 
 function NotificationGroupItem({ group, onMarkRead, index }: { group: GroupedNotification; onMarkRead: (ids: string[]) => void; index: number }) {
   const navigate = useNavigate();
-  const isFinance = group.origin === 'financeiro';
-  const isOverdue = isFinance && (group.title.includes('vencida') || group.description.includes('vencida'));
   const config = typeConfig[group.type] || typeConfig.info;
-  
-  // Finance notifications get special icon
-  const Icon = isFinance ? DollarSign : config.icon;
-  const iconColor = isFinance ? 'text-amber-500' : config.color;
-  const iconBg = isFinance ? 'bg-amber-500/10' : config.bg;
-  const iconRing = isFinance ? 'ring-amber-500/20' : config.ring;
+  const route = getActionRoute(group);
+  const timeAgo = formatDistanceToNow(new Date(group.latestDate), { addSuffix: true, locale: ptBR });
 
   return (
-    <div
+    <button
+      onClick={() => {
+        onMarkRead(group.ids);
+        if (route) navigate(route);
+      }}
       className={cn(
-        "flex flex-col gap-2 p-3.5 rounded-2xl transition-all duration-200",
-        "bg-secondary/40 hover:bg-secondary/70",
-        "animate-slide-up",
-        isOverdue && "ring-1 ring-destructive/20 bg-destructive/5"
+        "w-full flex items-center gap-3 p-3 rounded-2xl transition-all duration-150 text-left",
+        "bg-secondary/40 hover:bg-secondary/70 active:scale-[0.98]",
+        "animate-slide-up"
       )}
       style={{ animationDelay: `${index * 40}ms`, animationFillMode: 'both' }}
     >
-      <div className="flex items-start gap-3.5">
-        {/* Icon */}
-        <div className={cn(
-          "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ring-1",
-          iconBg, iconRing
-        )}>
-          <Icon className={cn("w-[18px] h-[18px]", iconColor)} />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-[13px] text-foreground leading-tight">{group.title}</p>
-            {group.count > 1 && (
-              <span className={cn(
-                "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
-                iconBg, iconColor
-              )}>
-                {group.count}×
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
-            {isFinance ? formatDescription(group.description) : group.description}
-          </p>
-          
-          {/* Timestamp with WhatsApp-style double tick */}
-          <div className="flex items-center gap-1.5 mt-2">
-            <span className="text-[10px] text-muted-foreground/60 font-medium">
-              {formatDistanceToNow(new Date(group.latestDate), { addSuffix: true, locale: ptBR })}
-            </span>
-            <span className="text-[10px] text-primary/50 font-medium">✓✓</span>
-            <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-            <span className="text-[10px] text-muted-foreground/60 font-medium capitalize">{group.origin}</span>
-          </div>
-        </div>
-
-        <button
-          onClick={() => onMarkRead(group.ids)}
-          className={cn(
-            "p-2 rounded-xl transition-all duration-200 shrink-0",
-            "hover:bg-success/15 active:scale-95 group"
-          )}
-          title="Marcar como lida"
-        >
-          <Check className="w-4 h-4 text-muted-foreground/50 group-hover:text-success transition-colors" />
-        </button>
+      {/* Icon */}
+      <div className={cn(
+        "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ring-1",
+        config.bg, config.ring
+      )}>
+        <config.icon className={cn("w-[18px] h-[18px]", config.color)} />
       </div>
 
-      {/* Finance action button */}
-      {isFinance && (
-        <button
-          onClick={() => navigate('/finance')}
-          className={cn(
-            "flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-semibold transition-all",
-            "bg-primary/10 text-primary hover:bg-primary/20 active:scale-[0.98]"
-          )}
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          Ver contas pendentes
-        </button>
-      )}
-    </div>
+      {/* Text */}
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-[13px] text-foreground leading-tight truncate">
+          {cleanTitle(group.title)}
+          {group.count > 1 && <span className="text-muted-foreground font-normal"> ({group.count})</span>}
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-0.5">{timeAgo}</p>
+      </div>
+
+      {/* Arrow */}
+      <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+    </button>
   );
 }
-
 export function NotificationCard() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [expanded, setExpanded] = useState(true);
