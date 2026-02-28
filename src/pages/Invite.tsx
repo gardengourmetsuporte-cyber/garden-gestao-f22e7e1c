@@ -199,9 +199,7 @@ export default function Invite() {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-hidden">
-      <div className="absolute top-8 right-4 z-20">
-        <ThemeToggle />
-      </div>
+      {/* ThemeToggle removido temporariamente */}
 
       <div className="absolute top-[-30%] left-[-20%] w-[600px] h-[600px] rounded-full blur-[120px] animate-float"
         style={{ background: 'radial-gradient(circle, hsl(var(--neon-cyan) / 0.1), transparent 60%)' }}
