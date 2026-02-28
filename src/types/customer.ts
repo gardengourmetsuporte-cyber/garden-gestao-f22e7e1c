@@ -19,6 +19,7 @@ export interface Customer {
   score: number;
   loyalty_points: number;
   visit_frequency_days: number | null;
+  tags: string[];
 }
 
 export interface LoyaltyRule {

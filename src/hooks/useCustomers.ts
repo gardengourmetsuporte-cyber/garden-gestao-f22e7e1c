@@ -39,6 +39,7 @@ export function useCustomers() {
         origin: input.origin || 'manual',
         notes: input.notes || null,
         birthday: input.birthday || null,
+        tags: input.tags || [],
       });
       if (error) throw error;
     },
