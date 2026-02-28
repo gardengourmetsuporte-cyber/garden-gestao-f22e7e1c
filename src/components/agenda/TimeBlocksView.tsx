@@ -244,7 +244,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
 
       {/* Task Picker Sheet */}
       <Sheet open={pickerHour !== null} onOpenChange={(open) => !open && setPickerHour(null)}>
-        <SheetContent side="bottom" className="h-auto max-h-[60vh] rounded-t-3xl overflow-y-auto">
+        <SheetContent side="bottom" className="h-auto max-h-[60vh] rounded-t-3xl overflow-y-auto bg-[#0a1a10]">
           <SheetHeader className="text-left pb-2">
             <SheetTitle>
               Agendar às {pickerHour !== null ? `${String(pickerHour).padStart(2, '0')}:00` : ''}
@@ -280,7 +280,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
                           <button
                             key={task.id}
                             onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-secondary/50 border border-border/60 hover:border-primary/30 hover:bg-secondary/70 transition-all text-left mb-1.5"
+                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:border-emerald-500/25 transition-all text-left mb-1.5"
                           >
                             <div className="min-w-0 flex-1">
                               <span className="text-sm font-medium truncate block">{task.title}</span>
@@ -303,7 +303,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
                           <button
                             key={task.id}
                             onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-secondary/50 border border-border/60 hover:border-primary/30 hover:bg-secondary/70 transition-all text-left mb-1.5"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:border-emerald-500/25 transition-all text-left mb-1.5"
                           >
                             <div className="min-w-0 flex-1">
                               <span className="text-sm font-medium truncate block">{task.title}</span>
