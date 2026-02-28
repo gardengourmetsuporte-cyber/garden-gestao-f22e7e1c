@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TransactionFilters, TransactionFiltersState } from './TransactionFilters';
 import { FinanceCategory, FinanceAccount } from '@/types/finance';
+import { cn } from '@/lib/utils';
 import {
   DndContext,
   DragEndEvent,
@@ -124,11 +125,11 @@ export function FinanceTransactions({
     })
   );
 
-  
+
 
   const filteredTransactionsByDate = useMemo(() => {
     const result: Record<string, FinanceTransaction[]> = {};
-    
+
     Object.entries(transactionsByDate).forEach(([date, transactions]) => {
       const filtered = transactions.filter(t => {
         if (filters.status === 'paid' && !t.is_paid) return false;
@@ -139,12 +140,12 @@ export function FinanceTransactions({
         if (filters.accountId && t.account_id !== filters.accountId && t.to_account_id !== filters.accountId) return false;
         return true;
       });
-      
+
       if (filtered.length > 0) {
         result[date] = filtered;
       }
     });
-    
+
     return result;
   }, [transactionsByDate, filters]);
 
@@ -224,7 +225,7 @@ export function FinanceTransactions({
                 </Button>
               </>
             )}
-            <Button 
+            <Button
               variant={hasActiveFilters ? "default" : "outline"}
               size="sm"
               onClick={() => setShowFilters(true)}
@@ -245,8 +246,8 @@ export function FinanceTransactions({
             </span>
           </div>
           <div className="flex items-center justify-between text-xs mt-1">
-             <span className="text-success font-semibold font-display">+{formatCurrency(monthStats.totalIncome)}</span>
-             <span className="text-destructive font-semibold font-display">-{formatCurrency(monthStats.totalExpense)}</span>
+            <span className="text-success font-semibold font-display">+{formatCurrency(monthStats.totalIncome)}</span>
+            <span className="text-destructive font-semibold font-display">-{formatCurrency(monthStats.totalExpense)}</span>
           </div>
         </div>
 
@@ -255,7 +256,7 @@ export function FinanceTransactions({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            onDragStart={() => { try { navigator.vibrate?.(50); } catch {} }}
+            onDragStart={() => { try { navigator.vibrate?.(50); } catch { } }}
             onDragEnd={handleDragEnd}
           >
             <div className="px-4 pb-32 space-y-4">
@@ -270,16 +271,19 @@ export function FinanceTransactions({
                 return (
                   <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
                     {/* Date Header */}
-                    <div className={`flex items-center justify-between py-2 px-2 rounded-lg ${dateStr === todayStr ? 'gradient-primary' : ''}`}>
+                    <div className={cn(
+                      "flex items-center justify-between py-2 px-3 rounded-lg sticky top-[52px] lg:top-[64px] z-20 backdrop-blur-xl transition-all duration-300 shadow-sm border border-border/10",
+                      dateStr === todayStr ? 'gradient-primary border-primary/20' : 'bg-background/80'
+                    )}>
                       <div className="flex items-center gap-2">
                         {dateStr === todayStr && (
                           <span className="w-2 h-2 rounded-full bg-primary-foreground animate-pulse shrink-0" />
                         )}
-                        <span className={`text-sm font-medium capitalize ${dateStr === todayStr ? 'font-semibold' : 'text-muted-foreground'}`}>
+                        <span className={cn("text-xs uppercase tracking-wider font-semibold", dateStr === todayStr ? 'text-primary-foreground' : 'text-muted-foreground')}>
                           {getDateLabel(dateStr)}
                         </span>
                       </div>
-                      <span className={`text-sm font-bold font-display ${dayTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
+                      <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? (dateStr === todayStr ? 'text-primary-foreground' : 'text-success') : (dateStr === todayStr ? 'text-primary-foreground/90' : 'text-destructive'))}>
                         {formatCurrency(dayTotal)}
                       </span>
                     </div>

@@ -198,8 +198,9 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete, 
       {/* Main content */}
       <div
         className={cn(
-          'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y',
+          'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y transition-all duration-300',
           !is_paid && 'opacity-60',
+          swipeOffset === 0 ? 'hover:bg-primary/5 hover:border-primary/20 active:scale-[0.98]' : '',
           swipeOffset === 0 && 'transition-transform duration-200 ease-out'
         )}
         style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
