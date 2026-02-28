@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GripVertical } from 'lucide-react';
 import { DashboardWidget } from '@/hooks/useDashboardWidgets';
 import {
   DndContext,
@@ -51,8 +52,6 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
       data-vaul-no-drag
       className={cn(
         'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-pan-y select-none',
@@ -61,6 +60,17 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
     >
       <AppIcon name={widget.icon} size={20} className="text-muted-foreground shrink-0" />
       <span className="flex-1 text-sm font-medium text-foreground">{widget.label}</span>
+
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label={`Reordenar ${widget.label}`}
+        className="shrink-0 rounded-md p-2 text-muted-foreground/70 touch-none cursor-grab active:cursor-grabbing"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
       <div
         onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
@@ -138,7 +148,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
         <SheetHeader className="mb-4">
           <SheetTitle className="text-base font-bold">Gerenciar tela inicial</SheetTitle>
           <SheetDescription className="text-xs text-muted-foreground">
-            Arraste para reordenar e ative/desative os widgets.
+            Role a lista normalmente; use a alça para reordenar e ative/desative os widgets.
           </SheetDescription>
         </SheetHeader>
 
