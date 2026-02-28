@@ -1,5 +1,4 @@
-import { ReactNode, useRef, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PageTransitionProps {
@@ -7,22 +6,15 @@ interface PageTransitionProps {
   className?: string;
 }
 
+/**
+ * Lightweight wrapper — no animation to avoid flicker/double-render bugs.
+ * The previous implementation used key={pathname} + displayChildren state
+ * which caused React to unmount/remount the entire page tree on navigation,
+ * destroying open Sheets/Drawers and causing visible "open-close-open" glitches.
+ */
 export function PageTransition({ children, className }: PageTransitionProps) {
-  const location = useLocation();
-  const [animClass, setAnimClass] = useState('');
-  const prevPathRef = useRef(location.pathname);
-
-  useEffect(() => {
-    if (prevPathRef.current === location.pathname) return;
-    prevPathRef.current = location.pathname;
-
-    setAnimClass('page-enter-fade');
-    const timer = setTimeout(() => setAnimClass(''), 300);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
-
   return (
-    <div className={cn(animClass, className)}>
+    <div className={cn(className)}>
       {children}
     </div>
   );
