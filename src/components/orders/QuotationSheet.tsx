@@ -75,7 +75,7 @@ export function QuotationSheet({ open, onOpenChange }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto">
+      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto bg-[#0a1a10]">
         <SheetHeader className="pb-4">
           <SheetTitle>Nova Cotação</SheetTitle>
         </SheetHeader>
@@ -108,9 +108,9 @@ export function QuotationSheet({ open, onOpenChange }: Props) {
                   onClick={() => toggleSupplier(s.id)}
                   className={cn(
                     'px-3 py-1.5 rounded-xl text-sm font-medium border transition-all',
-                    selectedSuppliers.includes(s.id)
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-secondary text-foreground border-border hover:border-primary/40'
+                     selectedSuppliers.includes(s.id)
+                       ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                       : 'bg-emerald-500/5 text-foreground border-emerald-500/10 hover:border-emerald-500/20'
                   )}
                 >
                   {s.name}
@@ -138,7 +138,7 @@ export function QuotationSheet({ open, onOpenChange }: Props) {
                     key={item.id}
                     className={cn(
                       'flex items-center gap-3 p-2.5 rounded-xl transition-colors',
-                      selected ? 'bg-primary/5 border border-primary/20' : 'hover:bg-secondary/50'
+                      selected ? 'bg-emerald-500/5 border border-emerald-500/20' : 'hover:bg-emerald-500/5'
                     )}
                   >
                     <Checkbox
@@ -168,7 +168,7 @@ export function QuotationSheet({ open, onOpenChange }: Props) {
           <Button
             onClick={handleSubmit}
             disabled={submitting || selectedSuppliers.length < 2 || itemCount === 0}
-            className="w-full h-12 rounded-xl shadow-lg shadow-primary/20"
+            className="w-full h-12 rounded-xl shadow-lg shadow-emerald-500/20"
           >
             {submitting ? 'Criando...' : `Criar Cotação (${itemCount} itens, ${selectedSuppliers.length} fornecedores)`}
           </Button>

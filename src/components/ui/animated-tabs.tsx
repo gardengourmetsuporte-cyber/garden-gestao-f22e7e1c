@@ -43,7 +43,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
     >
       {/* Animated slider indicator */}
       <div
-        className="absolute top-1 bottom-1 rounded-xl bg-card shadow-sm border border-border will-change-transform"
+        className="absolute top-1 bottom-1 rounded-xl bg-emerald-500/10 shadow-sm shadow-emerald-500/10 border border-emerald-500/20 will-change-transform"
         style={{
           left: indicator.left,
           width: indicator.width,
@@ -58,7 +58,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
           onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
           className={cn(
             "relative flex-1 flex items-center justify-center gap-1.5 py-3 px-1 min-h-[44px] min-w-0 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-            activeTab === tab.key ? 'text-foreground' : 'text-muted-foreground'
+            activeTab === tab.key ? 'text-emerald-400' : 'text-muted-foreground'
           )}
         >
           {tab.icon}
@@ -67,7 +67,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             <span className={cn(
               "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center",
               activeTab === tab.key
-                ? "bg-primary/15 text-primary"
+                ? "bg-emerald-500/15 text-emerald-400"
                 : "bg-muted text-muted-foreground"
             )}>
               {tab.badge > 99 ? '99+' : tab.badge}
