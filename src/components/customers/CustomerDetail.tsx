@@ -45,7 +45,7 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
 
         <div className="flex-1 overflow-y-auto space-y-5 mt-4 pb-8">
           {/* Score visual */}
-          <div className="rounded-xl bg-secondary/30 p-4 space-y-3">
+          <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/10 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Score de Relacionamento</span>
               <span className="text-2xl font-bold">{customer.score}</span>
@@ -69,11 +69,11 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
 
           {/* Quick info */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="card-surface rounded-xl p-3 text-center">
+            <div className="rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60 p-3 text-center">
               <p className="text-lg font-bold text-amber-500">{customer.loyalty_points}</p>
               <p className="text-[10px] text-muted-foreground">Pontos Fidelidade</p>
             </div>
-            <div className="card-surface rounded-xl p-3 text-center">
+            <div className="rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60 p-3 text-center">
               <p className="text-lg font-bold">{customer.visit_frequency_days ? `${Math.round(customer.visit_frequency_days)}d` : '-'}</p>
               <p className="text-[10px] text-muted-foreground">Freq. Visita</p>
             </div>
@@ -81,8 +81,8 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
 
           {/* Active loyalty rules */}
           {(activePointsRule || activeOrdersRule) && (
-            <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 space-y-2">
-              <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+            <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/10 p-3 space-y-2">
+              <p className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
                 <span className="material-symbols-rounded" style={{ fontSize: 14 }}>loyalty</span>
                 Regras de Fidelidade Ativas
               </p>
@@ -98,7 +98,7 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
                   </p>
                   <div className="flex items-center gap-2">
                     <Progress value={((customer.total_orders || 0) % activeOrdersRule.threshold) / activeOrdersRule.threshold * 100} className="h-1.5 flex-1" />
-                    <span className="text-[10px] font-bold text-primary">
+                    <span className="text-[10px] font-bold text-emerald-400">
                       {(customer.total_orders || 0) % activeOrdersRule.threshold}/{activeOrdersRule.threshold}
                     </span>
                   </div>
