@@ -21,13 +21,13 @@ export function ProductCard({ product, userBalance, onRedeem, isRedeeming }: Pro
       disabled={isDisabled}
       onClick={() => onRedeem(product)}
       className={cn(
-        "card-base w-full flex items-center gap-4 p-3 text-left transition-all",
-        "active:scale-[0.98] hover:shadow-lg hover:border-primary/20",
+        "w-full flex items-center gap-4 p-3 text-left transition-all rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60",
+        "active:scale-[0.98] hover:border-emerald-500/25 hover:shadow-lg",
         isDisabled && "opacity-60 pointer-events-none"
       )}
     >
       {/* Image */}
-      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="w-20 h-20 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 overflow-hidden">
         {product.image_url ? (
           <img 
             src={product.image_url} 
