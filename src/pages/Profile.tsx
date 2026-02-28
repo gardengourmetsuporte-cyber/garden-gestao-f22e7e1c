@@ -84,12 +84,12 @@ export default function Profile() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-3 rounded-xl bg-secondary/40">
+              <div className="text-center p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
                 <AppIcon name="TrendingUp" size={16} className="mx-auto mb-1 text-emerald-400" />
                 <p className="text-lg font-bold text-foreground">{formatPoints(profile.monthlyBase)}</p>
                 <p className="text-[10px] text-muted-foreground">Base Mensal</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-secondary/40">
+              <div className="text-center p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
                 <AppIcon name="Flame" size={16} className="mx-auto mb-1 text-amber-400" />
                 <p className="text-lg font-bold text-amber-400">{formatPoints(profile.monthlyBonus)}</p>
                 <p className="text-[10px] text-muted-foreground">Bônus Mensal</p>
@@ -117,7 +117,7 @@ export default function Profile() {
               </div>
               <div className="space-y-1.5">
                 {profile.bonusPoints.map((bp, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 px-3 rounded-xl bg-secondary/50">
+                  <div key={i} className="flex items-center justify-between py-2 px-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
                     <span className="text-xs text-foreground truncate flex-1">{bp.reason}</span>
                     <span className="text-xs font-bold ml-2 shrink-0 text-warning">+{bp.points}</span>
                   </div>
@@ -129,38 +129,38 @@ export default function Profile() {
           {/* Histórico + Stats combinados */}
           <div className="card-surface p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <AppIcon name="BarChart3" size={16} className="text-primary" />
+              <AppIcon name="BarChart3" size={16} className="text-emerald-400" />
               <h3 className="font-bold text-sm text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Resumo</h3>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <div className="text-center p-3 rounded-xl bg-secondary/50">
+              <div className="text-center p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
                 <AppIcon name="Star" size={14} className="mx-auto mb-1 text-success" />
                 <p className="text-lg font-bold text-foreground">{formatPoints(profile.earned)}</p>
                 <p className="text-[10px] text-muted-foreground">Ganhos</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-secondary/50">
+              <div className="text-center p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
                 <AppIcon name="ShoppingBag" size={14} className="mx-auto mb-1 text-destructive" />
                 <p className="text-lg font-bold text-foreground">{formatPoints(profile.spent)}</p>
                 <p className="text-[10px] text-muted-foreground">Gastos</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-secondary/50">
-                <AppIcon name="Coins" size={14} className="mx-auto mb-1 text-primary" />
+              <div className="text-center p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
+                <AppIcon name="Coins" size={14} className="mx-auto mb-1 text-emerald-400" />
                 <p className="text-lg font-bold text-foreground">{formatPoints(profile.balance)}</p>
                 <p className="text-[10px] text-muted-foreground">Saldo</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
                 <AppIcon name="CheckCircle2" size={18} className="text-success shrink-0" />
                 <div>
                   <p className="text-lg font-bold text-foreground">{profile.totalCompletions}</p>
                   <p className="text-[10px] text-muted-foreground">Tarefas</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                <AppIcon name="Gift" size={18} className="text-primary shrink-0" />
+              <div className="flex items-center gap-3 p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60">
+                <AppIcon name="Gift" size={18} className="text-emerald-400 shrink-0" />
                 <div>
                   <p className="text-lg font-bold text-foreground">{profile.totalRedemptions}</p>
                   <p className="text-[10px] text-muted-foreground">Resgates</p>
