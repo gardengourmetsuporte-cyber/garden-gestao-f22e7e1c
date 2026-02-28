@@ -55,7 +55,7 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
       {...listeners}
       data-vaul-no-drag
       className={cn(
-        'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-none select-none',
+        'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-pan-y select-none',
         isDragging && 'opacity-60 shadow-lg scale-[1.02] relative'
       )}
     >
