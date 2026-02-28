@@ -130,10 +130,9 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay — covers entire screen including behind bottom bar */}
       <div
         className="fixed inset-0 z-40 bg-black/60 animate-fade-in"
-        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
         onClick={() => onOpenChange(false)}
       />
       {/* Panel */}
