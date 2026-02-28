@@ -61,7 +61,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
             <div className={cn(
               "relative mb-2 rounded-full",
               position === 1 && "ring-2 ring-offset-2 ring-offset-background ring-amber-500/60",
-              isCurrentUser && position !== 1 && "ring-2 ring-emerald-500 ring-offset-2 ring-offset-background"
+              isCurrentUser && position !== 1 && "ring-2 ring-primary ring-offset-2 ring-offset-background"
             )}>
               <RankedAvatar
                 avatarUrl={entry.avatar_url}

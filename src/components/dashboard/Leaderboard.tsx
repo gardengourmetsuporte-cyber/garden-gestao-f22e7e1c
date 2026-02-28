@@ -107,8 +107,8 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
                     key={entry.user_id}
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 animate-slide-up",
-                      "border border-emerald-500/10 bg-[#0a1a10]/60",
-                      isCurrentUser && "ring-1 ring-emerald-500/30 bg-emerald-500/5",
+                      "border border-border/30 bg-secondary/50",
+                      isCurrentUser && "ring-1 ring-primary/30 bg-primary/5",
                       `stagger-${Math.min(idx + 1, 8)}`
                     )}
                   >
@@ -119,7 +119,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
                     <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earned_all_time ?? entry.total_score} size={32} userName={entry.full_name} userId={entry.user_id} />
 
                     <div className="flex-1 min-w-0">
-                      <p className={cn("font-medium text-sm truncate", isCurrentUser && "text-emerald-400")}>
+                      <p className={cn("font-medium text-sm truncate", isCurrentUser && "text-primary")}>
                         {entry.full_name}
                         {isCurrentUser && <span className="text-xs ml-1 text-muted-foreground">(você)</span>}
                       </p>
