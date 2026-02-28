@@ -136,7 +136,7 @@ export function FinanceTransactions({
         if (filters.type === 'income' && t.type !== 'income') return false;
         if (filters.type === 'expense' && t.type !== 'expense') return false;
         if (filters.categoryId && t.category_id !== filters.categoryId) return false;
-        if (filters.accountId && t.account_id !== filters.accountId) return false;
+        if (filters.accountId && t.account_id !== filters.accountId && t.to_account_id !== filters.accountId) return false;
         return true;
       });
       
