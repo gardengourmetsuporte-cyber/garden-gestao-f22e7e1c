@@ -3,11 +3,11 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 
-const actionConfig: Record<string, { label: string; icon: typeof Brain; color: string }> = {
-  respond: { label: 'Resposta', icon: Brain, color: 'hsl(var(--neon-cyan))' },
-  create_order: { label: 'Pedido', icon: ArrowUpRight, color: 'hsl(var(--neon-green))' },
-  escalate: { label: 'Escalação', icon: AlertTriangle, color: 'hsl(var(--neon-amber))' },
-  off_hours: { label: 'Fora do horário', icon: Clock, color: 'hsl(var(--muted-foreground))' },
+const actionConfig: Record<string, { label: string; icon: string; color: string }> = {
+  respond: { label: 'Resposta', icon: 'Brain', color: 'hsl(var(--neon-cyan))' },
+  create_order: { label: 'Pedido', icon: 'ArrowUpRight', color: 'hsl(var(--neon-green))' },
+  escalate: { label: 'Escalação', icon: 'AlertTriangle', color: 'hsl(var(--neon-amber))' },
+  off_hours: { label: 'Fora do horário', icon: 'Clock', color: 'hsl(var(--muted-foreground))' },
 };
 
 export function WhatsAppLogs() {
@@ -37,7 +37,7 @@ export function WhatsAppLogs() {
                 className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                 style={{ background: `${cfg.color}15`, border: `1px solid ${cfg.color}30` }}
               >
-                <Icon className="w-4 h-4" style={{ color: cfg.color }} />
+                <AppIcon name={cfg.icon} className="w-4 h-4" style={{ color: cfg.color }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">

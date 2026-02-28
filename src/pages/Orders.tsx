@@ -360,17 +360,17 @@ export default function OrdersPage() {
                                   <div className="flex items-center gap-2 pt-1 border-t border-border/30">
                                     {order.status === 'draft' && (
                                       hasValidWhatsApp(order.supplier?.phone || null) ? (
-                                        <Button
+                                         <Button
                                           size="sm"
                                           onClick={(e) => { e.stopPropagation(); handleSendWhatsApp(order); }}
                                           className="gap-1.5 rounded-xl bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] shadow-lg"
                                         >
-                                          <MessageCircle className="w-4 h-4" />
+                                          <AppIcon name="MessageCircle" className="w-4 h-4" />
                                           WhatsApp
                                         </Button>
                                       ) : (
                                         <span className="text-xs text-warning flex items-center gap-1 px-2 py-1 bg-warning/10 rounded-lg">
-                                          <MessageCircle className="w-3.5 h-3.5" />
+                                          <AppIcon name="MessageCircle" className="w-3.5 h-3.5" />
                                           Sem WhatsApp
                                         </span>
                                       )

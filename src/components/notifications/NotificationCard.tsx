@@ -7,9 +7,9 @@ import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 
 const typeConfig = {
-  alert: { icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/10', ring: 'ring-destructive/20', glow: 'shadow-glow-destructive' },
-  info: { icon: Info, color: 'text-primary', bg: 'bg-primary/10', ring: 'ring-primary/20', glow: 'shadow-glow-primary' },
-  success: { icon: CheckCircle, color: 'text-success', bg: 'bg-success/10', ring: 'ring-success/20', glow: 'shadow-glow-success' },
+  alert: { icon: 'AlertTriangle' as const, color: 'text-destructive', bg: 'bg-destructive/10', ring: 'ring-destructive/20' },
+  info: { icon: 'Info' as const, color: 'text-primary', bg: 'bg-primary/10', ring: 'ring-primary/20' },
+  success: { icon: 'CheckCircle2' as const, color: 'text-success', bg: 'bg-success/10', ring: 'ring-success/20' },
 };
 
 interface GroupedNotification {
@@ -101,7 +101,7 @@ function NotificationGroupItem({ group, onMarkRead, index }: { group: GroupedNot
         "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ring-1",
         config.bg, config.ring
       )}>
-        <config.icon className={cn("w-[18px] h-[18px]", config.color)} />
+        <AppIcon name={config.icon} className={cn("w-[18px] h-[18px]", config.color)} />
       </div>
 
       {/* Text */}
