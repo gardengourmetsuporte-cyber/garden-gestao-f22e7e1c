@@ -125,6 +125,7 @@ function MobileBrandHeader() {
     <div
       className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full"
       style={{
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
         background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
         backgroundSize: '350% 350%',
         animation: 'navyCardFlow 12s ease-in-out infinite',
@@ -386,16 +387,8 @@ export default function Auth() {
 
       {/* ── RIGHT: Form Panel ── */}
       <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0">
-        {/* Navy safe-area cover for mobile (extends gradient behind status bar) */}
-        <div
-          className="fixed top-0 left-0 right-0 z-30 lg:hidden"
-          style={{
-            height: 'env(safe-area-inset-top, 0px)',
-            background: 'hsl(224 45% 6%)',
-          }}
-        />
-        {/* Top bar - absolute on mobile to overlay the banner */}
-        <div className="flex items-center justify-between px-5 pt-4 relative z-20 lg:relative absolute top-0 left-0 right-0 lg:bg-transparent bg-[hsl(224_45%_6%)]" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
+        {/* Top bar - absolute on mobile to overlay the navy banner seamlessly */}
+        <div className="flex items-center justify-between px-5 absolute top-0 left-0 right-0 z-20 lg:relative" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
           <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
