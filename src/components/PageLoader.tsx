@@ -2,9 +2,9 @@ import gardenLogo from "@/assets/logo.png";
 
 export function PageLoader() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a1a12] relative">
+    <div className="min-h-screen flex flex-col items-center justify-center relative" style={{ background: 'radial-gradient(ellipse at center, hsl(156 40% 8%) 0%, hsl(0 0% 2%) 60%, hsl(0 0% 0%) 100%)' }}>
       {/* Super subtle center glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150px] h-[150px] bg-emerald-500/20 blur-[60px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, hsl(156 60% 35% / 0.15) 0%, transparent 70%)' }} />
 
       <div className="relative w-16 h-16 flex items-center justify-center">
         {/* Background track */}
