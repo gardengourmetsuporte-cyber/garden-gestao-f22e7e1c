@@ -8,7 +8,6 @@ import {
   DndContext,
   closestCenter,
   PointerSensor,
-  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -84,8 +83,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
   }, [open, widgets]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
 
   const handleDragStart = useCallback((_event: DragStartEvent) => {
@@ -142,8 +140,9 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
         >
           <SortableContext items={draft.map(w => w.key)} strategy={verticalListSortingStrategy}>
             <div
+              style={{ touchAction: isDragActive ? 'none' : 'pan-y' }}
               className={cn(
-                "space-y-2 max-h-[50vh] overflow-y-auto pr-1",
+                "space-y-2 max-h-[50vh] overflow-y-auto overscroll-contain pr-1",
                 isDragActive && "overflow-hidden"
               )}
             >
