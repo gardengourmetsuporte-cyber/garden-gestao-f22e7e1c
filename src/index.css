@@ -446,7 +446,7 @@
   /* ========== FINANCE HERO CARD ========== */
 
   .finance-hero-card {
-    @apply relative overflow-hidden rounded-[24px] border transition-all duration-300 active:scale-[0.98];
+    @apply relative overflow-hidden rounded-2xl border transition-all duration-300 active:scale-[0.98];
     background: linear-gradient(145deg, #0a1a12 0%, #102a1d 50%, #0a1a12 100%);
     background-size: 200% 200%;
     animation: navyCardFlow 12s ease-in-out infinite;
