@@ -8,6 +8,7 @@ export interface DashboardWidget {
 }
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
+  { key: 'ai-insights', label: 'Insights da IA', icon: 'Sparkles', visible: true },
   { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
   { key: 'finance-chart', label: 'Gráfico financeiro', icon: 'BarChart3', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },

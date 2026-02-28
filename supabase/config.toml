@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.whatsapp-bulk-send]
 verify_jwt = false
+
+[functions.ai-insights]
+verify_jwt = false

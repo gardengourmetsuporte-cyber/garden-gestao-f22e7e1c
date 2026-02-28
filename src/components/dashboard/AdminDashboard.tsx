@@ -14,6 +14,7 @@ import { SetupChecklistWidget } from './SetupChecklistWidget';
 import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
 import { PendingOrdersWidget } from './PendingOrdersWidget';
+import { AIInsightsWidget } from './AIInsightsWidget';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 
 // Lazy-load heavy below-fold widgets
@@ -42,6 +43,7 @@ function LazySection({ children, className }: { children: React.ReactNode; class
 
 // Widget renderer map
 const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode | null> = {
+  'ai-insights': () => <AIInsightsWidget />,
   'finance': ({ hasAccess, stats, statsLoading, formatCurrency, navigate }) => {
     if (!hasAccess('finance')) return null;
     return (
