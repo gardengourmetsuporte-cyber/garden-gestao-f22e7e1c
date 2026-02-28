@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
-import dashboardMockup from "@/assets/dashboard-mockup.png";
+import { AnimatedMockup } from "./AnimatedMockup";
 
 const features = [
   { icon: "BarChart3", label: "Financeiro" },
@@ -153,16 +153,8 @@ export function HeroSection() {
                 </div>
               </div>
 
-              {/* Image with subtle overlay for contrast */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
-                <img
-                  src={dashboardMockup}
-                  alt="Dashboard do Garden Gestão"
-                  className="w-full object-cover"
-                  loading="eager"
-                />
-              </div>
+              {/* Animated UI Component */}
+              <AnimatedMockup />
             </div>
           </div>
         </div>
