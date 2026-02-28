@@ -138,7 +138,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
       </div>
 
       {/* Timeline */}
-      <div ref={scrollRef} className="relative space-y-1">
+      <div ref={scrollRef} className="relative flex flex-col-reverse gap-1">
         {HOURS.map((hour) => {
           const taskId = allocations[hour];
           const task = taskId ? taskMap.get(taskId) ?? null : null;
