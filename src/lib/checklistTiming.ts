@@ -34,8 +34,8 @@ interface DeadlineInfo {
 
 /** Default deadlines used when no custom setting is configured */
 const DEFAULT_DEADLINES: Record<string, DeadlineSetting> = {
-  abertura: { checklist_type: 'abertura', deadline_hour: 19, deadline_minute: 30, is_next_day: false, is_active: true },
-  fechamento: { checklist_type: 'fechamento', deadline_hour: 2, deadline_minute: 0, is_next_day: true, is_active: true },
+  abertura: { checklist_type: 'abertura', deadline_hour: 19, deadline_minute: 30, is_next_day: false, is_active: false },
+  fechamento: { checklist_type: 'fechamento', deadline_hour: 2, deadline_minute: 0, is_next_day: true, is_active: false },
 };
 
 function getSettingForType(type: ChecklistType, settings?: DeadlineSetting[] | null): DeadlineSetting | null {
