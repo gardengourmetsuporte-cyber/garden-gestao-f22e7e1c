@@ -137,9 +137,9 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
       />
       {/* Panel */}
       <div
-        className="fixed inset-x-0 top-0 z-50 overflow-hidden flex flex-col animate-fade-in"
+        className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
         style={{
-          bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
+          paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
           background: 'linear-gradient(to bottom, hsl(220 70% 16%) 0px, hsl(220 70% 16%) 280px, hsl(var(--background)) 280px)',
         }}
       >
