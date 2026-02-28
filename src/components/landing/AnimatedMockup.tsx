@@ -6,183 +6,241 @@ export function AnimatedMockup() {
     const [activeTab, setActiveTab] = useState("overview");
 
     useEffect(() => {
-        // Trigger entrance animations after a tiny delay
-        const timer = setTimeout(() => setIsLoaded(true), 100);
+        const timer = setTimeout(() => setIsLoaded(true), 150);
         return () => clearTimeout(timer);
     }, []);
 
     return (
-        <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-[#050505] overflow-hidden group font-sans">
+        <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-[#000000] overflow-hidden group font-sans">
 
-            {/* Dynamic Background Glows inside the mockup */}
-            <div className="absolute top-0 right-0 w-[60%] h-[60%] bg-emerald-500/10 blur-[80px] rounded-full mix-blend-screen opacity-50 group-hover:opacity-80 transition-opacity duration-1000" />
-            <div className="absolute bottom-0 left-0 w-[40%] h-[50%] bg-cyan-500/10 blur-[60px] rounded-full mix-blend-screen opacity-30 group-hover:opacity-60 transition-opacity duration-1000 delay-100" />
+            {/* Dynamic Background Glows inside the mockup - Much higher quality */}
+            <div className="absolute top-[-20%] right-[-10%] w-[70%] h-[70%] bg-emerald-500/20 blur-[100px] rounded-full mix-blend-screen opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[60%] bg-teal-500/15 blur-[80px] rounded-full mix-blend-screen opacity-40 group-hover:opacity-70 transition-opacity duration-1000 delay-100" />
+            <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] bg-cyan-500/10 blur-[100px] rounded-full mix-blend-screen opacity-30 animate-pulse" />
 
-            {/* Grid pattern overlay */}
+            {/* High-end micro dot pattern overlay */}
             <div
-                className="absolute inset-0 opacity-[0.03]"
+                className="absolute inset-0 opacity-[0.1]"
                 style={{
-                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                    backgroundSize: '24px 24px'
+                    backgroundImage: 'radial-gradient(circle at center, rgba(255,255,255,0.15) 1px, transparent 1px)',
+                    backgroundSize: '20px 20px',
                 }}
             />
 
-            <div className="flex h-full w-full relative z-10">
+            <div className="flex h-full w-full relative z-10 p-2 sm:p-4 gap-2 sm:gap-4">
 
-                {/* Sidebar */}
-                <div className="w-[18%] sm:w-[15%] h-full border-r border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl flex flex-col py-4 px-2 items-center sm:items-stretch">
-
-                    <div className="mb-8 px-2 flex items-center justify-center sm:justify-start gap-2">
-                        <div className={`w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all duration-700 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
-                            <AppIcon name="Leaf" size={12} className="text-white" />
-                        </div>
-                        <span className={`text-white font-bold text-xs hidden sm:block transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}>Garden</span>
+                {/* Sidebar - Glassmorphic and floating */}
+                <div className={`w-[15%] sm:w-[13%] rounded-2xl border border-white/5 bg-white/[0.01] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] backdrop-blur-3xl flex flex-col py-6 items-center transition-all duration-1000 ease-out ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-white/10 to-white/0 border border-white/10 flex items-center justify-center mb-8 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                        <AppIcon name="Orbit" size={16} className="text-emerald-400" />
                     </div>
 
-                    <div className="space-y-2 flex-1 w-full">
+                    <div className="space-y-4 flex-1 flex flex-col items-center w-full px-2">
                         {[
-                            { id: "overview", icon: "LayoutDashboard", label: "Dashboard" },
-                            { id: "sales", icon: "TrendingUp", label: "Vendas" },
-                            { id: "orders", icon: "ShoppingCart", label: "Pedidos" },
-                            { id: "customers", icon: "Users", label: "Clientes" }
+                            { id: "overview", icon: "LayoutDashboard" },
+                            { id: "sales", icon: "LineChart" },
+                            { id: "orders", icon: "Clock" },
+                            { id: "customers", icon: "Users" },
+                            { id: "settings", icon: "Settings2" }
                         ].map((item, index) => (
                             <div
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
-                                className={`w-full flex items-center justify-center sm:justify-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-500 hover:bg-white/5 ${activeTab === item.id
-                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                        : "text-white/40 border border-transparent"
-                                    } ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-                                style={{ transitionDelay: `${150 + index * 50}ms` }}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-500 hover:bg-white/5 ${activeTab === item.id
+                                        ? "bg-white/10 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] border border-white/10"
+                                        : "text-white/30 border border-transparent hover:text-white/70"
+                                    }`}
+                                style={{ transitionDelay: `${200 + index * 100}ms` }}
                             >
-                                <AppIcon name={item.icon} size={14} />
-                                <span className="text-[10px] font-medium hidden sm:block">{item.label}</span>
+                                <AppIcon name={item.icon} size={18} strokeWidth={activeTab === item.id ? 2.5 : 2} />
                             </div>
                         ))}
                     </div>
 
-                    {/* User profile mock at bottom */}
-                    <div className={`mt-auto w-full p-2 flex items-center justify-center sm:justify-start gap-2 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center border border-white/5">
-                            <AppIcon name="User" size={12} className="text-white/60" />
-                        </div>
-                        <div className="hidden sm:block">
-                            <div className="text-[9px] text-white/80 font-medium">B. Momesso</div>
-                            <div className="text-[8px] text-emerald-500">Admin</div>
+                    {/* User profile avatar */}
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1px] mt-auto cursor-pointer">
+                        <div className="w-full h-full bg-black rounded-full flex items-center justify-center text-[10px] font-bold text-white">
+                            BM
                         </div>
                     </div>
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 h-full flex flex-col p-4 sm:p-6 lg:p-8 overflow-hidden relative">
+                <div className="flex-1 h-full flex flex-col space-y-2 sm:space-y-4 overflow-hidden relative">
 
-                    <div className="flex justify-between items-center mb-6">
-                        <div className={`transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                            <h2 className="text-white font-bold text-sm sm:text-base lg:text-lg tracking-tight">Visão Geral</h2>
-                            <p className="text-white/40 text-[9px] sm:text-[10px] mt-0.5">Acompanhe seus resultados em tempo real</p>
+                    {/* Top Navbar */}
+                    <div className={`h-14 sm:h-16 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-3xl flex items-center justify-between px-4 sm:px-6 transition-all duration-1000 delay-200 ease-out ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+                                <AppIcon name="Sparkles" size={14} className="text-emerald-400" />
+                            </div>
+                            <div>
+                                <h2 className="text-white font-bold text-xs sm:text-sm tracking-tight leading-none">Visão de Performance</h2>
+                                <p className="text-white/40 text-[9px] sm:text-[10px] mt-1">Atualizado há 2 segundos</p>
+                            </div>
                         </div>
 
-                        <div className={`p-1.5 rounded-lg border border-white/10 bg-white/5 flex items-center gap-2 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                            <span className="text-white/60 text-[9px] font-medium mr-1">Ao vivo</span>
+                        <div className="flex items-center gap-3">
+                            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                                <span className="text-white/60 text-[10px] font-medium">Conectado</span>
+                            </div>
+                            <div className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                                <AppIcon name="Bell" size={14} className="text-white/50" />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-                        {[
-                            { label: "Receita Hoje", value: "R$ 4.250,00", trend: "+12.5%", isUp: true },
-                            { label: "Pedidos", value: "145", trend: "+5.2%", isUp: true },
-                            { label: "Ticket Médio", value: "R$ 65,90", trend: "-1.4%", isUp: false },
-                            { label: "Clientes Novos", value: "28", trend: "+18.2%", isUp: true }
-                        ].map((stat, i) => (
-                            <div
-                                key={i}
-                                className={`p-3 sm:p-4 rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-sm transition-all duration-700 ease-out hover:bg-white/5 hover:border-white/10 group/card ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-                                style={{ transitionDelay: `${300 + i * 100}ms` }}
-                            >
-                                <div className="text-white/40 text-[9px] sm:text-[10px] mb-1.5">{stat.label}</div>
-                                <div className="text-white font-bold text-xs sm:text-sm lg:text-base tracking-tight">{stat.value}</div>
-                                <div className={`text-[8px] sm:text-[9px] font-medium mt-1.5 flex items-center gap-0.5 ${stat.isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                    <AppIcon name={stat.isUp ? 'TrendingUp' : 'TrendingDown'} size={10} />
-                                    {stat.trend} <span className="text-white/30 font-normal ml-0.5">vs ontem</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <div className="flex-1 flex flex-col lg:flex-row gap-2 sm:gap-4 overflow-hidden">
 
-                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3">
-
-                        {/* Chart Area */}
-                        <div
-                            className={`lg:col-span-2 rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-sm p-4 flex flex-col relative overflow-hidden transition-all duration-1000 delay-500 ease-out ${isLoaded ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-[0.98]'}`}
-                        >
-                            <div className="text-white/60 text-[10px] sm:text-xs font-medium mb-4 flex items-center justify-between">
-                                <span>Faturamento Semanal</span>
-                                <AppIcon name="MoreHorizontal" size={14} className="text-white/20" />
-                            </div>
-
-                            <div className="flex-1 flex items-end justify-between gap-1.5 sm:gap-2 pb-2">
-                                {[45, 65, 30, 80, 50, 95, 60].map((height, i) => (
-                                    <div key={i} className="relative flex-1 flex flex-col justify-end items-center group/bar h-full">
-                                        {/* Tooltip on hover */}
-                                        <div className="absolute -top-6 bg-[#1a1a1a] text-white text-[8px] py-1 px-2 rounded-md opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-xl border border-white/10">
-                                            R$ {(height * 75).toFixed(2)}
-                                        </div>
-                                        {/* The bar */}
-                                        <div
-                                            className="w-full max-w-[24px] sm:max-w-[32px] rounded-t-sm transition-all duration-[1.5s] ease-[cubic-bezier(0.22,1,0.36,1)] relative overflow-hidden"
-                                            style={{
-                                                height: isLoaded ? `${height}%` : '0%',
-                                                background: i === 5 ? 'linear-gradient(to top, hsl(142 71% 45%), hsl(142 76% 60%))' : 'hsl(0 0% 100% / 0.1)'
-                                            }}
-                                        >
-                                            {/* Shine effect on tallest bar */}
-                                            {i === 5 && (
-                                                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-transparent -translate-y-full group-hover:animate-[shimmer_1s_infinite]" />
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* List Area */}
-                        <div
-                            className={`rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-sm p-3 sm:p-4 flex flex-col transition-all duration-1000 delay-700 ease-out hidden lg:flex ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}
-                        >
-                            <div className="text-white/60 text-xs font-medium mb-3">Últimas Vendas</div>
-                            <div className="space-y-2 flex-1 relative">
-                                {/* Fade out mask at bottom */}
-                                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#0a0a0a] to-transparent z-10" />
-
+                        {/* Left Column (Charts) */}
+                        <div className="flex-1 flex flex-col gap-2 sm:gap-4 min-w-0">
+                            {/* KPI Cards */}
+                            <div className="grid grid-cols-2 gap-2 sm:gap-4">
                                 {[
-                                    { id: 1042, user: "Maria S.", val: "R$ 145,90", stat: "success" },
-                                    { id: 1043, user: "João P.", val: "R$ 82,50", stat: "success" },
-                                    { id: 1044, user: "Ana C.", val: "R$ 45,00", stat: "warning" },
-                                    { id: 1045, user: "Carlos S.", val: "R$ 210,00", stat: "success" },
-                                    { id: 1046, user: "Bruno M.", val: "R$ 65,90", stat: "success" },
-                                ].map((order, i) => (
+                                    { label: "Receita (Hoje)", value: "R$ 4.250,00", trend: "+12.5%", color: "text-emerald-400" },
+                                    { label: "Pedidos (Hoje)", value: "145", trend: "+5.2%", color: "text-white" }
+                                ].map((stat, i) => (
                                     <div
                                         key={i}
-                                        className={`flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5 transition-all duration-500 ease-out hover:bg-white/10 hover:border-white/10 cursor-default ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                                        style={{ transitionDelay: `${800 + i * 100}ms` }}
+                                        className={`relative p-4 sm:p-5 rounded-2xl border border-white/5 bg-gradient-to-b from-white/[0.03] to-white/[0.01] backdrop-blur-3xl overflow-hidden group/kpi transition-all duration-1000 delay-300 ease-out hover:border-white/10 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[8px] text-white/60 font-medium">
-                                                {order.user.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div className="text-white text-[10px] font-medium leading-none">{order.user}</div>
-                                                <div className="text-white/40 text-[8px] mt-0.5">Pedido #{order.id}</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-1">
-                                            <div className="text-white text-[10px] font-medium font-mono tracking-tight">{order.val}</div>
-                                            <div className={`w-1.5 h-1.5 rounded-full ${order.stat === 'success' ? 'bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-amber-400'}`} />
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover/kpi:bg-white/10 transition-colors" />
+                                        <div className="text-white/40 text-[10px] sm:text-xs font-medium mb-2 tracking-wide uppercase">{stat.label}</div>
+                                        <div className="text-white font-extrabold text-lg sm:text-2xl tracking-tighter mb-2">{stat.value}</div>
+                                        <div className={`text-[9px] sm:text-[10px] font-bold flex items-center gap-1 ${stat.color}`}>
+                                            <AppIcon name="TrendingUp" size={12} />
+                                            {stat.trend} <span className="text-white/30 font-medium ml-1">vs ontem</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Main Line Chart (SVG Animated) */}
+                            <div className={`flex-1 rounded-2xl border border-white/5 bg-[#050505]/50 backdrop-blur-3xl p-4 sm:p-6 flex flex-col relative overflow-hidden transition-all duration-1000 delay-500 ease-out ${isLoaded ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-[0.98]'}`}>
+                                <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
+
+                                <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div>
+                                        <div className="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Volume Financeiro</div>
+                                        <div className="text-white font-bold text-xl tracking-tight">R$ 28.450,00 <span className="text-emerald-400 text-sm ml-2">+18%</span></div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {["1D", "7D", "30D"].map(range => (
+                                            <div key={range} className={`px-2 py-1 rounded-md text-[9px] font-bold cursor-pointer transition-colors ${range === "7D" ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}>{range}</div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* SVG Line Chart */}
+                                <div className="flex-1 w-full relative mt-auto z-10">
+                                    {/* Horizontal grid lines */}
+                                    <div className="absolute inset-0 flex flex-col justify-between opacity-10">
+                                        {[0, 1, 2, 3].map(i => <div key={i} className="w-full h-px border-t border-dashed border-white" />)}
+                                    </div>
+
+                                    <svg className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                        {/* Area gradient */}
+                                        <defs>
+                                            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="hsl(156, 72%, 40%)" stopOpacity="0.3" />
+                                                <stop offset="100%" stopColor="hsl(156, 72%, 40%)" stopOpacity="0" />
+                                            </linearGradient>
+                                            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                                                <stop offset="0%" stopColor="hsl(190, 90%, 50%)" />
+                                                <stop offset="100%" stopColor="hsl(156, 72%, 40%)" />
+                                            </linearGradient>
+                                        </defs>
+
+                                        {/* Shimmer/Pulse effect on area */}
+                                        {isLoaded && (
+                                            <path
+                                                d="M0,80 C20,60 30,90 50,40 C70,-10 80,50 100,20 L100,100 L0,100 Z"
+                                                fill="url(#areaGradient)"
+                                                className="animate-[fade-in_2s_ease-out]"
+                                            />
+                                        )}
+
+                                        {/* Animated Line */}
+                                        <path
+                                            d="M0,80 C20,60 30,90 50,40 C70,-10 80,50 100,20"
+                                            fill="none"
+                                            stroke="url(#lineGradient)"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+                                            style={{
+                                                strokeDasharray: 400,
+                                                strokeDashoffset: isLoaded ? 0 : 400,
+                                                transition: 'stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1)'
+                                            }}
+                                        />
+
+                                        {/* Data Point Dots */}
+                                        <circle cx="50" cy="40" r="3" fill="#000" stroke="#10b981" strokeWidth="2" className={`transition-all duration-700 delay-1000 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
+                                        <circle cx="100" cy="20" r="4" fill="#fff" className={`transition-all duration-700 delay-[1200ms] shadow-[0_0_10px_white] ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column (Activity / Radar) */}
+                        <div className={`hidden lg:flex w-1/3 flex-col gap-4 rounded-2xl border border-white/5 bg-[#050505]/50 backdrop-blur-3xl p-5 relative overflow-hidden transition-all duration-1000 delay-700 ease-out ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
+
+                            <div className="absolute top-0 right-0 w-full h-[30%] bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
+
+                            <div className="text-white/80 font-bold text-sm mb-6 flex justify-between items-center z-10">
+                                Transações Recentes
+                                <AppIcon name="ArrowRight" size={14} className="text-white/30 hover:text-white/80 cursor-pointer" />
+                            </div>
+
+                            <div className="flex-1 flex flex-col gap-3 relative z-10">
+                                {[
+                                    { name: "Mesa 12", value: "R$ 145,90", items: "3 itens", time: "Agora" },
+                                    { name: "iFood #482", value: "R$ 82,50", items: "1 item", time: "2 min atrás" },
+                                    { name: "Balcão (João)", value: "R$ 45,00", items: "2 itens", time: "5 min atrás" },
+                                    { name: "Mesa 04", value: "R$ 210,00", items: "5 itens", time: "12 min atrás" }
+                                ].map((tx, i) => (
+                                    <div
+                                        key={i}
+                                        className={`p-3 rounded-xl bg-white/[0.02] border border-white/[0.03] hover:bg-white/[0.05] transition-all cursor-default flex justify-between items-center group/tx`}
+                                        style={{ transitionDelay: `${900 + (i * 100)}ms`, opacity: isLoaded ? 1 : 0, transform: isLoaded ? 'translateY(0)' : 'translateY(10px)' }}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 group-hover/tx:border-emerald-500/30 transition-colors">
+                                                <AppIcon name="Receipt" size={12} className="text-white/50 group-hover/tx:text-emerald-400" />
+                                            </div>
+                                            <div>
+                                                <div className="text-white text-xs font-bold leading-none mb-1">{tx.name}</div>
+                                                <div className="text-white/30 text-[9px]">{tx.items} • <span className="text-white/20">{tx.time}</span></div>
+                                            </div>
+                                        </div>
+                                        <div className="text-white font-mono text-xs font-bold">{tx.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Animated Ring Indicator at bottom */}
+                            <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-4">
+                                <div className="relative w-10 h-10 flex items-center justify-center">
+                                    <svg className="absolute inset-0 w-full h-full -rotate-90">
+                                        <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                                        <circle
+                                            cx="20" cy="20" r="16" fill="none" stroke="currentColor" strokeWidth="3"
+                                            strokeDasharray="100"
+                                            strokeDashoffset={isLoaded ? "25" : "100"}
+                                            className="text-emerald-400 transition-all duration-[2s] ease-out drop-shadow-[0_0_4px_rgba(16,185,129,0.5)]"
+                                        />
+                                    </svg>
+                                    <span className="text-white text-[9px] font-bold">75%</span>
+                                </div>
+                                <div>
+                                    <div className="text-white text-xs font-bold">Meta Diária</div>
+                                    <div className="text-emerald-400 text-[10px]">Falta R$ 1.250</div>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>

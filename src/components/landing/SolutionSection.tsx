@@ -1,28 +1,26 @@
 import { AppIcon } from "@/components/ui/app-icon";
-import screenshotFinanceiro from "@/assets/screenshot-financeiro.png";
-import screenshotChecklist from "@/assets/screenshot-checklist.png";
-import screenshotEstoque from "@/assets/screenshot-estoque.png";
+import { AnimatedPhoneMockup } from "./AnimatedPhoneMockup";
 
-const steps = [
+const steps: { number: string; title: string; desc: string; type: "finance" | "checklist" | "inventory"; alt: string }[] = [
   {
     number: "01",
     title: "Cadastre suas contas e categorias",
     desc: "Em minutos, configure suas contas bancárias, categorias de despesas e receitas. O sistema já vem com sugestões prontas para restaurantes.",
-    image: screenshotFinanceiro,
+    type: "finance",
     alt: "Configuração financeira do Garden",
   },
   {
     number: "02",
     title: "Configure os checklists da sua equipe",
     desc: "Crie tarefas para abertura, fechamento e rotina. Cada funcionário sabe exatamente o que fazer — e você acompanha de qualquer lugar.",
-    image: screenshotChecklist,
+    type: "checklist",
     alt: "Checklist de abertura e fechamento",
   },
   {
     number: "03",
     title: "Acompanhe tudo em tempo real",
     desc: "Dashboard com lucro, estoque, equipe e alertas. Sem surpresas no final do mês.",
-    image: screenshotEstoque,
+    type: "inventory",
     alt: "Dashboard com visão geral",
   },
 ];
@@ -98,19 +96,9 @@ export function SolutionSection() {
                   {/* Ambient Glow */}
                   <div className="absolute -inset-8 bg-gradient-to-tr from-emerald-500/10 via-transparent to-teal-500/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
 
-                  {/* Glass Card */}
-                  <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
-                    {/* Mac Header */}
-                    <div className="flex items-center gap-1.5 px-3 py-2.5 sm:px-4 sm:py-3 border-b border-white/10 bg-white/[0.02]">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-white/10" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-white/10" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-white/10" />
-                    </div>
-                    {/* Content Image with dim overlay */}
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
-                      <img src={step.image} alt={step.alt} className="w-full object-cover" loading="lazy" />
-                    </div>
+                  {/* Animated Phone Mockup placed natively */}
+                  <div className="relative overflow-hidden pt-4 pb-2 px-6 sm:px-10 flex justify-center bg-[#050505]">
+                    <AnimatedPhoneMockup type={step.type} />
                   </div>
                 </div>
               </div>

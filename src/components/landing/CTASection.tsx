@@ -10,16 +10,18 @@ export function CTASection() {
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          className="relative rounded-3xl overflow-hidden p-10 sm:p-14 md:p-20 text-center"
+          className="relative rounded-[2.5rem] overflow-hidden p-10 sm:p-14 md:p-20 text-center border border-white/10"
           style={{
-            background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
-            backgroundSize: '350% 350%',
-            animation: 'navyCardFlow 12s ease-in-out infinite',
+            background: 'linear-gradient(145deg, #050a05 0%, #0a150a 50%, #050a05 100%)',
+            boxShadow: '0 20px 80px -20px rgba(16,185,129,0.15), inset 0 1px 1px rgba(255,255,255,0.05)'
           }}
         >
+          {/* Subtle Grid overlay */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
           {/* Glow orbs */}
-          <div className="absolute top-[20%] left-[20%] w-[250px] h-[250px] rounded-full blur-[100px] opacity-15 pointer-events-none" style={{ background: 'hsl(220 80% 50%)', animation: 'float-orb-1 8s ease-in-out infinite' }} />
-          <div className="absolute bottom-[20%] right-[20%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-10 pointer-events-none" style={{ background: 'hsl(234 80% 60%)', animation: 'float-orb-2 10s ease-in-out infinite' }} />
+          <div className="absolute top-[20%] left-[20%] w-[300px] h-[300px] rounded-full blur-[100px] opacity-[0.15] mix-blend-screen pointer-events-none" style={{ background: 'hsl(156 72% 40%)', animation: 'float-orb-1 8s ease-in-out infinite' }} />
+          <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] rounded-full blur-[80px] opacity-[0.1] mix-blend-screen pointer-events-none" style={{ background: 'hsl(190 90% 50%)', animation: 'float-orb-2 10s ease-in-out infinite' }} />
 
           <div className="relative z-10">
             <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-8 shadow-lg" style={{ boxShadow: '0 0 60px hsl(220 80% 50% / 0.15)' }}>

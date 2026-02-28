@@ -10,7 +10,7 @@ const plans = [
     description: "Para restaurantes em crescimento",
     monthly: 97,
     yearly: 77,
-    highlight: false,
+    highlight: true,
     icon: Star,
     features: [
       "Financeiro completo",
@@ -30,7 +30,7 @@ const plans = [
     description: "Para operações avançadas",
     monthly: 197,
     yearly: 157,
-    highlight: true,
+    highlight: false,
     icon: Zap,
     features: [
       "Tudo do Pro",
@@ -98,8 +98,8 @@ export function PricingSection() {
             <div
               key={plan.name}
               className={`group relative rounded-3xl transition-all duration-300 ${plan.highlight
-                  ? "md:scale-105 z-10 p-[1px] hover:-translate-y-1"
-                  : "p-[1px] hover:-translate-y-1 opacity-90 hover:opacity-100"
+                ? "md:scale-105 z-10 p-[1px] hover:-translate-y-1"
+                : "p-[1px] hover:-translate-y-1 opacity-90 hover:opacity-100"
                 }`}
             >
               {/* Highlight specific border/bg glow */}
@@ -113,8 +113,8 @@ export function PricingSection() {
               )}
 
               <div className={`relative h-full flex flex-col rounded-[23px] p-8 sm:p-10 ${plan.highlight
-                  ? "bg-[#050B05] backdrop-blur-3xl overflow-hidden"
-                  : "bg-[#0a0a0a] backdrop-blur-2xl"
+                ? "bg-[#050B05] backdrop-blur-3xl overflow-hidden"
+                : "bg-[#0a0a0a] backdrop-blur-2xl"
                 }`}>
 
                 {/* Highlight specific inner glow */}
@@ -134,8 +134,8 @@ export function PricingSection() {
 
                 <div className="relative z-10 flex items-center gap-4 mb-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shadow-inner ${plan.highlight
-                      ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
-                      : "bg-white/5 border-white/10 text-white/70"
+                    ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
+                    : "bg-white/5 border-white/10 text-white/70"
                     }`}>
                     <plan.icon className="w-6 h-6" />
                   </div>
@@ -170,8 +170,8 @@ export function PricingSection() {
                 <button
                   onClick={() => setSelectedPlan(plan)}
                   className={`group/btn mt-auto flex items-center justify-center gap-2 w-full h-14 rounded-xl font-bold text-base transition-all duration-300 active:scale-[0.98] ${plan.highlight
-                      ? "bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)]"
-                      : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/10"
+                    ? "bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)]"
+                    : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/10"
                     }`}
                 >
                   {plan.cta}
