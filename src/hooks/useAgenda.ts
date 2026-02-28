@@ -248,7 +248,7 @@ export function useAgenda() {
           user_id: user.id,
           name: category.name,
           color: category.color,
-          icon: category.icon || 'Folder',
+          icon: category.icon || 'folder',
           sort_order: categories.length,
         } as any);
       if (error) throw error;
@@ -261,10 +261,12 @@ export function useAgenda() {
   });
 
   const updateCategoryMutation = useMutation({
-    mutationFn: async ({ id, name, color }: { id: string; name: string; color: string }) => {
+    mutationFn: async ({ id, name, color, icon }: { id: string; name: string; color: string; icon?: string }) => {
+      const updates: any = { name, color };
+      if (icon !== undefined) updates.icon = icon;
       const { error } = await supabase
         .from('task_categories' as any)
-        .update({ name, color } as any)
+        .update(updates)
         .eq('id', id);
       if (error) throw error;
     },

@@ -229,7 +229,7 @@ export default function Agenda() {
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl card-surface hover:bg-secondary/70 transition-all">
                   <div className="flex items-center gap-3">
-                    <AppIcon name={category.icon || 'Folder'} size={20} style={{ color: category.color }} />
+                    <span className="material-symbols-rounded shrink-0" style={{ fontSize: 20, color: category.color }}>{category.icon || 'folder'}</span>
                     <span className="font-semibold text-sm text-foreground">{category.name}</span>
                     <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">{catTasks.length}</span>
                   </div>
@@ -418,41 +418,98 @@ export default function Agenda() {
   );
 }
 
+// ─── Task Category Icons ─────────────────────────────────────
+const TASK_CATEGORY_ICONS = [
+  'work', 'person', 'group', 'home', 'storefront',
+  'local_shipping', 'payments', 'receipt_long', 'shopping_cart', 'campaign',
+  'call', 'mail', 'forum', 'event', 'schedule',
+  'task_alt', 'checklist', 'edit_note', 'description', 'folder',
+  'bookmark', 'label', 'star', 'favorite', 'flag',
+  'lightbulb', 'school', 'fitness_center', 'restaurant', 'local_hospital',
+  'directions_car', 'flight', 'build', 'handyman', 'brush',
+  'code', 'laptop_mac', 'smartphone', 'headphones', 'photo_camera',
+  'music_note', 'movie', 'pets', 'eco', 'park',
+  'celebration', 'emoji_events', 'savings', 'account_balance', 'gavel',
+];
+
 // ─── Category Manager Sheet ─────────────────────────────────────
 
 interface CategoryManagerSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   categories: TaskCategory[];
-  onAdd: (cat: { name: string; color: string }) => void;
-  onUpdate: (cat: { id: string; name: string; color: string }) => void;
+  onAdd: (cat: { name: string; color: string; icon?: string }) => void;
+  onUpdate: (cat: { id: string; name: string; color: string; icon?: string }) => void;
   onDelete: (id: string) => void;
 }
 
 function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate, onDelete }: CategoryManagerSheetProps) {
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState(CATEGORY_COLORS[4]);
+  const [newIcon, setNewIcon] = useState('folder');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
+  const [editIcon, setEditIcon] = useState('');
+  const [iconSearch, setIconSearch] = useState('');
+
+  const filteredIcons = useMemo(() => {
+    if (!iconSearch) return TASK_CATEGORY_ICONS;
+    return TASK_CATEGORY_ICONS.filter(i => i.includes(iconSearch.toLowerCase()));
+  }, [iconSearch]);
 
   const handleAdd = () => {
     if (!newName.trim()) return;
-    onAdd({ name: newName.trim(), color: newColor });
+    onAdd({ name: newName.trim(), color: newColor, icon: newIcon });
     setNewName('');
+    setNewIcon('folder');
   };
 
   const startEdit = (cat: TaskCategory) => {
     setEditingId(cat.id);
     setEditName(cat.name);
     setEditColor(cat.color);
+    setEditIcon(cat.icon || 'folder');
+    setIconSearch('');
   };
 
   const saveEdit = () => {
     if (!editingId || !editName.trim()) return;
-    onUpdate({ id: editingId, name: editName.trim(), color: editColor });
+    onUpdate({ id: editingId, name: editName.trim(), color: editColor, icon: editIcon });
     setEditingId(null);
   };
+
+  const renderIconGrid = (selectedIcon: string, onSelect: (icon: string) => void) => (
+    <div className="space-y-2">
+      <Input
+        placeholder="Buscar ícone..."
+        value={iconSearch}
+        onChange={e => setIconSearch(e.target.value)}
+        className="h-9 text-xs"
+      />
+      <div className="grid grid-cols-7 gap-1 max-h-32 overflow-y-auto rounded-xl border border-border/40 p-1.5 bg-secondary/20">
+        {filteredIcons.map(icon => (
+          <button
+            key={icon}
+            type="button"
+            onClick={() => onSelect(icon)}
+            className={cn(
+              "flex items-center justify-center p-1.5 rounded-lg transition-colors",
+              selectedIcon === icon
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-secondary/60 text-muted-foreground"
+            )}
+            title={icon.replace(/_/g, ' ')}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 20 }}>{icon}</span>
+          </button>
+        ))}
+        {filteredIcons.length === 0 && (
+          <p className="col-span-7 text-xs text-muted-foreground text-center py-2">Nenhum ícone encontrado</p>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -466,6 +523,14 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
           {/* Add new */}
           <div className="bg-secondary/50 rounded-2xl p-4 border border-border space-y-3">
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border border-border"
+                style={{ backgroundColor: newColor + '20' }}
+                onClick={() => {}}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 20, color: newColor }}>{newIcon}</span>
+              </button>
               <Input
                 placeholder="Nova categoria"
                 value={newName}
@@ -491,6 +556,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                 />
               ))}
             </div>
+            {renderIconGrid(newIcon, setNewIcon)}
           </div>
 
           {/* List */}
@@ -503,6 +569,13 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                   {editingId === cat.id ? (
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border border-border"
+                          style={{ backgroundColor: editColor + '20' }}
+                        >
+                          <span className="material-symbols-rounded" style={{ fontSize: 20, color: editColor }}>{editIcon}</span>
+                        </button>
                         <Input
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
@@ -529,11 +602,12 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                           />
                         ))}
                       </div>
+                      {renderIconGrid(editIcon, setEditIcon)}
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="w-4 h-4 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
+                        <span className="material-symbols-rounded shrink-0" style={{ fontSize: 20, color: cat.color }}>{cat.icon || 'folder'}</span>
                         <span className="font-medium text-sm">{cat.name}</span>
                       </div>
                       <div className="flex items-center gap-1">
