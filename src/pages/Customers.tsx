@@ -58,16 +58,18 @@ export default function Customers() {
   useEffect(() => {
     if (!activeUnit) return;
     const IMPORT_KEY = `goomer_customers_imported_${activeUnit.id}`;
-    if (localStorage.getItem(IMPORT_KEY)) return;
+    // Also check legacy key
+    if (localStorage.getItem(IMPORT_KEY) || localStorage.getItem('goomer_customers_imported_v1')) return;
     
     const doImport = async () => {
+      // Mark immediately to prevent concurrent retries
+      localStorage.setItem(IMPORT_KEY, 'pending');
       try {
         const res = await fetch('/data/goomer-customers.csv');
-        if (!res.ok) return;
+        if (!res.ok) { localStorage.setItem(IMPORT_KEY, 'skip'); return; }
         const csvText = await res.text();
-        if (!csvText.includes('"Nome"') || !csvText.includes(';')) return;
+        if (!csvText.includes('"Nome"') || !csvText.includes(';')) { localStorage.setItem(IMPORT_KEY, 'skip'); return; }
         
-        localStorage.setItem(IMPORT_KEY, 'pending');
         const { error, data } = await supabase.functions.invoke('import-customers-csv', {
           body: { csvText, unitId: activeUnit.id },
         });
@@ -81,7 +83,8 @@ export default function Customers() {
         }
       } catch (err: any) {
         console.error('Auto-import failed:', err);
-        localStorage.removeItem(IMPORT_KEY);
+        // Keep the key set to prevent infinite retries
+        localStorage.setItem(IMPORT_KEY, 'error');
       }
     };
     

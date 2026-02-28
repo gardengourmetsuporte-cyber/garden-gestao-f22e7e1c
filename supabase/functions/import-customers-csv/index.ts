@@ -66,16 +66,24 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "CSV vazio" }), { status: 400, headers: corsHeaders });
     }
 
-    // Fetch existing phones for this unit to deduplicate
-    const { data: existingCustomers } = await supabase
-      .from('customers')
-      .select('phone')
-      .eq('unit_id', unitId)
-      .not('phone', 'is', null);
-    
-    const existingPhones = new Set(
-      (existingCustomers || []).map((c: any) => c.phone).filter(Boolean)
-    );
+    // Fetch ALL existing phones for this unit (paginated to bypass 1000 limit)
+    const existingPhones = new Set<string>();
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data: page } = await supabase
+        .from('customers')
+        .select('phone')
+        .eq('unit_id', unitId)
+        .not('phone', 'is', null)
+        .range(from, from + pageSize - 1);
+      if (!page || page.length === 0) break;
+      for (const c of page) {
+        if (c.phone) existingPhones.add(c.phone);
+      }
+      if (page.length < pageSize) break;
+      from += pageSize;
+    }
 
     // Skip header and parse records
     const records: any[] = [];
@@ -128,16 +136,31 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Batch insert in chunks of 100
+    // Batch insert in chunks of 100, fallback to individual on conflict
     let inserted = 0;
     for (let i = 0; i < records.length; i += 100) {
       const chunk = records.slice(i, i + 100);
       const { error } = await supabase.from('customers').insert(chunk);
       if (error) {
-        console.error(`Chunk error at ${i}:`, error);
-        return new Response(JSON.stringify({ error: error.message, inserted }), { status: 500, headers: corsHeaders });
+        if (error.code === '23505') {
+          // Duplicate in chunk — insert one by one, skipping conflicts
+          console.warn(`Chunk ${i} had duplicates, inserting individually`);
+          for (const record of chunk) {
+            const { error: singleErr } = await supabase.from('customers').insert(record);
+            if (singleErr) {
+              if (singleErr.code === '23505') continue; // skip duplicate
+              console.error('Single insert error:', singleErr);
+            } else {
+              inserted++;
+            }
+          }
+        } else {
+          console.error(`Chunk error at ${i}:`, error);
+          return new Response(JSON.stringify({ error: error.message, inserted }), { status: 500, headers: corsHeaders });
+        }
+      } else {
+        inserted += chunk.length;
       }
-      inserted += chunk.length;
     }
 
     // Recalculate scores for all imported customers
