@@ -50,10 +50,10 @@ export function RedemptionHistory({ redemptions }: RedemptionHistoryProps) {
         return (
           <div 
             key={redemption.id}
-            className="flex items-center justify-between p-3 rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60"
+            className="flex items-center justify-between p-3 rounded-xl border border-border/30 bg-secondary/50"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <AppIcon name="Star" size={20} className="text-primary" />
               </div>
               <div>
