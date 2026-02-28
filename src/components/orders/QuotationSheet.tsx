@@ -75,7 +75,7 @@ export function QuotationSheet({ open, onOpenChange }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto bg-[#0a1a10]">
+      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle>Nova Cotação</SheetTitle>
         </SheetHeader>

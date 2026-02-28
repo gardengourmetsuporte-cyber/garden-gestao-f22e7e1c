@@ -101,7 +101,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl flex flex-col overflow-hidden bg-[#0a1a10]">
+        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl flex flex-col overflow-hidden">
           <SheetHeader className="text-left pb-2">
             <SheetTitle>{editingTask ? 'Editar Lembrete' : 'Novo Lembrete'}</SheetTitle>
             <SheetDescription className="text-muted-foreground">
