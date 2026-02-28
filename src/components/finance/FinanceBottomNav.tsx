@@ -116,20 +116,14 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
       )}
 
       <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
+        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 pointer-events-none"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {/* Subtle top separator */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
-
-        {/* Bar background */}
-        <div
-          className="relative"
-          style={{
-            background: 'hsl(var(--background))',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-          }}
-        >
-          <div className="flex items-center h-[68px] max-w-lg mx-auto relative">
+        <div className="mx-4 mb-3 pointer-events-auto">
+          <div
+            className="relative flex items-center h-[64px] max-w-lg mx-auto rounded-full shadow-[0_4px_30px_rgba(0,0,0,0.4)]"
+            style={{ background: 'rgba(26,26,26,0.92)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}
+          >
             {/* Left tabs */}
             {tabs.slice(0, 2).map(tab => (
               <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
