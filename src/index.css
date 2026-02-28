@@ -1901,13 +1901,13 @@
 
   .fab-gradient {
     background: linear-gradient(135deg,
-        #050a05 0%,
-        #0a150a 30%,
-        rgba(16, 185, 129, 0.4) 55%,
-        #0a150a 75%,
-        #050a05 100%);
-    background-size: 350% 350%;
-    animation: navyCardFlow 12s ease-in-out infinite;
+        rgba(5, 40, 20, 0.9) 0%,
+        rgba(10, 80, 40, 1) 30%,
+        rgba(16, 185, 129, 1) 50%,
+        rgba(10, 80, 40, 1) 70%,
+        rgba(5, 40, 20, 0.9) 100%);
+    background-size: 300% 300%;
+    animation: navyCardFlow 8s ease-in-out infinite;
   }
 
   /* ========== AMBIENT GLOW EFFECTS ========== */
