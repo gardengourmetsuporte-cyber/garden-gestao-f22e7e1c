@@ -393,7 +393,7 @@ export default function Auth() {
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
-          <ThemeToggle />
+          <ThemeToggle className="lg:text-foreground text-white/80 hover:text-white hover:bg-white/10" />
         </div>
 
       <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
