@@ -101,7 +101,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl flex flex-col overflow-hidden">
+        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl flex flex-col overflow-hidden bg-[#0a1a10]">
           <SheetHeader className="text-left pb-2">
             <SheetTitle>{editingTask ? 'Editar Lembrete' : 'Novo Lembrete'}</SheetTitle>
             <SheetDescription className="text-muted-foreground">
@@ -110,7 +110,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
           </SheetHeader>
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto space-y-4 mt-4 pb-4">
-              <div className="bg-secondary/50 rounded-2xl p-4 space-y-2 border border-border">
+              <div className="bg-emerald-500/5 rounded-2xl p-4 space-y-2 border border-emerald-500/10">
                 <Input
                   placeholder="Título"
                   value={title}
@@ -126,13 +126,13 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                   data-vaul-no-drag
                 />
               </div>
-              <div className="bg-secondary/50 rounded-2xl p-4 border border-border">
-                <button type="button" onClick={() => setShowCategoryPicker(true)} className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-3"><div className="p-2.5 rounded-xl bg-primary/10"><AppIcon name="Folder" size={16} className="text-primary" /></div><p className="font-semibold text-sm">Categoria</p></div>
+               <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10">
+                 <button type="button" onClick={() => setShowCategoryPicker(true)} className="flex items-center justify-between w-full">
+                   <div className="flex items-center gap-3"><div className="p-2.5 rounded-xl bg-emerald-500/10"><AppIcon name="Folder" size={16} className="text-emerald-400" /></div><p className="font-semibold text-sm">Categoria</p></div>
                   <span className="text-sm text-muted-foreground">{selectedCategoryName || 'Nenhuma'}</span>
                 </button>
               </div>
-              <div className="bg-secondary/50 rounded-2xl divide-y divide-border border border-border">
+              <div className="bg-emerald-500/5 rounded-2xl divide-y divide-emerald-500/10 border border-emerald-500/10">
                 <div className="p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -184,7 +184,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                 </div>
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-primary/10"><AppIcon name="Clock" size={16} className="text-primary" /></div>
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10"><AppIcon name="Clock" size={16} className="text-emerald-400" /></div>
                     <div>
                       <p className="font-semibold text-sm">Horário</p>
                       {hasTime && (
@@ -208,7 +208,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                   Excluir
                 </Button>
               )}
-              <Button type="submit" className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20" disabled={!title.trim() || isSubmitting}>
+              <Button type="submit" className="flex-1 h-12 rounded-xl shadow-lg shadow-emerald-500/20" disabled={!title.trim() || isSubmitting}>
                 {isSubmitting ? 'Salvando...' : editingTask ? 'Salvar' : 'Criar Lembrete'}
               </Button>
             </div>
