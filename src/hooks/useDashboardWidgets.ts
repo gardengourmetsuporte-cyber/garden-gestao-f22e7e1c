@@ -8,7 +8,6 @@ export interface DashboardWidget {
 }
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
-  { key: 'ai-insights', label: 'Insights da IA', icon: 'Sparkles', visible: true },
   { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
   { key: 'finance-chart', label: 'Gráfico financeiro', icon: 'BarChart3', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
@@ -18,6 +17,7 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'agenda', label: 'Agenda', icon: 'ListTodo', visible: true },
   { key: 'pending-actions', label: 'Ações pendentes', icon: 'Bell', visible: true },
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
+  { key: 'ai-insights', label: 'Insights da IA', icon: 'Sparkles', visible: true },
 ];
 
 const STORAGE_KEY = 'dashboard-widgets-config';
