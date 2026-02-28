@@ -1,23 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { 
-  Banknote, 
-  CreditCard, 
-  Smartphone, 
-  Truck, 
-  Upload, 
-  Camera,
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  Plus,
-  Trash2,
-  Receipt,
-  Wallet,
-  Utensils,
-  CalendarIcon
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +12,7 @@ import { useCashClosing } from '@/hooks/useCashClosing';
 import { PAYMENT_METHODS } from '@/types/cashClosing';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const DRAFT_KEY = 'cash_closing_draft';
 
@@ -88,7 +72,7 @@ function DateInline({ selectedDate, onSelect, todayDate, minAllowedDate }: {
   return (
     <div>
       <Button variant="outline" size="sm" className="gap-2 font-medium" onClick={() => setOpen(!open)}>
-        <CalendarIcon className="w-4 h-4" />
+        <AppIcon name="CalendarIcon" className="w-4 h-4" />
         {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
       </Button>
       {open && (
@@ -317,14 +301,14 @@ export function CashClosingForm({ onSuccess }: Props) {
       <Card className="card-unified">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Wallet className="w-4 h-4" />
+            <AppIcon name="Wallet" className="w-4 h-4" />
             Caixa Inicial
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-warning/10">
-              <Wallet className="w-5 h-5 text-warning" />
+              <AppIcon name="Wallet" className="w-5 h-5 text-warning" />
             </div>
             <Label className="flex-1 text-sm font-medium">Valor inicial do caixa</Label>
             <div className="relative w-32">
@@ -351,7 +335,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       <Card className="card-unified">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Banknote className="w-4 h-4" />
+            <AppIcon name="Banknote" className="w-4 h-4" />
             Dinheiro Contado no Caixa
           </CardTitle>
         </CardHeader>
@@ -361,7 +345,7 @@ export function CashClosingForm({ onSuccess }: Props) {
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
               style={{ backgroundColor: '#22c55e20' }}
             >
-              <Banknote className="w-5 h-5" style={{ color: '#22c55e' }} />
+              <AppIcon name="Banknote" className="w-5 h-5" style={{ color: '#22c55e' }} />
             </div>
             <Label className="flex-1 text-sm font-medium">Valor contado (notas + moedas)</Label>
             <div className="relative w-32">
@@ -427,7 +411,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       <Card className="card-unified">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Receipt className="w-4 h-4" />
+            <AppIcon name="Receipt" className="w-4 h-4" />
             Gastos do Dia (opcional)
           </CardTitle>
         </CardHeader>
@@ -445,7 +429,7 @@ export function CashClosingForm({ onSuccess }: Props) {
                 className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 onClick={() => removeExpense(index)}
               >
-                <Trash2 className="w-4 h-4" />
+                <AppIcon name="Trash2" className="w-4 h-4" />
               </Button>
             </div>
           ))}
@@ -477,7 +461,7 @@ export function CashClosingForm({ onSuccess }: Props) {
               onClick={addExpense}
               className="shrink-0"
             >
-              <Plus className="w-4 h-4" />
+              <AppIcon name="Plus" className="w-4 h-4" />
             </Button>
           </div>
 
@@ -581,7 +565,7 @@ export function CashClosingForm({ onSuccess }: Props) {
           </div>
           {cashDifference !== 0 && (
             <p className="text-xs text-warning mt-2 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" />
+              <AppIcon name="AlertCircle" className="w-3 h-3" />
               {cashDifference > 0 ? 'Sobra' : 'Falta'} no caixa será registrada
             </p>
           )}
@@ -592,7 +576,7 @@ export function CashClosingForm({ onSuccess }: Props) {
       <Card className="card-unified">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Upload className="w-4 h-4" />
+            <AppIcon name="Upload" className="w-4 h-4" />
             Comprovante do PDV (Colibri) - opcional
           </CardTitle>
         </CardHeader>
@@ -626,7 +610,7 @@ export function CashClosingForm({ onSuccess }: Props) {
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Camera className="w-4 h-4 mr-1" />
+                  <AppIcon name="Camera" className="w-4 h-4 mr-1" />
                   Câmera
                 </Button>
                 <Button
@@ -634,7 +618,7 @@ export function CashClosingForm({ onSuccess }: Props) {
                   size="sm"
                   onClick={() => galleryInputRef.current?.click()}
                 >
-                  <Upload className="w-4 h-4 mr-1" />
+                  <AppIcon name="Upload" className="w-4 h-4 mr-1" />
                   Galeria
                 </Button>
               </div>
@@ -646,7 +630,7 @@ export function CashClosingForm({ onSuccess }: Props) {
                 className="flex-1 h-32 border-dashed flex flex-col gap-2"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Camera className="w-7 h-7 text-muted-foreground" />
+                <AppIcon name="Camera" className="w-7 h-7 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">Câmera</span>
               </Button>
               <Button
@@ -654,7 +638,7 @@ export function CashClosingForm({ onSuccess }: Props) {
                 className="flex-1 h-32 border-dashed flex flex-col gap-2"
                 onClick={() => galleryInputRef.current?.click()}
               >
-                <Upload className="w-7 h-7 text-muted-foreground" />
+                <AppIcon name="Upload" className="w-7 h-7 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">Galeria / Arquivo</span>
               </Button>
             </div>
@@ -684,12 +668,12 @@ export function CashClosingForm({ onSuccess }: Props) {
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            <AppIcon name="Loader2" className="w-5 h-5 mr-2 animate-spin" />
             Enviando...
           </>
         ) : (
           <>
-            <CheckCircle2 className="w-5 h-5 mr-2" />
+            <AppIcon name="CheckCircle2" className="w-5 h-5 mr-2" />
             Enviar Fechamento
           </>
         )}

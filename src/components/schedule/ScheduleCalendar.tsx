@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WorkSchedule } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface ScheduleCalendarProps {
   schedules: WorkSchedule[];
@@ -85,13 +85,13 @@ export function ScheduleCalendar({
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
-          <ChevronLeft className="w-5 h-5" />
+          <AppIcon name="ChevronLeft" className="w-5 h-5" />
         </Button>
         <h3 className="font-semibold text-lg capitalize">
           {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
         </h3>
         <Button variant="ghost" size="icon" onClick={goToNextMonth}>
-          <ChevronRight className="w-5 h-5" />
+          <AppIcon name="ChevronRight" className="w-5 h-5" />
         </Button>
       </div>
 

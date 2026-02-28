@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { X, Package, Soup, AlertTriangle, Pencil, Check, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost } from '@/types/recipe';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface IngredientRowProps {
   ingredient: {
@@ -130,7 +130,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
               "p-1.5 rounded-lg shrink-0",
               isSubRecipe ? "bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent" : "bg-primary/10 text-primary"
             )}>
-              {isSubRecipe ? <Soup className="h-4 w-4" /> : <Package className="h-4 w-4" />}
+              {isSubRecipe ? <AppIcon name="Soup" className="h-4 w-4" /> : <AppIcon name="Package" className="h-4 w-4" />}
             </div>
             <div className="min-w-0">
               <p className="font-medium text-sm truncate">{displayName}</p>
@@ -148,14 +148,14 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
             className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
             onClick={onRemove}
           >
-            <X className="h-4 w-4" />
+            <AppIcon name="X" className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Alert for no price */}
         {hasNoPrice && (
           <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/20 px-2 py-1.5 rounded-md">
-            <AlertTriangle className="h-3 w-3 shrink-0" />
+            <AppIcon name="AlertTriangle" className="h-3 w-3 shrink-0" />
             <span>Sem preço definido — custo não será calculado</span>
           </div>
         )}
@@ -177,7 +177,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                     className="h-6 px-2 text-xs text-muted-foreground hover:text-primary"
                     onClick={() => setEditingBaseUnit(true)}
                   >
-                    <Pencil className="h-3 w-3 mr-1" />
+                    <AppIcon name="Pencil" className="h-3 w-3 mr-1" />
                     Alterar
                   </Button>
                 )}
@@ -219,7 +219,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                     className="h-8 px-2 text-xs text-muted-foreground"
                     onClick={() => setEditingBaseUnit(false)}
                   >
-                    <XCircle className="h-4 w-4" />
+                    <AppIcon name="XCircle" className="h-4 w-4" />
                   </Button>
                   {isSavingUnit && <span className="text-xs text-muted-foreground">Salvando...</span>}
                 </div>
@@ -248,7 +248,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                   className="h-6 px-2 text-xs text-muted-foreground hover:text-primary"
                   onClick={handleStartEditPrice}
                 >
-                  <Pencil className="h-3 w-3 mr-1" />
+                  <AppIcon name="Pencil" className="h-3 w-3 mr-1" />
                   Editar
                 </Button>
               ) : null}
@@ -268,10 +268,10 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                 />
                 <span className="text-muted-foreground text-xs">/{displayUnit}</span>
                 <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-primary shrink-0" onClick={handleConfirmPriceEdit}>
-                  <Check className="h-4 w-4" />
+                  <AppIcon name="Check" className="h-4 w-4" />
                 </Button>
                 <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground shrink-0" onClick={() => setEditingPrice(false)}>
-                  <XCircle className="h-4 w-4" />
+                  <AppIcon name="XCircle" className="h-4 w-4" />
                 </Button>
               </div>
             ) : (

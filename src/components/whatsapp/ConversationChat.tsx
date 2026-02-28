@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, User, Send, ArrowLeftRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useWhatsAppMessages, useWhatsAppSend } from '@/hooks/useWhatsApp';
@@ -8,6 +7,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import type { WhatsAppConversation } from '@/types/whatsapp';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface Props {
   conversation: WhatsAppConversation;
@@ -55,7 +55,7 @@ export function ConversationChat({ conversation, onStatusChange }: Props) {
       <div className="shrink-0 p-4 border-b border-border/30 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-            <MessageCircle className="w-4 h-4 text-primary" />
+            <AppIcon name="MessageCircle" className="w-4 h-4 text-primary" />
           </div>
           <div className="min-w-0">
             <p className="font-semibold font-display text-sm text-foreground truncate">
@@ -73,7 +73,7 @@ export function ConversationChat({ conversation, onStatusChange }: Props) {
               className="text-xs gap-1.5"
               style={{ borderColor: 'hsl(var(--neon-amber) / 0.3)', color: 'hsl(var(--neon-amber))' }}
             >
-              <User className="w-3.5 h-3.5" /> Assumir
+              <AppIcon name="User" className="w-3.5 h-3.5" /> Assumir
             </Button>
           )}
           {isHuman && (
@@ -84,7 +84,7 @@ export function ConversationChat({ conversation, onStatusChange }: Props) {
               className="text-xs gap-1.5"
               style={{ borderColor: 'hsl(var(--neon-cyan) / 0.3)', color: 'hsl(var(--neon-cyan))' }}
             >
-              <Bot className="w-3.5 h-3.5" /> Devolver IA
+              <AppIcon name="Bot" className="w-3.5 h-3.5" /> Devolver IA
             </Button>
           )}
           {!isClosed && (
@@ -120,8 +120,8 @@ export function ConversationChat({ conversation, onStatusChange }: Props) {
                 >
                   {/* Sender label */}
                   <div className="flex items-center gap-1.5 mb-1">
-                    {msg.sender_type === 'ai' && <Bot className="w-3 h-3" style={{ color: senderColors.ai }} />}
-                    {msg.sender_type === 'human' && <User className="w-3 h-3" style={{ color: senderColors.human }} />}
+                    {msg.sender_type === 'ai' && <AppIcon name="Bot" className="w-3 h-3" style={{ color: senderColors.ai }} />}
+                    {msg.sender_type === 'human' && <AppIcon name="User" className="w-3 h-3" style={{ color: senderColors.human }} />}
                     <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: senderColors[msg.sender_type] }}>
                       {msg.sender_type === 'customer' ? 'Cliente' : msg.sender_type === 'ai' ? 'IA' : 'Atendente'}
                     </span>
@@ -154,7 +154,7 @@ export function ConversationChat({ conversation, onStatusChange }: Props) {
               size="icon"
               className="shrink-0"
             >
-              <Send className="w-4 h-4" />
+              <AppIcon name="Send" className="w-4 h-4" />
             </Button>
           </div>
         </div>

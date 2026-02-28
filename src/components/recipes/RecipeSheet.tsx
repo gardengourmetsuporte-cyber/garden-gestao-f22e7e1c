@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, AlertTriangle, TrendingUp, Package, Percent, Building2, ArrowLeft } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -15,6 +14,7 @@ import { IngredientPicker } from './IngredientPicker';
 import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type Recipe, type RecipeCategory, type RecipeUnitType, type IngredientSourceType } from '@/types/recipe';
 import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface LocalIngredient {
   id?: string;
@@ -287,7 +287,7 @@ export function RecipeSheet({
                   className="h-8 w-8 shrink-0"
                   onClick={() => onOpenChange(false)}
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <AppIcon name="ArrowLeft" className="h-4 w-4" />
                 </Button>
                 <SheetTitle className="text-base">{recipe ? 'Editar Ficha' : 'Nova Ficha Técnica'}</SheetTitle>
               </div>
@@ -369,7 +369,7 @@ export function RecipeSheet({
                     size="sm"
                     onClick={() => setPickerOpen(true)}
                   >
-                    <Plus className="h-4 w-4 mr-1" />
+                    <AppIcon name="Plus" className="h-4 w-4 mr-1" />
                     Adicionar
                   </Button>
                 </div>
@@ -399,7 +399,7 @@ export function RecipeSheet({
                 {/* Alerts */}
                 {ingredientsWithoutPrice.length > 0 && (
                   <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl text-sm text-amber-700 dark:text-amber-300">
-                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <AppIcon name="AlertTriangle" className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>
                       {ingredientsWithoutPrice.length} ingrediente(s) sem preço definido. O custo final pode estar incompleto.
                     </span>
@@ -416,7 +416,7 @@ export function RecipeSheet({
                 {/* A) Custos Variáveis */}
                 <div className="rounded-xl border p-4 space-y-2">
                   <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                    <Package className="h-4 w-4 text-primary" />
+                    <AppIcon name="Package" className="h-4 w-4 text-primary" />
                     Custos Variáveis
                   </div>
                   <div className="flex justify-between text-sm">
@@ -439,7 +439,7 @@ export function RecipeSheet({
                 {salesCost > 0 && (
                   <div className="rounded-xl border p-4 space-y-2">
                     <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                      <Percent className="h-4 w-4 text-orange-500" />
+                      <AppIcon name="Percent" className="h-4 w-4 text-orange-500" />
                       Custos de Venda
                     </div>
                     {operationalCosts.taxAmount > 0 && (
@@ -465,7 +465,7 @@ export function RecipeSheet({
                 {fixedCost > 0 && (
                   <div className="rounded-xl border p-4 space-y-2">
                     <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                      <Building2 className="h-4 w-4 text-emerald-500" />
+                      <AppIcon name="Building2" className="h-4 w-4 text-emerald-500" />
                       Custos Fixos
                       <span className="text-[10px] text-muted-foreground font-normal ml-auto">somente leitura</span>
                     </div>
@@ -497,7 +497,7 @@ export function RecipeSheet({
               {/* ═══ MARGIN SIMULATOR ═══ */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <AppIcon name="TrendingUp" className="h-4 w-4 text-primary" />
                   <Label className="text-base font-semibold">Simulador de Preço</Label>
                 </div>
 
@@ -552,13 +552,13 @@ export function RecipeSheet({
                   {/* Margin Alerts */}
                   {isNegativeMargin && (
                     <div className="flex items-center gap-2 p-2 bg-destructive/10 rounded-lg text-xs text-destructive">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <AppIcon name="AlertTriangle" className="h-3.5 w-3.5 shrink-0" />
                       Preço abaixo do custo! Você terá prejuízo neste produto.
                     </div>
                   )}
                   {isLowMargin && !isNegativeMargin && (
                     <div className="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-950/20 rounded-lg text-xs text-amber-600 dark:text-amber-400">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <AppIcon name="AlertTriangle" className="h-3.5 w-3.5 shrink-0" />
                       Margem baixa. Considere revisar custos ou ajustar o preço.
                     </div>
                   )}

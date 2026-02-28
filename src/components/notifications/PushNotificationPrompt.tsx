@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Bell, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useAuth } from '@/contexts/AuthContext';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export function PushNotificationPrompt() {
   const { user } = useAuth();
@@ -48,7 +48,7 @@ export function PushNotificationPrompt() {
       <div className="bg-card border border-border/50 rounded-2xl p-4 shadow-xl backdrop-blur-xl">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-            <Bell className="w-5 h-5 text-primary" />
+            <AppIcon name="Bell" className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm text-foreground">Ativar Notificações</h3>
@@ -65,7 +65,7 @@ export function PushNotificationPrompt() {
             </div>
           </div>
           <button onClick={handleDismiss} className="p-1 rounded-lg hover:bg-secondary transition-colors">
-            <X className="w-4 h-4 text-muted-foreground" />
+            <AppIcon name="X" className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
       </div>

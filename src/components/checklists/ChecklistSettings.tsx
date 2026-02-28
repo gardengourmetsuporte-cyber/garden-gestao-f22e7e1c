@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Switch } from '@/components/ui/switch';
-import { ChevronDown as SelectChevron } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -871,7 +870,7 @@ export function ChecklistSettings({
                 <div className="flex items-center gap-2">
                   {(() => { const opt = frequencyOptions.find(f => f.value === itemFrequency); return opt ? <><AppIcon name={opt.iconName} size={16} />{opt.label}</> : 'Selecione'; })()}
                 </div>
-                <SelectChevron className="w-4 h-4 text-muted-foreground" />
+                <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
               </button>
               <ListPicker
                 open={freqPickerOpen}
@@ -894,7 +893,7 @@ export function ChecklistSettings({
                 <div className="flex items-center gap-2">
                   {(() => { const opt = checklistTypeOptions.find(t => t.value === itemChecklistType); return opt ? <><AppIcon name={opt.iconName} size={16} />{opt.label}</> : 'Selecione'; })()}
                 </div>
-                <SelectChevron className="w-4 h-4 text-muted-foreground" />
+                <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
               </button>
               <ListPicker
                 open={typePickerOpen}
@@ -926,7 +925,7 @@ export function ChecklistSettings({
                         <AppIcon name="star" size={16} style={{ ...style, fill: style.color as string }} />
                         {currentOptions.find(p => p.value === itemPoints)?.label || `${itemPoints} pontos`}
                       </div>
-                      <SelectChevron className="w-4 h-4 text-muted-foreground" />
+                      <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
                     </button>
                     <ListPicker
                       open={pointsPickerOpen}

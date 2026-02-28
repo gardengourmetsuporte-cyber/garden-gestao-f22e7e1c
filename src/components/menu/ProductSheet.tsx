@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, Plus, Star, X } from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import type { MenuProduct, MenuGroup } from '@/hooks/useMenuAdmin';
 
@@ -159,11 +158,11 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
                     <Input className="flex-1" placeholder="Tamanho/tipo" value={cp.label} onChange={e => updateCustomPrice(idx, 'label', e.target.value)} />
                     <Input className="w-20" placeholder="Cód." value={cp.code} onChange={e => updateCustomPrice(idx, 'code', e.target.value)} />
                     <Input className="w-24" type="number" step="0.01" placeholder="Preço" value={cp.price || ''} onChange={e => updateCustomPrice(idx, 'price', parseFloat(e.target.value) || 0)} />
-                    <button onClick={() => removeCustomPrice(idx)} className="p-1"><X className="w-4 h-4 text-destructive" /></button>
+                    <button onClick={() => removeCustomPrice(idx)} className="p-1"><AppIcon name="X" className="w-4 h-4 text-destructive" /></button>
                   </div>
                 ))}
                 <Button type="button" size="sm" variant="outline" onClick={addCustomPrice}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Adicionar variação
+                  <AppIcon name="Plus" className="w-3.5 h-3.5 mr-1" /> Adicionar variação
                 </Button>
               </div>
             )}
@@ -184,7 +183,7 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
 
           {/* Toggles */}
           <div className="flex items-center justify-between">
-            <Label className="flex items-center gap-2"><Star className="w-4 h-4 text-warning" /> Destaque</Label>
+            <Label className="flex items-center gap-2"><AppIcon name="Star" className="w-4 h-4 text-warning" /> Destaque</Label>
             <Switch checked={form.is_highlighted ?? false} onCheckedChange={v => setForm({ ...form, is_highlighted: v })} />
           </div>
 
@@ -203,7 +202,7 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
             <Button onClick={handleSave} className="flex-1" disabled={!form.name}>Salvar</Button>
             {form.id && onDelete && (
               <Button variant="destructive" onClick={() => { onDelete(form.id!); onOpenChange(false); }}>
-                <Trash2 className="w-4 h-4" />
+                <AppIcon name="Trash2" className="w-4 h-4" />
               </Button>
             )}
           </div>

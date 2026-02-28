@@ -3,10 +3,10 @@ import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
 import { ChecklistClone } from '@/components/settings/ChecklistClone';
-import { Loader2, ClipboardCheck, Sun, Moon, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { ChecklistType } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export function ChecklistSettingsManager() {
   const {
@@ -36,7 +36,7 @@ export function ChecklistSettingsManager() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <AppIcon name="Loader2" className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -126,7 +126,7 @@ export function ChecklistSettingsManager() {
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <ClipboardCheck className="w-5 h-5 text-primary" />
+          <AppIcon name="ClipboardCheck" className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-foreground">Configurar Checklists</h3>
         </div>
         <ChecklistTrash
@@ -151,7 +151,7 @@ export function ChecklistSettingsManager() {
               : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
           )}
         >
-          <Sun className="w-5 h-5" />
+          <AppIcon name="Sun" className="w-5 h-5" />
           <span className="font-semibold text-sm">Abertura</span>
         </button>
         <button
@@ -163,7 +163,7 @@ export function ChecklistSettingsManager() {
               : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
           )}
         >
-          <Moon className="w-5 h-5" />
+          <AppIcon name="Moon" className="w-5 h-5" />
           <span className="font-semibold text-sm">Fechamento</span>
         </button>
         <button
@@ -175,7 +175,7 @@ export function ChecklistSettingsManager() {
               : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
           )}
         >
-          <Zap className="w-4 h-4" />
+          <AppIcon name="Zap" className="w-4 h-4" />
           <span className="font-semibold text-xs">Bônus</span>
         </button>
       </div>

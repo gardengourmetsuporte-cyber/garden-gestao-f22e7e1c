@@ -1,6 +1,6 @@
+import { AppIcon } from '@/components/ui/app-icon';
  import { useState, useEffect } from 'react';
- import { Calculator, HelpCircle, Save } from 'lucide-react';
- import { Button } from '@/components/ui/button';
+  import { Button } from '@/components/ui/button';
  import { Input } from '@/components/ui/input';
  import { Label } from '@/components/ui/label';
  import { Checkbox } from '@/components/ui/checkbox';
@@ -82,7 +82,7 @@
          <Card>
            <CardHeader className="pb-3">
              <CardTitle className="text-base flex items-center gap-2">
-               <Calculator className="h-4 w-4" />
+               <AppIcon name="Calculator" className="h-4 w-4" />
                Rateio de Custos Fixos
              </CardTitle>
              <CardDescription>
@@ -95,7 +95,7 @@
                  Média de produtos vendidos por mês
                  <Tooltip>
                    <TooltipTrigger>
-                     <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                     <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
                    </TooltipTrigger>
                    <TooltipContent className="max-w-xs">
                      Informe quantos produtos você vende em média por mês.
@@ -122,7 +122,7 @@
                  Categorias de Custo Fixo (do Financeiro)
                  <Tooltip>
                    <TooltipTrigger>
-                     <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                     <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
                    </TooltipTrigger>
                    <TooltipContent className="max-w-xs">
                      Selecione quais categorias de despesa do financeiro devem ser
@@ -186,7 +186,7 @@
                    Impostos sobre venda
                    <Tooltip>
                      <TooltipTrigger>
-                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                       <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
                      </TooltipTrigger>
                      <TooltipContent>
                        Percentual de impostos (ex: DAS, ISS)
@@ -212,7 +212,7 @@
                    Taxa de maquininha
                    <Tooltip>
                      <TooltipTrigger>
-                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                       <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
                      </TooltipTrigger>
                      <TooltipContent>
                        Taxa média cobrada pela máquina de cartão
@@ -238,7 +238,7 @@
                    Custo de embalagem
                    <Tooltip>
                      <TooltipTrigger>
-                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                       <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
                      </TooltipTrigger>
                      <TooltipContent>
                        Custo médio de embalagem por unidade vendida
@@ -263,7 +263,7 @@
  
          {/* Botão Salvar */}
          <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
-           <Save className="h-4 w-4 mr-2" />
+           <AppIcon name="Save" className="h-4 w-4 mr-2" />
            {isSaving ? 'Salvando...' : 'Salvar Configurações'}
          </Button>
        </div>

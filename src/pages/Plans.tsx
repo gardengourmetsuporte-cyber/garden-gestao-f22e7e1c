@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PLANS } from '@/lib/plans';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
 
 export default function Plans() {
   const { profile, plan: userPlan, session, isSuperAdmin, isAdmin } = useAuth();
@@ -160,7 +159,7 @@ export default function Plans() {
                     }}
                   >
                     {portalLoading ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" /> Abrindo portal...</>
+                      <><AppIcon name="Loader2" className="w-4 h-4 animate-spin" /> Abrindo portal...</>
                     ) : (
                       <><AppIcon name="Settings" size={16} /> Gerenciar Assinatura</>
                     )}
@@ -288,7 +287,7 @@ export default function Plans() {
                         }}
                       >
                         {loadingPlan === plan.id ? (
-                          <><Loader2 className="w-4 h-4 animate-spin" /> Redirecionando...</>
+                          <><AppIcon name="Loader2" className="w-4 h-4 animate-spin" /> Redirecionando...</>
                         ) : (
                           <>Começar 14 dias grátis</>
                         )}

@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Trash2, X } from 'lucide-react';
 import type { MenuOptionGroup, MenuOption } from '@/hooks/useMenuAdmin';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface Props {
   open: boolean;
@@ -111,7 +111,7 @@ export function OptionGroupSheet({ open, onOpenChange, optionGroup, onSave, onDe
                     <Input className="w-20" placeholder="Cód." value={opt.codigo_pdv} onChange={e => updateOption(idx, { codigo_pdv: e.target.value })} />
                     <Input className="w-24" type="number" step="0.01" placeholder="Preço" value={opt.price || ''} onChange={e => updateOption(idx, { price: parseFloat(e.target.value) || 0 })} />
                     <button onClick={() => removeOption(idx)} className="p-1.5 hover:bg-destructive/10 rounded-lg">
-                      <X className="w-4 h-4 text-destructive" />
+                      <AppIcon name="X" className="w-4 h-4 text-destructive" />
                     </button>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
@@ -127,7 +127,7 @@ export function OptionGroupSheet({ open, onOpenChange, optionGroup, onSave, onDe
                 </div>
               ))}
               <Button type="button" size="sm" variant="outline" onClick={addOption} className="w-full">
-                <Plus className="w-3.5 h-3.5 mr-1" /> Nova Opção
+                <AppIcon name="Plus" className="w-3.5 h-3.5 mr-1" /> Nova Opção
               </Button>
             </div>
           </div>
@@ -137,7 +137,7 @@ export function OptionGroupSheet({ open, onOpenChange, optionGroup, onSave, onDe
             <Button onClick={handleSave} className="flex-1" disabled={!form.title}>Salvar</Button>
             {form.id && onDelete && (
               <Button variant="destructive" onClick={() => { onDelete(form.id!); onOpenChange(false); }}>
-                <Trash2 className="w-4 h-4" />
+                <AppIcon name="Trash2" className="w-4 h-4" />
               </Button>
             )}
           </div>

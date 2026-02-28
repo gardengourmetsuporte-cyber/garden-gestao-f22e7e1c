@@ -18,8 +18,8 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export interface SortableItemRenderProps {
   isDragging: boolean;
@@ -157,7 +157,7 @@ export function DragHandle({
         className
       )}
     >
-      <GripVertical className="w-5 h-5" />
+      <AppIcon name="GripVertical" className="w-5 h-5" />
     </div>
   );
 }

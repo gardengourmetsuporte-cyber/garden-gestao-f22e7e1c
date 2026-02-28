@@ -24,7 +24,7 @@ function loadAllocations(dateStr: string): Record<number, string> {
 }
 
 function saveAllocations(dateStr: string, allocs: Record<number, string>) {
-  try { localStorage.setItem(getStorageKey(dateStr), JSON.stringify(allocs)); } catch {}
+  try { localStorage.setItem(getStorageKey(dateStr), JSON.stringify(allocs)); } catch { }
 }
 
 // Working hours only (6h - 23h)
@@ -84,7 +84,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
   const allocateTask = useCallback((hour: number, taskId: string) => {
     setAllocations(prev => ({ ...prev, [hour]: taskId }));
     setPickerHour(null);
-    try { navigator.vibrate?.(10); } catch {}
+    try { navigator.vibrate?.(10); } catch { }
   }, []);
 
   const removeAllocation = useCallback((hour: number) => {
@@ -152,18 +152,18 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
               id={`block-${hour}`}
               onClick={() => !task && availableTasks.length > 0 && setPickerHour(hour)}
               className={cn(
-                "flex items-center gap-3 px-3 py-3 rounded-xl border transition-all duration-200 min-h-[52px]",
+                "flex items-center gap-3 px-3 py-3 rounded-xl border transition-all duration-300 min-h-[52px]",
                 !task && "cursor-pointer",
                 // Base
-                "bg-card border-border/40",
+                "card-surface border-white/5",
                 // Now
-                isNow && "border-primary/50 bg-primary/5 ring-1 ring-primary/20",
+                isNow && "border-primary/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-primary/20",
                 // Past empty
-                isPast && !task && "opacity-50",
+                isPast && !task && "opacity-40",
                 // Filled
-                task && "border-border bg-card shadow-sm",
+                task && "shadow-sm border-white/10",
                 // Hover empty
-                !task && !isPast && "hover:border-primary/20 hover:bg-secondary/30"
+                !task && !isPast && "hover:border-primary/20 hover:bg-white/5 hover:shadow-card-hover"
               )}
             >
               {/* Now indicator */}
@@ -175,7 +175,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
               <div className="shrink-0 w-[52px] text-center">
                 <span className={cn(
                   "text-xs font-mono font-medium",
-                  isNow ? "text-primary font-bold" : isPast ? "text-muted-foreground/50" : "text-muted-foreground"
+                  isNow ? "text-emerald-400 font-bold drop-shadow-md" : isPast ? "text-muted-foreground/40" : "text-muted-foreground"
                 )}>
                   {String(hour).padStart(2, '0')}:00
                 </span>

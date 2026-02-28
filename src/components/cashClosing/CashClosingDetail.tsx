@@ -2,26 +2,7 @@ import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { exportCashClosingPdf } from '@/lib/exportPdf';
 import { ptBR } from 'date-fns/locale';
-import { 
-   Banknote, 
-   CreditCard, 
-   Smartphone, 
-   Truck,
-   Clock,
-   CheckCircle2,
-   AlertTriangle,
-   User,
-   Calendar,
-   Building2,
-   FileImage,
-   MessageSquare,
-   Loader2,
-  Trash2,
-  Receipt,
-  Pencil,
-  X,
-  Save
- } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
  import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
  import { Badge } from '@/components/ui/badge';
@@ -191,7 +172,7 @@ import {
                   className="text-primary"
                   onClick={startEditing}
                 >
-                  <Pencil className="w-5 h-5" />
+                  <AppIcon name="Pencil" className="w-5 h-5" />
                 </Button>
               )}
               {isEditing && (
@@ -201,7 +182,7 @@ import {
                   className="text-muted-foreground"
                   onClick={() => setIsEditing(false)}
                 >
-                  <X className="w-5 h-5" />
+                  <AppIcon name="X" className="w-5 h-5" />
                 </Button>
               )}
               <Button
@@ -210,7 +191,7 @@ import {
                 className="text-muted-foreground"
                 onClick={() => exportCashClosingPdf(closing)}
               >
-                <Receipt className="w-5 h-5" />
+                <AppIcon name="Receipt" className="w-5 h-5" />
               </Button>
               {canDelete && (
                 <Button
@@ -219,7 +200,7 @@ import {
                   className="text-destructive"
                   onClick={() => setShowDeleteDialog(true)}
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <AppIcon name="Trash2" className="w-5 h-5" />
                 </Button>
               )}
              </div>
@@ -229,14 +210,14 @@ import {
          <Card className="card-unified">
            <CardContent className="p-4 space-y-3">
              <div className="flex items-center gap-3">
-               <User className="w-5 h-5 text-muted-foreground" />
+               <AppIcon name="User" className="w-5 h-5 text-muted-foreground" />
                <div>
                  <p className="text-sm text-muted-foreground">Responsável</p>
                  <p className="font-medium">{closing.profile?.full_name || 'Usuário'}</p>
                </div>
              </div>
              <div className="flex items-center gap-3">
-               <Calendar className="w-5 h-5 text-muted-foreground" />
+               <AppIcon name="Calendar" className="w-5 h-5 text-muted-foreground" />
                <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Data</p>
                   {isEditing ? (
@@ -254,7 +235,7 @@ import {
                 </div>
              </div>
              <div className="flex items-center gap-3">
-               <Building2 className="w-5 h-5 text-muted-foreground" />
+               <AppIcon name="Building2" className="w-5 h-5 text-muted-foreground" />
                <div>
                  <p className="text-sm text-muted-foreground">Unidade</p>
                  <p className="font-medium">{closing.unit_name}</p>
@@ -348,9 +329,9 @@ import {
             className="w-full h-12"
           >
             {isSaving ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <AppIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
             ) : (
-              <Save className="w-4 h-4 mr-2" />
+              <AppIcon name="Save" className="w-4 h-4 mr-2" />
             )}
             Salvar Alterações
           </Button>
@@ -361,7 +342,7 @@ import {
           <Card className="card-unified">
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-muted-foreground" />
+                <AppIcon name="Receipt" className="w-5 h-5 text-muted-foreground" />
                 <h3 className="font-semibold">Gastos do Dia</h3>
               </div>
               
@@ -391,7 +372,7 @@ import {
            <CardContent className="p-4">
              <div className="flex items-center justify-between mb-3">
                <div className="flex items-center gap-2">
-                 <FileImage className="w-5 h-5 text-muted-foreground" />
+                 <AppIcon name="FileImage" className="w-5 h-5 text-muted-foreground" />
                  <span className="font-medium">Comprovante PDV</span>
                </div>
               {closing.receipt_url && (
@@ -445,7 +426,7 @@ import {
            <Card className="card-unified">
              <CardContent className="p-4">
                <div className="flex items-center gap-2 mb-2">
-                 <MessageSquare className="w-5 h-5 text-muted-foreground" />
+                 <AppIcon name="MessageSquare" className="w-5 h-5 text-muted-foreground" />
                  <span className="font-medium">Observações</span>
                </div>
                <p className="text-sm text-muted-foreground">{closing.notes}</p>
@@ -458,7 +439,7 @@ import {
            <Card className="card-unified border-destructive/50">
              <CardContent className="p-4">
                <div className="flex items-center gap-2 mb-2">
-                 <AlertTriangle className="w-5 h-5 text-destructive" />
+                 <AppIcon name="AlertTriangle" className="w-5 h-5 text-destructive" />
                  <span className="font-medium text-destructive">Motivo da Divergência</span>
                </div>
                <p className="text-sm">{closing.validation_notes}</p>
@@ -477,7 +458,7 @@ import {
            <Card className="card-unified border-success/50">
              <CardContent className="p-4">
                <div className="flex items-center gap-2">
-                 <CheckCircle2 className="w-5 h-5 text-success" />
+                 <AppIcon name="CheckCircle2" className="w-5 h-5 text-success" />
                  <div>
                    <span className="font-medium text-success">Aprovado</span>
                    <p className="text-xs text-muted-foreground">
@@ -503,7 +484,7 @@ import {
                className="flex-1 h-12 border-destructive text-destructive hover:bg-destructive/10"
                onClick={() => setShowDivergentDialog(true)}
              >
-               <AlertTriangle className="w-4 h-4 mr-2" />
+               <AppIcon name="AlertTriangle" className="w-4 h-4 mr-2" />
                Divergente
              </Button>
              <Button
@@ -512,9 +493,9 @@ import {
                disabled={isApproving}
              >
                {isApproving ? (
-                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                 <AppIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
                ) : (
-                 <CheckCircle2 className="w-4 h-4 mr-2" />
+                 <AppIcon name="CheckCircle2" className="w-4 h-4 mr-2" />
                )}
                Aprovar
              </Button>
@@ -549,7 +530,7 @@ import {
                className="bg-destructive hover:bg-destructive/90"
              >
                {isMarkingDivergent ? (
-                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                 <AppIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
                ) : null}
                Confirmar Divergência
              </AlertDialogAction>

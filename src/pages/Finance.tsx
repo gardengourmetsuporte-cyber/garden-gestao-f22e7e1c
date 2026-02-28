@@ -20,7 +20,6 @@ import { TransactionFiltersState } from '@/components/finance/TransactionFilters
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
-import { Undo2, Redo2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Finance() {

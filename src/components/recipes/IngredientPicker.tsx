@@ -1,11 +1,11 @@
  import { useState, useMemo } from 'react';
-import { Search, ChevronDown, ChevronRight, Package, Soup } from 'lucide-react';
  import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
  import { Input } from '@/components/ui/input';
  import { ScrollArea } from '@/components/ui/scroll-area';
  import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency } from '@/types/recipe';
+import { AppIcon } from '@/components/ui/app-icon';
  import { cn } from '@/lib/utils';
  
  interface InventoryItem {
@@ -140,17 +140,17 @@ interface SubRecipeItem {
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'inventory' | 'recipes')} className="flex flex-col h-[calc(80vh-80px)]">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="inventory" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
+              <AppIcon name="Package" className="h-4 w-4" />
               Estoque
             </TabsTrigger>
             <TabsTrigger value="recipes" className="flex items-center gap-2">
-              <Soup className="h-4 w-4" />
+              <AppIcon name="Soup" className="h-4 w-4" />
               Sub-Receitas
             </TabsTrigger>
           </TabsList>
           
          <div className="relative mb-4">
-           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+           <AppIcon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
            <Input
               placeholder={activeTab === 'inventory' ? 'Buscar no estoque...' : 'Buscar sub-receitas...'}
              value={search}
@@ -175,9 +175,9 @@ interface SubRecipeItem {
                  >
                    <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
                      {expandedCategories.has(categoryId) || search.length > 0 ? (
-                       <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                       <AppIcon name="ChevronDown" className="h-4 w-4 text-muted-foreground" />
                      ) : (
-                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                       <AppIcon name="ChevronRight" className="h-4 w-4 text-muted-foreground" />
                      )}
                      <div
                        className="w-3 h-3 rounded-full"
@@ -231,9 +231,9 @@ interface SubRecipeItem {
                     >
                       <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
                         {expandedCategories.has(categoryId) || search.length > 0 ? (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          <AppIcon name="ChevronDown" className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          <AppIcon name="ChevronRight" className="h-4 w-4 text-muted-foreground" />
                         )}
                         <div
                           className="w-3 h-3 rounded-full"
@@ -257,7 +257,7 @@ interface SubRecipeItem {
                               )}
                             >
                               <div className="flex items-center gap-2">
-                                <Soup className="h-4 w-4 text-accent" />
+                                <AppIcon name="Soup" className="h-4 w-4 text-accent" />
                                 <span className="font-medium">{recipe.name}</span>
                               </div>
                               <span className="text-sm text-muted-foreground">

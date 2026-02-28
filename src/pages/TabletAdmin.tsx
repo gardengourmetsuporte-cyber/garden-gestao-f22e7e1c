@@ -10,15 +10,11 @@ import { Switch } from '@/components/ui/switch';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
 } from '@/components/ui/sheet';
-import {
-  Package, Plus, Trash2, RefreshCw, Monitor, Settings2, LayoutGrid,
-  AlertCircle, CheckCircle2, Clock, Send, QrCode, ExternalLink,
-  Wifi, WifiOff, Loader2, Info, ArrowRight, Zap, Download, Copy,
-} from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useUnit } from '@/contexts/UnitContext';
 import { useToast } from '@/hooks/use-toast';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export default function TabletAdmin() {
   const {
@@ -145,7 +141,7 @@ export default function TabletAdmin() {
               rel="noopener"
               className="flex items-center gap-1.5 text-xs text-primary font-medium bg-primary/10 px-3 py-1.5 rounded-lg"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <AppIcon name="ExternalLink" className="w-3.5 h-3.5" />
               Ver Cardápio
             </a>
           </div>
@@ -155,17 +151,17 @@ export default function TabletAdmin() {
         {pdvConfig?.is_active && (
           <div className="grid grid-cols-3 gap-2">
             <div className="card-base p-3 text-center">
-              <Send className="w-4 h-4 mx-auto text-success mb-1" />
+              <AppIcon name="Send" className="w-4 h-4 mx-auto text-success mb-1" />
               <p className="text-lg font-bold text-foreground">{todayStats.sent}</p>
               <p className="text-[10px] text-muted-foreground">Enviados</p>
             </div>
             <div className="card-base p-3 text-center">
-              <AlertCircle className="w-4 h-4 mx-auto text-destructive mb-1" />
+              <AppIcon name="AlertCircle" className="w-4 h-4 mx-auto text-destructive mb-1" />
               <p className="text-lg font-bold text-foreground">{todayStats.errors}</p>
               <p className="text-[10px] text-muted-foreground">Erros</p>
             </div>
             <div className="card-base p-3 text-center">
-              <Clock className="w-4 h-4 mx-auto text-warning mb-1" />
+              <AppIcon name="Clock" className="w-4 h-4 mx-auto text-warning mb-1" />
               <p className="text-lg font-bold text-foreground">{todayStats.pending}</p>
               <p className="text-[10px] text-muted-foreground">Pendentes</p>
             </div>
@@ -175,7 +171,7 @@ export default function TabletAdmin() {
         {/* Products without PDV code warning */}
         {productsWithoutPDV.length > 0 && (
           <div className="flex items-center gap-2 p-3 rounded-xl bg-warning/10 border border-warning/20">
-            <AlertCircle className="w-4 h-4 text-warning shrink-0" />
+            <AppIcon name="AlertCircle" className="w-4 h-4 text-warning shrink-0" />
             <p className="text-xs text-warning">
               {productsWithoutPDV.length} produto(s) sem código PDV — não serão enviados ao Colibri
             </p>
@@ -236,7 +232,7 @@ export default function TabletAdmin() {
                   )}
                   {order.error_message && (
                     <div className="mt-2 flex items-start gap-2 text-xs text-destructive">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                      <AppIcon name="AlertCircle" className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                       <span>{order.error_message}</span>
                     </div>
                   )}
@@ -247,7 +243,7 @@ export default function TabletAdmin() {
                       onClick={() => retryPDV(order.id)}
                       className="mt-2"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                      <AppIcon name="RefreshCw" className="w-3.5 h-3.5 mr-1" />
                       Reenviar ao PDV
                     </Button>
                   )}
@@ -262,7 +258,7 @@ export default function TabletAdmin() {
           {/* PRODUCTS TAB */}
           <TabsContent value="products" className="space-y-3 mt-4">
             <Button onClick={openNewProduct} className="w-full h-12 rounded-xl">
-              <Plus className="w-4 h-4 mr-2" />
+              <AppIcon name="Plus" className="w-4 h-4 mr-2" />
               Novo Produto
             </Button>
             {products.map(p => (
@@ -272,9 +268,9 @@ export default function TabletAdmin() {
                     <p className="font-semibold text-sm text-foreground flex items-center gap-1.5">
                       {p.name}
                       {p.codigo_pdv ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                        <AppIcon name="CheckCircle2" className="w-3.5 h-3.5 text-success" />
                       ) : (
-                        <AlertCircle className="w-3.5 h-3.5 text-warning" />
+                        <AppIcon name="AlertCircle" className="w-3.5 h-3.5 text-warning" />
                       )}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -299,7 +295,7 @@ export default function TabletAdmin() {
             {activeUnit && (
               <div className="card-base p-4 space-y-4">
                 <h3 className="font-bold text-foreground flex items-center gap-2">
-                  <QrCode className="w-4 h-4" />
+                  <AppIcon name="QrCode" className="w-4 h-4" />
                   Cardápio Digital (QR Code)
                 </h3>
                 <p className="text-xs text-muted-foreground">
@@ -328,7 +324,7 @@ export default function TabletAdmin() {
                           toast({ title: 'Link copiado!' });
                         }}
                       >
-                        <Copy className="w-3 h-3 mr-1" /> Copiar
+                        <AppIcon name="Copy" className="w-3 h-3 mr-1" /> Copiar
                       </Button>
                       <a
                         href={`/m/${activeUnit.id}`}
@@ -336,7 +332,7 @@ export default function TabletAdmin() {
                         rel="noopener"
                         className="inline-flex items-center gap-1 text-xs text-primary font-medium"
                       >
-                        <ExternalLink className="w-3 h-3" /> Abrir
+                        <AppIcon name="ExternalLink" className="w-3 h-3" /> Abrir
                       </a>
                     </div>
                   </div>
@@ -386,7 +382,7 @@ export default function TabletAdmin() {
                 className="flex-1"
               />
               <Button onClick={() => { addTable(parseInt(newTableNum)); setNewTableNum(''); }} disabled={!newTableNum}>
-                <Plus className="w-4 h-4 mr-1" />
+                <AppIcon name="Plus" className="w-4 h-4 mr-1" />
                 Adicionar
               </Button>
             </div>
@@ -398,7 +394,7 @@ export default function TabletAdmin() {
                     onClick={() => removeTable(t.id)}
                     className="absolute top-1 right-1 p-1 rounded hover:bg-destructive/10"
                   >
-                    <Trash2 className="w-3 h-3 text-destructive" />
+                    <AppIcon name="Trash2" className="w-3 h-3 text-destructive" />
                   </button>
                 </div>
               ))}
@@ -412,11 +408,11 @@ export default function TabletAdmin() {
               onClick={() => setShowGuide(!showGuide)}
               className="w-full flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 text-sm text-primary"
             >
-              <Info className="w-4 h-4 shrink-0" />
+              <AppIcon name="Info" className="w-4 h-4 shrink-0" />
               <span className="flex-1 text-left font-medium">
                 {showGuide ? 'Ocultar guia' : 'Como configurar o Gestor de Pedidos Colibri'}
               </span>
-              <ArrowRight className={`w-4 h-4 transition-transform ${showGuide ? 'rotate-90' : ''}`} />
+              <AppIcon name="ArrowRight" className={`w-4 h-4 transition-transform ${showGuide ? 'rotate-90' : ''}`} />
             </button>
 
             {showGuide && (
@@ -455,11 +451,11 @@ export default function TabletAdmin() {
             {/* Config Form */}
             <div className="card-base p-4 space-y-4">
               <h3 className="font-bold text-foreground flex items-center gap-2">
-                <Settings2 className="w-4 h-4" />
+                <AppIcon name="Settings2" className="w-4 h-4" />
                 Configuração Colibri PDV
                 {pdvConfig?.is_active && (
                   <Badge variant="outline" className="text-success border-success/30 text-[10px]">
-                    <Wifi className="w-3 h-3 mr-1" /> Ativo
+                    <AppIcon name="Wifi" className="w-3 h-3 mr-1" /> Ativo
                   </Badge>
                 )}
               </h3>
@@ -505,13 +501,13 @@ export default function TabletAdmin() {
                   className="w-full"
                 >
                   {testingConnection ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <AppIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
                   ) : connectionStatus === 'success' ? (
-                    <CheckCircle2 className="w-4 h-4 mr-2 text-success" />
+                    <AppIcon name="CheckCircle2" className="w-4 h-4 mr-2 text-success" />
                   ) : connectionStatus === 'error' ? (
-                    <WifiOff className="w-4 h-4 mr-2 text-destructive" />
+                    <AppIcon name="WifiOff" className="w-4 h-4 mr-2 text-destructive" />
                   ) : (
-                    <Zap className="w-4 h-4 mr-2" />
+                    <AppIcon name="Zap" className="w-4 h-4 mr-2" />
                   )}
                   {testingConnection ? 'Testando...' : 'Testar Conexão'}
                 </Button>
@@ -534,7 +530,7 @@ export default function TabletAdmin() {
             {/* Retry info */}
             <div className="card-base p-4">
               <h4 className="font-semibold text-sm text-foreground mb-2 flex items-center gap-2">
-                <RefreshCw className="w-4 h-4" />
+                <AppIcon name="RefreshCw" className="w-4 h-4" />
                 Retry Automático
               </h4>
               <p className="text-xs text-muted-foreground">
@@ -611,7 +607,7 @@ export default function TabletAdmin() {
                     variant="destructive"
                     onClick={() => { deleteProduct(editingProduct.id!); setProductSheet(false); }}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <AppIcon name="Trash2" className="w-4 h-4" />
                   </Button>
                 )}
               </div>

@@ -59,14 +59,14 @@ function DateStrip({ days, selectedDate, onSelectDate }: {
                 <div className={cn(
                   "w-[38px] h-[38px] rounded-full flex items-center justify-center transition-colors",
                   isSelected
-                    ? "finance-hero-card checklist-gradient-slow shadow-md"
+                    ? "finance-hero-card checklist-gradient-slow shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-primary/30"
                     : isDayToday
                       ? "bg-primary/8"
                       : "hover:bg-secondary/60"
                 )}>
                   <span className={cn(
                     "text-sm font-bold leading-none",
-                    isSelected ? "text-primary-foreground dark:text-[hsl(220_30%_20%)]" : isDayToday ? "text-primary" : "text-foreground"
+                    isSelected ? "text-white drop-shadow-md" : isDayToday ? "text-primary dark:text-emerald-400" : "text-foreground"
                   )}>
                     {format(day, 'dd')}
                   </span>
@@ -106,7 +106,7 @@ export default function ChecklistsPage() {
   const [settingsMode, setSettingsMode] = useState(false);
   const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  
+
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
 
   // The settings type follows the checklist type
@@ -318,7 +318,7 @@ export default function ChecklistsPage() {
 
   const handleAddSector = async (data: { name: string; color: string }) => {
     const scope = settingsType === 'bonus' ? 'bonus' : 'standard';
-    try { 
+    try {
       const newSector = await addSector({ ...data, scope });
       // Auto-create a default subcategory for bonus sectors
       if (scope === 'bonus' && newSector?.id) {
@@ -358,9 +358,9 @@ export default function ChecklistsPage() {
           <div className="px-4 py-4 space-y-4">
             <Skeleton className="h-12 rounded-xl" />
             <div className="grid grid-cols-2 gap-3">
-              {[1,2].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+              {[1, 2].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}
             </div>
-            {[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}
+            {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}
           </div>
         </div>
       </AppLayout>
@@ -436,8 +436,8 @@ export default function ChecklistsPage() {
                       getTypeProgress.abertura.percent === 100 ? "text-success" : checklistType === 'abertura' ? "text-foreground" : "text-muted-foreground"
                     )}
                   />
-                   <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
-                 </div>
+                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
+                </div>
                 {!settingsMode && (
                   <div className="space-y-1.5">
                     <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-white/15" : "bg-secondary/60")}>
@@ -503,8 +503,8 @@ export default function ChecklistsPage() {
                       getTypeProgress.fechamento.percent === 100 ? "text-success" : checklistType === 'fechamento' ? "text-foreground" : "text-muted-foreground"
                     )}
                   />
-                   <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
-                 </div>
+                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
+                </div>
                 {!settingsMode && (
                   <div className="space-y-1.5">
                     <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-white/15" : "bg-secondary/60")}>

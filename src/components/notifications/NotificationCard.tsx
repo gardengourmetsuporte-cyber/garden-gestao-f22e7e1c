@@ -1,10 +1,10 @@
-import { Bell, AlertTriangle, Info, CheckCircle, Check, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications, AppNotification } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const typeConfig = {
   alert: { icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/10', ring: 'ring-destructive/20', glow: 'shadow-glow-destructive' },
@@ -114,7 +114,7 @@ function NotificationGroupItem({ group, onMarkRead, index }: { group: GroupedNot
       </div>
 
       {/* Arrow */}
-      <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+      <AppIcon name="ChevronRight" className="w-4 h-4 text-muted-foreground/40 shrink-0" />
     </button>
   );
 }
@@ -133,7 +133,7 @@ export function NotificationCard() {
   if (unreadCount === 0) return (
     <div className="py-10 flex flex-col items-center gap-3">
       <div className="w-14 h-14 rounded-3xl bg-muted/50 flex items-center justify-center">
-        <Bell className="w-6 h-6 text-muted-foreground/30" />
+        <AppIcon name="Bell" className="w-6 h-6 text-muted-foreground/30" />
       </div>
       <p className="text-sm text-muted-foreground/60 font-medium">Tudo limpo por aqui ✨</p>
     </div>
@@ -148,7 +148,7 @@ export function NotificationCard() {
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center relative ring-1 ring-primary/20">
-            <Bell className="w-[18px] h-[18px] text-primary" />
+            <AppIcon name="Bell" className="w-[18px] h-[18px] text-primary" />
             <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
               {grouped.length}
             </span>
@@ -168,7 +168,7 @@ export function NotificationCard() {
             </span>
           )}
           <div className="w-7 h-7 rounded-xl bg-muted/50 flex items-center justify-center group-hover:bg-muted transition-colors">
-            {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            {expanded ? <AppIcon name="ChevronUp" className="w-4 h-4 text-muted-foreground" /> : <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />}
           </div>
         </div>
       </button>

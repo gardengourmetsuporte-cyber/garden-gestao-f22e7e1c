@@ -1,18 +1,12 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { 
-  Clock, 
-  CheckCircle2, 
-  AlertTriangle,
-  ChevronRight,
-  User
-} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CashClosing } from '@/types/cashClosing';
 import { CashClosingDetail } from './CashClosingDetail';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { AppIcon } from '@/components/ui/app-icon';
  
  interface Props {
    closings: CashClosing[];
@@ -58,7 +52,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
      return (
        <div className="flex flex-col items-center justify-center py-12 text-center">
          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-           <Clock className="w-8 h-8 text-muted-foreground" />
+           <AppIcon name="Clock" className="w-8 h-8 text-muted-foreground" />
          </div>
          <h3 className="font-medium text-lg mb-1">Nenhum fechamento</h3>
          <p className="text-muted-foreground text-sm">
@@ -93,7 +87,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
                         <div className="flex items-center gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <User className="w-4 h-4 text-muted-foreground" />
+                              <AppIcon name="User" className="w-4 h-4 text-muted-foreground" />
                               <span className="font-medium truncate">
                                 {closing.profile?.full_name || 'Usuário'}
                               </span>
@@ -120,7 +114,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
                             {status.label}
                           </Badge>
                           
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          <AppIcon name="ChevronRight" className="w-5 h-5 text-muted-foreground" />
                         </div>
                       </CardContent>
                    </Card>

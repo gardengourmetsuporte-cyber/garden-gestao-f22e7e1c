@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Trash2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ChecklistItem } from '@/types/database';
@@ -16,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface ChecklistTrashProps {
   fetchDeletedItems: () => Promise<ChecklistItem[]>;
@@ -99,14 +99,14 @@ export function ChecklistTrash({
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button variant="outline" size="sm" className="gap-2">
-            <Trash2 className="w-4 h-4" />
+            <AppIcon name="Trash2" className="w-4 h-4" />
             Lixeira
           </Button>
         </SheetTrigger>
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle className="flex items-center gap-2">
-              <Trash2 className="w-5 h-5" />
+              <AppIcon name="Trash2" className="w-5 h-5" />
               Lixeira
             </SheetTitle>
           </SheetHeader>
@@ -121,7 +121,7 @@ export function ChecklistTrash({
             </div>
           ) : deletedItems.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <Trash2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <AppIcon name="Trash2" className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">Lixeira vazia</p>
               <p className="text-sm mt-1">Nenhum item excluído recentemente</p>
             </div>
@@ -148,7 +148,7 @@ export function ChecklistTrash({
                       onClick={() => handleRestore(item.id)}
                       className="gap-1.5"
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
+                      <AppIcon name="RotateCcw" className="w-3.5 h-3.5" />
                       Restaurar
                     </Button>
                     <Button
@@ -157,7 +157,7 @@ export function ChecklistTrash({
                       onClick={() => setConfirmDeleteId(item.id)}
                       className="gap-1.5"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <AppIcon name="Trash2" className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 </div>
@@ -170,7 +170,7 @@ export function ChecklistTrash({
                     onClick={() => setConfirmEmptyOpen(true)}
                     className="w-full gap-2"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <AppIcon name="Trash2" className="w-4 h-4" />
                     Esvaziar Lixeira
                   </Button>
                 </div>
@@ -185,7 +185,7 @@ export function ChecklistTrash({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-destructive" />
+              <AppIcon name="AlertTriangle" className="w-5 h-5 text-destructive" />
               Excluir permanentemente?
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -206,7 +206,7 @@ export function ChecklistTrash({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-destructive" />
+              <AppIcon name="AlertTriangle" className="w-5 h-5 text-destructive" />
               Esvaziar lixeira?
             </AlertDialogTitle>
             <AlertDialogDescription>

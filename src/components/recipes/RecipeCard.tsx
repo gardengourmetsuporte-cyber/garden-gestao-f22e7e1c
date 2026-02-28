@@ -1,4 +1,3 @@
-import { MoreVertical, Copy, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,6 +9,7 @@ import {
 import { getLucideIcon } from '@/lib/icons';
 import { formatCurrency, type Recipe } from '@/types/recipe';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -60,24 +60,24 @@ export function RecipeCard({
       <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
           <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-            <MoreVertical className="h-4 w-4" />
+            <AppIcon name="MoreVertical" className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(recipe.id); }}>
-            <Copy className="h-4 w-4 mr-2" />
+            <AppIcon name="Copy" className="h-4 w-4 mr-2" />
             Duplicar
           </DropdownMenuItem>
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleActive(recipe.id, !recipe.is_active); }}>
             {recipe.is_active ? (
-              <><ToggleLeft className="h-4 w-4 mr-2" />Inativar</>
+              <><AppIcon name="ToggleLeft" className="h-4 w-4 mr-2" />Inativar</>
             ) : (
-              <><ToggleRight className="h-4 w-4 mr-2" />Ativar</>
+              <><AppIcon name="ToggleRight" className="h-4 w-4 mr-2" />Ativar</>
             )}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); onDelete(recipe.id); }}>
-            <Trash2 className="h-4 w-4 mr-2" />
+            <AppIcon name="Trash2" className="h-4 w-4 mr-2" />
             Excluir
           </DropdownMenuItem>
         </DropdownMenuContent>

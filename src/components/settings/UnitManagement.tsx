@@ -9,11 +9,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Store, Plus, Pencil, Users, Loader2, Check, Copy, ChevronRight, ChevronLeft, Sparkles, CheckCircle2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface UserUnitAssignment {
   user_id: string;
@@ -404,7 +404,7 @@ export function UnitManagement() {
                 u.is_assigned ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground/30'
               )}
             >
-              {u.is_assigned && <Check className="w-3.5 h-3.5" />}
+              {u.is_assigned && <AppIcon name="Check" className="w-3.5 h-3.5" />}
             </button>
             <span className="font-medium text-sm">{u.full_name}</span>
           </div>
@@ -449,11 +449,11 @@ export function UnitManagement() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Store className="w-5 h-5 text-primary" />
+          <AppIcon name="Store" className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-foreground">Gerenciar Lojas</h3>
         </div>
         <Button size="sm" onClick={openWizard}>
-          <Plus className="w-4 h-4 mr-1" /> Nova Loja
+          <AppIcon name="Plus" className="w-4 h-4 mr-1" /> Nova Loja
         </Button>
       </div>
 
@@ -466,7 +466,7 @@ export function UnitManagement() {
           <div key={unit.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Store className="w-5 h-5 text-primary" />
+                <AppIcon name="Store" className="w-5 h-5 text-primary" />
               </div>
               <div className="min-w-0">
                 <span className="font-medium block truncate">{unit.name}</span>
@@ -477,17 +477,17 @@ export function UnitManagement() {
             <div className="flex items-center gap-1 shrink-0">
               {units.length > 1 && (
                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => { setDeletingUnit(unit); setDeleteConfirmOpen(true); }} title="Excluir">
-                  <Trash2 className="w-4 h-4" />
+                  <AppIcon name="Trash2" className="w-4 h-4" />
                 </Button>
               )}
               <Button variant="ghost" size="icon" onClick={() => openCloneSheet(unit)} title="Copiar templates">
-                <Copy className="w-4 h-4" />
+                <AppIcon name="Copy" className="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="icon" onClick={() => openUsersSheet(unit)} title="Usuários">
-                <Users className="w-4 h-4" />
+                <AppIcon name="Users" className="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="icon" onClick={() => openEditSheet(unit)} title="Editar">
-                <Pencil className="w-4 h-4" />
+                <AppIcon name="Pencil" className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -502,7 +502,7 @@ export function UnitManagement() {
         <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] flex flex-col">
           <SheetHeader className="shrink-0">
             <SheetTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
+              <AppIcon name="Sparkles" className="w-5 h-5 text-primary" />
               Nova Loja
             </SheetTitle>
           </SheetHeader>
@@ -581,7 +581,7 @@ export function UnitManagement() {
                   Selecione os usuários que terão acesso a esta loja.
                 </p>
                 {wLoadingUsers ? (
-                  <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+                  <div className="flex justify-center py-8"><AppIcon name="Loader2" className="w-6 h-6 animate-spin text-primary" /></div>
                 ) : (
                   <UserList items={wUsers} setItems={setWUsers} />
                 )}
@@ -592,7 +592,7 @@ export function UnitManagement() {
             {wizardStep === 'done' && (
               <div className="text-center space-y-4 py-6">
                 <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <Sparkles className="w-10 h-10 text-primary" />
+                  <AppIcon name="Sparkles" className="w-10 h-10 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-xl">Tudo pronto! 🎉</h3>
@@ -610,20 +610,20 @@ export function UnitManagement() {
           <div className="shrink-0 pt-2 pb-4 flex gap-2">
             {wizardStep === 'done' ? (
               <Button onClick={wizardFinish} className="w-full">
-                <Store className="w-4 h-4 mr-2" />
+                <AppIcon name="Store" className="w-4 h-4 mr-2" />
                 Ativar Loja
               </Button>
             ) : (
               <>
                 {(wizardStep === 'templates' || wizardStep === 'users') && (
                   <Button variant="outline" onClick={() => setWizardStep(wizardStep === 'users' ? 'templates' : 'info')} className="shrink-0">
-                    <ChevronLeft className="w-4 h-4" />
+                    <AppIcon name="ChevronLeft" className="w-4 h-4" />
                   </Button>
                 )}
                 <Button onClick={wizardNext} disabled={wSaving} className="flex-1">
-                  {wSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  {wSaving ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin mr-2" /> : null}
                   {wizardStep === 'info' ? 'Próximo' : wizardStep === 'templates' ? 'Próximo' : 'Criar Loja'}
-                  <ChevronRight className="w-4 h-4 ml-1" />
+                  <AppIcon name="ChevronRight" className="w-4 h-4 ml-1" />
                 </Button>
               </>
             )}
@@ -645,7 +645,7 @@ export function UnitManagement() {
               <Input value={editSlug} onChange={e => setEditSlug(e.target.value)} />
             </div>
             <Button onClick={handleEditSave} disabled={editSaving} className="w-full">
-              {editSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {editSaving ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin mr-2" /> : null}
               Salvar
             </Button>
           </div>
@@ -671,7 +671,7 @@ export function UnitManagement() {
             <CloneOptionsUI opts={cloneOpts} setOpts={setCloneOpts} />
             <p className="text-xs text-muted-foreground">⚠️ Itens de estoque serão criados com estoque zerado.</p>
             <Button onClick={handleClone} disabled={cloning || !cloneSourceId || cloneOpts.size === 0} className="w-full">
-              {cloning ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+              {cloning ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin mr-2" /> : <AppIcon name="Copy" className="w-4 h-4 mr-2" />}
               Copiar Templates
             </Button>
           </div>
@@ -684,14 +684,14 @@ export function UnitManagement() {
           <SheetHeader><SheetTitle>Usuários — {usersUnit?.name}</SheetTitle></SheetHeader>
           <div className="flex-1 overflow-y-auto py-4">
             {loadingUsers ? (
-              <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+              <div className="flex justify-center py-8"><AppIcon name="Loader2" className="w-6 h-6 animate-spin text-primary" /></div>
             ) : (
               <UserList items={userAssignments} setItems={setUserAssignments} />
             )}
           </div>
           <div className="shrink-0 pt-2 pb-4">
             <Button onClick={saveUserAssignments} disabled={savingUsers} className="w-full">
-              {savingUsers ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {savingUsers ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin mr-2" /> : null}
               Salvar Atribuições
             </Button>
           </div>
@@ -710,7 +710,7 @@ export function UnitManagement() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteUnit} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              {deleting ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin mr-2" /> : <AppIcon name="Trash2" className="w-4 h-4 mr-2" />}
               Excluir Permanentemente
             </AlertDialogAction>
           </AlertDialogFooter>

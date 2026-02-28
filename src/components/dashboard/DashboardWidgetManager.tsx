@@ -3,7 +3,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
-import { GripVertical } from 'lucide-react';
 import { DashboardWidget } from '@/hooks/useDashboardWidgets';
 import {
   DndContext,
@@ -70,7 +69,7 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
         aria-label={`Reordenar ${widget.label}`}
         className="shrink-0 rounded-md p-2 text-muted-foreground/70 touch-none cursor-grab active:cursor-grabbing"
       >
-        <GripVertical className="h-4 w-4" />
+        <AppIcon name="GripVertical" className="h-4 w-4" />
       </button>
 
       <div

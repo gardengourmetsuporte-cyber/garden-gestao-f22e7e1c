@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle2, Loader2, Store, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { Toaster as Sonner } from '@/components/ui/sonner';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface QuotationData {
   quotation_supplier_id: string;
@@ -93,7 +93,7 @@ export default function QuotationPublic() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <AppIcon name="Loader2" className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -115,7 +115,7 @@ export default function QuotationPublic() {
         <Sonner />
         <div className="text-center space-y-3">
           <div className="w-16 h-16 mx-auto rounded-full bg-success/10 flex items-center justify-center">
-            <CheckCircle2 className="w-8 h-8 text-success" />
+            <AppIcon name="CheckCircle2" className="w-8 h-8 text-success" />
           </div>
           <p className="text-xl font-bold text-foreground">Cotação Enviada!</p>
           <p className="text-sm text-muted-foreground">
@@ -136,7 +136,7 @@ export default function QuotationPublic() {
       <header className="bg-card border-b border-border p-4 sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Store className="w-5 h-5 text-primary" />
+            <AppIcon name="Store" className="w-5 h-5 text-primary" />
           </div>
           <div>
             <h1 className="font-bold text-lg">{data.quotation_title || 'Cotação de Preços'}</h1>
@@ -145,7 +145,7 @@ export default function QuotationPublic() {
         </div>
         {data.deadline && (
           <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
-            <Clock className="w-3.5 h-3.5" />
+            <AppIcon name="Clock" className="w-3.5 h-3.5" />
             Prazo: {new Date(data.deadline).toLocaleDateString('pt-BR')}
           </div>
         )}
@@ -242,7 +242,7 @@ export default function QuotationPublic() {
           className="w-full h-12 rounded-xl shadow-lg shadow-primary/20 text-base"
         >
           {submitting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <AppIcon name="Loader2" className="w-5 h-5 animate-spin" />
           ) : (
             `Enviar Cotação (${filledCount}/${data.items.length} itens)`
           )}

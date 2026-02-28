@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Scale, Plus, Clock, CheckCircle2, AlertTriangle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 import { useQuotations, Quotation } from '@/hooks/useQuotations';
 import { QuotationSheet } from './QuotationSheet';
 import { QuotationDetail } from './QuotationDetail';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const statusConfig: Record<string, { label: string; bg: string; text: string; icon: any }> = {
   draft: { label: 'Rascunho', bg: 'bg-muted', text: 'text-muted-foreground', icon: Clock },
@@ -32,7 +32,7 @@ export function QuotationList() {
   return (
     <div className="space-y-4">
       <Button onClick={() => setSheetOpen(true)} className="w-full gap-2 rounded-xl h-12 shadow-lg shadow-primary/20">
-        <Plus className="w-4 h-4" />
+        <AppIcon name="Plus" className="w-4 h-4" />
         Nova Cotação
       </Button>
 
@@ -60,7 +60,7 @@ export function QuotationList() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <Scale className="w-5 h-5 text-primary" />
+                      <AppIcon name="Scale" className="w-5 h-5 text-primary" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-foreground truncate">
@@ -81,7 +81,7 @@ export function QuotationList() {
                       className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={(e) => { e.stopPropagation(); deleteQuotation(q.id); }}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <AppIcon name="Trash2" className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>

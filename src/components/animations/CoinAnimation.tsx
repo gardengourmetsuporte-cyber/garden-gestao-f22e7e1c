@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Star } from 'lucide-react';
 import { useCoinAnimation } from '@/contexts/CoinAnimationContext';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface FlyingCoinProps {
   id: string;
@@ -75,7 +75,7 @@ function FlyingCoin({ id, startX, startY, endX, endY, points = 1 }: FlyingCoinPr
           border: '3px solid hsl(var(--background))',
         }}
       >
-        <Star className="w-7 h-7 text-primary-foreground fill-primary-foreground drop-shadow-lg" />
+        <AppIcon name="Star" className="w-7 h-7 text-primary-foreground fill-primary-foreground drop-shadow-lg" />
       </div>
     </div>,
     document.body

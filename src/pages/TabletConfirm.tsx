@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { CheckCircle2, QrCode, Camera, Clock, AlertCircle, RefreshCw, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AppIcon } from '@/components/ui/app-icon';
 
 type ConfirmStep = 'show_qr' | 'scanning' | 'success' | 'error';
 
@@ -129,7 +129,7 @@ export default function TabletConfirm() {
       {step === 'show_qr' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-6 animate-fade-in">
           <div className="space-y-2">
-            <QrCode className="w-12 h-12 mx-auto text-primary" />
+            <AppIcon name="QrCode" className="w-12 h-12 mx-auto text-primary" />
             <h1 className="text-2xl font-bold text-foreground">Confirme seu Pedido</h1>
             <p className="text-sm text-muted-foreground">
               Escaneie o QR Code abaixo ou clique em "Confirmar" para enviar o pedido à cozinha
@@ -143,7 +143,7 @@ export default function TabletConfirm() {
 
           {/* Timer */}
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
-            <Clock className="w-4 h-4" />
+            <AppIcon name="Clock" className="w-4 h-4" />
             <span className={`text-sm font-mono font-bold ${timeLeft <= 30 ? 'text-destructive' : ''}`}>
               Expira em {formatTime(timeLeft)}
             </span>
@@ -156,7 +156,7 @@ export default function TabletConfirm() {
               variant="outline"
               className="w-full h-12 rounded-xl"
             >
-              <Camera className="w-5 h-5 mr-2" />
+              <AppIcon name="Camera" className="w-5 h-5 mr-2" />
               Escanear QR Code
             </Button>
             <Button
@@ -164,7 +164,7 @@ export default function TabletConfirm() {
               className="w-full h-14 text-lg font-bold rounded-xl"
               disabled={confirming}
             >
-              <CheckCircle2 className="w-5 h-5 mr-2" />
+              <AppIcon name="CheckCircle2" className="w-5 h-5 mr-2" />
               {confirming ? 'Confirmando...' : 'Confirmar Pedido'}
             </Button>
           </div>
@@ -186,7 +186,7 @@ export default function TabletConfirm() {
 
       {step === 'success' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-6 animate-fade-in">
-          <PartyPopper className="w-20 h-20 mx-auto text-success" />
+          <AppIcon name="PartyPopper" className="w-20 h-20 mx-auto text-success" />
           <h1 className="text-2xl font-bold text-foreground">Pedido Confirmado!</h1>
           <p className="text-muted-foreground">
             Seu pedido foi enviado para a cozinha. Aguarde na mesa {new URLSearchParams(window.location.search).get('mesa') || ''}.
@@ -202,7 +202,7 @@ export default function TabletConfirm() {
 
       {step === 'error' && (
         <div className="w-full max-w-sm mx-auto text-center space-y-6 animate-fade-in">
-          <AlertCircle className="w-16 h-16 mx-auto text-destructive" />
+          <AppIcon name="AlertCircle" className="w-16 h-16 mx-auto text-destructive" />
           <h1 className="text-xl font-bold text-foreground">Erro</h1>
           <p className="text-muted-foreground">{error}</p>
           <div className="space-y-3">
@@ -210,7 +210,7 @@ export default function TabletConfirm() {
               onClick={() => { setError(''); setStep('show_qr'); setTimeLeft(120); }}
               className="w-full h-12 rounded-xl"
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <AppIcon name="RefreshCw" className="w-4 h-4 mr-2" />
               Tentar Novamente
             </Button>
             <Button

@@ -280,9 +280,9 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
                         Beta
                       </span>
                     )}
-                    <div className="relative z-10">
-                      <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors", active ? "bg-primary/20" : "bg-card")}>
-                        <AppIcon name={item.icon} size={18} fill={active ? 1 : 0} className={active ? "text-primary drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "text-foreground/70"} />
+                    <div className="relative z-10 w-full flex justify-center">
+                      <div className={cn("w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0 transition-all duration-300", active ? "bg-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-primary/30" : "bg-card border border-white/5")}>
+                        <AppIcon name={item.icon} size={20} fill={active ? 1 : 0} className={active ? "text-primary drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "text-foreground/70"} />
                       </div>
                       {locked && (
                         <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />

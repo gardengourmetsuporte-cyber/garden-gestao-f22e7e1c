@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Plus, BookOpen, Pencil, Trash2, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useWhatsAppKnowledge } from '@/hooks/useWhatsApp';
 import { useUnit } from '@/contexts/UnitContext';
 import type { WhatsAppKnowledgeArticle } from '@/types/whatsapp';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const CATEGORY_OPTIONS = ['geral', 'entrega', 'pagamento', 'funcionamento', 'politicas', 'contato'];
 
@@ -58,17 +58,17 @@ export function WhatsAppKnowledge() {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-primary" />
+          <AppIcon name="BookOpen" className="w-4 h-4 text-primary" />
           <h2 className="text-sm font-semibold">Base de Conhecimento</h2>
           <span className="text-xs text-muted-foreground">({articles.length} artigos)</span>
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={() => setShowSuggestions(!showSuggestions)}>
-            <Lightbulb className="w-3.5 h-3.5 mr-1" />
+            <AppIcon name="Lightbulb" className="w-3.5 h-3.5 mr-1" />
             Sugestões
           </Button>
           <Button size="sm" onClick={openNew}>
-            <Plus className="w-3.5 h-3.5 mr-1" />
+            <AppIcon name="Plus" className="w-3.5 h-3.5 mr-1" />
             Novo
           </Button>
         </div>
@@ -94,7 +94,7 @@ export function WhatsAppKnowledge() {
         <p className="text-sm text-muted-foreground text-center py-8">Carregando...</p>
       ) : articles.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
+          <AppIcon name="BookOpen" className="w-8 h-8 mx-auto mb-2 opacity-40" />
           <p className="text-sm">Nenhum artigo cadastrado</p>
           <p className="text-xs mt-1">Use as sugestões ou crie um novo artigo</p>
         </div>
@@ -112,10 +112,10 @@ export function WhatsAppKnowledge() {
               </div>
               <div className="flex gap-1">
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(article)}>
-                  <Pencil className="w-3.5 h-3.5" />
+                  <AppIcon name="Pencil" className="w-3.5 h-3.5" />
                 </Button>
                 <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteArticle.mutate(article.id)}>
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <AppIcon name="Trash2" className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>

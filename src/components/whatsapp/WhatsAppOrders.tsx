@@ -1,9 +1,9 @@
-import { Check, X, ShoppingBag, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWhatsAppOrders } from '@/hooks/useWhatsApp';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const statusMap: Record<string, { label: string; class: string }> = {
   draft: { label: 'Rascunho', class: 'badge-warning' },
@@ -19,7 +19,7 @@ export function WhatsAppOrders() {
   if (orders.length === 0) {
     return (
       <div className="empty-state">
-        <ShoppingBag className="empty-state-icon" />
+        <AppIcon name="ShoppingBag" className="empty-state-icon" />
         <p className="empty-state-title">Nenhum pedido</p>
         <p className="empty-state-text">Os pedidos gerados via WhatsApp aparecerão aqui.</p>
       </div>
@@ -41,7 +41,7 @@ export function WhatsAppOrders() {
                   <span className={cn('badge-status text-[10px]', st.class)}>{st.label}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                  <Phone className="w-3 h-3" />
+                  <AppIcon name="Phone" className="w-3 h-3" />
                   {order.contact?.phone || '-'}
                   <span className="ml-2">{format(new Date(order.created_at), 'dd/MM/yy HH:mm', { locale: ptBR })}</span>
                 </div>
@@ -68,7 +68,7 @@ export function WhatsAppOrders() {
                   className="flex-1 gap-1.5 text-xs"
                   onClick={() => updateOrderStatus.mutate({ id: order.id, status: 'confirmed' })}
                 >
-                  <Check className="w-3.5 h-3.5" /> Confirmar
+                  <AppIcon name="Check" className="w-3.5 h-3.5" /> Confirmar
                 </Button>
                 <Button
                   size="sm"
@@ -76,7 +76,7 @@ export function WhatsAppOrders() {
                   className="flex-1 gap-1.5 text-xs text-destructive"
                   onClick={() => updateOrderStatus.mutate({ id: order.id, status: 'cancelled' })}
                 >
-                  <X className="w-3.5 h-3.5" /> Cancelar
+                  <AppIcon name="X" className="w-3.5 h-3.5" /> Cancelar
                 </Button>
               </div>
             )}

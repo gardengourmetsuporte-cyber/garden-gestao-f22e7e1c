@@ -1,25 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { 
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  User,
-  Lock,
-  Star,
-  RefreshCw,
-  Users,
-  Sparkles,
-  X,
-  Zap,
-  AlertTriangle,
-  Send,
-  Undo2,
-  Camera,
-  Image as ImageIcon,
-} from 'lucide-react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ICON_MAP } from '@/lib/iconMap';
 import { ChecklistSector, ChecklistType, ChecklistCompletion, Profile } from '@/types/database';
@@ -369,7 +350,7 @@ export function ChecklistView({
       {/* Deadline banner */}
       {deadlineBannerText && !isAdmin && (
         <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
-          <Clock className="w-4 h-4 shrink-0" />
+          <AppIcon name="Clock" className="w-4 h-4 shrink-0" />
           <span>{deadlineBannerText}</span>
         </div>
       )}
@@ -443,7 +424,7 @@ export function ChecklistView({
                   "transition-transform duration-300",
                   isExpanded ? "rotate-0" : "-rotate-90"
                 )}>
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  <AppIcon name="ChevronDown" className="w-5 h-5 text-muted-foreground" />
                 </div>
               </div>
             </button>
@@ -510,7 +491,7 @@ export function ChecklistView({
                                 : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
                               isJustCompleted && "scale-125"
                             )}>
-                              {isContested ? <AlertTriangle className="w-4 h-4" /> : wasSkipped ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+                              {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <div className="flex items-start justify-between gap-2">
@@ -526,10 +507,10 @@ export function ChecklistView({
                                   color: getItemPointsColors(pointsAwarded).color,
                                   borderColor: getItemPointsColors(pointsAwarded).border,
                                 } : undefined}>
-                                  {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
-                                    : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
-                                    : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
-                                    : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
+                                  {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
+                                    : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
+                                    : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
+                                    : (<div className="flex items-center gap-0.5"><AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
                                 </div>
                               </div>
                               {isContested && contestedReason && (
@@ -538,7 +519,7 @@ export function ChecklistView({
                               {item.description && !isContested && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.description}</p>}
                               {completion && (
                                 <div className="flex items-center gap-1 mt-1 text-[11px] text-muted-foreground flex-wrap">
-                                  <User className="w-3 h-3 shrink-0" />
+                                  <AppIcon name="User" className="w-3 h-3 shrink-0" />
                                   <span className="truncate">{completion.profile?.full_name || 'Usuário'} · {format(new Date(completion.completed_at), 'HH:mm')}</span>
                                   {isContested && <span className="text-amber-600 dark:text-amber-400">(contestado)</span>}
                                   {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary">(já pronto)</span>}
@@ -548,7 +529,7 @@ export function ChecklistView({
                                       onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
                                       className="flex items-center gap-0.5 text-primary hover:underline"
                                     >
-                                      <Camera className="w-3 h-3" />
+                                      <AppIcon name="Camera" className="w-3 h-3" />
                                       <span>foto</span>
                                     </button>
                                   )}
@@ -570,7 +551,7 @@ export function ChecklistView({
                                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                 >
                                   <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
-                                    <Undo2 className="w-5 h-5 text-muted-foreground" />
+                                    <AppIcon name="Undo2" className="w-5 h-5 text-muted-foreground" />
                                   </div>
                                   <div>
                                     <p className="font-semibold text-foreground">Desmarcar item</p>
@@ -585,7 +566,7 @@ export function ChecklistView({
                                   {splittingItemId === item.id ? (
                                     <div className="space-y-2 animate-fade-in">
                                       <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                                        <Users className="w-4 h-4" />
+                                        <AppIcon name="Users" className="w-4 h-4" />
                                         <span>Dividir pontos ({item.points ?? 1} pts)</span>
                                       </div>
                                       <div className="max-h-40 overflow-y-auto space-y-1">
@@ -627,7 +608,7 @@ export function ChecklistView({
                                           {splitLoading ? 'Dividindo...' : 'Confirmar divisão'}
                                         </button>
                                         <button onClick={() => { setSplittingItemId(null); setSplitSelectedUsers(new Set()); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
-                                          <X className="w-4 h-4 text-muted-foreground" />
+                                          <AppIcon name="X" className="w-4 h-4 text-muted-foreground" />
                                         </button>
                                       </div>
                                     </div>
@@ -637,7 +618,7 @@ export function ChecklistView({
                                       className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
                                     >
                                       <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
-                                        <Users className="w-5 h-5 text-primary" />
+                                        <AppIcon name="Users" className="w-5 h-5 text-primary" />
                                       </div>
                                       <div>
                                         <p className="font-semibold text-primary">Dividir pontos</p>
@@ -654,7 +635,7 @@ export function ChecklistView({
                                   {contestingItemId === item.id ? (
                                     <div className="space-y-2 animate-fade-in">
                                       <div className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
-                                        <AlertTriangle className="w-4 h-4" />
+                                        <AppIcon name="AlertTriangle" className="w-4 h-4" />
                                         <span>Motivo da contestação</span>
                                       </div>
                                       <div className="flex items-center gap-2">
@@ -672,10 +653,10 @@ export function ChecklistView({
                                           disabled={!contestReason.trim() || contestLoading}
                                           className="p-2 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
                                         >
-                                          <Send className="w-4 h-4" />
+                                          <AppIcon name="Send" className="w-4 h-4" />
                                         </button>
                                         <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
-                                          <X className="w-4 h-4 text-muted-foreground" />
+                                          <AppIcon name="X" className="w-4 h-4 text-muted-foreground" />
                                         </button>
                                       </div>
                                     </div>
@@ -685,7 +666,7 @@ export function ChecklistView({
                                       className="w-full flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]"
                                     >
                                       <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center">
-                                        <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                        <AppIcon name="AlertTriangle" className="w-5 h-5 text-amber-500" />
                                       </div>
                                       <div>
                                         <p className="font-semibold text-amber-600 dark:text-amber-400">Contestar</p>
@@ -719,7 +700,7 @@ export function ChecklistView({
                           <div className="flex-1 text-left">
                             <div className="flex items-center gap-1.5">
                               <p className="font-medium text-foreground">{item.name}</p>
-                              {(item as any).requires_photo && <Camera className="w-3.5 h-3.5 text-primary shrink-0" />}
+                              {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
                             </div>
                             {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
                           </div>
@@ -731,7 +712,7 @@ export function ChecklistView({
                                 borderColor: getItemPointsColors(configuredPoints).border,
                                 boxShadow: `0 0 12px ${getItemPointsColors(configuredPoints).glow}`,
                               }}>
-                              <Zap className="w-3 h-3" />
+                              <AppIcon name="Zap" className="w-3 h-3" />
                               <span>+{configuredPoints}</span>
                             </div>
                           ) : (
@@ -747,13 +728,13 @@ export function ChecklistView({
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
                                 >
                                   <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
-                                    <Users className="w-5 h-5 text-primary" />
+                                    <AppIcon name="Users" className="w-5 h-5 text-primary" />
                                   </div>
                                   <div className="flex-1">
                                     <p className="font-semibold text-foreground">Quem realizou?</p>
                                     <p className="text-xs text-muted-foreground">Selecione quem fez</p>
                                   </div>
-                                  <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", expandedPeopleFor === item.id && "rotate-180")} />
+                                  <AppIcon name="ChevronDown" className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", expandedPeopleFor === item.id && "rotate-180")} />
                                 </button>
                                 <div className={cn("overflow-hidden transition-all duration-300 ease-out", expandedPeopleFor === item.id ? "max-h-64 opacity-100" : "max-h-0 opacity-0")}>
                                   <div className="max-h-48 overflow-y-auto space-y-1 pt-1">
@@ -761,7 +742,7 @@ export function ChecklistView({
                                       <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
                                         className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
                                           profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
-                                        <User className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
+                                        <AppIcon name="User" className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
                                         {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
                                       </button>
                                     ))}
@@ -774,10 +755,10 @@ export function ChecklistView({
                               <>
                                 <button onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><Check className="w-5 h-5 text-success-foreground" /></div>
+                                  <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
                                   <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
                                     {configuredPoints > 0 ? (
-                                      <div className="flex items-center gap-0.5 mt-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} />
+                                      <div className="flex items-center gap-0.5 mt-0.5"><AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} />
                                         <span className="text-xs font-bold ml-0.5" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span></div>
                                     ) : (<span className="text-xs text-muted-foreground">Tarefa sem pontos</span>)}
                                   </div>
@@ -785,7 +766,7 @@ export function ChecklistView({
                                 <div className="border-t border-border" />
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
+                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
                                   <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                                 {configuredPoints > 0 && (
@@ -793,7 +774,7 @@ export function ChecklistView({
                                     <div className="border-t border-border" />
                                     <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget)}
                                       className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                      <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><RefreshCw className="w-5 h-5 text-muted-foreground" /></div>
+                                      <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
                                       <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                     </button>
                                   </>
@@ -803,7 +784,7 @@ export function ChecklistView({
                             {isAdmin && configuredPoints > 0 && (
                               <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget)}
                                 className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><RefreshCw className="w-5 h-5 text-muted-foreground" /></div>
+                                <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
                                 <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos (eu marquei)</p></div>
                               </button>
                             )}
@@ -812,7 +793,7 @@ export function ChecklistView({
                                 <div className="border-t border-border" />
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
+                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
                                   <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                               </>
@@ -848,8 +829,8 @@ export function ChecklistView({
                             subComplete ? "bg-success/15" : "bg-muted/50"
                           )}>
                             {subComplete 
-                              ? <Check className="w-3.5 h-3.5 text-success animate-scale-in" /> 
-                              : <ChevronRight className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform duration-300", isSubExpanded && "rotate-90")} />
+                              ? <AppIcon name="Check" className="w-3.5 h-3.5 text-success animate-scale-in" /> 
+                              : <AppIcon name="ChevronRight" className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform duration-300", isSubExpanded && "rotate-90")} />
                             }
                           </div>
                           <span className={cn("font-medium text-sm transition-colors duration-300", subComplete ? "text-success" : "text-foreground")}>{subcategory.name}</span>
@@ -858,7 +839,7 @@ export function ChecklistView({
                             subComplete ? "bg-success/10 text-success" : "bg-muted/50 text-muted-foreground"
                           )}>{completedItems.length}/{activeItems.length}</span>
                         </div>
-                        <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform duration-300", isSubExpanded ? "rotate-0" : "-rotate-90")} />
+                        <AppIcon name="ChevronDown" className={cn("w-4 h-4 text-muted-foreground transition-transform duration-300", isSubExpanded ? "rotate-0" : "-rotate-90")} />
                       </button>
 
                       <div className={cn("overflow-hidden transition-all duration-300 ease-out", isSubExpanded ? "max-h-[3000px] opacity-100" : "max-h-0 opacity-0")}>
@@ -915,7 +896,7 @@ export function ChecklistView({
                                         : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
                                       isJustCompleted && "scale-125"
                                     )}>
-                                      {isContested ? <AlertTriangle className="w-4 h-4" /> : wasSkipped ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+                                      {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
                                     </div>
                                     <div className="flex-1 min-w-0 text-left">
                                       <div className="flex items-start justify-between gap-2">
@@ -931,15 +912,15 @@ export function ChecklistView({
                                           color: getItemPointsColors(pointsAwarded).color,
                                           borderColor: getItemPointsColors(pointsAwarded).border,
                                         } : undefined}>
-                                          {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
-                                            : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
-                                            : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
+                                          {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
+                                            : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
+                                            : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
                                             : (<div className="flex items-center gap-0.5">
                                                 {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
                                                   const colors = getItemPointsColors(pointsAwarded);
-                                                  return <Star key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
+                                                  return <AppIcon name="Star" key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
                                                 })}
-                                                {isBonus && <Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
+                                                {isBonus && <AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
                                                 <span className="ml-0.5">+{pointsAwarded}</span>
                                               </div>)}
                                         </div>
@@ -950,7 +931,7 @@ export function ChecklistView({
                                       {item.description && !isContested && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.description}</p>}
                                       {completion && (
                                         <div className="flex items-center gap-1 mt-1 text-[11px] text-muted-foreground flex-wrap">
-                                          <User className="w-3 h-3 shrink-0" />
+                                          <AppIcon name="User" className="w-3 h-3 shrink-0" />
                                           <span className="truncate">{completion.profile?.full_name || 'Usuário'} · {format(new Date(completion.completed_at), 'HH:mm')}</span>
                                           {isContested && <span className="text-amber-600 dark:text-amber-400">(contestado)</span>}
                                           {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary">(já pronto)</span>}
@@ -960,7 +941,7 @@ export function ChecklistView({
                                               onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
                                               className="flex items-center gap-0.5 text-primary hover:underline"
                                             >
-                                              <Camera className="w-3 h-3" />
+                                              <AppIcon name="Camera" className="w-3 h-3" />
                                               <span>foto</span>
                                             </button>
                                           )}
@@ -981,7 +962,7 @@ export function ChecklistView({
                                           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                         >
                                           <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
-                                            <Undo2 className="w-5 h-5 text-muted-foreground" />
+                                            <AppIcon name="Undo2" className="w-5 h-5 text-muted-foreground" />
                                           </div>
                                           <div>
                                             <p className="font-semibold text-foreground">Desmarcar item</p>
@@ -996,7 +977,7 @@ export function ChecklistView({
                                           {splittingItemId === item.id ? (
                                             <div className="space-y-2 animate-fade-in">
                                               <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                                                <Users className="w-4 h-4" />
+                                                <AppIcon name="Users" className="w-4 h-4" />
                                                 <span>Dividir pontos ({item.points ?? 1} pts)</span>
                                               </div>
                                               <div className="max-h-40 overflow-y-auto space-y-1">
@@ -1038,7 +1019,7 @@ export function ChecklistView({
                                                   {splitLoading ? 'Dividindo...' : 'Confirmar divisão'}
                                                 </button>
                                                 <button onClick={() => { setSplittingItemId(null); setSplitSelectedUsers(new Set()); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
-                                                  <X className="w-4 h-4 text-muted-foreground" />
+                                                  <AppIcon name="X" className="w-4 h-4 text-muted-foreground" />
                                                 </button>
                                               </div>
                                             </div>
@@ -1048,7 +1029,7 @@ export function ChecklistView({
                                               className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
                                             >
                                               <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
-                                                <Users className="w-5 h-5 text-primary" />
+                                                <AppIcon name="Users" className="w-5 h-5 text-primary" />
                                               </div>
                                               <div>
                                                 <p className="font-semibold text-primary">Dividir pontos</p>
@@ -1064,7 +1045,7 @@ export function ChecklistView({
                                           {contestingItemId === item.id ? (
                                             <div className="space-y-2 animate-fade-in">
                                               <div className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
-                                                <AlertTriangle className="w-4 h-4" />
+                                                <AppIcon name="AlertTriangle" className="w-4 h-4" />
                                                 <span>Motivo da contestação</span>
                                               </div>
                                               <div className="flex items-center gap-2">
@@ -1082,10 +1063,10 @@ export function ChecklistView({
                                                   disabled={!contestReason.trim() || contestLoading}
                                                   className="p-2 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
                                                 >
-                                                  <Send className="w-4 h-4" />
+                                                  <AppIcon name="Send" className="w-4 h-4" />
                                                 </button>
                                                 <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
-                                                  <X className="w-4 h-4 text-muted-foreground" />
+                                                  <AppIcon name="X" className="w-4 h-4 text-muted-foreground" />
                                                 </button>
                                               </div>
                                             </div>
@@ -1095,7 +1076,7 @@ export function ChecklistView({
                                               className="w-full flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]"
                                             >
                                               <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center">
-                                                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                                <AppIcon name="AlertTriangle" className="w-5 h-5 text-amber-500" />
                                               </div>
                                               <div>
                                                 <p className="font-semibold text-amber-600 dark:text-amber-400">Contestar</p>
@@ -1129,7 +1110,7 @@ export function ChecklistView({
                                   <div className="flex-1 text-left">
                                     <div className="flex items-center gap-1.5">
                                       <p className="font-medium text-foreground">{item.name}</p>
-                                      {(item as any).requires_photo && <Camera className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                      {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
                                     </div>
                                     {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
                                   </div>
@@ -1141,7 +1122,7 @@ export function ChecklistView({
                                         borderColor: getItemPointsColors(configuredPoints).border,
                                         boxShadow: isBonus ? `0 0 12px ${getItemPointsColors(configuredPoints).glow}` : undefined,
                                       }}>
-                                      {isBonus ? <Zap className="w-3 h-3" /> : <Star className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
+                                      {isBonus ? <AppIcon name="Zap" className="w-3 h-3" /> : <AppIcon name="Star" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
                                       <span>+{configuredPoints}</span>
                                     </div>
                                   ) : (
@@ -1157,13 +1138,13 @@ export function ChecklistView({
                                           className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
                                         >
                                           <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
-                                            <Users className="w-5 h-5 text-primary" />
+                                            <AppIcon name="Users" className="w-5 h-5 text-primary" />
                                           </div>
                                           <div className="flex-1">
                                             <p className="font-semibold text-foreground">Quem realizou?</p>
                                             <p className="text-xs text-muted-foreground">Selecione quem fez</p>
                                           </div>
-                                          <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", expandedPeopleFor === item.id && "rotate-180")} />
+                                          <AppIcon name="ChevronDown" className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", expandedPeopleFor === item.id && "rotate-180")} />
                                         </button>
                                         <div className={cn("overflow-hidden transition-all duration-300 ease-out", expandedPeopleFor === item.id ? "max-h-64 opacity-100" : "max-h-0 opacity-0")}>
                                           <div className="max-h-48 overflow-y-auto space-y-1 pt-1">
@@ -1171,7 +1152,7 @@ export function ChecklistView({
                                               <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
                                                 className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all duration-200 text-sm",
                                                   profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
-                                                <User className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
+                                                <AppIcon name="User" className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
                                                 {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
                                               </button>
                                             ))}
@@ -1184,13 +1165,13 @@ export function ChecklistView({
                                       <>
                                         <button onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
-                                          <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><Check className="w-5 h-5 text-success-foreground" /></div>
+                                          <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
                                           <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
                                             {configuredPoints > 0 ? (
                                               <div className="flex items-center gap-0.5 mt-0.5">
-                                                {isBonus ? <Zap className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} /> : (
+                                                {isBonus ? <AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} /> : (
                                                   Array.from({ length: configuredPoints }).map((_, i) => (
-                                                    <Star key={i} className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />
+                                                    <AppIcon name="Star" key={i} className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />
                                                   ))
                                                 )}
                                                 <span className="text-xs font-bold ml-0.5" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span>
@@ -1201,7 +1182,7 @@ export function ChecklistView({
                                         <div className="border-t border-border" />
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
+                                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
                                           <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
                                         {configuredPoints > 0 && (
@@ -1209,7 +1190,7 @@ export function ChecklistView({
                                             <div className="border-t border-border" />
                                             <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget)}
                                               className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                              <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><RefreshCw className="w-5 h-5 text-muted-foreground" /></div>
+                                              <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
                                               <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                             </button>
                                           </>
@@ -1219,7 +1200,7 @@ export function ChecklistView({
                                     {isAdmin && configuredPoints > 0 && (
                                       <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget)}
                                         className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                        <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><RefreshCw className="w-5 h-5 text-muted-foreground" /></div>
+                                        <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
                                         <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos (eu marquei)</p></div>
                                       </button>
                                     )}
@@ -1228,7 +1209,7 @@ export function ChecklistView({
                                         <div className="border-t border-border" />
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><X className="w-5 h-5 text-destructive" /></div>
+                                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
                                           <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
                                       </>
@@ -1264,7 +1245,7 @@ export function ChecklistView({
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle className="flex items-center gap-2">
-              <Camera className="w-5 h-5 text-primary" />
+              <AppIcon name="Camera" className="w-5 h-5 text-primary" />
               Foto de confirmação
             </SheetTitle>
           </SheetHeader>
@@ -1279,12 +1260,12 @@ export function ChecklistView({
                   onClick={() => { setPhotoPreview(null); setPhotoFile(null); }}
                   className="absolute top-2 right-2 w-8 h-8 bg-background/80 backdrop-blur rounded-full flex items-center justify-center"
                 >
-                  <X className="w-4 h-4" />
+                  <AppIcon name="X" className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <label className="flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors">
-                <Camera className="w-10 h-10 text-primary" />
+                <AppIcon name="Camera" className="w-10 h-10 text-primary" />
                 <span className="text-sm font-medium text-primary">Tirar foto ou escolher</span>
                 <input
                   type="file"
@@ -1311,7 +1292,7 @@ export function ChecklistView({
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
             <SheetTitle className="flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-primary" />
+              <AppIcon name="Image" className="w-5 h-5 text-primary" />
               Foto de confirmação
             </SheetTitle>
           </SheetHeader>

@@ -29,7 +29,7 @@ const CATEGORY_COLORS = [
   '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280',
 ];
 
-function SortableTaskItem({ id, children }: { id: string; children: React.ReactNode }) {
+function SortableTaskItem({ id, children }: { id: string; children: React.ReactNode; key?: React.Key }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style: React.CSSProperties = {
     transform: CSS.Translate.toString(transform),
@@ -165,7 +165,7 @@ export default function Agenda() {
   if (!canAccessAgenda) return null;
 
   const handleDragStart = (_event: DragStartEvent) => {
-    try { navigator.vibrate?.(10); } catch {}
+    try { navigator.vibrate?.(10); } catch { }
   };
 
   const handleDragEnd = (event: DragEndEvent, taskList: ManagerTask[]) => {
@@ -175,7 +175,7 @@ export default function Agenda() {
     const newIndex = taskList.findIndex(t => t.id === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
     const reordered = arrayMove(taskList, oldIndex, newIndex);
-    
+
     // Optimistic local state
     setTempTasks(prev => {
       const base = prev || tasks;
@@ -184,7 +184,7 @@ export default function Agenda() {
       return base.map(t => taskIds.has(t.id) ? { ...t, sort_order: orderMap.get(t.id)! } : t)
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
     });
-    
+
     reorderTasks(reordered.map((t, i) => ({ id: t.id, sort_order: i })));
   };
 
@@ -206,17 +206,17 @@ export default function Agenda() {
     <div className="space-y-1.5">
       {isLoading ? (
         <div className="space-y-3">
-          {[1,2,3,4].map(i => (
+          {[1, 2, 3, 4].map(i => (
             <Skeleton key={i} className="h-16 w-full rounded-2xl" />
           ))}
         </div>
       ) : pendingTasks.length === 0 && !showCompleted ? (
         <div className="flex flex-col items-center justify-center py-16">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'hsl(142 60% 45% / 0.12)' }}>
-            <AppIcon name="Check" size={28} style={{ color: 'hsl(142 60% 50%)' }} />
+          <div className="w-16 h-16 rounded-[20px] flex items-center justify-center mb-4 finance-hero-card checklist-gradient-slow shadow-[0_0_20px_rgba(16,185,129,0.2)] border border-primary/20">
+            <AppIcon name="Sparkles" size={32} className="text-primary drop-shadow-md" />
           </div>
-          <p className="text-muted-foreground text-sm font-medium">Tudo em dia! 🎉</p>
-          <Button variant="link" className="mt-1 text-primary text-sm" onClick={() => setTaskSheetOpen(true)}>
+          <p className="text-foreground text-base font-semibold">Tudo em dia! 🎉</p>
+          <Button variant="link" className="mt-2 text-primary font-medium hover:text-primary/80" onClick={() => setTaskSheetOpen(true)}>
             Criar novo lembrete
           </Button>
         </div>
@@ -227,13 +227,13 @@ export default function Agenda() {
             const isExpanded = expandedCategories[category.id] === true;
             return (
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-card border border-border/60 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl card-surface hover:shadow-card-hover border-white/5 transition-all duration-300 group">
                   <div className="flex items-center gap-3.5">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
-                      style={{ backgroundColor: category.color + '18', border: `1.5px solid ${category.color}30` }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
+                      style={{ backgroundColor: category.color + '15', border: `1px solid ${category.color}30` }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color }}>{category.icon || 'folder'}</span>
+                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }}>{category.icon || 'folder'}</span>
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
@@ -303,7 +303,7 @@ export default function Agenda() {
   );
 
   const CalendarContent = () => (
-    <AgendaCalendarView 
+    <AgendaCalendarView
       tasks={displayTasks}
       onTaskClick={handleEditTask}
       onToggleTask={toggleTask}
@@ -348,9 +348,9 @@ export default function Agenda() {
             </div>
           </div>
           {/* View mode tabs with animated indicator */}
-          <div className="relative flex bg-muted/50 rounded-2xl p-1 border border-border">
+          <div className="relative flex bg-secondary/50 rounded-2xl p-1 border border-white/5 shadow-inner">
             <div
-              className="absolute top-1 bottom-1 rounded-xl bg-card shadow-sm border border-border transition-all duration-300 ease-out"
+              className="absolute top-1 bottom-1 rounded-xl bg-primary/20 shadow-sm border border-primary/30 transition-all duration-300 ease-out"
               style={{
                 width: 'calc(33.333% - 4px)',
                 left: viewMode === 'list' ? '4px' : viewMode === 'calendar' ? 'calc(33.333% + 0px)' : 'calc(66.666% + 0px)',
@@ -360,7 +360,7 @@ export default function Agenda() {
               onClick={() => setViewMode('list')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'list' ? 'text-foreground' : 'text-muted-foreground'
+                viewMode === 'list' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <AppIcon name="ListChecks" size={16} />
@@ -370,7 +370,7 @@ export default function Agenda() {
               onClick={() => setViewMode('calendar')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'calendar' ? 'text-foreground' : 'text-muted-foreground'
+                viewMode === 'calendar' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <AppIcon name="Calendar" size={16} />
@@ -380,7 +380,7 @@ export default function Agenda() {
               onClick={() => setViewMode('blocks')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'blocks' ? 'text-foreground' : 'text-muted-foreground'
+                viewMode === 'blocks' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <AppIcon name="LayoutGrid" size={16} />
@@ -540,7 +540,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
                 type="button"
                 className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border border-border"
                 style={{ backgroundColor: newColor + '20' }}
-                onClick={() => {}}
+                onClick={() => { }}
               >
                 <span className="material-symbols-rounded" style={{ fontSize: 20, color: newColor }}>{newIcon}</span>
               </button>

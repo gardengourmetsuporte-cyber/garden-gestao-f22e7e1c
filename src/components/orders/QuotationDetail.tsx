@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Trophy, Copy, MessageCircle, Scale, AlertTriangle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useQuotations, Quotation, QuotationPrice } from '@/hooks/useQuotations';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface Props {
   quotation: Quotation;
@@ -128,7 +128,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl">
-          <ArrowLeft className="w-5 h-5" />
+          <AppIcon name="ArrowLeft" className="w-5 h-5" />
         </Button>
         <div className="flex-1 min-w-0">
           <h2 className="font-bold text-lg truncate">{quotation.title || 'Cotação'}</h2>
@@ -157,11 +157,11 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
               </p>
             </div>
             <Button size="sm" variant="outline" className="rounded-xl gap-1" onClick={() => copyLink(qs.token)}>
-              <Copy className="w-3.5 h-3.5" />
+              <AppIcon name="Copy" className="w-3.5 h-3.5" />
             </Button>
             {qs.supplier?.phone && (
               <Button size="sm" className="rounded-xl gap-1 bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)]" onClick={() => sendWhatsApp(qs)}>
-                <MessageCircle className="w-3.5 h-3.5" />
+                <AppIcon name="MessageCircle" className="w-3.5 h-3.5" />
               </Button>
             )}
           </div>
@@ -172,7 +172,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
       {prices.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Scale className="w-4 h-4" />
+            <AppIcon name="Scale" className="w-4 h-4" />
             Comparação de Preços
           </p>
           <div className="overflow-x-auto rounded-2xl border border-border bg-card">
@@ -227,7 +227,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
           {/* Economy */}
           {economy > 0 && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-success/10 border border-success/20">
-              <Sparkles className="w-5 h-5 text-success" />
+              <AppIcon name="Sparkles" className="w-5 h-5 text-success" />
               <p className="text-sm font-semibold text-success">
                 Economia estimada: R$ {economy.toFixed(2).replace('.', ',')}
               </p>
@@ -253,7 +253,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                   className="rounded-xl gap-1.5 border-orange-500/30 text-orange-500 hover:bg-orange-500/10"
                   onClick={() => handleContest(qs.supplier_id)}
                 >
-                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <AppIcon name="AlertTriangle" className="w-3.5 h-3.5" />
                   Contestar {qs.supplier?.name}
                 </Button>
               );
@@ -264,7 +264,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 onClick={handleResolve}
                 className="rounded-xl gap-1.5 shadow-lg shadow-primary/20"
               >
-                <Trophy className="w-4 h-4" />
+                <AppIcon name="Trophy" className="w-4 h-4" />
                 Gerar Pedidos Otimizados
               </Button>
             )}

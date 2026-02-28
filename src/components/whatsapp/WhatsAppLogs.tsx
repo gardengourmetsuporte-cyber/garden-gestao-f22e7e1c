@@ -1,7 +1,7 @@
-import { Brain, ArrowUpRight, AlertTriangle, Clock } from 'lucide-react';
 import { useWhatsAppLogs } from '@/hooks/useWhatsApp';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const actionConfig: Record<string, { label: string; icon: typeof Brain; color: string }> = {
   respond: { label: 'Resposta', icon: Brain, color: 'hsl(var(--neon-cyan))' },
@@ -18,7 +18,7 @@ export function WhatsAppLogs() {
   if (!logs || logs.length === 0) {
     return (
       <div className="empty-state">
-        <Brain className="empty-state-icon" />
+        <AppIcon name="Brain" className="empty-state-icon" />
         <p className="empty-state-title">Nenhum log</p>
         <p className="empty-state-text">Os logs de decisão da IA aparecerão aqui.</p>
       </div>

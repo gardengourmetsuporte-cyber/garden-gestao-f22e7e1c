@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Copy, Save, Wifi, WifiOff, CheckCircle2, XCircle, Loader2, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +9,7 @@ import { useWhatsAppChannels } from '@/hooks/useWhatsApp';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from '@/hooks/use-toast';
 import type { WhatsAppChannel } from '@/types/whatsapp';
+import { AppIcon } from '@/components/ui/app-icon';
 
 const providers = [
   { value: 'evolution', label: 'Evolution API' },
@@ -85,8 +85,8 @@ export function WhatsAppSettings() {
   if (isLoading) return <div className="text-center py-10 text-muted-foreground">Carregando...</div>;
 
   const StatusIcon = ({ ok }: { ok: boolean }) => ok 
-    ? <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--neon-green))' }} /> 
-    : <XCircle className="w-4 h-4 text-destructive shrink-0" />;
+    ? <AppIcon name="CheckCircle2" className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--neon-green))' }} /> 
+    : <AppIcon name="XCircle" className="w-4 h-4 text-destructive shrink-0" />;
 
   return (
     <div className="p-4 space-y-6 max-w-2xl mx-auto">
@@ -95,7 +95,7 @@ export function WhatsAppSettings() {
         <div className="flex items-center justify-between">
           <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Diagnóstico de Conexão</Label>
           <Button size="sm" variant="outline" onClick={testConnection} disabled={testing} className="gap-2">
-            {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
+            {testing ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin" /> : <AppIcon name="Activity" className="w-4 h-4" />}
             {testing ? 'Testando...' : 'Testar Conexão'}
           </Button>
         </div>
@@ -120,7 +120,7 @@ export function WhatsAppSettings() {
               ))
             ) : (
               <div className="flex items-start gap-2 text-sm p-2 rounded-lg bg-destructive/10">
-                <XCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                <AppIcon name="XCircle" className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                 <div>
                   <span className="font-medium">Erro no teste</span>
                   <p className="text-xs text-muted-foreground">{healthResult.error || 'Erro desconhecido'}</p>
@@ -138,7 +138,7 @@ export function WhatsAppSettings() {
         <div className="flex gap-2">
           <Input value={webhookUrl} readOnly className="text-xs font-mono" />
           <Button size="icon" variant="outline" onClick={copyWebhook}>
-            <Copy className="w-4 h-4" />
+            <AppIcon name="Copy" className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -147,9 +147,9 @@ export function WhatsAppSettings() {
       <div className="flex items-center justify-between p-4 rounded-xl border border-border/30 bg-card/60">
         <div className="flex items-center gap-3">
           {form.is_active ? (
-            <Wifi className="w-5 h-5" style={{ color: 'hsl(var(--neon-green))' }} />
+            <AppIcon name="Wifi" className="w-5 h-5" style={{ color: 'hsl(var(--neon-green))' }} />
           ) : (
-            <WifiOff className="w-5 h-5 text-muted-foreground" />
+            <AppIcon name="WifiOff" className="w-5 h-5 text-muted-foreground" />
           )}
           <div>
             <p className="font-medium text-sm">Atendimento IA</p>
@@ -246,7 +246,7 @@ export function WhatsAppSettings() {
 
       {/* Save */}
       <Button onClick={handleSave} disabled={upsertChannel.isPending} className="w-full gap-2">
-        <Save className="w-4 h-4" />
+        <AppIcon name="Save" className="w-4 h-4" />
         Salvar Configurações
       </Button>
     </div>

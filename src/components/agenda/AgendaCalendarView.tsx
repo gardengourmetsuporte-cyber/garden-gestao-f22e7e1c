@@ -100,9 +100,9 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
               key={day.toISOString()}
               className={cn(
                 'aspect-square flex flex-col items-center justify-start p-1 rounded-xl transition-all',
-                'hover:bg-secondary/50',
-                isToday(day) && 'bg-primary/10 ring-1 ring-primary/30',
-                isOverdue && 'bg-destructive/8',
+                'hover:bg-primary/5 hover:border hover:border-primary/20',
+                isToday(day) && 'card-surface shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-primary/30',
+                isOverdue && 'bg-rose-500/10 border border-rose-500/20',
                 !isSameMonth(day, currentMonth) && 'opacity-40'
               )}
               onClick={() => {
@@ -111,20 +111,24 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
             >
               <span className={cn(
                 'text-sm font-medium',
-                isToday(day) && 'text-primary font-bold',
-                isOverdue && 'text-destructive font-semibold'
+                isToday(day) && 'text-emerald-400 font-bold drop-shadow-md',
+                isOverdue && 'text-rose-400 font-bold drop-shadow-md',
+                !isToday(day) && !isOverdue && 'text-foreground'
               )}>
                 {format(day, 'd')}
               </span>
-              
+
               {/* Task indicators — only pending */}
               {dayTasks.length > 0 && (
                 <div className="flex gap-0.5 flex-wrap justify-center mt-0.5">
                   {dayTasks.slice(0, 3).map((task) => (
                     <div
                       key={task.id}
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: isOverdue ? 'hsl(var(--destructive))' : (task.category?.color || 'hsl(var(--primary))') }}
+                      className="w-1.5 h-1.5 rounded-full shadow-sm"
+                      style={{
+                        backgroundColor: isOverdue ? 'hsl(348, 83%, 65%)' : (task.category?.color || 'transparent'),
+                        boxShadow: `0 0 4px ${isOverdue ? 'rgba(251,113,133,0.8)' : task.category?.color ? task.category.color + '80' : 'rgba(16,185,129,0.6)'}`
+                      }}
                     />
                   ))}
                 </div>
@@ -150,7 +154,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
               <AppIcon name="X" size={16} />
             </Button>
           </div>
-          
+
           {(tasksByDate.get(selectedDate) || []).length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               Nenhuma tarefa neste dia
@@ -161,8 +165,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
                 <div
                   key={task.id}
                   className={cn(
-                    'p-3 rounded-xl bg-card border border-border transition-all',
-                    'hover:border-primary/30 hover:shadow-sm',
+                    'p-3 rounded-xl card-surface hover:shadow-card-hover border-white/5 transition-all',
                     task.is_completed && 'opacity-60'
                   )}
                 >
@@ -180,8 +183,8 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
                     >
                       <div className="flex items-center gap-2">
                         {task.category && (
-                          <div 
-                            className="w-2 h-2 rounded-full shrink-0" 
+                          <div
+                            className="w-2 h-2 rounded-full shrink-0"
                             style={{ backgroundColor: task.category.color }}
                           />
                         )}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { ChefHat, Utensils } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface TableData {
   id: string;
@@ -32,7 +32,7 @@ export default function TabletSelect() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="bg-card/90 backdrop-blur-xl border-b border-border/20 px-4 py-6 text-center">
-        <ChefHat className="w-12 h-12 mx-auto text-primary mb-2" />
+        <AppIcon name="ChefHat" className="w-12 h-12 mx-auto text-primary mb-2" />
         <h1 className="text-2xl font-bold text-foreground">Bem-vindo!</h1>
         <p className="text-muted-foreground text-sm mt-1">Selecione sua mesa para iniciar o pedido</p>
       </header>
@@ -43,7 +43,7 @@ export default function TabletSelect() {
           <p className="text-center text-muted-foreground py-12">Carregando mesas...</p>
         ) : tables.length === 0 ? (
           <div className="text-center py-12">
-            <Utensils className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+            <AppIcon name="Utensils" className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-muted-foreground">Nenhuma mesa configurada</p>
           </div>
         ) : (

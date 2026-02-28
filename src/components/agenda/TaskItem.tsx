@@ -16,6 +16,7 @@ interface TaskItemProps {
   onUpdateSubtask?: (id: string, title: string) => void;
   isDragging?: boolean;
   dragHandleProps?: Record<string, unknown>;
+  key?: React.Key;
 }
 
 function formatDueDate(dateStr: string | null, timeStr: string | null): string | null {
@@ -54,7 +55,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
   const handleToggle = () => {
     if (!task.is_completed) {
       setCompleting(true);
-      try { navigator.vibrate?.(10); } catch {}
+      try { navigator.vibrate?.(10); } catch { }
       setTimeout(() => { onToggle(task.id); setCompleting(false); }, 300);
     } else {
       onToggle(task.id);
@@ -81,9 +82,9 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
     >
       <div
         className={cn(
-          'bg-card rounded-xl border border-border/40 overflow-hidden transition-all duration-200',
+          'card-surface rounded-xl overflow-hidden transition-all duration-300',
           task.is_completed && 'opacity-45',
-          isDragging && 'shadow-elevated ring-2 ring-primary/40 scale-[1.02]',
+          isDragging && 'shadow-[0_0_30px_rgba(16,185,129,0.15)] ring-1 ring-primary/40 scale-[1.02]',
         )}
       >
         {/* Parent task row */}
@@ -99,7 +100,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
             )}
           />
 
-          <button 
+          <button
             className="flex-1 min-w-0 text-left"
             onClick={() => hasSubtasks ? setExpanded(!expanded) : onClick?.()}
           >
@@ -135,14 +136,14 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, on
               )}
               {dueLabel && (
                 <span className={cn(
-                  'text-[10px] px-1.5 py-0.5 rounded-md font-medium flex items-center gap-1',
+                  'text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1.5 border tracking-wide uppercase',
                   overdue
-                    ? 'bg-destructive/10 text-destructive'
+                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-sm'
                     : dueLabel.includes('Hoje')
-                      ? 'bg-warning/10 text-warning'
+                      ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-sm'
                       : dueLabel.includes('Amanhã')
-                        ? 'bg-primary/10 text-primary'
-                        : 'bg-secondary/80 text-muted-foreground'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm'
+                        : 'bg-secondary/40 text-muted-foreground border-white/5'
                 )}>
                   <AppIcon name="Clock" size={9} className={cn(clockUrgency.colorClass, clockUrgency.pulse && 'animate-pulse')} />
                   {dueLabel}

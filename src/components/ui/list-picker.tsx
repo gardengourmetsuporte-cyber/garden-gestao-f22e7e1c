@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Check, Plus, Loader2, Search } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 export interface ListPickerItem {
   id: string;
@@ -85,7 +85,7 @@ export function ListPicker({
           {/* Search + Create button row */}
           <div className="flex gap-2 mb-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+              <AppIcon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -100,7 +100,7 @@ export function ListPicker({
                 className="h-10 gap-1 shrink-0"
                 onClick={() => setShowCreateInput(true)}
               >
-                <Plus className="w-4 h-4" />
+                <AppIcon name="Plus" className="w-4 h-4" />
                 Novo
               </Button>
             )}
@@ -133,7 +133,7 @@ export function ListPicker({
                 disabled={!newName.trim() || isCreating}
                 onClick={handleCreate}
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Criar'}
+                {isCreating ? <AppIcon name="Loader2" className="w-4 h-4 animate-spin" /> : 'Criar'}
               </Button>
             </div>
           )}
@@ -149,7 +149,7 @@ export function ListPicker({
                 )}
               >
                 <span className="flex-1 text-left font-medium text-muted-foreground">{noneLabel}</span>
-                {selectedId === null && <Check className="w-5 h-5 text-primary" />}
+                {selectedId === null && <AppIcon name="Check" className="w-5 h-5 text-primary" />}
               </button>
             )}
 
@@ -165,7 +165,7 @@ export function ListPicker({
                   )}
                 >
                   <span className="flex-1 text-left font-medium">{item.label}</span>
-                  {isSelected && <Check className="w-5 h-5 text-primary" />}
+                  {isSelected && <AppIcon name="Check" className="w-5 h-5 text-primary" />}
                 </button>
               );
             })}
