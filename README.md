@@ -4,74 +4,97 @@
 
 > Sistema completo de gestão para restaurantes — estoque, financeiro, equipe, IA e muito mais.
 
-## Project info
+## Tecnologias
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+- React + TypeScript + Vite
+- Tailwind CSS + shadcn/ui
+- Capacitor (app nativo iOS/Android)
+- Lovable Cloud (backend)
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Desenvolvimento local
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📱 Compilar App Nativo (Android)
 
-**Use GitHub Codespaces**
+### Pré-requisitos
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. **Node.js** instalado (v18+)
+2. **Android Studio** instalado — [download](https://developer.android.com/studio)
+3. **Conta Google Play Developer** — US$ 25 (única vez) — [criar conta](https://play.google.com/console)
 
-## What technologies are used for this project?
+### Passo a passo
 
-This project is built with:
+```sh
+# 1. Clone o repositório (Export to GitHub no Lovable primeiro)
+git clone <YOUR_GIT_URL>
+cd <YOUR_PROJECT_NAME>
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# 2. Instale as dependências
+npm install
 
-## How can I deploy this project?
+# 3. Adicione a plataforma Android
+npx cap add android
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+# 4. Build do projeto web
+npm run build
 
-## Can I connect a custom domain to my Lovable project?
+# 5. Sincronize com o projeto nativo
+npx cap sync
 
-Yes, you can!
+# 6. Teste no emulador ou dispositivo físico
+npx cap run android
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Gerar AAB para Google Play
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+1. Abra o Android Studio: `npx cap open android`
+2. Vá em **Build → Generate Signed Bundle / APK**
+3. Selecione **Android App Bundle (.aab)**
+4. Crie uma **keystore** (primeira vez) — **guarde em local seguro!**
+5. Gere o bundle assinado
+6. Faça upload do `.aab` na [Google Play Console](https://play.google.com/console)
+
+### Após cada atualização no Lovable
+
+```sh
+git pull
+npm install
+npm run build
+npx cap sync
+# Gere novo AAB no Android Studio
+```
+
+---
+
+## 📱 Compilar App Nativo (iOS)
+
+### Pré-requisitos
+
+1. **Mac** com **Xcode** instalado (App Store, gratuito)
+2. **Conta Apple Developer** — US$ 99/ano — [criar conta](https://developer.apple.com)
+
+```sh
+npx cap add ios
+npm run build
+npx cap sync
+npx cap run ios
+# ou: npx cap open ios (abre no Xcode)
+```
+
+---
+
+## Deploy Web (PWA)
+
+Abra o [Lovable](https://lovable.dev) e clique em **Share → Publish**.
+
+## Domínio customizado
+
+Vá em **Project → Settings → Domains** e clique em **Connect Domain**.
