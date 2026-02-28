@@ -1,43 +1,80 @@
 
 
-## Plano de Testes Completos — Auditoria End-to-End
+## Plano Completo: Publicar Garden Gestão na Google Play Store
 
-Vou usar o browser automation para navegar por todos os módulos principais, verificar renderização, interações e fluxos críticos. O teste será dividido em batches:
+### O que você precisa fazer (fora do Lovable)
 
-### Batch 1: Dashboard + Finance
-1. Navegar ao Dashboard (`/`) — verificar widgets (saldo, gráfico, contas a vencer, sugestão de compras, ranking, checklists)
-2. Navegar ao Financeiro (`/finance`) — verificar comparativo mensal (variação vs mês anterior), cards de receita/despesa
-3. Testar botão Export CSV na aba de transações
-4. Verificar fluxo de caixa projetado (widget `cash-flow` no dashboard, se habilitado)
+1. **Conta de Desenvolvedor Google Play** — Taxa única de **US$ 25** (~R$ 125)
+   - Criar em: https://play.google.com/console
+   - Precisa de um cartão de crédito e documento de identidade
 
-### Batch 2: CRM + Customers
-5. Navegar a `/customers` — verificar BirthdayAlerts no topo
-6. Verificar tags nos CustomerCards
-7. Abrir CustomerSheet e testar adição de tags
-8. Verificar link WhatsApp nos alertas de aniversário
+2. **Computador com Android Studio instalado** (gratuito)
+   - Download: https://developer.android.com/studio
+   - Necessário para compilar o APK/AAB do app
 
-### Batch 3: Estoque + Pedidos
-9. Navegar a `/inventory` — verificar cards e categorias
-10. Navegar a `/orders` — verificar OrdersTab e sugestões de reposição
-11. Testar criação de rascunho de pedido via AutoOrderWidget
+3. **Exportar o projeto para GitHub** — Botão "Export to GitHub" no Lovable
 
-### Batch 4: Checklists + Cash Closing
-12. Navegar a `/checklists` — verificar abertura/fechamento, pontos
-13. Navegar a `/cash-closing` — verificar WeeklySummary com variação semanal
-14. Testar formulário de fechamento de caixa
+4. **Comandos no terminal** (após git pull):
+   ```text
+   npm install
+   npx cap add android
+   npx cap sync
+   npm run build
+   npx cap sync
+   npx cap run android  (testar no emulador/celular)
+   ```
 
-### Batch 5: Outros Módulos
-15. Navegar a `/employees`, `/recipes`, `/marketing`, `/whatsapp`, `/ranking`
-16. Verificar que cada página carrega sem erros (lazy loading funcionando)
-17. Checar console por warnings/errors em cada página
+5. **Gerar o AAB assinado** — Via Android Studio > Build > Generate Signed Bundle
+   - Você cria uma "keystore" (chave de assinatura) na primeira vez
+   - Guarde essa keystore em lugar seguro — sem ela você não consegue atualizar o app
 
-### Batch 6: Settings + Edge Cases
-18. Navegar a `/settings` — verificar todas as abas
-19. Testar DashboardWidgetManager (reordenar/ocultar widgets)
-20. Verificar responsividade mobile (viewport 375px)
+6. **Subir na Google Play Console** — Upload do arquivo `.aab`, preencher ficha (screenshots, descrição, ícone), e enviar para revisão
 
-### Entregáveis
-- Relatório completo de cada módulo: OK ou com bugs
-- Lista de bugs encontrados com screenshots
-- Correções imediatas para qualquer problema identificado
+### O que o Lovable faz por você
+
+- Configura o **Capacitor** no projeto (capacitor.config.ts, plugins nativos)
+- Cria os **wrappers nativos** (haptics, push, status bar)
+- Migra a vibração do botão para usar Haptics nativo
+- Configura ícones e splash screen
+- Todo o código fica pronto para compilar
+
+### O que o Lovable NÃO consegue fazer
+
+- Compilar o APK/AAB (precisa do Android Studio no seu computador)
+- Criar sua conta na Google Play Console
+- Fazer upload na loja
+- Assinar o app com sua keystore
+
+### Resumo de custos
+
+```text
+Item                          Custo
+─────────────────────────────────────
+Conta Google Play Developer   US$ 25 (única vez)
+Android Studio                Gratuito
+Hospedagem Lovable            Já incluída no seu plano
+─────────────────────────────────────
+Total                         ~US$ 25
+```
+
+### Implementação técnica (o que vou fazer agora)
+
+1. Instalar `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`
+2. Criar `capacitor.config.ts` com appId e server URL do sandbox
+3. Instalar plugins: `@capacitor/haptics`, `@capacitor/status-bar`, `@capacitor/splash-screen`
+4. Criar `src/lib/native.ts` — detecção de plataforma + wrappers
+5. Migrar `Button.tsx` para usar Haptics nativo quando disponível
+6. Documentar o passo-a-passo de build no README
+
+### Pós-implementação (seus passos)
+
+```text
+1. Export to GitHub (botão no Lovable)
+2. git clone → npm install
+3. npx cap add android
+4. npm run build → npx cap sync
+5. npx cap run android (testar)
+6. Android Studio → Build → Generate Signed Bundle
+7. Upload do .aab na Google Play Console
+```
 
