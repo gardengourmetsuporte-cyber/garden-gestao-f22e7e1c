@@ -95,7 +95,9 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
     return <PendingOrdersWidget />;
   },
   'pending-actions': ({ hasAccess, stats, navigate }) => {
-    if (!hasAccess('rewards') || stats.pendingRedemptions <= 0) return null;
+    if (!hasAccess('rewards')) return null;
+    const hasPending = stats.pendingRedemptions > 0;
+
     return (
       <div className="card-command-info p-4 animate-spring-in spring-stagger-4">
         <div className="flex items-center gap-2 mb-2">
@@ -103,7 +105,7 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
           <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Ações pendentes</span>
         </div>
         <button onClick={() => navigate('/rewards')} className="flex items-center justify-between w-full py-1.5 hover:bg-muted/30 rounded-lg px-2 transition-colors">
-          <span className="text-xs text-foreground">Resgates aguardando</span>
+          <span className="text-xs text-foreground">{hasPending ? 'Resgates aguardando' : 'Nenhuma ação pendente'}</span>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary">{stats.pendingRedemptions}</span>
         </button>
       </div>
