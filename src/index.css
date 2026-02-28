@@ -349,7 +349,9 @@
 
   :is(.dark) .card-base,
   :is(.dark) .card-surface {
-    @apply bg-card/80 backdrop-blur-2xl border border-white/[0.08] rounded-2xl overflow-hidden relative;
+    @apply backdrop-blur-2xl rounded-2xl overflow-hidden relative;
+    background: hsl(152 40% 5% / 0.6);
+    border: 1px solid hsl(152 50% 40% / 0.1);
     box-shadow: var(--shadow-card);
   }
 
@@ -386,7 +388,8 @@
   }
 
   .card-press {
-    @apply card-surface active:scale-[0.985] transition-all duration-300 hover:border-primary/30;
+    @apply card-surface active:scale-[0.985] transition-all duration-300;
+    &:hover { border-color: hsl(152 50% 40% / 0.25); }
   }
 
   .card-elevated {
