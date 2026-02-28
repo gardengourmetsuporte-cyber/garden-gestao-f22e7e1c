@@ -52,6 +52,9 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
       style={style}
       {...attributes}
       {...listeners}
+      onTouchMoveCapture={(e) => {
+        if (isDragActive) e.preventDefault();
+      }}
       className={cn(
         'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-none select-none',
         isDragging && 'opacity-60 shadow-lg scale-[1.02] relative'
@@ -81,6 +84,15 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
   useEffect(() => {
     if (open) setDraft(widgets);
   }, [open, widgets]);
+
+  useEffect(() => {
+    if (!isDragActive) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isDragActive]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
