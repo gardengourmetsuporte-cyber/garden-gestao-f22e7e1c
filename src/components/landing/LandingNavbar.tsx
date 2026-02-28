@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 
 export function LandingNavbar() {
@@ -81,7 +81,7 @@ export function LandingNavbar() {
             onClick={() => setOpen(!open)}
             className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10 bg-white/5 border border-white/10"
           >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {open ? <AppIcon name="X" size={20} /> : <AppIcon name="Menu" size={20} />}
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { X, Check, ArrowRight, Shield } from "lucide-react";
+import { AppIcon } from "@/components/ui/app-icon";
 
 interface PlanCheckoutDialogProps {
   plan: {
@@ -27,7 +27,7 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md card-surface p-6 space-y-5 animate-slide-up">
         <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
-          <X className="w-5 h-5" />
+          <AppIcon name="X" size={20} />
         </button>
 
         <div>
@@ -46,7 +46,7 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
         <ul className="space-y-2.5 border-y border-border/40 py-4">
           {plan.features.slice(0, 5).map((f) => (
             <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
-              <Check className="w-4 h-4 shrink-0 text-success" />
+              <AppIcon name="Check" size={16} className="shrink-0 text-success" />
               {f}
             </li>
           ))}
@@ -66,11 +66,11 @@ export function PlanCheckoutDialog({ plan, yearly, onClose }: PlanCheckoutDialog
             }}
           >
             Começar 14 dias grátis
-            <ArrowRight className="w-4 h-4" />
+            <AppIcon name="ArrowRight" size={16} />
           </button>
 
           <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/60">
-            <Shield className="w-3 h-3" />
+            <AppIcon name="Shield" size={12} />
             <span>Sem cartão de crédito • Cancele quando quiser</span>
           </div>
         </div>

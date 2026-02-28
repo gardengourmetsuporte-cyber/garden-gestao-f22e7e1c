@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 
@@ -40,7 +39,7 @@ export function CTASection() {
               className="group inline-flex items-center gap-2.5 h-14 px-10 rounded-2xl font-bold text-base bg-white text-[hsl(220,30%,15%)] shadow-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
             >
               Criar minha conta grátis
-              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
+              <AppIcon name="ArrowRight" size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
 
             <div className="mt-7 flex items-center justify-center gap-4 sm:gap-5 text-xs text-white/35 flex-wrap">

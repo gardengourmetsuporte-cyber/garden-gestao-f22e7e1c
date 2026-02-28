@@ -99,6 +99,7 @@ export const ICON_MAP: Record<string, string> = {
   Monitor: 'desktop_mac',
   Globe: 'public',
   Hash: 'tag',
+  Scale: 'balance',
 
   // Content & Media
   Image: 'image',

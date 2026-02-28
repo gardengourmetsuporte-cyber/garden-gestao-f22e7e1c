@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Star, Zap, ArrowRight } from "lucide-react";
+import { AppIcon } from "@/components/ui/app-icon";
 import { Switch } from "@/components/ui/switch";
 import { PlanCheckoutDialog } from "@/components/landing/PlanCheckoutDialog";
 
@@ -11,7 +11,7 @@ const plans = [
     monthly: 97,
     yearly: 77,
     highlight: true,
-    icon: Star,
+    icon: 'Star',
     features: [
       "Financeiro completo",
       "Estoque inteligente",
@@ -31,7 +31,7 @@ const plans = [
     monthly: 197,
     yearly: 157,
     highlight: false,
-    icon: Zap,
+    icon: 'Zap',
     features: [
       "Tudo do Pro",
       "IA Copiloto",
@@ -126,7 +126,7 @@ export function PricingSection() {
                 <div className="h-8 mb-4">
                   {plan.highlight && (
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <AppIcon name="Star" size={14} className="fill-current" />
                       Mais popular
                     </div>
                   )}
@@ -137,7 +137,7 @@ export function PricingSection() {
                     ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
                     : "bg-white/5 border-white/10 text-white/70"
                     }`}>
-                    <plan.icon className="w-6 h-6" />
+                    <AppIcon name={plan.icon} size={24} />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white tracking-tight">
@@ -175,7 +175,7 @@ export function PricingSection() {
                     }`}
                 >
                   {plan.cta}
-                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                  <AppIcon name="ArrowRight" size={20} className="group-hover/btn:translate-x-1 transition-transform" />
                 </button>
 
                 <div className="mt-10 pt-8 border-t border-white/10">
@@ -187,7 +187,7 @@ export function PricingSection() {
                       <li key={f} className="flex items-start gap-3 text-sm font-medium text-white/70">
                         <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${plan.highlight ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60"
                           }`}>
-                          <Check className="w-3 h-3" strokeWidth={3} />
+                          <AppIcon name="Check" size={12} />
                         </div>
                         <span className="leading-snug">{f}</span>
                       </li>
