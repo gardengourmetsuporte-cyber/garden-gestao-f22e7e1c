@@ -171,7 +171,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       {/* ======= Mobile Header with Navy Brand Strip ======= */}
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-50"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+        }}
       >
         {/* Navy gradient brand bar */}
         <div
