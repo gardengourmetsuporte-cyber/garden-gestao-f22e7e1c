@@ -1,29 +1,56 @@
 
 
-## Plano: CRM Inteligente — Regras de Pontos, Segmentação Automática e Preparação para Integração
+## Plano: Fortalecer Núcleo do CRM — Service Layer, Normalização e Unicidade
 
-### ✅ Implementado
+### Contexto
+Hoje a lógica de clientes está dispersa entre hooks, edge functions e páginas. Telefone não é normalizado consistentemente, e não existe garantia de unicidade. Precisamos centralizar antes de escalar.
 
-#### 1. Trigger automático de score + pontos (Migration)
-- Trigger `trg_customer_loyalty` criado no banco
-- Toda vez que `total_spent` ou `total_orders` é atualizado em `customers`, automaticamente:
-  - Recalcula score/segment via `recalculate_customer_score()`
-  - Recalcula `loyalty_points` com base nas `loyalty_rules` ativas (tipo `points_per_real`)
+### 1. Criar `src/lib/normalizePhone.ts`
+Helper puro que:
+- Remove todos os caracteres não-numéricos
+- Garante prefixo `55` (Brasil)
+- Remove nono dígito duplicado se necessário
+- Retorna `null` se inválido (menos de 10 dígitos)
+- Usado em todos os pontos de entrada: `CustomerSheet`, `import-daily-sales`, `DigitalMenu` roleta
 
-#### 2. Endpoint de importação de vendas diárias (Edge Function)
-- `import-daily-sales` criado e deployado
-- Aceita CSV flexível (`;` ou `,`) com colunas: nome, telefone, valor, data
-- Faz upsert do cliente por telefone/nome
-- Incrementa `total_spent` e `total_orders`
-- O trigger cuida do resto (score + pontos)
-- Botão "Importar vendas (Colibri)" adicionado na página de Clientes
+### 2. Criar `src/lib/customerService.ts`
+Funções puras e reutilizáveis:
 
-#### 3. Roleta → Captura obrigatória de dados
-- Nome e telefone agora são campos obrigatórios antes de girar
-- Ao registrar a jogada, faz upsert do cliente com `origin: 'mesa'`
-- Máscara de telefone aplicada no input
+```typescript
+normalizePhone(raw: string): string | null
+calcularScore(customer): { score, segment, visit_frequency_days }
+registrarCompra(customerId, valor, date?): Promise<void>  // via supabase update + trigger cuida do resto
+```
 
-#### 4. Exibir regra de pontos no detalhe do cliente
-- `CustomerDetail` agora mostra regras ativas de fidelidade
-- Regra `points_per_real`: "⭐ X pts a cada R$Y gasto"
-- Regra `orders_for_free`: progresso visual com barra até o próximo grátis
+- `calcularScore` replica a lógica RFM do banco (`recalculate_customer_score`) no frontend para preview/validação
+- `registrarCompra` faz `update` incremental no `total_spent`, `total_orders`, `last_purchase_at` — o trigger `trg_customer_loyalty` já cuida de recalcular score e pontos automaticamente
+
+### 3. Migration: Unique constraint no telefone normalizado
+```sql
+CREATE UNIQUE INDEX idx_customers_unit_phone 
+ON customers (unit_id, phone) 
+WHERE phone IS NOT NULL AND phone != '';
+```
+Isso garante que não existam duplicatas por telefone dentro da mesma unidade.
+
+### 4. Aplicar `normalizePhone` em todos os pontos de entrada
+- **`CustomerSheet.tsx`**: Normalizar antes de salvar
+- **`import-daily-sales/index.ts`**: Usar mesma lógica de normalização no backend
+- **`DigitalMenu.tsx`** (roleta): Já normaliza parcialmente, usar helper consistente
+- **`useCustomers.ts`** (`createCustomer`/`updateCustomer`): Normalizar phone antes do insert/update
+
+### 5. Adicionar `registrarCompra` ao hook `useCustomerCRM`
+Nova mutation que chama o service, incrementando dados e deixando o trigger do banco fazer o resto (score + pontos).
+
+### Arquivos novos
+- `src/lib/normalizePhone.ts`
+- `src/lib/customerService.ts`
+
+### Arquivos editados
+- `src/components/customers/CustomerSheet.tsx` — normalizar telefone no submit
+- `src/hooks/useCustomers.ts` — normalizar phone no create/update
+- `src/hooks/useCustomerCRM.ts` — adicionar mutation `registrarCompra`
+- `supabase/functions/import-daily-sales/index.ts` — usar normalização consistente
+- `src/pages/DigitalMenu.tsx` — usar `normalizePhone` do helper
+- Migration SQL para unique index
+
