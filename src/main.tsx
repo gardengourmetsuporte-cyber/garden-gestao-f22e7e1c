@@ -6,33 +6,41 @@ import "./index.css";
 
 // Force update: when a new service worker is installed, reload immediately
 if ('serviceWorker' in navigator) {
-  // Force reload when new SW takes control
+  const forceActivate = (reg: ServiceWorkerRegistration) => {
+    if (reg.waiting) {
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+  };
+
+  // Reload when a new SW takes control
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     window.location.reload();
   });
 
-  // Aggressively update any waiting or installing SW
-  navigator.serviceWorker.getRegistration().then((reg) => {
-    if (!reg) return;
-    
-    // If there's a waiting SW, skip waiting immediately
-    if (reg.waiting) {
-      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-    }
+  // Wait until the SW is fully ready (more reliable on iOS/Safari)
+  navigator.serviceWorker.ready
+    .then((reg) => {
+      forceActivate(reg);
 
-    // Watch for new SW installations
-    reg.addEventListener('updatefound', () => {
-      const newSW = reg.installing;
-      newSW?.addEventListener('statechange', () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          newSW.postMessage({ type: 'SKIP_WAITING' });
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW?.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            newSW.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
+      // Check updates on load + when returning to app
+      reg.update().catch(() => {});
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          reg.update().catch(() => {});
+          forceActivate(reg);
         }
       });
-    });
-
-    // Force check for updates every time app loads
-    reg.update().catch(() => {});
-  });
+    })
+    .catch(() => {});
 }
 
 // Fix: prevent page jump when virtual keyboard opens on iOS/mobile
