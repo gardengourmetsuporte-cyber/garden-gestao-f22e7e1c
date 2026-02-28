@@ -24,6 +24,7 @@ const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ d
 const LazyChecklist = lazy(() => import('./ChecklistDashboardWidget').then(m => ({ default: m.ChecklistDashboardWidget })));
 const LazyAgenda = lazy(() => import('./AgendaDashboardWidget').then(m => ({ default: m.AgendaDashboardWidget })));
 const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
+const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ default: m.AutoOrderWidget })));
 
 function WidgetSkeleton() {
   return <Skeleton className="h-32 w-full rounded-2xl" />;
@@ -98,6 +99,10 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
   'pending-orders': ({ hasAccess }) => {
     if (!hasAccess('orders')) return null;
     return <PendingOrdersWidget />;
+  },
+  'auto-order': ({ hasAccess }) => {
+    if (!hasAccess('inventory')) return null;
+    return <LazySection><LazyAutoOrder /></LazySection>;
   },
   'pending-actions': ({ hasAccess, stats, navigate }) => {
     if (!hasAccess('rewards')) return null;

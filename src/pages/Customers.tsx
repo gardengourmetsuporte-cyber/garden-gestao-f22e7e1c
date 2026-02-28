@@ -18,6 +18,7 @@ import { useCustomerCRM, useCustomerEvents } from '@/hooks/useCustomerCRM';
 import { EmptyState } from '@/components/ui/empty-state';
 import type { Customer, CustomerSegment } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
+import { BirthdayAlerts } from '@/components/customers/BirthdayAlerts';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { cn } from '@/lib/utils';
 import {
@@ -157,6 +158,9 @@ export default function Customers() {
           <span>Ticket R${stats.avgTicket.toFixed(0)}</span>
           <span>Retorno {stats.returnRate.toFixed(0)}%</span>
         </div>
+
+        {/* Birthday alerts */}
+        <BirthdayAlerts customers={customers} />
 
         {/* Search + Segment filter inline */}
         <div className="flex gap-2">
