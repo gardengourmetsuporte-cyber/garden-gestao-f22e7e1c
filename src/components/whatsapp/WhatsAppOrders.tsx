@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { useWhatsAppOrders } from '@/hooks/useWhatsApp';
+import { useWhatsAppOrders, useRecoverCarts } from '@/hooks/useWhatsApp';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ const statusMap: Record<string, { label: string; class: string }> = {
 
 export function WhatsAppOrders() {
   const { orders, isLoading, updateOrderStatus } = useWhatsAppOrders();
+  const recoverCarts = useRecoverCarts();
 
   if (isLoading) return <div className="text-center py-10 text-muted-foreground">Carregando...</div>;
 
@@ -28,6 +29,19 @@ export function WhatsAppOrders() {
 
   return (
     <div className="p-4 space-y-3">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-medium text-foreground">Pedidos via WhatsApp</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+          onClick={() => recoverCarts.mutate()}
+          disabled={recoverCarts.isPending}
+        >
+          <AppIcon name="RefreshCcw" className={cn("w-3.5 h-3.5", recoverCarts.isPending && "animate-spin")} />
+          {recoverCarts.isPending ? "Processando..." : "Recuperar Carrinhos"}
+        </Button>
+      </div>
       {orders.map(order => {
         const st = statusMap[order.status] || statusMap.draft;
         return (

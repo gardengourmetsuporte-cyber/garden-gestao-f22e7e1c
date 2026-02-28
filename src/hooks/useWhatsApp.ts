@@ -216,6 +216,29 @@ export function useWhatsAppOrders() {
   return { ...query, orders: query.data || [], updateOrderStatus };
 }
 
+export function useRecoverCarts() {
+  const { activeUnitId } = useUnit();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('whatsapp-recover-carts', {
+        body: { unit_id: activeUnitId },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['whatsapp-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['whatsapp-conversations'] });
+      toast({ title: 'Recuperação Iniciada', description: `${data.recovered_count || 0} mensagens enviadas.` });
+    },
+    onError: (err: any) => {
+      toast({ title: 'Erro ao recuperar carrinhos', description: err.message, variant: 'destructive' });
+    },
+  });
+}
+
 // ============ AI LOGS ============
 
 export function useWhatsAppLogs(conversationId?: string) {
