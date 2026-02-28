@@ -202,7 +202,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 pt-3 pb-4 border-t border-border bg-background/80 backdrop-blur-md flex gap-2">
+            <div className="sticky bottom-0 pt-3 pb-4 flex gap-2">
               {editingTask && onDelete && (
                 <Button type="button" variant="destructive" className="h-12 rounded-xl" onClick={handleDelete}>
                   Excluir
