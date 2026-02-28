@@ -1085,18 +1085,72 @@
     to { opacity: 1; }
   }
 
+  /* ── Modern Page Transitions (Linear / iOS inspired) ── */
+
   .animate-page-enter {
-    animation: pageEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: pageEnterFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  @keyframes pageEnter {
+  /* Crossfade — lateral navigation (same depth) */
+  .page-enter-fade {
+    animation: pageEnterFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Forward — drilling deeper into content */
+  .page-enter-forward {
+    animation: pageEnterForward 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  /* Back — returning to parent */
+  .page-enter-back {
+    animation: pageEnterBack 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  @keyframes pageEnterFade {
     from {
       opacity: 0;
-      transform: translateY(8px) scale(0.998);
+      transform: scale(0.985);
+      filter: blur(2px);
+    }
+    40% {
+      filter: blur(0);
     }
     to {
       opacity: 1;
       transform: none;
+      filter: none;
+    }
+  }
+
+  @keyframes pageEnterForward {
+    from {
+      opacity: 0;
+      transform: translateX(24px) scale(0.97);
+      filter: blur(3px);
+    }
+    50% {
+      filter: blur(0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  @keyframes pageEnterBack {
+    from {
+      opacity: 0;
+      transform: translateX(-16px) scale(0.98);
+      filter: blur(2px);
+    }
+    50% {
+      filter: blur(0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
     }
   }
 
