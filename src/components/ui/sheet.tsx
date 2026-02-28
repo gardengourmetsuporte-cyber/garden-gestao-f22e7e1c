@@ -16,15 +16,17 @@ interface SheetProps {
   onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
   modal?: boolean;
+  /** When true, mobile drawer can only be closed via handle bar (not by dragging content) */
+  mobileHandleOnly?: boolean;
 }
 
-const Sheet = ({ children, ...props }: SheetProps) => {
+const Sheet = ({ children, mobileHandleOnly, ...props }: SheetProps) => {
   const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
       <SheetMobileContext.Provider value={true}>
-        <DrawerPrimitive.Root {...props}>
+        <DrawerPrimitive.Root handleOnly={mobileHandleOnly} {...props}>
           {children}
         </DrawerPrimitive.Root>
       </SheetMobileContext.Provider>
