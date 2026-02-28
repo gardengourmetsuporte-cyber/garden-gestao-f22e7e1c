@@ -14,7 +14,7 @@ import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
 import { TimeBlocksView } from '@/components/agenda/TimeBlocksView';
-import { CategoryChips } from '@/components/agenda/CategoryChips';
+import { CategoryFilter } from '@/components/agenda/CategoryFilter';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -229,7 +229,7 @@ export default function Agenda() {
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl card-surface hover:bg-secondary/70 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-background" style={{ backgroundColor: category.color, boxShadow: `0 0 8px ${category.color}40` }} />
+                    <span className="material-symbols-rounded shrink-0" style={{ fontSize: 20, color: category.color }}>{category.icon || 'label'}</span>
                     <span className="font-semibold text-sm text-foreground">{category.name}</span>
                     <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">{catTasks.length}</span>
                   </div>
@@ -375,9 +375,9 @@ export default function Agenda() {
             </button>
           </div>
 
-          {/* Category filter chips */}
+          {/* Category filter */}
           {viewMode === 'list' && categories.length > 0 && (
-            <CategoryChips
+            <CategoryFilter
               categories={categories}
               selectedCategoryId={selectedCategoryId}
               onSelectCategory={setSelectedCategoryId}
