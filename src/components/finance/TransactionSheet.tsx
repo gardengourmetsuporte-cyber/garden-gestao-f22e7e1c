@@ -875,7 +875,7 @@ export function TransactionSheet({
                 variant="outline"
                 onClick={handleSaveAndContinue}
                 disabled={isLoading}
-                className="w-full h-12 mb-2"
+                className="w-full h-12 mb-2 bg-transparent"
               >
                 Salvar e continuar
               </Button>
