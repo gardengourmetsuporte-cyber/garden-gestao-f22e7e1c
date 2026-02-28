@@ -491,7 +491,7 @@ export function ChecklistView({
                             }}
                             disabled={isContested ? true : (isAdmin || completion?.completed_by === currentUserId) ? false : !canToggle}
                             className={cn(
-                              "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
+                              "w-full flex items-start gap-3 p-3 rounded-xl transition-all duration-300",
                               isContested
                                 ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
                                 : !canToggle && !isAdmin && "cursor-not-allowed opacity-80",
@@ -505,59 +505,55 @@ export function ChecklistView({
                             style={{ animationDelay: `${itemIndex * 40}ms` }}
                           >
                             <div className={cn(
-                              "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
+                              "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white shadow-md transition-all duration-300 mt-0.5",
                               isContested ? "bg-amber-500 shadow-amber-500/30"
                                 : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
                               isJustCompleted && "scale-125"
                             )}>
-                              {isContested ? <AlertTriangle className="w-5 h-5" /> : wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
+                              {isContested ? <AlertTriangle className="w-4 h-4" /> : wasSkipped ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                             </div>
-                            <div className="flex-1 text-left">
-                              <div className="flex items-center gap-2">
-                                <p className={cn("font-medium line-through", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
-                                {isLockedByOther && !isContested && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                            <div className="flex-1 min-w-0 text-left">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className={cn("font-medium line-through text-sm leading-tight", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
+                                <div className={cn(
+                                  "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
+                                  isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                    : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                    : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
+                                )}
+                                style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
+                                  backgroundColor: getItemPointsColors(pointsAwarded).bg,
+                                  color: getItemPointsColors(pointsAwarded).color,
+                                  borderColor: getItemPointsColors(pointsAwarded).border,
+                                } : undefined}>
+                                  {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
+                                    : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
+                                    : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
+                                    : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
+                                </div>
                               </div>
                               {isContested && contestedReason && (
                                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Contestado: {contestedReason}</p>
                               )}
-                              {item.description && !isContested && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                              {item.description && !isContested && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.description}</p>}
                               {completion && (
-                                <>
-                                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                  <User className="w-3 h-3" />
-                                  <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
-                                  {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
-                                  {!isContested && wasSkipped && <span className="text-destructive ml-1">(não concluído)</span>}
-                                  {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
-                                  {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
+                                <div className="flex items-center gap-1 mt-1 text-[11px] text-muted-foreground flex-wrap">
+                                  <User className="w-3 h-3 shrink-0" />
+                                  <span className="truncate">{completion.profile?.full_name || 'Usuário'} · {format(new Date(completion.completed_at), 'HH:mm')}</span>
+                                  {isContested && <span className="text-amber-600 dark:text-amber-400">(contestado)</span>}
+                                  {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary">(já pronto)</span>}
+                                  {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary">👥 {count}</span> : null; })()}
+                                  {(completion as any)?.photo_url && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
+                                      className="flex items-center gap-0.5 text-primary hover:underline"
+                                    >
+                                      <Camera className="w-3 h-3" />
+                                      <span>foto</span>
+                                    </button>
+                                  )}
                                 </div>
-                                {(completion as any)?.photo_url && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
-                                    className="mt-1.5 flex items-center gap-1.5 text-xs text-primary hover:underline"
-                                  >
-                                    <Camera className="w-3 h-3" />
-                                    <span>Ver foto</span>
-                                  </button>
-                                )}
-                                </>
                               )}
-                            </div>
-                            <div className={cn(
-                              "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
-                              isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                                : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
-                                : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
-                            )}
-                            style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
-                              backgroundColor: getItemPointsColors(pointsAwarded).bg,
-                              color: getItemPointsColors(pointsAwarded).color,
-                              borderColor: getItemPointsColors(pointsAwarded).border,
-                            } : undefined}>
-                              {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
-                                : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
-                                : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
-                                : (<div className="flex items-center gap-0.5"><Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
                             </div>
                           </button>
                           {/* Inline panel for completed items (admin or own completion) */}
@@ -900,7 +896,7 @@ export function ChecklistView({
                                     }}
                                     disabled={isContested ? true : (isAdmin || completion?.completed_by === currentUserId) ? false : !canToggle}
                                     className={cn(
-                                      "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-300",
+                                      "w-full flex items-start gap-3 p-3 rounded-xl transition-all duration-300",
                                       isContested
                                         ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
                                         : !canToggle && !isAdmin && "cursor-not-allowed opacity-80",
@@ -914,66 +910,62 @@ export function ChecklistView({
                                     style={{ animationDelay: `${itemIndex * 40}ms` }}
                                   >
                                     <div className={cn(
-                                      "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-lg transition-all duration-300",
+                                      "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white shadow-md transition-all duration-300 mt-0.5",
                                       isContested ? "bg-amber-500 shadow-amber-500/30"
                                         : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
                                       isJustCompleted && "scale-125"
                                     )}>
-                                      {isContested ? <AlertTriangle className="w-5 h-5" /> : wasSkipped ? <X className="w-5 h-5" /> : <Check className="w-5 h-5" />}
+                                      {isContested ? <AlertTriangle className="w-4 h-4" /> : wasSkipped ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                                     </div>
-                                    <div className="flex-1 text-left">
-                                      <div className="flex items-center gap-2">
-                                        <p className={cn("font-medium line-through", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
-                                        {isLockedByOther && !isContested && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                                    <div className="flex-1 min-w-0 text-left">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <p className={cn("font-medium line-through text-sm leading-tight", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
+                                        <div className={cn(
+                                          "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
+                                          isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                            : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                            : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
+                                        )}
+                                        style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
+                                          backgroundColor: getItemPointsColors(pointsAwarded).bg,
+                                          color: getItemPointsColors(pointsAwarded).color,
+                                          borderColor: getItemPointsColors(pointsAwarded).border,
+                                        } : undefined}>
+                                          {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
+                                            : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
+                                            : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
+                                            : (<div className="flex items-center gap-0.5">
+                                                {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
+                                                  const colors = getItemPointsColors(pointsAwarded);
+                                                  return <Star key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
+                                                })}
+                                                {isBonus && <Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
+                                                <span className="ml-0.5">+{pointsAwarded}</span>
+                                              </div>)}
+                                        </div>
                                       </div>
                                       {isContested && contestedReason && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Contestado: {contestedReason}</p>
                                       )}
-                                      {item.description && !isContested && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                                      {item.description && !isContested && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.description}</p>}
                                       {completion && (
-                                        <>
-                                        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                                          <User className="w-3 h-3" />
-                                          <span>{completion.profile?.full_name || 'Usuário'} às {format(new Date(completion.completed_at), 'HH:mm')}</span>
-                                          {isContested && <span className="text-amber-600 dark:text-amber-400 ml-1">(contestado)</span>}
-                                          {!isContested && wasSkipped && <span className="text-destructive ml-1">(não concluído)</span>}
-                                          {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary ml-1">(já pronto)</span>}
-                                          {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary ml-1">👥 {count} participantes</span> : null; })()}
+                                        <div className="flex items-center gap-1 mt-1 text-[11px] text-muted-foreground flex-wrap">
+                                          <User className="w-3 h-3 shrink-0" />
+                                          <span className="truncate">{completion.profile?.full_name || 'Usuário'} · {format(new Date(completion.completed_at), 'HH:mm')}</span>
+                                          {isContested && <span className="text-amber-600 dark:text-amber-400">(contestado)</span>}
+                                          {!isContested && !wasSkipped && !wasAwardedPoints && <span className="text-primary">(já pronto)</span>}
+                                          {(() => { const count = getItemCompletionCount(item.id); return count > 1 ? <span className="text-primary">👥 {count}</span> : null; })()}
+                                          {(completion as any)?.photo_url && (
+                                            <button
+                                              onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
+                                              className="flex items-center gap-0.5 text-primary hover:underline"
+                                            >
+                                              <Camera className="w-3 h-3" />
+                                              <span>foto</span>
+                                            </button>
+                                          )}
                                         </div>
-                                        {(completion as any)?.photo_url && (
-                                          <button
-                                            onClick={(e) => { e.stopPropagation(); setViewingPhotoUrl((completion as any).photo_url); }}
-                                            className="mt-1.5 flex items-center gap-1.5 text-xs text-primary hover:underline"
-                                          >
-                                            <Camera className="w-3 h-3" />
-                                            <span>Ver foto</span>
-                                          </button>
-                                        )}
-                                        </>
                                       )}
-                                    </div>
-                                    <div className={cn(
-                                      "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-300",
-                                      isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                                        : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
-                                        : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
-                                    )}
-                                    style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
-                                      backgroundColor: getItemPointsColors(pointsAwarded).bg,
-                                      color: getItemPointsColors(pointsAwarded).color,
-                                      borderColor: getItemPointsColors(pointsAwarded).border,
-                                    } : undefined}>
-                                      {isContested ? (<><AlertTriangle className="w-3 h-3" /><span>contestado</span></>)
-                                        : wasSkipped ? (<><X className="w-3 h-3" /><span>não concluído</span></>) 
-                                        : !wasAwardedPoints ? (<><RefreshCw className="w-3 h-3" /><span>pronto</span></>) 
-                                        : (<div className="flex items-center gap-0.5">
-                                            {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
-                                              const colors = getItemPointsColors(pointsAwarded);
-                                              return <Star key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
-                                            })}
-                                            {isBonus && <Zap className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
-                                            <span className="ml-0.5">+{pointsAwarded}</span>
-                                          </div>)}
                                     </div>
                                   </button>
                                   {/* Inline panel for completed items (admin or own completion) */}
