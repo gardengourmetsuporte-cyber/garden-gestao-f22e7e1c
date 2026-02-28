@@ -1,45 +1,70 @@
 
-## Plano: Widget de Insights com IA no Dashboard
 
-### Visão geral
-Criar um widget compacto no dashboard que exibe 2-4 cards de insights gerados pela IA, baseados nos dados reais da operação (financeiro, estoque, checklists, equipe). Os insights são carregados em background e atualizados a cada 10 minutos.
+## Plano: CRM Inteligente — Regras de Pontos, Segmentação Automática e Preparação para Integração
 
-### 1. Nova Edge Function: `ai-insights`
-- Reutiliza o mesmo padrão de autenticação JWT da `management-ai`
-- Consulta dados operacionais (saldo, estoque crítico, despesas pendentes, checklists, boletos vencendo, comparativo mensal)
-- Envia snapshot compacto para a IA (gemini-2.5-flash-lite - mais rápido/barato)
-- Pede exatamente 3-4 insights curtos em formato JSON via tool calling
-- Cada insight: `{ emoji, title, description, action_route? }`
-- Cache de 10min via `staleTime` no React Query
+### Diagnóstico confirmado
+- **A) Pontos**: `loyalty_points` existe no banco mas nunca é calculado automaticamente. O botão "Adicionar Pontos" só soma +10 fixo manualmente.
+- **B) Segmentação**: `recalculate_customer_score()` existe mas só roda manualmente via botão "Recalcular Scores" nas configurações.
+- **C) Integração**: Já existe import CSV via Edge Function (`import-customers-csv`). Falta um endpoint para receber CSV diário do Colibri com dados de vendas (não só cadastro).
+- **D) Roleta → Captura**: A roleta (`SlotMachine`) pede `order_id` e `customer_name` opcionais, mas não exige cadastro de telefone/email.
 
-### 2. Novo hook: `useAIInsights`
-- Chama a edge function `ai-insights` via `supabase.functions.invoke`
-- React Query com `staleTime: 10 * 60 * 1000`
-- Retorna array de insights tipados
+### Etapas de implementação
 
-### 3. Novo componente: `AIInsightsWidget`
-- Cards minimalistas com emoji, título curto (1 linha) e descrição (1-2 linhas)
-- Tap no card navega para a rota relevante (finance, inventory, etc.)
-- Skeleton shimmer enquanto carrega
-- Sem estado expandido/colapsado - sempre visível e compacto
+#### 1. Trigger automático de score + pontos (Migration)
+Criar trigger no banco que, toda vez que `total_spent` ou `total_orders` for atualizado em `customers`, automaticamente:
+- Recalcula score/segment via `recalculate_customer_score()`
+- Recalcula `loyalty_points` com base nas `loyalty_rules` ativas (tipo `points_per_real`):
+  - `loyalty_points = floor(total_spent / threshold) * reward_value`
 
-### 4. Integrar no Dashboard
-- Adicionar `'ai-insights'` ao `DEFAULT_WIDGETS` em `useDashboardWidgets`
-- Adicionar renderer no `WIDGET_RENDERERS` do `AdminDashboard`
-- Posicionar logo após o SetupChecklistWidget (antes dos outros widgets)
+Isso elimina o cálculo manual e garante que pontos reflitam gastos reais.
 
-### Estrutura dos insights esperados
-```text
-┌─────────────────────────────────┐
-│ 💡 Insights da IA               │
-├─────────────────────────────────┤
-│ 📉 Margem caiu 12%             │
-│ Despesas subiram vs mês passado │
-│                                 │
-│ ⚠️ 5 itens em estoque crítico  │
-│ Picanha e Alcatra quase zerando │
-│                                 │
-│ 💰 R$2.400 em contas vencendo  │
-│ 3 boletos nos próximos 5 dias  │
-└─────────────────────────────────┘
+#### 2. Endpoint de importação de vendas diárias (Edge Function)
+Criar `import-daily-sales` que aceita CSV do Colibri com colunas tipo: `nome, telefone, valor, data`.
+- Faz upsert do cliente por telefone
+- Soma `total_spent` e `total_orders`
+- Atualiza `last_purchase_at`
+- O trigger do passo 1 cuida do resto (score + pontos)
+
+#### 3. Roleta → Captura obrigatória de dados
+Modificar o fluxo da roleta (`useGamification` + UI) para exigir `nome` + `telefone` antes de girar:
+- Ao registrar a jogada, fazer upsert do cliente com `origin: 'mesa'` se não existir
+- Vincular `gamification_plays.customer_name` ao cliente real
+
+#### 4. Exibir regra de pontos no detalhe do cliente
+No `CustomerDetail`, mostrar a regra ativa (ex: "1 pt a cada R$1 gasto") e o progresso até próximo resgate, usando dados das `loyalty_rules`.
+
+### Detalhes técnicos
+
+**Migration SQL (trigger):**
+```sql
+CREATE OR REPLACE FUNCTION auto_update_customer_loyalty()
+RETURNS trigger AS $$
+DECLARE v_rule RECORD;
+BEGIN
+  -- Recalculate RFM score
+  PERFORM recalculate_customer_score(NEW.id);
+  -- Recalculate loyalty_points from active rules
+  SELECT * INTO v_rule FROM loyalty_rules
+    WHERE unit_id = NEW.unit_id AND rule_type = 'points_per_real' AND is_active = true LIMIT 1;
+  IF FOUND THEN
+    UPDATE customers SET loyalty_points = floor(NEW.total_spent / v_rule.threshold) * v_rule.reward_value
+    WHERE id = NEW.id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER trg_customer_loyalty
+AFTER UPDATE OF total_spent, total_orders ON customers
+FOR EACH ROW EXECUTE FUNCTION auto_update_customer_loyalty();
 ```
+
+**Edge Function `import-daily-sales`:**
+- Recebe CSV com vendas do dia
+- Para cada linha: upsert cliente por telefone, incrementa `total_spent` e `total_orders`
+- Botão na página de Clientes para upload manual enquanto automação não existe
+
+**Roleta — campos obrigatórios:**
+- Adicionar campos `nome` e `telefone` obrigatórios no formulário antes do spin
+- Upsert em `customers` com `origin: 'mesa'`
+
