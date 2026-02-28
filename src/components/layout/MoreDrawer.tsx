@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -16,6 +16,7 @@ import { MODULE_REQUIRED_PLAN, PRODUCTION_MODULES, planSatisfies } from '@/lib/p
 import type { PlanTier } from '@/lib/plans';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { toast } from 'sonner';
+import { BottomBarTabPicker } from '@/components/settings/BottomBarTabPicker';
 
 interface NavItem {
   icon: string;
@@ -58,6 +59,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
   
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
+  const [tabPickerOpen, setTabPickerOpen] = useState(false);
 
   const hasAccessLevel = allowedModules !== null && allowedModules !== undefined;
 
@@ -130,6 +132,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
   return (
     <>
+      <BottomBarTabPicker open={tabPickerOpen} onOpenChange={setTabPickerOpen} />
       {/* Overlay — covers entire screen including behind bottom bar */}
       <div
         className="fixed inset-0 z-40 bg-black/60 animate-fade-in"
@@ -313,6 +316,16 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
 
           {/* Settings + Logout — Meta style */}
           <div className="space-y-1.5 mt-2">
+            <button
+              onClick={() => setTabPickerOpen(true)}
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-secondary/50 hover:bg-secondary active:bg-secondary/80 transition-all"
+            >
+              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+                <AppIcon name="Settings2" size={18} className="text-foreground/70" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Personalizar barra inferior</span>
+              <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
+            </button>
             {(
               <button
                 onClick={() => { navigate('/settings'); onOpenChange(false); }}

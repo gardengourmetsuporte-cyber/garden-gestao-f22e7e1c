@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useUserModules } from '@/hooks/useAccessLevels';
+import { useBottomBarTabs } from '@/hooks/useBottomBarTabs';
 import { useFabContext } from '@/contexts/FabActionContext';
 import { MoreDrawer } from './MoreDrawer';
 import { QuickActionSheet } from './QuickActionSheet';
@@ -22,25 +23,13 @@ interface TabDef {
   moduleKey: string;
 }
 
-const DEFAULT_TABS: TabDef[] = [
-  { key: 'home', icon: 'Home', label: 'Início', path: '/', moduleKey: 'dashboard' },
-  { key: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', path: '/checklists', moduleKey: 'checklists' },
-  { key: 'finance', icon: 'DollarSign', label: 'Financeiro', path: '/finance', moduleKey: 'finance' },
-];
+const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/', moduleKey: 'dashboard' };
 
 // Custom tabs when inside CardapioHub
 const CARDAPIO_TABS: TabDef[] = [
-  { key: 'home', icon: 'Home', label: 'Início', path: '/', moduleKey: 'dashboard' },
+  HOME_TAB,
   { key: 'cardapio', icon: 'BookOpen', label: 'Cardápio', path: '/cardapio', moduleKey: 'cardapio' },
   { key: 'pedidos', icon: 'ShoppingBag', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
-];
-
-const FALLBACK_TABS: TabDef[] = [
-  { key: 'inventory', icon: 'Package', label: 'Estoque', path: '/inventory', moduleKey: 'inventory' },
-  { key: 'agenda', icon: 'CalendarDays', label: 'Agenda', path: '/agenda', moduleKey: 'agenda' },
-  { key: 'employees', icon: 'Users', label: 'Equipe', path: '/employees', moduleKey: 'employees' },
-  { key: 'recipes', icon: 'ChefHat', label: 'Fichas', path: '/recipes', moduleKey: 'recipes' },
-  { key: 'cash-closing', icon: 'Receipt', label: 'Fechamento', path: '/cash-closing', moduleKey: 'cash-closing' },
 ];
 
 const HIDDEN_ROUTES = ['/finance'];
@@ -50,6 +39,7 @@ export function BottomTabBar() {
   const navigate = useNavigate();
   const { activeUnit } = useUnit();
   const { hasAccess } = useUserModules();
+  const { pinnedTabs } = useBottomBarTabs();
   const { fabAction } = useFabContext();
   const { plan } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -63,22 +53,15 @@ export function BottomTabBar() {
   const isCardapioRoute = location.pathname.startsWith('/cardapio');
 
   const resolvedTabs: TabDef[] = [];
-  const usedKeys = new Set<string>();
 
   if (isCardapioRoute) {
-    // Use custom cardápio tabs
     resolvedTabs.push(...CARDAPIO_TABS);
   } else {
-    for (const tab of DEFAULT_TABS) {
-      if (hasAccess(tab.moduleKey)) {
-        resolvedTabs.push(tab);
-        usedKeys.add(tab.key);
-      } else {
-        const fallback = FALLBACK_TABS.find(f => !usedKeys.has(f.key) && hasAccess(f.moduleKey));
-        if (fallback) {
-          resolvedTabs.push(fallback);
-          usedKeys.add(fallback.key);
-        }
+    resolvedTabs.push(HOME_TAB);
+    // Use pinned tabs from user preference, filtering by access
+    for (const pt of pinnedTabs) {
+      if (hasAccess(pt.moduleKey)) {
+        resolvedTabs.push(pt);
       }
     }
   }
