@@ -1901,11 +1901,11 @@
 
   .fab-gradient {
     background: linear-gradient(135deg,
-        hsl(224 45% 8%) 0%,
-        hsl(220 70% 16%) 30%,
-        hsl(234 75% 28%) 55%,
-        hsl(220 65% 18%) 75%,
-        hsl(224 45% 8%) 100%);
+        #050a05 0%,
+        #0a150a 30%,
+        rgba(16, 185, 129, 0.4) 55%,
+        #0a150a 75%,
+        #050a05 100%);
     background-size: 350% 350%;
     animation: navyCardFlow 12s ease-in-out infinite;
   }
@@ -1960,11 +1960,11 @@
   .tab-icon-galaxy {
     color: transparent !important;
     background: linear-gradient(135deg,
-        hsl(220 30% 15%) 0%,
-        hsl(225 40% 22%) 35%,
-        hsl(230 50% 30%) 55%,
-        hsl(225 35% 18%) 75%,
-        hsl(220 20% 12%) 100%);
+        #0a150a 0%,
+        #102a1a 35%,
+        #153f25 55%,
+        #102a1a 75%,
+        #0a150a 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -1975,9 +1975,9 @@
   .tab-icon-galaxy-text {
     color: transparent !important;
     background: linear-gradient(135deg,
-        hsl(220 25% 18%) 0%,
-        hsl(225 35% 25%) 50%,
-        hsl(220 20% 15%) 100%);
+        #0a150a 0%,
+        #102a1a 50%,
+        #0a150a 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -1988,12 +1988,12 @@
   /* Dark mode: light gradient on light card */
   .dark .tab-icon-galaxy {
     background: linear-gradient(135deg,
-        hsl(0 0% 95%) 0%,
-        hsl(0 0% 90%) 25%,
-        hsl(234 50% 85%) 45%,
-        hsl(234 60% 80%) 55%,
-        hsl(0 0% 92%) 70%,
-        hsl(0 0% 95%) 100%);
+        #e2e8f0 0%,
+        #f8fafc 25%,
+        rgba(16, 185, 129, 0.4) 45%,
+        rgba(16, 185, 129, 0.3) 55%,
+        #f8fafc 70%,
+        #e2e8f0 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -2003,9 +2003,9 @@
 
   .dark .tab-icon-galaxy-text {
     background: linear-gradient(135deg,
-        hsl(0 0% 92%) 0%,
-        hsl(234 40% 85%) 50%,
-        hsl(0 0% 93%) 100%);
+        #f8fafc 0%,
+        rgba(16, 185, 129, 0.6) 50%,
+        #f8fafc 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
