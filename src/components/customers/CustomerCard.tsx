@@ -18,7 +18,7 @@ export function CustomerCard({ customer, onEdit, onDelete }: Props) {
 
   return (
     <div
-      className="card-surface rounded-xl p-4 space-y-3 active:scale-[0.98] transition-transform cursor-pointer"
+      className="card-surface rounded-xl p-4 space-y-3 hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 active:scale-[0.98] transition-all duration-200 cursor-pointer"
       onClick={onEdit}
     >
       {/* Header */}

@@ -148,19 +148,18 @@ export function BottomTabBar() {
         {/* Subtle top separator */}
         <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
 
-        {/* Bar background — full width, edge to edge */}
+        {/* Bar background — full width, edge to edge with strong glassmorphism */}
         <div
-          className="relative"
+          className="relative bg-background/90 backdrop-blur-[32px]"
           style={{
-            background: 'hsl(var(--background))',
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
           {/* Animated ambient glow — clipped independently */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute inset-0 tabbar-ambient-glow" />
+            <div className="absolute inset-0 tabbar-ambient-glow opacity-60 mix-blend-screen" />
           </div>
-          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative">
+          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10">
             {/* No pill — active state is icon glow only */}
 
             {/* Left tabs */}
@@ -218,7 +217,7 @@ export function BottomTabBar() {
             ))}
 
             {/* "Mais" tab — 3-dot menu for cardápio, drawer for others */}
-{isCardapioRoute ? (
+            {isCardapioRoute ? (
               <button
                 onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }}
                 aria-label="Configurações"
@@ -229,15 +228,15 @@ export function BottomTabBar() {
                 <span className="text-[10px] font-normal text-muted-foreground">Config</span>
               </button>
             ) : (
-            <button
-              onClick={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }}
-              aria-label="Mais opções"
-              className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
-              style={{ width: '20%' }}
-            >
-              <AppIcon name="Menu" size={22} fill={0} className="text-muted-foreground transition-colors" />
-              <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
-            </button>
+              <button
+                onClick={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }}
+                aria-label="Mais opções"
+                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
+                style={{ width: '20%' }}
+              >
+                <AppIcon name="Menu" size={22} fill={0} className="text-muted-foreground transition-colors" />
+                <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
+              </button>
             )}
           </div>
         </div>
@@ -297,8 +296,8 @@ const TabButton = forwardRef<
       <div
         className="relative"
         style={{
-          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.1)' : 'scale(1)'),
-          transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.15)' : 'scale(1)'),
+          transition: bouncing ? 'transform 80ms cubic-bezier(0.2, 0, 0, 1)' : 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
         <AppIcon

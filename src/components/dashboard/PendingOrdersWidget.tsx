@@ -117,7 +117,7 @@ export function PendingOrdersWidget() {
               {/* Order row — tappable */}
               <button
                 onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                className="w-full flex items-center justify-between py-2.5 px-3 bg-secondary/50 hover:bg-secondary/80 transition-colors text-left"
+                className="w-full flex items-center justify-between py-2.5 px-3 bg-secondary/50 hover:bg-primary/5 active:scale-[0.98] transition-all duration-200 text-left"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <AppIcon name="Package" size={14} className="text-muted-foreground shrink-0" />
@@ -137,7 +137,7 @@ export function PendingOrdersWidget() {
                   <AppIcon
                     name="ChevronDown"
                     size={14}
-                    className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-180")}
+                    className={cn("text-muted-foreground transition-transform duration-300", isExpanded && "rotate-180")}
                   />
                 </div>
               </button>

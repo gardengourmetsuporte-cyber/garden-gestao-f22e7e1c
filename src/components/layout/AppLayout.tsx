@@ -178,9 +178,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         {/* Navy gradient brand bar */}
         <div
-          className="relative overflow-hidden"
+          className="relative overflow-hidden backdrop-blur-3xl"
           style={{
-            background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+            background: 'linear-gradient(135deg, hsl(224 45% 8% / 0.85) 0%, hsl(220 70% 16% / 0.85) 40%, hsl(234 75% 26% / 0.85) 70%, hsl(220 65% 16% / 0.85) 100%)',
           }}
         >
           {/* Animated ambient glow */}
@@ -237,12 +237,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       </header>
 
       {/* ======= Desktop Sidebar ======= */}
-      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card border-r border-border/20">
+      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card/60 backdrop-blur-3xl border-r border-border/10">
         {/* Navy brand header */}
         <div
-          className="relative overflow-hidden shrink-0"
+          className="relative overflow-hidden shrink-0 border-b border-border/10"
           style={{
-            background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
+            background: 'linear-gradient(135deg, hsl(224 45% 8% / 0.6) 0%, hsl(220 70% 16% / 0.6) 40%, hsl(234 75% 26% / 0.6) 70%, hsl(220 65% 16% / 0.6) 100%)',
           }}
         >
           <div className="flex items-center gap-3 px-4 h-16 relative z-10">
@@ -307,17 +307,20 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     onMouseEnter={() => void preloadRoute(targetHref)}
                     onTouchStart={() => void preloadRoute(targetHref)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all relative",
+                      "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all relative overflow-hidden group",
                       isActive
-                        ? "bg-primary/15 text-primary"
+                        ? "bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20"
                         : locked
-                          ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-secondary/30"
-                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                          ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-white/5"
+                          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                     )}
                   >
-                    <AppIcon name={item.icon} size={20} style={{ opacity: locked ? 0.5 : 1 }} />
-                    <span className="truncate flex-1">{item.label}</span>
-                    {locked && <AppIcon name="Lock" size={14} className="text-primary/60 shrink-0" />}
+                    {!isActive && !locked && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out pointer-events-none" />
+                    )}
+                    <AppIcon name={item.icon} size={20} style={{ opacity: locked ? 0.5 : 1 }} className="relative z-10" />
+                    <span className="truncate flex-1 relative z-10">{item.label}</span>
+                    {locked && <AppIcon name="Lock" size={14} className="text-primary/60 shrink-0 relative z-10" />}
                   </Link>
                 );
               })}
