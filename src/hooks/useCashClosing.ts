@@ -428,7 +428,14 @@ export function useCashClosing() {
       }
 
       await supabase.from('cash_closings' as any).update({ financial_integrated: true } as any).eq('id', closing.id);
-      toast.success(`${transactions.length} lançamentos financeiros criados`);
+      toast.success(`${transactions.length} lançamentos financeiros criados`, {
+        action: {
+          label: 'Ver no Financeiro',
+          onClick: () => {
+            window.location.href = '/finance';
+          },
+        },
+      });
     } catch (error) {
       console.error('Error integrating with financial:', error);
       toast.error('Erro ao integrar com financeiro');
