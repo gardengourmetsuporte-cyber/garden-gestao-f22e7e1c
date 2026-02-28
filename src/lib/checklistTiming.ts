@@ -42,8 +42,9 @@ function getSettingForType(type: ChecklistType, settings?: DeadlineSetting[] | n
   const custom = settings?.find(s => s.checklist_type === type);
   if (custom && custom.is_active === false) return null;
   if (custom) return custom;
-  // Fall back to default for abertura/fechamento
+  // Fall back to default — but respect is_active flag
   const def = DEFAULT_DEADLINES[type];
+  if (def && def.is_active === false) return null;
   return def || null;
 }
 
