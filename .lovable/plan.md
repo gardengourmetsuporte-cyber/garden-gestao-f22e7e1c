@@ -1,53 +1,54 @@
 
 
-## Diagnóstico
+## Design System Extraction: tuyo.com
 
-O bug de "abrir-sumir-abrir de novo" tem duas causas raiz no componente `PageTransition`:
+### Elementos identificados no tuyo.com
 
-1. **`key={location.pathname}`** na div wrapper força o React a desmontar e remontar todo o conteúdo da página a cada navegação. Isso mata Sheets/Drawers abertos e faz elementos piscarem.
+**Bottom Nav (o que o usuário mais gostou):**
+- Barra flutuante pill-shaped com `border-radius` total (~999px)
+- Fundo `rgba(30,30,30,0.9)` com `backdrop-blur`
+- 5 ícones com labels, botão central verde limão (#B4FF39) elevado e circular
+- Posicionada com margem inferior (~16px), não colada na borda
+- Sem borda visível, apenas sombra sutil
 
-2. **Dois `useEffect` concorrentes** ambos atualizando `displayChildren` — um para mudança de rota e outro para mudança de children na mesma rota. Isso causa renderizações duplas onde o conteúdo aparece, some, e reaparece.
+**Paleta geral:**
+- Background puro preto (#000000)
+- Cards: cinza escuro (#111 a #1a1a1a) com bordas sutis (#222)
+- Accent: verde limão (#B4FF39 / hsl(80 100% 61%))
+- Texto principal: branco puro
+- Texto secundário: branco/50-60%
 
-3. **Estado `displayChildren` desnecessário** — manter children em state cria uma camada extra de re-renders que propaga flickers por todo o sistema (Sheets, Drawers, modais).
+**Tipografia:**
+- Headlines extra-bold, tracking tight
+- Subtítulos em cor accent (verde limão) para destaque
+- Font sizes grandes (48-64px mobile hero)
 
-## Plano
+### Plano de implementação
 
-### 1. Simplificar o PageTransition radicalmente
+O foco principal será na **barra inferior flutuante** no estilo Tuyo, aplicada à `BottomTabBar` e `FinanceBottomNav` do app. Não vamos mudar a landing page inteira (o branding navy do Garden está consolidado), mas vamos incorporar o estilo da bottom nav.
 
-Remover o estado `displayChildren` e a lógica de `key` que força remount. Renderizar `children` diretamente e aplicar a animação de opacidade apenas via uma classe CSS transitória que é adicionada brevemente na mudança de rota:
+#### 1. Redesenhar BottomTabBar no estilo Tuyo
 
-```tsx
-export function PageTransition({ children, className }: PageTransitionProps) {
-  const location = useLocation();
-  const [animClass, setAnimClass] = useState('');
-  const prevPathRef = useRef(location.pathname);
+Arquivo: `src/components/layout/BottomTabBar.tsx`
 
-  useEffect(() => {
-    if (prevPathRef.current === location.pathname) return;
-    prevPathRef.current = location.pathname;
-    
-    setAnimClass('page-enter-fade');
-    const timer = setTimeout(() => setAnimClass(''), 300);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
+Mudanças:
+- Converter a barra de edge-to-edge para **floating pill** com `rounded-full` e margem horizontal/inferior
+- Remover o fundo `hsl(var(--background))` sólido e usar `bg-[#1a1a1a]/90 backdrop-blur-2xl`
+- FAB central mantém o gradiente navy mas ganha o estilo circular elevado do Tuyo (levemente maior, com sombra mais pronunciada)
+- Remover o separator `h-px` no topo
+- Adicionar `mx-4 mb-3` para flutuar acima da borda
 
-  return (
-    <div className={cn(animClass, className)}>
-      {children}
-    </div>
-  );
-}
-```
+#### 2. Aplicar mesmo estilo ao FinanceBottomNav
 
-Mudanças-chave:
-- Remove `key={location.pathname}` (não remonta mais a árvore inteira)
-- Remove estado `displayChildren` (sem renderizações fantasma)
-- Remove o segundo `useEffect` concorrente
-- A classe de animação é aplicada temporariamente e removida após 300ms
+Arquivo: `src/components/finance/FinanceBottomNav.tsx`
 
-### 2. Manter o CSS existente como está
+Mesmas mudanças de layout para manter consistência.
 
-As keyframes `pageEnterFade` com apenas opacity já estão corretas e não precisam de alteração.
+#### 3. Aplicar ao MenuBottomNav (cardápio digital)
 
-**Arquivo afetado:** `src/components/layout/PageTransition.tsx`
+Arquivo: `src/components/digital-menu/MenuBottomNav.tsx`
+
+Já tem estilo parecido (floating), ajustar para ficar idêntico aos outros.
+
+**Arquivos afetados:** 3 componentes de navegação inferior.
 
