@@ -26,13 +26,6 @@ import {
 
 const SEGMENTS: CustomerSegment[] = ['vip', 'frequent', 'occasional', 'inactive', 'new'];
 
-const STAT_ITEMS = [
-  { key: 'total', label: 'Total', icon: 'group', getValue: (s: any) => s.total },
-  { key: 'active', label: 'Ativos', icon: 'person_check', getValue: (s: any) => s.activeThisMonth },
-  { key: 'inactive', label: 'Inativos', icon: 'person_off', getValue: (s: any) => s.inactive },
-  { key: 'ticket', label: 'Ticket', icon: 'payments', getValue: (s: any) => `R$${s.avgTicket.toFixed(0)}` },
-  { key: 'return', label: 'Retorno', icon: 'sync', getValue: (s: any) => `${s.returnRate.toFixed(0)}%` },
-] as const;
 
 export default function Customers() {
   const { customers, isLoading, createCustomer, updateCustomer, deleteCustomer, importCSV } = useCustomers();
@@ -121,56 +114,16 @@ export default function Customers() {
   return (
     <AppLayout>
       <div className="px-4 py-3 lg:px-6 space-y-4 pb-24">
-        {/* Dashboard Stats */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
-          {STAT_ITEMS.map(s => (
-            <div key={s.key} className="shrink-0 min-w-[72px] flex-1 card-surface rounded-xl p-3 flex flex-col items-center gap-1">
-              <span className="material-symbols-rounded text-muted-foreground" style={{ fontSize: 18 }}>
-                {s.icon}
-              </span>
-              <p className="text-base font-bold leading-none">{s.getValue(stats)}</p>
-              <p className="text-[10px] text-muted-foreground leading-none">{s.label}</p>
-            </div>
-          ))}
+        {/* Compact stats row */}
+        <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span className="font-semibold text-foreground">{stats.total} clientes</span>
+          <span>{stats.activeThisMonth} ativos</span>
+          <span>{stats.inactive} inativos</span>
+          <span>Ticket R${stats.avgTicket.toFixed(0)}</span>
+          <span>Retorno {stats.returnRate.toFixed(0)}%</span>
         </div>
 
-        {/* Segment chips */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pt-1 pb-2">
-          <button
-            onClick={() => setSegmentFilter(null)}
-            style={!segmentFilter ? { background: 'var(--gradient-brand)' } : undefined}
-            className={cn(
-              'shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all',
-              !segmentFilter
-                ? 'text-primary-foreground shadow-md border border-primary/30'
-                : 'bg-card text-muted-foreground hover:text-foreground border border-border'
-            )}
-          >
-            Todos ({customers.length})
-          </button>
-          {SEGMENTS.map(seg => {
-            const cfg = SEGMENT_CONFIG[seg];
-            const isActive = segmentFilter === seg;
-            return (
-              <button
-                key={seg}
-                onClick={() => setSegmentFilter(isActive ? null : seg)}
-                style={isActive ? { background: 'var(--gradient-brand)' } : undefined}
-                className={cn(
-                  'shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5',
-                  isActive
-                    ? 'text-primary-foreground ring-1 ring-primary/40 shadow-md'
-                    : 'bg-card text-muted-foreground hover:text-foreground border border-border'
-                )}
-              >
-                <span className="material-symbols-rounded" style={{ fontSize: 14 }}>{cfg.icon}</span>
-                {cfg.label} ({segCounts[seg] || 0})
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search + Import */}
+        {/* Search + Segment filter inline */}
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: 18 }}>
@@ -178,6 +131,21 @@ export default function Customers() {
             </span>
             <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11" />
           </div>
+          <select
+            value={segmentFilter || ''}
+            onChange={e => setSegmentFilter((e.target.value || null) as CustomerSegment | null)}
+            className="h-11 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground appearance-none cursor-pointer min-w-[120px]"
+          >
+            <option value="">Todos ({customers.length})</option>
+            {SEGMENTS.map(seg => {
+              const cfg = SEGMENT_CONFIG[seg];
+              return (
+                <option key={seg} value={seg}>
+                  {cfg.label} ({segCounts[seg] || 0})
+                </option>
+              );
+            })}
+          </select>
           {segmentFilter && (
             <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => setCampaignOpen(true)} title="Enviar mensagem em massa">
               <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
