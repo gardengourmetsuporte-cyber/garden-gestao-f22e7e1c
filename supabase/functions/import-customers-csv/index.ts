@@ -109,7 +109,10 @@ Deno.serve(async (req) => {
     let inserted = 0;
     for (let i = 0; i < records.length; i += 100) {
       const chunk = records.slice(i, i + 100);
-      const { error } = await supabase.from('customers').insert(chunk);
+      const { error } = await supabase.from('customers').upsert(chunk, {
+        onConflict: 'unit_id,phone',
+        ignoreDuplicates: true,
+      });
       if (error) {
         console.error(`Chunk error at ${i}:`, error);
         return new Response(JSON.stringify({ error: error.message, inserted }), { status: 500, headers: corsHeaders });
