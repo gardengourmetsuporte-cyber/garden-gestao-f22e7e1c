@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isBefore, startOfDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -23,15 +23,20 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 
-  // Group tasks by date
+  // Group tasks by date — only pending tasks (for past days = overdue indicators)
   const tasksByDate = useMemo(() => {
+    const today = startOfDay(new Date());
     const map = new Map<string, ManagerTask[]>();
     tasks.forEach(task => {
-      if (task.due_date) {
-        const key = task.due_date;
-        if (!map.has(key)) map.set(key, []);
-        map.get(key)!.push(task);
-      }
+      if (!task.due_date) return;
+      const taskDate = new Date(task.due_date + 'T12:00:00');
+      const isPast = isBefore(taskDate, today) && !isToday(taskDate);
+      // Past days: only show pending (overdue). Today/future: show pending only.
+      if (task.is_completed && isPast) return;
+      if (task.is_completed) return;
+      const key = task.due_date;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(task);
     });
     return map;
   }, [tasks]);
@@ -86,8 +91,9 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
         {days.map(day => {
           const dateKey = format(day, 'yyyy-MM-dd');
           const dayTasks = tasksByDate.get(dateKey) || [];
-          const pendingTasks = dayTasks.filter(t => !t.is_completed);
-          const hasCompleted = dayTasks.some(t => t.is_completed);
+          const today = startOfDay(new Date());
+          const dayDate = new Date(dateKey + 'T12:00:00');
+          const isOverdue = isBefore(dayDate, today) && !isToday(dayDate) && dayTasks.length > 0;
 
           return (
             <button
@@ -96,6 +102,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
                 'aspect-square flex flex-col items-center justify-start p-1 rounded-xl transition-all',
                 'hover:bg-secondary/50',
                 isToday(day) && 'bg-primary/10 ring-1 ring-primary/30',
+                isOverdue && 'bg-destructive/8',
                 !isSameMonth(day, currentMonth) && 'opacity-40'
               )}
               onClick={() => {
@@ -104,24 +111,22 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
             >
               <span className={cn(
                 'text-sm font-medium',
-                isToday(day) && 'text-primary font-bold'
+                isToday(day) && 'text-primary font-bold',
+                isOverdue && 'text-destructive font-semibold'
               )}>
                 {format(day, 'd')}
               </span>
               
-              {/* Task indicators */}
+              {/* Task indicators — only pending */}
               {dayTasks.length > 0 && (
                 <div className="flex gap-0.5 flex-wrap justify-center mt-0.5">
-                  {pendingTasks.slice(0, 3).map((task, i) => (
+                  {dayTasks.slice(0, 3).map((task) => (
                     <div
                       key={task.id}
                       className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: task.category?.color || 'hsl(var(--primary))' }}
+                      style={{ backgroundColor: isOverdue ? 'hsl(var(--destructive))' : (task.category?.color || 'hsl(var(--primary))') }}
                     />
                   ))}
-                  {hasCompleted && pendingTasks.length < 3 && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
-                  )}
                 </div>
               )}
             </button>
