@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Order, OrderItem } from '@/types/database';
 import { Button } from '@/components/ui/button';
@@ -25,13 +25,13 @@ interface ReceiveOrderSheetProps {
   onSmartReceive?: () => void;
 }
 
-export function ReceiveOrderSheet({
+export const ReceiveOrderSheet = forwardRef<HTMLDivElement, ReceiveOrderSheetProps>(function ReceiveOrderSheet({
   order,
   open,
   onOpenChange,
   onConfirmReceive,
   onSmartReceive,
-}: ReceiveOrderSheetProps) {
+}, ref) {
   const [receivedItems, setReceivedItems] = useState<ReceivedItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -112,7 +112,7 @@ export function ReceiveOrderSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
+      <SheetContent ref={ref} side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
             <AppIcon name="Package" size={20} className="text-primary" />
@@ -205,4 +205,4 @@ export function ReceiveOrderSheet({
       </SheetContent>
     </Sheet>
   );
-}
+});

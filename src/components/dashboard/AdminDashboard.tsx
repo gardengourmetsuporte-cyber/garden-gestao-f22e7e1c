@@ -25,6 +25,7 @@ const LazyChecklist = lazy(() => import('./ChecklistDashboardWidget').then(m => 
 const LazyAgenda = lazy(() => import('./AgendaDashboardWidget').then(m => ({ default: m.AgendaDashboardWidget })));
 const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
 const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ default: m.AutoOrderWidget })));
+const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 
 function WidgetSkeleton() {
   return <Skeleton className="h-32 w-full rounded-2xl" />;
@@ -124,6 +125,10 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
   'leaderboard': ({ hasAccess, userId }) => {
     if (!hasAccess('ranking')) return null;
     return <LazySection><LazyLeaderboard currentUserId={userId} /></LazySection>;
+  },
+  'cash-flow': ({ hasAccess, stats }) => {
+    if (!hasAccess('finance')) return null;
+    return <LazySection><LazyCashFlow totalBalance={stats.monthBalance ?? 0} /></LazySection>;
   },
 };
 

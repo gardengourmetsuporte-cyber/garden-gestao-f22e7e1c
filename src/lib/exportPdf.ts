@@ -155,3 +155,33 @@ export function exportCashClosingPdf(closing: CashClosingData) {
 
   openPrintWindow(`Fechamento - ${closing.date}`, body);
 }
+
+interface CsvTransaction {
+  date: string;
+  description: string;
+  category?: string;
+  amount: number;
+  type: string;
+  is_paid: boolean;
+  account?: string;
+}
+
+export function exportTransactionsCsv(transactions: CsvTransaction[], monthLabel: string) {
+  const BOM = '\uFEFF';
+  const header = 'Data;Descrição;Categoria;Tipo;Valor;Status;Conta';
+  const rows = transactions.map(t => {
+    const typeLabel = t.type === 'income' ? 'Receita' : t.type === 'expense' ? 'Despesa' : t.type === 'transfer' ? 'Transferência' : t.type;
+    const status = t.is_paid ? 'Pago' : 'Pendente';
+    const value = t.amount.toFixed(2).replace('.', ',');
+    return `${t.date};${t.description};${t.category || ''};${typeLabel};${value};${status};${t.account || ''}`;
+  });
+
+  const csv = BOM + [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `extrato-${monthLabel.replace(/\s/g, '-').toLowerCase()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}

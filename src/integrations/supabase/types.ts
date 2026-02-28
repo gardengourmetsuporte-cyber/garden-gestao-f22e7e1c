@@ -3431,6 +3431,55 @@ export type Database = {
           },
         ]
       }
+      supplier_price_history: {
+        Row: {
+          id: string
+          item_id: string
+          recorded_at: string
+          supplier_id: string | null
+          unit_id: string | null
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          recorded_at?: string
+          supplier_id?: string | null
+          unit_id?: string | null
+          unit_price?: number
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          recorded_at?: string
+          supplier_id?: string | null
+          unit_id?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_price_history_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_price_history_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_price_history_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppliers: {
         Row: {
           created_at: string
