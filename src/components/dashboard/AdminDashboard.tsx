@@ -15,6 +15,7 @@ import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
 import { PendingOrdersWidget } from './PendingOrdersWidget';
 import { AIInsightsWidget } from './AIInsightsWidget';
+import { BillsDueWidget } from './BillsDueWidget';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 
 // Lazy-load heavy below-fold widgets
@@ -73,6 +74,10 @@ const WIDGET_RENDERERS: Record<string, (ctx: WidgetContext) => React.ReactNode |
   'finance-chart': ({ hasAccess }) => {
     if (!hasAccess('finance')) return null;
     return <FinanceChartWidget />;
+  },
+  'bills-due': ({ hasAccess, stats }) => {
+    if (!hasAccess('finance')) return null;
+    return <BillsDueWidget bills={stats.billsDueSoon || []} />;
   },
   'weekly-summary': ({ hasAccess }) => {
     if (!hasAccess('cash-closing')) return null;

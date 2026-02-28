@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { AppIcon } from '@/components/ui/app-icon';
 import { normalizePhone } from '@/lib/normalizePhone';
 import type { Customer } from '@/types/customer';
 
@@ -16,6 +18,8 @@ const ORIGINS = [
   { value: 'whatsapp', label: 'WhatsApp' },
   { value: 'csv', label: 'CSV' },
 ] as const;
+
+const SUGGESTED_TAGS = ['VIP', 'Delivery', 'Fiel', 'Corporativo', 'Evento', 'Alergias', 'Vegano', 'Sem glúten'];
 
 interface Props {
   open: boolean;
@@ -32,6 +36,8 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
   const [origin, setOrigin] = useState<string>('manual');
   const [birthday, setBirthday] = useState('');
   const [notes, setNotes] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
 
   useEffect(() => {
     if (customer) {
@@ -41,10 +47,31 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
       setOrigin(customer.origin);
       setBirthday(customer.birthday || '');
       setNotes(customer.notes || '');
+      setTags(customer.tags || []);
     } else {
-      setName(''); setPhone(''); setEmail(''); setOrigin('manual'); setBirthday(''); setNotes('');
+      setName(''); setPhone(''); setEmail(''); setOrigin('manual'); setBirthday(''); setNotes(''); setTags([]);
     }
+    setTagInput('');
   }, [customer, open]);
+
+  const addTag = (tag: string) => {
+    const trimmed = tag.trim();
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags(prev => [...prev, trimmed]);
+    }
+    setTagInput('');
+  };
+
+  const removeTag = (tag: string) => {
+    setTags(prev => prev.filter(t => t !== tag));
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    }
+  };
 
   const handleSubmit = () => {
     if (!name.trim()) return;
@@ -56,8 +83,11 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
       origin: origin as Customer['origin'],
       birthday: birthday || null,
       notes: notes.trim() || null,
+      tags,
     });
   };
+
+  const unusedSuggestions = SUGGESTED_TAGS.filter(t => !tags.includes(t));
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -91,6 +121,42 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
             <Label>Aniversário</Label>
             <Input type="date" value={birthday} onChange={e => setBirthday(e.target.value)} />
           </div>
+
+          {/* Tags */}
+          <div>
+            <Label>Tags</Label>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {tags.map(tag => (
+                <Badge key={tag} variant="secondary" className="gap-1 pr-1">
+                  {tag}
+                  <button onClick={() => removeTag(tag)} className="ml-0.5 hover:text-destructive">
+                    <AppIcon name="X" size={12} />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+            <Input
+              value={tagInput}
+              onChange={e => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              placeholder="Digite uma tag e pressione Enter"
+              className="mb-2"
+            />
+            {unusedSuggestions.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {unusedSuggestions.slice(0, 6).map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => addTag(tag)}
+                    className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/60 text-muted-foreground hover:bg-secondary transition-colors"
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div>
             <Label>Observações</Label>
             <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas sobre o cliente..." rows={3} />

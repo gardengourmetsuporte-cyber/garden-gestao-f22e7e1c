@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useInventoryDB } from './useInventoryDB';
 import { useOrders } from './useOrders';
 import { useSuppliers } from './useSuppliers';
+import { useStockPrediction } from './useStockPrediction';
 
 export interface AutoOrderItem {
   itemId: string;
@@ -9,6 +10,9 @@ export interface AutoOrderItem {
   currentStock: number;
   minStock: number;
   deficit: number;
+  avgDailyConsumption: number;
+  suggestedQuantity: number;
+  daysUntilEmpty: number | null;
 }
 
 export interface AutoOrderSuggestion {
@@ -23,6 +27,7 @@ export function useAutoOrderSuggestion() {
   const { items } = useInventoryDB();
   const { orders, createOrder } = useOrders();
   const { suppliers } = useSuppliers();
+  const { predictions } = useStockPrediction();
 
   // Map supplier id -> delivery_frequency from DB
   const supplierFreqMap = useMemo(() => {
@@ -32,6 +37,15 @@ export function useAutoOrderSuggestion() {
     });
     return map;
   }, [suppliers]);
+
+  // Map item id -> prediction data for smarter suggestions
+  const predictionMap = useMemo(() => {
+    const map: Record<string, { avgDaily: number; daysUntilEmpty: number | null }> = {};
+    predictions.forEach(p => {
+      map[p.itemId] = { avgDaily: p.avgDailyConsumption, daysUntilEmpty: p.daysUntilEmpty };
+    });
+    return map;
+  }, [predictions]);
 
   const suggestions = useMemo(() => {
     const pendingOrderItemIds = new Set<string>();
@@ -45,9 +59,19 @@ export function useAutoOrderSuggestion() {
       item => item.current_stock <= item.min_stock && item.supplier_id && !pendingOrderItemIds.has(item.id)
     );
 
+    // Also include items predicted to run out within 5 days (consumption-based)
+    const predictedItems = items.filter(item => {
+      if (!item.supplier_id || pendingOrderItemIds.has(item.id)) return false;
+      if (item.current_stock <= item.min_stock) return false; // already in lowStock
+      const pred = predictionMap[item.id];
+      return pred && pred.daysUntilEmpty !== null && pred.daysUntilEmpty <= 5;
+    });
+
+    const allItems = [...lowStockItems, ...predictedItems];
+
     // Group by supplier
     const bySupplier: Record<string, AutoOrderSuggestion> = {};
-    lowStockItems.forEach(item => {
+    allItems.forEach(item => {
       const sid = item.supplier_id!;
       if (!bySupplier[sid]) {
         const freq = supplierFreqMap[sid] || 'weekly';
@@ -59,17 +83,28 @@ export function useAutoOrderSuggestion() {
           items: [],
         };
       }
+
+      const pred = predictionMap[item.id];
+      const avgDaily = pred?.avgDaily || 0;
+      const deficit = Math.max(0, item.min_stock - item.current_stock);
+      // Smart suggestion: use 7-day consumption if available, otherwise use deficit
+      const consumptionBased = avgDaily > 0 ? Math.ceil(avgDaily * 7) : 0;
+      const suggestedQuantity = Math.max(deficit, consumptionBased);
+
       bySupplier[sid].items.push({
         itemId: item.id,
         itemName: item.name,
         currentStock: item.current_stock,
         minStock: item.min_stock,
-        deficit: Math.max(0, item.min_stock - item.current_stock),
+        deficit,
+        avgDailyConsumption: avgDaily,
+        suggestedQuantity: suggestedQuantity > 0 ? suggestedQuantity : item.min_stock,
+        daysUntilEmpty: pred?.daysUntilEmpty ?? null,
       });
     });
 
     return Object.values(bySupplier);
-  }, [items, orders, supplierFreqMap]);
+  }, [items, orders, supplierFreqMap, predictionMap]);
 
   // Only daily suggestions for the dashboard widget
   const dailySuggestions = useMemo(() => {
@@ -94,7 +129,7 @@ export function useAutoOrderSuggestion() {
   const createDraftOrder = async (suggestion: AutoOrderSuggestion) => {
     const orderItems = suggestion.items.map(i => ({
       item_id: i.itemId,
-      quantity: i.deficit > 0 ? i.deficit : i.minStock,
+      quantity: i.suggestedQuantity > 0 ? i.suggestedQuantity : i.minStock,
     }));
     await createOrder(suggestion.supplierId, orderItems);
   };

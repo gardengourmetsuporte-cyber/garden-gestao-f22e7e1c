@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import type { Customer } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
 import { differenceInDays } from 'date-fns';
@@ -85,6 +86,17 @@ export const CustomerCard = forwardRef<HTMLDivElement, Props>(function CustomerC
           </span>
         )}
       </div>
+
+      {/* Tags */}
+      {customer.tags && customer.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {customer.tags.map(tag => (
+            <Badge key={tag} variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-primary/20 text-primary/80">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )}
     </div>
   );
 });

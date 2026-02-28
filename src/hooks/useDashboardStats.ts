@@ -2,7 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { startOfMonth, endOfMonth, format } from 'date-fns';
+import { startOfMonth, endOfMonth, format, addDays, differenceInCalendarDays } from 'date-fns';
+
+export interface BillDueSoon {
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
+  daysUntilDue: number;
+}
 
 export interface DashboardStats {
   criticalItems: number;
@@ -14,14 +22,16 @@ export interface DashboardStats {
   itemsCount: number;
   monthBalance: number;
   pendingExpenses: number;
+  billsDueSoon: BillDueSoon[];
 }
 
 async function fetchDashboardStats(userId: string, unitId: string, isAdmin: boolean): Promise<DashboardStats> {
   const now = new Date();
   const startDate = format(startOfMonth(now), 'yyyy-MM-dd');
   const endDate = format(endOfMonth(now), 'yyyy-MM-dd');
+  const todayStr = format(now, 'yyyy-MM-dd');
+  const weekLaterStr = format(addDays(now, 7), 'yyyy-MM-dd');
 
-  // Run all counts in parallel
   const [
     inventoryRes,
     ordersRes,
@@ -33,86 +43,40 @@ async function fetchDashboardStats(userId: string, unitId: string, isAdmin: bool
     incomeRes,
     expenseRes,
     pendingExpRes,
+    billsDueRes,
   ] = await Promise.all([
-    // Inventory items for critical stock calculation
-    supabase
-      .from('inventory_items')
-      .select('current_stock, min_stock')
-      .eq('unit_id', unitId),
-    // Pending orders
-    supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true })
-      .eq('unit_id', unitId)
-      .in('status', ['draft', 'sent']),
-    // Pending redemptions (admin only)
+    supabase.from('inventory_items').select('current_stock, min_stock').eq('unit_id', unitId),
+    supabase.from('orders').select('*', { count: 'exact', head: true }).eq('unit_id', unitId).in('status', ['draft', 'sent']),
     isAdmin
-      ? supabase
-          .from('reward_redemptions')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'pending')
+      ? supabase.from('reward_redemptions').select('*', { count: 'exact', head: true }).eq('status', 'pending')
       : Promise.resolve({ count: 0 }),
-    // Pending cash closings
     isAdmin
-      ? supabase
-          .from('cash_closings')
-          .select('*', { count: 'exact', head: true })
-          .eq('unit_id', unitId)
-          .eq('status', 'pending')
+      ? supabase.from('cash_closings').select('*', { count: 'exact', head: true }).eq('unit_id', unitId).eq('status', 'pending')
       : Promise.resolve({ count: 0 }),
-    // Recipes count
-    supabase
-      .from('recipes')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', true),
-    // Users count
+    supabase.from('recipes').select('*', { count: 'exact', head: true }).eq('is_active', true),
     isAdmin
-      ? supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
+      ? supabase.from('profiles').select('*', { count: 'exact', head: true })
       : Promise.resolve({ count: 0 }),
-    // Total inventory items
-    supabase
-      .from('inventory_items')
-      .select('*', { count: 'exact', head: true })
-      .eq('unit_id', unitId),
-    // Monthly income (paid)
-    supabase
-      .from('finance_transactions')
-      .select('amount')
-      .eq('user_id', userId)
-      .eq('unit_id', unitId)
-      .eq('type', 'income')
-      .eq('is_paid', true)
-      .gte('date', startDate)
-      .lte('date', endDate),
-    // Monthly expense (paid)
-    supabase
-      .from('finance_transactions')
-      .select('amount')
-      .eq('user_id', userId)
-      .eq('unit_id', unitId)
-      .in('type', ['expense', 'credit_card'])
-      .eq('is_paid', true)
-      .gte('date', startDate)
-      .lte('date', endDate),
-    // Pending expenses
-    supabase
-      .from('finance_transactions')
-      .select('amount')
-      .eq('user_id', userId)
-      .eq('unit_id', unitId)
-      .in('type', ['expense', 'credit_card'])
-      .eq('is_paid', false)
-      .gte('date', startDate)
-      .lte('date', endDate),
+    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('unit_id', unitId),
+    supabase.from('finance_transactions').select('amount').eq('user_id', userId).eq('unit_id', unitId).eq('type', 'income').eq('is_paid', true).gte('date', startDate).lte('date', endDate),
+    supabase.from('finance_transactions').select('amount').eq('user_id', userId).eq('unit_id', unitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
+    supabase.from('finance_transactions').select('amount').eq('user_id', userId).eq('unit_id', unitId).in('type', ['expense', 'credit_card']).eq('is_paid', false).gte('date', startDate).lte('date', endDate),
+    // Bills due in next 7 days
+    supabase.from('finance_transactions').select('id, description, amount, date').eq('user_id', userId).eq('unit_id', unitId).in('type', ['expense', 'credit_card']).eq('is_paid', false).gte('date', todayStr).lte('date', weekLaterStr).order('date').limit(10),
   ]);
 
   const criticalItems = (inventoryRes.data || []).filter(i => i.current_stock <= i.min_stock).length;
-
   const totalIncome = (incomeRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
   const totalExpense = (expenseRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
   const pendingExpenses = (pendingExpRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
+
+  const billsDueSoon: BillDueSoon[] = ((billsDueRes as any).data || []).map((b: any) => ({
+    id: b.id,
+    description: b.description,
+    amount: Number(b.amount),
+    date: b.date,
+    daysUntilDue: differenceInCalendarDays(new Date(b.date + 'T12:00:00'), now),
+  }));
 
   return {
     criticalItems,
@@ -124,6 +88,7 @@ async function fetchDashboardStats(userId: string, unitId: string, isAdmin: bool
     itemsCount: itemsRes.count || 0,
     monthBalance: totalIncome - totalExpense,
     pendingExpenses,
+    billsDueSoon,
   };
 }
 
@@ -135,7 +100,7 @@ export function useDashboardStats() {
     queryKey: ['dashboard-stats', user?.id, activeUnitId],
     queryFn: () => fetchDashboardStats(user!.id, activeUnitId!, isAdmin),
     enabled: !!user && !!activeUnitId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 
   return {
@@ -149,6 +114,7 @@ export function useDashboardStats() {
       itemsCount: 0,
       monthBalance: 0,
       pendingExpenses: 0,
+      billsDueSoon: [],
     },
     isLoading,
   };

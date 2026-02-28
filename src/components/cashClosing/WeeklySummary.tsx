@@ -22,13 +22,26 @@ export function WeeklySummary({ closings }: Props) {
     const weekStart = startOfWeek(target, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(target, { weekStartsOn: 1 });
 
+    // Previous week for comparison
+    const prevWeekStart = startOfWeek(addWeeks(target, -1), { weekStartsOn: 1 });
+    const prevWeekEnd = endOfWeek(addWeeks(target, -1), { weekStartsOn: 1 });
+
     const weekClosings = closings.filter(c => {
       const d = parseISO(c.date);
       return isWithinInterval(d, { start: weekStart, end: weekEnd });
     });
 
+    const prevWeekClosings = closings.filter(c => {
+      const d = parseISO(c.date);
+      return isWithinInterval(d, { start: prevWeekStart, end: prevWeekEnd });
+    });
+
     const total = weekClosings.reduce((sum, c) => sum + (c.total_amount || 0), 0);
+    const prevTotal = prevWeekClosings.reduce((sum, c) => sum + (c.total_amount || 0), 0);
     const count = weekClosings.length;
+
+    // Calculate variation percentage
+    const variation = prevTotal > 0 ? ((total - prevTotal) / prevTotal) * 100 : null;
 
     const byMethod: Record<string, number> = {};
     PAYMENT_METHODS.forEach(m => { byMethod[m.key] = 0; });
@@ -47,6 +60,8 @@ export function WeeklySummary({ closings }: Props) {
 
     return {
       total,
+      prevTotal,
+      variation,
       count,
       topMethods,
       weekLabel: `${format(weekStart, "dd/MM", { locale: ptBR })} – ${format(weekEnd, "dd/MM", { locale: ptBR })}`,
@@ -95,7 +110,20 @@ export function WeeklySummary({ closings }: Props) {
             <span className="text-2xl font-black text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
               <AnimatedCurrency value={summary.total} />
             </span>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Total em vendas na semana</p>
+            <div className="flex items-center justify-center gap-2 mt-0.5">
+              <p className="text-[10px] text-muted-foreground">Total em vendas na semana</p>
+              {summary.variation !== null && (
+                <span className={`text-[10px] font-bold flex items-center gap-0.5 ${summary.variation >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  <AppIcon name={summary.variation >= 0 ? 'TrendingUp' : 'TrendingDown'} size={10} />
+                  {summary.variation >= 0 ? '+' : ''}{summary.variation.toFixed(1)}%
+                </span>
+              )}
+            </div>
+            {summary.prevTotal > 0 && (
+              <p className="text-[9px] text-muted-foreground/60 mt-0.5">
+                Semana anterior: {formatCurrency(summary.prevTotal)}
+              </p>
+            )}
           </div>
 
           {/* Breakdown by method */}

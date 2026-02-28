@@ -910,6 +910,7 @@ export type Database = {
           phone: string | null
           score: number | null
           segment: string | null
+          tags: string[] | null
           total_orders: number | null
           total_spent: number | null
           unit_id: string
@@ -930,6 +931,7 @@ export type Database = {
           phone?: string | null
           score?: number | null
           segment?: string | null
+          tags?: string[] | null
           total_orders?: number | null
           total_spent?: number | null
           unit_id: string
@@ -950,6 +952,7 @@ export type Database = {
           phone?: string | null
           score?: number | null
           segment?: string | null
+          tags?: string[] | null
           total_orders?: number | null
           total_spent?: number | null
           unit_id?: string
