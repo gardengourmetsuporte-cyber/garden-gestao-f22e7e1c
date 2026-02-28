@@ -31,15 +31,18 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
   return (
     <div
       onClick={onClick}
-      className="card-surface p-3.5 cursor-pointer hover:shadow-card-hover active:scale-[0.98] transition-all duration-200"
+      className="card-surface p-3.5 cursor-pointer hover:shadow-[0_0_20px_rgba(16,185,129,0.05)] hover:border-white/10 active:scale-[0.98] transition-all duration-300 relative overflow-hidden group"
     >
-      <div className="flex items-center gap-3">
+      {/* Subtle background glow on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      <div className="flex items-center gap-3 relative z-10">
         {/* Icon with category color */}
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-          style={{ backgroundColor: `${categoryColor}12` }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-white/5 shadow-inner"
+          style={{ backgroundColor: `${categoryColor}15` }}
         >
-          <AppIcon name="Package" size={18} style={{ color: categoryColor }} />
+          <AppIcon name="Package" size={18} style={{ color: categoryColor, filter: `drop-shadow(0 0 6px ${categoryColor}80)` }} />
         </div>
 
         {/* Info */}
@@ -57,21 +60,21 @@ export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
         <div className="text-right shrink-0 flex items-center gap-2">
           <div>
             <p className={cn(
-              "text-base font-bold leading-tight",
+              "text-base font-bold leading-tight drop-shadow-md",
               status === 'ok' && "text-foreground",
-              status === 'low' && "text-warning",
-              status === 'out' && "text-destructive"
+              status === 'low' && "text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]",
+              status === 'out' && "text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]"
             )}>
               {item.current_stock.toFixed(item.unit_type === 'unidade' ? 0 : 2)}
               <span className="text-xs font-normal text-muted-foreground ml-0.5">{unitLabel}</span>
             </p>
             <span className={cn(
-              "text-[10px] font-semibold px-1.5 py-0.5 rounded-full inline-block mt-0.5",
-              status === 'ok' && "bg-success/15 text-success",
-              status === 'low' && "bg-warning/15 text-warning",
-              status === 'out' && "bg-destructive/15 text-destructive"
+              "text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded inline-block mt-0.5 shadow-sm border",
+              status === 'ok' && "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+              status === 'low' && "bg-amber-500/10 border-amber-500/20 text-amber-400",
+              status === 'out' && "bg-rose-500/10 border-rose-500/20 text-rose-400"
             )}>
-              {status === 'ok' ? 'OK' : status === 'low' ? 'Baixo' : 'Zerado'}
+              {status === 'ok' ? 'OK' : status === 'low' ? 'BAIXO' : 'ZERADO'}
             </span>
           </div>
 

@@ -123,11 +123,11 @@ export default function InventoryPage() {
         <div className="min-h-screen bg-background pb-24">
           <div className="px-4 py-3 lg:px-6 space-y-4">
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              {[1,2,3,4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
             </div>
             <Skeleton className="h-12 rounded-2xl" />
             <Skeleton className="h-12 rounded-xl" />
-            {[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}
+            {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-2xl" />)}
           </div>
         </div>
       </AppLayout>
@@ -151,7 +151,10 @@ export default function InventoryPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 overflow-x-hidden">
-        <div className="px-4 py-3 lg:px-6 space-y-4">
+        <div className="px-4 py-3 lg:px-6 space-y-4 relative z-10">
+          {/* Subtle background glow */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
           {/* Stats */}
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatsCard title="Total de Itens" value={items.length} icon="Package" variant="default" onClick={() => handleStockFilterClick('all')} />
@@ -162,11 +165,16 @@ export default function InventoryPage() {
 
           {/* Active Filter */}
           {stockFilter && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-xl">
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/20 rounded-xl">
               <span className="text-sm text-primary font-medium">
                 Filtro ativo: {stockFilter === 'zero' ? 'Itens zerados' : stockFilter === 'low' ? 'Estoque baixo' : 'Todos os itens'}
               </span>
-              <button onClick={() => setStockFilter(null)} className="text-xs text-primary underline">Limpar filtro</button>
+              <button
+                onClick={() => setStockFilter(null)}
+                className="text-xs text-primary/80 hover:text-primary transition-colors ml-auto"
+              >
+                Limpar filtro
+              </button>
             </div>
           )}
 
