@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { TransactionFilters, TransactionFiltersState } from './TransactionFilters';
 import { FinanceCategory, FinanceAccount } from '@/types/finance';
 import { cn } from '@/lib/utils';
+import { exportTransactionsCsv } from '@/lib/exportPdf';
 import {
   DndContext,
   DragEndEvent,
@@ -225,6 +226,28 @@ export function FinanceTransactions({
                 </Button>
               </>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const allTxns = Object.entries(transactionsByDate).flatMap(([, txns]) =>
+                  txns.map(t => ({
+                    date: t.date,
+                    description: t.description,
+                    category: (t as any).category?.name || '',
+                    amount: Number(t.amount),
+                    type: t.type,
+                    is_paid: t.is_paid,
+                    account: (t as any).account?.name || '',
+                  }))
+                );
+                const label = format(selectedMonth, "MMMM yyyy", { locale: ptBR });
+                exportTransactionsCsv(allTxns, label);
+              }}
+              className="gap-1"
+            >
+              <AppIcon name="Download" size={16} />
+            </Button>
             <Button
               variant={hasActiveFilters ? "default" : "outline"}
               size="sm"

@@ -20,6 +20,7 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'pending-actions', label: 'Ações pendentes', icon: 'Bell', visible: true },
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
   { key: 'ai-insights', label: 'Insights da IA', icon: 'Sparkles', visible: true },
+  { key: 'cash-flow', label: 'Fluxo de caixa projetado', icon: 'TrendingUp', visible: false },
 ];
 
 const STORAGE_KEY = 'dashboard-widgets-config';
