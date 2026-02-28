@@ -65,6 +65,9 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
         type="button"
         {...attributes}
         {...listeners}
+        data-vaul-no-drag
+        onPointerDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         aria-label={`Reordenar ${widget.label}`}
         className="shrink-0 rounded-md p-2 text-muted-foreground/70 touch-none cursor-grab active:cursor-grabbing"
       >
