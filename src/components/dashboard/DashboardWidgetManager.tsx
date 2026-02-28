@@ -52,9 +52,7 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
       style={style}
       {...attributes}
       {...listeners}
-      onTouchMoveCapture={(e) => {
-        if (isDragActive) e.preventDefault();
-      }}
+      data-vaul-no-drag
       className={cn(
         'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-none select-none',
         isDragging && 'opacity-60 shadow-lg scale-[1.02] relative'
@@ -133,8 +131,8 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="!max-h-[85vh]">
+    <Sheet open={open} onOpenChange={onOpenChange} mobileHandleOnly>
+      <SheetContent side="bottom" className="!max-h-[85vh]" data-vaul-no-drag>
         <SheetHeader className="mb-4">
           <SheetTitle className="text-base font-bold">Gerenciar tela inicial</SheetTitle>
           <SheetDescription className="text-xs text-muted-foreground">
@@ -152,6 +150,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
         >
           <SortableContext items={draft.map(w => w.key)} strategy={verticalListSortingStrategy}>
             <div
+              data-vaul-no-drag
               style={{ touchAction: isDragActive ? 'none' : 'pan-y' }}
               className={cn(
                 "space-y-2 max-h-[50vh] overflow-y-auto overscroll-contain pr-1",
