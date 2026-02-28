@@ -29,37 +29,40 @@ export function CategoryChips({ categories, selectedCategoryId, onSelectCategory
 
   return (
     <div className="relative">
-      {showLeftFade && <div className="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />}
-      {showRightFade && <div className="absolute right-0 top-0 bottom-0 w-5 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />}
-      <div ref={scrollRef} className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+      {showLeftFade && <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />}
+      {showRightFade && <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />}
+      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        {/* "All" chip */}
         <button
           onClick={() => onSelectCategory(null)}
           className={cn(
-            "px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
+            "px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 border",
             selectedCategoryId === null
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary/70 text-muted-foreground hover:text-foreground"
+              ? "text-primary-foreground border-primary/30 shadow-md"
+              : "bg-card text-muted-foreground hover:text-foreground border-border"
           )}
+          style={selectedCategoryId === null ? { background: 'var(--gradient-brand)' } : undefined}
         >
           Todos
         </button>
+
         {categories.map((cat) => {
           const isSelected = selectedCategoryId === cat.id;
           return (
             <button
               key={cat.id}
-              onClick={() => onSelectCategory(cat.id)}
+              onClick={() => onSelectCategory(isSelected ? null : cat.id)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all shrink-0 flex items-center gap-1.5",
+                "px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 flex items-center gap-2 border",
                 isSelected
-                  ? "text-white shadow-sm"
-                  : "bg-secondary/70 text-muted-foreground hover:text-foreground"
+                  ? "text-white border-transparent shadow-md"
+                  : "bg-card text-muted-foreground hover:text-foreground border-border"
               )}
               style={isSelected ? { backgroundColor: cat.color } : undefined}
             >
               <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.7)' : cat.color }}
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.8)' : cat.color }}
               />
               {cat.name}
             </button>
