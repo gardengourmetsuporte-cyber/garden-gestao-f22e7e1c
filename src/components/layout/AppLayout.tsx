@@ -183,6 +183,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             background: 'linear-gradient(135deg, hsl(224 45% 8%) 0%, hsl(220 70% 16%) 40%, hsl(234 75% 26%) 70%, hsl(220 65% 16%) 100%)',
           }}
         >
+          {/* Animated ambient glow */}
+          <div className="absolute inset-0 pointer-events-none header-ambient-glow" />
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
             {/* Left: Logo + Unit Name */}
             <button

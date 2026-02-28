@@ -150,12 +150,14 @@ export function BottomTabBar() {
 
         {/* Bar background — full width, edge to edge */}
         <div
-          className="relative"
+          className="relative overflow-hidden"
           style={{
             background: 'hsl(var(--background))',
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
+          {/* Animated ambient glow */}
+          <div className="absolute inset-0 pointer-events-none tabbar-ambient-glow" />
           <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative">
             {/* No pill — active state is icon glow only */}
 
