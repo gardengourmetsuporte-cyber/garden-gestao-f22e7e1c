@@ -227,15 +227,15 @@ export default function Agenda() {
             const isExpanded = expandedCategories[category.id] === true;
             return (
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl hover:bg-secondary/50 transition-all">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
+                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 rounded-2xl card-surface hover:bg-secondary/70 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-background" style={{ backgroundColor: category.color, boxShadow: `0 0 8px ${category.color}40` }} />
                     <span className="font-semibold text-sm text-foreground">{category.name}</span>
-                    <span className="text-[11px] font-medium text-muted-foreground">{catTasks.length}</span>
+                    <span className="text-[11px] font-bold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">{catTasks.length}</span>
                   </div>
-                  <AppIcon name="ChevronDown" size={14} className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-180")} />
+                  <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", isExpanded && "rotate-180")} />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-1 space-y-1">
+                <CollapsibleContent className="mt-1.5 space-y-1 pl-2">
                   <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
                     <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                       {catTasks.map(task => renderTaskItem(task))}
