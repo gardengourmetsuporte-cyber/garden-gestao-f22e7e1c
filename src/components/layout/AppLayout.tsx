@@ -169,17 +169,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Mobile Header with Navy Brand Strip ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-white/5"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-emerald-500/10"
         style={{
           paddingTop: 'env(safe-area-inset-top)',
-          background: 'linear-gradient(145deg, #050a05 0%, #0a150a 50%, #050a05 100%)',
+          background: 'linear-gradient(145deg, #031208 0%, #082618 50%, #031208 100%)',
         }}
       >
         {/* Premium gradient brand bar */}
         <div
           className="relative overflow-hidden backdrop-blur-3xl"
           style={{
-            background: 'linear-gradient(145deg, rgba(5,10,5,0.85) 0%, rgba(10,21,10,0.85) 50%, rgba(5,10,5,0.85) 100%)',
+            background: 'linear-gradient(145deg, rgba(3,18,8,0.92) 0%, rgba(8,38,24,0.92) 50%, rgba(3,18,8,0.92) 100%)',
           }}
         >
           {/* Animated ambient glow */}
@@ -236,12 +236,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       </header>
 
       {/* ======= Desktop Sidebar ======= */}
-      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card/60 backdrop-blur-3xl border-r border-border/10">
+      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] z-50 flex-col bg-card/60 backdrop-blur-3xl border-r border-emerald-500/10">
         {/* Premium brand header */}
         <div
-          className="relative overflow-hidden shrink-0 border-b border-border/10"
+          className="relative overflow-hidden shrink-0 border-b border-emerald-500/10"
           style={{
-            background: 'linear-gradient(145deg, rgba(5,10,5,0.6) 0%, rgba(10,21,10,0.6) 50%, rgba(5,10,5,0.6) 100%)',
+            background: 'linear-gradient(145deg, rgba(3,18,8,0.7) 0%, rgba(8,38,24,0.7) 50%, rgba(3,18,8,0.7) 100%)',
           }}
         >
           <div className="flex items-center gap-3 px-4 h-16 relative z-10">
@@ -253,7 +253,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </button>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
-              <p className="text-[10px] text-white/40 font-medium tracking-wide">Gestão Inteligente</p>
+              <p className="text-[10px] text-emerald-400/50 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
           </div>
         </div>
@@ -261,7 +261,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {/* User card */}
         <button
           onClick={() => navigate('/profile/me')}
-          className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors border-b border-border/10"
+          className="flex items-center gap-3 px-4 py-3 hover:bg-emerald-500/5 transition-colors border-b border-emerald-500/10"
         >
           <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={36} />
           <div className="text-left min-w-0 flex-1">
@@ -280,8 +280,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all",
               location.pathname === '/'
-                ? "bg-primary/15 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                ? "bg-emerald-500/12 text-emerald-400"
+                : "text-muted-foreground hover:text-foreground hover:bg-emerald-500/5"
             )}
           >
             <AppIcon name="Home" size={20} />
@@ -306,19 +306,19 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     onTouchStart={() => void preloadRoute(targetHref)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all relative overflow-hidden group",
-                      isActive
-                        ? "bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20"
+                     isActive
+                        ? "bg-emerald-500/12 text-emerald-400 shadow-sm ring-1 ring-emerald-500/20"
                         : locked
-                          ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-white/5"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                          ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-emerald-500/5"
+                          : "text-muted-foreground hover:text-foreground hover:bg-emerald-500/5"
                     )}
                   >
                     {!isActive && !locked && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out pointer-events-none" />
                     )}
                     <AppIcon name={item.icon} size={20} style={{ opacity: locked ? 0.5 : 1 }} className="relative z-10" />
                     <span className="truncate flex-1 relative z-10">{item.label}</span>
-                    {locked && <AppIcon name="Lock" size={14} className="text-primary/60 shrink-0 relative z-10" />}
+                    {locked && <AppIcon name="Lock" size={14} className="text-emerald-500/60 shrink-0 relative z-10" />}
                   </Link>
                 );
               })}
@@ -327,13 +327,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </nav>
 
         {/* Bottom actions */}
-        <div className="px-3 py-3 border-t border-border/15 space-y-1 shrink-0">
+        <div className="px-3 py-3 border-t border-emerald-500/10 space-y-1 shrink-0">
           <div className="flex items-center gap-2 px-3 py-1.5">
             <PointsDisplay isPulsing={isPulsing} showLabel className="scale-90 origin-left" />
           </div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-emerald-500/5 transition-all"
           >
             <AppIcon name="LogOut" size={18} />
             <span className="font-medium">Sair</span>
