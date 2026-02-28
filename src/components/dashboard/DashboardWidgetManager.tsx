@@ -106,8 +106,8 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
   }, [isDragActive]);
 
   const sensors = useSensors(
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
   );
 
   const handleDragStart = useCallback((_event: DragStartEvent) => {
