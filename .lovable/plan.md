@@ -1,53 +1,39 @@
 
 
-## Diagnóstico
+## Plano: Tabs da barra inferior configuráveis pelo admin
 
-O bug de "abrir-sumir-abrir de novo" tem duas causas raiz no componente `PageTransition`:
+Atualmente os 2 slots da barra (posição 2 e 3, ao lado de "Início") são hardcoded como Checklists e Financeiro, com fallback automático se o usuário não tem acesso. A ideia é permitir que o admin da unidade escolha quais módulos aparecem nesses 2 slots.
 
-1. **`key={location.pathname}`** na div wrapper força o React a desmontar e remontar todo o conteúdo da página a cada navegação. Isso mata Sheets/Drawers abertos e faz elementos piscarem.
+### Armazenamento
 
-2. **Dois `useEffect` concorrentes** ambos atualizando `displayChildren` — um para mudança de rota e outro para mudança de children na mesma rota. Isso causa renderizações duplas onde o conteúdo aparece, some, e reaparece.
+Salvar a preferência no `localStorage` por usuário (`bottombar-pinned-tabs`), contendo um array de 2 `moduleKey` strings. Sem necessidade de tabela no banco — é preferência de UI local.
 
-3. **Estado `displayChildren` desnecessário** — manter children em state cria uma camada extra de re-renders que propaga flickers por todo o sistema (Sheets, Drawers, modais).
+### Mudanças
 
-## Plano
+**1. Criar componente de configuração `BottomBarTabPicker`**
+- Novo arquivo `src/components/settings/BottomBarTabPicker.tsx`
+- Lista todos os módulos disponíveis (filtrados por `hasAccess`) exceto `dashboard` e `settings`
+- Permite selecionar exatamente 2 módulos para os slots da barra
+- Salva no `localStorage`
 
-### 1. Simplificar o PageTransition radicalmente
+**2. Criar hook `useBottomBarTabs`**
+- Novo arquivo `src/hooks/useBottomBarTabs.ts`
+- Lê do `localStorage` os 2 módulos escolhidos
+- Resolve as `TabDef` a partir de `ALL_MODULES` (key, icon, label, path)
+- Exporta `pinnedTabs` e `setPinnedTabs`
+- Fallback: se nenhuma preferência salva, usa o comportamento atual (checklists + finance)
 
-Remover o estado `displayChildren` e a lógica de `key` que força remount. Renderizar `children` diretamente e aplicar a animação de opacidade apenas via uma classe CSS transitória que é adicionada brevemente na mudança de rota:
+**3. Alterar `BottomTabBar.tsx`**
+- Importar `useBottomBarTabs`
+- Substituir a lógica de `DEFAULT_TABS` + `FALLBACK_TABS` pelos tabs retornados pelo hook
+- Manter "Início" fixo no slot 1, "Mais" fixo no slot 5
+- Manter a lógica especial do `CARDAPIO_TABS` intacta
 
-```tsx
-export function PageTransition({ children, className }: PageTransitionProps) {
-  const location = useLocation();
-  const [animClass, setAnimClass] = useState('');
-  const prevPathRef = useRef(location.pathname);
+**4. Adicionar entrada nas Configurações**
+- No `Settings.tsx` ou no `MoreDrawer.tsx`, adicionar um botão "Personalizar barra inferior" que abre o `BottomBarTabPicker` em um Sheet
 
-  useEffect(() => {
-    if (prevPathRef.current === location.pathname) return;
-    prevPathRef.current = location.pathname;
-    
-    setAnimClass('page-enter-fade');
-    const timer = setTimeout(() => setAnimClass(''), 300);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
+### Módulos disponíveis para seleção
 
-  return (
-    <div className={cn(animClass, className)}>
-      {children}
-    </div>
-  );
-}
-```
-
-Mudanças-chave:
-- Remove `key={location.pathname}` (não remonta mais a árvore inteira)
-- Remove estado `displayChildren` (sem renderizações fantasma)
-- Remove o segundo `useEffect` concorrente
-- A classe de animação é aplicada temporariamente e removida após 300ms
-
-### 2. Manter o CSS existente como está
-
-As keyframes `pageEnterFade` com apenas opacity já estão corretas e não precisam de alteração.
-
-**Arquivo afetado:** `src/components/layout/PageTransition.tsx`
+Todos de `ALL_MODULES` exceto `dashboard` e `settings`:
+Agenda, Copilot, Financeiro, Estoque, Clientes, Pedidos, Checklists, Fechamento, Fichas Técnicas, Funcionários, Recompensas, Ranking, Marketing, Cardápio Digital, WhatsApp
 
