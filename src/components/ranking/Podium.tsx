@@ -61,7 +61,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
             <div className={cn(
               "relative mb-2 rounded-full",
               position === 1 && "ring-2 ring-offset-2 ring-offset-background ring-amber-500/60",
-              isCurrentUser && position !== 1 && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+              isCurrentUser && position !== 1 && "ring-2 ring-emerald-500 ring-offset-2 ring-offset-background"
             )}>
               <RankedAvatar
                 avatarUrl={entry.avatar_url}
@@ -83,7 +83,7 @@ export function Podium({ entries, currentUserId, compact = false }: PodiumProps)
             <p className={cn(
               "font-semibold text-center truncate max-w-[70px]",
               compact ? "text-[11px]" : "text-xs",
-              isCurrentUser ? "text-primary" : "text-foreground"
+              isCurrentUser ? "text-emerald-400" : "text-foreground"
             )}>
               {entry.full_name?.split(' ')[0]}
             </p>
