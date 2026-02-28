@@ -414,6 +414,27 @@ import {
                 src={closing.receipt_url} 
                 alt="Comprovante" 
                 className="w-full rounded-xl border"
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  // If public URL fails, try signed URL
+                  if (!img.dataset.retried) {
+                    img.dataset.retried = 'true';
+                    // Extract path from public URL
+                    const match = closing.receipt_url.match(/cash-receipts\/(.+)$/);
+                    if (match) {
+                      import('@/integrations/supabase/client').then(({ supabase }) => {
+                        supabase.storage
+                          .from('cash-receipts')
+                          .createSignedUrl(match[1].split('?')[0], 3600)
+                          .then(({ data }) => {
+                            if (data?.signedUrl) {
+                              img.src = data.signedUrl;
+                            }
+                          });
+                      });
+                    }
+                  }
+                }}
               />
             )}
            </CardContent>
