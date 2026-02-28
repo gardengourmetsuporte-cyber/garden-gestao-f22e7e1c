@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
 import dashboardMockup from "@/assets/dashboard-mockup.png";
-import logoImg from "@/assets/logo.png";
 
 const features = [
   { icon: "BarChart3", label: "Financeiro" },
@@ -15,150 +14,162 @@ const features = [
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden">
-      {/* Navy gradient background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
-          backgroundSize: '350% 350%',
-          animation: 'navyCardFlow 12s ease-in-out infinite',
-        }}
-      />
+    <section className="relative overflow-hidden bg-[#000000]">
+      {/* Core Background Mesh/Glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Deep mesh gradient base */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 15% 50%, hsl(156 72% 35% / 0.15), transparent 25%),
+              radial-gradient(circle at 85% 30%, hsl(234 89% 50% / 0.15), transparent 25%)
+            `
+          }}
+        />
 
-      {/* Grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
+        {/* Animated Orbs for organic feel */}
+        <div
+          className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] mix-blend-screen opacity-30 animate-pulse"
+          style={{ background: 'hsl(156 72% 40%)', animationDuration: '8s' }}
+        />
+        <div
+          className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[150px] mix-blend-screen opacity-20"
+          style={{ background: 'hsl(234 89% 65%)', animation: 'float-orb-2 15s ease-in-out infinite' }}
+        />
+        <div
+          className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[800px] h-[400px] rounded-[100%] blur-[120px] mix-blend-screen opacity-10 pointer-events-none"
+          style={{ background: 'hsl(190 90% 50%)', animation: 'float-orb-3 10s ease-in-out infinite' }}
+        />
 
-      {/* Glow orbs */}
-      <div
-        className="absolute top-[20%] left-[10%] w-[400px] h-[400px] rounded-full blur-[150px] opacity-15 pointer-events-none"
-        style={{ background: 'hsl(220 80% 50%)', animation: 'float-orb-1 8s ease-in-out infinite' }}
-      />
-      <div
-        className="absolute bottom-[10%] right-[10%] w-[350px] h-[350px] rounded-full blur-[120px] opacity-10 pointer-events-none"
-        style={{ background: 'hsl(234 80% 60%)', animation: 'float-orb-2 10s ease-in-out infinite' }}
-      />
-      <div
-        className="absolute top-[60%] left-[50%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-10 pointer-events-none"
-        style={{ background: 'hsl(210 90% 55%)', animation: 'float-orb-3 6s ease-in-out infinite' }}
-      />
+        {/* Subtle Grid overlay for 'tech' feel */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)'
+          }}
+        />
+      </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 md:pt-40 pb-20 md:pb-28">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          {/* Left — Text */}
-          <div className="space-y-7 animate-[fade-up_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold"
-              style={{ background: 'hsl(220 60% 50% / 0.12)', color: 'hsl(220 80% 70%)', border: '1px solid hsl(220 60% 50% / 0.2)' }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Feito por restaurante, para restaurantes
-            </div>
+      {/* Content Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 md:pt-48 pb-24 md:pb-32">
+        <div className="flex flex-col items-center text-center space-y-8 animate-[fade-up_0.8s_ease-out_both] max-w-4xl mx-auto">
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-white font-display">
-              A gestão completa ✨{" "}
-              <br className="hidden sm:block" />
-              que seu restaurante{" "}
-              <br className="hidden sm:block" />
-              <span className="text-white/50">precisa pra crescer</span>
-            </h1>
-
-            <p className="text-base sm:text-lg text-white/50 max-w-md leading-relaxed">
-              Financeiro, estoque, equipe e IA — tudo em um app criado por quem vive a rotina de food service.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link
-                to="/auth?plan=free"
-                className="group inline-flex items-center justify-center gap-2.5 h-12 px-7 rounded-xl font-bold text-sm bg-white text-[hsl(220,30%,15%)] shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 whitespace-nowrap"
-              >
-                Começar grátis
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/auth"
-                className="inline-flex items-center justify-center h-12 px-6 rounded-xl text-sm font-semibold text-white/70 hover:text-white border border-white/15 hover:border-white/30 hover:bg-white/5 transition-all duration-200 whitespace-nowrap"
-              >
-                Já tenho conta
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-2 text-[11px] text-white/30 pt-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
-              <span>14 dias grátis</span>
-              <span className="mx-1 text-white/10">•</span>
-              <span>Sem cartão</span>
-              <span className="mx-1 text-white/10">•</span>
-              <span>Setup em 5min</span>
-            </div>
+          {/* Top Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-md border border-white/10 bg-white/5 shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-colors cursor-default">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+              A nova era da gestão para restaurantes
+            </span>
           </div>
 
-          {/* Right — Screenshot (desktop) */}
-          <div className="relative hidden md:block animate-[fade-up_0.7s_cubic-bezier(0.16,1,0.3,1)_0.3s_both]">
-            <div
-              className="relative"
-              style={{ transform: "perspective(1200px) rotateY(-6deg) rotateX(2deg)" }}
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-display leading-[1.1]">
+            O sistema perfeito para <br className="hidden sm:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50">
+              o seu restaurante crescer.
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed font-medium">
+            Tudo em um só lugar. Esqueça planilhas confusas e sistemas lentos. Experimente o SaaS mais inteligente, rápido e bonito do mercado, construído por quem vive o food service.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
+            <Link
+              to="/auth?plan=free"
+              className="group relative inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full font-bold text-base bg-white text-black overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              style={{ boxShadow: '0 0 40px hsl(0 0% 100% / 0.15)' }}
             >
-              <div className="absolute -inset-6 rounded-3xl blur-[60px]" style={{ background: 'hsl(234 80% 50% / 0.12)' }} />
-              <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5" style={{ background: 'hsl(220 30% 8%)' }}>
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
-                  </div>
-                  <div className="flex-1 mx-8">
-                    <div className="h-5 rounded-md max-w-[200px] mx-auto flex items-center justify-center" style={{ background: 'hsl(220 20% 12%)' }}>
-                      <span className="text-[10px] text-white/25 font-medium">app.gardengestao.com.br</span>
-                    </div>
-                  </div>
-                </div>
-                <img src={dashboardMockup} alt="Dashboard do Garden Gestão" className="w-full" loading="eager" />
-              </div>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+              Começar grátis agora
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/auth"
+              className="inline-flex items-center justify-center h-14 px-8 rounded-full text-base font-semibold text-white/80 hover:text-white backdrop-blur-md border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300"
+            >
+              Já tenho uma conta
+            </Link>
+          </div>
+
+          {/* Trust indicators */}
+          <div className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-xs text-white/40 pt-2 font-medium">
+            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-emerald-500" /> Sem cartão de crédito</span>
+            <span className="w-1 h-1 rounded-full bg-white/20 hidden md:block" />
+            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-emerald-500" /> Setup em 5 minutos</span>
+            <span className="w-1 h-1 rounded-full bg-white/20 hidden md:block" />
+            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-emerald-500" /> Cancele quando quiser</span>
           </div>
         </div>
 
-        {/* Feature pills row */}
-        <div className="mt-14 md:mt-20 flex flex-wrap items-center justify-center gap-3 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.5s_both]">
+        {/* Feature Pills */}
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-3 animate-[fade-up_0.8s_ease-out_0.2s_both] max-w-4xl mx-auto">
           {features.map(({ icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all hover:scale-[1.04]"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-[1.05] hover:bg-white/10 cursor-default"
               style={{
-                background: 'hsl(220 60% 50% / 0.08)',
-                color: 'hsl(220 80% 72%)',
-                border: '1px solid hsl(220 60% 50% / 0.12)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                color: 'rgba(255, 255, 255, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(12px)',
               }}
             >
-              <AppIcon name={icon} size={16} />
+              <AppIcon name={icon} size={16} className="text-white/60" />
               {label}
             </div>
           ))}
         </div>
 
-        {/* Mobile screenshot */}
-        <div className="md:hidden mt-12 animate-[fade-up_0.6s_cubic-bezier(0.16,1,0.3,1)_0.4s_both]">
-          <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl">
-            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5" style={{ background: 'hsl(220 30% 8%)' }}>
-              <div className="w-2 h-2 rounded-full bg-red-400/60" />
-              <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-              <div className="w-2 h-2 rounded-full bg-green-400/60" />
+        {/* 3D Dashboard Mockup Presentation */}
+        <div className="relative mt-20 sm:mt-24 w-full max-w-5xl mx-auto animate-[fade-up_1s_ease-out_0.4s_both] group">
+          <div
+            className="relative transition-transform duration-700 ease-out hover:scale-[1.02]"
+            style={{ transform: "perspective(1200px) rotateX(4deg)", transformStyle: "preserve-3d" }}
+          >
+            {/* Glow behind the mockup */}
+            <div className="absolute -inset-10 rounded-[3rem] blur-[80px] bg-gradient-to-b from-primary/20 to-transparent opacity-50 group-hover:opacity-70 transition-opacity duration-700" />
+
+            {/* Mockup Container */}
+            <div className="relative rounded-2xl sm:rounded-[32px] overflow-hidden border border-white/10 bg-black shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
+              {/* Fake Browser Header */}
+              <div className="flex items-center gap-2 px-4 py-3 sm:py-4 border-b border-white/10 bg-[#0a0a0a]">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FF5F56] border border-white/10" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FFBD2E] border border-white/10" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#27C93F] border border-white/10" />
+                </div>
+                <div className="flex-1 mx-4 sm:mx-8">
+                  <div className="h-6 sm:h-8 rounded-md max-w-[280px] mx-auto flex items-center justify-center bg-white/5 border border-white/5">
+                    <AppIcon name="Lock" size={12} className="text-white/40 mr-1.5" />
+                    <span className="text-[10px] sm:text-xs text-white/40 font-medium tracking-wide">app.gardengestao.com.br</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Image with subtle overlay for contrast */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
+                <img
+                  src={dashboardMockup}
+                  alt="Dashboard do Garden Gestão"
+                  className="w-full object-cover"
+                  loading="eager"
+                />
+              </div>
             </div>
-            <img src={dashboardMockup} alt="Dashboard do Garden Gestão" className="w-full" loading="eager" />
           </div>
         </div>
       </div>
 
-      {/* Bottom curve transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-8 bg-background rounded-t-[2rem]" />
+      {/* Bottom fade transition to app background - matches dark mode background var(--background) */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   );
 }
