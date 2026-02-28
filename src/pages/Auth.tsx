@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { lovable } from '@/integrations/lovable/index';
 import gardenLogo from '@/assets/logo.png';
 
@@ -377,10 +376,6 @@ export default function Auth() {
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
-          <div className="md:hidden"></div> {/* Spacer for mobile so it doesn't look weird without theme toggle */}
-          <div className="hidden md:block">
-            <ThemeToggle className="lg:text-foreground text-white/80 hover:text-white hover:bg-white/10" />
-          </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
