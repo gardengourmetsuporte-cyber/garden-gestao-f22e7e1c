@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.ai-insights]
 verify_jwt = false
+
+[functions.whatsapp-recover-carts]
+verify_jwt = false
