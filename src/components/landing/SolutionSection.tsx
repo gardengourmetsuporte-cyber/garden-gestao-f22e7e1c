@@ -42,55 +42,75 @@ const modules = [
 
 export function SolutionSection() {
   return (
-    <section id="como-funciona" className="py-20 md:py-28 relative">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
+    <section id="como-funciona" className="py-24 md:py-32 relative bg-[#000000] overflow-hidden">
+      {/* Top subtle border */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
-          <p className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-primary bg-primary/8 px-3 py-1.5 rounded-full mb-5">
-            Como funciona
-          </p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground leading-tight font-display">
-            Comece em 3 passos simples
+        <div className="text-center max-w-2xl mx-auto mb-20 md:mb-28">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/70">
+              Como funciona
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-[1.15] tracking-tight font-display mb-4">
+            Comece em 3 passos práticos
           </h2>
-          <p className="text-muted-foreground mt-4 text-base leading-relaxed">
-            Do zero ao controle total em menos de 10 minutos.
+          <p className="text-white/50 text-base sm:text-lg leading-relaxed font-medium">
+            Do zero ao controle total em menos de 10 minutos. Esqueça sistemas complexos.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="space-y-16 md:space-y-24">
+        <div className="space-y-24 md:space-y-32">
           {steps.map((step, i) => (
             <div
               key={step.number}
-              className={`grid md:grid-cols-2 gap-10 md:gap-14 items-center ${i % 2 === 1 ? "md:[direction:rtl]" : ""}`}
+              className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${i % 2 === 1 ? "lg:[direction:rtl]" : ""}`}
             >
-              <div className="md:[direction:ltr] space-y-5">
-                <div className="inline-flex items-center gap-3">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center font-extrabold text-sm text-white"
-                    style={{
-                      background: 'linear-gradient(135deg, hsl(220 70% 16%), hsl(234 75% 28%))',
-                    }}
-                  >
-                    {step.number}
-                  </div>
-                  <div className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-primary/30 to-transparent" />
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{step.desc}</p>
-              </div>
-              <div className="md:[direction:ltr]">
-                <div className="relative group">
-                  <div className="absolute -inset-3 bg-gradient-to-b from-primary/8 via-primary/4 to-transparent blur-[40px] rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="rounded-2xl overflow-hidden border border-border/50 bg-card shadow-sm group-hover:shadow-lg group-hover:-translate-y-1 transition-all duration-400">
-                    <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/50 border-b border-border/30">
-                      <div className="w-2.5 h-2.5 rounded-full bg-destructive/30" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-warning/30" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-success/30" />
+              <div className="lg:[direction:ltr] space-y-6">
+                <div className="inline-flex items-center gap-4">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-30" />
+                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-white bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-emerald-400/30">
+                      {step.number}
                     </div>
-                    <img src={step.image} alt={step.alt} className="w-full" loading="lazy" />
+                  </div>
+                  <div className="h-px flex-1 min-w-[60px] max-w-[100px] bg-gradient-to-r from-emerald-500/50 to-transparent" />
+                </div>
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-4 tracking-tight">{step.title}</h3>
+                  <p className="text-white/50 leading-relaxed text-base sm:text-lg font-medium">{step.desc}</p>
+                </div>
+              </div>
+
+              {/* 3D Mockup Container */}
+              <div className="lg:[direction:ltr] perspective-1200 group">
+                <div
+                  className="relative transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                  style={{
+                    transform: i % 2 === 0 ? "rotateY(-4deg) rotateX(2deg)" : "rotateY(4deg) rotateX(2deg)",
+                    transformStyle: "preserve-3d"
+                  }}
+                >
+                  {/* Ambient Glow */}
+                  <div className="absolute -inset-8 bg-gradient-to-tr from-emerald-500/10 via-transparent to-teal-500/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
+
+                  {/* Glass Card */}
+                  <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0a0a0a] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
+                    {/* Mac Header */}
+                    <div className="flex items-center gap-1.5 px-3 py-2.5 sm:px-4 sm:py-3 border-b border-white/10 bg-white/[0.02]">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-white/10" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-white/10" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-white/10" />
+                    </div>
+                    {/* Content Image with dim overlay */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
+                      <img src={step.image} alt={step.alt} className="w-full object-cover" loading="lazy" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -98,27 +118,37 @@ export function SolutionSection() {
           ))}
         </div>
 
-        {/* Modules grid */}
-        <div className="mt-24 md:mt-32">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground mb-3 font-display">
+        {/* Modules Grid */}
+        <div className="mt-32 md:mt-40 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+          <div className="text-center mb-16 relative z-10">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight font-display">
               Tudo que você precisa, em um só lugar
             </h3>
-            <p className="text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">
-              10 módulos integrados que conversam entre si para você ter uma visão completa.
+            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg font-medium">
+              10 módulos integrados que conversam entre si para você ter a visão completa do negócio.
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
             {modules.map((m) => (
               <div
                 key={m.title}
-                className="group relative rounded-2xl border border-border/50 bg-card p-4 sm:p-5 text-center transition-all duration-300 hover:border-primary/20 hover:shadow-md hover:-translate-y-0.5"
+                className="group relative rounded-2xl p-[1px] overflow-hidden transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/8 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/12 transition-colors">
-                  <AppIcon name={m.icon} size={20} className="text-primary" />
+                {/* Border effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 group-hover:from-emerald-500/40 group-hover:to-transparent transition-colors duration-500" />
+
+                <div className="relative h-full bg-[#0a0a0a] rounded-[15px] p-5 text-center flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/30 transition-all duration-300 shadow-inner">
+                    <AppIcon name={m.icon} size={22} className="text-white/60 group-hover:text-emerald-400 transition-colors" />
+                  </div>
+                  <h4 className="font-bold text-white text-sm mb-2">{m.title}</h4>
+                  <p className="text-white/40 text-[11px] leading-relaxed hidden sm:block">
+                    {m.desc}
+                  </p>
                 </div>
-                <h4 className="font-bold text-foreground text-xs sm:text-sm mb-1">{m.title}</h4>
-                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed hidden sm:block">{m.desc}</p>
               </div>
             ))}
           </div>
