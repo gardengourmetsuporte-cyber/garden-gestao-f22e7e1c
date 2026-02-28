@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -50,7 +50,7 @@ interface MoreDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
+export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(function MoreDrawer({ open, onOpenChange }, _ref) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, isAdmin, isSuperAdmin, signOut, plan } = useAuth();
@@ -358,4 +358,5 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
       </div>
     </>
   );
-}
+});
+MoreDrawer.displayName = "MoreDrawer";
