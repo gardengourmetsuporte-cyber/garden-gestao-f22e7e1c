@@ -167,6 +167,7 @@ export function BottomTabBar() {
                 tab={tab}
                 active={isActive(tab.path)}
                 locked={isTabLocked(tab.path)}
+                moreOpen={moreOpen}
                 onClick={() => { setMoreOpen(false); isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path); }}
               />
             ))}
@@ -207,6 +208,7 @@ export function BottomTabBar() {
                 tab={tab}
                 active={isActive(tab.path)}
                 locked={isTabLocked(tab.path)}
+                moreOpen={moreOpen}
                 onClick={() => { setMoreOpen(false); isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path); }}
               />
             ))}
@@ -247,15 +249,19 @@ const TabButton = forwardRef<
     tab: TabDef;
     active: boolean;
     locked?: boolean;
+    moreOpen?: boolean;
     onClick: () => void;
   }
->(({ tab, active, locked, onClick }, ref) => {
+>(({ tab, active, locked, moreOpen, onClick }, ref) => {
   const [bouncing, setBouncing] = useState(false);
 
   const handleTap = () => {
     navigator.vibrate?.(10);
     setBouncing(true);
-    if (active) {
+    // If the More drawer is open, always navigate (close drawer + go to page)
+    if (moreOpen) {
+      onClick();
+    } else if (active) {
       // Already on this page — scroll to top
       const scrollable = document.querySelector('[data-scroll-container]')
         || document.querySelector('.flex-1.overflow-y-auto')
