@@ -39,23 +39,27 @@ function GridSkeleton({ rows = 2, cols = 2 }: { rows: number; cols: number }) {
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-4">
-      {/* Stats row */}
+    <div className="space-y-5">
+      {/* Welcome */}
+      <div className="space-y-1.5">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-3.5 w-32" />
+      </div>
+      {/* Hero balance card */}
+      <Skeleton className="h-28 w-full rounded-2xl" />
+      {/* Income/expense cards */}
       <div className="grid grid-cols-2 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="card-surface p-4 space-y-2">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-7 w-16" />
-          </div>
-        ))}
+        <Skeleton className="h-24 rounded-2xl" />
+        <Skeleton className="h-24 rounded-2xl" />
       </div>
       {/* Chart */}
-      <div className="card-surface p-4 space-y-3">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-40 w-full rounded-xl" />
+      <Skeleton className="h-40 w-full rounded-2xl" />
+      {/* Widgets */}
+      <div className="space-y-3">
+        {[1, 2].map(i => (
+          <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+        ))}
       </div>
-      {/* List */}
-      <ListSkeleton rows={3} />
     </div>
   );
 }

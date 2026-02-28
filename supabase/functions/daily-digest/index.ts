@@ -138,7 +138,36 @@ Deno.serve(async (req) => {
         alertCount += draftOrders.length;
       }
 
-      // 7. Appointments today
+      // 7. Checklist deadlines - items not completed today
+      const { data: checklistDeadlines } = await supabase
+        .from('checklist_deadline_settings')
+        .select('checklist_type, deadline_hour, deadline_minute')
+        .in('unit_id', unitIds)
+        .eq('is_active', true);
+
+      if (checklistDeadlines && checklistDeadlines.length > 0) {
+        // Check if today's checklists have pending items
+        const { data: todayCompletions } = await supabase
+          .from('checklist_completions')
+          .select('checklist_type')
+          .in('unit_id', unitIds)
+          .eq('date', today);
+
+        const completedTypes = new Set((todayCompletions || []).map((c: { checklist_type: string }) => c.checklist_type));
+        const pendingDeadlines = checklistDeadlines.filter(
+          (d: { checklist_type: string }) => !completedTypes.has(d.checklist_type)
+        );
+
+        if (pendingDeadlines.length > 0) {
+          const types = pendingDeadlines.map((d: { checklist_type: string; deadline_hour: number; deadline_minute: number }) => 
+            `${d.checklist_type} (até ${String(d.deadline_hour).padStart(2, '0')}:${String(d.deadline_minute).padStart(2, '0')})`
+          ).join(', ');
+          sections.push(`⏰ Checklists com prazo hoje: ${types}`);
+          alertCount += pendingDeadlines.length;
+        }
+      }
+
+      // 8. Appointments today
       const { data: appointments } = await supabase
         .from('manager_appointments')
         .select('title, scheduled_time')

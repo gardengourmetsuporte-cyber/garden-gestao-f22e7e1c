@@ -4,6 +4,7 @@ import { MonthSelector } from './MonthSelector';
 import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
 import { cn } from '@/lib/utils';
+import type { PrevMonthStats } from '@/hooks/usePreviousMonthStats';
 
 interface FinanceHomeProps {
   selectedMonth: Date;
@@ -14,6 +15,7 @@ interface FinanceHomeProps {
   onNavigate?: (tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => void;
   onAccountClick?: (account: FinanceAccount) => void;
   variant?: 'business' | 'personal';
+  prevMonthStats?: PrevMonthStats | null;
 }
 
 export function FinanceHome({
@@ -25,6 +27,7 @@ export function FinanceHome({
   onNavigate,
   onAccountClick,
   variant = 'business',
+  prevMonthStats,
 }: FinanceHomeProps) {
   const formatCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -33,6 +36,13 @@ export function FinanceHome({
   const profitPercent = monthStats.totalIncome > 0 
     ? ((profit / monthStats.totalIncome) * 100).toFixed(0) 
     : '0';
+
+  const incomeVariation = prevMonthStats && prevMonthStats.totalIncome > 0
+    ? ((monthStats.totalIncome - prevMonthStats.totalIncome) / prevMonthStats.totalIncome) * 100
+    : null;
+  const expenseVariation = prevMonthStats && prevMonthStats.totalExpense > 0
+    ? ((monthStats.totalExpense - prevMonthStats.totalExpense) / prevMonthStats.totalExpense) * 100
+    : null;
 
   return (
     <div className="px-4 py-3 lg:px-6 space-y-4">
@@ -103,6 +113,11 @@ export function FinanceHome({
           <p className="text-lg font-bold text-success">
             {formatCurrency(monthStats.totalIncome)}
           </p>
+          {incomeVariation !== null && (
+            <p className={cn("text-[10px] font-semibold mt-1", incomeVariation >= 0 ? "text-success/70" : "text-destructive/70")}>
+              {incomeVariation >= 0 ? '↑' : '↓'} {Math.abs(incomeVariation).toFixed(0)}% vs mês anterior
+            </p>
+          )}
         </button>
         <button
           onClick={() => onNavigate?.('transactions', { type: 'expense' })}
@@ -117,6 +132,11 @@ export function FinanceHome({
           <p className="text-lg font-bold text-destructive">
             {formatCurrency(monthStats.totalExpense)}
           </p>
+          {expenseVariation !== null && (
+            <p className={cn("text-[10px] font-semibold mt-1", expenseVariation <= 0 ? "text-success/70" : "text-destructive/70")}>
+              {expenseVariation >= 0 ? '↑' : '↓'} {Math.abs(expenseVariation).toFixed(0)}% vs mês anterior
+            </p>
+          )}
         </button>
       </div>
 

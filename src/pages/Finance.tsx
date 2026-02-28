@@ -12,6 +12,7 @@ import { FinancePlanning } from '@/components/finance/FinancePlanning';
 import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
+import { usePreviousMonthStats } from '@/hooks/usePreviousMonthStats';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useEmployees } from '@/hooks/useEmployees';
@@ -101,6 +102,7 @@ export default function Finance() {
 
   const { suppliers, addSupplier } = useSuppliers();
   const { employees, addEmployee } = useEmployees();
+  const prevMonthStats = usePreviousMonthStats(selectedMonth);
 
 
   const handleAddTransaction = (type: TransactionType) => {
@@ -176,6 +178,7 @@ export default function Finance() {
             monthStats={monthStats}
             onNavigate={handleFinanceNavigate}
             onAccountClick={handleAccountCardClick}
+            prevMonthStats={prevMonthStats}
           />
         )}
 
