@@ -97,6 +97,18 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Phone normalization helper (same logic as frontend normalizePhone)
+    function normalizePhoneBackend(raw: string | null): string | null {
+      if (!raw) return null;
+      let digits = raw.replace(/\D/g, "");
+      if (digits.length === 0) return null;
+      if (digits.startsWith("55") && digits.length >= 12) digits = digits.slice(2);
+      if (digits.startsWith("0") && digits.length >= 11) digits = digits.slice(1);
+      if (digits.length < 10) return null;
+      if (digits.length > 11) digits = digits.slice(0, 11);
+      return "55" + digits;
+    }
+
     let updated = 0;
     let created = 0;
     let errors = 0;
@@ -108,7 +120,8 @@ Deno.serve(async (req) => {
           .map((c: string) => c.replace(/"/g, "").trim());
 
         const name = nameIdx >= 0 ? cols[nameIdx] : null;
-        const phone = phoneIdx >= 0 ? cols[phoneIdx]?.replace(/\D/g, "") : null;
+        const rawPhone = phoneIdx >= 0 ? cols[phoneIdx] : null;
+        const phone = normalizePhoneBackend(rawPhone);
         const value = valueIdx >= 0 ? parseFloat(cols[valueIdx]?.replace(",", ".") || "0") : 0;
         const dateStr = dateIdx >= 0 ? cols[dateIdx] : null;
 
