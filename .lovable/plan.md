@@ -1,53 +1,45 @@
 
+## Plano: Widget de Insights com IA no Dashboard
 
-## Plano: Botão "Cotar" no fluxo de criação de pedido
+### Visão geral
+Criar um widget compacto no dashboard que exibe 2-4 cards de insights gerados pela IA, baseados nos dados reais da operação (financeiro, estoque, checklists, equipe). Os insights são carregados em background e atualizados a cada 10 minutos.
 
-### Problema
-Hoje, para fazer uma cotação, o usuário precisa ir na aba Cotações e montar tudo do zero. O ideal é que, ao criar um pedido para um fornecedor, ele tenha a opção de enviar os mesmos itens para cotação com outros fornecedores.
+### 1. Nova Edge Function: `ai-insights`
+- Reutiliza o mesmo padrão de autenticação JWT da `management-ai`
+- Consulta dados operacionais (saldo, estoque crítico, despesas pendentes, checklists, boletos vencendo, comparativo mensal)
+- Envia snapshot compacto para a IA (gemini-2.5-flash-lite - mais rápido/barato)
+- Pede exatamente 3-4 insights curtos em formato JSON via tool calling
+- Cada insight: `{ emoji, title, description, action_route? }`
+- Cache de 10min via `staleTime` no React Query
 
-### Fluxo proposto
+### 2. Novo hook: `useAIInsights`
+- Chama a edge function `ai-insights` via `supabase.functions.invoke`
+- React Query com `staleTime: 10 * 60 * 1000`
+- Retorna array de insights tipados
 
-1. Na sheet "Novo Pedido" (ao clicar "Pedir" em um fornecedor), adicionar um segundo botão **"Cotar"** ao lado do "Criar Pedido"
-2. Ao clicar em "Cotar", abre uma **segunda etapa** na mesma sheet onde o usuário seleciona **fornecedores adicionais** (mín. 1 extra, pois o original já está incluído)
-3. Ao confirmar, o sistema cria a cotação automaticamente com:
-   - O fornecedor original + os selecionados
-   - Os itens e quantidades já preenchidos
-   - Status `sent` (pronta para receber respostas)
-4. Redireciona para a aba "Cotações"
+### 3. Novo componente: `AIInsightsWidget`
+- Cards minimalistas com emoji, título curto (1 linha) e descrição (1-2 linhas)
+- Tap no card navega para a rota relevante (finance, inventory, etc.)
+- Skeleton shimmer enquanto carrega
+- Sem estado expandido/colapsado - sempre visível e compacto
 
-### Mudanças técnicas
+### 4. Integrar no Dashboard
+- Adicionar `'ai-insights'` ao `DEFAULT_WIDGETS` em `useDashboardWidgets`
+- Adicionar renderer no `WIDGET_RENDERERS` do `AdminDashboard`
+- Posicionar logo após o SetupChecklistWidget (antes dos outros widgets)
 
-**`src/pages/Orders.tsx`**
-- Adicionar estado `cotationStep` (boolean) para controlar a etapa de seleção de fornecedores extras
-- Adicionar estado `extraSuppliers` (string[]) para fornecedores adicionais selecionados
-- Na sheet de "Novo Pedido", adicionar botão "Cotar" (ícone Scale) com variant outline ao lado de "Criar Pedido"
-- Quando `cotationStep = true`, mostrar lista de fornecedores (excluindo o atual) com chips selecionáveis
-- Botão final "Iniciar Cotação" que chama `createQuotation` do hook `useQuotations`
-- Importar `useQuotations` e o ícone `Scale`
-
-**Nenhuma mudança de backend necessária** — usa o hook `useQuotations.createQuotation` que já existe.
-
-### Layout da sheet (2 etapas)
-
+### Estrutura dos insights esperados
 ```text
-┌─────────────────────────────┐
-│ Novo Pedido — Fornecedor X  │
-│                             │
-│ [Item 1]         [qty] [un] │
-│ [Item 2]         [qty] [un] │
-│                             │
-│ [ Criar Pedido ]  [ Cotar ] │  ← Etapa 1
-└─────────────────────────────┘
-
-Ao clicar "Cotar":
-
-┌─────────────────────────────┐
-│ Cotação — Fornecedor X + ?  │
-│                             │
-│ Selecione mais fornecedores │
-│ [Forn. A] [Forn. B] [Forn.C]│
-│                             │
-│ ← Voltar  [Iniciar Cotação] │  ← Etapa 2
-└─────────────────────────────┘
+┌─────────────────────────────────┐
+│ 💡 Insights da IA               │
+├─────────────────────────────────┤
+│ 📉 Margem caiu 12%             │
+│ Despesas subiram vs mês passado │
+│                                 │
+│ ⚠️ 5 itens em estoque crítico  │
+│ Picanha e Alcatra quase zerando │
+│                                 │
+│ 💰 R$2.400 em contas vencendo  │
+│ 3 boletos nos próximos 5 dias  │
+└─────────────────────────────────┘
 ```
-
