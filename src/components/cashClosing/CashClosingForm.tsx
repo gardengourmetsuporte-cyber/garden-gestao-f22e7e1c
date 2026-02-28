@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
@@ -147,22 +147,27 @@ export function CashClosingForm({ onSuccess }: Props) {
     }
   }, [draft]);
 
-  // Auto-save draft on every change
+  // Auto-save draft debounced to avoid jank during typing
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => {
-    saveDraft({
-      selectedDate: operationalDate,
-      initialCash,
-      cashCounted,
-      debitAmount,
-      creditAmount,
-      pixAmount,
-      mealVoucherAmount,
-      deliveryAmount,
-      signedAccountAmount,
-      cashDifference,
-      notes,
-      expenses,
-    });
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      saveDraft({
+        selectedDate: operationalDate,
+        initialCash,
+        cashCounted,
+        debitAmount,
+        creditAmount,
+        pixAmount,
+        mealVoucherAmount,
+        deliveryAmount,
+        signedAccountAmount,
+        cashDifference,
+        notes,
+        expenses,
+      });
+    }, 500);
+    return () => { if (draftTimerRef.current) clearTimeout(draftTimerRef.current); };
   }, [operationalDate, initialCash, cashCounted, debitAmount, creditAmount, pixAmount, mealVoucherAmount, deliveryAmount, signedAccountAmount, cashDifference, notes, expenses]);
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
