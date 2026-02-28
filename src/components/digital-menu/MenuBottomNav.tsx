@@ -18,10 +18,10 @@ const tabs: { key: MenuTab; icon: string; iconFilled: string; label: string }[] 
 
 export function MenuBottomNav({ active, onTabChange, cartCount }: Props) {
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 safe-area-pb">
-      <div className="max-w-4xl mx-auto px-3 pb-2">
-        <div className="bg-card/90 backdrop-blur-2xl border border-border/40 rounded-2xl shadow-xl">
-          <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-0 inset-x-0 z-50 pointer-events-none" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="mx-4 mb-3 pointer-events-auto">
+        <div className="rounded-full shadow-[0_4px_30px_rgba(0,0,0,0.4)]" style={{ background: 'rgba(26,26,26,0.92)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}>
+          <div className="flex items-center justify-around h-[64px]">
             {tabs.map(tab => {
               const isActive = active === tab.key;
               return (
