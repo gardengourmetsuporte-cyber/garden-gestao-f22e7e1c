@@ -9,12 +9,12 @@ interface AppIconProps {
   style?: React.CSSProperties;
   /** 0 = outlined, 1 = filled (default) */
   fill?: 0 | 1;
-  /** Weight: 100-700, default 300 for modern premium look */
+  /** Weight: 100-700, default 400 for modern premium look */
   weight?: number;
 }
 
 export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
-  ({ name, size = 24, className, style, fill = 0, weight = 300 }, ref) => {
+  ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
     const materialName = ICON_MAP[name] || name;
 
     return (
