@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const SEGMENTS: CustomerSegment[] = ['vip', 'frequent', 'occasional', 'inactive', 'new'];
+const PAGE_SIZE = 30;
 
 
 export default function Customers() {
@@ -41,6 +42,7 @@ export default function Customers() {
   const [detailCustomer, setDetailCustomer] = useState<Customer | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [campaignOpen, setCampaignOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const salesFileRef = useRef<HTMLInputElement>(null);
 
   const { data: detailEvents = [], isLoading: eventsLoading } = useCustomerEvents(detailCustomer?.id || null);
@@ -52,10 +54,11 @@ export default function Customers() {
 
   useFabAction({ icon: 'Plus', label: 'Novo cliente', onClick: openNewSheet }, [openNewSheet]);
 
-  // One-time auto-import of Goomer customers CSV
+  // One-time auto-import of Goomer customers CSV (scoped to unit)
   useEffect(() => {
-    const IMPORT_KEY = 'goomer_customers_imported_v1';
-    if (localStorage.getItem(IMPORT_KEY) || !activeUnit) return;
+    if (!activeUnit) return;
+    const IMPORT_KEY = `goomer_customers_imported_${activeUnit.id}`;
+    if (localStorage.getItem(IMPORT_KEY)) return;
     
     const doImport = async () => {
       try {
@@ -72,8 +75,10 @@ export default function Customers() {
         if (data?.error) throw new Error(data.error);
         
         localStorage.setItem(IMPORT_KEY, 'done');
-        toast.success(`${data.inserted} clientes importados do Goomer!`);
-        qc.invalidateQueries({ queryKey: ['customers'] });
+        if (data.inserted > 0) {
+          toast.success(`${data.inserted} clientes importados do Goomer!`);
+          qc.invalidateQueries({ queryKey: ['customers'] });
+        }
       } catch (err: any) {
         console.error('Auto-import failed:', err);
         localStorage.removeItem(IMPORT_KEY);
@@ -96,6 +101,13 @@ export default function Customers() {
     }
     return list.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }, [customers, search, segmentFilter]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, segmentFilter]);
+
+  const visibleCustomers = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   const segCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -196,16 +208,27 @@ export default function Customers() {
             subtitle={search || segmentFilter ? 'Nenhum resultado para os filtros.' : 'Cadastre seu primeiro cliente ou importe um CSV.'}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            {filtered.map(c => (
-              <CustomerCard
-                key={c.id}
-                customer={c}
-                onEdit={() => setDetailCustomer(c)}
-                onDelete={() => setDeletingId(c.id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {visibleCustomers.map(c => (
+                <CustomerCard
+                  key={c.id}
+                  customer={c}
+                  onEdit={() => setDetailCustomer(c)}
+                  onDelete={() => setDeletingId(c.id)}
+                />
+              ))}
+            </div>
+            {visibleCount < filtered.length && (
+              <Button
+                variant="outline"
+                className="w-full mt-3 rounded-xl border-emerald-500/10"
+                onClick={() => setVisibleCount(v => v + PAGE_SIZE)}
+              >
+                Mostrar mais ({filtered.length - visibleCount} restantes)
+              </Button>
+            )}
+          </>
         )}
       </div>
 

@@ -7,7 +7,6 @@ const corsHeaders = {
 
 function parseDateBR(dateStr: string): string | null {
   if (!dateStr) return null;
-  // Format: DD/MM/YYYY, HH:MM:SS or DD/MM/YYYY
   const match = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})(?:,?\s*(\d{2}):(\d{2}):(\d{2}))?/);
   if (!match) return null;
   const [, dd, mm, yyyy, hh, mi, ss] = match;
@@ -20,6 +19,17 @@ function parseBirthdayBR(dateStr: string): string | null {
   if (!match) return null;
   const [, dd, mm, yyyy] = match;
   return `${yyyy}-${mm}-${dd}`;
+}
+
+function normalizePhone(raw: string | null): string | null {
+  if (!raw) return null;
+  let digits = raw.replace(/\D/g, '');
+  if (digits.length === 0) return null;
+  if (digits.startsWith('55') && digits.length >= 12) digits = digits.slice(2);
+  if (digits.startsWith('0') && digits.length >= 11) digits = digits.slice(1);
+  if (digits.length < 10) return null;
+  if (digits.length > 11) digits = digits.slice(0, 11);
+  return '55' + digits;
 }
 
 Deno.serve(async (req) => {
@@ -56,11 +66,21 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "CSV vazio" }), { status: 400, headers: corsHeaders });
     }
 
-    // Skip header
+    // Fetch existing phones for this unit to deduplicate
+    const { data: existingCustomers } = await supabase
+      .from('customers')
+      .select('phone')
+      .eq('unit_id', unitId)
+      .not('phone', 'is', null);
+    
+    const existingPhones = new Set(
+      (existingCustomers || []).map((c: any) => c.phone).filter(Boolean)
+    );
+
+    // Skip header and parse records
     const records: any[] = [];
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
-      // Parse semicolon-separated quoted fields
       const fields: string[] = [];
       let current = '';
       let inQuotes = false;
@@ -80,15 +100,18 @@ Deno.serve(async (req) => {
       const name = fields[0]?.trim();
       if (!name) continue;
 
-      const phone = fields[1]?.trim() || null;
+      const phone = normalizePhone(fields[1]?.trim() || null);
       const email = fields[2]?.trim() || null;
       const birthday = parseBirthdayBR(fields[3] || '');
-      // fields[4] = delivery orders (skip, use total)
       const totalSpent = parseFloat(fields[5]?.replace(',', '.') || '0') || 0;
       const totalOrders = parseInt(fields[6] || '0', 10) || 0;
-      // fields[7] = first order (skip)
       const lastOrder = parseDateBR(fields[8] || '');
       const address = fields[9]?.trim() || null;
+
+      // Skip duplicates by phone
+      if (phone && existingPhones.has(phone)) continue;
+      // Track within batch too
+      if (phone) existingPhones.add(phone);
 
       records.push({
         unit_id: unitId,
@@ -109,10 +132,7 @@ Deno.serve(async (req) => {
     let inserted = 0;
     for (let i = 0; i < records.length; i += 100) {
       const chunk = records.slice(i, i + 100);
-      const { error } = await supabase.from('customers').upsert(chunk, {
-        onConflict: 'unit_id,phone',
-        ignoreDuplicates: true,
-      });
+      const { error } = await supabase.from('customers').insert(chunk);
       if (error) {
         console.error(`Chunk error at ${i}:`, error);
         return new Response(JSON.stringify({ error: error.message, inserted }), { status: 500, headers: corsHeaders });
@@ -121,7 +141,9 @@ Deno.serve(async (req) => {
     }
 
     // Recalculate scores for all imported customers
-    await supabase.rpc('recalculate_all_customer_scores', { p_unit_id: unitId });
+    if (inserted > 0) {
+      await supabase.rpc('recalculate_all_customer_scores', { p_unit_id: unitId });
+    }
 
     return new Response(JSON.stringify({ success: true, inserted }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {

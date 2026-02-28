@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Progress } from '@/components/ui/progress';
 import type { Customer } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
@@ -10,7 +11,7 @@ interface Props {
   onDelete: () => void;
 }
 
-export function CustomerCard({ customer, onEdit, onDelete }: Props) {
+export const CustomerCard = forwardRef<HTMLDivElement, Props>(function CustomerCard({ customer, onEdit, onDelete }, ref) {
   const seg = SEGMENT_CONFIG[customer.segment] || SEGMENT_CONFIG.new;
   const daysSince = customer.last_purchase_at
     ? differenceInDays(new Date(), new Date(customer.last_purchase_at))
@@ -18,6 +19,7 @@ export function CustomerCard({ customer, onEdit, onDelete }: Props) {
 
   return (
     <div
+      ref={ref}
       className="rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60 p-4 space-y-3 hover:border-emerald-500/25 active:scale-[0.98] transition-all duration-200 cursor-pointer"
       onClick={onEdit}
     >
@@ -85,4 +87,4 @@ export function CustomerCard({ customer, onEdit, onDelete }: Props) {
       </div>
     </div>
   );
-}
+});
