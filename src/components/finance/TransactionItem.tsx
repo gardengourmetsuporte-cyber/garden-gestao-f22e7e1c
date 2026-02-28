@@ -195,15 +195,17 @@ export function TransactionItem({ transaction, onClick, onTogglePaid, onDelete, 
         </button>
       </div>
 
-      {/* Main content */}
       <div
         className={cn(
-          'flex items-center gap-3 p-3 bg-card border rounded-xl w-full relative z-10 touch-pan-y transition-all duration-300',
-          !is_paid && 'opacity-60',
-          swipeOffset === 0 ? 'hover:bg-primary/5 hover:border-primary/20 active:scale-[0.98]' : '',
-          swipeOffset === 0 && 'transition-transform duration-200 ease-out'
+          'flex items-center gap-3 p-3.5 bg-card/60 backdrop-blur-2xl border border-white/[0.04] rounded-[18px] w-full relative z-10 touch-pan-y transition-all duration-300',
+          !is_paid && 'opacity-70',
+          swipeOffset === 0 ? 'hover:bg-primary/10 hover:border-primary/30 hover:shadow-glow active:scale-[0.985]' : '',
+          swipeOffset === 0 && 'transition-transform duration-300 ease-out'
         )}
-        style={{ transform: `translate3d(-${swipeOffset}px, 0, 0)` }}
+        style={{
+          transform: `translate3d(-${swipeOffset}px, 0, 0)`,
+          boxShadow: is_paid ? 'inset 0 1px 1px rgba(255,255,255,0.06), 0 4px 16px rgba(0,0,0,0.15)' : 'inset 0 1px 1px rgba(255,255,255,0.02)',
+        }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

@@ -19,35 +19,34 @@
 }
 
 /* =========================================================
-   DESIGN SYSTEM - Garden Gestão (Dark Command Center)
+   DESIGN SYSTEM - Garden Gestão (Premium SaaS)
    ========================================================= */
 
 @layer base {
 
-  /* Base tokens shared by both themes */
   :root {
-    --radius: 1.25rem;
+    --radius: 1rem;
 
-    /* Brand colors */
-    --garden-green: 150 28% 22%;
+    /* Brand base */
+    --garden-green: 156 72% 38%;
 
-    /* Neon glow tokens */
-    --neon-cyan: 215 50% 28%;
-    --neon-green: 142 71% 45%;
-    --neon-red: 0 84% 60%;
-    --neon-amber: 38 92% 50%;
-    --neon-purple: 218 55% 22%;
+    /* Neon glow tokens - Enhanced for premium feel */
+    --neon-cyan: 190 90% 50%;
+    --neon-green: 156 72% 45%;
+    --neon-red: 348 83% 53%;
+    --neon-amber: 43 96% 56%;
+    --neon-purple: 250 89% 65%;
 
     /* Semantic finance tokens */
-    --color-income: 142 71% 45%;
-    --color-expense: 0 84% 60%;
-    --color-transfer: 234 50% 60%;
-    --color-pending: 38 92% 50%;
-    --color-credit-card: 225 40% 50%;
+    --color-income: 156 72% 45%;
+    --color-expense: 348 83% 53%;
+    --color-transfer: 220 80% 65%;
+    --color-pending: 43 96% 56%;
+    --color-credit-card: 260 70% 60%;
 
-    /* Surface hierarchy */
-    --surface-elevated: 240 5% 12%;
-    --surface-sunken: 240 6% 4%;
+    /* Premium surface gradients */
+    --surface-elevated: 240 5% 15%;
+    --surface-sunken: 240 10% 4%;
 
     /* Coin animation tokens */
     --coin-1: 190 90% 55%;
@@ -58,119 +57,112 @@
     --coin-3-glow: 328 92% 62% / 0.9;
     --coin-4: 262 92% 70%;
     --coin-4-glow: 262 92% 70% / 0.9;
-
-    /* Bonus tier tokens (5, 10, 15, 20 pts) */
-    --bonus-5: 142 60% 50%;
-    --bonus-5-glow: 142 60% 50% / 0.9;
-    --bonus-10: 38 92% 50%;
-    --bonus-10-glow: 38 92% 50% / 0.9;
-    --bonus-15: 328 85% 60%;
-    --bonus-15-glow: 328 85% 60% / 0.9;
-    --bonus-20: 280 90% 65%;
-    --bonus-20-glow: 280 90% 65% / 0.9;
   }
 
-  /* ===== DARK THEME (default) ===== */
+  /* ===== DARK THEME (Premium Slate/Zinc) ===== */
   .dark {
-    --background: 240 6% 4%;
-    --foreground: 0 0% 95%;
+    --background: 240 6% 3.5%;
+    --foreground: 0 0% 98%;
 
-    --card: 240 5% 12%;
-    --card-foreground: 0 0% 95%;
+    /* Soft elevated cards */
+    --card: 240 5% 7%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 240 5% 9%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 240 5% 8%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 215 50% 28%;
+    /* Sapphire/Emerald primary */
+    --primary: 156 72% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 4% 14%;
-    --secondary-foreground: 0 0% 80%;
+    --secondary: 240 5% 12%;
+    --secondary-foreground: 240 5% 85%;
 
-    --muted: 240 4% 16%;
-    --muted-foreground: 0 0% 50%;
+    --muted: 240 5% 14%;
+    --muted-foreground: 240 4% 55%;
 
-    --accent: 218 55% 22%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 240 5% 18%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 348 83% 53%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;
+    --success: 156 72% 45%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 43 96% 56%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 240 4% 20%;
-    --input: 240 4% 12%;
-    --ring: 215 50% 28%;
+    --border: 240 5% 14%;
+    --input: 240 5% 12%;
+    --ring: 156 72% 40%;
 
-    /* Glow & Shadow tokens */
-    --glow-primary: 0 0 20px hsl(215 50% 28% / 0.3), 0 0 48px hsl(215 50% 28% / 0.15);
-    --glow-accent: 0 0 16px hsl(218 55% 22% / 0.2), 0 0 40px hsl(218 55% 22% / 0.1);
-    --glow-success: 0 0 16px hsl(142 71% 45% / 0.15), 0 0 32px hsl(142 71% 45% / 0.08);
-    --glow-destructive: 0 0 16px hsl(0 84% 60% / 0.15), 0 0 32px hsl(0 84% 60% / 0.08);
-    --glow-warning: 0 0 16px hsl(38 92% 50% / 0.15), 0 0 32px hsl(38 92% 50% / 0.08);
-    --glow-cyan: 0 0 16px hsl(215 50% 28% / 0.25), 0 0 32px hsl(215 50% 28% / 0.12);
+    /* Ultra-refined Glows (Apple/Vercel style) */
+    --glow-primary: 0 0 40px hsl(156 72% 40% / 0.15), 0 0 20px hsl(156 72% 40% / 0.1);
+    --glow-accent: 0 0 30px hsl(250 89% 65% / 0.1), 0 0 15px hsl(250 89% 65% / 0.05);
+    --glow-success: 0 0 40px hsl(156 72% 45% / 0.15), 0 0 20px hsl(156 72% 45% / 0.1);
+    --glow-destructive: 0 0 40px hsl(348 83% 53% / 0.15), 0 0 20px hsl(348 83% 53% / 0.1);
+    --glow-warning: 0 0 40px hsl(43 96% 56% / 0.15), 0 0 20px hsl(43 96% 56% / 0.1);
+    --glow-cyan: 0 0 40px hsl(190 90% 50% / 0.15), 0 0 20px hsl(190 90% 50% / 0.1);
 
-    /* Gradient tokens */
-    --gradient-brand: linear-gradient(135deg, hsl(215 45% 18%), hsl(218 55% 22%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(215 45% 18% / 0.12), hsl(218 55% 22% / 0.08));
-    --gradient-surface: linear-gradient(180deg, hsl(240 5% 12%), hsl(240 6% 5%));
-    --gradient-gold: linear-gradient(135deg, hsl(215 40% 15%), hsl(218 55% 20%), hsl(220 45% 16%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(215 45% 18% / 0.15), hsl(218 55% 22% / 0.08));
+    /* Subtle Gradients */
+    --gradient-brand: linear-gradient(135deg, hsl(156 72% 35%), hsl(160 80% 45%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(156 72% 40% / 0.15), hsl(160 80% 45% / 0.05));
+    --gradient-surface: linear-gradient(180deg, hsl(240 5% 10%), hsl(240 6% 5%));
+    --gradient-gold: linear-gradient(135deg, hsl(43 90% 45%), hsl(45 95% 55%), hsl(40 85% 40%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(43 90% 45% / 0.15), hsl(45 95% 55% / 0.05));
 
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.5), 0 6px 20px hsl(0 0% 0% / 0.35);
-    --shadow-card-hover: 0 6px 24px hsl(0 0% 0% / 0.6), 0 12px 40px hsl(0 0% 0% / 0.3);
-    --shadow-elevated: 0 8px 32px hsl(0 0% 0% / 0.7), 0 16px 56px hsl(0 0% 0% / 0.35);
-    --shadow-floating: 0 8px 32px hsl(0 0% 0% / 0.25), 0 2px 8px hsl(0 0% 0% / 0.15);
-    --shadow-glow: 0 0 24px hsl(215 50% 28% / 0.35), 0 0 48px hsl(215 50% 28% / 0.18);
+    /* Shadows */
+    --shadow-card: 0 2px 10px hsl(240 20% 0% / 0.4), 0 8px 30px hsl(240 20% 0% / 0.3), inset 0 1px 1px hsl(0 0% 100% / 0.05);
+    --shadow-card-hover: 0 4px 20px hsl(240 20% 0% / 0.6), 0 12px 40px hsl(240 20% 0% / 0.4), inset 0 1px 1px hsl(0 0% 100% / 0.08);
+    --shadow-elevated: 0 10px 40px hsl(240 20% 0% / 0.8), 0 20px 60px hsl(240 20% 0% / 0.5), inset 0 1px 1px hsl(0 0% 100% / 0.1);
+    --shadow-floating: 0 10px 40px hsl(240 20% 0% / 0.5), inset 0 1px 1px hsl(0 0% 100% / 0.08);
+    --shadow-glow: 0 0 30px hsl(156 72% 40% / 0.2), inset 0 1px 1px hsl(0 0% 100% / 0.1);
   }
 
   /* ===== LIGHT THEME ===== */
   :root:not(.dark) {
-    /* Light theme semantic overrides */
-    --color-income: 142 71% 30%;
-    --color-expense: 0 72% 42%;
-    --color-transfer: 234 50% 45%;
-    --color-pending: 38 80% 40%;
-    --color-credit-card: 225 35% 45%;
+    --color-income: 156 72% 38%;
+    --color-expense: 348 83% 45%;
+    --color-transfer: 220 80% 50%;
+    --color-pending: 43 96% 45%;
+    --color-credit-card: 260 70% 50%;
+
     --surface-elevated: 0 0% 100%;
-    --surface-sunken: 234 8% 95%;
-    --background: 234 8% 97%;
-    --foreground: 240 15% 6%;
+    --surface-sunken: 240 5% 96%;
+    --background: 240 5% 98%;
+    --foreground: 240 10% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 15% 6%;
+    --card-foreground: 240 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 15% 6%;
+    --popover-foreground: 240 10% 10%;
 
-    --primary: 215 50% 20%;
+    --primary: 156 72% 38%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 234 12% 93%;
-    --secondary-foreground: 240 12% 15%;
+    --secondary: 240 5% 94%;
+    --secondary-foreground: 240 10% 20%;
 
-    --muted: 234 8% 94%;
-    --muted-foreground: 240 6% 35%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 5% 45%;
 
-    --accent: 218 55% 18%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 10% 10%;
 
-    --destructive: 0 72% 48%;
+    --destructive: 348 83% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 32%;
+    --success: 156 72% 40%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 42%;
+    --warning: 43 96% 45%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 234 12% 88%;
-    --input: 234 8% 93%;
-    --ring: 215 50% 20%;
+    --border: 240 6% 90%;
+    --input: 240 5% 94%;
+    --ring: 156 72% 38%;
 
     /* Neon overrides for light — darker so they read well */
     --neon-cyan: 215 50% 20%;
@@ -351,45 +343,78 @@
 
   .card-base,
   .card-surface {
-    @apply bg-card rounded-2xl transition-all duration-200;
-    border: 1px solid transparent;
+    @apply bg-card rounded-[20px] transition-all duration-300;
+    border: 1px solid hsl(var(--border) / 0.5);
     box-shadow: var(--shadow-card);
   }
 
   :is(.dark) .card-base,
   :is(.dark) .card-surface {
-    @apply bg-card border border-border/50 shadow-sm rounded-xl overflow-hidden relative;
-    box-shadow: inset 0 1px 1px 0 hsl(0 0% 100% / 0.05), 0 1px 3px hsl(0 0% 0% / 0.1);
+    @apply bg-card/60 backdrop-blur-2xl border border-white/[0.04] rounded-2xl overflow-hidden relative;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Sweep reflection for premium dark cards */
+  :is(.dark) .card-base::after,
+  :is(.dark) .card-surface::after,
+  :is(.dark) .card-elevated::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 40%, hsl(0 0% 100% / 0.02) 45%, hsl(0 0% 100% / 0.04) 50%, transparent 55%);
+    background-size: 200% 200%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  :is(.dark) .card-base:hover::after,
+  :is(.dark) .card-surface:hover::after,
+  :is(.dark) .card-elevated:hover::after {
+    opacity: 1;
+    animation: premiumShine 2.5s ease-out;
+  }
+
+  @keyframes premiumShine {
+    0% {
+      background-position: 200% 50%;
+    }
+
+    100% {
+      background-position: -200% 50%;
+    }
   }
 
   .card-press {
-    @apply card-surface active:scale-[0.98] transition-all duration-300 hover:shadow-md hover:border-primary/30;
-    box-shadow: inset 0 1px 1px 0 hsl(0 0% 100% / 0.05), 0 2px 8px hsl(var(--primary) / 0.05);
+    @apply card-surface active:scale-[0.985] transition-all duration-300 hover:border-primary/30;
   }
 
   .card-elevated {
-    @apply bg-card rounded-2xl transition-all duration-200;
+    @apply bg-card rounded-2xl transition-all duration-300;
     border: 1px solid transparent;
     box-shadow: var(--shadow-elevated);
   }
 
   :is(.dark) .card-elevated {
-    border-color: hsl(var(--border) / 0.15);
+    @apply bg-card/90 backdrop-blur-2xl border-border/15;
   }
 
   .card-interactive {
-    @apply bg-card rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.97];
+    @apply bg-card rounded-2xl cursor-pointer transition-all duration-300 active:scale-[0.98];
     border: 1px solid transparent;
     box-shadow: var(--shadow-card);
   }
 
   :is(.dark) .card-interactive {
-    border-color: hsl(var(--border) / 0.15);
+    @apply bg-card/80 backdrop-blur-xl border-border/15;
+    box-shadow: inset 0 1px 1px 0 hsl(0 0% 100% / 0.05), 0 2px 8px hsl(0 0% 0% / 0.1);
   }
 
   .card-interactive:hover {
-    box-shadow: var(--shadow-card-hover);
-    border-color: hsl(var(--primary) / 0.1);
+    @apply bg-primary/5;
+    border-color: hsl(var(--primary) / 0.2);
+    box-shadow: inset 0 1px 1px 0 hsl(0 0% 100% / 0.05), 0 4px 12px hsl(0 0% 0% / 0.15);
   }
 
   .card-glass {
@@ -595,7 +620,7 @@
   /* ========== PAGE HEADERS ========== */
 
   .page-header {
-    @apply bg-card/60 backdrop-blur-xl border-b border-border/40 sticky z-40;
+    @apply bg-background/80 backdrop-blur-2xl border-b border-border/30 sticky z-40 transition-all duration-300;
     top: calc(env(safe-area-inset-top) + 3.5rem);
   }
 
