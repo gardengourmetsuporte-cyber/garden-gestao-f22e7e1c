@@ -136,6 +136,21 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
 function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handler = (e: PromiseRejectionEvent) => {
+      const msg = String(e.reason?.message || e.reason || "");
+      // Auto-reload on dynamic import failures (stale cache / deploy)
+      if (msg.includes("Failed to fetch dynamically imported module") || msg.includes("Loading chunk")) {
+        e.preventDefault();
+        const key = "unhandled_import_reload";
+        const count = parseInt(sessionStorage.getItem(key) || "0", 10);
+        if (count < 2) {
+          sessionStorage.setItem(key, String(count + 1));
+          window.location.reload();
+        } else {
+          sessionStorage.removeItem(key);
+          toast.error("Erro ao carregar a página. Tente recarregar manualmente.");
+        }
+        return;
+      }
       console.error("[Unhandled rejection]", e.reason);
       toast.error("Ocorreu um erro inesperado.");
       e.preventDefault();
