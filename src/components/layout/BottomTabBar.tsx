@@ -32,7 +32,7 @@ const CARDAPIO_TABS: TabDef[] = [
   { key: 'pedidos', icon: 'ShoppingBag', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
 ];
 
-const HIDDEN_ROUTES = ['/finance'];
+const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
 
 export function BottomTabBar() {
   const location = useLocation();

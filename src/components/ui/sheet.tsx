@@ -20,7 +20,7 @@ interface SheetProps {
   mobileHandleOnly?: boolean;
 }
 
-const Sheet = ({ children, mobileHandleOnly, ...props }: SheetProps) => {
+const Sheet = React.forwardRef<HTMLDivElement, SheetProps>(({ children, mobileHandleOnly, ...props }, _ref) => {
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -38,7 +38,8 @@ const Sheet = ({ children, mobileHandleOnly, ...props }: SheetProps) => {
       <SheetPrimitive.Root {...props}>{children}</SheetPrimitive.Root>
     </SheetMobileContext.Provider>
   );
-};
+});
+Sheet.displayName = "Sheet";
 
 // ── Trigger ──
 const SheetTrigger = React.forwardRef<

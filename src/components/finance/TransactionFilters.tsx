@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -23,14 +23,14 @@ interface TransactionFiltersProps {
   accounts: FinanceAccount[];
 }
 
-export function TransactionFilters({
+export const TransactionFilters = forwardRef<HTMLDivElement, TransactionFiltersProps>(function TransactionFilters({
   open,
   onOpenChange,
   filters,
   onFiltersChange,
   categories,
   accounts
-}: TransactionFiltersProps) {
+}, _ref) {
   const [localFilters, setLocalFilters] = useState<TransactionFiltersState>(filters);
 
   const handleApply = () => {
@@ -200,4 +200,4 @@ export function TransactionFilters({
       </SheetContent>
     </Sheet>
   );
-}
+});
