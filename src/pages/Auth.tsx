@@ -21,34 +21,24 @@ const nameSchema = z.string().min(2, 'Nome deve ter no mínimo 2 caracteres');
 // ── Brand Panel (left half on desktop) ─────────────────────────────
 function BrandPanel() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden">
-      {/* Animated navy gradient background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
-          backgroundSize: '350% 350%',
-          animation: 'navyCardFlow 12s ease-in-out infinite',
-        }}
-      />
-
+    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-[#000000]">
       {/* Subtle grid pattern overlay */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.05]"
         style={{
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
 
-      {/* Glow orbs */}
+      {/* Glow orbs - Emerald theme */}
       <div
-        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20"
-        style={{ background: 'hsl(220 80% 50%)' }}
+        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 pointer-events-none"
+        style={{ background: 'hsl(142 71% 45%)' }}
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-15"
-        style={{ background: 'hsl(234 80% 60%)' }}
+        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-15 pointer-events-none"
+        style={{ background: 'hsl(142 76% 36%)' }}
       />
 
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
@@ -57,10 +47,10 @@ function BrandPanel() {
           className="relative w-36 h-36 rounded-[2rem] overflow-hidden flex items-center justify-center"
           style={{
             background: 'white',
-            boxShadow: '0 0 100px hsl(220 80% 50% / 0.2), 0 25px 70px hsl(224 45% 6% / 0.6)',
+            boxShadow: '0 0 100px hsl(142 71% 45% / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
           }}
         >
-          <img alt="Garden Gestão" className="w-[75%] h-[75%] object-contain" src={gardenLogo} />
+          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
         </div>
 
         {/* Headline */}
@@ -86,9 +76,9 @@ function BrandPanel() {
               key={label}
               className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium"
               style={{
-                background: 'hsl(220 60% 50% / 0.1)',
-                color: 'hsl(220 80% 70%)',
-                border: '1px solid hsl(220 60% 50% / 0.15)',
+                background: 'hsl(142 71% 45% / 0.1)',
+                color: 'hsl(142 76% 60%)',
+                border: '1px solid hsl(142 71% 45% / 0.15)',
               }}
             >
               <AppIcon name={icon} size={14} />
@@ -99,8 +89,8 @@ function BrandPanel() {
 
         {/* Social proof */}
         <div className="text-center space-y-4 mt-4">
-          <p className="text-sm text-white/30 leading-relaxed max-w-xs mx-auto">
-            Simplifique a gestão do seu negócio com uma plataforma completa e intuitiva.
+          <p className="text-sm text-white/40 leading-relaxed max-w-xs mx-auto">
+            Simplifique a gestão do seu negócio com a plataforma mais veloz do mercado.
           </p>
           <div className="flex items-center justify-center gap-6 text-white/20 text-xs">
             <div className="flex items-center gap-1.5">
@@ -123,40 +113,33 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-[#000000]"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
-        background: 'linear-gradient(135deg, hsl(224 45% 6%) 0%, hsl(220 70% 16%) 18%, hsl(234 75% 28%) 36%, hsl(220 65% 18%) 54%, hsl(228 55% 10%) 72%, hsl(234 75% 26%) 88%, hsl(224 45% 6%) 100%)',
-        backgroundSize: '350% 350%',
-        animation: 'navyCardFlow 12s ease-in-out infinite',
       }}
     >
-      {/* Animated glow orbs */}
+      {/* Subtle border top separator indicating header */}
+      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+
+      {/* Animated glow orbs - Emerald Theme */}
       <div
         className="absolute top-[15%] left-[20%] w-[250px] h-[250px] rounded-full blur-[100px] opacity-20 pointer-events-none"
         style={{
-          background: 'hsl(220 80% 50%)',
+          background: 'hsl(142 71% 45%)',
           animation: 'float-orb-1 8s ease-in-out infinite',
         }}
       />
       <div
         className="absolute bottom-[20%] right-[15%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-15 pointer-events-none"
         style={{
-          background: 'hsl(234 80% 60%)',
+          background: 'hsl(142 76% 36%)',
           animation: 'float-orb-2 10s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="absolute top-[50%] left-[60%] w-[150px] h-[150px] rounded-full blur-[60px] opacity-10 pointer-events-none"
-        style={{
-          background: 'hsl(210 90% 55%)',
-          animation: 'float-orb-3 6s ease-in-out infinite',
         }}
       />
 
       {/* Grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
@@ -164,26 +147,26 @@ function MobileBrandHeader() {
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center gap-5 pt-16 pb-10">
+      <div className="relative z-10 flex flex-col items-center gap-6 pt-16 pb-12">
         {/* Logo with entrance animation */}
         <div
           className="w-24 h-24 rounded-[1.25rem] overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
           style={{
             background: 'white',
-            boxShadow: '0 0 80px hsl(220 80% 50% / 0.2), 0 16px 50px hsl(224 45% 6% / 0.6)',
+            boxShadow: '0 0 80px hsl(142 71% 45% / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
           }}
         >
-          <img alt="Garden Gestão" className="w-[75%] h-[75%] object-contain" src={gardenLogo} />
+          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
         </div>
 
         {/* Title with staggered entrance */}
         <div className="text-center space-y-1.5 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.25s_both]">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight font-display">Garden</h1>
+          <h1 className="text-4xl font-extrabold text-white tracking-tight font-display">Garden</h1>
           <p className="text-[10px] text-white/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
         </div>
 
         {/* Feature pills with stagger */}
-        <div className="flex flex-wrap items-center justify-center gap-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.4s_both]">
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.4s_both]">
           {[
             { icon: 'BarChart3', label: 'Financeiro' },
             { icon: 'Package', label: 'Estoque' },
@@ -195,9 +178,9 @@ function MobileBrandHeader() {
               key={label}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
               style={{
-                background: 'hsl(220 60% 50% / 0.1)',
-                color: 'hsl(220 80% 70%)',
-                border: '1px solid hsl(220 60% 50% / 0.15)',
+                background: 'hsl(142 71% 45% / 0.1)',
+                color: 'hsl(142 76% 60%)',
+                border: '1px solid hsl(142 71% 45% / 0.15)',
               }}
             >
               <AppIcon name={icon} size={12} />
@@ -207,7 +190,7 @@ function MobileBrandHeader() {
         </div>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-5 text-white/20 text-[10px] mt-1 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
+        <div className="flex items-center justify-center gap-5 text-white/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
           <div className="flex items-center gap-1">
             <AppIcon name="Shield" size={12} />
             <span>Dados seguros</span>
@@ -220,7 +203,8 @@ function MobileBrandHeader() {
         </div>
       </div>
 
-      {/* Bottom curve */}
+      {/* Bottom overlay blending mask into page content */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-6 bg-background rounded-t-3xl" />
     </div>
   );
@@ -338,8 +322,8 @@ export default function Auth() {
         const redirectUrl = planFromUrl
           ? `${window.location.origin}/auth?plan=${planFromUrl}&payment=success`
           : tokenFromUrl
-          ? `${window.location.origin}/invite?token=${tokenFromUrl}`
-          : `${window.location.origin}/`;
+            ? `${window.location.origin}/invite?token=${tokenFromUrl}`
+            : `${window.location.origin}/`;
         const { error } = await signUp(email, password, fullName, redirectUrl);
         if (error) {
           if (error.message.includes('already registered')) toast.error('Este email já está cadastrado');
@@ -373,12 +357,12 @@ export default function Auth() {
   const formSubtitle = isNewPassword
     ? 'Defina sua nova senha abaixo'
     : isResetPassword
-    ? 'Enviaremos um link de recuperação'
-    : isLogin
-    ? 'Acesse sua conta para continuar'
-    : planFromUrl
-    ? `Cadastre-se para ativar o plano ${planFromUrl.charAt(0).toUpperCase() + planFromUrl.slice(1)}`
-    : 'Preencha os dados para começar';
+      ? 'Enviaremos um link de recuperação'
+      : isLogin
+        ? 'Acesse sua conta para continuar'
+        : planFromUrl
+          ? `Cadastre-se para ativar o plano ${planFromUrl.charAt(0).toUpperCase() + planFromUrl.slice(1)}`
+          : 'Preencha os dados para começar';
 
   return (
     <div className="min-h-[100dvh] flex flex-row bg-background">
@@ -396,180 +380,180 @@ export default function Auth() {
           <ThemeToggle className="lg:text-foreground text-white/80 hover:text-white hover:bg-white/10" />
         </div>
 
-      <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
+        <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
           {/* Mobile brand header */}
           <MobileBrandHeader />
 
-        <div className="w-full flex flex-col items-center px-6 py-8">
+          <div className="w-full flex flex-col items-center px-6 py-8">
 
-          <div className="w-full max-w-[380px] space-y-6">
-            {/* Header */}
-            <div className="space-y-1.5">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                {formTitle}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {formSubtitle}
-              </p>
-            </div>
-
-            {/* Social login buttons - top position */}
-            {!isNewPassword && !isResetPassword && (
-              <div className="space-y-2.5">
-                <button
-                  type="button"
-                  onClick={async () => { try { await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin, extraParams: { prompt: "select_account" } }); } catch { toast.error('Erro ao conectar com Google'); } }}
-                  className="w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-colors border border-border/60 bg-card hover:bg-secondary/60 text-foreground"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
-                  Continuar com Google
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => { try { await lovable.auth.signInWithOAuth("apple", { redirect_uri: window.location.origin }); } catch { toast.error('Erro ao conectar com Apple'); } }}
-                  className="w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-colors border border-border/60 bg-card hover:bg-secondary/60 text-foreground"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                  </svg>
-                  Continuar com Apple
-                </button>
+            <div className="w-full max-w-[380px] space-y-6">
+              {/* Header */}
+              <div className="space-y-1.5">
+                <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                  {formTitle}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {formSubtitle}
+                </p>
               </div>
-            )}
 
-            {/* Divider */}
-            {!isNewPassword && !isResetPassword && (
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-border/60" />
-                <span className="text-xs text-muted-foreground/60 uppercase tracking-wider">ou</span>
-                <div className="flex-1 h-px bg-border/60" />
-              </div>
-            )}
-
-            {/* Form */}
-            {isNewPassword ? (
-              <form onSubmit={handleSetNewPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword" className="text-sm font-medium text-muted-foreground">Nova Senha</Label>
-                  <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'newPassword' ? 'text-primary' : 'text-muted-foreground')}>
-                      <AppIcon name="Lock" size={18} />
-                    </div>
-                    <Input id="newPassword" type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} onFocus={() => setFocusedField('newPassword')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className={cn(inputClasses('password'), "pr-11")} />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-                      <AppIcon name={showPassword ? "EyeOff" : "Eye"} size={18} />
-                    </button>
-                  </div>
-                  {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+              {/* Social login buttons - top position */}
+              {!isNewPassword && !isResetPassword && (
+                <div className="space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={async () => { try { await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin, extraParams: { prompt: "select_account" } }); } catch { toast.error('Erro ao conectar com Google'); } }}
+                    className="w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-colors border border-border/60 bg-card hover:bg-secondary/60 text-foreground"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                    </svg>
+                    Continuar com Google
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => { try { await lovable.auth.signInWithOAuth("apple", { redirect_uri: window.location.origin }); } catch { toast.error('Erro ao conectar com Apple'); } }}
+                    className="w-full h-12 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-colors border border-border/60 bg-card hover:bg-secondary/60 text-foreground"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                    </svg>
+                    Continuar com Apple
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-muted-foreground">Confirmar Senha</Label>
-                  <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'confirmPassword' ? 'text-primary' : 'text-muted-foreground')}>
-                      <AppIcon name="Lock" size={18} />
-                    </div>
-                    <Input id="confirmPassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} onFocus={() => setFocusedField('confirmPassword')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className={inputClasses('confirmPassword')} />
-                  </div>
-                  {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword}</p>}
-                </div>
-                <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold rounded-xl" style={{ boxShadow: '0 4px 20px hsl(var(--primary) / 0.2)' }}>
-                  {isSubmitting ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Aguarde...</span> : 'Salvar nova senha'}
-                </Button>
-              </form>
-            ) : isResetPassword ? (
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="resetEmail" className="text-sm font-medium text-muted-foreground">Email</Label>
-                  <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'resetEmail' ? 'text-primary' : 'text-muted-foreground')}>
-                      <AppIcon name="Mail" size={18} />
-                    </div>
-                    <Input id="resetEmail" type="email" value={email} onChange={e => setEmail(e.target.value)} onFocus={() => setFocusedField('resetEmail')} onBlur={() => setFocusedField(null)} placeholder="seu@email.com" className={inputClasses('email')} />
-                  </div>
-                  {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-                </div>
-                <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold rounded-xl" style={{ boxShadow: '0 4px 20px hsl(var(--primary) / 0.2)' }}>
-                  {isSubmitting ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Aguarde...</span> : 'Enviar link de recuperação'}
-                </Button>
-              </form>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin && (
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-sm font-medium text-muted-foreground">Nome Completo</Label>
-                    <div className="relative">
-                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'fullName' ? 'text-primary' : 'text-muted-foreground')}>
-                        <AppIcon name="User" size={18} />
-                      </div>
-                      <Input id="fullName" type="text" autoComplete="name" autoCapitalize="words" value={fullName} onChange={e => setFullName(e.target.value)} onFocus={() => setFocusedField('fullName')} onBlur={() => setFocusedField(null)} placeholder="Seu nome" className={inputClasses('fullName')} />
-                    </div>
-                    {errors.fullName && <p className="text-xs text-destructive">{errors.fullName}</p>}
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
-                  <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'email' ? 'text-primary' : 'text-muted-foreground')}>
-                      <AppIcon name="Mail" size={18} />
-                    </div>
-                    <Input id="email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={e => setEmail(e.target.value)} onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)} placeholder="seu@email.com" className={inputClasses('email')} />
-                  </div>
-                  {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-sm font-medium text-muted-foreground">Senha</Label>
-                    {isLogin && (
-                      <button type="button" onClick={() => { setIsResetPassword(true); setErrors({}); }} className="text-xs text-primary hover:text-primary/80 transition-colors font-medium">
-                        Esqueceu a senha?
-                      </button>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'password' ? 'text-primary' : 'text-muted-foreground')}>
-                      <AppIcon name="Lock" size={18} />
-                    </div>
-                    <Input id="password" type={showPassword ? 'text' : 'password'} autoComplete={isLogin ? "current-password" : "new-password"} value={password} onChange={e => setPassword(e.target.value)} onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className={cn(inputClasses('password'), "pr-11")} />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-                      <AppIcon name={showPassword ? "EyeOff" : "Eye"} size={18} />
-                    </button>
-                  </div>
-                  {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
-                </div>
-
-                <div className="pt-1">
-                  <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold rounded-xl" style={{ boxShadow: '0 4px 20px hsl(var(--primary) / 0.2)' }}>
-                    {isSubmitting ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Aguarde...</span> : <>{isLogin ? 'Entrar' : 'Criar conta'}<AppIcon name="ArrowRight" size={18} className="ml-2" /></>}
-                  </Button>
-                </div>
-              </form>
-            )}
-
-            {/* Toggle login/signup */}
-            <div className="text-center pt-2">
-              {isResetPassword ? (
-                <button type="button" onClick={() => { setIsResetPassword(false); setErrors({}); }} className="text-sm text-primary font-medium hover:text-primary/80 transition-colors">
-                  ← Voltar para o login
-                </button>
-              ) : canSignUp ? (
-                <button type="button" onClick={() => { setIsLogin(!isLogin); setErrors({}); setPassword(''); setFullName(''); }} className="text-sm text-muted-foreground">
-                  {isLogin ? <>Não tem conta? <span className="font-medium text-primary">Cadastre-se</span></> : <>Já tem conta? <span className="font-medium text-primary">Entrar</span></>}
-                </button>
-              ) : (
-                <button type="button" onClick={() => navigate('/landing')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  ← Voltar para o site
-                </button>
               )}
+
+              {/* Divider */}
+              {!isNewPassword && !isResetPassword && (
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-border/60" />
+                  <span className="text-xs text-muted-foreground/60 uppercase tracking-wider">ou</span>
+                  <div className="flex-1 h-px bg-border/60" />
+                </div>
+              )}
+
+              {/* Form */}
+              {isNewPassword ? (
+                <form onSubmit={handleSetNewPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword" className="text-sm font-medium text-muted-foreground">Nova Senha</Label>
+                    <div className="relative">
+                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'newPassword' ? 'text-primary' : 'text-muted-foreground')}>
+                        <AppIcon name="Lock" size={18} />
+                      </div>
+                      <Input id="newPassword" type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} onFocus={() => setFocusedField('newPassword')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className={cn(inputClasses('password'), "pr-11")} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                        <AppIcon name={showPassword ? "EyeOff" : "Eye"} size={18} />
+                      </button>
+                    </div>
+                    {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-muted-foreground">Confirmar Senha</Label>
+                    <div className="relative">
+                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'confirmPassword' ? 'text-primary' : 'text-muted-foreground')}>
+                        <AppIcon name="Lock" size={18} />
+                      </div>
+                      <Input id="confirmPassword" type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} onFocus={() => setFocusedField('confirmPassword')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className={inputClasses('confirmPassword')} />
+                    </div>
+                    {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword}</p>}
+                  </div>
+                  <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold rounded-xl" style={{ boxShadow: '0 4px 20px hsl(var(--primary) / 0.2)' }}>
+                    {isSubmitting ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Aguarde...</span> : 'Salvar nova senha'}
+                  </Button>
+                </form>
+              ) : isResetPassword ? (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="resetEmail" className="text-sm font-medium text-muted-foreground">Email</Label>
+                    <div className="relative">
+                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'resetEmail' ? 'text-primary' : 'text-muted-foreground')}>
+                        <AppIcon name="Mail" size={18} />
+                      </div>
+                      <Input id="resetEmail" type="email" value={email} onChange={e => setEmail(e.target.value)} onFocus={() => setFocusedField('resetEmail')} onBlur={() => setFocusedField(null)} placeholder="seu@email.com" className={inputClasses('email')} />
+                    </div>
+                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                  </div>
+                  <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold rounded-xl" style={{ boxShadow: '0 4px 20px hsl(var(--primary) / 0.2)' }}>
+                    {isSubmitting ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Aguarde...</span> : 'Enviar link de recuperação'}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {!isLogin && (
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName" className="text-sm font-medium text-muted-foreground">Nome Completo</Label>
+                      <div className="relative">
+                        <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'fullName' ? 'text-primary' : 'text-muted-foreground')}>
+                          <AppIcon name="User" size={18} />
+                        </div>
+                        <Input id="fullName" type="text" autoComplete="name" autoCapitalize="words" value={fullName} onChange={e => setFullName(e.target.value)} onFocus={() => setFocusedField('fullName')} onBlur={() => setFocusedField(null)} placeholder="Seu nome" className={inputClasses('fullName')} />
+                      </div>
+                      {errors.fullName && <p className="text-xs text-destructive">{errors.fullName}</p>}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
+                    <div className="relative">
+                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'email' ? 'text-primary' : 'text-muted-foreground')}>
+                        <AppIcon name="Mail" size={18} />
+                      </div>
+                      <Input id="email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={e => setEmail(e.target.value)} onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)} placeholder="seu@email.com" className={inputClasses('email')} />
+                    </div>
+                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="text-sm font-medium text-muted-foreground">Senha</Label>
+                      {isLogin && (
+                        <button type="button" onClick={() => { setIsResetPassword(true); setErrors({}); }} className="text-xs text-primary hover:text-primary/80 transition-colors font-medium">
+                          Esqueceu a senha?
+                        </button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <div className={cn("absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200", focusedField === 'password' ? 'text-primary' : 'text-muted-foreground')}>
+                        <AppIcon name="Lock" size={18} />
+                      </div>
+                      <Input id="password" type={showPassword ? 'text' : 'password'} autoComplete={isLogin ? "current-password" : "new-password"} value={password} onChange={e => setPassword(e.target.value)} onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)} placeholder="••••••••" className={cn(inputClasses('password'), "pr-11")} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                        <AppIcon name={showPassword ? "EyeOff" : "Eye"} size={18} />
+                      </button>
+                    </div>
+                    {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                  </div>
+
+                  <div className="pt-1">
+                    <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-base font-semibold rounded-xl" style={{ boxShadow: '0 4px 20px hsl(var(--primary) / 0.2)' }}>
+                      {isSubmitting ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Aguarde...</span> : <>{isLogin ? 'Entrar' : 'Criar conta'}<AppIcon name="ArrowRight" size={18} className="ml-2" /></>}
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {/* Toggle login/signup */}
+              <div className="text-center pt-2">
+                {isResetPassword ? (
+                  <button type="button" onClick={() => { setIsResetPassword(false); setErrors({}); }} className="text-sm text-primary font-medium hover:text-primary/80 transition-colors">
+                    ← Voltar para o login
+                  </button>
+                ) : canSignUp ? (
+                  <button type="button" onClick={() => { setIsLogin(!isLogin); setErrors({}); setPassword(''); setFullName(''); }} className="text-sm text-muted-foreground">
+                    {isLogin ? <>Não tem conta? <span className="font-medium text-primary">Cadastre-se</span></> : <>Já tem conta? <span className="font-medium text-primary">Entrar</span></>}
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => navigate('/landing')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    ← Voltar para o site
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
         </div>
 
         {/* Footer */}
