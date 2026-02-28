@@ -527,7 +527,7 @@ export default function OrdersPage() {
 
         {/* Create Order Sheet */}
         <Sheet open={sheetOpen} onOpenChange={(open) => { setSheetOpen(open); if (!open) { setCotationStep(false); setExtraSuppliers([]); } }}>
-          <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto bg-[#0a1a10]">
+          <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
             <SheetHeader className="pb-4">
               <SheetTitle>
                 {cotationStep

@@ -244,7 +244,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
 
       {/* Task Picker Sheet */}
       <Sheet open={pickerHour !== null} onOpenChange={(open) => !open && setPickerHour(null)}>
-        <SheetContent side="bottom" className="h-auto max-h-[60vh] rounded-t-3xl overflow-y-auto bg-[#0a1a10]">
+        <SheetContent side="bottom" className="h-auto max-h-[60vh] rounded-t-3xl overflow-y-auto">
           <SheetHeader className="text-left pb-2">
             <SheetTitle>
               Agendar às {pickerHour !== null ? `${String(pickerHour).padStart(2, '0')}:00` : ''}

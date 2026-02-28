@@ -526,7 +526,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl overflow-y-auto bg-[#0a1a10]">
+      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl overflow-y-auto">
         <SheetHeader className="text-left pb-2">
           <SheetTitle>Categorias</SheetTitle>
           <SheetDescription>Crie, edite ou exclua categorias dos seus lembretes</SheetDescription>
