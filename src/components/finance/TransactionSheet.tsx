@@ -872,10 +872,10 @@ export function TransactionSheet({
             {/* Save and Continue - only for new transactions */}
             {!editingTransaction && (
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={handleSaveAndContinue}
                 disabled={isLoading}
-                className="text-primary w-full mb-2"
+                className="w-full h-12 mb-2"
               >
                 Salvar e continuar
               </Button>
