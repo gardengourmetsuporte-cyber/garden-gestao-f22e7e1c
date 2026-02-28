@@ -1,44 +1,43 @@
 
 
-## Plano de Melhorias — Fase 3: Automações, Relatórios e Performance
+## Plano de Testes Completos — Auditoria End-to-End
 
-### 1. Corrigir warning no console (ReceiveOrderSheet)
-- O `ReceiveOrderSheet` tem o mesmo problema de ref que já corrigimos no `AIInsightsWidget` — componente funcional sem `forwardRef` dentro do `SheetContent`
-- Identificar o componente problemático e envolver com `React.forwardRef`
+Vou usar o browser automation para navegar por todos os módulos principais, verificar renderização, interações e fluxos críticos. O teste será dividido em batches:
 
-### 2. Relatório Financeiro: Exportação de Extrato em CSV
-- Adicionar botão "Exportar CSV" na tela de transações (`FinanceTransactions`)
-- Gerar CSV com: data, descrição, categoria, valor, tipo, status (pago/pendente), conta
-- Permitir exportar o mês selecionado completo
+### Batch 1: Dashboard + Finance
+1. Navegar ao Dashboard (`/`) — verificar widgets (saldo, gráfico, contas a vencer, sugestão de compras, ranking, checklists)
+2. Navegar ao Financeiro (`/finance`) — verificar comparativo mensal (variação vs mês anterior), cards de receita/despesa
+3. Testar botão Export CSV na aba de transações
+4. Verificar fluxo de caixa projetado (widget `cash-flow` no dashboard, se habilitado)
 
-### 3. Automação: Lembrete de contas a vencer (Edge Function)
-- Criar edge function `bill-reminders` que roda diariamente (via cron)
-- Busca despesas não pagas com vencimento em 1-3 dias
-- Cria notificação in-app + push para cada admin
-- Diferente do daily-digest: este é específico e acionável
+### Batch 2: CRM + Customers
+5. Navegar a `/customers` — verificar BirthdayAlerts no topo
+6. Verificar tags nos CustomerCards
+7. Abrir CustomerSheet e testar adição de tags
+8. Verificar link WhatsApp nos alertas de aniversário
 
-### 4. Fluxo de Caixa Projetado no Dashboard
-- O `CashFlowProjection` já existe mas não está integrado no dashboard admin
-- Adicionar como widget opcional no `WIDGET_RENDERERS` e `useDashboardWidgets`
-- Acessível via dashboard para admins com acesso ao módulo financeiro
+### Batch 3: Estoque + Pedidos
+9. Navegar a `/inventory` — verificar cards e categorias
+10. Navegar a `/orders` — verificar OrdersTab e sugestões de reposição
+11. Testar criação de rascunho de pedido via AutoOrderWidget
 
-### 5. Performance: Lazy load de páginas pesadas
-- Verificar se todas as pages em `App.tsx` usam `React.lazy` (algumas podem estar importadas diretamente)
-- Garantir que páginas como `WhatsApp`, `Marketing`, `Recipes` são lazy-loaded
-- Adicionar prefetch nas rotas mais usadas
+### Batch 4: Checklists + Cash Closing
+12. Navegar a `/checklists` — verificar abertura/fechamento, pontos
+13. Navegar a `/cash-closing` — verificar WeeklySummary com variação semanal
+14. Testar formulário de fechamento de caixa
 
-### 6. Estoque: Histórico de preços por fornecedor
-- Criar tabela `supplier_price_history` com campos: item_id, supplier_id, unit_price, recorded_at, unit_id
-- Trigger que registra automaticamente quando `inventory_items.unit_price` muda
-- Exibir mini-gráfico de evolução de preço no card do item
+### Batch 5: Outros Módulos
+15. Navegar a `/employees`, `/recipes`, `/marketing`, `/whatsapp`, `/ranking`
+16. Verificar que cada página carrega sem erros (lazy loading funcionando)
+17. Checar console por warnings/errors em cada página
 
-### Arquivos a criar/editar:
-- `src/components/inventory/ReceiveOrderSheet.tsx` — fix forwardRef
-- `src/components/finance/FinanceTransactions.tsx` — botão export CSV
-- `src/lib/exportPdf.ts` — adicionar `exportTransactionsCsv()`
-- `supabase/functions/bill-reminders/index.ts` — nova edge function
-- `src/components/dashboard/AdminDashboard.tsx` — widget cash-flow
-- `src/hooks/useDashboardWidgets.ts` — registrar widget
-- `src/App.tsx` — verificar lazy imports
-- Migration SQL — tabela `supplier_price_history` + trigger
+### Batch 6: Settings + Edge Cases
+18. Navegar a `/settings` — verificar todas as abas
+19. Testar DashboardWidgetManager (reordenar/ocultar widgets)
+20. Verificar responsividade mobile (viewport 375px)
+
+### Entregáveis
+- Relatório completo de cada módulo: OK ou com bugs
+- Lista de bugs encontrados com screenshots
+- Correções imediatas para qualquer problema identificado
 
