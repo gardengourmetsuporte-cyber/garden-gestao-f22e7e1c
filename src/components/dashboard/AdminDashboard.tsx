@@ -14,6 +14,7 @@ import { SetupChecklistWidget } from './SetupChecklistWidget';
 import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
 import { PendingOrdersWidget } from './PendingOrdersWidget';
+import { PageSkeleton } from '@/components/ui/page-skeleton';
 
 // Lazy-load heavy below-fold widgets
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
@@ -124,10 +125,13 @@ interface WidgetContext {
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { hasAccess } = useUserModules();
+  const { hasAccess, isLoading: modulesLoading } = useUserModules();
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { widgets, setWidgets, resetDefaults, isVisible } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
+
+  // Gate: show skeleton until critical data is ready to avoid layout flash
+  const isReady = !statsLoading && !modulesLoading && !!profile;
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -140,6 +144,14 @@ export function AdminDashboard() {
   })();
 
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
+
+  if (!isReady) {
+    return (
+      <div className="px-4 py-3 lg:px-6">
+        <PageSkeleton variant="dashboard" />
+      </div>
+    );
+  }
 
   const ctx: WidgetContext = { hasAccess, stats, statsLoading, formatCurrency, navigate, userId: user?.id };
 
