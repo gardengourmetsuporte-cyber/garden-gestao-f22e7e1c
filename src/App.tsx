@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useRoutePersist, useRouteRestore } from "@/hooks/useRouteRestore";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 const LAZY_RELOAD_KEY = 'lazy_reload_count';
 
@@ -163,6 +164,7 @@ function AppRoutes() {
   useRoutePersist();
   useRouteRestore();
   useDocumentTitle();
+  useNetworkStatus();
 
   return (
     <>
