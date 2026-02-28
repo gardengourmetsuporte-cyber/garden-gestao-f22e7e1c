@@ -14,6 +14,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { normalizePhone } from '@/lib/normalizePhone';
 import type { GamificationPrize } from '@/hooks/useGamification';
 
 export default function DigitalMenu() {
@@ -49,7 +50,8 @@ export default function DigitalMenu() {
   const handleGameStart = async () => {
     if (!gameOrderId.trim()) { toast.error('Digite o número do pedido'); return; }
     if (!gameName.trim()) { toast.error('Digite seu nome'); return; }
-    if (!gamePhone.trim() || gamePhone.replace(/\D/g, '').length < 10) { toast.error('Digite um telefone válido'); return; }
+    const normalizedPhone = normalizePhone(gamePhone);
+    if (!normalizedPhone) { toast.error('Digite um telefone válido'); return; }
     setValidating(true);
     try {
       if (!isEnabled) { toast.error('Jogo desativado no momento'); return; }
@@ -58,18 +60,17 @@ export default function DigitalMenu() {
       // Upsert customer
       if (unitId) {
         const { supabase } = await import('@/integrations/supabase/client');
-        const phone = gamePhone.replace(/\D/g, '');
         const { data: existing } = await supabase
           .from('customers')
           .select('id')
           .eq('unit_id', unitId)
-          .eq('phone', phone)
+          .eq('phone', normalizedPhone)
           .maybeSingle();
         if (!existing) {
           await supabase.from('customers').insert({
             unit_id: unitId,
             name: gameName.trim(),
-            phone,
+            phone: normalizedPhone,
             origin: 'mesa',
             score: 0,
             segment: 'new',

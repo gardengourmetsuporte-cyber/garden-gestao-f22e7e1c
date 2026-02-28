@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { normalizePhone } from '@/lib/normalizePhone';
 import type { Customer } from '@/types/customer';
 
 export function useCustomers() {
@@ -33,7 +34,7 @@ export function useCustomers() {
         unit_id: unitId,
         created_by: user.id,
         name: input.name!,
-        phone: input.phone || null,
+        phone: normalizePhone(input.phone),
         email: input.email || null,
         origin: input.origin || 'manual',
         notes: input.notes || null,
@@ -49,7 +50,11 @@ export function useCustomers() {
 
   const updateCustomer = useMutation({
     mutationFn: async ({ id, ...input }: Partial<Customer> & { id: string }) => {
-      const { error } = await supabase.from('customers').update(input).eq('id', id);
+      const normalized = { ...input };
+      if ('phone' in normalized) {
+        normalized.phone = normalizePhone(normalized.phone);
+      }
+      const { error } = await supabase.from('customers').update(normalized).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

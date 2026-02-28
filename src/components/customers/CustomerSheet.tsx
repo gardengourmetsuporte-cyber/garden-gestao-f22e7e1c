@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { normalizePhone } from '@/lib/normalizePhone';
 import type { Customer } from '@/types/customer';
 
 const ORIGINS = [
@@ -50,7 +51,7 @@ export function CustomerSheet({ open, onOpenChange, customer, onSave, isSaving }
     onSave({
       ...(customer ? { id: customer.id } : {}),
       name: name.trim(),
-      phone: phone.trim() || null,
+      phone: normalizePhone(phone) || null,
       email: email.trim() || null,
       origin: origin as Customer['origin'],
       birthday: birthday || null,

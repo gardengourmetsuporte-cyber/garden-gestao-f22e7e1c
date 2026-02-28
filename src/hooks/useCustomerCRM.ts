@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 import { startOfMonth } from 'date-fns';
+import { registrarCompra } from '@/lib/customerService';
 import type { Customer, LoyaltyRule, LoyaltyEvent } from '@/types/customer';
 
 export function useCustomerCRM(customers: Customer[]) {
@@ -111,7 +112,17 @@ export function useCustomerCRM(customers: Customer[]) {
     },
   });
 
-  return { stats, loyaltyRules, rulesLoading, createRule, updateRule, deleteRule, addEvent, recalculateScores };
+  const registerPurchase = useMutation({
+    mutationFn: async ({ customerId, valor, date }: { customerId: string; valor: number; date?: string }) => {
+      await registrarCompra(customerId, valor, date);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['customers', unitId] });
+      toast.success('Compra registrada!');
+    },
+  });
+
+  return { stats, loyaltyRules, rulesLoading, createRule, updateRule, deleteRule, addEvent, recalculateScores, registerPurchase };
 }
 
 // Separate top-level hook for customer events
