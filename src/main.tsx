@@ -4,11 +4,19 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Force update: when a new service worker is installed, reload immediately
+// Force update: when a new service worker is installed, reload — but only after a grace period
 if ('serviceWorker' in navigator) {
+  let pendingSince: number | null = null;
+  const GRACE_MS = 30_000; // 30s grace period before auto-reload
+
   const forceActivate = (reg: ServiceWorkerRegistration) => {
     if (reg.waiting) {
-      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      // Only skip-wait if the update has been pending long enough
+      if (pendingSince && Date.now() - pendingSince > GRACE_MS) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } else if (!pendingSince) {
+        pendingSince = Date.now();
+      }
     }
   };
 
@@ -17,7 +25,6 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
 
-  // Wait until the SW is fully ready (more reliable on iOS/Safari)
   navigator.serviceWorker.ready
     .then((reg) => {
       forceActivate(reg);
@@ -26,17 +33,22 @@ if ('serviceWorker' in navigator) {
         const newSW = reg.installing;
         newSW?.addEventListener('statechange', () => {
           if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            newSW.postMessage({ type: 'SKIP_WAITING' });
+            pendingSince = Date.now();
           }
         });
       });
 
-      // Check updates on load + when returning to app
+      // Check updates on load + when returning to app (debounced)
       reg.update().catch(() => {});
+      let updateDebounce: ReturnType<typeof setTimeout> | null = null;
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-          reg.update().catch(() => {});
-          forceActivate(reg);
+          if (updateDebounce) clearTimeout(updateDebounce);
+          updateDebounce = setTimeout(() => {
+            reg.update().catch(() => {});
+            forceActivate(reg);
+            updateDebounce = null;
+          }, 3000); // wait 3s after returning before checking
         }
       });
     })
