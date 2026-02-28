@@ -1085,73 +1085,21 @@
     to { opacity: 1; }
   }
 
-  /* ── Modern Page Transitions (Linear / iOS inspired) ── */
+  /* ── Modern Page Transitions (Linear / iOS inspired) ──
+     IMPORTANT: Only use opacity to avoid creating stacking contexts
+     that break position:fixed elements (bottom bar, FAB).
+     transform/filter:blur cause layout bugs when iOS resumes from background. */
 
-  .animate-page-enter {
-    animation: pageEnterFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  /* Crossfade — lateral navigation (same depth) */
-  .page-enter-fade {
-    animation: pageEnterFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  /* Forward — drilling deeper into content */
-  .page-enter-forward {
-    animation: pageEnterForward 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
-  }
-
-  /* Back — returning to parent */
+  .animate-page-enter,
+  .page-enter-fade,
+  .page-enter-forward,
   .page-enter-back {
-    animation: pageEnterBack 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: pageEnterFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @keyframes pageEnterFade {
-    from {
-      opacity: 0;
-      transform: scale(0.985);
-      filter: blur(2px);
-    }
-    40% {
-      filter: blur(0);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-      filter: none;
-    }
-  }
-
-  @keyframes pageEnterForward {
-    from {
-      opacity: 0;
-      transform: translateX(24px) scale(0.97);
-      filter: blur(3px);
-    }
-    50% {
-      filter: blur(0);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-      filter: none;
-    }
-  }
-
-  @keyframes pageEnterBack {
-    from {
-      opacity: 0;
-      transform: translateX(-16px) scale(0.98);
-      filter: blur(2px);
-    }
-    50% {
-      filter: blur(0);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-      filter: none;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 
   @keyframes neonPulse {
