@@ -84,12 +84,12 @@ export default function Profile() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-3 rounded-xl border border-border/30 bg-secondary/50">
+              <div className="text-center p-3 rounded-xl border border-foreground/10 bg-foreground/[0.04]">
                 <AppIcon name="TrendingUp" size={16} className="mx-auto mb-1 text-primary" />
                 <p className="text-lg font-bold text-foreground">{formatPoints(profile.monthlyBase)}</p>
                 <p className="text-[10px] text-muted-foreground">Base Mensal</p>
               </div>
-              <div className="text-center p-3 rounded-xl border border-border/30 bg-secondary/50">
+              <div className="text-center p-3 rounded-xl border border-foreground/10 bg-foreground/[0.04]">
                 <AppIcon name="Flame" size={16} className="mx-auto mb-1 text-amber-400" />
                 <p className="text-lg font-bold text-amber-400">{formatPoints(profile.monthlyBonus)}</p>
                 <p className="text-[10px] text-muted-foreground">Bônus Mensal</p>
