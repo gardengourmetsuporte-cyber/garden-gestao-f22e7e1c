@@ -385,10 +385,18 @@ export default function Auth() {
       <BrandPanel />
 
       {/* ── RIGHT: Form Panel ── */}
-      <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0" style={{ paddingTop: 'max(env(safe-area-inset-top), 0px)' }}>
+      <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0">
+        {/* Navy safe-area cover for mobile (extends gradient behind status bar) */}
+        <div
+          className="fixed top-0 left-0 right-0 z-30 lg:hidden"
+          style={{
+            height: 'env(safe-area-inset-top, 0px)',
+            background: 'hsl(224 45% 6%)',
+          }}
+        />
         {/* Top bar - absolute on mobile to overlay the banner */}
         <div className="flex items-center justify-between px-5 pt-4 relative z-20 lg:relative absolute top-0 left-0 right-0" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/70 hover:text-white lg:text-muted-foreground lg:hover:text-foreground -ml-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
