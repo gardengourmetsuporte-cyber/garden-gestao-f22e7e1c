@@ -1,5 +1,5 @@
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { AppIcon } from "@/components/ui/app-icon";
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, setTheme } = useTheme();
@@ -10,8 +10,8 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       className={`p-2 rounded-lg hover:bg-secondary transition-all ${className}`}
       aria-label="Alternar tema"
     >
-      <Sun className="w-5 h-5 hidden dark:block" />
-      <Moon className="w-5 h-5 block dark:hidden" />
+      <AppIcon name="Sun" size={20} className="hidden dark:block" />
+      <AppIcon name="Moon" size={20} className="block dark:hidden" />
     </button>
   );
 }

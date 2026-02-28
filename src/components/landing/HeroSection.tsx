@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles } from "lucide-react";
 import { AppIcon } from "@/components/ui/app-icon";
 import { AnimatedMockup } from "./AnimatedMockup";
 
@@ -60,7 +59,7 @@ export function HeroSection() {
 
           {/* Top Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-md border border-white/10 bg-white/5 shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-colors cursor-default">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <AppIcon name="Sparkles" size={14} className="text-emerald-400" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
               A nova era da gestão para restaurantes
             </span>
@@ -88,7 +87,7 @@ export function HeroSection() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
               Começar grátis agora
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <AppIcon name="ArrowRight" size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/auth"
