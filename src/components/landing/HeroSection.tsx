@@ -74,17 +74,17 @@ export function HeroSection() {
               Financeiro, estoque, equipe e IA — tudo em um app criado por quem vive a rotina de food service.
             </p>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Link
                 to="/auth?plan=free"
-                className="group inline-flex items-center gap-2.5 h-13 px-8 rounded-xl font-bold text-sm bg-white text-[hsl(220,30%,15%)] shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-200"
+                className="group inline-flex items-center justify-center gap-2.5 h-12 px-7 rounded-xl font-bold text-sm bg-white text-[hsl(220,30%,15%)] shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 whitespace-nowrap"
               >
                 Começar grátis
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/auth"
-                className="inline-flex items-center gap-2 h-13 px-6 rounded-xl text-sm font-semibold text-white/70 hover:text-white border border-white/15 hover:border-white/30 hover:bg-white/5 transition-all duration-200"
+                className="inline-flex items-center justify-center h-12 px-6 rounded-xl text-sm font-semibold text-white/70 hover:text-white border border-white/15 hover:border-white/30 hover:bg-white/5 transition-all duration-200 whitespace-nowrap"
               >
                 Já tenho conta
               </Link>
