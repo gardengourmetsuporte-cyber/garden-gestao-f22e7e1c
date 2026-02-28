@@ -233,7 +233,7 @@ export function MoreDrawer({ open, onOpenChange }: MoreDrawerProps) {
           </div>
 
           {/* Module grid — adaptive cards */}
-          <div className="px-4 pt-5 pb-8 space-y-3 bg-background rounded-t-[20px] -mt-3 relative z-10">
+          <div className="px-4 pt-5 pb-8 space-y-3 bg-background -mt-3 relative z-10">
             {groupedNav.map(group => {
               const count = group.items.length;
               const useCols3 = count >= 3 && count !== 4;
