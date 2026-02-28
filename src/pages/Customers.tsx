@@ -7,6 +7,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CustomerCard } from '@/components/customers/CustomerCard';
 import { CustomerSheet } from '@/components/customers/CustomerSheet';
 import { CustomerDetail } from '@/components/customers/CustomerDetail';
@@ -131,21 +132,25 @@ export default function Customers() {
             </span>
             <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11" />
           </div>
-          <select
-            value={segmentFilter || ''}
-            onChange={e => setSegmentFilter((e.target.value || null) as CustomerSegment | null)}
-            className="h-11 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground appearance-none cursor-pointer min-w-[120px]"
+          <Select
+            value={segmentFilter || 'all'}
+            onValueChange={v => setSegmentFilter(v === 'all' ? null : v as CustomerSegment)}
           >
-            <option value="">Todos ({customers.length})</option>
-            {SEGMENTS.map(seg => {
-              const cfg = SEGMENT_CONFIG[seg];
-              return (
-                <option key={seg} value={seg}>
-                  {cfg.label} ({segCounts[seg] || 0})
-                </option>
-              );
-            })}
-          </select>
+            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos ({customers.length})</SelectItem>
+              {SEGMENTS.map(seg => {
+                const cfg = SEGMENT_CONFIG[seg];
+                return (
+                  <SelectItem key={seg} value={seg}>
+                    {cfg.label} ({segCounts[seg] || 0})
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
           {segmentFilter && (
             <Button size="icon" variant="outline" className="h-11 w-11 shrink-0" onClick={() => setCampaignOpen(true)} title="Enviar mensagem em massa">
               <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
