@@ -1,56 +1,53 @@
 
 
-## Plano: Fortalecer Núcleo do CRM — Service Layer, Normalização e Unicidade
+## Diagnóstico
 
-### Contexto
-Hoje a lógica de clientes está dispersa entre hooks, edge functions e páginas. Telefone não é normalizado consistentemente, e não existe garantia de unicidade. Precisamos centralizar antes de escalar.
+O bug de "abrir-sumir-abrir de novo" tem duas causas raiz no componente `PageTransition`:
 
-### 1. Criar `src/lib/normalizePhone.ts`
-Helper puro que:
-- Remove todos os caracteres não-numéricos
-- Garante prefixo `55` (Brasil)
-- Remove nono dígito duplicado se necessário
-- Retorna `null` se inválido (menos de 10 dígitos)
-- Usado em todos os pontos de entrada: `CustomerSheet`, `import-daily-sales`, `DigitalMenu` roleta
+1. **`key={location.pathname}`** na div wrapper força o React a desmontar e remontar todo o conteúdo da página a cada navegação. Isso mata Sheets/Drawers abertos e faz elementos piscarem.
 
-### 2. Criar `src/lib/customerService.ts`
-Funções puras e reutilizáveis:
+2. **Dois `useEffect` concorrentes** ambos atualizando `displayChildren` — um para mudança de rota e outro para mudança de children na mesma rota. Isso causa renderizações duplas onde o conteúdo aparece, some, e reaparece.
 
-```typescript
-normalizePhone(raw: string): string | null
-calcularScore(customer): { score, segment, visit_frequency_days }
-registrarCompra(customerId, valor, date?): Promise<void>  // via supabase update + trigger cuida do resto
+3. **Estado `displayChildren` desnecessário** — manter children em state cria uma camada extra de re-renders que propaga flickers por todo o sistema (Sheets, Drawers, modais).
+
+## Plano
+
+### 1. Simplificar o PageTransition radicalmente
+
+Remover o estado `displayChildren` e a lógica de `key` que força remount. Renderizar `children` diretamente e aplicar a animação de opacidade apenas via uma classe CSS transitória que é adicionada brevemente na mudança de rota:
+
+```tsx
+export function PageTransition({ children, className }: PageTransitionProps) {
+  const location = useLocation();
+  const [animClass, setAnimClass] = useState('');
+  const prevPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    if (prevPathRef.current === location.pathname) return;
+    prevPathRef.current = location.pathname;
+    
+    setAnimClass('page-enter-fade');
+    const timer = setTimeout(() => setAnimClass(''), 300);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  return (
+    <div className={cn(animClass, className)}>
+      {children}
+    </div>
+  );
+}
 ```
 
-- `calcularScore` replica a lógica RFM do banco (`recalculate_customer_score`) no frontend para preview/validação
-- `registrarCompra` faz `update` incremental no `total_spent`, `total_orders`, `last_purchase_at` — o trigger `trg_customer_loyalty` já cuida de recalcular score e pontos automaticamente
+Mudanças-chave:
+- Remove `key={location.pathname}` (não remonta mais a árvore inteira)
+- Remove estado `displayChildren` (sem renderizações fantasma)
+- Remove o segundo `useEffect` concorrente
+- A classe de animação é aplicada temporariamente e removida após 300ms
 
-### 3. Migration: Unique constraint no telefone normalizado
-```sql
-CREATE UNIQUE INDEX idx_customers_unit_phone 
-ON customers (unit_id, phone) 
-WHERE phone IS NOT NULL AND phone != '';
-```
-Isso garante que não existam duplicatas por telefone dentro da mesma unidade.
+### 2. Manter o CSS existente como está
 
-### 4. Aplicar `normalizePhone` em todos os pontos de entrada
-- **`CustomerSheet.tsx`**: Normalizar antes de salvar
-- **`import-daily-sales/index.ts`**: Usar mesma lógica de normalização no backend
-- **`DigitalMenu.tsx`** (roleta): Já normaliza parcialmente, usar helper consistente
-- **`useCustomers.ts`** (`createCustomer`/`updateCustomer`): Normalizar phone antes do insert/update
+As keyframes `pageEnterFade` com apenas opacity já estão corretas e não precisam de alteração.
 
-### 5. Adicionar `registrarCompra` ao hook `useCustomerCRM`
-Nova mutation que chama o service, incrementando dados e deixando o trigger do banco fazer o resto (score + pontos).
-
-### Arquivos novos
-- `src/lib/normalizePhone.ts`
-- `src/lib/customerService.ts`
-
-### Arquivos editados
-- `src/components/customers/CustomerSheet.tsx` — normalizar telefone no submit
-- `src/hooks/useCustomers.ts` — normalizar phone no create/update
-- `src/hooks/useCustomerCRM.ts` — adicionar mutation `registrarCompra`
-- `supabase/functions/import-daily-sales/index.ts` — usar normalização consistente
-- `src/pages/DigitalMenu.tsx` — usar `normalizePhone` do helper
-- Migration SQL para unique index
+**Arquivo afetado:** `src/components/layout/PageTransition.tsx`
 
