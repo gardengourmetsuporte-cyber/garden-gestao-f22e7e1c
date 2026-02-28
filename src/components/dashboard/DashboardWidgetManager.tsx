@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -21,6 +22,13 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
+// Custom modifier to restrict drag to vertical axis
+import type { Modifier } from '@dnd-kit/core';
+
+const restrictToVerticalAxis: Modifier = ({ transform }) => ({
+  ...transform,
+  x: 0,
+});
 
 interface Props {
   open: boolean;
@@ -30,12 +38,13 @@ interface Props {
   onReset: () => void;
 }
 
-function SortableItem({ widget, onToggle }: { widget: DashboardWidget; onToggle: (key: string) => void }) {
+function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWidget; onToggle: (key: string) => void; isDragActive: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: widget.key });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    zIndex: isDragging ? 50 : undefined,
   };
 
   return (
@@ -46,12 +55,16 @@ function SortableItem({ widget, onToggle }: { widget: DashboardWidget; onToggle:
       {...listeners}
       className={cn(
         'flex items-center gap-3 rounded-xl px-3 py-3 bg-card border border-border/50 touch-none select-none',
-        isDragging && 'opacity-60 shadow-lg z-50 scale-[1.02]'
+        isDragging && 'opacity-60 shadow-lg scale-[1.02] relative'
       )}
     >
       <AppIcon name={widget.icon} size={20} className="text-muted-foreground shrink-0" />
       <span className="flex-1 text-sm font-medium text-foreground">{widget.label}</span>
-      <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
         <Switch
           checked={widget.visible}
           onCheckedChange={() => onToggle(widget.key)}
@@ -63,19 +76,24 @@ function SortableItem({ widget, onToggle }: { widget: DashboardWidget; onToggle:
 
 export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, onReset }: Props) {
   const [draft, setDraft] = useState<DashboardWidget[]>(widgets);
+  const [isDragActive, setIsDragActive] = useState(false);
 
-  // Reset draft when opening
-  const handleOpenChange = (o: boolean) => {
-    if (o) setDraft(widgets);
-    onOpenChange(o);
-  };
+  // Sync draft when sheet opens or widgets prop changes
+  useEffect(() => {
+    if (open) setDraft(widgets);
+  }, [open, widgets]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragStart = useCallback((_event: DragStartEvent) => {
+    setIsDragActive(true);
+  }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setIsDragActive(false);
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setDraft(prev => {
@@ -84,11 +102,15 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
         return arrayMove(prev, oldIndex, newIndex);
       });
     }
-  };
+  }, []);
 
-  const handleToggle = (key: string) => {
+  const handleDragCancel = useCallback(() => {
+    setIsDragActive(false);
+  }, []);
+
+  const handleToggle = useCallback((key: string) => {
     setDraft(prev => prev.map(w => w.key === key ? { ...w, visible: !w.visible } : w));
-  };
+  }, []);
 
   const handleSave = () => {
     onSave(draft);
@@ -101,7 +123,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
   };
 
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="!max-h-[85vh]">
         <SheetHeader className="mb-4">
           <SheetTitle className="text-base font-bold">Gerenciar tela inicial</SheetTitle>
@@ -110,11 +132,23 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
           </SheetDescription>
         </SheetHeader>
 
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+          modifiers={[restrictToVerticalAxis]}
+        >
           <SortableContext items={draft.map(w => w.key)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+            <div
+              className={cn(
+                "space-y-2 max-h-[50vh] overflow-y-auto pr-1",
+                isDragActive && "overflow-hidden"
+              )}
+            >
               {draft.map(widget => (
-                <SortableItem key={widget.key} widget={widget} onToggle={handleToggle} />
+                <SortableItem key={widget.key} widget={widget} onToggle={handleToggle} isDragActive={isDragActive} />
               ))}
             </div>
           </SortableContext>
