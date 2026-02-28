@@ -365,19 +365,22 @@ export default function Auth() {
           : 'Preencha os dados para começar';
 
   return (
-    <div className="min-h-[100dvh] flex flex-row bg-background">
+    <div className="dark min-h-[100dvh] flex flex-row bg-[#000000] text-foreground">
       {/* ── LEFT: Brand Panel (desktop) ── */}
       <BrandPanel />
 
       {/* ── RIGHT: Form Panel ── */}
-      <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0">
+      <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0 bg-background">
         {/* Top bar - absolute on mobile to overlay the navy banner seamlessly */}
         <div className="flex items-center justify-between px-5 absolute top-0 left-0 right-0 z-20 lg:relative" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
           <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
-          <ThemeToggle className="lg:text-foreground text-white/80 hover:text-white hover:bg-white/10" />
+          <div className="md:hidden"></div> {/* Spacer for mobile so it doesn't look weird without theme toggle */}
+          <div className="hidden md:block">
+            <ThemeToggle className="lg:text-foreground text-white/80 hover:text-white hover:bg-white/10" />
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
