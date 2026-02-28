@@ -182,7 +182,7 @@ export default function OrdersPage() {
   const getStatusConfig = (status: Order['status']) => {
     switch (status) {
       case 'draft': return { label: 'Rascunho', bg: 'bg-muted', text: 'text-muted-foreground' };
-      case 'sent': return { label: 'Enviado', bg: 'bg-primary/10', text: 'text-primary' };
+      case 'sent': return { label: 'Enviado', bg: 'bg-emerald-500/10', text: 'text-emerald-400' };
       case 'received': return { label: 'Recebido', bg: 'bg-success/10', text: 'text-success' };
       case 'cancelled': return { label: 'Cancelado', bg: 'bg-destructive/10', text: 'text-destructive' };
       default: return { label: status, bg: 'bg-muted', text: 'text-muted-foreground' };
@@ -225,7 +225,7 @@ export default function OrdersPage() {
                     return (
                       <div
                         key={supplierId}
-                        className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 animate-fade-in"
+                        className="bg-[#0a1a10] rounded-2xl border border-emerald-500/10 overflow-hidden transition-all hover:border-emerald-500/25 animate-fade-in"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplierId]: open }))}>
@@ -234,9 +234,9 @@ export default function OrdersPage() {
                             <CollapsibleTrigger className="flex items-center gap-3 min-w-0 flex-1 text-left">
                               <div className={cn(
                                 "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors",
-                                isNoSupplier ? "bg-muted" : "bg-primary/10"
-                              )}>
-                                <AppIcon name="Package" size={20} className={cn(isNoSupplier ? "text-muted-foreground" : "text-primary")} />
+                                isNoSupplier ? "bg-muted" : "bg-emerald-500/10"
+                               )}>
+                                 <AppIcon name="Package" size={20} className={cn(isNoSupplier ? "text-muted-foreground" : "text-emerald-400")} />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="font-semibold font-display text-foreground truncate">
@@ -255,7 +255,7 @@ export default function OrdersPage() {
                               <Button
                                 size="sm"
                                 onClick={() => handleOpenOrder(supplier)}
-                                className="gap-1.5 rounded-xl shadow-lg shadow-primary/20 shrink-0"
+                                className="gap-1.5 rounded-xl shadow-lg shadow-emerald-500/20 shrink-0"
                               >
                                 <AppIcon name="Plus" size={16} />
                                 Pedir
@@ -265,13 +265,13 @@ export default function OrdersPage() {
 
                           {/* Items list - collapsible */}
                           <CollapsibleContent>
-                            <div className="border-t border-border/50">
+                            <div className="border-t border-emerald-500/5">
                               {supplierItems.map((item, i) => (
                                 <div
                                   key={item.id}
                                   className={cn(
                                     "flex items-center justify-between px-4 py-2.5 transition-colors",
-                                    i < supplierItems.length - 1 && "border-b border-border/30"
+                                    i < supplierItems.length - 1 && "border-b border-emerald-500/5"
                                   )}
                                 >
                                   <span className="text-sm text-foreground">{item.name}</span>
@@ -320,14 +320,14 @@ export default function OrdersPage() {
                         return (
                           <Collapsible key={order.id}>
                             <div
-                              className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 animate-fade-in"
-                              style={{ animationDelay: `${index * 50}ms` }}
-                            >
-                              <CollapsibleTrigger className="w-full text-left">
-                                <div className="flex items-center justify-between p-4">
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                      <AppIcon name="ShoppingCart" size={20} className="text-primary" />
+                               className="bg-[#0a1a10] rounded-2xl border border-emerald-500/10 overflow-hidden transition-all hover:border-emerald-500/25 animate-fade-in"
+                               style={{ animationDelay: `${index * 50}ms` }}
+                             >
+                               <CollapsibleTrigger className="w-full text-left">
+                                 <div className="flex items-center justify-between p-4">
+                                   <div className="flex items-center gap-3 min-w-0">
+                                     <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                       <AppIcon name="ShoppingCart" size={20} className="text-emerald-400" />
                                     </div>
                                     <div className="min-w-0">
                                       <p className="font-semibold font-display text-foreground truncate">{order.supplier?.name}</p>
@@ -343,11 +343,11 @@ export default function OrdersPage() {
                               </CollapsibleTrigger>
 
                               <CollapsibleContent>
-                                <div className="border-t border-border/50 px-4 py-3 space-y-3">
-                                  {/* Items */}
-                                  <div className="space-y-1.5">
-                                    {order.order_items?.map(oi => (
-                                      <div key={oi.id} className="flex items-center justify-between py-1.5">
+                                 <div className="border-t border-emerald-500/5 px-4 py-3 space-y-3">
+                                   {/* Items */}
+                                   <div className="space-y-1.5">
+                                     {order.order_items?.map(oi => (
+                                       <div key={oi.id} className="flex items-center justify-between py-1.5">
                                         <span className="text-sm text-foreground">{oi.item?.name}</span>
                                         <span className="text-xs font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
                                           ×{oi.quantity} {oi.item?.unit_type}
@@ -357,8 +357,8 @@ export default function OrdersPage() {
                                   </div>
 
                                   {/* Actions */}
-                                  <div className="flex items-center gap-2 pt-1 border-t border-border/30">
-                                    {order.status === 'draft' && (
+                                   <div className="flex items-center gap-2 pt-1 border-t border-emerald-500/5">
+                                     {order.status === 'draft' && (
                                       hasValidWhatsApp(order.supplier?.phone || null) ? (
                                          <Button
                                           size="sm"
@@ -413,13 +413,13 @@ export default function OrdersPage() {
                         return (
                           <Collapsible key={order.id}>
                             <div
-                              className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/20 animate-fade-in"
-                              style={{ animationDelay: `${index * 50}ms` }}
-                            >
-                              <CollapsibleTrigger className="w-full text-left">
-                                <div className="flex items-center justify-between p-4">
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <div className={cn(
+                               className="bg-[#0a1a10] rounded-2xl border border-emerald-500/10 overflow-hidden transition-all hover:border-emerald-500/25 animate-fade-in"
+                               style={{ animationDelay: `${index * 50}ms` }}
+                             >
+                               <CollapsibleTrigger className="w-full text-left">
+                                 <div className="flex items-center justify-between p-4">
+                                   <div className="flex items-center gap-3 min-w-0">
+                                     <div className={cn(
                                       "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
                                       order.status === 'received' ? "bg-success/10" : "bg-destructive/10"
                                     )}>
@@ -447,10 +447,10 @@ export default function OrdersPage() {
                               </CollapsibleTrigger>
 
                               <CollapsibleContent>
-                                <div className="border-t border-border/50 px-4 py-3 space-y-3">
-                                  <div className="space-y-1.5">
-                                    {order.order_items?.map(oi => (
-                                      <div key={oi.id} className="flex items-center justify-between py-1.5">
+                                 <div className="border-t border-emerald-500/5 px-4 py-3 space-y-3">
+                                   <div className="space-y-1.5">
+                                     {order.order_items?.map(oi => (
+                                       <div key={oi.id} className="flex items-center justify-between py-1.5">
                                         <span className="text-sm text-foreground">{oi.item?.name}</span>
                                         <span className="text-xs font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
                                           ×{oi.quantity} {oi.item?.unit_type}
@@ -459,7 +459,7 @@ export default function OrdersPage() {
                                     ))}
                                   </div>
 
-                                  <div className="flex items-center gap-2 pt-1 border-t border-border/30">
+                                  <div className="flex items-center gap-2 pt-1 border-t border-emerald-500/5">
                                     {order.status === 'received' && !order.supplier_invoice_id && (
                                       <Button
                                         size="sm"
@@ -527,7 +527,7 @@ export default function OrdersPage() {
 
         {/* Create Order Sheet */}
         <Sheet open={sheetOpen} onOpenChange={(open) => { setSheetOpen(open); if (!open) { setCotationStep(false); setExtraSuppliers([]); } }}>
-          <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto">
+          <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[80vh] overflow-y-auto bg-[#0a1a10]">
             <SheetHeader className="pb-4">
               <SheetTitle>
                 {cotationStep
@@ -539,7 +539,7 @@ export default function OrdersPage() {
             {!cotationStep ? (
               <div className="space-y-3">
                 {selectedSupplier && itemsBySupplier[selectedSupplier.id]?.map(item => (
-                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50 border border-border/50">
+                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
                       <p className="text-xs text-muted-foreground">
@@ -560,7 +560,7 @@ export default function OrdersPage() {
                   <Button
                     onClick={handleCreateOrder}
                     disabled={isSubmitting || Object.values(quantities).every(q => q === 0)}
-                    className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20"
+                    className="flex-1 h-12 rounded-xl shadow-lg shadow-emerald-500/20"
                   >
                     {isSubmitting ? 'Criando...' : 'Criar Pedido'}
                   </Button>
@@ -593,9 +593,9 @@ export default function OrdersPage() {
                         )}
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all border",
-                          isSelected
-                            ? "bg-primary/10 border-primary/30 text-primary"
-                            : "bg-secondary/50 border-border/50 text-foreground hover:border-primary/20"
+                           isSelected
+                             ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+                             : "bg-emerald-500/5 border-emerald-500/10 text-foreground hover:border-emerald-500/20"
                         )}
                       >
                         {isSelected && <AppIcon name="Check" size={14} />}
@@ -621,7 +621,7 @@ export default function OrdersPage() {
                   <Button
                     onClick={handleStartQuotation}
                     disabled={extraSuppliers.length === 0 || isCreatingQuotation}
-                    className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20 gap-2"
+                    className="flex-1 h-12 rounded-xl shadow-lg shadow-emerald-500/20 gap-2"
                   >
                     <AppIcon name="Scale" size={16} />
                     {isCreatingQuotation ? 'Criando...' : 'Iniciar Cotação'}
