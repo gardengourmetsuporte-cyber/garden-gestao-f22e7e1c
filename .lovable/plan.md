@@ -1,39 +1,43 @@
 
 
-## Plano: Tabs da barra inferior configuráveis pelo admin
+## Plan: Orders Module Visual Overhaul — Emerald Premium
 
-Atualmente os 2 slots da barra (posição 2 e 3, ao lado de "Início") são hardcoded como Checklists e Financeiro, com fallback automático se o usuário não tem acesso. A ideia é permitir que o admin da unidade escolha quais módulos aparecem nesses 2 slots.
+### Problem
+The Orders page (`/orders`) uses generic flat `bg-card` and `bg-muted` styling that clashes with the emerald dark premium theme applied to the rest of the system. Cards look grey/dull, icon containers lack emerald glow, and the AnimatedTabs indicator doesn't match the new palette.
 
-### Armazenamento
+### Changes
 
-Salvar a preferência no `localStorage` por usuário (`bottombar-pinned-tabs`), contendo um array de 2 `moduleKey` strings. Sem necessidade de tabela no banco — é preferência de UI local.
+**1. `src/components/ui/animated-tabs.tsx`** — Emerald active state
+- Active tab indicator: change from `bg-card` to `bg-emerald-500/10` with `border-emerald-500/20` and subtle emerald glow shadow
+- Active tab text: `text-emerald-400` instead of generic `text-foreground`
+- Active badge: `bg-emerald-500/15 text-emerald-400`
 
-### Mudanças
+**2. `src/pages/Orders.tsx`** — Supplier cards & order cards
+- Supplier suggestion cards: replace `bg-card border-border` with `bg-[#0a1a10] border-emerald-500/10` and hover `border-emerald-500/25`
+- Icon containers: from `bg-primary/10` to `bg-emerald-500/10` with `text-emerald-400`
+- "+ Pedir" button shadow: `shadow-emerald-500/20`
+- Status badges: update "Enviado" to `bg-emerald-500/10 text-emerald-400`
+- Order history cards: same dark emerald card style
+- Collapsible item rows: subtle `border-emerald-500/5` dividers
+- WhatsApp button: keep existing green, ensure consistent `rounded-xl`
+- Sheet (bottom): dark background `bg-[#0a1a10]` with emerald-tinted inputs
 
-**1. Criar componente de configuração `BottomBarTabPicker`**
-- Novo arquivo `src/components/settings/BottomBarTabPicker.tsx`
-- Lista todos os módulos disponíveis (filtrados por `hasAccess`) exceto `dashboard` e `settings`
-- Permite selecionar exatamente 2 módulos para os slots da barra
-- Salva no `localStorage`
+**3. `src/components/orders/QuotationList.tsx`** — Quotation cards
+- Same dark emerald card background pattern
+- Icon container: `bg-emerald-500/10 text-emerald-400`
+- "Nova Cotacao" button: ensure `shadow-emerald-500/20`
 
-**2. Criar hook `useBottomBarTabs`**
-- Novo arquivo `src/hooks/useBottomBarTabs.ts`
-- Lê do `localStorage` os 2 módulos escolhidos
-- Resolve as `TabDef` a partir de `ALL_MODULES` (key, icon, label, path)
-- Exporta `pinnedTabs` e `setPinnedTabs`
-- Fallback: se nenhuma preferência salva, usa o comportamento atual (checklists + finance)
+**4. `src/components/orders/QuotationDetail.tsx`** — Detail view
+- Supplier link cards: `bg-[#0a1a10] border-emerald-500/10`
+- Table header: `bg-emerald-500/5` instead of `bg-secondary/30`
+- Economy banner: already `bg-success/10` which maps to emerald -- keep
 
-**3. Alterar `BottomTabBar.tsx`**
-- Importar `useBottomBarTabs`
-- Substituir a lógica de `DEFAULT_TABS` + `FALLBACK_TABS` pelos tabs retornados pelo hook
-- Manter "Início" fixo no slot 1, "Mais" fixo no slot 5
-- Manter a lógica especial do `CARDAPIO_TABS` intacta
+**5. `src/components/orders/QuotationSheet.tsx`** — Sheet styling
+- Supplier chips selected state: `bg-emerald-500/15 border-emerald-500/30 text-emerald-400`
+- Item selected state: `bg-emerald-500/5 border-emerald-500/20`
 
-**4. Adicionar entrada nas Configurações**
-- No `Settings.tsx` ou no `MoreDrawer.tsx`, adicionar um botão "Personalizar barra inferior" que abre o `BottomBarTabPicker` em um Sheet
-
-### Módulos disponíveis para seleção
-
-Todos de `ALL_MODULES` exceto `dashboard` e `settings`:
-Agenda, Copilot, Financeiro, Estoque, Clientes, Pedidos, Checklists, Fechamento, Fichas Técnicas, Funcionários, Recompensas, Ranking, Marketing, Cardápio Digital, WhatsApp
+### Scope
+- 5 files total
+- All changes are CSS class swaps, no logic changes
+- Consistent with emerald pattern used in MoreDrawer, FinanceBottomNav, and AppLayout
 
