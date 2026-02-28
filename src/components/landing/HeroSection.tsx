@@ -63,7 +63,7 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.08] tracking-tight text-white font-display">
-              A gestão completa{" "}
+              A gestão completa ✨{" "}
               <br className="hidden sm:block" />
               que seu restaurante{" "}
               <br className="hidden sm:block" />
