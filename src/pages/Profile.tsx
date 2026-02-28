@@ -64,41 +64,41 @@ export default function Profile() {
             userId={profile.userId}
           />
 
-          {/* Score do Mês - Hero Card */}
-          <div className="gradient-primary rounded-2xl p-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-500/15">
-                <AppIcon name="Trophy" size={18} className="text-amber-400" />
+          {/* Score do Mês */}
+          <div className="card-surface p-5 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--neon-amber) / 0.12)' }}>
+                <AppIcon name="Trophy" size={20} style={{ color: 'hsl(var(--neon-amber))' }} />
               </div>
-              <h3 className="font-bold text-sm text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
+              <h3 className="font-bold text-base text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
                 Score do Mês
               </h3>
             </div>
 
-            <div className="flex items-center justify-center gap-2 py-1">
-              <AppIcon name="Flame" size={28} className="text-amber-400" />
-              <span className="text-4xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
+            <div className="flex items-center justify-center gap-2.5 py-2">
+              <AppIcon name="Flame" size={30} style={{ color: 'hsl(var(--neon-amber))' }} />
+              <span className="text-5xl font-black text-foreground font-display" style={{ letterSpacing: '-0.04em' }}>
                 {formatPoints(profile.monthlyScore)}
               </span>
-              <span className="text-sm text-muted-foreground">pts</span>
+              <span className="text-sm text-muted-foreground mt-2">pts</span>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-3 rounded-xl border border-foreground/10 bg-foreground/[0.04]">
-                <AppIcon name="TrendingUp" size={16} className="mx-auto mb-1 text-primary" />
-                <p className="text-lg font-bold text-foreground">{formatPoints(profile.monthlyBase)}</p>
-                <p className="text-[10px] text-muted-foreground">Base Mensal</p>
+              <div className="text-center p-4 rounded-xl bg-primary/8 border border-primary/15">
+                <AppIcon name="TrendingUp" size={18} className="mx-auto mb-1.5 text-primary" />
+                <p className="text-xl font-bold text-foreground">{formatPoints(profile.monthlyBase)}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Base Mensal</p>
               </div>
-              <div className="text-center p-3 rounded-xl border border-foreground/10 bg-foreground/[0.04]">
-                <AppIcon name="Flame" size={16} className="mx-auto mb-1 text-amber-400" />
-                <p className="text-lg font-bold text-amber-400">{formatPoints(profile.monthlyBonus)}</p>
-                <p className="text-[10px] text-muted-foreground">Bônus Mensal</p>
+              <div className="text-center p-4 rounded-xl border" style={{ background: 'hsl(var(--neon-amber) / 0.06)', borderColor: 'hsl(var(--neon-amber) / 0.12)' }}>
+                <AppIcon name="Flame" size={18} className="mx-auto mb-1.5" style={{ color: 'hsl(var(--neon-amber))' }} />
+                <p className="text-xl font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{formatPoints(profile.monthlyBonus)}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Bônus Mensal</p>
               </div>
             </div>
 
             {profile.leaderboardRank && (
-              <div className="flex items-center justify-center gap-2 pt-3 border-t border-secondary/30">
-                <AppIcon name="Trophy" size={16} className="text-amber-400" />
+              <div className="flex items-center justify-center gap-2 pt-3 border-t border-border/30">
+                <AppIcon name="Trophy" size={16} style={{ color: 'hsl(var(--neon-amber))' }} />
                 <span className="text-sm text-muted-foreground">
                   Posição <span className="font-bold text-foreground">#{profile.leaderboardRank}</span> no ranking
                 </span>

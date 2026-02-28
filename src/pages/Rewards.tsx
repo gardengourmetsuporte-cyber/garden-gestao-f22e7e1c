@@ -58,27 +58,27 @@ export default function RewardsPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-4">
-          {/* Hero — Premium Inversion */}
-          <div className="gradient-primary p-5 rounded-2xl">
-            <p className="text-sm text-muted-foreground mb-1">Seu saldo</p>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-amber-500/15">
-                <AppIcon name="Star" size={22} className="text-amber-400" />
+          {/* Hero — Saldo */}
+          <div className="card-surface p-5">
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-medium">Seu saldo</p>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--neon-amber) / 0.12)' }}>
+                <AppIcon name="Star" size={24} style={{ color: 'hsl(var(--neon-amber))' }} />
               </div>
-              <span className="text-4xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
+              <span className="text-5xl font-black text-foreground font-display" style={{ letterSpacing: '-0.04em' }}>
                 {animatedBalance}
               </span>
-              <span className="text-base text-muted-foreground">pontos</span>
+              <span className="text-base text-muted-foreground mt-2">pontos</span>
             </div>
 
             {/* Progress to next prize */}
             {nextPrize && balance < nextPrize.points_cost && (
-              <div className="space-y-1.5">
+              <div className="space-y-2 pt-3 border-t border-border/30">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Próximo: {nextPrize.name}</span>
-                  <span className="font-medium text-foreground">{balance}/{nextPrize.points_cost}</span>
+                  <span className="font-bold text-foreground">{balance}/{nextPrize.points_cost}</span>
                 </div>
-                <Progress value={progressPercent} className="h-2 bg-black/10 dark:bg-white/10" />
+                <Progress value={progressPercent} className="h-2" />
               </div>
             )}
           </div>
