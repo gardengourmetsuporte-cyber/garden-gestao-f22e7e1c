@@ -13,6 +13,7 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
   { key: 'pending-orders', label: 'Pedidos pendentes', icon: 'ShoppingCart', visible: true },
+  { key: 'auto-order', label: 'Sugestão de compras', icon: 'TrendingUp', visible: true },
   { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
   { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
   { key: 'agenda', label: 'Agenda', icon: 'ListTodo', visible: true },

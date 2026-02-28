@@ -1,13 +1,15 @@
+import { forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useAIInsights, type AIInsight } from '@/hooks/useAIInsights';
 import { ShimmerSkeleton } from '@/components/ui/shimmer-skeleton';
 
-function InsightCard({ insight }: { insight: AIInsight }) {
+const InsightCard = forwardRef<HTMLButtonElement, { insight: AIInsight }>(function InsightCard({ insight }, ref) {
   const navigate = useNavigate();
 
   return (
     <button
+      ref={ref}
       onClick={() => insight.action_route && navigate(insight.action_route)}
       className="w-full text-left p-3.5 rounded-xl bg-muted/40 hover:bg-muted/70 transition-colors card-press"
     >
@@ -23,7 +25,7 @@ function InsightCard({ insight }: { insight: AIInsight }) {
       </div>
     </button>
   );
-}
+});
 
 function InsightsSkeleton() {
   return (
