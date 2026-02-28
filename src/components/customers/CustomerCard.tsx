@@ -18,14 +18,14 @@ export function CustomerCard({ customer, onEdit, onDelete }: Props) {
 
   return (
     <div
-      className="card-surface rounded-xl p-4 space-y-3 hover:bg-primary/5 hover:ring-1 hover:ring-primary/20 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+      className="rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60 p-4 space-y-3 hover:border-emerald-500/25 active:scale-[0.98] transition-all duration-200 cursor-pointer"
       onClick={onEdit}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold text-sm truncate">{customer.name}</p>
+            <p className="font-semibold text-sm truncate text-foreground">{customer.name}</p>
             <span className={cn(
               'inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap',
               seg.bg, seg.color
