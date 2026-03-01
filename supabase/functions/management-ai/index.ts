@@ -293,6 +293,30 @@ function getSupabaseAdmin() {
   );
 }
 
+// ── Rate Limiting (30 req/min per user) ──
+const userRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const USER_RATE_LIMIT_MAX = 30;
+const USER_RATE_LIMIT_WINDOW_MS = 60_000;
+
+function isUserRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const entry = userRateLimitMap.get(userId);
+  if (!entry || now > entry.resetAt) {
+    userRateLimitMap.set(userId, { count: 1, resetAt: now + USER_RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > USER_RATE_LIMIT_MAX;
+}
+
+// Cleanup stale entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, entry] of userRateLimitMap) {
+    if (now > entry.resetAt) userRateLimitMap.delete(id);
+  }
+}, 300_000);
+
 function getToday(): string {
   return new Date().toISOString().split("T")[0];
 }
@@ -1178,8 +1202,33 @@ serve(async (req) => {
 
     const user_id = claimsData.claims.sub as string;
 
+    // ── Rate Limiting ──
+    if (isUserRateLimited(user_id)) {
+      return new Response(
+        JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em 1 minuto." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const body = await req.json();
     const { messages: conversationHistory, context, unit_id, image } = body;
+
+    // ── IDOR Protection: validate unit_id belongs to authenticated user ──
+    if (unit_id) {
+      const sb = getSupabaseAdmin();
+      const { data: unitAccess } = await sb
+        .from("user_units")
+        .select("unit_id")
+        .eq("user_id", user_id)
+        .eq("unit_id", unit_id)
+        .maybeSingle();
+      if (!unitAccess) {
+        return new Response(
+          JSON.stringify({ error: "Acesso negado a esta unidade." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     // Load user preferences for context injection
     let preferencesBlock = "";

@@ -47,3 +47,9 @@ verify_jwt = false
 
 [functions.bill-reminders]
 verify_jwt = false
+
+[functions.colibri-health]
+verify_jwt = false
+
+[functions.import-daily-sales]
+verify_jwt = false
