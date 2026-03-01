@@ -1,80 +1,54 @@
 
 
-## Plano Completo: Publicar Garden Gestão na Google Play Store
+## Plano: Adaptação Completa para Desktop
 
-### O que você precisa fazer (fora do Lovable)
+O sistema está construído com foco mobile-first. Vários módulos perdem funcionalidade ou aproveitam mal o espaço em telas desktop (>=1024px). Aqui está o plano de adaptação:
 
-1. **Conta de Desenvolvedor Google Play** — Taxa única de **US$ 25** (~R$ 125)
-   - Criar em: https://play.google.com/console
-   - Precisa de um cartão de crédito e documento de identidade
+---
 
-2. **Computador com Android Studio instalado** (gratuito)
-   - Download: https://developer.android.com/studio
-   - Necessário para compilar o APK/AAB do app
+### 1. Finance — Navegação por Tabs no Desktop
+**Problema:** O `FinanceBottomNav` usa `lg:hidden`, então no desktop não há como trocar entre as abas (Home, Transações, Gráficos, Mais).
+**Solução:** Adicionar uma barra de tabs horizontal no topo da página Finance, visível apenas em `lg:` breakpoint. A bottom nav permanece no mobile.
+- Arquivo: `src/pages/Finance.tsx` — adicionar tabs desktop inline
+- Arquivo: `src/components/finance/FinanceBottomNav.tsx` — manter `lg:hidden`
 
-3. **Exportar o projeto para GitHub** — Botão "Export to GitHub" no Lovable
+### 2. Dashboard — Layout em Grid no Desktop
+**Problema:** Todos os widgets ficam empilhados em coluna única mesmo em telas largas.
+**Solução:** Usar `lg:grid lg:grid-cols-2` para distribuir widgets lado a lado no desktop. Widgets largos (finance hero, checklist) ocupam `lg:col-span-2`.
+- Arquivo: `src/components/dashboard/AdminDashboard.tsx`
 
-4. **Comandos no terminal** (após git pull):
-   ```text
-   npm install
-   npx cap add android
-   npx cap sync
-   npm run build
-   npx cap sync
-   npx cap run android  (testar no emulador/celular)
-   ```
+### 3. Finance Home — Grid para Cards
+**Problema:** Cards de receita/despesa e contas ficam estreitos em tela larga.
+**Solução:** Usar grid responsivo para distribuir cards de contas e summaries.
+- Arquivo: `src/components/finance/FinanceHome.tsx`
 
-5. **Gerar o AAB assinado** — Via Android Studio > Build > Generate Signed Bundle
-   - Você cria uma "keystore" (chave de assinatura) na primeira vez
-   - Guarde essa keystore em lugar seguro — sem ela você não consegue atualizar o app
+### 4. Settings — Layout Sidebar + Content no Desktop
+**Problema:** No desktop, clicar em uma seção substitui toda a tela. Perde-se o contexto do menu.
+**Solução:** No desktop (`lg:`), mostrar menu lateral fixo + conteúdo à direita lado a lado.
+- Arquivo: `src/pages/Settings.tsx`
 
-6. **Subir na Google Play Console** — Upload do arquivo `.aab`, preencher ficha (screenshots, descrição, ícone), e enviar para revisão
+### 5. Inventory — Grid de Items no Desktop
+**Problema:** Items ficam em lista estreita no desktop.
+**Solução:** Usar `lg:grid-cols-2` para os item cards dentro de cada categoria.
+- Arquivo: `src/pages/Inventory.tsx`
 
-### O que o Lovable faz por você
+### 6. Checklists — Layout mais amplo no Desktop
+**Problema:** A date strip e os checklists ficam comprimidos.
+**Solução:** Aplicar `max-w-4xl mx-auto` para conteúdo centralizado e melhor legibilidade.
+- Arquivo: `src/pages/Checklists.tsx`
 
-- Configura o **Capacitor** no projeto (capacitor.config.ts, plugins nativos)
-- Cria os **wrappers nativos** (haptics, push, status bar)
-- Migra a vibração do botão para usar Haptics nativo
-- Configura ícones e splash screen
-- Todo o código fica pronto para compilar
+### 7. WhatsApp — Já está adaptado
+O WhatsApp já tem layout split `lg:w-[340px]` + flex detail. Sem mudanças necessárias.
 
-### O que o Lovable NÃO consegue fazer
+### 8. Employees/Recipes/Marketing — Ajustes de Grid
+**Solução:** Adicionar grids responsivos onde listas são renderizadas em coluna única.
+- Arquivos: `src/pages/Employees.tsx`, componentes de lista internos
 
-- Compilar o APK/AAB (precisa do Android Studio no seu computador)
-- Criar sua conta na Google Play Console
-- Fazer upload na loja
-- Assinar o app com sua keystore
+---
 
-### Resumo de custos
-
-```text
-Item                          Custo
-─────────────────────────────────────
-Conta Google Play Developer   US$ 25 (única vez)
-Android Studio                Gratuito
-Hospedagem Lovable            Já incluída no seu plano
-─────────────────────────────────────
-Total                         ~US$ 25
-```
-
-### Implementação técnica (o que vou fazer agora)
-
-1. Instalar `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`
-2. Criar `capacitor.config.ts` com appId e server URL do sandbox
-3. Instalar plugins: `@capacitor/haptics`, `@capacitor/status-bar`, `@capacitor/splash-screen`
-4. Criar `src/lib/native.ts` — detecção de plataforma + wrappers
-5. Migrar `Button.tsx` para usar Haptics nativo quando disponível
-6. Documentar o passo-a-passo de build no README
-
-### Pós-implementação (seus passos)
-
-```text
-1. Export to GitHub (botão no Lovable)
-2. git clone → npm install
-3. npx cap add android
-4. npm run build → npx cap sync
-5. npx cap run android (testar)
-6. Android Studio → Build → Generate Signed Bundle
-7. Upload do .aab na Google Play Console
-```
+### Resumo técnico
+- Todas as mudanças usam classes Tailwind responsivas (`lg:`)
+- Nenhuma alteração de lógica/dados — apenas layout
+- Mobile permanece inalterado
+- Estimativa: ~8-10 arquivos editados
 
