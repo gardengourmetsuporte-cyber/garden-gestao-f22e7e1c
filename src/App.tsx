@@ -78,6 +78,7 @@ const QuotationPublic = lazy(() => lazyRetry(() => import("./pages/QuotationPubl
 const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")));
 const Customers = lazy(() => lazyRetry(() => import("./pages/Customers")));
 const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
+const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -203,6 +204,7 @@ function AppRoutes() {
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
           <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />
           <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
