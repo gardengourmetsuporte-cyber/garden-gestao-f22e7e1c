@@ -25,6 +25,19 @@ const ACTION_LABELS: Record<string, string> = {
   cash_closing_created: 'Fechamento de caixa',
   cash_closing_updated: 'Fechamento atualizado',
   checklist_completed: 'Checklist concluído',
+  user_unit_added: 'Membro adicionado',
+  user_unit_updated: 'Papel alterado',
+  user_unit_removed: 'Membro removido',
+  access_level_updated: 'Permissão alterada',
+  access_level_deleted: 'Permissão removida',
+  employee_created: 'Funcionário criado',
+  employee_updated: 'Funcionário editado',
+  employee_deleted: 'Funcionário removido',
+  customer_deleted: 'Cliente removido',
+  finance_account_created: 'Conta criada',
+  finance_account_updated: 'Conta editada',
+  finance_account_deleted: 'Conta removida',
+  user_login: 'Login realizado',
 };
 
 export function getActionLabel(action: string) {
