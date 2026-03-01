@@ -9,19 +9,19 @@ export interface DashboardWidget {
 }
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
-  { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true, defaultOpen: true },
-  { key: 'finance-chart', label: 'Gráfico financeiro', icon: 'BarChart3', visible: true, defaultOpen: false },
-  { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true, defaultOpen: false },
-  { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true, defaultOpen: false },
-  { key: 'pending-orders', label: 'Pedidos pendentes', icon: 'ShoppingCart', visible: true, defaultOpen: false },
-  { key: 'auto-order', label: 'Sugestão de compras', icon: 'TrendingUp', visible: true, defaultOpen: false },
-  { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true, defaultOpen: true },
-  { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true, defaultOpen: false },
-  { key: 'agenda', label: 'Agenda', icon: 'ListTodo', visible: true, defaultOpen: false },
-  { key: 'pending-actions', label: 'Ações pendentes', icon: 'Bell', visible: true, defaultOpen: false },
-  { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true, defaultOpen: false },
-  { key: 'ai-insights', label: 'Insights da IA', icon: 'Sparkles', visible: true, defaultOpen: true },
-  { key: 'cash-flow', label: 'Fluxo de caixa projetado', icon: 'TrendingUp', visible: false, defaultOpen: false },
+  { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
+  { key: 'finance-chart', label: 'Gráfico financeiro', icon: 'BarChart3', visible: true },
+  { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
+  { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
+  { key: 'pending-orders', label: 'Pedidos pendentes', icon: 'ShoppingCart', visible: true },
+  { key: 'auto-order', label: 'Sugestão de compras', icon: 'TrendingUp', visible: true },
+  { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
+  { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
+  { key: 'agenda', label: 'Agenda', icon: 'ListTodo', visible: true },
+  { key: 'pending-actions', label: 'Ações pendentes', icon: 'Bell', visible: true },
+  { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
+  { key: 'ai-insights', label: 'Insights da IA', icon: 'Sparkles', visible: true },
+  { key: 'cash-flow', label: 'Fluxo de caixa projetado', icon: 'TrendingUp', visible: false },
 ];
 
 const STORAGE_KEY = 'dashboard-widgets-config';
