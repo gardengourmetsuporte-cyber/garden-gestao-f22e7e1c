@@ -107,7 +107,7 @@ export function useChecklists() {
     queryKey: completionsKey,
     queryFn: () => fetchCompletionsData(currentDate, currentType, activeUnitId),
     enabled: !!user && !!currentDate && !!currentType && !!activeUnitId,
-    staleTime: 0, // Always refetch when invalidated
+    staleTime: 30_000, // 30s stale window to avoid excessive refetches on tab focus
   });
 
   // Show loading while unit context resolves OR sectors are actually loading
@@ -263,9 +263,11 @@ export function useChecklists() {
         .filter((s): s is ChecklistSector => !!s)
         .map((s, i) => ({ ...s, sort_order: i }));
     });
-    await Promise.all(orderedIds.map((id, i) =>
-      supabase.from('checklist_sectors').update({ sort_order: i }).eq('id', id)
-    ));
+    // Single RPC call instead of N parallel updates
+    await supabase.rpc('batch_reorder_checklist_sectors', {
+      p_ids: orderedIds,
+      p_orders: orderedIds.map((_, i) => i),
+    });
   }, [queryClient, sectorsKey]);
 
   const reorderSubcategories = useCallback(async (sectorId: string, orderedIds: string[]) => {
@@ -281,9 +283,11 @@ export function useChecklists() {
         return { ...sector, subcategories: reordered };
       });
     });
-    await Promise.all(orderedIds.map((id, i) =>
-      supabase.from('checklist_subcategories').update({ sort_order: i }).eq('id', id)
-    ));
+    // Single RPC call instead of N parallel updates
+    await supabase.rpc('batch_reorder_checklist_subcategories', {
+      p_ids: orderedIds,
+      p_orders: orderedIds.map((_, i) => i),
+    });
   }, [queryClient, sectorsKey]);
 
   const reorderItems = useCallback(async (subcategoryId: string, orderedIds: string[]) => {
@@ -302,9 +306,11 @@ export function useChecklists() {
         })
       }));
     });
-    await Promise.all(orderedIds.map((id, i) =>
-      supabase.from('checklist_items').update({ sort_order: i }).eq('id', id)
-    ));
+    // Single RPC call instead of N parallel updates
+    await supabase.rpc('batch_reorder_checklist_items', {
+      p_ids: orderedIds,
+      p_orders: orderedIds.map((_, i) => i),
+    });
   }, [queryClient, sectorsKey]);
 
   // ---- Completion toggle ----

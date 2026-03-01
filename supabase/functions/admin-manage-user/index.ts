@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Não autorizado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -21,26 +21,25 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Verify caller
-    const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user: caller }, error: authError } = await anonClient.auth.getUser();
-    if (authError || !caller) {
+    // Verify caller via getClaims (faster than getUser)
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await adminClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
       return new Response(JSON.stringify({ error: "Não autorizado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    const callerId = claimsData.claims.sub as string;
+
     // Verify caller is admin
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey);
     const { data: roleData } = await adminClient
       .from("user_roles")
       .select("role")
-      .eq("user_id", caller.id)
+      .eq("user_id", callerId)
       .single();
 
     if (!roleData || !["admin", "super_admin"].includes(roleData.role)) {
@@ -60,7 +59,7 @@ Deno.serve(async (req) => {
     }
 
     // Prevent self-action
-    if (target_user_id === caller.id) {
+    if (target_user_id === callerId) {
       return new Response(JSON.stringify({ error: "Não é possível executar esta ação em si mesmo" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -68,7 +67,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "remove_from_unit") {
-      // Remove user from specific unit
       if (!unit_id) {
         return new Response(JSON.stringify({ error: "unit_id é obrigatório" }), {
           status: 400,
@@ -95,7 +93,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "transfer_to_unit") {
-      // Transfer user from one unit to another
       if (!unit_id || !target_unit_id) {
         return new Response(JSON.stringify({ error: "unit_id e target_unit_id são obrigatórios" }), {
           status: 400,
@@ -129,7 +126,6 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!existing) {
-        // Add to target unit
         const { error } = await adminClient
           .from("user_units")
           .insert({
@@ -153,18 +149,11 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_account") {
-      // Delete user completely: remove from all units, delete profile, delete auth user
-      
-      // 1. Remove from all units
+      // Delete user completely
       await adminClient.from("user_units").delete().eq("user_id", target_user_id);
-      
-      // 2. Remove roles
       await adminClient.from("user_roles").delete().eq("user_id", target_user_id);
-      
-      // 3. Delete profile
       await adminClient.from("profiles").delete().eq("user_id", target_user_id);
-      
-      // 4. Delete auth user
+
       const { error: deleteError } = await adminClient.auth.admin.deleteUser(target_user_id);
       if (deleteError) {
         return new Response(JSON.stringify({ error: deleteError.message }), {

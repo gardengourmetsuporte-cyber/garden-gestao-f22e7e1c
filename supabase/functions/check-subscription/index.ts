@@ -45,27 +45,37 @@ serve(async (req) => {
       });
     }
 
+    // Use getClaims for faster validation (no network round-trip to auth server)
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
-    if (userError || !userData.user?.email) {
+    const { data: claimsData, error: claimsError } = await supabaseAdmin.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
       // Expired/invalid session: return free and let frontend continue gracefully
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
-    const user = userData.user;
-    logStep("User authenticated", { userId: user.id, email: user.email });
+
+    const userId = claimsData.claims.sub as string;
+    const userEmail = claimsData.claims.email as string;
+    if (!userEmail) {
+      return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    logStep("User authenticated", { userId, email: userEmail });
 
     // Check if user has a manual override (stripe_customer_id is null but plan is not free)
     const { data: currentProfile } = await supabaseAdmin
       .from("profiles")
       .select("plan, plan_status, stripe_customer_id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .maybeSingle();
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
 
     if (customers.data.length === 0) {
       logStep("No Stripe customer found");
@@ -87,7 +97,7 @@ serve(async (req) => {
       await supabaseAdmin.from("profiles").update({
         plan: "free",
         plan_status: "active",
-      }).eq("user_id", user.id);
+      }).eq("user_id", userId);
 
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -135,7 +145,7 @@ serve(async (req) => {
         plan: "free",
         plan_status: "canceled",
         stripe_customer_id: customerId,
-      }).eq("user_id", user.id);
+      }).eq("user_id", userId);
 
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -153,7 +163,7 @@ serve(async (req) => {
       plan,
       plan_status: sub.status === "trialing" ? "trialing" : "active",
       stripe_customer_id: customerId,
-    }).eq("user_id", user.id);
+    }).eq("user_id", userId);
 
     return new Response(JSON.stringify({
       subscribed: true,
