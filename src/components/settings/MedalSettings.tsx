@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { invalidateGamificationCaches } from '@/lib/queryKeys';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -135,9 +136,7 @@ export function MedalSettings() {
       setSelectedUser('');
       setSelectedMedal('');
       queryClient.invalidateQueries({ queryKey: ['granted-medals'] });
-      queryClient.invalidateQueries({ queryKey: ['points'] });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      invalidateGamificationCaches(queryClient);
     } catch (error) {
       console.error(error);
       toast({ title: 'Erro ao conceder medalha', variant: 'destructive' });

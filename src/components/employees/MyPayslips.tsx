@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { formatCurrency } from '@/lib/format';
 import { ptBR } from 'date-fns/locale';
 import { useEmployees, useEmployeePayments } from '@/hooks/useEmployees';
 import { PAYMENT_TYPE_LABELS, MONTHS } from '@/types/employee';
@@ -14,7 +15,7 @@ export function MyPayslips() {
   const { payments, isLoading: loadingPayments } = useEmployeePayments(myEmployee?.id);
   const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
 
-  const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  
 
   const toggleExpand = (paymentId: string) => {
     setExpandedPayments(prev => { const n = new Set(prev); n.has(paymentId) ? n.delete(paymentId) : n.add(paymentId); return n; });

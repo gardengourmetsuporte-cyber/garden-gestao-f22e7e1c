@@ -5,6 +5,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { invalidateGamificationCaches } from '@/lib/queryKeys';
 
 export interface TimeRecord {
   id: string;
@@ -111,9 +112,7 @@ export function useTimeTracking() {
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey });
-    queryClient.invalidateQueries({ queryKey: ['points'] });
-    queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
-    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    invalidateGamificationCaches(queryClient);
   }, [queryClient, queryKey]);
 
   // Calculate points based on time differences

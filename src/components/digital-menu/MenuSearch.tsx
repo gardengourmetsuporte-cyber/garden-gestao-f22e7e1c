@@ -8,9 +8,7 @@ interface Props {
   onSelectProduct: (product: DMProduct) => void;
 }
 
-function formatPrice(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+import { formatCurrency as formatPrice } from '@/lib/format';
 
 export function MenuSearch({ products, onSelectProduct }: Props) {
   const [query, setQuery] = useState('');

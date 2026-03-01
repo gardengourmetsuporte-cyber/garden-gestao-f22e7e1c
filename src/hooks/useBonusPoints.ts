@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { startOfMonth, format } from 'date-fns';
 import { toast } from 'sonner';
+import { invalidateGamificationCaches } from '@/lib/queryKeys';
 
 export interface BonusPoint {
   id: string;
@@ -87,7 +88,7 @@ export function useBonusPoints(targetUserId?: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bonus-points'] });
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      invalidateGamificationCaches(queryClient);
     },
   });
 
@@ -108,7 +109,7 @@ export function useBonusPoints(targetUserId?: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bonus-points'] });
-      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      invalidateGamificationCaches(queryClient);
       toast.success('Bônus concedido com sucesso!');
     },
     onError: () => {

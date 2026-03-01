@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { formatCurrencyCompact as formatCurrency } from '@/lib/format';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useFinance } from '@/hooks/useFinance';
@@ -67,8 +68,7 @@ export function CashFlowProjection({ totalBalance }: CashFlowProjectionProps) {
     return points;
   }, [futureTransactions, totalBalance, horizon]);
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact' }).format(value);
+  
 
   const minBalance = Math.min(...chartData.map(d => d.balance));
   const endBalance = chartData[chartData.length - 1]?.balance ?? totalBalance;

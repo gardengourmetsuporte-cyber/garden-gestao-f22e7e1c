@@ -16,9 +16,7 @@ interface Props {
   onClear: () => void;
 }
 
-function formatPrice(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+import { formatCurrency as formatPrice } from '@/lib/format';
 
 export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRemove, onClear }: Props) {
   const [tableNumber, setTableNumber] = useState(mesa || '');

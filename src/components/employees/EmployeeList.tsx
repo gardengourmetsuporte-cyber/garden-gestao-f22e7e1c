@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useUsers } from '@/hooks/useUsers';
 import { Employee } from '@/types/employee';
@@ -54,12 +55,6 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
     return matchesSearch && matchesStatus;
   });
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
 
   const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);

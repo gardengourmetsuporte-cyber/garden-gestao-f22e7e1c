@@ -23,8 +23,7 @@ interface CashClosingData {
   notes?: string | null;
 }
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+import { formatCurrency } from '@/lib/format';
 
 function openPrintWindow(title: string, bodyHtml: string) {
   const win = window.open('', '_blank');

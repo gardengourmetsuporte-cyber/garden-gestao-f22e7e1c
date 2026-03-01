@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -20,8 +21,7 @@ interface DRELine {
 }
 
 export function DREReport({ transactions, categories, monthLabel = '' }: DREReportProps) {
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  
 
   // Build category name lookup (including subcategories)
   const categoryNameMap = useMemo(() => {

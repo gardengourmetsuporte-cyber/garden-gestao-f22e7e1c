@@ -26,8 +26,7 @@ interface FinanceChartsProps {
   categories?: FinanceCategory[];
 }
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+import { formatCurrency } from '@/lib/format';
 
 const formatCompact = (value: number) => {
   if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { formatCurrencySimple as formatCurrency } from '@/lib/format';
 import { startOfWeek, endOfWeek, format, parseISO, isWithinInterval, addWeeks, isSameWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -69,8 +70,7 @@ export function WeeklySummary({ closings }: Props) {
     };
   }, [closings, weekOffset]);
 
-  const formatCurrency = (v: number) =>
-    `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  
 
   return (
     <div className="card-command p-4 space-y-3">
