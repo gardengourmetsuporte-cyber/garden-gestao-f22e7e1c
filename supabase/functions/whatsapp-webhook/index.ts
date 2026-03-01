@@ -303,7 +303,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    console.log("[WEBHOOK] Received payload:", JSON.stringify(body).substring(0, 500));
+    console.log("[WEBHOOK] Received event from provider");
 
     // Determine provider from query param or body
     const url = new URL(req.url);
@@ -347,7 +347,7 @@ serve(async (req) => {
 
     // Parse incoming message
     const incoming = parseIncoming(channel.provider, body);
-    console.log("[WEBHOOK] Parsed message:", incoming ? JSON.stringify(incoming).substring(0, 300) : "null (skipped)");
+    console.log("[WEBHOOK] Parsed message:", incoming ? `phone=***${incoming.phone.slice(-4)}, len=${incoming.content.length}` : "null (skipped)");
     
     if (!incoming || !incoming.phone || !incoming.content) {
       console.log("[WEBHOOK] Skipping - no valid message parsed from event");

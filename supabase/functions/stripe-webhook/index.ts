@@ -62,7 +62,7 @@ serve(async (req) => {
         }).eq("user_id", user.id);
         console.log(`[stripe-webhook] Updated user ${user.id} to plan=${plan}`);
       } else {
-        console.log(`[stripe-webhook] No user found for email ${customerEmail}`);
+        console.log(`[stripe-webhook] No user found for checkout session`);
       }
     }
 
@@ -76,7 +76,7 @@ serve(async (req) => {
         .eq("stripe_customer_id", customerId)
         .select("user_id");
 
-      console.log(`[stripe-webhook] Subscription canceled for customer ${customerId}`, data);
+      console.log(`[stripe-webhook] Subscription canceled, affected rows: ${data?.length || 0}`);
     }
 
     return new Response(JSON.stringify({ received: true }), {

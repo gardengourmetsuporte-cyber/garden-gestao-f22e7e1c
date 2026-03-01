@@ -13,7 +13,68 @@ serve(async (req) => {
   }
 
   try {
+    // ── Authentication ──
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const userId = claimsData.claims.sub as string;
+
     const { prompt, unit_id, topic } = await req.json();
+
+    // ── Input validation ──
+    if (prompt && (typeof prompt !== "string" || prompt.length > 2000)) {
+      return new Response(JSON.stringify({ error: "Prompt inválido" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (topic && (typeof topic !== "string" || topic.length > 200)) {
+      return new Response(JSON.stringify({ error: "Tópico inválido" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── IDOR Protection: validate unit_id belongs to authenticated user ──
+    if (unit_id) {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const { data: unitAccess } = await adminClient
+        .from("user_units")
+        .select("unit_id")
+        .eq("user_id", userId)
+        .eq("unit_id", unit_id)
+        .maybeSingle();
+      if (!unitAccess) {
+        return new Response(JSON.stringify({ error: "Acesso negado a esta unidade." }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 

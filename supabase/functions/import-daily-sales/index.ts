@@ -36,6 +36,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    const userId = claimsData.claims.sub as string;
+
     const { csvText, unitId } = await req.json();
     if (!csvText || !unitId) {
       return new Response(
@@ -44,6 +46,24 @@ Deno.serve(async (req) => {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
+      );
+    }
+
+    // ── IDOR Protection: validate unitId belongs to authenticated user ──
+    const adminCheck = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: unitAccess } = await adminCheck
+      .from("user_units")
+      .select("unit_id")
+      .eq("user_id", userId)
+      .eq("unit_id", unitId)
+      .maybeSingle();
+    if (!unitAccess) {
+      return new Response(
+        JSON.stringify({ error: "Acesso negado a esta unidade." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
