@@ -1,49 +1,118 @@
 
 
-## Esconder o header do accordion ao expandir
+## Redesign Completo do Dashboard Administrativo
 
-### O que muda
+### Conceito
 
-Quando um card estiver **aberto**, o trigger (barra com ícone + nome + badge) vai colapsar visualmente com uma transição suave -- ficando com height 0 e opacidade 0. Quando **fechado**, volta a aparecer normalmente. Isso é feito 100% via CSS usando o seletor `data-state`.
+Substituir o layout de accordion por um dashboard moderno estilo **Bento Grid** -- cards de tamanhos variados organizados em seções lógicas, sempre visíveis (sem expandir/colapsar). Layout inspirado em dashboards SaaS modernos (Linear, Vercel, Notion). O gestor vê tudo de relance.
 
-### Implementação
-
-**1. `src/index.css`** -- Adicionar transição no trigger:
-
-```css
-.dash-accordion-trigger {
-  /* existente... */
-  overflow: hidden;
-  max-height: 3.5rem; /* altura normal */
-  opacity: 1;
-  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
-}
-
-.dash-accordion-trigger[data-state="open"] {
-  max-height: 0;
-  opacity: 0;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  pointer-events: none; /* evita cliques acidentais enquanto invisível */
-}
-```
-
-**2. `src/components/dashboard/DashboardAccordion.tsx`** -- Adicionar um botão de "minimizar" dentro do `AccordionContent` para que o usuário consiga fechar o card mesmo sem o header visível. Será um pequeno botão no topo do conteúdo expandido com o ícone do widget + label + chevron para cima, funcionando como trigger de colapso.
+### Estrutura visual
 
 ```text
-┌──────────────────────────────────────┐
-│ 💰 Saldo financeiro  R$ 12.450   ▴  │  ← mini-header clicável (fecha)
-│ ┌────────────────────────────────┐   │
-│ │  [conteúdo completo do widget] │   │
-│ └────────────────────────────────┘   │
-└──────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│  Bom dia, João 👋                       │
+│  Sexta, 28 de fevereiro                 │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  💰 SALDO          R$ 14.949   │    │  ← Hero card (full width, gradient)
+│  │  Pendências: R$ 2.300          │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌──────────┐ ┌──────────┐              │
+│  │ Pedidos  │ │ Contas   │              │  ← KPI cards (grid 2 cols)
+│  │    3     │ │    5     │              │
+│  └──────────┘ └──────────┘              │
+│  ┌──────────┐ ┌──────────┐              │
+│  │ Resgates │ │ Estoque  │              │
+│  │    1     │ │    4     │              │
+│  └──────────┘ └──────────┘              │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  📋 Checklists (Abertura/Fech.) │    │  ← Full width widget
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  📊 Despesas do mês (donut)    │    │  ← Full width
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  ⚠️ Contas a vencer            │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  💡 Insights da IA             │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  📅 Agenda / Calendário        │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  🏆 Ranking                    │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ⚙️ Gerenciar tela inicial              │
+└─────────────────────────────────────────┘
 ```
 
-Esse mini-header usa `AccordionPrimitive.Trigger` (ou wrapping manual via `onValueChange`) para alternar o estado.
+No desktop (lg+), os KPI cards ficam em grid de 4 colunas, e widgets maiores ficam lado a lado em 2 colunas.
 
-### Sem risco
+### Ordem lógica para o gestor
 
-- O Radix Accordion continua controlando o estado
-- Apenas CSS esconde o trigger original quando aberto
-- O botão dentro do content garante que o card sempre pode ser fechado
+1. **Saudação + data** (contexto)
+2. **Setup onboarding** (só durante configuração inicial)
+3. **Hero financeiro** -- saldo é o dado mais importante
+4. **KPI cards** -- indicadores rápidos: pedidos pendentes, contas a vencer, resgates, estoque crítico
+5. **Checklists** -- operação diária
+6. **Gráfico de despesas** -- visão financeira detalhada
+7. **Contas a vencer** -- alertas financeiros
+8. **Insights IA** -- sugestões inteligentes
+9. **Agenda/Calendário** -- próximos compromissos
+10. **Pedidos pendentes** -- detalhes dos pedidos
+11. **Sugestão de compras** -- reposição automática
+12. **Ranking/Leaderboard** -- gamificação
+13. **Fluxo de caixa projetado** -- (oculto por padrão)
+
+### Mudanças técnicas
+
+**1. `src/components/dashboard/AdminDashboard.tsx`** -- Reescrever completamente
+- Remover import do `DashboardAccordion`
+- Renderizar widgets diretamente em seções, cada uma condicional ao `isVisible(key)` e `hasAccess(module)`
+- Hero financeiro como card gradient full-width
+- KPI grid com 4 mini-cards (pedidos, contas, resgates, estoque)
+- Widgets subsequentes como cards independentes com header compacto
+- Manter lazy loading nos widgets pesados
+- Manter botão "Gerenciar tela inicial" + DashboardWidgetManager
+
+**2. `src/components/dashboard/DashboardKPIGrid.tsx`** -- Novo componente
+- Grid de 2x2 (mobile) / 4 cols (desktop) com mini-cards animados
+- Cada card: ícone colorido, label, valor numérico grande, tap navega para a seção
+- Cores: pedidos=orange, contas=amber, resgates=rose, estoque=red
+
+**3. `src/components/dashboard/DashboardSection.tsx`** -- Novo componente wrapper
+- Componente reutilizável que envolve cada widget
+- Props: `title`, `icon`, `iconColor`, `children`, `onNavigate?`
+- Renderiza header compacto + conteúdo sempre visível
+- Sem accordion, sem expand/collapse
+
+**4. `src/index.css`** -- Limpar estilos do accordion
+- Remover todas as classes `.dash-accordion-*`
+- Adicionar novas classes para o bento grid: `.dash-section`, `.dash-kpi-card`, `.dash-hero`
+
+**5. `src/hooks/useDashboardWidgets.ts`** -- Simplificar
+- Remover campo `defaultOpen` (não precisa mais)
+- Manter visibilidade e reordenação
+
+**6. Deletar `src/components/dashboard/DashboardAccordion.tsx`**
+- Não é mais necessário
+
+### O que permanece intacto
+
+- Todos os widgets internos (FinanceChartWidget, ChecklistDashboardWidget, BillsDueWidget, etc.) continuam como estão
+- DashboardWidgetManager com drag-and-drop para reordenar/ocultar
+- SetupChecklistWidget
+- LazySection para lazy loading
+- useDashboardStats e useDashboardWidgets (lógica core)
+- EmployeeDashboard (não afetado)
 
