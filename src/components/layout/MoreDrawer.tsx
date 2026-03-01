@@ -179,7 +179,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
 
             {/* Store selector — compact inline */}
             {units.length > 1 && (
-              <div className="flex gap-1.5 overflow-x-auto no-scrollbar px-0.5">
+              <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${units.length}, 1fr)` }}>
                 {units.map(unit => {
                   const isActive = unit.id === activeUnit?.id;
                   return (
@@ -190,7 +190,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                         onOpenChange(false);
                       }}
                       className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all shrink-0",
+                        "flex items-center justify-center gap-1.5 px-2 py-2 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all min-w-0",
                         isActive
                           ? "bg-white/20 text-white border border-white/30"
                           : "bg-white/10 text-white/60 hover:bg-white/15"
@@ -202,7 +202,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                           isActive ? "bg-emerald-400" : "bg-white/40"
                         )}
                       />
-                      {unit.name}
+                      <span className="truncate">{unit.name}</span>
                     </button>
                   );
                 })}
