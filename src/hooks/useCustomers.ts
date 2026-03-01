@@ -30,6 +30,7 @@ export function useCustomers() {
         .from('customers')
         .select('*')
         .eq('unit_id', unitId)
+        .is('deleted_at' as any, null)
         .order('name')
         .range(pageParam, pageParam + PAGE_SIZE - 1);
 
@@ -94,7 +95,7 @@ export function useCustomers() {
 
   const deleteCustomer = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('customers').delete().eq('id', id);
+      const { error } = await supabase.from('customers').update({ deleted_at: new Date().toISOString() } as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

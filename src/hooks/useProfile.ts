@@ -126,8 +126,8 @@ export function useProfile(userId: string | undefined, leaderboard?: Array<{ use
     queryKey: ['profile', userId, unitId],
     queryFn: () => fetchProfileData(userId!, unitId ?? null),
     enabled: !!userId,
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+    staleTime: 60_000,
+    refetchInterval: 300_000, // Reduced from 60s to 5min to lower backend load at scale
   });
 
   const leaderboardRank = leaderboard?.find(e => e.user_id === userId)?.rank ?? null;

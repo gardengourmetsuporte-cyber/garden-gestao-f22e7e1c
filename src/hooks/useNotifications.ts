@@ -83,8 +83,9 @@ export function useNotifications() {
     queryKey,
     queryFn: () => fetchNotificationsData(user!.id),
     enabled: !!user,
-    staleTime: 30_000, // Don't refetch for 30s
-    refetchInterval: 60_000, // Poll every 60s as fallback
+    staleTime: 60_000,
+    // Realtime handles updates — polling only as safety net every 5min
+    refetchInterval: 300_000,
   });
 
   // Realtime subscription - debounced batch updates
