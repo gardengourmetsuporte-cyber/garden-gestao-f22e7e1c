@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useSupplierInvoices } from '@/hooks/useSupplierInvoices';
@@ -27,12 +28,6 @@ export function SupplierInvoicesList() {
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [isPaying, setIsPaying] = useState(false);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
 
   const handleEdit = (invoice: typeof invoices[0]) => {
     setEditingInvoice(invoice);

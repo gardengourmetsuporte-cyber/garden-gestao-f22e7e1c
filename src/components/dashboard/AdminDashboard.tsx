@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
@@ -152,8 +153,7 @@ export function AdminDashboard() {
   // Gate: show skeleton until critical data is ready to avoid layout flash
   const isReady = !statsLoading && !modulesLoading && !!profile;
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  
 
   const greeting = (() => {
     const h = new Date().getHours();

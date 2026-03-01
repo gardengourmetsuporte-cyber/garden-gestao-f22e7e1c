@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useEmployeePayments } from '@/hooks/useEmployees';
@@ -81,9 +82,6 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
     fetchAccounts();
   }, [user]);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  };
 
   const handleEdit = (payment: EmployeePayment) => {
     if (payment.type === 'salary' && payment.total_earnings > 0) {

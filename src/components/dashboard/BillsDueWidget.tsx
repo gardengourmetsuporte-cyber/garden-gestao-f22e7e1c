@@ -1,5 +1,6 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
+import { formatCurrencySimple as formatCurrency } from '@/lib/format';
 import type { BillDueSoon } from '@/hooks/useDashboardStats';
 
 interface Props {
@@ -9,8 +10,7 @@ interface Props {
 export function BillsDueWidget({ bills }: Props) {
   if (bills.length === 0) return null;
 
-  const formatCurrency = (v: number) =>
-    `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  
 
   const total = bills.reduce((s, b) => s + b.amount, 0);
 

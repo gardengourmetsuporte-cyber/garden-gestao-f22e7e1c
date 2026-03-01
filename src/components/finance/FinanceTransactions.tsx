@@ -28,8 +28,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-const formatCurrency = (value: number) => currencyFormatter.format(value);
+import { formatCurrency } from '@/lib/format';
 
 function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
   const {

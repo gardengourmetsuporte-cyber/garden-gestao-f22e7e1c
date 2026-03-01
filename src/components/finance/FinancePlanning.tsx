@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { MonthSelector } from './MonthSelector';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -27,8 +28,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
   const [selectedCategory, setSelectedCategory] = useState<FinanceCategory | null>(null);
   const [amount, setAmount] = useState('');
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  
 
   // Calculate spent per category (expense only, paid)
   const spentByCategory = useMemo(() => {

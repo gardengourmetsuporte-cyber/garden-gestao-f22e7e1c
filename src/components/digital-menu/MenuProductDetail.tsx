@@ -14,9 +14,7 @@ interface Props {
   onAddToCart: (item: CartItem) => void;
 }
 
-function formatPrice(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+import { formatCurrency as formatPrice } from '@/lib/format';
 
 export function MenuProductDetail({ product, optionGroups, open, onClose, onAddToCart }: Props) {
   const [quantity, setQuantity] = useState(1);

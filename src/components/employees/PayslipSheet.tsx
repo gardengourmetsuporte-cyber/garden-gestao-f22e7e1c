@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatCurrency } from '@/lib/format';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,7 +72,7 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
   const totalEarnings = (parseFloat(baseSalary)||0)+(parseFloat(nightBonus)||0)+(parseFloat(overtimeBonus)||0)+(parseFloat(mealAllowance)||0)+(parseFloat(transportAllowance)||0)+(parseFloat(otherEarnings)||0);
   const totalDeductions = (parseFloat(inssDeduction)||0)+(parseFloat(irrfDeduction)||0)+(parseFloat(advanceDeduction)||0)+(parseFloat(otherDeductions)||0);
   const netSalary = totalEarnings - totalDeductions;
-  const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  
 
   const handleSave = async () => {
     if (!employee) return;

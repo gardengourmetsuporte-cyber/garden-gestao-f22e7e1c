@@ -1,10 +1,26 @@
-// Database types matching Supabase schema
+/**
+ * Domain types with joined/composite data.
+ * 
+ * Base column types come from `src/integrations/supabase/types.ts` (auto-generated).
+ * This file defines ONLY:
+ *   - String literal union types (enums not in DB enums)
+ *   - Interfaces with joined/nested data (e.g. `items?: ChecklistItem[]`)
+ *   - Composite view types not present in the auto-generated schema
+ */
+
+// ---- Enum-like string unions ----
+
 export type AppRole = 'admin' | 'funcionario' | 'super_admin';
 export type UnitType = 'unidade' | 'kg' | 'litro';
 export type MovementType = 'entrada' | 'saida';
 export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';
 export type ChecklistType = 'abertura' | 'fechamento' | 'bonus';
 export type ScheduleStatus = 'pending' | 'approved' | 'rejected';
+export type ItemFrequency = 'daily' | 'weekly' | 'monthly';
+export type RewardStatus = 'pending' | 'approved' | 'delivered' | 'cancelled';
+
+// ---- Joined/composite interfaces ----
+// These extend the auto-generated Row types with optional related data from joins.
 
 export interface Profile {
   id: string;
@@ -15,13 +31,6 @@ export interface Profile {
   department: string | null;
   created_at: string;
   updated_at: string;
-}
-
-export interface UserRole {
-  id: string;
-  user_id: string;
-  role: AppRole;
-  created_at: string;
 }
 
 export interface Category {
@@ -57,7 +66,6 @@ export interface InventoryItem {
   recipe_unit_price: number | null;
   created_at: string;
   updated_at: string;
-  // Joined data
   category?: Category;
   supplier?: Supplier;
 }
@@ -70,9 +78,18 @@ export interface StockMovement {
   notes: string | null;
   user_id: string | null;
   created_at: string;
-  // Joined data
   item?: InventoryItem;
   profile?: Profile;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  item_id: string;
+  quantity: number;
+  notes: string | null;
+  created_at: string;
+  item?: InventoryItem;
 }
 
 export interface Order {
@@ -85,48 +102,9 @@ export interface Order {
   supplier_invoice_id: string | null;
   created_at: string;
   updated_at: string;
-  // Joined data
   supplier?: Supplier;
   order_items?: OrderItem[];
 }
-
-export interface OrderItem {
-  id: string;
-  order_id: string;
-  item_id: string;
-  quantity: number;
-  notes: string | null;
-  created_at: string;
-  // Joined data
-  item?: InventoryItem;
-}
-
-// Checklist types
-export interface ChecklistSector {
-  id: string;
-  name: string;
-  color: string;
-  icon: string | null;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-  // Joined data
-  subcategories?: ChecklistSubcategory[];
-}
-
-export interface ChecklistSubcategory {
-  id: string;
-  sector_id: string;
-  name: string;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-  // Joined data
-  sector?: ChecklistSector;
-  items?: ChecklistItem[];
-}
-
-export type ItemFrequency = 'daily' | 'weekly' | 'monthly';
 
 export interface ChecklistItem {
   id: string;
@@ -138,12 +116,33 @@ export interface ChecklistItem {
   sort_order: number;
   is_active: boolean;
   deleted_at: string | null;
-  points: number; // 0 = no points, 1-4 = configurable points
+  points: number;
   requires_photo: boolean;
   created_at: string;
   updated_at: string;
-  // Joined data
   subcategory?: ChecklistSubcategory;
+}
+
+export interface ChecklistSubcategory {
+  id: string;
+  sector_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  sector?: ChecklistSector;
+  items?: ChecklistItem[];
+}
+
+export interface ChecklistSector {
+  id: string;
+  name: string;
+  color: string;
+  icon: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  subcategories?: ChecklistSubcategory[];
 }
 
 export interface ChecklistCompletion {
@@ -155,19 +154,17 @@ export interface ChecklistCompletion {
   notes: string | null;
   date: string;
   awarded_points: boolean;
-  points_awarded: number; // 1-4 stars, 0 means "already done"
-  is_skipped: boolean; // "Não concluído" — marked but not done
+  points_awarded: number;
+  is_skipped: boolean;
   photo_url: string | null;
   is_contested: boolean;
   contested_by: string | null;
   contested_reason: string | null;
   contested_at: string | null;
-  // Joined data
   item?: ChecklistItem;
   profile?: Profile;
 }
 
-// Work Schedule types
 export interface WorkSchedule {
   id: string;
   user_id: string;
@@ -179,7 +176,6 @@ export interface WorkSchedule {
   notes: string | null;
   created_at: string;
   updated_at: string;
-  // Joined data
   profile?: Profile;
   approver_profile?: Profile;
 }
@@ -190,9 +186,6 @@ export interface DashboardStats {
   outOfStockItems: number;
   recentMovements: number;
 }
-
-// Reward types
-export type RewardStatus = 'pending' | 'approved' | 'delivered' | 'cancelled';
 
 export interface RewardProduct {
   id: string;
@@ -215,7 +208,6 @@ export interface RewardRedemption {
   notes: string | null;
   created_at: string;
   updated_at: string;
-  // Joined data
   product?: RewardProduct;
   profile?: Profile;
 }
