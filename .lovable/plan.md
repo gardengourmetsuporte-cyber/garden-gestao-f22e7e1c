@@ -1,54 +1,74 @@
 
 
-## Plano: Adaptação Completa para Desktop
+## Plano de Refatoração Estrutural
 
-O sistema está construído com foco mobile-first. Vários módulos perdem funcionalidade ou aproveitam mal o espaço em telas desktop (>=1024px). Aqui está o plano de adaptação:
+### Diagnóstico dos Problemas Encontrados
 
----
+**1. `formatCurrency` duplicada 20+ vezes**
+A mesma função `new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)` está copiada em 20 arquivos diferentes, com variações inconsistentes (algumas usam `toLocaleString`, outras `notation: 'compact'`).
 
-### 1. Finance — Navegação por Tabs no Desktop
-**Problema:** O `FinanceBottomNav` usa `lg:hidden`, então no desktop não há como trocar entre as abas (Home, Transações, Gráficos, Mais).
-**Solução:** Adicionar uma barra de tabs horizontal no topo da página Finance, visível apenas em `lg:` breakpoint. A bottom nav permanece no mobile.
-- Arquivo: `src/pages/Finance.tsx` — adicionar tabs desktop inline
-- Arquivo: `src/components/finance/FinanceBottomNav.tsx` — manter `lg:hidden`
+**2. Invalidação de cache gamification repetida**
+O bloco `invalidateQueries(['points']) + invalidateQueries(['profile']) + invalidateQueries(['leaderboard'])` aparece 6 vezes em 3 arquivos (useChecklists, useTimeTracking, MedalSettings).
 
-### 2. Dashboard — Layout em Grid no Desktop
-**Problema:** Todos os widgets ficam empilhados em coluna única mesmo em telas largas.
-**Solução:** Usar `lg:grid lg:grid-cols-2` para distribuir widgets lado a lado no desktop. Widgets largos (finance hero, checklist) ocupam `lg:col-span-2`.
-- Arquivo: `src/components/dashboard/AdminDashboard.tsx`
+**3. `useFinanceCore.ts` monolítico (545 linhas)**
+Mistura fetch helpers, mutations CRUD, undo/redo, computações derivadas e inicialização de defaults num único arquivo.
 
-### 3. Finance Home — Grid para Cards
-**Problema:** Cards de receita/despesa e contas ficam estreitos em tela larga.
-**Solução:** Usar grid responsivo para distribuir cards de contas e summaries.
-- Arquivo: `src/components/finance/FinanceHome.tsx`
+**4. `useChecklists.ts` monolítico (491 linhas)**
+CRUD de sectors, subcategories, items, completions, reorder, contest e split — tudo num hook.
 
-### 4. Settings — Layout Sidebar + Content no Desktop
-**Problema:** No desktop, clicar em uma seção substitui toda a tela. Perde-se o contexto do menu.
-**Solução:** No desktop (`lg:`), mostrar menu lateral fixo + conteúdo à direita lado a lado.
-- Arquivo: `src/pages/Settings.tsx`
+**5. `as any` excessivo (~553 ocorrências)**
+Principalmente em hooks que operam tabelas não tipadas no schema auto-gerado. Não será possível eliminar todos (dependem do schema real), mas os mais flagrantes podem ser isolados.
 
-### 5. Inventory — Grid de Items no Desktop
-**Problema:** Items ficam em lista estreita no desktop.
-**Solução:** Usar `lg:grid-cols-2` para os item cards dentro de cada categoria.
-- Arquivo: `src/pages/Inventory.tsx`
-
-### 6. Checklists — Layout mais amplo no Desktop
-**Problema:** A date strip e os checklists ficam comprimidos.
-**Solução:** Aplicar `max-w-4xl mx-auto` para conteúdo centralizado e melhor legibilidade.
-- Arquivo: `src/pages/Checklists.tsx`
-
-### 7. WhatsApp — Já está adaptado
-O WhatsApp já tem layout split `lg:w-[340px]` + flex detail. Sem mudanças necessárias.
-
-### 8. Employees/Recipes/Marketing — Ajustes de Grid
-**Solução:** Adicionar grids responsivos onde listas são renderizadas em coluna única.
-- Arquivos: `src/pages/Employees.tsx`, componentes de lista internos
+**6. `src/types/database.ts` duplica tipos do Supabase**
+Interfaces manuais que divergem do `types.ts` auto-gerado, forçando casting.
 
 ---
 
-### Resumo técnico
-- Todas as mudanças usam classes Tailwind responsivas (`lg:`)
-- Nenhuma alteração de lógica/dados — apenas layout
-- Mobile permanece inalterado
-- Estimativa: ~8-10 arquivos editados
+### Mudanças Planejadas
+
+#### A. Criar `src/lib/format.ts` — utilitário centralizado
+- Exportar `formatCurrency(value)`, `formatCurrencyCompact(value)`, `formatCurrencySimple(value)`
+- Substituir todas as 20+ definições locais por imports desse arquivo
+- **Nenhuma mudança funcional**
+
+#### B. Criar `src/lib/queryKeys.ts` — constantes de query keys
+- Centralizar keys como `QUERY_KEYS.points`, `QUERY_KEYS.profile`, `QUERY_KEYS.leaderboard`
+- Criar helper `invalidateGamificationCaches(queryClient)` para eliminar o bloco repetido de 3 invalidações
+
+#### C. Dividir `useFinanceCore.ts` em 3 arquivos
+- `src/hooks/finance/useFinanceFetch.ts` — fetch helpers (fetchAccountsCore, fetchCategoriesCore, fetchTransactionsCore)
+- `src/hooks/finance/useFinanceUndoRedo.ts` — lógica de undo/redo + mutations com undo
+- `src/hooks/finance/useFinanceCore.ts` — hook principal que compõe os anteriores
+- `src/hooks/finance/initializeDefaults.ts` — função `initializeDefaultsCore` isolada
+- Re-exportar de `src/hooks/useFinanceCore.ts` para manter imports existentes
+
+#### D. Dividir `useChecklists.ts` em módulos
+- `src/hooks/checklists/useChecklistFetch.ts` — fetchSectorsData, fetchCompletionsData
+- `src/hooks/checklists/useChecklistCRUD.ts` — CRUD de sectors/subcategories/items
+- `src/hooks/checklists/useChecklistCompletions.ts` — toggleCompletion, splitCompletion, contestCompletion
+- `src/hooks/checklists/useChecklists.ts` — hook composto
+- Re-exportar de `src/hooks/useChecklists.ts`
+
+#### E. Limpar `src/types/database.ts`
+- Manter apenas tipos que **não existem** no schema auto-gerado (tipos compostos com joins, enums de domínio)
+- Adicionar comentário indicando que tipos base vêm de `integrations/supabase/types.ts`
+
+---
+
+### O que NÃO será alterado
+- Nenhuma funcionalidade
+- Nenhum componente visual
+- Nenhuma rota ou página
+- Imports de componentes UI permanecem iguais
+- O arquivo `integrations/supabase/types.ts` (auto-gerado)
+
+### Ordem de execução
+1. `src/lib/format.ts` + substituições
+2. `src/lib/queryKeys.ts` + substituições
+3. Split de `useFinanceCore`
+4. Split de `useChecklists`
+5. Limpeza de `database.ts`
+
+### Estimativa
+~30 arquivos tocados, todos com mudanças de import/extração — zero alteração de comportamento.
 
