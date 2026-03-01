@@ -6,51 +6,43 @@ import "./index.css";
 
 // Force update: when a new service worker is installed, reload — but only after a grace period
 if ('serviceWorker' in navigator) {
-  let pendingSince: number | null = null;
-  const GRACE_MS = 30_000; // 30s grace period before auto-reload
-
-  const forceActivate = (reg: ServiceWorkerRegistration) => {
-    if (reg.waiting) {
-      // Only skip-wait if the update has been pending long enough
-      if (pendingSince && Date.now() - pendingSince > GRACE_MS) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      } else if (!pendingSince) {
-        pendingSince = Date.now();
-      }
-    }
-  };
-
-  // Reload when a new SW takes control
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.location.reload();
-  });
-
   navigator.serviceWorker.ready
     .then((reg) => {
-      forceActivate(reg);
-
-      reg.addEventListener('updatefound', () => {
-        const newSW = reg.installing;
-        newSW?.addEventListener('statechange', () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            pendingSince = Date.now();
-          }
-        });
-      });
-
-      // Check updates on load + when returning to app (debounced)
+      // Check for updates on load
       reg.update().catch(() => {});
+
+      // On visibility change (returning to app), check for updates with debounce
       let updateDebounce: ReturnType<typeof setTimeout> | null = null;
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           if (updateDebounce) clearTimeout(updateDebounce);
           updateDebounce = setTimeout(() => {
             reg.update().catch(() => {});
-            forceActivate(reg);
             updateDebounce = null;
-          }, 3000); // wait 3s after returning before checking
+          }, 5000);
         }
       });
+
+      // When a new SW is installed and waiting, activate it silently
+      // The new version will be active on next natural navigation
+      const activateWaiting = () => {
+        if (reg.waiting) {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      };
+
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW?.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // New version ready — activate silently without reload
+            activateWaiting();
+          }
+        });
+      });
+
+      // If there's already a waiting SW on load, activate it
+      activateWaiting();
     })
     .catch(() => {});
 }
