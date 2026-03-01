@@ -22,6 +22,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RecurringEditMode } from '@/components/finance/TransactionSheet';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function Finance() {
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
@@ -165,9 +166,41 @@ export default function Finance() {
     );
   }
 
+  const desktopTabs = [
+    { id: 'home' as FinanceTab, icon: 'Home', label: 'Principal' },
+    { id: 'transactions' as FinanceTab, icon: 'FileText', label: 'Transações' },
+    { id: 'charts' as FinanceTab, icon: 'PieChart', label: 'Gráficos' },
+    { id: 'planning' as FinanceTab, icon: 'Target', label: 'Planejar' },
+    { id: 'more' as FinanceTab, icon: 'MoreHorizontal', label: 'Mais' },
+  ];
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-32">
+      {/* Desktop top tabs */}
+      <div className="hidden lg:flex items-center gap-1 px-6 py-2 border-b border-border/40 bg-card/50">
+        {desktopTabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              activeTab === tab.id
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+            )}
+          >
+            <AppIcon name={tab.icon} size={16} />
+            {tab.label}
+          </button>
+        ))}
+        <div className="ml-auto">
+          <Button size="sm" onClick={() => handleAddTransaction('expense')} className="gap-1.5">
+            <AppIcon name="Plus" size={16} />
+            Nova transação
+          </Button>
+        </div>
+      </div>
       <div>
         {activeTab === 'home' && (
           <FinanceHome

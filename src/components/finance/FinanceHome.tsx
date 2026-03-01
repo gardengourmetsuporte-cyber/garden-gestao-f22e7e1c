@@ -192,7 +192,7 @@ export function FinanceHome({
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-sm uppercase tracking-wider text-muted-foreground font-display">Contas</h2>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
           {accounts.map(account => (
             <AccountCard key={account.id} account={account} onClick={() => onAccountClick?.(account)} />
           ))}

@@ -249,7 +249,7 @@ export default function InventoryPage() {
                         {/* Category Items with collapse animation */}
                         <div
                           className={cn(
-                            "space-y-2 overflow-hidden transition-all duration-300 ease-out",
+                            "space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 overflow-hidden transition-all duration-300 ease-out",
                             isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
                           )}
                         >

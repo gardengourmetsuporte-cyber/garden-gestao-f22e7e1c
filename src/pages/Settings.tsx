@@ -120,80 +120,110 @@ export default function SettingsPage() {
     }
   });
 
-  if (activeSection) {
-    const activeItem = menuItems.find(i => i.value === activeSection);
-    return (
-      <AppLayout>
-        <div className="min-h-screen bg-background pb-24">
-          <header className="page-header-bar">
-            <div className="page-header-content flex items-center gap-3">
-              <button onClick={() => setActiveSection(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                <AppIcon name="ChevronRight" size={20} className="rotate-180 text-muted-foreground hover:text-foreground transition-colors" />
-              </button>
-              <h1 className="text-lg font-bold">{activeItem?.label}</h1>
-            </div>
-          </header>
+  const settingsContent = activeSection ? (
+    <Suspense fallback={<SettingsFallback />}>
+      {activeSection === 'profile' && <ProfileSettings />}
+      {activeSection === 'categories' && <CategorySettings />}
+      {activeSection === 'suppliers' && <SupplierSettings />}
+      {activeSection === 'checklists' && <ChecklistSettingsManager />}
+      {activeSection === 'team' && <TeamHub />}
+      {activeSection === 'rewards' && <RewardSettings />}
+      {activeSection === 'payments' && <PaymentMethodSettings />}
+      {activeSection === 'costs' && <RecipeCostSettings />}
+      {activeSection === 'units' && <UnitManagement />}
+      {activeSection === 'medals' && <MedalSettings />}
+      {activeSection === 'notifications' && <NotificationSettings />}
+      {activeSection === 'audit-log' && <AuditLogSettings />}
+      {activeSection === 'cardapio-digital' && <CardapioSettings />}
+      {activeSection === 'loyalty' && <LoyaltySettings />}
+    </Suspense>
+  ) : null;
 
-          <div className="px-4 py-3 lg:px-6 pb-24">
-            <Suspense fallback={<SettingsFallback />}>
-              {activeSection === 'profile' && <ProfileSettings />}
-              {activeSection === 'categories' && <CategorySettings />}
-              {activeSection === 'suppliers' && <SupplierSettings />}
-              {activeSection === 'checklists' && <ChecklistSettingsManager />}
-              {activeSection === 'team' && <TeamHub />}
-              {activeSection === 'rewards' && <RewardSettings />}
-              {activeSection === 'payments' && <PaymentMethodSettings />}
-              {activeSection === 'costs' && <RecipeCostSettings />}
-              {activeSection === 'units' && <UnitManagement />}
-              {activeSection === 'medals' && <MedalSettings />}
-              {activeSection === 'notifications' && <NotificationSettings />}
-              {activeSection === 'audit-log' && <AuditLogSettings />}
-              {activeSection === 'cardapio-digital' && <CardapioSettings />}
-              {activeSection === 'loyalty' && <LoyaltySettings />}
-            </Suspense>
+  const menuList = (
+    <div className="space-y-6">
+      {sections.map((section) => (
+        <div key={section.label}>
+          <h3 className="section-label mb-1 px-1">{section.label}</h3>
+          <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
+            {section.items.map((item) => {
+              const locked = !hasPlan(item.requiredPlan);
+              const planLabel = PLAN_LABELS[item.requiredPlan];
+              return (
+                <button
+                  key={item.value}
+                  onClick={() => handleSectionClick(item.value, item.requiredPlan)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors",
+                    locked && "opacity-50",
+                    activeSection === item.value && "bg-primary/5 border-l-2 border-primary"
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className={cn("font-medium text-sm", locked ? "text-muted-foreground" : "text-foreground")}>{item.label}</span>
+                    {locked && planLabel && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-full">
+                        💎 {planLabel}
+                      </span>
+                    )}
+                  </span>
+                  <AppIcon name={locked ? "Lock" : "ChevronRight"} size={16} className="text-muted-foreground shrink-0" />
+                </button>
+              );
+            })}
           </div>
         </div>
-      </AppLayout>
-    );
+      ))}
+    </div>
+  );
+
+  // Mobile: show either menu or content
+  // Desktop: show menu sidebar + content side by side
+  if (activeSection && !settingsContent) {
+    // fallback
   }
+
+  // Mobile with active section — full screen content
+  const mobileActiveView = activeSection ? (
+    <div className="lg:hidden min-h-screen bg-background pb-24">
+      <header className="page-header-bar">
+        <div className="page-header-content flex items-center gap-3">
+          <button onClick={() => setActiveSection(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+            <AppIcon name="ChevronRight" size={20} className="rotate-180 text-muted-foreground hover:text-foreground transition-colors" />
+          </button>
+          <h1 className="text-lg font-bold">{menuItems.find(i => i.value === activeSection)?.label}</h1>
+        </div>
+      </header>
+      <div className="px-4 py-3 pb-24">
+        {settingsContent}
+      </div>
+    </div>
+  ) : null;
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
-
-        <div className="px-4 py-3 lg:px-6 space-y-6">
-          {sections.map((section) => (
-            <div key={section.label}>
-              <h3 className="section-label mb-1 px-1">{section.label}</h3>
-              <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
-                {section.items.map((item) => {
-                  const locked = !hasPlan(item.requiredPlan);
-                  const planLabel = PLAN_LABELS[item.requiredPlan];
-                  return (
-                    <button
-                      key={item.value}
-                      onClick={() => handleSectionClick(item.value, item.requiredPlan)}
-                      className={cn(
-                        "w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors",
-                        locked && "opacity-50"
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className={cn("font-medium text-sm", locked ? "text-muted-foreground" : "text-foreground")}>{item.label}</span>
-                        {locked && planLabel && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-full">
-                            💎 {planLabel}
-                          </span>
-                        )}
-                      </span>
-                      <AppIcon name={locked ? "Lock" : "ChevronRight"} size={16} className="text-muted-foreground shrink-0" />
-                    </button>
-                  );
-                })}
-              </div>
+      {/* Desktop: sidebar + content */}
+      <div className="hidden lg:flex min-h-screen bg-background">
+        <aside className="w-[300px] shrink-0 border-r border-border/40 overflow-y-auto py-3 px-4">
+          {menuList}
+        </aside>
+        <main className="flex-1 overflow-y-auto py-3 px-6 pb-24">
+          {settingsContent || (
+            <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
+              Selecione uma opção ao lado
             </div>
-          ))}
-        </div>
+          )}
+        </main>
+      </div>
+
+      {/* Mobile: original behavior */}
+      <div className="lg:hidden">
+        {activeSection ? mobileActiveView : (
+          <div className="min-h-screen bg-background pb-24">
+            <div className="px-4 py-3 space-y-6">
+              {menuList}
+            </div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
