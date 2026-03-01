@@ -65,26 +65,26 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
                 key={mod.key}
                 onClick={() => toggle(mod.key)}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-all active:scale-95 border-2",
+                  "flex flex-col items-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 border",
                   isSelected
-                    ? "border-primary bg-primary/10"
-                    : "border-transparent bg-secondary/50 hover:bg-secondary"
+                    ? "border-primary/60 bg-primary/10"
+                    : "border-border/30 bg-[#0a1a10]/40 hover:bg-[#0a1a10]/60"
                 )}
               >
                 <div className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center",
-                  isSelected ? "bg-primary/20" : "bg-muted"
+                  "w-10 h-10 rounded-xl flex items-center justify-center",
+                  isSelected ? "bg-primary/15" : "bg-muted/30"
                 )}>
                   <AppIcon
                     name={mod.icon}
-                    size={18}
+                    size={20}
                     fill={isSelected ? 1 : 0}
-                    className={isSelected ? "text-primary" : "text-foreground/70"}
+                    className={isSelected ? "text-primary" : "text-foreground/60"}
                   />
                 </div>
                 <span className={cn(
                   "text-[11px] font-medium text-center leading-tight",
-                  isSelected ? "text-primary" : "text-foreground/80"
+                  isSelected ? "text-primary" : "text-foreground/70"
                 )}>
                   {mod.label}
                 </span>
@@ -97,10 +97,10 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
           onClick={handleSave}
           disabled={selected.length !== 2}
           className={cn(
-            "w-full py-3 rounded-xl font-semibold text-sm transition-all",
+            "w-full py-3.5 rounded-xl font-semibold text-sm transition-all",
             selected.length === 2
               ? "bg-primary text-primary-foreground hover:bg-primary/90"
-              : "bg-muted text-muted-foreground cursor-not-allowed"
+              : "bg-muted/30 text-muted-foreground cursor-not-allowed"
           )}
         >
           Salvar ({selected.length}/2)
