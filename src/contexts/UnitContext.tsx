@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUnitTheme, applyUnitTheme } from '@/lib/unitThemes';
@@ -30,6 +31,7 @@ const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
   const { user, isSuperAdmin, isLoading: authLoading, setEffectivePlan } = useAuth();
+  const queryClient = useQueryClient();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -217,16 +219,20 @@ export function UnitProvider({ children }: { children: ReactNode }) {
 
     if (hasInitialized.current) {
       setIsTransitioning(true);
-      const timer = setTimeout(() => setIsTransitioning(false), 500);
+      const timer = setTimeout(() => setIsTransitioning(false), 200);
       return () => clearTimeout(timer);
     }
     hasInitialized.current = true;
   }, [activeUnit?.id, activeUnit?.slug]);
 
   const setActiveUnitId = useCallback((id: string) => {
+    if (id === activeUnitId) return;
+    // Cancel in-flight queries from old unit and clear stale data
+    queryClient.cancelQueries();
+    queryClient.removeQueries({ predicate: (q) => q.queryKey.includes(activeUnitId) });
     setActiveUnitIdState(id);
     localStorage.setItem(ACTIVE_UNIT_KEY, id);
-  }, []);
+  }, [activeUnitId, queryClient]);
 
   return (
     <UnitContext.Provider
