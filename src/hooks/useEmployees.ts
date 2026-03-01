@@ -17,6 +17,7 @@ export function useEmployees() {
       let query = supabase
         .from('employees')
         .select('*')
+        .is('deleted_at' as any, null)
         .order('full_name');
       if (activeUnitId) query = query.eq('unit_id', activeUnitId);
       const { data, error } = await query;
@@ -97,12 +98,12 @@ export function useEmployees() {
     },
   });
 
-  // Delete employee
+  // Soft-delete employee
   const deleteEmployee = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('employees')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() } as any)
         .eq('id', id);
       
       if (error) throw error;

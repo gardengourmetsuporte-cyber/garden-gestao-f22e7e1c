@@ -22,10 +22,13 @@ import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
 import { getRank } from '@/lib/ranks';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
-import { BottomTabBar } from './BottomTabBar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { preloadRoute, preloadRoutes } from '@/lib/routePreload';
+import { lazy, Suspense, memo } from 'react';
+
+// Lazy-load BottomTabBar — only used on mobile
+const LazyBottomTabBar = lazy(() => import('./BottomTabBar').then(m => ({ default: m.BottomTabBar })));
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -351,8 +354,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         </PageTransition>
       </main>
 
-      {/* ======= Global Bottom Tab Bar (mobile only) ======= */}
-      <BottomTabBar />
+      {/* ======= Global Bottom Tab Bar (mobile only, lazy-loaded) ======= */}
+      {isMobile && (
+        <Suspense fallback={null}>
+          <LazyBottomTabBar />
+        </Suspense>
+      )}
 
       {isTransitioning && (
         <div

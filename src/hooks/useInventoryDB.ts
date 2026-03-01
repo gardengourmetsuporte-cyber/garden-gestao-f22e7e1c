@@ -9,6 +9,7 @@ async function fetchItemsData(unitId: string): Promise<InventoryItem[]> {
   let query = supabase
     .from('inventory_items')
     .select('*, category:categories(*), supplier:suppliers(*)')
+    .is('deleted_at' as any, null)
     .order('name');
 
   if (unitId) {
@@ -122,7 +123,7 @@ export function useInventoryDB() {
 
   const deleteItemMut = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('inventory_items').delete().eq('id', id);
+      const { error } = await supabase.from('inventory_items').update({ deleted_at: new Date().toISOString() } as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => invalidateAll(),
