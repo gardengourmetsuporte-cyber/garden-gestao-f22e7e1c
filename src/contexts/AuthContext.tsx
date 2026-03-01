@@ -298,11 +298,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user, refreshSubscription]);
 
-  // Re-validate user data when tab regains focus
+  // Re-validate user data when tab regains focus (debounced to avoid rapid re-fetches)
   useEffect(() => {
+    let lastFetchAt = 0;
+    const DEBOUNCE_MS = 30_000; // 30s minimum between visibility refetches
+
     const handleVisibility = () => {
       if (document.visibilityState === 'visible' && user) {
-        fetchUserDataRef.current?.(user.id);
+        const now = Date.now();
+        if (now - lastFetchAt > DEBOUNCE_MS) {
+          lastFetchAt = now;
+          fetchUserDataRef.current?.(user.id);
+        }
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);

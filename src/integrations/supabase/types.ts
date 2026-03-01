@@ -4528,6 +4528,10 @@ export type Database = {
         Args: { _conversation_id: string }
         Returns: Database["public"]["Enums"]["chat_conversation_type"]
       }
+      get_dashboard_stats: {
+        Args: { p_is_admin?: boolean; p_unit_id: string; p_user_id: string }
+        Returns: Json
+      }
       get_global_leaderboard_data: {
         Args: { p_month_end: string; p_month_start: string }
         Returns: {
@@ -4562,6 +4566,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_sector_points_summary: { Args: { p_unit_id: string }; Returns: Json }
       get_unit_plan: { Args: { p_unit_id: string }; Returns: string }
       get_user_unit_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {

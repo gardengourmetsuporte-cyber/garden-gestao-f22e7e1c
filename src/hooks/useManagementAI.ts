@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useDashboardStats } from './useDashboardStats';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { format, startOfMonth, endOfMonth, subDays, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface AIMessage {
@@ -192,7 +192,7 @@ export function useManagementAI() {
     greetedRef.current = false;
   }, []);
 
-  // Fetch rich context from all modules
+  // Fetch rich context via edge function (single request replaces 19 parallel queries)
   const fetchFullContext = useCallback(async () => {
     if (!user || !activeUnitId) return {};
 
@@ -201,114 +201,25 @@ export function useManagementAI() {
       return contextCacheRef.current.data;
     }
 
-    const nowDate = new Date();
-    const startDate = format(startOfMonth(nowDate), 'yyyy-MM-dd');
-    const endDate = format(endOfMonth(nowDate), 'yyyy-MM-dd');
-    const last7days = format(subDays(nowDate, 7), 'yyyy-MM-dd');
-    const todayStr = format(nowDate, 'yyyy-MM-dd');
-    const next7days = format(addDays(nowDate, 7), 'yyyy-MM-dd');
-
     try {
-      const [
-        accountsRes, incomeRes, expenseRes, pendingExpRes,
-        lowStockRes, ordersRes, closingsRes, employeesRes,
-        suppliersRes, recentTxRes, tasksRes, employeePaymentsRes,
-        allMonthTxRes,
-        checklistItemsRes, checklistCompletionsRes,
-        supplierInvoicesRes, budgetsRes, budgetSpentRes,
-        preferencesRes,
-      ] = await Promise.all([
-        supabase.from('finance_accounts').select('name, type, balance').eq('unit_id', activeUnitId).eq('is_active', true),
-        supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).eq('type', 'income').eq('is_paid', true).gte('date', startDate).lte('date', endDate),
-        supabase.from('finance_transactions').select('amount').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
-        supabase.from('finance_transactions').select('amount, description, date, employee_id').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', false).gte('date', startDate).lte('date', endDate).order('date').limit(30),
-        supabase.from('inventory_items').select('name, current_stock, min_stock, supplier:suppliers(name)').eq('unit_id', activeUnitId).order('current_stock'),
-        supabase.from('orders').select('status, supplier:suppliers(name), created_at').eq('unit_id', activeUnitId).in('status', ['draft', 'sent']).order('created_at', { ascending: false }).limit(10),
-        supabase.from('cash_closings').select('date, total_amount, status, unit_name').eq('unit_id', activeUnitId).eq('status', 'pending').order('date', { ascending: false }).limit(5),
-        supabase.from('employees').select('full_name, role, is_active, base_salary').eq('unit_id', activeUnitId).eq('is_active', true),
-        supabase.from('suppliers').select('name, delivery_frequency').eq('unit_id', activeUnitId),
-        supabase.from('finance_transactions').select('description, amount, type, date, is_paid, category:finance_categories(name), employee:employees(full_name), supplier:suppliers(name)').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', last7days).order('date', { ascending: false }).limit(50),
-        supabase.from('manager_tasks').select('title, is_completed, priority, period').eq('user_id', user.id).eq('date', todayStr),
-        supabase.from('employee_payments').select('amount, type, is_paid, payment_date, employee:employees(full_name)').eq('unit_id', activeUnitId).eq('reference_month', nowDate.getMonth() + 1).eq('reference_year', nowDate.getFullYear()).order('payment_date', { ascending: false }).limit(30),
-        supabase.from('finance_transactions').select('description, amount, type, date, is_paid').eq('user_id', user.id).eq('unit_id', activeUnitId).gte('date', startDate).lte('date', endDate).order('date', { ascending: false }).limit(100),
-        supabase.from('checklist_items').select('id, checklist_type').eq('unit_id', activeUnitId).eq('is_active', true).is('deleted_at', null),
-        supabase.from('checklist_completions').select('id, checklist_type, is_skipped').eq('unit_id', activeUnitId).eq('date', todayStr),
-        supabase.from('supplier_invoices').select('description, amount, due_date, is_paid, supplier:suppliers(name)').eq('unit_id', activeUnitId).eq('is_paid', false).gte('due_date', todayStr).lte('due_date', next7days).order('due_date').limit(10),
-        supabase.from('finance_budgets').select('planned_amount, category:finance_categories(name)').eq('unit_id', activeUnitId).eq('user_id', user.id).eq('month', nowDate.getMonth() + 1).eq('year', nowDate.getFullYear()),
-        supabase.from('finance_transactions').select('amount, category_id').eq('user_id', user.id).eq('unit_id', activeUnitId).in('type', ['expense', 'credit_card']).eq('is_paid', true).gte('date', startDate).lte('date', endDate),
-        supabase.from('copilot_preferences').select('key, value, category').eq('user_id', user.id).limit(50),
-      ]);
-
-      const totalIncome = (incomeRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
-      const totalExpense = (expenseRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
-      const totalPending = (pendingExpRes.data || []).reduce((s, t) => s + Number(t.amount), 0);
-      const lowStockItems = (lowStockRes.data || []).filter((i: any) => i.current_stock <= i.min_stock);
-
-      const checklistItems = checklistItemsRes.data || [];
-      const checklistCompletions = checklistCompletionsRes.data || [];
-      const abertura = checklistItems.filter((i: any) => i.checklist_type === 'abertura');
-      const fechamento = checklistItems.filter((i: any) => i.checklist_type === 'fechamento');
-      const aberturaCompleted = checklistCompletions.filter((c: any) => c.checklist_type === 'abertura').length;
-      const fechamentoCompleted = checklistCompletions.filter((c: any) => c.checklist_type === 'fechamento').length;
-      const checklistProgress = `Abertura: ${aberturaCompleted}/${abertura.length} (${abertura.length > 0 ? Math.round((aberturaCompleted / abertura.length) * 100) : 0}%) | Fechamento: ${fechamentoCompleted}/${fechamento.length} (${fechamento.length > 0 ? Math.round((fechamentoCompleted / fechamento.length) * 100) : 0}%)`;
-
-      const upcomingInvoices = (supplierInvoicesRes.data || []).map((inv: any) =>
-        `${(inv.supplier as any)?.name || '?'}: ${inv.description} - R$${Number(inv.amount).toFixed(2)} (vence ${inv.due_date})`
-      );
-
-      const budgetData = budgetsRes.data || [];
-      const spentByCat: Record<string, number> = {};
-      (budgetSpentRes.data || []).forEach((t: any) => {
-        if (t.category_id) {
-          spentByCat[t.category_id] = (spentByCat[t.category_id] || 0) + Number(t.amount);
-        }
+      const { data, error } = await supabase.functions.invoke('copilot-context', {
+        body: { unit_id: activeUnitId },
       });
-      const budgetStatus = budgetData.map((b: any) => {
-        const catName = (b.category as any)?.name || 'Sem categoria';
-        const spent = spentByCat[(b.category as any)?.id] || 0;
-        const pct = b.planned_amount > 0 ? Math.round((spent / b.planned_amount) * 100) : 0;
-        return `${catName}: R$${spent.toFixed(2)} / R$${Number(b.planned_amount).toFixed(2)} (${pct}%)`;
-      });
+
+      if (error) throw error;
 
       const contextData = {
-        criticalStockCount: stats.criticalItems,
+        ...data.context,
         pendingRedemptions: stats.pendingRedemptions,
         dayOfWeek,
         timeOfDay,
-        accounts: (accountsRes.data || []).map((a: any) => `${a.name} (${a.type}): R$${Number(a.balance).toFixed(2)}`),
-        monthlyIncome: totalIncome,
-        monthlyExpense: totalExpense,
-        monthlyBalance: totalIncome - totalExpense,
-        pendingExpensesTotal: totalPending,
-        pendingExpenses: (pendingExpRes.data || []).map((e: any) => `${e.description}: R$${Number(e.amount).toFixed(2)} (${e.date})`),
-        recentTransactions: (recentTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'} | cat: ${(t.category as any)?.name || 'sem'} | func: ${(t.employee as any)?.full_name || '-'} | forn: ${(t.supplier as any)?.name || '-'}`),
-        allMonthTransactions: (allMonthTxRes.data || []).map((t: any) => `${t.date} | ${t.type === 'income' ? '+' : '-'}R$${Number(t.amount).toFixed(2)} | ${t.description} | ${t.is_paid ? 'pago' : 'pendente'}`),
-        lowStockItems: lowStockItems.slice(0, 10).map((i: any) => `${i.name}: ${i.current_stock}/${i.min_stock} (forn: ${(i.supplier as any)?.name || 'nenhum'})`),
-        pendingOrders: (ordersRes.data || []).map((o: any) => `${(o.supplier as any)?.name || '?'}: ${o.status}`),
-        pendingClosings: (closingsRes.data || []).map((c: any) => `${c.date}: R$${Number(c.total_amount || 0).toFixed(2)} (${c.unit_name})`),
-        employees: (employeesRes.data || []).map((e: any) => `${e.full_name} (${e.role || 'sem cargo'}) - Salário base: R$${Number(e.base_salary || 0).toFixed(2)}`),
-        employeePayments: (employeePaymentsRes.data || []).map((p: any) => `${(p.employee as any)?.full_name || '?'}: R$${Number(p.amount).toFixed(2)} (${p.type}) - ${p.is_paid ? 'pago' : 'pendente'} - ${p.payment_date}`),
-        suppliers: (suppliersRes.data || []).map((s: any) => `${s.name} [${s.delivery_frequency || 'weekly'}]`),
-        todayTasks: (tasksRes.data || []).map((t: any) => `${t.is_completed ? '✅' : '⬜'} ${t.title} (${t.priority}, ${t.period})`),
-        checklistProgress,
-        upcomingInvoices,
-        budgetStatus,
-        preferences: (preferencesRes.data || []).map((p: any) => `${p.key} = ${p.value} (${p.category})`),
       };
 
       contextCacheRef.current = { data: contextData, timestamp: Date.now() };
 
-      // Populate contextStats for UI chips/briefing
-      // Note: aberturaCompleted already defined above (line ~251), reuse it here
-      const aberturaItems = checklistItemsRes.data?.filter((i: any) => i.checklist_type === 'abertura') || [];
-      setContextStats({
-        pendingExpensesCount: (pendingExpRes.data || []).length,
-        pendingExpensesTotal: totalPending,
-        lowStockCount: lowStockItems.length,
-        pendingTasksCount: (tasksRes.data || []).filter((t: any) => !t.is_completed).length,
-        upcomingInvoicesCount: (supplierInvoicesRes.data || []).length,
-        checklistPct: aberturaItems.length > 0 ? Math.round((aberturaCompleted / aberturaItems.length) * 100) : 0, // aberturaCompleted from line ~251
-      });
+      if (data.contextStats) {
+        setContextStats(data.contextStats);
+      }
 
       return contextData;
     } catch (err) {
@@ -322,8 +233,7 @@ export function useManagementAI() {
     }
   }, [user, activeUnitId, stats, dayOfWeek, timeOfDay]);
 
-  // Enrich contextStats in background with full data (tasks, invoices, checklist)
-  // Must come AFTER fetchFullContext definition to avoid temporal dead zone
+  // Enrich contextStats in background with full data
   useEffect(() => {
     if (!user || !activeUnitId) return;
     fetchFullContext().catch(() => {});
