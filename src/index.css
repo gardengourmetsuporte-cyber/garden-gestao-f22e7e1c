@@ -2408,77 +2408,90 @@ select:focus {
 }
 
 /* =========================================================
-   DASHBOARD ACCORDION
+   DASHBOARD BENTO GRID
    ========================================================= */
 
-.dash-accordion-item {
-  border: 1px solid hsl(var(--border));
+.dash-hero {
+  display: block;
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.7) 100%);
+  border: 1px solid hsl(var(--primary) / 0.3);
+  box-shadow: 0 8px 32px -8px hsl(var(--primary) / 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dash-hero:active {
+  transform: scale(0.985);
+}
+
+.dash-kpi-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.875rem 1rem;
   border-radius: 1rem;
   background: hsl(var(--card));
-  overflow: hidden;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1px solid hsl(var(--border));
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
 }
 
-.dash-accordion-item[data-state="open"] {
-  border-color: hsl(var(--primary) / 0.3);
-  box-shadow: 0 0 20px -4px hsl(var(--primary) / 0.1);
+.dash-kpi-card:active {
+  transform: scale(0.97);
 }
 
-.dash-accordion-item + .dash-accordion-item {
-  margin-top: 0; /* handled by space-y on parent */
+.dash-kpi-card:hover {
+  border-color: hsl(var(--primary) / 0.2);
+  box-shadow: 0 4px 16px -4px hsl(var(--primary) / 0.08);
 }
 
-.dash-accordion-trigger {
-  padding: 0.875rem 1rem !important;
-  gap: 0.5rem;
-  border-radius: 1rem;
-  overflow: hidden;
-  max-height: 3.5rem;
-  opacity: 1;
-  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease, background 0.15s ease;
-}
-
-.dash-accordion-trigger:hover {
-  background: hsl(var(--muted) / 0.3);
-  text-decoration: none !important;
-}
-
-.dash-accordion-trigger[data-state="open"] {
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-  border-radius: 1rem 1rem 0 0;
-}
-
-.dash-accordion-icon {
+.dash-kpi-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
   border-radius: 0.625rem;
+  flex-shrink: 0;
+}
+
+.dash-section {
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  background: hsl(var(--card));
+  overflow: hidden;
+}
+
+.dash-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition: background 0.15s ease;
+}
+
+.dash-section-header:not(:disabled):hover {
+  background: hsl(var(--muted) / 0.3);
+}
+
+.dash-section-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 0.5rem;
   background: hsl(var(--muted) / 0.5);
   flex-shrink: 0;
 }
 
-.dash-accordion-badge {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  padding: 0.125rem 0.5rem;
-  border-radius: 999px;
-  background: hsl(var(--primary) / 0.12);
-  color: hsl(var(--primary));
-  white-space: nowrap;
-  margin-right: 0.25rem;
-}
-
-.dash-accordion-content {
-  padding: 0 !important;
-}
-
-.dash-accordion-content > div {
+.dash-section-body {
   padding: 0.75rem 1rem 1rem;
-}
-
-/* Override base accordion border-b */
-.dash-accordion .dash-accordion-item {
-  border-bottom: 1px solid hsl(var(--border));
 }
