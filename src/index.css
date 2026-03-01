@@ -2406,3 +2406,76 @@ select:focus {
     transform: translateX(100%);
   }
 }
+
+/* =========================================================
+   DASHBOARD ACCORDION
+   ========================================================= */
+
+.dash-accordion-item {
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  background: hsl(var(--card));
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-accordion-item[data-state="open"] {
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 0 0 20px -4px hsl(var(--primary) / 0.1);
+}
+
+.dash-accordion-item + .dash-accordion-item {
+  margin-top: 0; /* handled by space-y on parent */
+}
+
+.dash-accordion-trigger {
+  padding: 0.875rem 1rem !important;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  transition: background 0.15s ease;
+}
+
+.dash-accordion-trigger:hover {
+  background: hsl(var(--muted) / 0.3);
+  text-decoration: none !important;
+}
+
+.dash-accordion-trigger[data-state="open"] {
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  border-radius: 1rem 1rem 0 0;
+}
+
+.dash-accordion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 0.625rem;
+  background: hsl(var(--muted) / 0.5);
+  flex-shrink: 0;
+}
+
+.dash-accordion-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+  white-space: nowrap;
+  margin-right: 0.25rem;
+}
+
+.dash-accordion-content {
+  padding: 0 !important;
+}
+
+.dash-accordion-content > div {
+  padding: 0.75rem 1rem 1rem;
+}
+
+/* Override base accordion border-b */
+.dash-accordion .dash-accordion-item {
+  border-bottom: 1px solid hsl(var(--border));
+}
