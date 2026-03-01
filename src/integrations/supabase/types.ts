@@ -903,6 +903,7 @@ export type Database = {
           birthday: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
           email: string | null
           id: string
           last_purchase_at: string | null
@@ -924,6 +925,7 @@ export type Database = {
           birthday?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           email?: string | null
           id?: string
           last_purchase_at?: string | null
@@ -945,6 +947,7 @@ export type Database = {
           birthday?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           email?: string | null
           id?: string
           last_purchase_at?: string | null
@@ -1131,6 +1134,7 @@ export type Database = {
           base_salary: number
           cpf: string | null
           created_at: string
+          deleted_at: string | null
           department: string | null
           full_name: string
           id: string
@@ -1146,6 +1150,7 @@ export type Database = {
           base_salary?: number
           cpf?: string | null
           created_at?: string
+          deleted_at?: string | null
           department?: string | null
           full_name: string
           id?: string
@@ -1161,6 +1166,7 @@ export type Database = {
           base_salary?: number
           cpf?: string | null
           created_at?: string
+          deleted_at?: string | null
           department?: string | null
           full_name?: string
           id?: string
@@ -1430,6 +1436,7 @@ export type Database = {
           created_at: string
           credit_card_invoice_id: string | null
           date: string
+          deleted_at: string | null
           description: string
           employee_id: string | null
           id: string
@@ -1458,6 +1465,7 @@ export type Database = {
           created_at?: string
           credit_card_invoice_id?: string | null
           date?: string
+          deleted_at?: string | null
           description: string
           employee_id?: string | null
           id?: string
@@ -1486,6 +1494,7 @@ export type Database = {
           created_at?: string
           credit_card_invoice_id?: string | null
           date?: string
+          deleted_at?: string | null
           description?: string
           employee_id?: string | null
           id?: string
@@ -1699,6 +1708,7 @@ export type Database = {
           category_id: string | null
           created_at: string
           current_stock: number
+          deleted_at: string | null
           id: string
           min_stock: number
           name: string
@@ -1714,6 +1724,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           current_stock?: number
+          deleted_at?: string | null
           id?: string
           min_stock?: number
           name: string
@@ -1729,6 +1740,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           current_stock?: number
+          deleted_at?: string | null
           id?: string
           min_stock?: number
           name?: string
