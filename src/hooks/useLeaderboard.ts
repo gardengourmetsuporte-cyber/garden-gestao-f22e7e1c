@@ -125,44 +125,16 @@ function buildEntries(rpcData: any, profilesData: any): LeaderboardEntry[] {
 }
 
 async function fetchSectorPointsData(unitId: string): Promise<SectorPointsSummary[]> {
-  const [{ data: sectors }, { data: subcategories }, { data: items }, { data: completions }] = await Promise.all([
-    supabase.from('checklist_sectors').select('id, name, color').eq('unit_id', unitId).order('sort_order'),
-    supabase.from('checklist_subcategories').select('id, sector_id').eq('unit_id', unitId).limit(10000),
-    supabase.from('checklist_items').select('id, subcategory_id, is_active').eq('unit_id', unitId).limit(10000),
-    supabase.from('checklist_completions').select('item_id').eq('unit_id', unitId).limit(10000),
-  ]);
-
-  const subcatToSectorMap = new Map<string, string>();
-  subcategories?.forEach(sub => subcatToSectorMap.set(sub.id, sub.sector_id));
-
-  const itemToSectorMap = new Map<string, string>();
-  items?.forEach(item => {
-    if (item.is_active) {
-      const sectorId = subcatToSectorMap.get(item.subcategory_id);
-      if (sectorId) itemToSectorMap.set(item.id, sectorId);
-    }
+  const { data, error } = await supabase.rpc('get_sector_points_summary', {
+    p_unit_id: unitId,
   });
-
-  const sectorCompletions = new Map<string, number>();
-  completions?.forEach(c => {
-    const sectorId = itemToSectorMap.get(c.item_id);
-    if (sectorId) sectorCompletions.set(sectorId, (sectorCompletions.get(sectorId) || 0) + 1);
-  });
-
-  const sectorTasks = new Map<string, number>();
-  items?.forEach(item => {
-    if (item.is_active) {
-      const sectorId = subcatToSectorMap.get(item.subcategory_id);
-      if (sectorId) sectorTasks.set(sectorId, (sectorTasks.get(sectorId) || 0) + 1);
-    }
-  });
-
-  return (sectors || []).map(sector => ({
-    sector_id: sector.id,
-    sector_name: sector.name,
-    sector_color: sector.color,
-    points_earned: sectorCompletions.get(sector.id) || 0,
-    total_tasks: sectorTasks.get(sector.id) || 0,
+  if (error) throw error;
+  return ((data as any[]) || []).map((s: any) => ({
+    sector_id: s.sector_id,
+    sector_name: s.sector_name,
+    sector_color: s.sector_color,
+    points_earned: Number(s.points_earned) || 0,
+    total_tasks: Number(s.total_tasks) || 0,
   }));
 }
 
