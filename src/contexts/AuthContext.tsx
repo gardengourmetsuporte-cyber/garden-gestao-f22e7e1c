@@ -242,6 +242,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           // Use setTimeout to avoid Supabase deadlock warning
           setTimeout(() => fetchUserData(session.user.id), 0);
+
+          // Audit login event
+          if (event === 'SIGNED_IN') {
+            supabase.rpc('log_audit_event' as any, {
+              p_user_id: session.user.id,
+              p_unit_id: null,
+              p_action: 'user_login',
+              p_entity_type: 'auth',
+              p_entity_id: null,
+              p_details: { email: session.user.email },
+            }).then(() => {});
+          }
         } else if (event === 'SIGNED_OUT') {
           if (isMounted) {
             setProfile(null);
