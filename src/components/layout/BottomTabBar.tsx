@@ -245,7 +245,8 @@ const TabButton = forwardRef<
     moreOpen?: boolean;
     onClick: () => void;
   }
->(({ tab, active, locked, moreOpen, onClick }, ref) => {
+>(({ tab, active: routeActive, locked, moreOpen, onClick }, ref) => {
+  const active = routeActive && !moreOpen;
   const [bouncing, setBouncing] = useState(false);
 
   const handleTap = () => {
