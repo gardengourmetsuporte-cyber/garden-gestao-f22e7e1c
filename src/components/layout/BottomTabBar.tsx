@@ -217,8 +217,15 @@ export function BottomTabBar() {
                 className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
                 style={{ width: '20%' }}
               >
-                <AppIcon name="Menu" size={22} fill={0} className="text-muted-foreground transition-colors" />
-                <span className="text-[10px] font-normal text-muted-foreground">Mais</span>
+                <div
+                  style={{
+                    transform: moreOpen ? 'scale(1.15)' : 'scale(1)',
+                    transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
+                >
+                  <AppIcon name="Menu" size={22} fill={moreOpen ? 1 : 0} weight={moreOpen ? 600 : 400} className={moreOpen ? 'tab-icon-galaxy' : 'text-muted-foreground transition-colors'} />
+                </div>
+                <span className={cn("text-[10px]", moreOpen ? "font-semibold tab-icon-galaxy-text" : "font-normal text-muted-foreground")}>Mais</span>
               </button>
             )}
           </div>
