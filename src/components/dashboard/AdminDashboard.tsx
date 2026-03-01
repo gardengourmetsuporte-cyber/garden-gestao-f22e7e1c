@@ -189,15 +189,18 @@ export function AdminDashboard() {
       {/* Setup Onboarding */}
       <SetupChecklistWidget />
 
-      {/* Dynamic widgets */}
-      {widgets.map(w => {
-        if (!w.visible) return null;
-        const renderer = WIDGET_RENDERERS[w.key];
-        if (!renderer) return null;
-        const node = renderer(ctx);
-        if (!node) return null;
-        return <div key={w.key}>{node}</div>;
-      })}
+      {/* Dynamic widgets — 2-col grid on desktop */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-5 space-y-7 lg:space-y-0">
+        {widgets.map(w => {
+          if (!w.visible) return null;
+          const renderer = WIDGET_RENDERERS[w.key];
+          if (!renderer) return null;
+          const node = renderer(ctx);
+          if (!node) return null;
+          const fullWidth = ['finance', 'finance-chart', 'checklist', 'calendar', 'agenda', 'ai-insights', 'weekly-summary', 'cash-flow'].includes(w.key);
+          return <div key={w.key} className={fullWidth ? 'lg:col-span-2' : ''}>{node}</div>;
+        })}
+      </div>
 
       {/* Manage button */}
       <button
