@@ -1,5 +1,4 @@
 import { useState, useCallback, lazy, Suspense } from 'react';
-import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { Accordion, AccordionItem, AccordionContent, AccordionTrigger } from '@/components/ui/accordion';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -204,12 +203,6 @@ export function DashboardAccordion({ widgets, ctx }: DashboardAccordionProps) {
               )}
             </AccordionTrigger>
             <AccordionContent className="dash-accordion-content">
-              <AccordionPrimitive.Trigger asChild>
-                <button className="dash-accordion-miniheader w-full justify-end">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Minimizar</span>
-                  <AppIcon name="KeyboardArrowUp" size={18} className="text-muted-foreground" />
-                </button>
-              </AccordionPrimitive.Trigger>
               {content}
             </AccordionContent>
           </AccordionItem>

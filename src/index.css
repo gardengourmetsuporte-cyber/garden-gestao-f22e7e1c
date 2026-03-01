@@ -2444,28 +2444,8 @@ select:focus {
 }
 
 .dash-accordion-trigger[data-state="open"] {
-  max-height: 0;
-  opacity: 0;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  pointer-events: none;
-  border: none;
-}
-
-.dash-accordion-miniheader {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 0.75rem;
-  background: hsl(var(--muted) / 0.3);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.dash-accordion-miniheader:hover {
-  background: hsl(var(--muted) / 0.5);
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  border-radius: 1rem 1rem 0 0;
 }
 
 .dash-accordion-icon {
