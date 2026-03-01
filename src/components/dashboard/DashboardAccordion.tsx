@@ -205,12 +205,8 @@ export function DashboardAccordion({ widgets, ctx }: DashboardAccordionProps) {
             </AccordionTrigger>
             <AccordionContent className="dash-accordion-content">
               <AccordionPrimitive.Trigger asChild>
-                <button className="dash-accordion-miniheader w-full">
-                  <div className={`dash-accordion-icon ${iconColor}`}>
-                    <AppIcon name={w.icon} size={16} />
-                  </div>
-                  <span className="text-xs font-semibold text-foreground flex-1 text-left truncate">{w.label}</span>
-                  {summary && <span className="dash-accordion-badge">{summary}</span>}
+                <button className="dash-accordion-miniheader w-full justify-end">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Minimizar</span>
                   <AppIcon name="KeyboardArrowUp" size={18} className="text-muted-foreground" />
                 </button>
               </AccordionPrimitive.Trigger>
