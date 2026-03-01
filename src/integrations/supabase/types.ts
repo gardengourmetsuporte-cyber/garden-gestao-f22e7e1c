@@ -4507,6 +4507,18 @@ export type Database = {
     }
     Functions: {
       auto_provision_unit: { Args: { p_user_id: string }; Returns: string }
+      batch_reorder_checklist_items: {
+        Args: { p_ids: string[]; p_orders: number[] }
+        Returns: undefined
+      }
+      batch_reorder_checklist_sectors: {
+        Args: { p_ids: string[]; p_orders: number[] }
+        Returns: undefined
+      }
+      batch_reorder_checklist_subcategories: {
+        Args: { p_ids: string[]; p_orders: number[] }
+        Returns: undefined
+      }
       batch_reorder_transactions: {
         Args: { p_ids: string[]; p_orders: number[] }
         Returns: undefined

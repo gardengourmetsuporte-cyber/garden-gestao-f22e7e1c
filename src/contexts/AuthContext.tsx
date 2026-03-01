@@ -284,11 +284,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Poll subscription every 5min when logged in
+  // Poll subscription every 15min when logged in (reduced from 5min to lower backend load at scale)
   useEffect(() => {
     if (user) {
-      const timeout = setTimeout(() => refreshSubscription(), 5000);
-      subIntervalRef.current = setInterval(refreshSubscription, 300_000);
+      const timeout = setTimeout(() => refreshSubscription(), 10_000);
+      subIntervalRef.current = setInterval(refreshSubscription, 900_000);
       return () => {
         clearTimeout(timeout);
         if (subIntervalRef.current) clearInterval(subIntervalRef.current);

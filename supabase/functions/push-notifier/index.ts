@@ -191,11 +191,11 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
-      if (userErr || !user) {
+      const { data: claimsData, error: claimsErr } = await supabaseAdmin.auth.getClaims(token);
+      if (claimsErr || !claimsData?.claims?.sub) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
-      const userId = user.id;
+      const userId = claimsData.claims.sub as string;
       const body = await req.json();
       const sub = body.subscription;
       await supabaseAdmin.from('push_subscriptions').upsert({
@@ -215,11 +215,11 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user }, error: userErr } = await supabaseAdmin.auth.getUser(token);
-      if (userErr || !user) {
+      const { data: claimsData, error: claimsErr } = await supabaseAdmin.auth.getClaims(token);
+      if (claimsErr || !claimsData?.claims?.sub) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
       }
-      const userId = user.id;
+      const userId = claimsData.claims.sub as string;
       const { endpoint } = await req.json();
       await supabaseAdmin.from('push_subscriptions').delete().eq('user_id', userId).eq('endpoint', endpoint);
       return new Response(JSON.stringify({ success: true }), {
