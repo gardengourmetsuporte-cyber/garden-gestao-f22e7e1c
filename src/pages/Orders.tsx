@@ -138,7 +138,7 @@ export default function OrdersPage() {
     return phone.replace(/\D/g, '').length >= 10;
   };
 
-  const handleSendWhatsApp = (order: Order) => {
+  const handleSendWhatsApp = async (order: Order) => {
     if (!order.supplier?.phone || !hasValidWhatsApp(order.supplier.phone)) {
       toast.error('Fornecedor sem WhatsApp cadastrado');
       return;
@@ -150,7 +150,12 @@ export default function OrdersPage() {
     const message = `*Pedido de Compra*\n\nOlá! Gostaria de fazer o seguinte pedido:\n\n${itemsList}\n\n${order.notes ? `Obs: ${order.notes}` : ''}`;
     const phone = formatPhoneForWhatsApp(order.supplier.phone);
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
-    updateOrderStatus(order.id, 'sent');
+    try {
+      await updateOrderStatus(order.id, 'sent');
+    } catch (err) {
+      console.error('Erro ao atualizar status do pedido:', err);
+      toast.error('Pedido enviado mas houve erro ao atualizar o status');
+    }
   };
 
   const handleReceiveOrder = async (orderId: string, receivedItems: { itemId: string; quantity: number }[]) => {
