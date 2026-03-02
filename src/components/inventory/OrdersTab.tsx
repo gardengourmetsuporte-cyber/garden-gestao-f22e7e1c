@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { InventoryItem, Supplier, Order } from '@/types/database';
 import { Button } from '@/components/ui/button';
@@ -126,9 +127,9 @@ export function OrdersTab({
     return cleaned.length >= 10;
   };
 
-  const handleSendWhatsApp = (order: Order) => {
+  const handleSendWhatsApp = async (order: Order) => {
     if (!order.supplier?.phone || !hasValidWhatsApp(order.supplier.phone)) {
-      alert('Este fornecedor não tem telefone válido cadastrado. Cadastre um número de WhatsApp nas configurações.');
+      toast.error('Fornecedor sem WhatsApp cadastrado. Cadastre um número nas configurações.');
       return;
     }
 
@@ -143,7 +144,12 @@ export function OrdersTab({
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     
     window.open(whatsappUrl, '_blank');
-    onSendOrder(order.id);
+    try {
+      await onSendOrder(order.id);
+    } catch (err) {
+      console.error('Erro ao atualizar status do pedido:', err);
+      toast.error('Pedido enviado mas houve erro ao atualizar o status');
+    }
   };
 
   const getStatusBadge = (status: Order['status']) => {
