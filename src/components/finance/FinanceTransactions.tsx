@@ -29,6 +29,29 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 import { formatCurrency } from '@/lib/format';
+import { CategoryGroup } from './CategoryGroup';
+
+/** Group transactions by category_id; transfers go into a special '__transfer' bucket */
+function groupByCategory(transactions: FinanceTransaction[]): { key: string; category: FinanceCategory | null; isTransfer: boolean; txns: FinanceTransaction[] }[] {
+  const map = new Map<string, FinanceTransaction[]>();
+  const order: string[] = [];
+
+  for (const t of transactions) {
+    const key = t.type === 'transfer' ? '__transfer' : (t.category_id || '__none');
+    if (!map.has(key)) {
+      map.set(key, []);
+      order.push(key);
+    }
+    map.get(key)!.push(t);
+  }
+
+  return order.map(key => {
+    const txns = map.get(key)!;
+    const isTransfer = key === '__transfer';
+    const category = isTransfer ? null : (txns[0]?.category ?? null);
+    return { key, category, isTransfer, txns };
+  });
+}
 
 function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
   const {
@@ -310,34 +333,39 @@ export function FinanceTransactions({
                       </span>
                     </div>
 
-                    {/* Sortable transactions for this date */}
-                    <SortableContext items={transactions.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                      <div className="space-y-2">
-                        {transactions.map(transaction => (
-                          <SortableTransaction key={transaction.id} id={transaction.id}>
-                            {(isDragging) => (
-                              <div
-                                className="relative"
-                              >
-                                {transaction.is_recurring && transaction.installment_group_id && (
-                                  <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
-                                    <AppIcon name="Repeat" size={10} className="mr-0.5" />
-                                    {transaction.installment_number}/{transaction.total_installments}
-                                  </Badge>
-                                )}
-                                <TransactionItem
-                                  transaction={transaction}
-                                  onClick={() => onTransactionClick(transaction)}
-                                  onTogglePaid={onTogglePaid}
-                                  onDelete={onDeleteTransaction}
-                                  disableSwipe={isDragging}
-                                />
-                              </div>
-                            )}
-                          </SortableTransaction>
-                        ))}
-                      </div>
-                    </SortableContext>
+                    {/* Transactions grouped by category */}
+                    {groupByCategory(transactions).map(group => (
+                      <CategoryGroup
+                        key={group.key}
+                        category={group.category}
+                        isTransfer={group.isTransfer}
+                        transactions={group.txns}
+                      >
+                        <SortableContext items={group.txns.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                          {group.txns.map(transaction => (
+                            <SortableTransaction key={transaction.id} id={transaction.id}>
+                              {(isDragging) => (
+                                <div className="relative">
+                                  {transaction.is_recurring && transaction.installment_group_id && (
+                                    <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                                      <AppIcon name="Repeat" size={10} className="mr-0.5" />
+                                      {transaction.installment_number}/{transaction.total_installments}
+                                    </Badge>
+                                  )}
+                                  <TransactionItem
+                                    transaction={transaction}
+                                    onClick={() => onTransactionClick(transaction)}
+                                    onTogglePaid={onTogglePaid}
+                                    onDelete={onDeleteTransaction}
+                                    disableSwipe={isDragging}
+                                  />
+                                </div>
+                              )}
+                            </SortableTransaction>
+                          ))}
+                        </SortableContext>
+                      </CategoryGroup>
+                    ))}
                   </div>
                 );
               })}
