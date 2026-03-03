@@ -1,118 +1,44 @@
 
 
-## Redesign Completo do Dashboard Administrativo
+## Plano: Agrupar transações por categoria dentro de cada dia
 
-### Conceito
+### O que muda
+Dentro de cada grupo de dia (ex: "Hoje", "Ontem"), as transações serão automaticamente agrupadas por categoria em seções colapsáveis (accordion). Cada seção mostra o nome da categoria, ícone, cor, subtotal e quantidade de transações. Ao expandir, mostra as transações individuais.
 
-Substituir o layout de accordion por um dashboard moderno estilo **Bento Grid** -- cards de tamanhos variados organizados em seções lógicas, sempre visíveis (sem expandir/colapsar). Layout inspirado em dashboards SaaS modernos (Linear, Vercel, Notion). O gestor vê tudo de relance.
-
-### Estrutura visual
-
-```text
-┌─────────────────────────────────────────┐
-│  Bom dia, João 👋                       │
-│  Sexta, 28 de fevereiro                 │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  💰 SALDO          R$ 14.949   │    │  ← Hero card (full width, gradient)
-│  │  Pendências: R$ 2.300          │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌──────────┐ ┌──────────┐              │
-│  │ Pedidos  │ │ Contas   │              │  ← KPI cards (grid 2 cols)
-│  │    3     │ │    5     │              │
-│  └──────────┘ └──────────┘              │
-│  ┌──────────┐ ┌──────────┐              │
-│  │ Resgates │ │ Estoque  │              │
-│  │    1     │ │    4     │              │
-│  └──────────┘ └──────────┘              │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  📋 Checklists (Abertura/Fech.) │    │  ← Full width widget
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  📊 Despesas do mês (donut)    │    │  ← Full width
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  ⚠️ Contas a vencer            │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  💡 Insights da IA             │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  📅 Agenda / Calendário        │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │  🏆 Ranking                    │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ⚙️ Gerenciar tela inicial              │
-└─────────────────────────────────────────┘
-```
-
-No desktop (lg+), os KPI cards ficam em grid de 4 colunas, e widgets maiores ficam lado a lado em 2 colunas.
-
-### Ordem lógica para o gestor
-
-1. **Saudação + data** (contexto)
-2. **Setup onboarding** (só durante configuração inicial)
-3. **Hero financeiro** -- saldo é o dado mais importante
-4. **KPI cards** -- indicadores rápidos: pedidos pendentes, contas a vencer, resgates, estoque crítico
-5. **Checklists** -- operação diária
-6. **Gráfico de despesas** -- visão financeira detalhada
-7. **Contas a vencer** -- alertas financeiros
-8. **Insights IA** -- sugestões inteligentes
-9. **Agenda/Calendário** -- próximos compromissos
-10. **Pedidos pendentes** -- detalhes dos pedidos
-11. **Sugestão de compras** -- reposição automática
-12. **Ranking/Leaderboard** -- gamificação
-13. **Fluxo de caixa projetado** -- (oculto por padrão)
+### Como funciona para o usuário
+- Dentro de cada dia, em vez de uma lista solta, as transações aparecem organizadas em "pastas" por categoria
+- Cada pasta mostra: ícone + nome da categoria, quantidade de transações e subtotal
+- As pastas vêm expandidas por padrão para manter a visibilidade
+- Transações sem categoria ficam em um grupo "Sem categoria"
+- O drag-and-drop de reordenação continua funcionando dentro de cada grupo
+- Transferências ficam em um grupo separado "Transferências"
 
 ### Mudanças técnicas
 
-**1. `src/components/dashboard/AdminDashboard.tsx`** -- Reescrever completamente
-- Remover import do `DashboardAccordion`
-- Renderizar widgets diretamente em seções, cada uma condicional ao `isVisible(key)` e `hasAccess(module)`
-- Hero financeiro como card gradient full-width
-- KPI grid com 4 mini-cards (pedidos, contas, resgates, estoque)
-- Widgets subsequentes como cards independentes com header compacto
-- Manter lazy loading nos widgets pesados
-- Manter botão "Gerenciar tela inicial" + DashboardWidgetManager
+**`src/components/finance/FinanceTransactions.tsx`**
+- Dentro do loop de `sortedDates`, agrupar as transações do dia por `category_id` (ou por tipo para transferências)
+- Renderizar cada grupo de categoria como uma seção com header colapsável usando o componente `Collapsible` do Radix
+- O header do grupo mostra: ícone da categoria, nome, badge com contagem e subtotal
+- O `SortableContext` do dnd-kit será mantido por grupo de categoria
+- Transações com `type === 'transfer'` ficam em grupo próprio
 
-**2. `src/components/dashboard/DashboardKPIGrid.tsx`** -- Novo componente
-- Grid de 2x2 (mobile) / 4 cols (desktop) com mini-cards animados
-- Cada card: ícone colorido, label, valor numérico grande, tap navega para a seção
-- Cores: pedidos=orange, contas=amber, resgates=rose, estoque=red
+**Estrutura visual por dia:**
+```text
+┌─ Hoje ──────────────────── R$ +150,00 ─┐
+│                                         │
+│  ▼ 🛒 Matéria-prima (3)    -R$ 450,00  │
+│     ├─ Compra açougue                   │
+│     ├─ Hortifruti                       │
+│     └─ Bebidas                          │
+│                                         │
+│  ▼ 🏪 Vendas Balcão (2)    +R$ 600,00  │
+│     ├─ Venda manhã                      │
+│     └─ Venda tarde                      │
+│                                         │
+└─────────────────────────────────────────┘
+```
 
-**3. `src/components/dashboard/DashboardSection.tsx`** -- Novo componente wrapper
-- Componente reutilizável que envolve cada widget
-- Props: `title`, `icon`, `iconColor`, `children`, `onNavigate?`
-- Renderiza header compacto + conteúdo sempre visível
-- Sem accordion, sem expand/collapse
-
-**4. `src/index.css`** -- Limpar estilos do accordion
-- Remover todas as classes `.dash-accordion-*`
-- Adicionar novas classes para o bento grid: `.dash-section`, `.dash-kpi-card`, `.dash-hero`
-
-**5. `src/hooks/useDashboardWidgets.ts`** -- Simplificar
-- Remover campo `defaultOpen` (não precisa mais)
-- Manter visibilidade e reordenação
-
-**6. Deletar `src/components/dashboard/DashboardAccordion.tsx`**
-- Não é mais necessário
-
-### O que permanece intacto
-
-- Todos os widgets internos (FinanceChartWidget, ChecklistDashboardWidget, BillsDueWidget, etc.) continuam como estão
-- DashboardWidgetManager com drag-and-drop para reordenar/ocultar
-- SetupChecklistWidget
-- LazySection para lazy loading
-- useDashboardStats e useDashboardWidgets (lógica core)
-- EmployeeDashboard (não afetado)
+**Componentes utilizados:**
+- `Collapsible` + `CollapsibleTrigger` + `CollapsibleContent` (já instalado via Radix)
+- Reutiliza `AppIcon` e cores das categorias existentes
 
