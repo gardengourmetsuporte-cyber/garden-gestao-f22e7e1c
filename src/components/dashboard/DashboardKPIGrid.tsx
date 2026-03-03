@@ -61,16 +61,6 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
       route: '/rewards',
       visible: hasAccess('rewards') && isVisible('pending-actions'),
     },
-    {
-      key: 'stock',
-      label: 'Estoque crítico',
-      value: stats.criticalItems,
-      icon: 'PackageX',
-      color: 'text-red-400',
-      bgColor: 'bg-red-400/10',
-      route: '/inventory',
-      visible: hasAccess('inventory'),
-    },
   ];
 
   const visibleCards = cards.filter(c => c.visible);
