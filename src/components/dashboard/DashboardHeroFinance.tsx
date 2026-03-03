@@ -15,48 +15,47 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
   return (
     <button
       onClick={() => navigate('/finance')}
-      className="dash-hero w-full text-left animate-spring-in spring-stagger-2"
+      className="finance-hero-card w-full text-left animate-spring-in spring-stagger-2"
     >
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-            <AppIcon name="Wallet" size={14} className="text-white/80" />
-          </div>
-          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60">
+      <div className="finance-hero-inner p-5 pb-4">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>
             Saldo em contas
           </span>
+          <AppIcon name="ChevronRight" size={18} style={{ color: 'var(--gp-icon)' }} />
         </div>
-        <AppIcon name="ChevronRight" size={16} className="text-white/30" />
-      </div>
 
-      <div className="mt-3">
-        {isLoading ? (
-          <Skeleton className="h-10 w-44 bg-white/10 rounded-xl" />
-        ) : (
-          <p className={`text-[2.25rem] font-extrabold tracking-tight leading-none ${balance >= 0 ? 'text-white' : 'text-red-300'}`}>
-            {formatCurrency(balance)}
-          </p>
-        )}
-      </div>
+        <div className="mt-1">
+          {isLoading ? (
+            <Skeleton className="h-10 w-44 bg-white/10 rounded-xl" />
+          ) : (
+            <p className="text-[2rem] font-extrabold tracking-tight leading-tight" style={{ color: balance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
+              {formatCurrency(balance)}
+            </p>
+          )}
+        </div>
 
-      {!isLoading && (
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Lucro líquido</span>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`text-sm font-bold ${balance >= 0 ? 'text-emerald-300' : 'text-red-300'}`}>
-                {formatCurrency(Math.max(balance, 0))}
-              </span>
+        {!isLoading && (
+          <div className="flex gap-2 mt-3">
+            <div className="finance-hero-chip finance-hero-chip--success">
+              <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Lucro líquido</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-bold" style={{ color: balance >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
+                  {formatCurrency(Math.max(balance, 0))}
+                </span>
+              </div>
+            </div>
+            <div className="finance-hero-chip finance-hero-chip--neutral">
+              <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Despesas</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-bold" style={{ color: 'var(--gp-negative)' }}>
+                  {formatCurrency(pendingExpenses)}
+                </span>
+              </div>
             </div>
           </div>
-          <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Despesas</span>
-            <span className="text-sm font-bold text-white/80 mt-0.5 block">
-              {formatCurrency(pendingExpenses)}
-            </span>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </button>
   );
 }
