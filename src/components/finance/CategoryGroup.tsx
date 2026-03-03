@@ -14,7 +14,7 @@ interface CategoryGroupProps {
 }
 
 export function CategoryGroup({ category, isTransfer, transactions, children }: CategoryGroupProps) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const subtotal = transactions.reduce((sum, t) => {
     if (t.type === 'income') return sum + Number(t.amount);
