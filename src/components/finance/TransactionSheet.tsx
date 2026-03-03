@@ -261,7 +261,7 @@ export function TransactionSheet({
       return;
     }
     setValidationErrors({});
-    
+
     // If editing a recurring transaction, show the edit mode dialog
     if (editingTransaction && editingTransaction.is_recurring && editingTransaction.installment_group_id) {
       setShowRecurringEditDialog(true);
@@ -269,76 +269,81 @@ export function TransactionSheet({
     }
 
     setIsLoading(true);
-    
-    if (isRecurring && parseInt(recurringCount) > 1) {
-      const groupId = crypto.randomUUID();
-      const count = parseInt(recurringCount);
-      const today = startOfDay(new Date());
-      
-      for (let i = 0; i < count; i++) {
-        let txDate = date;
-        if (recurringInterval === 'weekly') {
-          txDate = addWeeks(date, i);
-        } else if (recurringInterval === 'biweekly') {
-          txDate = addWeeks(date, i * 2);
-        } else if (recurringInterval === 'monthly') {
-          txDate = addMonths(date, i);
-        } else if (recurringInterval === 'bimonthly') {
-          txDate = addMonths(date, i * 2);
-        } else if (recurringInterval === 'quarterly') {
-          txDate = addMonths(date, i * 3);
-        } else if (recurringInterval === 'semiannual') {
-          txDate = addMonths(date, i * 6);
-        } else if (recurringInterval === 'yearly') {
-          txDate = addMonths(date, i * 12);
+
+    try {
+      if (isRecurring && parseInt(recurringCount) > 1) {
+        const groupId = crypto.randomUUID();
+        const count = parseInt(recurringCount);
+        const today = startOfDay(new Date());
+
+        for (let i = 0; i < count; i++) {
+          let txDate = date;
+          if (recurringInterval === 'weekly') {
+            txDate = addWeeks(date, i);
+          } else if (recurringInterval === 'biweekly') {
+            txDate = addWeeks(date, i * 2);
+          } else if (recurringInterval === 'monthly') {
+            txDate = addMonths(date, i);
+          } else if (recurringInterval === 'bimonthly') {
+            txDate = addMonths(date, i * 2);
+          } else if (recurringInterval === 'quarterly') {
+            txDate = addMonths(date, i * 3);
+          } else if (recurringInterval === 'semiannual') {
+            txDate = addMonths(date, i * 6);
+          } else if (recurringInterval === 'yearly') {
+            txDate = addMonths(date, i * 12);
+          }
+
+          const txIsPaid = (i === 0 && startOfDay(txDate) <= today) ? isPaid : false;
+
+          await onSave({
+            type,
+            amount: numAmount,
+            description: `${description.trim()} (${i + 1}/${count})`,
+            category_id: categoryId,
+            account_id: accountId,
+            to_account_id: type === 'transfer' ? toAccountId : null,
+            date: format(txDate, 'yyyy-MM-dd'),
+            is_paid: txIsPaid,
+            is_fixed: isFixed,
+            is_recurring: true,
+            recurring_interval: recurringInterval,
+            notes: notes.trim() || undefined,
+            supplier_id: supplierId || undefined,
+            employee_id: employeeId || undefined,
+            installment_number: i + 1,
+            total_installments: count,
+            installment_group_id: groupId
+          });
         }
-        
-        const txIsPaid = (i === 0 && startOfDay(txDate) <= today) ? isPaid : false;
-        
+      } else {
         await onSave({
           type,
           amount: numAmount,
-          description: `${description.trim()} (${i + 1}/${count})`,
+          description: description.trim(),
           category_id: categoryId,
           account_id: accountId,
           to_account_id: type === 'transfer' ? toAccountId : null,
-          date: format(txDate, 'yyyy-MM-dd'),
-          is_paid: txIsPaid,
+          date: format(date, 'yyyy-MM-dd'),
+          is_paid: type === 'credit_card' ? false : isPaid,
           is_fixed: isFixed,
-          is_recurring: true,
-          recurring_interval: recurringInterval,
+          is_recurring: isRecurring,
+          recurring_interval: isRecurring ? recurringInterval : undefined,
           notes: notes.trim() || undefined,
           supplier_id: supplierId || undefined,
           employee_id: employeeId || undefined,
-          installment_number: i + 1,
-          total_installments: count,
-          installment_group_id: groupId
         });
       }
 
-    } else {
-      await onSave({
-        type,
-        amount: numAmount,
-        description: description.trim(),
-        category_id: categoryId,
-        account_id: accountId,
-        to_account_id: type === 'transfer' ? toAccountId : null,
-        date: format(date, 'yyyy-MM-dd'),
-        is_paid: type === 'credit_card' ? false : isPaid,
-        is_fixed: isFixed,
-        is_recurring: isRecurring,
-        recurring_interval: isRecurring ? recurringInterval : undefined,
-        notes: notes.trim() || undefined,
-        supplier_id: supplierId || undefined,
-        employee_id: employeeId || undefined,
-      });
+      clearDraft();
+      toast.success(editingTransaction ? 'Transação atualizada!' : 'Transação salva!');
+      onOpenChange(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível salvar a transação';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
-    clearDraft();
-    toast.success(editingTransaction ? 'Transação atualizada!' : 'Transação salva!');
-    onOpenChange(false);
   };
 
   const handleSaveAndContinue = async () => {
@@ -351,65 +356,77 @@ export function TransactionSheet({
     }
     setValidationErrors({});
     setIsLoading(true);
-    
-    await onSave({
-      type,
-      amount: numAmount,
-      description: description.trim(),
-      category_id: categoryId,
-      account_id: accountId,
-      to_account_id: type === 'transfer' ? toAccountId : null,
-      date: format(date, 'yyyy-MM-dd'),
-      is_paid: isPaid,
-      is_fixed: isFixed,
-      is_recurring: false,
-      notes: notes.trim() || undefined,
-      supplier_id: supplierId || undefined,
-      employee_id: employeeId || undefined,
-    });
-    
-    setIsLoading(false);
-    toast.success('Transação salva!');
-    
-    // Reset form for next entry
-    clearDraft();
-    setAmount('');
-    setDescription('');
-    setNotes('');
-    setSupplierId(null);
-    setEmployeeId(null);
-    setIsRecurring(false);
-    setShowRecurringConfig(false);
+
+    try {
+      await onSave({
+        type,
+        amount: numAmount,
+        description: description.trim(),
+        category_id: categoryId,
+        account_id: accountId,
+        to_account_id: type === 'transfer' ? toAccountId : null,
+        date: format(date, 'yyyy-MM-dd'),
+        is_paid: isPaid,
+        is_fixed: isFixed,
+        is_recurring: false,
+        notes: notes.trim() || undefined,
+        supplier_id: supplierId || undefined,
+        employee_id: employeeId || undefined,
+      });
+
+      toast.success('Transação salva!');
+
+      // Reset form for next entry
+      clearDraft();
+      setAmount('');
+      setDescription('');
+      setNotes('');
+      setSupplierId(null);
+      setEmployeeId(null);
+      setIsRecurring(false);
+      setShowRecurringConfig(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível salvar a transação';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRecurringEditConfirm = async () => {
     if (!editingTransaction) return;
-    
+
     setShowRecurringEditDialog(false);
     setIsLoading(true);
-    
+
+    try {
       const updateData: Partial<TransactionFormData> = {
-      type,
-      amount: getNumericAmount(),
-      description: description.trim(),
-      category_id: categoryId,
-      account_id: accountId,
-      to_account_id: type === 'transfer' ? toAccountId : null,
-      date: format(date, 'yyyy-MM-dd'),
-      is_paid: isPaid,
-      is_fixed: isFixed,
-      notes: notes.trim() || undefined
-    };
-    
-    if (onUpdateRecurring) {
-      await onUpdateRecurring(editingTransaction.id, updateData, recurringEditMode);
-    } else {
-      // Fallback: just update single
-      await onSave(updateData as TransactionFormData);
+        type,
+        amount: getNumericAmount(),
+        description: description.trim(),
+        category_id: categoryId,
+        account_id: accountId,
+        to_account_id: type === 'transfer' ? toAccountId : null,
+        date: format(date, 'yyyy-MM-dd'),
+        is_paid: isPaid,
+        is_fixed: isFixed,
+        notes: notes.trim() || undefined
+      };
+
+      if (onUpdateRecurring) {
+        await onUpdateRecurring(editingTransaction.id, updateData, recurringEditMode);
+      } else {
+        // Fallback: just update single
+        await onSave(updateData as TransactionFormData);
+      }
+
+      onOpenChange(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível atualizar a transação recorrente';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
-    onOpenChange(false);
   };
 
   const handleDelete = async () => {
