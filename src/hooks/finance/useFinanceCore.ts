@@ -348,10 +348,12 @@ export function useFinanceCore({
 
   // Wrapped mutation helpers that push to undo stack
   const addTransactionWithUndo = useCallback(async (data: TransactionFormData) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { recurring_count, ...dbData } = data as any;
     const { data: inserted, error } = await supabase.from('finance_transactions').insert({
-      ...data, user_id: userId!, unit_id: effectiveUnitId,
+      ...dbData, user_id: userId!, unit_id: effectiveUnitId,
     }).select('id').single();
-    if (error) { toast.error('Erro ao salvar transação'); throw error; }
+    if (error) { console.error('Insert transaction error:', error); toast.error('Erro ao salvar transação'); throw error; }
     undoRedo.pushAction({ type: 'create', transactionId: inserted.id, data });
     invalidateTransactionsAndAccounts();
   }, [userId, effectiveUnitId, undoRedo, invalidateTransactionsAndAccounts]);
@@ -364,8 +366,11 @@ export function useFinanceCore({
         (before as any)[key] = (current as any)[key];
       }
     }
-    const { error } = await supabase.from('finance_transactions').update(data).eq('id', id);
-    if (error) { toast.error('Erro ao atualizar transação'); throw error; }
+    // Strip fields that don't exist in the DB table
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { recurring_count, ...dbData } = data as any;
+    const { error } = await supabase.from('finance_transactions').update(dbData).eq('id', id);
+    if (error) { console.error('Update transaction error:', error); toast.error('Erro ao atualizar transação'); throw error; }
     if (current) {
       undoRedo.pushAction({ type: 'update', transactionId: id, before, after: data });
     }
