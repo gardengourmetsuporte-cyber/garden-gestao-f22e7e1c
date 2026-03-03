@@ -23,7 +23,7 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
             <AppIcon name="Wallet" size={14} className="text-white/80" />
           </div>
           <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60">
-            Saldo da empresa
+            Saldo em contas
           </span>
         </div>
         <AppIcon name="ChevronRight" size={16} className="text-white/30" />
@@ -39,11 +39,19 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
         )}
       </div>
 
-      {pendingExpenses > 0 && !isLoading && (
-        <div className="mt-3 flex items-center gap-2">
-          <div className="rounded-lg px-3 py-1.5 bg-white/5 border border-white/10">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40">Pendências</span>
-            <span className="text-sm font-bold ml-2 text-amber-300">
+      {!isLoading && (
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Lucro líquido</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className={`text-sm font-bold ${balance >= 0 ? 'text-emerald-300' : 'text-red-300'}`}>
+                {formatCurrency(Math.max(balance, 0))}
+              </span>
+            </div>
+          </div>
+          <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Despesas</span>
+            <span className="text-sm font-bold text-white/80 mt-0.5 block">
               {formatCurrency(pendingExpenses)}
             </span>
           </div>
