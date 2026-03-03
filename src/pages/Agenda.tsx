@@ -249,7 +249,7 @@ export default function Agenda() {
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-2 space-y-1 pl-1">
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)}>
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)} autoScroll={false}>
                     <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                       {catTasks.map(task => renderTaskItem(task))}
                     </SortableContext>
@@ -265,7 +265,7 @@ export default function Agenda() {
               {tasksByCategory.length > 0 && (
                 <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
               )}
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)} autoScroll={false}>
                 <SortableContext items={uncategorizedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                   {uncategorizedTasks.map(task => renderTaskItem(task))}
                 </SortableContext>
