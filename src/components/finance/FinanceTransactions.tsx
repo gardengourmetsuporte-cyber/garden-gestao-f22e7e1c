@@ -282,17 +282,32 @@ export function FinanceTransactions({
           </div>
         </div>
 
-        {/* Summary Header */}
-        <div className="mx-4 card-command p-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Saldo do mês</span>
-            <span className={monthStats.balance >= 0 ? 'text-success font-bold font-display' : 'text-destructive font-bold font-display'} style={{ letterSpacing: '-0.02em' }}>
-              {formatCurrency(monthStats.balance)}
+        {/* Summary Header — Hero style */}
+        <div className="mx-4 dash-hero p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
+              <AppIcon name="Wallet" size={14} className="text-white/80" />
+            </div>
+            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60">
+              Saldo do mês
             </span>
           </div>
-          <div className="flex items-center justify-between text-xs mt-1">
-            <span className="text-success font-semibold font-display">+{formatCurrency(monthStats.totalIncome)}</span>
-            <span className="text-destructive font-semibold font-display">-{formatCurrency(monthStats.totalExpense)}</span>
+          <p className={`text-[2rem] font-extrabold tracking-tight leading-none mt-2 ${monthStats.balance >= 0 ? 'text-white' : 'text-red-300'}`}>
+            {formatCurrency(monthStats.balance)}
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Receitas</span>
+              <span className="text-sm font-bold text-emerald-300 mt-0.5 block">
+                +{formatCurrency(monthStats.totalIncome)}
+              </span>
+            </div>
+            <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Despesas</span>
+              <span className="text-sm font-bold text-white/80 mt-0.5 block">
+                -{formatCurrency(monthStats.totalExpense)}
+              </span>
+            </div>
           </div>
         </div>
 
