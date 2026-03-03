@@ -92,13 +92,6 @@ export function AdminDashboard() {
         />
       )}
 
-      {/* KPI Grid */}
-      <DashboardKPIGrid
-        stats={stats}
-        isLoading={statsLoading}
-        hasAccess={hasAccess}
-        isVisible={isVisible}
-      />
 
       {/* Checklists */}
       {hasAccess('checklists') && isVisible('checklist') && (
