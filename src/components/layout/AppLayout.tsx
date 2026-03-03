@@ -75,6 +75,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
   const isMobile = useIsMobile();
+  const [isLgScreen, setIsLgScreen] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => setIsLgScreen(mql.matches);
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
   const { leaderboard } = useLeaderboard();
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -355,7 +363,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       </main>
 
       {/* ======= Global Bottom Tab Bar (mobile only, lazy-loaded) ======= */}
-      {isMobile && (
+      {!isLgScreen && (
         <Suspense fallback={null}>
           <LazyBottomTabBar />
         </Suspense>
