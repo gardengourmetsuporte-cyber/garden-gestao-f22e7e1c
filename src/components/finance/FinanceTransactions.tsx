@@ -32,51 +32,43 @@ import { formatCurrency } from '@/lib/format';
 import { CategoryGroup } from './CategoryGroup';
 
 /** Group transactions by PARENT category; transfers go into a special '__transfer' bucket */
-function groupByCategory(transactions: FinanceTransaction[]): { key: string; category: FinanceCategory | null; isTransfer: boolean; txns: FinanceTransaction[] }[] {
+function groupByCategory(transactions: FinanceTransaction[], categories: FinanceCategory[]): { key: string; category: FinanceCategory | null; isTransfer: boolean; txns: FinanceTransaction[] }[] {
+  // Build a lookup: category id → parent category
+  const parentLookup = new Map<string, FinanceCategory>();
+  for (const parent of categories) {
+    parentLookup.set(parent.id, parent);
+    parent.subcategories?.forEach(sub => {
+      parentLookup.set(sub.id, parent); // sub → parent
+    });
+  }
+
   const map = new Map<string, FinanceTransaction[]>();
   const order: string[] = [];
-  // Track the parent category object for each group key
-  const parentCategoryMap = new Map<string, FinanceCategory>();
+  const groupCategory = new Map<string, FinanceCategory>();
 
   for (const t of transactions) {
     let key: string;
     if (t.type === 'transfer') {
       key = '__transfer';
     } else {
-      // Group by parent category if subcategory, otherwise by category_id
-      const parentId = t.category?.parent_id;
-      key = parentId || t.category_id || '__none';
+      // Resolve to parent category
+      const parent = t.category_id ? parentLookup.get(t.category_id) : undefined;
+      key = parent?.id || t.category_id || '__none';
+      if (parent && !groupCategory.has(key)) {
+        groupCategory.set(key, parent);
+      }
     }
     if (!map.has(key)) {
       map.set(key, []);
       order.push(key);
     }
     map.get(key)!.push(t);
-
-    // Store the parent category object for the group
-    if (key !== '__transfer' && key !== '__none' && !parentCategoryMap.has(key)) {
-      const cat = t.category;
-      if (cat) {
-        if (cat.parent_id) {
-          // This is a subcategory — we need a synthetic parent reference
-          // Use the parent_id as key, create a minimal parent from what we know
-          // The actual parent might be in another transaction's category
-          parentCategoryMap.set(key, { ...cat, id: cat.parent_id, parent_id: null } as FinanceCategory);
-        } else {
-          parentCategoryMap.set(key, cat);
-        }
-      }
-    }
-    // Update parent category if we find one that IS the parent (not a sub)
-    if (t.category && !t.category.parent_id && t.category.id === key) {
-      parentCategoryMap.set(key, t.category);
-    }
   }
 
   const groups = order.map(key => {
     const txns = map.get(key)!;
     const isTransfer = key === '__transfer';
-    const category = isTransfer ? null : (parentCategoryMap.get(key) ?? txns[0]?.category ?? null);
+    const category = isTransfer ? null : (groupCategory.get(key) ?? txns[0]?.category ?? null);
     const subtotal = txns.reduce((sum, t) => {
       if (t.type === 'income') return sum + Number(t.amount);
       if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
@@ -364,7 +356,7 @@ export function FinanceTransactions({
                     </div>
 
                     {/* Transactions grouped by category */}
-                    {groupByCategory(transactions).map(group => (
+                    {groupByCategory(transactions, categories).map(group => (
                       <CategoryGroup
                         key={group.key}
                         category={group.category}
