@@ -1,12 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { formatCurrency } from '@/lib/format';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Employee, EmployeePayment, MONTHS } from '@/types/employee';
-import { format } from 'date-fns';
+import { Employee, EmployeePayment } from '@/types/employee';
 import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,25 +20,23 @@ interface PayslipSheetProps {
 
 export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onSave, onUpdate, onDelete }: PayslipSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [referenceMonth, setReferenceMonth] = useState(new Date().getMonth() + 1);
-  const [referenceYear, setReferenceYear] = useState(new Date().getFullYear());
+  const [paymentDate, setPaymentDate] = useState('');
   const [amount, setAmount] = useState('');
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
       if (editingPayment) {
-        setReferenceMonth(editingPayment.reference_month);
-        setReferenceYear(editingPayment.reference_year);
+        setPaymentDate(editingPayment.payment_date || '');
         setAmount(String(editingPayment.amount || ''));
         setReceiptUrl(editingPayment.receipt_url || null);
         setPreviewUrl(editingPayment.receipt_url || null);
       } else {
-        setReferenceMonth(new Date().getMonth() + 1);
-        setReferenceYear(new Date().getFullYear());
+        const today = new Date().toISOString().split('T')[0];
+        setPaymentDate(today);
         setAmount(employee?.base_salary ? String(employee.base_salary) : '');
         setReceiptUrl(null);
         setPreviewUrl(null);
@@ -53,7 +48,6 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
     const file = e.target.files?.[0];
     if (!file || !employee) return;
 
-    // Preview
     const reader = new FileReader();
     reader.onload = (ev) => setPreviewUrl(ev.target?.result as string);
     reader.readAsDataURL(file);
@@ -62,21 +56,14 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
     try {
       const ext = file.name.split('.').pop();
       const path = `payslips/${employee.id}/${Date.now()}.${ext}`;
-      
       const { error: uploadError } = await supabase.storage
         .from('cash-receipts')
         .upload(path, file, { upsert: true });
-
       if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from('cash-receipts')
-        .getPublicUrl(path);
-
+      const { data: urlData } = supabase.storage.from('cash-receipts').getPublicUrl(path);
       setReceiptUrl(urlData.publicUrl);
       toast.success('Foto enviada!');
-    } catch (err) {
-      console.error('Upload error:', err);
+    } catch {
       toast.error('Erro ao enviar foto');
       setPreviewUrl(receiptUrl);
     } finally {
@@ -85,24 +72,21 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
   };
 
   const handleSave = async () => {
-    if (!employee || !amount) return;
+    if (!employee || !amount || !paymentDate) return;
     setIsLoading(true);
     try {
-      const parsedAmount = parseFloat(amount) || 0;
-      const paymentDate = format(new Date(), 'yyyy-MM-dd');
-
+      const now = new Date(paymentDate + 'T12:00:00');
       const data = {
         employee_id: employee.id,
         type: 'salary' as const,
-        reference_month: referenceMonth,
-        reference_year: referenceYear,
+        reference_month: now.getMonth() + 1,
+        reference_year: now.getFullYear(),
         payment_date: paymentDate,
-        amount: parsedAmount,
-        net_salary: parsedAmount,
+        amount: parseFloat(amount) || 0,
+        net_salary: parseFloat(amount) || 0,
         receipt_url: receiptUrl,
         is_paid: false,
       };
-
       if (editingPayment && onUpdate) {
         await onUpdate({ id: editingPayment.id, ...data });
       } else {
@@ -122,55 +106,32 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
     onOpenChange(false);
   };
 
-  const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i);
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-2xl overflow-y-auto">
+      <SheetContent side="bottom" className="h-auto max-h-[80vh] rounded-t-2xl overflow-y-auto">
         <SheetHeader className="pb-2">
           <SheetTitle className="flex items-center gap-2">
             <AppIcon name="FileText" size={20} className="text-primary" />
             {editingPayment ? 'Editar Holerite' : 'Novo Holerite'}
           </SheetTitle>
-          {employee && (
-            <p className="text-sm text-muted-foreground">{employee.full_name}</p>
-          )}
+          {employee && <p className="text-sm text-muted-foreground">{employee.full_name}</p>}
         </SheetHeader>
 
         <div className="space-y-5 pb-6 pt-2">
-          {/* Mês / Ano */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Mês</Label>
-              <Select value={String(referenceMonth)} onValueChange={(v) => setReferenceMonth(parseInt(v))}>
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {MONTHS.map((month, i) => (
-                    <SelectItem key={i} value={String(i + 1)}>{month}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Ano</Label>
-              <Select value={String(referenceYear)} onValueChange={(v) => setReferenceYear(parseInt(v))}>
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map(year => (
-                    <SelectItem key={year} value={String(year)}>{year}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Data do Pagamento */}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Data do Pagamento</Label>
+            <Input
+              type="date"
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(e.target.value)}
+              className="h-12"
+            />
           </div>
 
-          {/* Valor Final */}
+          {/* Valor */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Valor Líquido (R$)</Label>
+            <Label className="text-xs text-muted-foreground">Valor (R$)</Label>
             <Input
               type="number"
               step="0.01"
@@ -182,46 +143,25 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
             />
           </div>
 
-          {/* Foto do Holerite */}
+          {/* Foto */}
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Foto do Holerite</Label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handlePhotoUpload}
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} />
 
             {previewUrl ? (
               <div className="relative rounded-xl overflow-hidden border border-border/40">
-                <img
-                  src={previewUrl}
-                  alt="Holerite"
-                  className="w-full max-h-64 object-contain bg-black/20"
-                />
+                <img src={previewUrl} alt="Holerite" className="w-full max-h-56 object-contain bg-muted/30" />
                 <div className="absolute bottom-2 right-2 flex gap-2">
-                  <Button
-                    variant="glass"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                  >
-                    <AppIcon name="Camera" size={14} className="mr-1" />
-                    Trocar
+                  <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                    <AppIcon name="Camera" size={14} className="mr-1" /> Trocar
                   </Button>
-                  <Button
-                    variant="glass"
-                    size="sm"
-                    onClick={() => { setPreviewUrl(null); setReceiptUrl(null); }}
-                  >
+                  <Button variant="secondary" size="sm" onClick={() => { setPreviewUrl(null); setReceiptUrl(null); }}>
                     <AppIcon name="Trash2" size={14} />
                   </Button>
                 </div>
                 {uploading && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <AppIcon name="progress_activity" size={24} className="animate-spin text-white" />
+                  <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                    <AppIcon name="progress_activity" size={24} className="animate-spin text-primary" />
                   </div>
                 )}
               </div>
@@ -230,7 +170,7 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full h-32 rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all flex flex-col items-center justify-center gap-2 text-muted-foreground"
+                className="w-full h-28 rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all flex flex-col items-center justify-center gap-2 text-muted-foreground"
               >
                 {uploading ? (
                   <AppIcon name="progress_activity" size={28} className="animate-spin" />
@@ -251,16 +191,11 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
                 <AppIcon name="Trash2" size={16} />
               </Button>
             )}
-            <Button
-              className="flex-1"
-              size="lg"
-              onClick={handleSave}
-              disabled={isLoading || !employee || !amount}
-            >
+            <Button className="flex-1" size="lg" onClick={handleSave} disabled={isLoading || !employee || !amount || !paymentDate}>
               {isLoading ? (
                 <><AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" />Salvando...</>
               ) : (
-                <>{editingPayment ? 'Salvar' : 'Criar Holerite'}</>
+                editingPayment ? 'Salvar' : 'Criar Holerite'
               )}
             </Button>
           </div>
