@@ -71,8 +71,9 @@ export default function CashClosing() {
 
         <Sheet open={isFormOpen} onOpenChange={(open) => {
           if (open) setIsFormOpen(true);
-        }}>
-          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()} onPointerDownOutside={(e) => e.preventDefault()} onFocusOutside={(e) => e.preventDefault()}>
+          // Never auto-close — user must use the "Fechar" button
+        }} modal={false}>
+          <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl z-50" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()} onPointerDownOutside={(e) => e.preventDefault()} onFocusOutside={(e) => e.preventDefault()}>
             <SheetHeader className="flex flex-row items-center justify-between">
               <SheetTitle>Novo Fechamento de Caixa</SheetTitle>
               <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="text-muted-foreground">
