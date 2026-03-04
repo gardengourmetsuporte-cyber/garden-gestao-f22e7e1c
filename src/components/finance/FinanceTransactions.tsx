@@ -298,43 +298,6 @@ export function FinanceTransactions({
           </div>
         </div>
 
-        {/* Summary Header — Hero style (matches DashboardHeroFinance) */}
-        <div className="mx-4 dash-hero p-4">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
-                <AppIcon name="Wallet" size={14} className="text-white/80" />
-              </div>
-              <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60">
-                Saldo em contas
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <p className={`text-[2.25rem] font-extrabold tracking-tight leading-none ${monthStats.balance >= 0 ? 'text-white' : 'text-red-300'}`}>
-              {formatCurrency(monthStats.balance)}
-            </p>
-          </div>
-
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Lucro líquido</span>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-sm font-bold ${monthStats.balance >= 0 ? 'text-emerald-300' : 'text-red-300'}`}>
-                  {formatCurrency(Math.max(monthStats.balance, 0))}
-                </span>
-              </div>
-            </div>
-            <div className="rounded-xl px-3 py-2 bg-white/5 border border-white/10">
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 block">Despesas</span>
-              <span className="text-sm font-bold text-white/80 mt-0.5 block">
-                {formatCurrency(monthStats.totalExpense)}
-              </span>
-            </div>
-          </div>
-        </div>
-
         {/* Transactions List with DnD */}
         {hasTransactions ? (
           <DndContext
