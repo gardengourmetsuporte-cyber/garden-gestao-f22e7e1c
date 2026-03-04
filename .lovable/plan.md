@@ -1,70 +1,28 @@
 
 
-## Plano: Upgrade visual dos ícones — mais personalidade e modernidade
+## Plan: Add 5 Custom SVG Icons
 
-### Problema atual
-Os ícones usam mapeamentos genéricos do Material Symbols (ex: `person` para User, `settings` para Settings, `inventory_2` para Package). Muitos são básicos e sem personalidade.
+Extract SVG paths from the uploaded files and add them to `CUSTOM_SVG_PATHS` in `src/lib/iconMap.ts`, mapping them to the icon names used throughout the app.
 
-### Abordagem
-Trocar os mapeamentos no `ICON_MAP` para ícones mais expressivos, modernos e com personalidade do Material Symbols, mantendo a mesma infraestrutura (AppIcon + Material Symbols Rounded). Também ajustar o peso padrão e o optical size para dar mais corpo aos ícones.
+### Icon → Feature Mapping
 
-### Mudanças principais
+| SVG File | Icon Key(s) | Feature |
+|---|---|---|
+| refund-alt.svg | `Receipt` | Fechamento de Caixa |
+| review.svg | `UserSearch`, `UserPlus`, `UserCheck` | Clientes |
+| receipt.svg | `FileText` | Transações (Finance tab) |
+| order-history.svg | `ShoppingCart`, `ShoppingBag` | Pedidos |
+| notebook-alt.svg | `CalendarDays`, `Calendar` | Agenda |
 
-**1. `src/lib/iconMap.ts` — Remapear ~40 ícones para versões mais expressivas**
+### Technical Details
 
-Exemplos das trocas mais impactantes:
+1. **`src/lib/iconMap.ts`** — Add 5 new entries to `CUSTOM_SVG_PATHS`:
+   - `Receipt`: single path from refund-alt.svg (dollar sign with circular arrow)
+   - `UserSearch`: two paths from review.svg (person + star rating)
+   - `FileText`: single path from receipt.svg (receipt with torn bottom)
+   - `ShoppingCart`: single path from order-history.svg (cart with clock)
+   - `CalendarDays`: single path from notebook-alt.svg (spiral notebook)
+   - Also alias `ShoppingBag` → same paths as `ShoppingCart`, `Calendar` → same as `CalendarDays`
 
-| Chave | Atual (genérico) | Novo (com personalidade) |
-|-------|------------------|--------------------------|
-| LayoutDashboard | `space_dashboard` | `dashboard` |
-| Home | `home` | `cottage` |
-| Settings | `settings` | `manufacturing` |
-| Users | `group` | `groups` |
-| User | `person` | `face` |
-| DollarSign | `account_balance_wallet` | `universal_currency_alt` |
-| Wallet | `wallet` | `account_balance_wallet` |
-| Package | `inventory_2` | `package_2` |
-| Gift | `redeem` | `featured_seasonal_and_gifts` |
-| Trophy | `emoji_events` | `trophy` |
-| Star | `kid_star` | `grade` |
-| Bell | `notifications` | `notifications_unread` |
-| Sparkles | `auto_awesome` | `magic_exchange` |
-| Brain | `neurology` | `cognition` |
-| ChefHat | `soup_kitchen` | `skillet` |
-| Receipt | `receipt_long` | `receipt` |
-| ClipboardCheck | `task_alt` | `order_approve` |
-| Megaphone | `campaign` | `breaking_news` |
-| Shield | `verified_user` | `admin_panel_settings` |
-| Bot | `smart_toy` | `robot_2` |
-| Crown | `diamond` | `crown` |
-| Heart | `favorite` | `cardiology` |
-| Truck | `local_shipping` | `package_2` → manter `local_shipping` |
-| Search | `search` | `manage_search` |
-| Pencil | `edit` | `ink_pen` |
-| Save | `save` | `save` (manter) |
-| Filter | `filter_list` | `tune` |
-| Send | `send` | `near_me` |
-| BookOpen | `auto_stories` | `menu_book` |
-| Eye | `visibility` | `preview` |
-| Lightbulb | `tips_and_updates` | `emoji_objects` |
-| CalendarDays | `calendar_month` | `date_range` |
-| MessageCircle | `chat` | `chat_bubble` |
-| Coins | `generating_tokens` | `monetization_on` |
-| Coffee | `coffee` | `local_cafe` |
-| Medal | `military_tech` | `rewarded_ads` |
-| Award | `workspace_premium` | `social_leaderboard` |
-| Gem | `diamond` | `diamond` (manter — usado como crown badge) |
-| QrCode | `qr_code_2` | `qr_code_scanner` |
-| Flame | `local_fire_department` | `whatshot` |
-
-**2. `src/components/ui/app-icon.tsx` — Ajuste sutil de weight**
-
-Mudar o weight padrão de `400` para `300` para um visual mais fino e elegante (estilo iOS/Instagram), e usar `GRAD` `-25` para um toque mais suave.
-
-### Arquivos modificados
-- `src/lib/iconMap.ts` — Remapeamento de ícones
-- `src/components/ui/app-icon.tsx` — Ajuste de weight/grad padrão
-
-### Impacto
-Todas as telas do app atualizam automaticamente pois usam o `AppIcon` centralizado. Nenhuma mudança de lógica, apenas visual.
+2. No changes to `app-icon.tsx` — the existing custom SVG rendering logic already handles multi-path SVGs with `fill="currentColor"` and the `tab-icon-galaxy` active state fix.
 
