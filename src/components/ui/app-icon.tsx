@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { ICON_MAP, CUSTOM_SVG_ICONS } from '@/lib/iconMap';
+import { ICON_MAP, CUSTOM_SVG_PATHS } from '@/lib/iconMap';
 
 interface AppIconProps {
   name: string;
@@ -15,30 +15,32 @@ interface AppIconProps {
 
 export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
   ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
-    const customSvg = CUSTOM_SVG_ICONS[name];
+    const customPaths = CUSTOM_SVG_PATHS[name];
 
-    if (customSvg) {
+    if (customPaths) {
       return (
         <span
           ref={ref}
-          className={cn("select-none leading-none inline-block", className)}
+          className={cn("select-none leading-none", className)}
           style={{
             width: size,
             height: size,
-            overflow: 'hidden',
             display: 'inline-block',
-            maskImage: `url(${customSvg})`,
-            WebkitMaskImage: `url(${customSvg})`,
-            maskSize: 'contain',
-            WebkitMaskSize: 'contain',
-            maskRepeat: 'no-repeat',
-            WebkitMaskRepeat: 'no-repeat',
-            maskPosition: 'center',
-            WebkitMaskPosition: 'center',
-            backgroundColor: 'currentColor',
             ...style,
           }}
-        />
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            width={size}
+            height={size}
+          >
+            {customPaths.map((d, i) => (
+              <path key={i} d={d} />
+            ))}
+          </svg>
+        </span>
       );
     }
 
