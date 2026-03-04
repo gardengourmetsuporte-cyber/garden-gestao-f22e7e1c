@@ -51,17 +51,16 @@ export function MonthSelector({ selectedMonth, onMonthChange }: MonthSelectorPro
             variant="ghost"
             className={cn(
               "text-sm font-semibold min-w-[150px] text-center capitalize gap-1.5 h-9 px-4 rounded-full",
-              "bg-gradient-to-r from-[hsl(156_40%_8%)] via-[hsl(156_50%_16%)] to-[hsl(156_40%_8%)] text-white/90 hover:text-white",
-              "dark:from-white dark:via-[hsl(156_30%_96%)] dark:to-white dark:text-[hsl(156_30%_20%)] dark:hover:text-[hsl(156_30%_10%)]"
+              "bg-secondary/80 text-foreground hover:bg-secondary border border-border/50"
             )}
           >
-            <AppIcon name="Calendar" size={16} className="shrink-0" />
+            <AppIcon name="Calendar" size={16} className="shrink-0 text-primary" />
             {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-3 rounded-2xl border-white/10 card-surface shadow-2xl" align="center" avoidCollisions={false}>
+        <PopoverContent className="w-[280px] p-3 rounded-2xl border-border/50 bg-card shadow-2xl" align="center" avoidCollisions={false}>
           {/* Year Navigation */}
-          <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/5">
+          <div className="flex items-center justify-between pb-3 mb-2 border-b border-border/30">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewYear(y => y - 1)}>
               <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
             </Button>
