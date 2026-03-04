@@ -8,6 +8,8 @@ import { useCountUpCurrency } from '@/hooks/useCountUp';
 
 interface Props {
   closings: CashClosing[];
+  weekOffset?: number;
+  onWeekOffsetChange?: (offset: number) => void;
 }
 
 function AnimatedCurrency({ value }: { value: number }) {
@@ -15,8 +17,14 @@ function AnimatedCurrency({ value }: { value: number }) {
   return <>{`R$ ${animated.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}</>;
 }
 
-export function WeeklySummary({ closings }: Props) {
-  const [weekOffset, setWeekOffset] = useState(0);
+export function WeeklySummary({ closings, weekOffset: externalOffset, onWeekOffsetChange }: Props) {
+  const [internalOffset, setInternalOffset] = useState(0);
+  const weekOffset = externalOffset ?? internalOffset;
+  const setWeekOffset = (fn: (prev: number) => number) => {
+    const newVal = fn(weekOffset);
+    if (onWeekOffsetChange) onWeekOffsetChange(newVal);
+    else setInternalOffset(newVal);
+  };
 
   const summary = useMemo(() => {
     const target = addWeeks(new Date(), weekOffset);
@@ -70,7 +78,11 @@ export function WeeklySummary({ closings }: Props) {
     };
   }, [closings, weekOffset]);
 
-  
+function AnimatedCurrency({ value }: { value: number }) {
+  const animated = useCountUpCurrency(value);
+  return <>{`R$ ${animated.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}</>;
+}
+
 
   return (
     <div className="card-command p-4 space-y-3">

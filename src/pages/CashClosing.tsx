@@ -1,26 +1,24 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { CashClosingForm, clearCashClosingDraft } from '@/components/cashClosing/CashClosingForm';
 import { CashClosingList } from '@/components/cashClosing/CashClosingList';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
-import { MonthSelector } from '@/components/finance/MonthSelector';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function CashClosing() {
   const { isAdmin, user } = useAuth();
   const { closings, isLoading, refetch } = useCashClosing();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [weekOffset, setWeekOffset] = useState(0);
   const [cashSearchParams, setCashSearchParams] = useSearchParams();
 
   // Handle ?action=new from quick actions
@@ -35,14 +33,14 @@ export default function CashClosing() {
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const todaysClosing = closings.find(c => c.date === today && c.user_id === user?.id);
-  const pendingCount = closings.filter(c => c.status === 'pending').length;
 
-  // Filter closings by selected month
+  // Filter closings by current week offset
   const filteredClosings = useMemo(() => {
-    const monthStart = format(startOfMonth(selectedMonth), 'yyyy-MM-dd');
-    const monthEnd = format(endOfMonth(selectedMonth), 'yyyy-MM-dd');
-    return closings.filter(c => c.date >= monthStart && c.date <= monthEnd);
-  }, [closings, selectedMonth]);
+    const target = addWeeks(new Date(), weekOffset);
+    const wStart = format(startOfWeek(target, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    const wEnd = format(endOfWeek(target, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    return closings.filter(c => c.date >= wStart && c.date <= wEnd);
+  }, [closings, weekOffset]);
 
   return (
     <AppLayout>
@@ -56,8 +54,7 @@ export default function CashClosing() {
             </div>
           ) : isAdmin ? (
             <div className="space-y-4">
-              <MonthSelector selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
-              <WeeklySummary closings={filteredClosings} />
+              <WeeklySummary closings={closings} weekOffset={weekOffset} onWeekOffsetChange={setWeekOffset} />
               <CashClosingList 
                 closings={filteredClosings} 
                 isAdmin={isAdmin}
@@ -71,9 +68,6 @@ export default function CashClosing() {
             />
           )}
         </div>
-
-
-
 
         <Sheet open={isFormOpen} onOpenChange={(open) => {
           if (open) setIsFormOpen(true);
