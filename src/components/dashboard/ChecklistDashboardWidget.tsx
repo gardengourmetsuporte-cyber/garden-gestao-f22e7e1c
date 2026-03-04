@@ -110,18 +110,18 @@ export function ChecklistDashboardWidget() {
       label: 'Abertura',
       iconName: 'Sun',
       progress: abertura,
-      accentColor: 'text-orange-400',
-      accentBg: 'bg-orange-500/70',
-      textColor: 'text-orange-400',
+      accentColor: 'text-primary',
+      accentBg: 'bg-primary/40',
+      textColor: 'text-primary',
     },
     {
       type: 'fechamento',
       label: 'Fechamento',
       iconName: 'Moon',
       progress: fechamento,
-      accentColor: 'text-emerald-400',
-      accentBg: 'bg-emerald-600/40',
-      textColor: 'text-emerald-400',
+      accentColor: 'text-primary',
+      accentBg: 'bg-primary/40',
+      textColor: 'text-primary',
     },
   ];
 
@@ -197,9 +197,7 @@ export function ChecklistDashboardWidget() {
                   "h-full rounded-full transition-all duration-700 ease-out",
                     isComplete
                       ? "bg-success"
-                      : card.type === 'abertura'
-                        ? "bg-orange-500"
-                        : "bg-primary"
+                      : "bg-primary"
                 )}
                 style={{ width: `${card.progress.percent}%` }}
               />
