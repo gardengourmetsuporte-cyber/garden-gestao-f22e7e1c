@@ -44,9 +44,7 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
             {transactions.length}
           </Badge>
           {allPaid ? (
-            <div className="w-4 h-4 rounded-full bg-success/20 flex items-center justify-center shrink-0">
-              <AppIcon name="Check" size={10} className="text-success" />
-            </div>
+            <div className="w-3 h-3 rounded-full bg-success shrink-0" />
           ) : (
             <div className="w-4 h-4 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
               <AppIcon name="Clock" size={10} className="text-warning" />
