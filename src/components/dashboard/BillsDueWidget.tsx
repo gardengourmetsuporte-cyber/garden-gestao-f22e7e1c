@@ -82,6 +82,9 @@ function GroupedView({ bills }: { bills: BillDueSoon[] }) {
                 <span className="text-[10px] text-muted-foreground shrink-0">({group.items.length})</span>
               </div>
               <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                {group.items.some(b => b.daysUntilDue <= 0) && (
+                  <span className="w-2 h-2 rounded-full bg-warning shrink-0" />
+                )}
                 <span className="text-xs font-bold text-destructive">{formatCurrency(subtotal)}</span>
                 <AppIcon
                   name="ChevronDown"
