@@ -102,12 +102,12 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
                 <span className={cn(
                   'text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1.5 border tracking-wide uppercase',
                   overdue
-                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-sm'
+                    ? 'bg-destructive/10 text-destructive border-destructive/20 shadow-sm'
                     : dueLabel.includes('Hoje')
-                      ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-sm'
+                      ? 'bg-warning/10 text-warning border-warning/20 shadow-sm'
                       : dueLabel.includes('Amanhã')
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm'
-                        : 'bg-secondary/40 text-muted-foreground border-white/5'
+                        ? 'bg-primary/10 text-primary border-primary/20 shadow-sm'
+                        : 'bg-secondary/40 text-muted-foreground border-border/50'
                 )}>
                   <AppIcon name="Clock" size={9} className={cn(clockUrgency.colorClass, clockUrgency.pulse && 'animate-pulse')} />
                   {dueLabel}
