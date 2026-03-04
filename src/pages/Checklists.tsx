@@ -12,6 +12,17 @@ import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistType } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -380,6 +391,62 @@ export default function ChecklistsPage() {
     try { await deleteItem(id); } catch { toast.error('Erro ao excluir item'); }
   };
 
+  const [closingType, setClosingType] = useState<ChecklistType | null>(null);
+
+  const handleManualClose = async (type: ChecklistType) => {
+    if (!user?.id || !activeUnitId) return;
+    setClosingType(type);
+    try {
+      const activeItemIds: string[] = [];
+      sectors.forEach((s: any) => {
+        if (type === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus') {
+          s.subcategories?.forEach((sub: any) => {
+            sub.items?.forEach((item: any) => {
+              if (item.is_active && item.checklist_type === type) activeItemIds.push(item.id);
+            });
+          });
+        }
+      });
+
+      // Fetch fresh completions
+      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', type);
+      if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
+      const { data: fresh } = await q;
+      const doneIds = new Set((fresh || []).map((c: any) => c.item_id));
+      const pending = activeItemIds.filter(id => !doneIds.has(id));
+
+      if (pending.length === 0) {
+        toast.info('Todas as tarefas já estão concluídas!');
+        return;
+      }
+
+      const rows = pending.map(itemId => ({
+        item_id: itemId,
+        checklist_type: type,
+        completed_by: user.id,
+        date: currentDate,
+        awarded_points: false,
+        points_awarded: 0,
+        is_skipped: true,
+        unit_id: activeUnitId,
+      }));
+
+      const { error } = await supabase
+        .from('checklist_completions')
+        .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' });
+      if (error) throw error;
+
+      fetchCompletions(currentDate, checklistType);
+      queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, type, activeUnitId] });
+      toast.success(`${type === 'abertura' ? 'Abertura' : 'Fechamento'} encerrado — ${pending.length} tarefa(s) marcada(s) como não concluída(s)`);
+    } catch (err: any) {
+      console.error('Manual close error:', err);
+      toast.error('Erro ao encerrar checklist');
+    } finally {
+      setClosingType(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -498,8 +565,38 @@ export default function ChecklistsPage() {
                     </div>
                   </div>
                 )}
-                {checklistType === 'abertura' && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+                {checklistType === 'abertura' && getTypeProgress.abertura.percent < 100 && !settingsMode && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <div
+                        role="button"
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/15 hover:bg-destructive/25 flex items-center justify-center transition-colors cursor-pointer"
+                      >
+                        <AppIcon name="Power" size={14} className="text-destructive" />
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Encerrar Abertura?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {getTypeProgress.abertura.total - getTypeProgress.abertura.completed} tarefa(s) pendente(s) serão marcadas como <strong>não concluídas</strong>. Essa ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleManualClose('abertura')}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {closingType === 'abertura' ? 'Encerrando...' : 'Encerrar'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+                {checklistType === 'abertura' && getTypeProgress.abertura.percent === 100 && (
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success animate-pulse" />
                 )}
               </button>
 
@@ -565,8 +662,38 @@ export default function ChecklistsPage() {
                     </div>
                   </div>
                 )}
-                {checklistType === 'fechamento' && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full animate-pulse" style={{ background: 'hsl(234 89% 67%)' }} />
+                {checklistType === 'fechamento' && getTypeProgress.fechamento.percent < 100 && !settingsMode && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <div
+                        role="button"
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/15 hover:bg-destructive/25 flex items-center justify-center transition-colors cursor-pointer"
+                      >
+                        <AppIcon name="Power" size={14} className="text-destructive" />
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Encerrar Fechamento?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {getTypeProgress.fechamento.total - getTypeProgress.fechamento.completed} tarefa(s) pendente(s) serão marcadas como <strong>não concluídas</strong>. Essa ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleManualClose('fechamento')}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {closingType === 'fechamento' ? 'Encerrando...' : 'Encerrar'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+                {checklistType === 'fechamento' && getTypeProgress.fechamento.percent === 100 && (
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success animate-pulse" />
                 )}
               </button>
             </div>
