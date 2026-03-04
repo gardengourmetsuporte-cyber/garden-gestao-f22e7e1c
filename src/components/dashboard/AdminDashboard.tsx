@@ -121,12 +121,6 @@ export function AdminDashboard() {
         </DashboardSection>
       )}
 
-      {/* AI Insights */}
-      {isVisible('ai-insights') && (
-        <DashboardSection title="Insights da IA" icon="Sparkles" iconColor="text-purple-400">
-          <AIInsightsWidget />
-        </DashboardSection>
-      )}
 
       {/* Calendar */}
       {hasAccess('agenda') && isVisible('calendar') && (
