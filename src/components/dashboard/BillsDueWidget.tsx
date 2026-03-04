@@ -33,39 +33,70 @@ function BillRow({ bill }: { bill: BillDueSoon }) {
 }
 
 function GroupedView({ bills }: { bills: BillDueSoon[] }) {
-  const today: BillDueSoon[] = [];
-  const tomorrow: BillDueSoon[] = [];
-  const later: BillDueSoon[] = [];
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
+  const groupMap = new Map<string, { name: string; icon: string; color: string; items: BillDueSoon[] }>();
   bills.forEach(b => {
-    if (b.daysUntilDue <= 0) today.push(b);
-    else if (b.daysUntilDue === 1) tomorrow.push(b);
-    else later.push(b);
+    const key = b.categoryName;
+    if (!groupMap.has(key)) {
+      groupMap.set(key, { name: b.categoryName, icon: b.categoryIcon, color: b.categoryColor, items: [] });
+    }
+    groupMap.get(key)!.items.push(b);
   });
 
-  const groups = [
-    { label: 'Vence hoje', items: today },
-    { label: 'Vence amanhã', items: tomorrow },
-    { label: 'Próximos dias', items: later },
-  ].filter(g => g.items.length > 0);
+  const groups = Array.from(groupMap.values()).sort((a, b) => {
+    const totalA = a.items.reduce((s, i) => s + i.amount, 0);
+    const totalB = b.items.reduce((s, i) => s + i.amount, 0);
+    return totalB - totalA;
+  });
+
+  const toggleGroup = (name: string) => {
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1.5">
       {groups.map(group => {
         const subtotal = group.items.reduce((s, b) => s + b.amount, 0);
+        const isOpen = openGroups.has(group.name);
         return (
-          <div key={group.label} className="space-y-1.5">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                {group.label} ({group.items.length})
-              </span>
-              <span className="text-[10px] font-bold text-destructive">{formatCurrency(subtotal)}</span>
-            </div>
-            <div className="space-y-1">
-              {group.items.map(bill => (
-                <BillRow key={bill.id} bill={bill} />
-              ))}
-            </div>
+          <div key={group.name}>
+            <button
+              onClick={() => toggleGroup(group.name)}
+              className="flex items-center justify-between w-full p-2.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors touch-manipulation"
+              type="button"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: group.color + '20' }}
+                >
+                  <AppIcon name={group.icon} size={14} style={{ color: group.color }} />
+                </div>
+                <span className="text-xs font-medium text-foreground truncate">{group.name}</span>
+                <span className="text-[10px] text-muted-foreground shrink-0">({group.items.length})</span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                <span className="text-xs font-bold text-destructive">{formatCurrency(subtotal)}</span>
+                <AppIcon
+                  name="ChevronDown"
+                  size={12}
+                  className={cn("text-muted-foreground transition-transform", isOpen && "rotate-180")}
+                />
+              </div>
+            </button>
+            {isOpen && (
+              <div className="space-y-1 mt-1 ml-3 border-l-2 border-border/30 pl-2">
+                {group.items.map(bill => (
+                  <BillRow key={bill.id} bill={bill} />
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
