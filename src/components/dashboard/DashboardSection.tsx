@@ -17,9 +17,6 @@ export function DashboardSection({ title, icon, iconColor = 'text-primary', chil
         disabled={!onNavigate}
         type="button"
       >
-        <span className={iconColor}>
-          <AppIcon name={icon} size={14} />
-        </span>
         <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</span>
         {onNavigate && <AppIcon name="ChevronRight" size={12} className="ml-auto text-muted-foreground/40" />}
       </button>
