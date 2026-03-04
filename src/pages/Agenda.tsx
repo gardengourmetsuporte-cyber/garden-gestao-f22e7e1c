@@ -218,7 +218,7 @@ export default function Agenda() {
             const isExpanded = expandedCategories[category.id] === true;
             return (
               <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-[#0a1a10] border border-emerald-500/10 hover:border-emerald-500/25 transition-all duration-300 group">
+                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-card border border-border/50 hover:border-primary/25 transition-all duration-300 group">
                   <div className="flex items-center gap-3.5">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
@@ -358,9 +358,9 @@ export default function Agenda() {
             </div>
           </div>
           {/* View mode tabs with animated indicator */}
-          <div className="relative flex bg-[#0a1a10] rounded-2xl p-1 border border-emerald-500/10 shadow-inner">
+          <div className="relative flex bg-card rounded-2xl p-1 border border-border/50 shadow-inner">
             <div
-              className="absolute top-1 bottom-1 rounded-xl bg-emerald-500/10 shadow-sm shadow-emerald-500/10 border border-emerald-500/20 transition-all duration-300 ease-out"
+              className="absolute top-1 bottom-1 rounded-xl bg-primary/10 shadow-sm shadow-primary/10 border border-primary/20 transition-all duration-300 ease-out"
               style={{
                 width: 'calc(33.333% - 4px)',
                 left: viewMode === 'list' ? '4px' : viewMode === 'calendar' ? 'calc(33.333% + 0px)' : 'calc(66.666% + 0px)',
@@ -370,7 +370,7 @@ export default function Agenda() {
               onClick={() => setViewMode('list')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'list' ? 'text-emerald-400' : 'text-muted-foreground hover:text-foreground'
+                viewMode === 'list' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <AppIcon name="ListChecks" size={16} />
@@ -380,7 +380,7 @@ export default function Agenda() {
               onClick={() => setViewMode('calendar')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'calendar' ? 'text-emerald-400' : 'text-muted-foreground hover:text-foreground'
+                viewMode === 'calendar' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <AppIcon name="Calendar" size={16} />
@@ -390,7 +390,7 @@ export default function Agenda() {
               onClick={() => setViewMode('blocks')}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'blocks' ? 'text-emerald-400' : 'text-muted-foreground hover:text-foreground'
+                viewMode === 'blocks' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <AppIcon name="LayoutGrid" size={16} />
@@ -516,7 +516,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
         onChange={e => setIconSearch(e.target.value)}
         className="h-9 text-xs"
       />
-      <div className="grid grid-cols-7 gap-1 max-h-32 overflow-y-auto rounded-xl border border-emerald-500/10 p-1.5 bg-[#0a1a10]">
+      <div className="grid grid-cols-7 gap-1 max-h-32 overflow-y-auto rounded-xl border border-border/50 p-1.5 bg-card">
         {filteredIcons.map(icon => (
           <button
             key={icon}
@@ -525,8 +525,8 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
             className={cn(
               "flex items-center justify-center p-1.5 rounded-lg transition-colors",
                selectedIcon === icon
-                 ? "bg-emerald-500/15 text-emerald-400"
-                 : "hover:bg-emerald-500/5 text-muted-foreground"
+                  ? "bg-primary/15 text-primary"
+                  : "hover:bg-primary/5 text-muted-foreground"
             )}
             title={icon.replace(/_/g, ' ')}
           >
@@ -550,7 +550,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
 
         <div className="space-y-4 mt-4 pb-4">
           {/* Add new */}
-          <div className="bg-[#0a1a10] rounded-2xl p-4 border border-emerald-500/10 space-y-3">
+          <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-3">
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -594,7 +594,7 @@ function CategoryManagerSheet({ open, onOpenChange, categories, onAdd, onUpdate,
           ) : (
             <div className="space-y-2">
               {categories.map((cat) => (
-                <div key={cat.id} className="bg-[#0a1a10] rounded-2xl border border-emerald-500/10 p-4">
+                <div key={cat.id} className="bg-card rounded-2xl border border-border/50 p-4">
                   {editingId === cat.id ? (
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
