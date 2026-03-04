@@ -27,10 +27,9 @@ export function useFinanceStats(
   const parentLookup = useMemo(() => {
     const map: Record<string, FinanceCategory> = {};
     categories.forEach(c => {
-      map[c.id] = c;
-      // Also index subcategories so we can resolve their parent_id
+      map[c.id] = c; // parent maps to itself
       c.subcategories?.forEach(sub => {
-        map[sub.id] = sub;
+        map[sub.id] = c; // subcategory maps to its PARENT
       });
     });
     return map;
@@ -51,20 +50,11 @@ export function useFinanceStats(
     expenseTransactions.forEach(t => {
       let categoryData = t.category;
       
-      // If subcategory, find parent from lookup or use parent_id from the joined category
-      if (categoryData?.parent_id) {
-        const parent = parentLookup[categoryData.parent_id];
-        if (parent) {
-          categoryData = parent;
-        } else {
-          // Cross-unit category: parent not in lookup. Find a matching parent by name from categories array.
-          const parentName = categoryData.parent_id;
-          const matchByName = categories.find(c => !c.parent_id && c.type === 'expense' && 
-            c.subcategories?.some(sub => sub.name === categoryData!.name));
-          if (matchByName) {
-            categoryData = matchByName;
-          }
-          // If still not found, skip grouping under parent — it'll show as its own entry
+      // Resolve to parent category using lookup
+      if (categoryData) {
+        const resolved = parentLookup[categoryData.id];
+        if (resolved) {
+          categoryData = resolved;
         }
       }
       
@@ -210,16 +200,11 @@ export function useFinanceStats(
     incomeTransactions.forEach(t => {
       let categoryData = t.category;
       
-      if (categoryData?.parent_id) {
-        const parent = parentLookup[categoryData.parent_id];
-        if (parent) {
-          categoryData = parent;
-        } else {
-          const matchByName = categories.find(c => !c.parent_id && c.type === 'income' && 
-            c.subcategories?.some(sub => sub.name === categoryData!.name));
-          if (matchByName) {
-            categoryData = matchByName;
-          }
+      // Resolve to parent category using lookup
+      if (categoryData) {
+        const resolved = parentLookup[categoryData.id];
+        if (resolved) {
+          categoryData = resolved;
         }
       }
       
