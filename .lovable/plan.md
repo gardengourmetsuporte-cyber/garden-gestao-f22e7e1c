@@ -1,34 +1,55 @@
 
 
-# Fix: Horário Limite não funciona
+## Lista de Compras Rápida — Plano
 
-## Problema
-Duas causas raízes identificadas:
+### O que será feito
 
-1. **DeadlineSettingPopover não re-sincroniza estado local**: O componente usa `useState` inicializado com `currentSetting` no mount. Quando o popover é reaberto após salvar (e a query refetcha), o estado interno (hour, minute, isActive, etc.) não atualiza — mantém os valores antigos.
+Adicionar um botão de "carrinho" (+) no sheet de movimentação rápida do estoque (a tela da screenshot) que permite ao usuário da cozinha adicionar o item diretamente a uma **lista de compras rápida**. Essa lista fica acessível na página de Pedidos como uma nova funcionalidade, permitindo que a equipe sinalize itens que precisam de atenção sem precisar criar um pedido formal.
 
-2. **Display "Sem limite configurado" mesmo com toggle ativo**: O texto mostra `formatDeadlineSetting(currentSetting)` que é null antes do primeiro save. Após salvar, como o estado local não re-sincroniza, o label do popover fica desatualizado.
+### Fluxo do usuário
 
-## Solução
+1. Abre o sheet de movimentação rápida de um item no estoque
+2. Vê um botão de carrinho (ícone `ShoppingCart` + `Plus`) ao lado do título ou abaixo do botão confirmar
+3. Ao clicar, o item é adicionado à lista de compras rápida com a quantidade sugerida (min_stock - current_stock) e um toast confirma
+4. Na página de Pedidos, uma nova aba ou seção "Lista Rápida" exibe os itens adicionados pela cozinha, agrupados, com opção de converter em pedido formal para um fornecedor
 
-### `src/components/checklists/DeadlineSettingPopover.tsx`
-- Adicionar `useEffect` para re-sincronizar os estados locais (`hour`, `minute`, `isNextDay`, `isActive`) sempre que `currentSetting` mudar (após o refetch da query).
-- Atualizar o texto de display para mostrar o horário formatado baseado nos valores locais (não apenas no `currentSetting`), para que mesmo antes de salvar o usuário veja o que está configurando.
+### Mudanças técnicas
 
-```tsx
-// Adicionar sync effect
-useEffect(() => {
-  setHour(currentSetting?.deadline_hour ?? defaults.hour);
-  setMinute(currentSetting?.deadline_minute ?? defaults.minute);
-  setIsNextDay(currentSetting?.is_next_day ?? defaults.nextDay);
-  setIsActive(currentSetting?.is_active ?? true);
-}, [currentSetting]);
-
-// Atualizar display text
-const displayLabel = isActive 
-  ? `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}${isNextDay ? ' (dia seguinte)' : ''}`
-  : 'Desativado';
+**1. Nova tabela `shopping_list_items`** (migration)
+```sql
+CREATE TABLE public.shopping_list_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  item_id UUID REFERENCES public.inventory_items(id) ON DELETE CASCADE NOT NULL,
+  quantity NUMERIC DEFAULT 1,
+  notes TEXT,
+  added_by UUID REFERENCES auth.users(id),
+  unit_id UUID REFERENCES public.units(id),
+  status TEXT DEFAULT 'pending', -- pending | ordered
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.shopping_list_items ENABLE ROW LEVEL SECURITY;
+-- Policies: authenticated users da mesma unit podem ver/inserir/deletar
 ```
 
-Mudança mínima em 1 arquivo, sem alterações de banco de dados.
+**2. Hook `useShoppingList.ts`**
+- CRUD para `shopping_list_items` com filtro por `unit_id`
+- Funções: `addToList`, `removeFromList`, `clearList`, `convertToOrder`
+
+**3. Botão no `QuickMovementSheetNew.tsx`**
+- Adicionar um botão com ícone de carrinho + plus abaixo do botão "Confirmar", estilo secundário
+- Texto: "Adicionar à Lista de Compras"
+- Ao clicar, insere o item na tabela `shopping_list_items` com quantidade sugerida
+
+**4. Badge no `ItemCardNew.tsx`** (opcional)
+- Indicador visual de que o item já está na lista de compras
+
+**5. Seção na página `Orders.tsx`**
+- Nova aba "Lista" nas `AnimatedTabs` com badge de contagem
+- Exibe os itens pendentes da lista, com opção de remover individualmente ou converter todos em pedido para o fornecedor vinculado
+
+### Arquivos impactados
+- `supabase/migrations/` — nova migration
+- `src/hooks/useShoppingList.ts` — novo hook
+- `src/components/inventory/QuickMovementSheetNew.tsx` — botão de adicionar
+- `src/pages/Orders.tsx` — nova aba "Lista"
 
