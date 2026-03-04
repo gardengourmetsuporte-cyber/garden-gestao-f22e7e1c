@@ -31,6 +31,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { formatCurrency } from '@/lib/format';
 import { CategoryGroup } from './CategoryGroup';
 
+type ViewMode = 'grouped' | 'list';
+
 /** Group transactions by PARENT category; transfers go into a special '__transfer' bucket */
 function groupByCategory(transactions: FinanceTransaction[], categories: FinanceCategory[]): { key: string; category: FinanceCategory | null; isTransfer: boolean; txns: FinanceTransaction[] }[] {
   // Build a lookup: category id → parent category
@@ -166,6 +168,9 @@ export function FinanceTransactions({
   onRedo,
 }: FinanceTransactionsProps) {
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    try { return (localStorage.getItem('finance_view_mode') as ViewMode) || 'grouped'; } catch { return 'grouped'; }
+  });
   const [filters, setFilters] = useState<TransactionFiltersState>({
     status: 'all',
     type: 'all',
@@ -297,6 +302,19 @@ export function FinanceTransactions({
             )}
             <Button
               variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => {
+                const next = viewMode === 'grouped' ? 'list' : 'grouped';
+                setViewMode(next);
+                try { localStorage.setItem('finance_view_mode', next); } catch {}
+              }}
+              title={viewMode === 'grouped' ? 'Modo lista' : 'Modo agrupado'}
+            >
+              <AppIcon name={viewMode === 'grouped' ? 'List' : 'LayoutGrid'} size={16} />
+            </Button>
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => {
                 const allTxns = Object.entries(transactionsByDate).flatMap(([, txns]) =>
@@ -331,15 +349,94 @@ export function FinanceTransactions({
 
         {/* Transactions List with DnD */}
         {hasTransactions ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={() => { try { navigator.vibrate?.(50); } catch { } }}
-            onDragEnd={handleDragEnd}
-          >
+          viewMode === 'grouped' ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={() => { try { navigator.vibrate?.(50); } catch { } }}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="px-4 pb-32 space-y-4">
+                {sortedDates.map(dateStr => {
+                  const transactions = filteredTransactionsByDate[dateStr];
+                  const dayTotal = transactions.reduce((sum, t) => {
+                    if (t.type === 'income') return sum + Number(t.amount);
+                    if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
+                    return sum;
+                  }, 0);
+
+                  return (
+                    <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
+                      <div className={cn(
+                        "flex items-center justify-between py-2 px-3 rounded-lg sticky top-[52px] lg:top-[64px] z-20 backdrop-blur-xl transition-all duration-300 shadow-sm border border-border/10",
+                        dateStr === todayStr ? 'gradient-primary border-primary/20' : 'bg-background/80'
+                      )}>
+                        <div className="flex items-center gap-2">
+                          {dateStr === todayStr && (
+                            <span className="w-2 h-2 rounded-full bg-primary-foreground animate-pulse shrink-0" />
+                          )}
+                          <span className={cn("text-xs uppercase tracking-wider font-semibold", dateStr === todayStr ? 'text-primary-foreground' : 'text-muted-foreground')}>
+                            {getDateLabel(dateStr)}
+                          </span>
+                        </div>
+                        <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? (dateStr === todayStr ? 'text-primary-foreground' : 'text-success') : (dateStr === todayStr ? 'text-primary-foreground/90' : 'text-destructive'))}>
+                          {formatCurrency(dayTotal)}
+                        </span>
+                      </div>
+
+                      {groupByCategory(transactions, categories).map(group => (
+                        <CategoryGroup
+                          key={group.key}
+                          category={group.category}
+                          isTransfer={group.isTransfer}
+                          transactions={group.txns}
+                        >
+                          <SortableContext items={group.txns.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                            {group.txns.map(transaction => (
+                              <SortableTransaction key={transaction.id} id={transaction.id}>
+                                {(isDragging) => (
+                                  <div className="relative">
+                                    {transaction.is_recurring && transaction.installment_group_id && (
+                                      <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                                        <AppIcon name="Repeat" size={10} className="mr-0.5" />
+                                        {transaction.installment_number}/{transaction.total_installments}
+                                      </Badge>
+                                    )}
+                                    <TransactionItem
+                                      transaction={transaction}
+                                      onClick={() => onTransactionClick(transaction)}
+                                      onTogglePaid={onTogglePaid}
+                                      onDelete={onDeleteTransaction}
+                                      disableSwipe={isDragging}
+                                    />
+                                  </div>
+                                )}
+                              </SortableTransaction>
+                            ))}
+                          </SortableContext>
+                        </CategoryGroup>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </DndContext>
+          ) : (
+            /* FLAT LIST MODE — sorted by category within each day, no drag */
             <div className="px-4 pb-32 space-y-4">
               {sortedDates.map(dateStr => {
                 const transactions = filteredTransactionsByDate[dateStr];
+                // Sort by category order: expenses first, then income, then transfers; within same type sort by parent category name then subcategory
+                const sorted = [...transactions].sort((a, b) => {
+                  const typeOrder = (t: FinanceTransaction) => t.type === 'transfer' ? 2 : (t.type === 'expense' || t.type === 'credit_card') ? 0 : 1;
+                  const ta = typeOrder(a);
+                  const tb = typeOrder(b);
+                  if (ta !== tb) return ta - tb;
+                  const catA = a.category?.name || '';
+                  const catB = b.category?.name || '';
+                  if (catA !== catB) return catA.localeCompare(catB);
+                  return Math.abs(Number(b.amount)) - Math.abs(Number(a.amount));
+                });
                 const dayTotal = transactions.reduce((sum, t) => {
                   if (t.type === 'income') return sum + Number(t.amount);
                   if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
@@ -348,7 +445,6 @@ export function FinanceTransactions({
 
                 return (
                   <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined}>
-                    {/* Date Header */}
                     <div className={cn(
                       "flex items-center justify-between py-2 px-3 rounded-lg sticky top-[52px] lg:top-[64px] z-20 backdrop-blur-xl transition-all duration-300 shadow-sm border border-border/10",
                       dateStr === todayStr ? 'gradient-primary border-primary/20' : 'bg-background/80'
@@ -366,44 +462,29 @@ export function FinanceTransactions({
                       </span>
                     </div>
 
-                    {/* Transactions grouped by category */}
-                    {groupByCategory(transactions, categories).map(group => (
-                      <CategoryGroup
-                        key={group.key}
-                        category={group.category}
-                        isTransfer={group.isTransfer}
-                        transactions={group.txns}
-                      >
-                        <SortableContext items={group.txns.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                          {group.txns.map(transaction => (
-                            <SortableTransaction key={transaction.id} id={transaction.id}>
-                              {(isDragging) => (
-                                <div className="relative">
-                                  {transaction.is_recurring && transaction.installment_group_id && (
-                                    <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
-                                      <AppIcon name="Repeat" size={10} className="mr-0.5" />
-                                      {transaction.installment_number}/{transaction.total_installments}
-                                    </Badge>
-                                  )}
-                                  <TransactionItem
-                                    transaction={transaction}
-                                    onClick={() => onTransactionClick(transaction)}
-                                    onTogglePaid={onTogglePaid}
-                                    onDelete={onDeleteTransaction}
-                                    disableSwipe={isDragging}
-                                  />
-                                </div>
-                              )}
-                            </SortableTransaction>
-                          ))}
-                        </SortableContext>
-                      </CategoryGroup>
-                    ))}
+                    <div className="mt-1 space-y-0.5">
+                      {sorted.map(transaction => (
+                        <div key={transaction.id} className="relative">
+                          {transaction.is_recurring && transaction.installment_group_id && (
+                            <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                              <AppIcon name="Repeat" size={10} className="mr-0.5" />
+                              {transaction.installment_number}/{transaction.total_installments}
+                            </Badge>
+                          )}
+                          <TransactionItem
+                            transaction={transaction}
+                            onClick={() => onTransactionClick(transaction)}
+                            onTogglePaid={onTogglePaid}
+                            onDelete={onDeleteTransaction}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 );
               })}
             </div>
-          </DndContext>
+          )
         ) : (
           <div className="px-4">
             <div className="flex flex-col items-center justify-center py-16 animate-fade-in">
