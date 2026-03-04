@@ -20,6 +20,7 @@ interface PayslipSheetProps {
 
 export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onSave, onUpdate, onDelete }: PayslipSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [payslipType, setPayslipType] = useState<'salary' | 'vale'>('salary');
   const [paymentDate, setPaymentDate] = useState('');
   const [amount, setAmount] = useState('');
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
@@ -30,19 +31,37 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
   useEffect(() => {
     if (open) {
       if (editingPayment) {
+        setPayslipType(editingPayment.type === 'vale' ? 'vale' : 'salary');
         setPaymentDate(editingPayment.payment_date || '');
         setAmount(String(editingPayment.amount || ''));
         setReceiptUrl(editingPayment.receipt_url || null);
         setPreviewUrl(editingPayment.receipt_url || null);
       } else {
-        const today = new Date().toISOString().split('T')[0];
-        setPaymentDate(today);
+        setPayslipType('salary');
+        // Default day 5 for salary
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        setPaymentDate(`${y}-${m}-05`);
         setAmount(employee?.base_salary ? String(employee.base_salary) : '');
         setReceiptUrl(null);
         setPreviewUrl(null);
       }
     }
   }, [open, editingPayment, employee]);
+
+  // Update default date when type changes
+  const handleTypeChange = (type: 'salary' | 'vale') => {
+    setPayslipType(type);
+    if (!editingPayment) {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const day = type === 'vale' ? '20' : '05';
+      setPaymentDate(`${y}-${m}-${day}`);
+      setAmount(type === 'vale' ? '' : (employee?.base_salary ? String(employee.base_salary) : ''));
+    }
+  };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,12 +97,12 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
       const now = new Date(paymentDate + 'T12:00:00');
       const data = {
         employee_id: employee.id,
-        type: 'salary' as const,
+        type: payslipType as any,
         reference_month: now.getMonth() + 1,
         reference_year: now.getFullYear(),
         payment_date: paymentDate,
         amount: parseFloat(amount) || 0,
-        net_salary: parseFloat(amount) || 0,
+        net_salary: payslipType === 'salary' ? (parseFloat(amount) || 0) : undefined,
         receipt_url: receiptUrl,
         is_paid: false,
       };
@@ -112,13 +131,39 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
         <SheetHeader className="pb-2">
           <SheetTitle className="flex items-center gap-2">
             <AppIcon name="FileText" size={20} className="text-primary" />
-            {editingPayment ? 'Editar Holerite' : 'Novo Holerite'}
+            {editingPayment ? 'Editar Lançamento' : 'Novo Lançamento'}
           </SheetTitle>
           {employee && <p className="text-sm text-muted-foreground">{employee.full_name}</p>}
         </SheetHeader>
 
         <div className="space-y-5 pb-6 pt-2">
-          {/* Data do Pagamento */}
+          {/* Tipo */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleTypeChange('salary')}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${
+                payslipType === 'salary'
+                  ? 'bg-primary/10 border-primary/30 text-primary font-semibold'
+                  : 'bg-card border-border hover:border-primary/20 text-muted-foreground'
+              }`}
+            >
+              <AppIcon name="Banknote" size={18} />
+              <span className="text-sm">Salário (dia 5)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTypeChange('vale')}
+              className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${
+                payslipType === 'vale'
+                  ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 font-semibold'
+                  : 'bg-card border-border hover:border-primary/20 text-muted-foreground'
+              }`}
+            >
+              <AppIcon name="HandCoins" size={18} />
+              <span className="text-sm">Vale (dia 20)</span>
+            </button>
+          </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">Data do Pagamento</Label>
             <Input
@@ -195,7 +240,7 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
               {isLoading ? (
                 <><AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" />Salvando...</>
               ) : (
-                editingPayment ? 'Salvar' : 'Criar Holerite'
+                editingPayment ? 'Salvar' : (payslipType === 'vale' ? 'Criar Vale' : 'Criar Holerite')
               )}
             </Button>
           </div>
