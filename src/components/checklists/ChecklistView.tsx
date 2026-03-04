@@ -411,6 +411,7 @@ export function ChecklistView({
           >
             {/* Sector Header */}
             <button
+              onPointerDown={(e) => { if (e.pointerType !== 'mouse') { e.preventDefault(); toggleSector(sector.id); } }}
               onClick={() => toggleSector(sector.id)}
               className={cn(
                 "w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300",
@@ -969,7 +970,8 @@ export function ChecklistView({
 
                   return (
                     <div key={subcategory.id} className="ml-2 space-y-1 mb-2 animate-fade-in" style={{ animationDelay: `${subIndex * 50}ms` }}>
-                      <button onClick={() => toggleSubcategory(subcategory.id)}
+                      <button onPointerDown={(e) => { if (e.pointerType !== 'mouse') { e.preventDefault(); toggleSubcategory(subcategory.id); } }}
+                        onClick={() => toggleSubcategory(subcategory.id)}
                         className={cn(
                           "w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-300 border",
                           subComplete 
@@ -1299,6 +1301,15 @@ export function ChecklistView({
                               <div key={item.id}>
                                 <button
                                   disabled={!canToggle}
+                                  onPointerDown={(e) => {
+                                    if (e.pointerType === 'mouse') return;
+                                    e.preventDefault();
+                                    if (isTimerMode) {
+                                      handleStdTimerClick();
+                                      return;
+                                    }
+                                    if (canToggle) setOpenPopover(openPopover === item.id ? null : item.id);
+                                  }}
                                   onClick={() => isTimerMode ? handleStdTimerClick() : (canToggle && setOpenPopover(openPopover === item.id ? null : item.id))}
                                   className={cn(
                                     "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",

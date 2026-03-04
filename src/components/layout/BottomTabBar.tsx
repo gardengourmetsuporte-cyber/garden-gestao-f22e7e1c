@@ -267,6 +267,11 @@ const TabButton = forwardRef<
   return (
     <button
       ref={ref}
+      onPointerDown={(e) => {
+        if (e.pointerType === 'mouse') return;
+        e.preventDefault();
+        handleTap();
+      }}
       onClick={handleTap}
       onMouseEnter={() => void preloadRoute(tab.path)}
       onTouchStart={() => void preloadRoute(tab.path)}
