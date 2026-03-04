@@ -566,7 +566,7 @@ export function ChecklistView({
                           {/* Inline panel for completed items (admin or own completion) */}
                           {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                             <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
-                              {/* Desmarcar */}
+                              {/* Continuar (desmarcar sem zerar timer) */}
                               {canToggle && (
                                 <button
                                   onClick={() => {
@@ -577,13 +577,36 @@ export function ChecklistView({
                                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                 >
                                   <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
-                                    <AppIcon name="Undo2" className="w-5 h-5 text-muted-foreground" />
+                                    <AppIcon name="Play" className="w-5 h-5 text-muted-foreground" />
                                   </div>
                                   <div>
-                                    <p className="font-semibold text-foreground">Desmarcar item</p>
-                                    <p className="text-xs text-muted-foreground">Reverter a conclusão</p>
+                                    <p className="font-semibold text-foreground">Continuar</p>
+                                    <p className="text-xs text-muted-foreground">Retomar sem zerar o timer</p>
                                   </div>
                                 </button>
+                              )}
+                              {/* Resetar tarefa (desmarcar + zerar timer) */}
+                              {canToggle && onCancelTimer && (
+                                <>
+                                  <div className="border-t border-border" />
+                                  <button
+                                    onClick={async () => {
+                                      setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                                      onToggleItem(item.id, 0);
+                                      await onCancelTimer(item.id);
+                                      setOpenPopover(null);
+                                    }}
+                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
+                                  >
+                                    <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center">
+                                      <AppIcon name="RotateCcw" className="w-5 h-5 text-destructive" />
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-destructive">Resetar tarefa</p>
+                                      <p className="text-xs text-muted-foreground">Zerar tudo e recomeçar</p>
+                                    </div>
+                                  </button>
+                                </>
                               )}
                               {/* Dividir pontos */}
                               {!wasSkipped && onSplitCompletion && profiles.length > 0 && (
@@ -1067,13 +1090,35 @@ export function ChecklistView({
                                           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                         >
                                           <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
-                                            <AppIcon name="Undo2" className="w-5 h-5 text-muted-foreground" />
+                                            <AppIcon name="Play" className="w-5 h-5 text-muted-foreground" />
                                           </div>
                                           <div>
-                                            <p className="font-semibold text-foreground">Desmarcar item</p>
-                                            <p className="text-xs text-muted-foreground">Reverter a conclusão</p>
+                                            <p className="font-semibold text-foreground">Continuar</p>
+                                            <p className="text-xs text-muted-foreground">Retomar sem zerar o timer</p>
                                           </div>
                                         </button>
+                                      )}
+                                      {canToggle && onCancelTimer && (
+                                        <>
+                                          <div className="border-t border-border" />
+                                          <button
+                                            onClick={async () => {
+                                              setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                                              onToggleItem(item.id, 0);
+                                              await onCancelTimer(item.id);
+                                              setOpenPopover(null);
+                                            }}
+                                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
+                                          >
+                                            <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center">
+                                              <AppIcon name="RotateCcw" className="w-5 h-5 text-destructive" />
+                                            </div>
+                                            <div>
+                                              <p className="font-semibold text-destructive">Resetar tarefa</p>
+                                              <p className="text-xs text-muted-foreground">Zerar tudo e recomeçar</p>
+                                            </div>
+                                          </button>
+                                        </>
                                       )}
                                       {/* Dividir pontos */}
                                       {!wasSkipped && onSplitCompletion && profiles.length > 0 && (
