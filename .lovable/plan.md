@@ -1,56 +1,70 @@
 
-Objetivo: corrigir de forma definitiva o “Erro ao resetar tarefa” no checklist (modo timer), eliminando estados inconsistentes e evitando regressão.
 
-1) Causa raiz identificada
-- Há duas implementações do card de item concluído dentro de `ChecklistView.tsx` (blocos duplicados para contextos visuais diferentes).
-- Um bloco já foi ajustado para reset sequencial com `try/catch`, mas o outro ainda está no fluxo antigo com `Promise.all` (reset + desmarcar em paralelo), gerando corrida e falha intermitente.
-- Além disso, o reset usa `onToggleItem(...)` que cai na regra de “5 minutos” em `useChecklistCompletions.ts`; isso bloqueia desmarcar mesmo quando o usuário tocou explicitamente em “Resetar tarefa”.
-- O toast genérico “Erro ao resetar tarefa” mascara o erro real e passa sensação de “bug sem solução”.
+## Plano: Upgrade visual dos ícones — mais personalidade e modernidade
 
-2) Plano de implementação
-- Padronizar o fluxo de reset em TODOS os blocos duplicados de `ChecklistView.tsx`:
-  - fechar popover
-  - marcar otimista
-  - `await onCancelTimer(item.id, { includeFinished: true })`
-  - `await onToggleItem(..., preserveTimerOnUncheck=true, bypassGrace=true)` (novo parâmetro)
-  - `try/catch` com rollback visual e erro claro.
-- Remover qualquer `Promise.all` em ações críticas de reset/continuar para evitar corrida.
-- Em `useChecklistCompletions.ts`, adicionar flag explícita para “reset manual”:
-  - manter regra dos 5 min para desmarque normal
-  - ignorar regra dos 5 min quando a ação vier do botão “Resetar tarefa”.
-- Melhorar mensagens:
-  - erro de permissão/regra -> mensagem específica
-  - erro inesperado -> toast genérico + log estruturado.
-- Garantir invalidação de cache consistente no fim do reset:
-  - `checklist-completions`
-  - `checklist-active-timers`
-  - `checklist-time-stats`
-  para UI refletir imediatamente o estado real.
+### Problema atual
+Os ícones usam mapeamentos genéricos do Material Symbols (ex: `person` para User, `settings` para Settings, `inventory_2` para Package). Muitos são básicos e sem personalidade.
 
-3) Arquivos que serão alterados
-- `src/components/checklists/ChecklistView.tsx`
-  - unificar handler de reset e handler de continuar nos dois blocos.
-- `src/pages/Checklists.tsx`
-  - repassar novo parâmetro do reset para o hook de completions.
-- `src/hooks/checklists/useChecklistCompletions.ts`
-  - adicionar parâmetro de bypass da janela de 5 minutos para reset explícito.
-- (Opcional, se necessário) `src/hooks/checklists/useChecklistTimer.ts`
-  - apenas ajuste fino de mensagens/retornos para manter semântica alinhada.
+### Abordagem
+Trocar os mapeamentos no `ICON_MAP` para ícones mais expressivos, modernos e com personalidade do Material Symbols, mantendo a mesma infraestrutura (AppIcon + Material Symbols Rounded). Também ajustar o peso padrão e o optical size para dar mais corpo aos ícones.
 
-4) Resultado esperado
-- “Resetar tarefa” volta a funcionar de primeira, sem depender de tempo de conclusão.
-- Sem dessintonia entre card/timer/completion.
-- Sem erro intermitente por corrida de promises.
-- UX previsível: botão mostra exatamente o estado real.
+### Mudanças principais
 
-5) Validação (fim a fim)
-- Cenários:
-  - tarefa concluída há menos de 5 min -> reset funciona
-  - tarefa concluída há mais de 5 min -> reset também funciona (quando acionado pelo botão de reset)
-  - “Continuar” mantém timer conforme esperado
-  - reset em checklist com e sem timer ativo
-  - teste em mobile (onde você está vendo o problema) e desktop.
-- Critério de aceite:
-  - nenhum toast “Erro ao resetar tarefa” em fluxo normal de reset
-  - card volta para estado não concluído imediatamente
-  - timer/estatísticas não “ressuscitam” após refetch.
+**1. `src/lib/iconMap.ts` — Remapear ~40 ícones para versões mais expressivas**
+
+Exemplos das trocas mais impactantes:
+
+| Chave | Atual (genérico) | Novo (com personalidade) |
+|-------|------------------|--------------------------|
+| LayoutDashboard | `space_dashboard` | `dashboard` |
+| Home | `home` | `cottage` |
+| Settings | `settings` | `manufacturing` |
+| Users | `group` | `groups` |
+| User | `person` | `face` |
+| DollarSign | `account_balance_wallet` | `universal_currency_alt` |
+| Wallet | `wallet` | `account_balance_wallet` |
+| Package | `inventory_2` | `package_2` |
+| Gift | `redeem` | `featured_seasonal_and_gifts` |
+| Trophy | `emoji_events` | `trophy` |
+| Star | `kid_star` | `grade` |
+| Bell | `notifications` | `notifications_unread` |
+| Sparkles | `auto_awesome` | `magic_exchange` |
+| Brain | `neurology` | `cognition` |
+| ChefHat | `soup_kitchen` | `skillet` |
+| Receipt | `receipt_long` | `receipt` |
+| ClipboardCheck | `task_alt` | `order_approve` |
+| Megaphone | `campaign` | `breaking_news` |
+| Shield | `verified_user` | `admin_panel_settings` |
+| Bot | `smart_toy` | `robot_2` |
+| Crown | `diamond` | `crown` |
+| Heart | `favorite` | `cardiology` |
+| Truck | `local_shipping` | `package_2` → manter `local_shipping` |
+| Search | `search` | `manage_search` |
+| Pencil | `edit` | `ink_pen` |
+| Save | `save` | `save` (manter) |
+| Filter | `filter_list` | `tune` |
+| Send | `send` | `near_me` |
+| BookOpen | `auto_stories` | `menu_book` |
+| Eye | `visibility` | `preview` |
+| Lightbulb | `tips_and_updates` | `emoji_objects` |
+| CalendarDays | `calendar_month` | `date_range` |
+| MessageCircle | `chat` | `chat_bubble` |
+| Coins | `generating_tokens` | `monetization_on` |
+| Coffee | `coffee` | `local_cafe` |
+| Medal | `military_tech` | `rewarded_ads` |
+| Award | `workspace_premium` | `social_leaderboard` |
+| Gem | `diamond` | `diamond` (manter — usado como crown badge) |
+| QrCode | `qr_code_2` | `qr_code_scanner` |
+| Flame | `local_fire_department` | `whatshot` |
+
+**2. `src/components/ui/app-icon.tsx` — Ajuste sutil de weight**
+
+Mudar o weight padrão de `400` para `300` para um visual mais fino e elegante (estilo iOS/Instagram), e usar `GRAD` `-25` para um toque mais suave.
+
+### Arquivos modificados
+- `src/lib/iconMap.ts` — Remapeamento de ícones
+- `src/components/ui/app-icon.tsx` — Ajuste de weight/grad padrão
+
+### Impacto
+Todas as telas do app atualizam automaticamente pois usam o `AppIcon` centralizado. Nenhuma mudança de lógica, apenas visual.
+
