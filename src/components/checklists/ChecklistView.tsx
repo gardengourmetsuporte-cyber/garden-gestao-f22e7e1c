@@ -596,9 +596,13 @@ export function ChecklistView({
                                     onClick={async () => {
                                       setOpenPopover(null);
                                       setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                      const togglePromise = onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                      const cancelPromise = onCancelTimer(item.id, { includeFinished: true });
-                                      await Promise.all([togglePromise, cancelPromise]);
+                                      try {
+                                        await onCancelTimer(item.id, { includeFinished: true });
+                                        await onToggleItem(item.id, 0, undefined, undefined, undefined, true);
+                                      } catch (error) {
+                                        console.error('Erro ao resetar tarefa no card:', error);
+                                        toast.error('Erro ao resetar tarefa');
+                                      }
                                     }}
                                     className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                   >

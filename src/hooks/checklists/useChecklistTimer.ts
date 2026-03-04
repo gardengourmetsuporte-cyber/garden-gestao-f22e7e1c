@@ -269,24 +269,44 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     const includeFinished = options?.includeFinished ?? false;
     let deletedCount = 0;
 
-    // includeFinished precisa sempre passar pelo RPC seguro (RLS bloqueia DELETE direto)
+    // includeFinished: tentar DELETE direto primeiro e usar RPC como fallback
     if (includeFinished) {
-      const { data: rpcDeletedCount, error: rpcError } = await supabase.rpc('reset_checklist_timer', {
-        p_unit_id: activeUnitId,
-        p_item_id: itemId,
-        p_date: date,
-        p_checklist_type: checklistType,
-      });
+      const { data: directDeleted, error: directError } = await supabase
+        .from('checklist_task_times')
+        .delete()
+        .eq('unit_id', activeUnitId)
+        .eq('item_id', itemId)
+        .eq('date', date)
+        .eq('checklist_type', checklistType)
+        .select('id');
 
-      if (rpcError) {
-        toast.error('Erro ao resetar tarefa');
-        console.error('cancelTimer includeFinished rpc error:', { rpcError, itemId, activeUnitId, checklistType, date });
-        return;
+      deletedCount = Array.isArray(directDeleted) ? directDeleted.length : 0;
+
+      if (directError || deletedCount <= 0) {
+        const { data: rpcDeletedCount, error: rpcError } = await supabase.rpc('reset_checklist_timer', {
+          p_unit_id: activeUnitId,
+          p_item_id: itemId,
+          p_date: date,
+          p_checklist_type: checklistType,
+        });
+
+        if (rpcError && deletedCount <= 0) {
+          toast.error('Erro ao resetar tarefa');
+          console.error('cancelTimer includeFinished direct+rpc error:', {
+            directError,
+            rpcError,
+            itemId,
+            activeUnitId,
+            checklistType,
+            date,
+          });
+          return;
+        }
+
+        deletedCount = Number(rpcDeletedCount || deletedCount || 0);
       }
 
-      deletedCount = Number(rpcDeletedCount || 0);
-
-      // Se não havia linha de timer, não deve bloquear o reset da tarefa
+      // Não bloqueia reset quando já não há linhas de timer para apagar
       setActiveTimers(prev => prev.filter(t => t.itemId !== itemId));
       queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
       queryClient.invalidateQueries({ queryKey: ['checklist-time-stats'] });
