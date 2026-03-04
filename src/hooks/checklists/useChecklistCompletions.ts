@@ -26,25 +26,39 @@ export function useChecklistCompletions({
     isAdmin?: boolean, points: number = 1, completedByUserId?: string,
     isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean
   ) => {
-    const existing = completions.find(
+    const existingCompletions = completions.filter(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
     );
 
-    if (existing) {
-      const completedAt = new Date(existing.completed_at);
-      const minutesSinceCompletion = (Date.now() - completedAt.getTime()) / 60_000;
-      const isOwnCompletion = existing.completed_by === userId;
-      const isWithinGracePeriod = minutesSinceCompletion <= 5;
+    if (existingCompletions.length > 0) {
+      if (isAdmin) {
+        // Admin reset must clear every completion for the item/date/type (including split points)
+        const completionIds = existingCompletions.map(c => c.id);
+        const { error } = await supabase
+          .from('checklist_completions')
+          .delete()
+          .in('id', completionIds);
+        if (error) throw error;
+      } else {
+        const ownCompletion = existingCompletions.find(c => c.completed_by === userId);
+        if (!ownCompletion) {
+          throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
+        }
 
-      if (!isAdmin && !isOwnCompletion) {
-        throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
-      }
-      if (!isAdmin && !isWithinGracePeriod) {
-        throw new Error('Não é possível desmarcar após 5 minutos. Solicite ao administrador.');
-      }
+        const completedAt = new Date(ownCompletion.completed_at);
+        const minutesSinceCompletion = (Date.now() - completedAt.getTime()) / 60_000;
+        const isWithinGracePeriod = minutesSinceCompletion <= 5;
 
-      const { error } = await supabase.from('checklist_completions').delete().eq('id', existing.id);
-      if (error) throw error;
+        if (!isWithinGracePeriod) {
+          throw new Error('Não é possível desmarcar após 5 minutos. Solicite ao administrador.');
+        }
+
+        const { error } = await supabase
+          .from('checklist_completions')
+          .delete()
+          .eq('id', ownCompletion.id);
+        if (error) throw error;
+      }
 
       // Also clean up any associated active timer rows for this item/date/type,
       // except when explicitly continuing the task with timer preserved.
