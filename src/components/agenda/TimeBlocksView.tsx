@@ -16,14 +16,26 @@ interface TimeBlocksViewProps {
 // ── localStorage helpers ──
 const getStorageKey = (date: string) => `timeblocks-${date}`;
 
-function loadAllocations(dateStr: string): Record<number, string> {
+// Migration: handle old format (Record<number, string>) and new (Record<number, string[]>)
+function loadAllocations(dateStr: string): Record<number, string[]> {
   try {
     const raw = localStorage.getItem(getStorageKey(dateStr));
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    // Migrate old format: { 6: "id" } → { 6: ["id"] }
+    const result: Record<number, string[]> = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      if (Array.isArray(v)) {
+        result[Number(k)] = v as string[];
+      } else if (typeof v === 'string') {
+        result[Number(k)] = [v];
+      }
+    }
+    return result;
   } catch { return {}; }
 }
 
-function saveAllocations(dateStr: string, allocs: Record<number, string>) {
+function saveAllocations(dateStr: string, allocs: Record<number, string[]>) {
   try { localStorage.setItem(getStorageKey(dateStr), JSON.stringify(allocs)); } catch { }
 }
 
@@ -40,7 +52,7 @@ function formatDateLabel(date: Date): string {
 export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksViewProps) {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const dateStr = format(currentDate, 'yyyy-MM-dd');
-  const [allocations, setAllocations] = useState<Record<number, string>>(() => loadAllocations(dateStr));
+  const [allocations, setAllocations] = useState<Record<number, string[]>>(() => loadAllocations(dateStr));
   const [pickerHour, setPickerHour] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentHour = new Date().getHours();
@@ -71,8 +83,12 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
     return m;
   }, [tasks]);
 
-  // Allocated task IDs
-  const allocatedIds = useMemo(() => new Set(Object.values(allocations)), [allocations]);
+  // Allocated task IDs (all across all hours)
+  const allocatedIds = useMemo(() => {
+    const s = new Set<string>();
+    Object.values(allocations).forEach(ids => ids.forEach(id => s.add(id)));
+    return s;
+  }, [allocations]);
 
   // Available tasks for this day
   const availableTasks = useMemo(() => {
@@ -82,20 +98,29 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
   }, [tasks, allocatedIds, dateStr]);
 
   const allocateTask = useCallback((hour: number, taskId: string) => {
-    setAllocations(prev => ({ ...prev, [hour]: taskId }));
-    setPickerHour(null);
+    setAllocations(prev => {
+      const existing = prev[hour] || [];
+      if (existing.includes(taskId)) return prev;
+      return { ...prev, [hour]: [...existing, taskId] };
+    });
+    // Don't close picker — allow adding more tasks
     try { navigator.vibrate?.(10); } catch { }
   }, []);
 
-  const removeAllocation = useCallback((hour: number) => {
+  const removeTaskFromHour = useCallback((hour: number, taskId: string) => {
     setAllocations(prev => {
-      const next = { ...prev };
-      delete next[hour];
-      return next;
+      const existing = prev[hour] || [];
+      const next = existing.filter(id => id !== taskId);
+      if (next.length === 0) {
+        const copy = { ...prev };
+        delete copy[hour];
+        return copy;
+      }
+      return { ...prev, [hour]: next };
     });
   }, []);
 
-  const filledCount = Object.keys(allocations).length;
+  const filledCount = Object.values(allocations).reduce((sum, ids) => sum + ids.length, 0);
   const totalWorking = HOURS.length;
 
   return (
@@ -123,10 +148,10 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
         <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
-            style={{ width: `${(filledCount / totalWorking) * 100}%` }}
+            style={{ width: `${Math.min((filledCount / totalWorking) * 100, 100)}%` }}
           />
         </div>
-        <span className="text-xs font-semibold text-muted-foreground">{filledCount}/{totalWorking}</span>
+        <span className="text-xs font-semibold text-muted-foreground">{filledCount}</span>
         {filledCount > 0 && (
           <button
             onClick={() => setAllocations({})}
@@ -140,8 +165,9 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
       {/* Timeline */}
       <div ref={scrollRef} className="relative flex flex-col-reverse gap-1">
         {HOURS.map((hour) => {
-          const taskId = allocations[hour];
-          const task = taskId ? taskMap.get(taskId) ?? null : null;
+          const taskIds = allocations[hour] || [];
+          const hourTasks = taskIds.map(id => taskMap.get(id)).filter(Boolean) as ManagerTask[];
+          const hasTasks = hourTasks.length > 0;
           const isNow = isToday(currentDate) && currentHour === hour;
           const isPast = isToday(currentDate) && hour < currentHour;
           const endHour = hour + 1;
@@ -150,29 +176,21 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
             <div
               key={hour}
               id={`block-${hour}`}
-              onClick={() => !task && availableTasks.length > 0 && setPickerHour(hour)}
               className={cn(
-                "flex items-center gap-3 px-3 py-3 rounded-xl border transition-all duration-300 min-h-[52px]",
-                !task && "cursor-pointer",
-                // Base
+                "relative flex gap-3 px-3 py-3 rounded-xl border transition-all duration-300 min-h-[52px]",
                 "card-surface border-white/5",
-                // Now
                 isNow && "border-primary/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-primary/20",
-                // Past empty
-                isPast && !task && "opacity-40",
-                // Filled
-                task && "shadow-sm border-white/10",
-                // Hover empty
-                !task && !isPast && "hover:border-primary/20 hover:bg-white/5 hover:shadow-card-hover"
+                isPast && !hasTasks && "opacity-40",
+                hasTasks && "shadow-sm border-white/10",
               )}
             >
               {/* Now indicator */}
               {isNow && (
-                <span className="absolute left-0 w-1 h-8 rounded-r-full bg-primary animate-pulse" />
+                <span className="absolute left-0 w-1 h-8 rounded-r-full bg-primary animate-pulse top-1/2 -translate-y-1/2" />
               )}
 
               {/* Time */}
-              <div className="shrink-0 w-[52px] text-center">
+              <div className="shrink-0 w-[52px] text-center pt-0.5">
                 <span className={cn(
                   "text-xs font-mono font-medium",
                   isNow ? "text-emerald-400 font-bold drop-shadow-md" : isPast ? "text-muted-foreground/40" : "text-muted-foreground"
@@ -182,61 +200,73 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
               </div>
 
               {/* Divider line */}
-              <div className={cn("w-px h-8 shrink-0", isNow ? "bg-primary/30" : "bg-border/60")} />
+              <div className={cn("w-px self-stretch shrink-0", isNow ? "bg-primary/30" : "bg-border/60")} />
 
               {/* Content */}
-              {task ? (
-                <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onTaskClick(task); }}
-                    className="flex items-center gap-2.5 min-w-0 flex-1"
-                  >
-                    {task.category && (
-                      <span
-                        className="w-2.5 h-8 rounded-full shrink-0"
-                        style={{ backgroundColor: task.category.color }}
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <span className={cn(
-                        "text-sm font-medium truncate block",
-                        task.is_completed && "line-through text-muted-foreground"
-                      )}>
-                        {task.title}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {String(hour).padStart(2, '0')}:00 – {String(endHour).padStart(2, '0')}:00
-                      </span>
-                    </div>
-                  </button>
-                  <div className="flex items-center gap-1 shrink-0">
+              <div className="flex-1 min-w-0 space-y-1.5">
+                {hourTasks.map((task) => (
+                  <div key={task.id} className="flex items-center justify-between gap-2">
                     <button
-                      onClick={(e) => { e.stopPropagation(); onToggleTask(task.id); }}
-                      className={cn(
-                        "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
-                        task.is_completed
-                          ? "bg-success/20 text-success"
-                          : "bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                      onClick={() => onTaskClick(task)}
+                      className="flex items-center gap-2.5 min-w-0 flex-1"
+                    >
+                      {task.category && (
+                        <span
+                          className="w-2.5 h-6 rounded-full shrink-0"
+                          style={{ backgroundColor: task.category.color }}
+                        />
                       )}
-                    >
-                      <AppIcon name="Check" size={14} />
+                      <div className="min-w-0">
+                        <span className={cn(
+                          "text-sm font-medium truncate block",
+                          task.is_completed && "line-through text-muted-foreground"
+                        )}>
+                          {task.title}
+                        </span>
+                      </div>
                     </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); removeAllocation(hour); }}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground/50 hover:text-destructive transition-colors"
-                    >
-                      <AppIcon name="X" size={14} />
-                    </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => onToggleTask(task.id)}
+                        className={cn(
+                          "w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                          task.is_completed
+                            ? "bg-success/20 text-success"
+                            : "bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                        )}
+                      >
+                        <AppIcon name="Check" size={14} />
+                      </button>
+                      <button
+                        onClick={() => removeTaskFromHour(hour, task.id)}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground/50 hover:text-destructive transition-colors"
+                      >
+                        <AppIcon name="X" size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <span className={cn(
-                  "text-xs italic",
-                  isPast ? "text-muted-foreground/30" : "text-muted-foreground/50"
-                )}>
-                  {availableTasks.length > 0 ? 'toque para agendar' : 'livre'}
-                </span>
-              )}
+                ))}
+
+                {/* Add more / empty slot */}
+                <button
+                  onClick={() => availableTasks.length > 0 && setPickerHour(hour)}
+                  className={cn(
+                    "flex items-center gap-1.5 text-xs italic transition-colors w-full text-left",
+                    hasTasks
+                      ? "text-primary/60 hover:text-primary pt-0.5"
+                      : isPast ? "text-muted-foreground/30" : "text-muted-foreground/50 hover:text-primary/60"
+                  )}
+                >
+                  {availableTasks.length > 0 ? (
+                    <>
+                      <AppIcon name="Plus" size={12} className="shrink-0" />
+                      <span>{hasTasks ? 'adicionar mais' : 'toque para agendar'}</span>
+                    </>
+                  ) : (
+                    !hasTasks && <span>livre</span>
+                  )}
+                </button>
+              </div>
             </div>
           );
         })}
@@ -249,8 +279,32 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
             <SheetTitle>
               Agendar às {pickerHour !== null ? `${String(pickerHour).padStart(2, '0')}:00` : ''}
             </SheetTitle>
-            <SheetDescription>Selecione uma tarefa para este horário</SheetDescription>
+            <SheetDescription>Selecione tarefas para este horário</SheetDescription>
           </SheetHeader>
+
+          {/* Tasks already in this slot */}
+          {pickerHour !== null && (allocations[pickerHour] || []).length > 0 && (
+            <div className="mb-3 space-y-1.5">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-1">Neste horário</span>
+              {(allocations[pickerHour] || []).map(id => {
+                const t = taskMap.get(id);
+                if (!t) return null;
+                return (
+                  <div key={id} className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {t.category && <span className="w-2 h-5 rounded-full shrink-0" style={{ backgroundColor: t.category.color }} />}
+                      <span className="text-sm font-medium truncate">{t.title}</span>
+                    </div>
+                    <button onClick={() => removeTaskFromHour(pickerHour!, id)} className="text-muted-foreground hover:text-destructive shrink-0">
+                      <AppIcon name="X" size={14} />
+                    </button>
+                  </div>
+                );
+              })}
+              <div className="border-t border-border mt-2 pt-2" />
+            </div>
+          )}
+
           <div className="space-y-2 mt-3 pb-4">
             {availableTasks.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">Todas as tarefas já foram alocadas</p>
@@ -319,6 +373,15 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
               })()
             )}
           </div>
+
+          {/* Close button */}
+          {availableTasks.length > 0 && (
+            <div className="sticky bottom-0 pb-4 pt-2 bg-background">
+              <Button variant="outline" className="w-full rounded-xl" onClick={() => setPickerHour(null)}>
+                Fechar
+              </Button>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>
