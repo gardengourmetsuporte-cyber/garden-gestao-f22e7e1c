@@ -174,7 +174,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                   <p className="text-[11px] font-medium text-white/70">{rank.title} · {earnedPoints} pts</p>
                 </div>
               </button>
-              {/* ThemeToggle removido temporariamente */}
+              <ThemeToggle />
             </div>
 
             {/* Store selector — compact inline */}
