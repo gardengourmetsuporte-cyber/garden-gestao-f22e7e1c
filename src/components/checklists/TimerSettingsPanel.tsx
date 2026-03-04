@@ -38,6 +38,30 @@ export function TimerSettingsPanel({ checklistType }: TimerSettingsPanelProps) {
   const handleToggle = async (enabled: boolean) => {
     if (!activeUnitId) return;
     setSaving(true);
+
+    // Optimistic update — reflect immediately in both caches
+    const previousUI = queryClient.getQueryData(settingsQueryKey);
+    const hookKey = ['checklist-timer-settings', activeUnitId, checklistType];
+    const previousHook = queryClient.getQueryData(hookKey);
+
+    const optimistic = {
+      ...(settings ?? {
+        unit_id: activeUnitId,
+        checklist_type: checklistType,
+        min_executions_for_stats: 3,
+        bonus_points_avg: 2,
+        bonus_points_record: 5,
+      }),
+      is_enabled: enabled,
+    };
+    queryClient.setQueryData(settingsQueryKey, optimistic);
+    queryClient.setQueryData(hookKey, {
+      isEnabled: enabled,
+      minExecutionsForStats: optimistic.min_executions_for_stats ?? 3,
+      bonusPointsAvg: optimistic.bonus_points_avg ?? 2,
+      bonusPointsRecord: optimistic.bonus_points_record ?? 5,
+    });
+
     try {
       const { error } = await supabase
         .from('checklist_timer_settings')
@@ -51,13 +75,17 @@ export function TimerSettingsPanel({ checklistType }: TimerSettingsPanelProps) {
         } as any, { onConflict: 'unit_id,checklist_type' });
       if (error) throw error;
 
+      // Refetch to confirm server state
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: settingsQueryKey }),
-        queryClient.invalidateQueries({ queryKey: ['checklist-timer-settings', activeUnitId, checklistType] }),
+        queryClient.invalidateQueries({ queryKey: hookKey }),
       ]);
 
       toast.success(enabled ? 'Modo timer ativado' : 'Modo timer desativado');
     } catch {
+      // Rollback on error
+      queryClient.setQueryData(settingsQueryKey, previousUI);
+      queryClient.setQueryData(hookKey, previousHook);
       toast.error('Erro ao salvar configuração');
     } finally {
       setSaving(false);
