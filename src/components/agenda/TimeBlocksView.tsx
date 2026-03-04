@@ -376,7 +376,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
 
           {/* Close button */}
           {availableTasks.length > 0 && (
-            <div className="sticky bottom-0 pb-4 pt-2 bg-background">
+            <div className="sticky bottom-0 pb-4 pt-2 bg-transparent">
               <Button variant="outline" className="w-full rounded-xl" onClick={() => setPickerHour(null)}>
                 Fechar
               </Button>
