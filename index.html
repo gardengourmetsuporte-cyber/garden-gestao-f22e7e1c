@@ -43,6 +43,16 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Detect Material Symbols font load to prevent FOUT
+      document.fonts.ready.then(function() {
+        document.documentElement.classList.add('fonts-loaded');
+      });
+      // Fallback: force reveal after 3s even if font fails
+      setTimeout(function() {
+        document.documentElement.classList.add('fonts-loaded');
+      }, 3000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
