@@ -78,7 +78,7 @@ async function fetchProfileData(userId: string, unitId: string | null): Promise<
     .limit(10000);
   if (unitId) inventorQuery = inventorQuery.eq('unit_id', unitId);
 
-  const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }, { data: badgeRows }, { data: employeeRow }, { data: inventorRows }] = await Promise.all([
+  const results = await Promise.all([
     supabase.from('profiles').select('user_id, full_name, avatar_url, job_title, selected_frame').eq('user_id', userId).single(),
     completionsQuery,
     redemptionsQuery,
@@ -88,6 +88,14 @@ async function fetchProfileData(userId: string, unitId: string | null): Promise<
     supabase.from('employees').select('admission_date').eq('user_id', userId).maybeSingle(),
     inventorQuery,
   ]);
+
+  // Log any errors for debugging
+  const queryNames = ['profile', 'completions', 'redemptions', 'bonus', 'monthlyCompletions', 'badges', 'employee', 'inventor'];
+  results.forEach((r, i) => {
+    if (r.error) console.error(`[useProfile] ${queryNames[i]} query error:`, r.error.message);
+  });
+
+  const [{ data: profile }, { data: completions }, { data: redemptions }, { data: bonusRows }, { data: monthlyCompletions }, { data: badgeRows }, { data: employeeRow }, { data: inventorRows }] = results;
 
   const summary = calculatePointsSummary(completions || [], redemptions || []);
   const totalCompletions = (completions || []).filter(c => c.awarded_points !== false).length;
