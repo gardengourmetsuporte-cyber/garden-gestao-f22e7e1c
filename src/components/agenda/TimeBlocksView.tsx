@@ -326,10 +326,10 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
                   <>
                     {[...grouped.values()].map(({ category, tasks: catTasks }) => (
                       <div key={category!.id || category!.name}>
-                        <div className="flex items-center gap-2 px-1 mb-1.5 mt-2 first:mt-0">
-                          <span className="material-symbols-rounded" style={{ fontSize: 16, color: category!.color }}>{(category as any)?.icon || 'folder'}</span>
-                          <span className="text-xs font-semibold text-muted-foreground">{category!.name}</span>
-                        </div>
+                        <div className="flex items-center gap-2 px-1 mb-1.5 mt-3 first:mt-0">
+                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: category!.color }} />
+                           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{category!.name}</span>
+                         </div>
                         {catTasks.map(task => (
                           <button
                             key={task.id}
