@@ -10,6 +10,9 @@ export interface BillDueSoon {
   amount: number;
   date: string;
   daysUntilDue: number;
+  categoryName: string;
+  categoryIcon: string;
+  categoryColor: string;
 }
 
 export interface DashboardStats {
@@ -44,6 +47,9 @@ async function fetchDashboardStats(userId: string, unitId: string, isAdmin: bool
     amount: Number(b.amount),
     date: b.date,
     daysUntilDue: differenceInCalendarDays(new Date(b.date + 'T12:00:00'), now),
+    categoryName: b.categoryName || 'Sem categoria',
+    categoryIcon: b.categoryIcon || 'Receipt',
+    categoryColor: b.categoryColor || '#888888',
   }));
 
   return {
