@@ -1,3 +1,18 @@
+// Custom SVG icons (solid filled style)
+export const CUSTOM_SVG_ICONS: Record<string, string> = {
+  ClipboardCheck: '/icons/ballot-check.svg',
+  ClipboardList: '/icons/ballot-check.svg',
+  ListChecks: '/icons/ballot-check.svg',
+  Package: '/icons/boxes.svg',
+  PackageX: '/icons/boxes.svg',
+  PackageCheck: '/icons/boxes.svg',
+  DollarSign: '/icons/debt.svg',
+  Wallet: '/icons/debt.svg',
+  Coins: '/icons/debt.svg',
+  Home: '/icons/house-blank.svg',
+  House: '/icons/house-blank.svg',
+};
+
 // Centralized mapping — "Unicolor Solid" style
 // Every symbol chosen for maximum fill, minimum internal lines
 export const ICON_MAP: Record<string, string> = {
