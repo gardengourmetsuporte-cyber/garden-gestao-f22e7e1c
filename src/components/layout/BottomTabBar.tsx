@@ -134,11 +134,42 @@ export function BottomTabBar() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          {/* Animated ambient glow */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Animated ambient glow */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
             <div className="absolute inset-0 tabbar-ambient-glow opacity-60 mix-blend-screen" />
           </div>
-          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10">
+
+          {/* FAB floating above the notch */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[14px] z-20">
+            <div className="fab-cradle-ring">
+              <button
+                aria-label={fabAction?.label || 'Ação rápida'}
+                onClick={() => {
+                  navigator.vibrate?.(10);
+                  if (fabAction) {
+                    fabAction.onClick();
+                  } else {
+                    setQuickOpen(true);
+                  }
+                }}
+                className={cn(
+                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
+                  "hover:scale-[1.08] active:scale-[0.92]"
+                )}
+                style={{
+                  boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
+                }}
+              >
+                <AppIcon
+                  name={fabAction?.icon || 'Plus'}
+                  size={22}
+                  className="relative z-10 text-white"
+                />
+              </button>
+            </div>
+          </div>
+
+          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10 tabbar-notch-shell">
             {/* Left tabs */}
             {leftTabs.map(tab => (
               <TabButton
@@ -152,33 +183,8 @@ export function BottomTabBar() {
               />
             ))}
 
-            {/* Center FAB */}
-            <div className="flex items-center justify-center" style={{ width: slotWidth }}>
-              <button
-                aria-label={fabAction?.label || 'Ação rápida'}
-                onClick={() => {
-                  navigator.vibrate?.(10);
-                  if (fabAction) {
-                    fabAction.onClick();
-                  } else {
-                    setQuickOpen(true);
-                  }
-                }}
-                 className={cn(
-                   "w-[46px] h-[46px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
-                   "hover:scale-[1.08] active:scale-[0.92]"
-                 )}
-                 style={{
-                   boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
-                 }}
-              >
-                <AppIcon
-                  name={fabAction?.icon || 'Plus'}
-                  size={22}
-                  className="relative z-10 text-white"
-                />
-              </button>
-            </div>
+            {/* Center spacer for notch */}
+            <div style={{ width: slotWidth }} />
 
             {/* Right tabs */}
             {rightTabs.map(tab => (

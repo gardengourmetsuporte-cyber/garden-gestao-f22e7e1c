@@ -129,27 +129,32 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div className="flex items-center h-[68px] max-w-lg mx-auto relative">
-            {/* Left tabs */}
-            {tabs.slice(0, 2).map(tab => (
-              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
-            ))}
-
-            {/* Center FAB "+" */}
-            <div className="flex items-center justify-center" style={{ width: '20%' }}>
+          {/* FAB floating above the notch */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[14px] z-20">
+            <div className="fab-cradle-ring">
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
-                  "absolute -top-7 w-[60px] h-[60px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
+                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
                   boxShadow: '0 4px 20px rgba(16,185,129,0.35), 0 8px 32px rgba(0,0,0,0.2)',
                 }}
               >
-                <AppIcon name="Plus" size={26} className="relative z-10 text-white" />
+                <AppIcon name="Plus" size={22} className="relative z-10 text-white" />
               </button>
             </div>
+          </div>
+
+          <div className="flex items-center h-[68px] max-w-lg mx-auto relative tabbar-notch-shell">
+            {/* Left tabs */}
+            {tabs.slice(0, 2).map(tab => (
+              <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
+            ))}
+
+            {/* Center spacer for notch */}
+            <div style={{ width: '20%' }} />
 
             {/* Right tabs */}
             {tabs.slice(2, 4).map(tab => (
