@@ -197,10 +197,6 @@ export default function Customers() {
            <Button size="icon" variant="outline" className="h-11 w-11 shrink-0 border-emerald-500/10 hover:border-emerald-500/25" onClick={() => setCsvOpen(true)} title="Importar clientes">
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
           </Button>
-          <Button size="icon" variant="outline" className="h-11 w-11 shrink-0 border-emerald-500/10 hover:border-emerald-500/25" onClick={() => salesFileRef.current?.click()} title="Importar vendas (Colibri)">
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>point_of_sale</span>
-          </Button>
-          <input ref={salesFileRef} type="file" accept=".csv" className="hidden" onChange={handleSalesImport} />
         </div>
 
         {/* List */}
