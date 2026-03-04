@@ -18,8 +18,10 @@ export function TimerSettingsPanel({ checklistType }: TimerSettingsPanelProps) {
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
 
+  const settingsQueryKey = ['checklist-timer-settings-ui', activeUnitId, checklistType] as const;
+
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['checklist-timer-settings', activeUnitId, checklistType],
+    queryKey: settingsQueryKey,
     queryFn: async () => {
       if (!activeUnitId) return null;
       const { data } = await supabase
@@ -48,7 +50,12 @@ export function TimerSettingsPanel({ checklistType }: TimerSettingsPanelProps) {
           bonus_points_record: settings?.bonus_points_record ?? 5,
         } as any, { onConflict: 'unit_id,checklist_type' });
       if (error) throw error;
-      queryClient.invalidateQueries({ queryKey: ['checklist-timer-settings', activeUnitId, checklistType] });
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: settingsQueryKey }),
+        queryClient.invalidateQueries({ queryKey: ['checklist-timer-settings', activeUnitId, checklistType] }),
+      ]);
+
       toast.success(enabled ? 'Modo timer ativado' : 'Modo timer desativado');
     } catch {
       toast.error('Erro ao salvar configuração');
@@ -72,7 +79,11 @@ export function TimerSettingsPanel({ checklistType }: TimerSettingsPanelProps) {
           bonus_points_record: field === 'bonus_points_record' ? value : (settings?.bonus_points_record ?? 5),
         } as any, { onConflict: 'unit_id,checklist_type' });
       if (error) throw error;
-      queryClient.invalidateQueries({ queryKey: ['checklist-timer-settings', activeUnitId, checklistType] });
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: settingsQueryKey }),
+        queryClient.invalidateQueries({ queryKey: ['checklist-timer-settings', activeUnitId, checklistType] }),
+      ]);
     } catch {
       toast.error('Erro ao salvar');
     } finally {
