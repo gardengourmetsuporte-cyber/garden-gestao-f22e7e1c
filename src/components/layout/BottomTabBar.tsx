@@ -59,18 +59,17 @@ export function BottomTabBar() {
     resolvedTabs.push(...CARDAPIO_TABS);
   } else {
     resolvedTabs.push(HOME_TAB);
-    // Add pinned tabs the user has access to
+    // Add pinned tabs (always show them, regardless of access — locked state handled visually)
     for (const pt of pinnedTabs) {
-      if (hasAccess(pt.moduleKey) && resolvedTabs.length < 4) {
+      if (resolvedTabs.length < 4) {
         resolvedTabs.push(pt);
       }
     }
-    // Fill remaining slots with fallback modules
+    // Fill remaining slots with fallback modules to guarantee 4 tabs
     if (resolvedTabs.length < 4) {
       for (const key of FALLBACK_MODULE_KEYS) {
         if (resolvedTabs.length >= 4) break;
         if (resolvedTabs.some(t => t.moduleKey === key)) continue;
-        if (!hasAccess(key)) continue;
         const mod = ALL_MODULES.find(m => m.key === key);
         if (!mod) continue;
         resolvedTabs.push({
