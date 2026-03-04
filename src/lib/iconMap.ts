@@ -1,5 +1,5 @@
-// Centralized mapping from Lucide icon names to Material Symbols Rounded
-// Solid filled icons — minimal internal detail, blob-like shapes
+// Centralized mapping — "Unicolor Solid" style
+// Every symbol chosen for maximum fill, minimum internal lines
 export const ICON_MAP: Record<string, string> = {
   // Navigation & Layout
   LayoutDashboard: 'space_dashboard',
@@ -150,7 +150,7 @@ export const ICON_MAP: Record<string, string> = {
   Fuel: 'local_gas_station',
   Plane: 'flight',
 
-  // Finance categories (common)
+  // Finance categories
   Banknote: 'payments',
   BadgeDollarSign: 'paid',
   PiggyBank: 'savings',
