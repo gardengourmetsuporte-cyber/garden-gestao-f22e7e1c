@@ -63,6 +63,7 @@ export function CategoryManagement({
   const [transactionCount, setTransactionCount] = useState(0);
 
   const filteredCategories = categories.filter(c => c.type === activeType && !c.parent_id);
+  const isSubcategoryEditing = Boolean(parentCategory || editingCategory?.parent_id);
 
   const getTransferOptions = () => {
     if (!categoryToDelete) return [];
@@ -87,8 +88,9 @@ export function CategoryManagement({
   const handleEdit = (category: FinanceCategory) => {
     setEditingCategory(category);
     setName(category.name);
-    setIcon(category.icon);
-    setColor(category.color);
+    const parent = category.parent_id ? categories.find(c => c.id === category.parent_id) : null;
+    setIcon(parent?.icon || category.icon);
+    setColor(parent?.color || category.color);
     setIsEditing(true);
   };
 
@@ -109,9 +111,13 @@ export function CategoryManagement({
     
     try {
       if (editingCategory) {
+        const payload = editingCategory.parent_id
+          ? { name: name.trim() }
+          : { name: name.trim(), icon, color };
+
         const { error } = await supabase
           .from('finance_categories')
-          .update({ name: name.trim(), icon, color })
+          .update(payload)
           .eq('id', editingCategory.id);
         if (error) throw error;
       } else {
@@ -341,40 +347,44 @@ export function CategoryManagement({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Ícone</Label>
-                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-secondary/30 rounded-lg">
-                  {ICONS.map(i => (
-                    <button
-                      key={i}
-                      className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
-                        icon === i ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary"
-                      )}
-                      onClick={() => setIcon(i)}
-                    >
-                      <AppIcon name={i} size={20} />
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {!isSubcategoryEditing && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Ícone</Label>
+                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-secondary/30 rounded-lg">
+                      {ICONS.map(i => (
+                        <button
+                          key={i}
+                          className={cn(
+                            "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+                            icon === i ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary"
+                          )}
+                          onClick={() => setIcon(i)}
+                        >
+                          <AppIcon name={i} size={20} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Cor</Label>
-                <div className="flex flex-wrap gap-2">
-                  {COLORS.map(c => (
-                    <button
-                      key={c}
-                      className={cn(
-                        "w-8 h-8 rounded-full transition-transform",
-                        color === c && "ring-2 ring-offset-2 ring-primary scale-110"
-                      )}
-                      style={{ backgroundColor: c }}
-                      onClick={() => setColor(c)}
-                    />
-                  ))}
-                </div>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Cor</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {COLORS.map(c => (
+                        <button
+                          key={c}
+                          className={cn(
+                            "w-8 h-8 rounded-full transition-transform",
+                            color === c && "ring-2 ring-offset-2 ring-primary scale-110"
+                          )}
+                          style={{ backgroundColor: c }}
+                          onClick={() => setColor(c)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="p-4 bg-secondary/30 rounded-lg">
                 <Label className="text-xs text-muted-foreground mb-2 block">Prévia</Label>
