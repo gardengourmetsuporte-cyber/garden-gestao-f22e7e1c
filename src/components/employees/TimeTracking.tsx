@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { format, parseISO, startOfMonth, subMonths, addMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 export function TimeTracking() {
   const { isAdmin, user } = useAuth();
-  const { records, isLoading, todayRecord, checkIn, checkOut, createManualEntry, settings, saveSettings } = useTimeTracking();
+  const { records, isLoading, todayRecord, checkIn, checkOut, createManualEntry, deleteRecord, settings, saveSettings } = useTimeTracking();
   const { employees } = useEmployees();
   const [showManualSheet, setShowManualSheet] = useState(false);
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
@@ -47,7 +47,7 @@ export function TimeTracking() {
         </div>
       )}
 
-      <RecordsList records={records} isAdmin={isAdmin} />
+      <RecordsList records={records} isAdmin={isAdmin} onDelete={isAdmin ? deleteRecord : undefined} />
 
       {/* Manual Entry Sheet */}
       <Sheet open={showManualSheet} onOpenChange={setShowManualSheet}>
@@ -226,7 +226,7 @@ function TimeBlock({
 }
 
 // ---- Records List ----
-function RecordsList({ records, isAdmin }: { records: TimeRecord[]; isAdmin: boolean }) {
+function RecordsList({ records, isAdmin, onDelete }: { records: TimeRecord[]; isAdmin: boolean; onDelete?: (id: string) => Promise<boolean> }) {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   const filteredRecords = useMemo(() => {
@@ -334,6 +334,18 @@ function RecordsList({ records, isAdmin }: { records: TimeRecord[]; isAdmin: boo
                     )}>
                       {record.points_awarded > 0 ? '+' : ''}{record.points_awarded}
                     </span>
+                  )}
+                  {onDelete && (
+                    <button
+                      onClick={() => {
+                        if (confirm('Excluir este registro de ponto?')) {
+                          onDelete(record.id);
+                        }
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors shrink-0"
+                    >
+                      <AppIcon name="Trash2" size={14} className="text-destructive/60" />
+                    </button>
                   )}
                 </div>
               ))}
