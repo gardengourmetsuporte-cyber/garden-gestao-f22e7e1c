@@ -50,9 +50,10 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        navigateFallbackDenylist: [/^\/~oauth/],
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/api/],
+        navigateFallbackAllowlist: [/^\/[^.]*$/],
         skipWaiting: false,
-        clientsClaim: true,
+        clientsClaim: false,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,woff2}"],
         importScripts: ["/push-sw.js"],
