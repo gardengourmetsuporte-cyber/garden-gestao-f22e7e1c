@@ -750,7 +750,7 @@ export function ChecklistView({
                             </div>
                           ) : (
                             <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
-                              <AppIcon name="PlayArrow" className="w-4 h-4 text-muted-foreground" />
+                              <AppIcon name="Play" className="w-4 h-4 text-muted-foreground" />
                             </div>
                           )}
                           <div className="flex-1 text-left min-w-0">
@@ -1196,7 +1196,7 @@ export function ChecklistView({
                                       </div>
                                     ) : (
                                       <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
-                                        <AppIcon name="PlayArrow" className="w-4 h-4 text-muted-foreground" />
+                                        <AppIcon name="Play" className="w-4 h-4 text-muted-foreground" />
                                       </div>
                                     )
                                   ) : (
