@@ -24,7 +24,8 @@ export function useChecklistCompletions({
   const toggleCompletion = useCallback(async (
     itemId: string, checklistType: ChecklistType, date: string,
     isAdmin?: boolean, points: number = 1, completedByUserId?: string,
-    isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean
+    isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean,
+    bypassGrace?: boolean
   ) => {
     const existingCompletions = completions.filter(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -45,12 +46,14 @@ export function useChecklistCompletions({
           throw new Error('Apenas o administrador pode desmarcar tarefas de outros usuários');
         }
 
-        const completedAt = new Date(ownCompletion.completed_at);
-        const minutesSinceCompletion = (Date.now() - completedAt.getTime()) / 60_000;
-        const isWithinGracePeriod = minutesSinceCompletion <= 5;
+        if (!bypassGrace) {
+          const completedAt = new Date(ownCompletion.completed_at);
+          const minutesSinceCompletion = (Date.now() - completedAt.getTime()) / 60_000;
+          const isWithinGracePeriod = minutesSinceCompletion <= 5;
 
-        if (!isWithinGracePeriod) {
-          throw new Error('Não é possível desmarcar após 5 minutos. Solicite ao administrador.');
+          if (!isWithinGracePeriod) {
+            throw new Error('Não é possível desmarcar após 5 minutos. Solicite ao administrador.');
+          }
         }
 
         const { error } = await supabase
