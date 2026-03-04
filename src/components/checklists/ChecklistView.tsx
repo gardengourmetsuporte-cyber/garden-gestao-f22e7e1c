@@ -570,12 +570,12 @@ export function ChecklistView({
                               {canToggle && (
                                 <button
                                   onClick={async () => {
-                                    await onToggleItem(item.id, 0);
-                                    const resumeUserId = completion?.completed_by || currentUserId;
-                                    if (onStartTimer && resumeUserId) {
-                                      await onStartTimer(item.id, resumeUserId);
-                                    }
                                     setOpenPopover(null);
+                                    const resumeUserId = completion?.completed_by || currentUserId;
+                                    // Fire both in parallel: start timer + unmark completion
+                                    const startPromise = (onStartTimer && resumeUserId) ? onStartTimer(item.id, resumeUserId) : Promise.resolve();
+                                    const togglePromise = onToggleItem(item.id, 0);
+                                    await Promise.all([startPromise, togglePromise]);
                                   }}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                 >
@@ -1085,12 +1085,11 @@ export function ChecklistView({
                                       {canToggle && (
                                         <button
                                           onClick={async () => {
-                                            await onToggleItem(item.id, 0);
-                                            const resumeUserId = completion?.completed_by || currentUserId;
-                                            if (onStartTimer && resumeUserId) {
-                                              await onStartTimer(item.id, resumeUserId);
-                                            }
                                             setOpenPopover(null);
+                                            const resumeUserId = completion?.completed_by || currentUserId;
+                                            const startPromise = (onStartTimer && resumeUserId) ? onStartTimer(item.id, resumeUserId) : Promise.resolve();
+                                            const togglePromise = onToggleItem(item.id, 0);
+                                            await Promise.all([startPromise, togglePromise]);
                                           }}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                         >
