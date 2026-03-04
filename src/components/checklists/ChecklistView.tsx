@@ -106,7 +106,7 @@ export function ChecklistView({
 }: ChecklistViewProps) {
   const { triggerCoin } = useCoinAnimation();
   const { activeUnitId } = useUnit();
-  const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set());
+  const [expandedSectors, setExpandedSectors] = useState<Set<string>>(() => new Set(sectors.map(s => s.id)));
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<Pick<Profile, 'user_id' | 'full_name'>[]>([]);
@@ -163,8 +163,17 @@ export function ChecklistView({
       });
   }, [activeUnitId]);
 
-  // Reset collapsed state when sectors change (keep collapsed)
-  // No need to auto-expand
+  // Auto-expand all sectors when sectors list changes
+  useEffect(() => {
+    if (sectors.length > 0) {
+      setExpandedSectors(prev => {
+        const allIds = new Set(sectors.map(s => s.id));
+        // Only update if there are new sectors not yet expanded
+        if (sectors.every(s => prev.has(s.id))) return prev;
+        return allIds;
+      });
+    }
+  }, [sectors]);
 
   // Clear optimistic toggles when completions update — only if there are pending toggles
   useEffect(() => {
