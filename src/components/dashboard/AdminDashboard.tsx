@@ -114,14 +114,6 @@ export function AdminDashboard() {
         </DashboardSection>
       )}
 
-      {/* Weekly Summary */}
-      {hasAccess('cash-closing') && isVisible('weekly-summary') && (
-        <DashboardSection title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')}>
-          <LazyWidget><LazyWeeklySummary /></LazyWidget>
-        </DashboardSection>
-      )}
-
-
       {/* Calendar */}
       {hasAccess('agenda') && isVisible('calendar') && (
         <DashboardSection title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')}>
@@ -136,17 +128,10 @@ export function AdminDashboard() {
         </DashboardSection>
       )}
 
-      {/* Pending Orders */}
-      {hasAccess('orders') && isVisible('pending-orders') && (
-        <DashboardSection title="Pedidos pendentes" icon="ShoppingCart" iconColor="text-orange-400" onNavigate={() => navigate('/orders')}>
-          <PendingOrdersWidget />
-        </DashboardSection>
-      )}
-
-      {/* Auto Order */}
-      {hasAccess('inventory') && isVisible('auto-order') && (
-        <DashboardSection title="Sugestão de compras" icon="TrendingUp" iconColor="text-cyan-400" onNavigate={() => navigate('/inventory')}>
-          <LazyWidget><LazyAutoOrder /></LazyWidget>
+      {/* Weekly Summary */}
+      {hasAccess('cash-closing') && isVisible('weekly-summary') && (
+        <DashboardSection title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')}>
+          <LazyWidget><LazyWeeklySummary /></LazyWidget>
         </DashboardSection>
       )}
 
@@ -154,13 +139,6 @@ export function AdminDashboard() {
       {hasAccess('ranking') && isVisible('leaderboard') && (
         <DashboardSection title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')}>
           <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
-        </DashboardSection>
-      )}
-
-      {/* Cash Flow */}
-      {hasAccess('finance') && isVisible('cash-flow') && (
-        <DashboardSection title="Fluxo de caixa projetado" icon="TrendingUp" iconColor="text-teal-400" onNavigate={() => navigate('/finance')}>
-          <LazyWidget><LazyCashFlow totalBalance={stats.monthBalance ?? 0} /></LazyWidget>
         </DashboardSection>
       )}
 
