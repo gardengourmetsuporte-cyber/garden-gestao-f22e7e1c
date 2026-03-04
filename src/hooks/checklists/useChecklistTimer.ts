@@ -131,8 +131,22 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
   // Start timer for an item
   const startTimer = useCallback(async (itemId: string, userId: string) => {
     if (!activeUnitId) return;
-    // Check if already has an active timer for this item
-    const existing = activeTimers.find(t => t.itemId === itemId && !t.userId); // shouldn't happen
+    // Prevent duplicate active timers for same item+user
+    const existingTimer = activeTimers.find(t => t.itemId === itemId && t.userId === userId);
+    if (existingTimer) {
+      toast.info('⏱️ Timer já está ativo para este item');
+      return;
+    }
+    // Also clean up any orphaned timers for this item in the DB before starting
+    await supabase
+      .from('checklist_task_times')
+      .delete()
+      .eq('item_id', itemId)
+      .eq('user_id', userId)
+      .eq('unit_id', activeUnitId)
+      .eq('date', date)
+      .is('finished_at', null);
+
     const { data, error } = await supabase
       .from('checklist_task_times')
       .insert({
