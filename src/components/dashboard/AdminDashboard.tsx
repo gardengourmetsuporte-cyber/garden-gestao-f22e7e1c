@@ -46,7 +46,7 @@ export function AdminDashboard() {
   const { user, profile } = useAuth();
   const { hasAccess, isLoading: modulesLoading } = useUserModules();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const { widgets, setWidgets, resetDefaults, isVisible } = useDashboardWidgets();
+  const { widgets, setWidgets, resetDefaults } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
@@ -84,7 +84,7 @@ export function AdminDashboard() {
       <SetupChecklistWidget />
 
       {/* Hero Finance */}
-      {hasAccess('finance') && isVisible('finance') && (
+      {false && (
         <DashboardHeroFinance
           balance={stats.monthBalance}
           pendingExpenses={stats.pendingExpenses}
@@ -92,56 +92,73 @@ export function AdminDashboard() {
         />
       )}
 
+      {widgets.map((widget) => {
+        if (!widget.visible) return null;
 
-      {/* Checklists */}
-      {hasAccess('checklists') && isVisible('checklist') && (
-        <DashboardSection title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')}>
-          <LazyWidget><LazyChecklist /></LazyWidget>
-        </DashboardSection>
-      )}
+        switch (widget.key) {
+          case 'finance':
+            return hasAccess('finance') ? (
+              <DashboardHeroFinance
+                key={widget.key}
+                balance={stats.monthBalance}
+                pendingExpenses={stats.pendingExpenses}
+                isLoading={statsLoading}
+              />
+            ) : null;
 
-      {/* Finance Chart */}
-      {hasAccess('finance') && isVisible('finance-chart') && (
-        <DashboardSection title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')}>
-          <FinanceChartWidget />
-        </DashboardSection>
-      )}
+          case 'checklist':
+            return hasAccess('checklists') ? (
+              <DashboardSection key={widget.key} title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')}>
+                <LazyWidget><LazyChecklist /></LazyWidget>
+              </DashboardSection>
+            ) : null;
 
-      {/* Bills Due */}
-      {hasAccess('finance') && isVisible('bills-due') && (stats.billsDueSoon?.length ?? 0) > 0 && (
-        <DashboardSection title="Contas a vencer" icon="AlertTriangle" iconColor="text-amber-400" onNavigate={() => navigate('/finance')}>
-          <BillsDueWidget bills={stats.billsDueSoon || []} />
-        </DashboardSection>
-      )}
+          case 'finance-chart':
+            return hasAccess('finance') ? (
+              <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')}>
+                <FinanceChartWidget />
+              </DashboardSection>
+            ) : null;
 
-      {/* Calendar */}
-      {hasAccess('agenda') && isVisible('calendar') && (
-        <DashboardSection title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')}>
-          <LazyWidget><LazyCalendar /></LazyWidget>
-        </DashboardSection>
-      )}
+          case 'bills-due':
+            return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
+              <DashboardSection key={widget.key} title="Contas a vencer" icon="AlertTriangle" iconColor="text-amber-400" onNavigate={() => navigate('/finance')}>
+                <BillsDueWidget bills={stats.billsDueSoon || []} />
+              </DashboardSection>
+            ) : null;
 
-      {/* Agenda */}
-      {hasAccess('agenda') && isVisible('agenda') && (
-        <DashboardSection title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')}>
-          <LazyWidget><LazyAgenda /></LazyWidget>
-        </DashboardSection>
-      )}
+          case 'calendar':
+            return hasAccess('agenda') ? (
+              <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')}>
+                <LazyWidget><LazyCalendar /></LazyWidget>
+              </DashboardSection>
+            ) : null;
 
-      {/* Weekly Summary */}
-      {hasAccess('cash-closing') && isVisible('weekly-summary') && (
-        <DashboardSection title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')}>
-          <LazyWidget><LazyWeeklySummary /></LazyWidget>
-        </DashboardSection>
-      )}
+          case 'agenda':
+            return hasAccess('agenda') ? (
+              <DashboardSection key={widget.key} title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')}>
+                <LazyWidget><LazyAgenda /></LazyWidget>
+              </DashboardSection>
+            ) : null;
 
-      {/* Leaderboard */}
-      {hasAccess('ranking') && isVisible('leaderboard') && (
-        <DashboardSection title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')}>
-          <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
-        </DashboardSection>
-      )}
+          case 'weekly-summary':
+            return hasAccess('cash-closing') ? (
+              <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')}>
+                <LazyWidget><LazyWeeklySummary /></LazyWidget>
+              </DashboardSection>
+            ) : null;
 
+          case 'leaderboard':
+            return hasAccess('ranking') ? (
+              <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')}>
+                <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
+              </DashboardSection>
+            ) : null;
+
+          default:
+            return null;
+        }
+      })}
       {/* Manage button */}
       <button
         onClick={() => setManagerOpen(true)}
