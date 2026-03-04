@@ -241,4 +241,6 @@ export const ICON_MAP: Record<string, string> = {
   Play: 'play_arrow',
   Pause: 'pause',
   Power: 'power_settings_new',
+  Loader2: 'progress_activity',
+  Delete: 'backspace',
 };
