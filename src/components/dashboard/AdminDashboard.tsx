@@ -69,7 +69,7 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-4 px-4 py-3 lg:px-6">
+    <div className="space-y-6 px-4 py-3 lg:px-6">
       {/* Welcome */}
       <div className="animate-spring-in spring-stagger-1">
         <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
