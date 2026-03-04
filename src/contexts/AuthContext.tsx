@@ -229,14 +229,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (event === 'TOKEN_REFRESHED' || event === 'PASSWORD_RECOVERY') {
           if (isMounted) {
             setSession(session);
-            setUser(session?.user ?? null);
+            // Only update user if ID changed to avoid re-render cascades
+            setUser(prev => prev?.id === session?.user?.id ? prev : session?.user ?? null);
           }
           return;
         }
 
         if (isMounted) {
           setSession(session);
-          setUser(session?.user ?? null);
+          // Only update user if ID changed to avoid unmounting pages on refocus
+          setUser(prev => prev?.id === session?.user?.id ? prev : session?.user ?? null);
         }
 
         if (session?.user) {
