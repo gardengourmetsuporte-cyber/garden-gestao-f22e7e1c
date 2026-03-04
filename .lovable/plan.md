@@ -1,35 +1,34 @@
 
 
-# Fix: Modo Timer não funciona nos cards de Abertura/Fechamento
+# Fix: Horário Limite não funciona
 
 ## Problema
-O modo timer com botão de play e PIN só está implementado na seção de checklist **bônus** (renderização flat). A seção **standard** (usada para Abertura e Fechamento) ignora completamente o `isTimerMode` — mostra o checkbox vazio normal e abre o popover padrão ao clicar.
+Duas causas raízes identificadas:
 
-## Causa Raiz
-No `ChecklistView.tsx`, existem dois blocos de renderização para itens não concluídos:
-1. **Bonus** (linhas ~710-870): Tem `handleTimerClick`, ícone de Timer animado, `TimerBadge`, `TimerStatsIndicator`
-2. **Standard** (linhas ~1160-1286): Não usa nenhuma prop de timer — sempre mostra checkbox vazio e `setOpenPopover`
+1. **DeadlineSettingPopover não re-sincroniza estado local**: O componente usa `useState` inicializado com `currentSetting` no mount. Quando o popover é reaberto após salvar (e a query refetcha), o estado interno (hour, minute, isActive, etc.) não atualiza — mantém os valores antigos.
+
+2. **Display "Sem limite configurado" mesmo com toggle ativo**: O texto mostra `formatDeadlineSetting(currentSetting)` que é null antes do primeiro save. Após salvar, como o estado local não re-sincroniza, o label do popover fica desatualizado.
 
 ## Solução
-Replicar a lógica de timer do bloco bonus para o bloco standard (abertura/fechamento):
 
-1. **No item não concluído standard** (linha ~1161-1286):
-   - Trocar o `onClick` de `setOpenPopover` para usar `handleTimerClick` quando `isTimerMode` estiver ativo
-   - Substituir o checkbox vazio por ícone de Play/Timer quando `isTimerMode` estiver ativo e não houver timer ativo
-   - Mostrar `TimerBadge` quando houver timer ativo no item
-   - Mostrar `TimerStatsIndicator` com média/recorde quando houver stats disponíveis
-   - Adicionar borda visual diferenciada quando timer estiver rodando
+### `src/components/checklists/DeadlineSettingPopover.tsx`
+- Adicionar `useEffect` para re-sincronizar os estados locais (`hour`, `minute`, `isNextDay`, `isActive`) sempre que `currentSetting` mudar (após o refetch da query).
+- Atualizar o texto de display para mostrar o horário formatado baseado nos valores locais (não apenas no `currentSetting`), para que mesmo antes de salvar o usuário veja o que está configurando.
 
-## Mudanças Técnicas
+```tsx
+// Adicionar sync effect
+useEffect(() => {
+  setHour(currentSetting?.deadline_hour ?? defaults.hour);
+  setMinute(currentSetting?.deadline_minute ?? defaults.minute);
+  setIsNextDay(currentSetting?.is_next_day ?? defaults.nextDay);
+  setIsActive(currentSetting?.is_active ?? true);
+}, [currentSetting]);
 
-### `src/components/checklists/ChecklistView.tsx`
-No bloco de renderização de itens não concluídos dentro de subcategorias (standard), na linha ~1161:
+// Atualizar display text
+const displayLabel = isActive 
+  ? `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}${isNextDay ? ' (dia seguinte)' : ''}`
+  : 'Desativado';
+```
 
-- Adicionar variáveis `activeTimer` e `itemStats` (igual ao bonus)
-- Trocar o `onClick` do botão para chamar `handleTimerClick` quando timer mode ativo
-- Trocar o ícone do checkbox: quando `isTimerMode` e tem timer ativo → Timer animado; quando `isTimerMode` sem timer → Play icon; senão → checkbox normal
-- Adicionar `TimerBadge` e `TimerStatsIndicator` no corpo do item
-- Adicionar classe de borda quando timer ativo
-
-Nenhuma mudança de banco de dados ou edge function necessária.
+Mudança mínima em 1 arquivo, sem alterações de banco de dados.
 
