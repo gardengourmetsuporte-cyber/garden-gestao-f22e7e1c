@@ -209,9 +209,8 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
   // Available tasks for this day
   const availableTasks = useMemo(() => {
     return tasks
-      .filter(t => !t.is_completed && !allocatedIds.has(t.id))
-      .filter(t => !t.due_date || t.due_date === dateStr);
-  }, [tasks, allocatedIds, dateStr]);
+      .filter(t => !t.is_completed && !allocatedIds.has(t.id));
+  }, [tasks, allocatedIds]);
 
   const allocateTask = useCallback((hour: number, taskId: string) => {
     setAllocations(prev => {
@@ -428,8 +427,8 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
           />
 
           {/* Close button */}
-          <div className="pt-3 pb-1 border-t border-border/60 bg-background/95 backdrop-blur-sm">
-            <Button variant="outline" className="w-full rounded-xl border-border" onClick={() => setPickerHour(null)}>
+          <div className="pt-3 pb-1 border-t border-border/60">
+            <Button variant="outline" className="w-full rounded-xl border-border bg-card" onClick={() => setPickerHour(null)}>
               Fechar
             </Button>
           </div>
