@@ -154,13 +154,16 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
               background: 'linear-gradient(135deg, #050a05 0%, #0a1a12 30%, #102a1d 70%, #050a05 100%)',
             }}
           >
-            {/* Close button */}
-            <button
-              onClick={() => onOpenChange(false)}
-              className="absolute top-[calc(env(safe-area-inset-top,12px)+12px)] right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10"
-            >
-              <AppIcon name="X" size={18} className="text-white/80" />
-            </button>
+            {/* Theme toggle + Close button */}
+            <div className="absolute top-[calc(env(safe-area-inset-top,12px)+12px)] right-4 flex items-center gap-1.5 z-10">
+              <ThemeToggle className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80" />
+              <button
+                onClick={() => onOpenChange(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="X" size={18} className="text-white/80" />
+              </button>
+            </div>
 
             {/* Profile card */}
             <div className="flex items-center gap-3 w-full py-3 pr-10">
@@ -174,7 +177,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                   <p className="text-[11px] font-medium text-white/70">{rank.title} · {earnedPoints} pts</p>
                 </div>
               </button>
-              <ThemeToggle />
+              
             </div>
 
             {/* Store selector — compact inline */}
