@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react';
 import { ALL_MODULES } from '@/lib/modules';
 
 const STORAGE_KEY = 'bottombar-pinned-tabs';
-const DEFAULT_KEYS = ['checklists', 'finance', 'ranking'];
-const PINNED_COUNT = 3;
+const DEFAULT_KEYS = ['checklists', 'finance'];
+const PINNED_COUNT = 2;
 
 export interface BottomTabDef {
   key: string;
@@ -31,13 +31,9 @@ function readFromStorage(): string[] {
     if (!raw) return DEFAULT_KEYS;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.every((k: unknown) => typeof k === 'string')) {
-      // Migrate from 2 to 3 pinned tabs
-      if (parsed.length === 2) {
-        // Add a sensible 3rd default that isn't already pinned
-        const third = DEFAULT_KEYS.find(k => !parsed.includes(k)) || 'ranking';
-        return [...parsed, third];
-      }
-      if (parsed.length === PINNED_COUNT) return parsed;
+      // Take only the first PINNED_COUNT items
+      const trimmed = parsed.slice(0, PINNED_COUNT);
+      if (trimmed.length === PINNED_COUNT) return trimmed;
     }
   } catch {}
   return DEFAULT_KEYS;
