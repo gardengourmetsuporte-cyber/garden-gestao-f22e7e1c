@@ -25,7 +25,7 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
   const pendingCount = transactions.filter(t => !t.is_paid).length;
   const allPaid = pendingCount === 0;
 
-  const icon = isTransfer ? 'SwapHoriz' : category?.icon || 'Category';
+  const icon = isTransfer ? 'ArrowLeftRight' : category?.icon || 'Category';
   const name = isTransfer ? 'Transferências' : category?.name || 'Sem categoria';
   const color = isTransfer ? 'hsl(var(--muted-foreground))' : category?.color || 'hsl(var(--muted-foreground))';
 
