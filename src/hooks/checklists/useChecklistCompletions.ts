@@ -24,7 +24,7 @@ export function useChecklistCompletions({
   const toggleCompletion = useCallback(async (
     itemId: string, checklistType: ChecklistType, date: string,
     isAdmin?: boolean, points: number = 1, completedByUserId?: string,
-    isSkipped?: boolean, photoUrl?: string
+    isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean
   ) => {
     const existing = completions.find(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -46,51 +46,54 @@ export function useChecklistCompletions({
       const { error } = await supabase.from('checklist_completions').delete().eq('id', existing.id);
       if (error) throw error;
 
-      // Also clean up any associated active timer rows for this item/date/type
-      await queryClient.cancelQueries({ queryKey: ['checklist-active-timers'] });
+      // Also clean up any associated active timer rows for this item/date/type,
+      // except when explicitly continuing the task with timer preserved.
+      if (!preserveTimerOnUncheck) {
+        await queryClient.cancelQueries({ queryKey: ['checklist-active-timers'] });
 
-      // 1) Try delete by business filters (most common path)
-      let timerDeleteQuery = supabase
-        .from('checklist_task_times')
-        .delete()
-        .eq('item_id', itemId)
-        .eq('date', date)
-        .eq('checklist_type', checklistType)
-        .is('finished_at', null);
-
-      if (activeUnitId) {
-        timerDeleteQuery = timerDeleteQuery.eq('unit_id', activeUnitId);
-      }
-
-      const { error: timerDeleteError } = await timerDeleteQuery;
-      if (timerDeleteError) throw timerDeleteError;
-
-      // 2) Extra safety: if a matching timer is still in cache, delete by ids too
-      const scopedTimers = queryClient.getQueryData(['checklist-active-timers', activeUnitId, checklistType, date]) as any[] | undefined;
-      const timerIdsToDelete = (Array.isArray(scopedTimers) ? scopedTimers : [])
-        .filter((t: any) => (t.item_id ?? t.itemId) === itemId)
-        .map((t: any) => t.id)
-        .filter(Boolean);
-
-      if (timerIdsToDelete.length > 0) {
-        const { error: deleteByIdError } = await supabase
+        // 1) Try delete by business filters (most common path)
+        let timerDeleteQuery = supabase
           .from('checklist_task_times')
           .delete()
-          .in('id', timerIdsToDelete as string[]);
-        if (deleteByIdError) throw deleteByIdError;
-      }
+          .eq('item_id', itemId)
+          .eq('date', date)
+          .eq('checklist_type', checklistType)
+          .is('finished_at', null);
 
-      // Immediate local reset so card volta para "Play" sem esperar refetch
-      queryClient.setQueriesData({ queryKey: ['checklist-active-timers'] }, (prev: any) => {
-        if (!Array.isArray(prev)) return prev;
-        return prev.filter((t: any) => {
-          const timerItemId = t.item_id ?? t.itemId;
-          return timerItemId !== itemId;
+        if (activeUnitId) {
+          timerDeleteQuery = timerDeleteQuery.eq('unit_id', activeUnitId);
+        }
+
+        const { error: timerDeleteError } = await timerDeleteQuery;
+        if (timerDeleteError) throw timerDeleteError;
+
+        // 2) Extra safety: if a matching timer is still in cache, delete by ids too
+        const scopedTimers = queryClient.getQueryData(['checklist-active-timers', activeUnitId, checklistType, date]) as any[] | undefined;
+        const timerIdsToDelete = (Array.isArray(scopedTimers) ? scopedTimers : [])
+          .filter((t: any) => (t.item_id ?? t.itemId) === itemId)
+          .map((t: any) => t.id)
+          .filter(Boolean);
+
+        if (timerIdsToDelete.length > 0) {
+          const { error: deleteByIdError } = await supabase
+            .from('checklist_task_times')
+            .delete()
+            .in('id', timerIdsToDelete as string[]);
+          if (deleteByIdError) throw deleteByIdError;
+        }
+
+        // Immediate local reset so card volta para "Play" sem esperar refetch
+        queryClient.setQueriesData({ queryKey: ['checklist-active-timers'] }, (prev: any) => {
+          if (!Array.isArray(prev)) return prev;
+          return prev.filter((t: any) => {
+            const timerItemId = t.item_id ?? t.itemId;
+            return timerItemId !== itemId;
+          });
         });
-      });
 
-      // Keep the scoped cache fully clean for this screen context
-      queryClient.setQueryData(['checklist-active-timers', activeUnitId, checklistType, date], []);
+        // Keep the scoped cache fully clean for this screen context
+        queryClient.setQueryData(['checklist-active-timers', activeUnitId, checklistType, date], []);
+      }
     } else {
       const targetUserId = completedByUserId || userId;
       const { error } = await supabase
