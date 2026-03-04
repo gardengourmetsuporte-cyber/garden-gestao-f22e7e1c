@@ -203,17 +203,36 @@ export default function OrdersPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-4">
-          {/* Animated Tabs */}
-          <AnimatedTabs
-            tabs={[
-              { key: 'to-order', label: 'Sugestões', icon: <AppIcon name="Package" size={16} />, badge: lowStockItems.length },
-              { key: 'shopping-list', label: 'Lista', icon: <AppIcon name="ShoppingCart" size={16} />, badge: shoppingListItems.length || undefined },
-              { key: 'quotations', label: 'Cotações', icon: <AppIcon name="Scale" size={16} /> },
-              { key: 'orders', label: 'Histórico', icon: <AppIcon name="Clock" size={16} />, badge: pendingOrders.length },
-            ]}
-            activeTab={orderTab}
-            onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders' | 'quotations' | 'shopping-list')}
-          />
+          {/* Navigation Cards 2x2 */}
+          <div className="grid grid-cols-2 gap-3">
+            {([
+              { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+              { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+              { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setOrderTab(tab.key)}
+                className={cn(
+                  "relative flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border transition-all duration-200 active:scale-[0.97]",
+                  orderTab === tab.key
+                    ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
+                    : "bg-card border-border hover:border-primary/20"
+                )}
+              >
+                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", orderTab === tab.key ? "bg-primary/20" : tab.bg)}>
+                  <AppIcon name={tab.icon} size={20} className={orderTab === tab.key ? "text-primary" : tab.color} />
+                </div>
+                <span className={cn("text-sm font-semibold", orderTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
+                {tab.badge != null && tab.badge > 0 && (
+                  <span className="absolute top-2 right-2 min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {tab.badge > 99 ? '99+' : tab.badge}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
 
           <div className="animate-fade-in" key={orderTab}>
             {orderTab === 'to-order' && (
