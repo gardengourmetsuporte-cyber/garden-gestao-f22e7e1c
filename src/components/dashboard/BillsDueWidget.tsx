@@ -86,13 +86,13 @@ function ListView({ bills }: { bills: BillDueSoon[] }) {
 
 export function BillsDueWidget({ bills, onNavigate }: Props) {
   const [viewMode, setViewMode] = useState<'grouped' | 'list'>(() => {
-    return (localStorage.getItem('bills-due-view') as 'grouped' | 'list') || 'grouped';
+    const saved = localStorage.getItem('bills-due-view');
+    return saved === 'list' || saved === 'grouped' ? saved : 'grouped';
   });
 
-  const toggleView = () => {
-    const next = viewMode === 'list' ? 'grouped' : 'list';
-    setViewMode(next);
-    localStorage.setItem('bills-due-view', next);
+  const setMode = (mode: 'grouped' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('bills-due-view', mode);
   };
 
   if (bills.length === 0) return null;
@@ -120,18 +120,30 @@ export function BillsDueWidget({ bills, onNavigate }: Props) {
           {onNavigate && <AppIcon name="ChevronRight" size={12} className="ml-1 text-muted-foreground/40" />}
         </button>
         <div className="flex items-center gap-2">
-          <button
-            onClick={(e) => { e.stopPropagation(); toggleView(); }}
-            className="p-1.5 rounded-lg bg-secondary/60 hover:bg-secondary transition-colors touch-manipulation"
-            title={viewMode === 'list' ? 'Agrupar' : 'Lista'}
-            type="button"
-          >
-            <AppIcon
-              name={viewMode === 'list' ? 'LayoutGrid' : 'List'}
-              size={14}
-              className="text-muted-foreground"
-            />
-          </button>
+          <div className="inline-flex items-center rounded-lg bg-secondary/60 p-0.5">
+            <button
+              onClick={() => setMode('grouped')}
+              className={cn(
+                'px-2 py-1 rounded-md transition-colors touch-manipulation',
+                viewMode === 'grouped' ? 'bg-card text-foreground' : 'text-muted-foreground hover:text-foreground'
+              )}
+              title="Agrupado"
+              type="button"
+            >
+              <AppIcon name="LayoutGrid" size={14} />
+            </button>
+            <button
+              onClick={() => setMode('list')}
+              className={cn(
+                'px-2 py-1 rounded-md transition-colors touch-manipulation',
+                viewMode === 'list' ? 'bg-card text-foreground' : 'text-muted-foreground hover:text-foreground'
+              )}
+              title="Lista"
+              type="button"
+            >
+              <AppIcon name="List" size={14} />
+            </button>
+          </div>
           <span className="text-sm font-bold text-warning">{formatCurrency(total)}</span>
         </div>
       </div>
