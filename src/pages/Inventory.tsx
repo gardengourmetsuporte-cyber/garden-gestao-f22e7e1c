@@ -44,7 +44,7 @@ export default function InventoryPage() {
   const [movementSheetOpen, setMovementSheetOpen] = useState(false);
   const [itemFormOpen, setItemFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
 
   // Handle ?action=move from quick actions
@@ -85,7 +85,7 @@ export default function InventoryPage() {
   };
 
   const toggleCategory = (categoryName: string) => {
-    setCollapsedCategories(prev => {
+    setExpandedCategories(prev => {
       const newSet = new Set(prev);
       if (newSet.has(categoryName)) newSet.delete(categoryName);
       else newSet.add(categoryName);
@@ -216,7 +216,7 @@ export default function InventoryPage() {
                 ) : (
                   sortedCategories.map((categoryName, catIndex) => {
                     const categoryItems = filteredByCategory[categoryName];
-                    const isCollapsed = collapsedCategories.has(categoryName);
+                    const isCollapsed = !expandedCategories.has(categoryName);
                     const category = categories.find(c => c.name === categoryName);
                     const categoryColor = category?.color || '#6b7280';
 
