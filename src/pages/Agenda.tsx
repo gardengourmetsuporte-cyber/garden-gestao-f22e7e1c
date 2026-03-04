@@ -302,13 +302,7 @@ export default function Agenda() {
     </div>
   );
 
-  const CalendarContent = () => (
-    <AgendaCalendarView
-      tasks={displayTasks}
-      onTaskClick={handleEditTask}
-      onToggleTask={toggleTask}
-    />
-  );
+  // CalendarContent inlined below to preserve selectedDate state across re-renders
 
   return (
     <AppLayout>
@@ -393,7 +387,13 @@ export default function Agenda() {
           {/* Content with fade transition */}
           <div className="animate-fade-in" key={viewMode}>
             {viewMode === 'list' && <ListContent />}
-            {viewMode === 'calendar' && <CalendarContent />}
+            {viewMode === 'calendar' && (
+              <AgendaCalendarView
+                tasks={displayTasks}
+                onTaskClick={handleEditTask}
+                onToggleTask={toggleTask}
+              />
+            )}
             {viewMode === 'blocks' && (
               <TimeBlocksView
                 tasks={displayTasks}
