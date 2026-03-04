@@ -47,19 +47,24 @@ export function useChecklistCompletions({
       if (error) throw error;
 
       // Also clean up any associated timer rows for this item/date/type
-      if (activeUnitId) {
-        const { error: timerDeleteError } = await supabase
-          .from('checklist_task_times')
-          .delete()
-          .eq('item_id', itemId)
-          .eq('date', date)
-          .eq('checklist_type', checklistType)
-          .eq('unit_id', activeUnitId);
+      let timerDeleteQuery = supabase
+        .from('checklist_task_times')
+        .delete()
+        .eq('item_id', itemId)
+        .eq('date', date)
+        .eq('checklist_type', checklistType);
 
-        if (timerDeleteError) throw timerDeleteError;
+      if (activeUnitId) {
+        timerDeleteQuery = timerDeleteQuery.eq('unit_id', activeUnitId);
       }
 
-      await queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
+      const { error: timerDeleteError } = await timerDeleteQuery;
+      if (timerDeleteError) throw timerDeleteError;
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['checklist-active-timers'] }),
+        queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] }),
+      ]);
     } else {
       const targetUserId = completedByUserId || userId;
       const { error } = await supabase
