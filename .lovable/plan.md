@@ -1,28 +1,45 @@
 
 
-## Plan: Add 5 Custom SVG Icons
+## Atualizar Layout dos Cards para Estilo Premium Dark Glass
 
-Extract SVG paths from the uploaded files and add them to `CUSTOM_SVG_PATHS` in `src/lib/iconMap.ts`, mapping them to the icon names used throughout the app.
+A imagem de referência mostra cards com estética **deep navy/dark blue glassmorphic** com bordas sutis em cyan/azul e cantos muito arredondados. Vou adaptar o design system existente para aproximar desse visual.
 
-### Icon → Feature Mapping
+### Mudanças Planejadas
 
-| SVG File | Icon Key(s) | Feature |
-|---|---|---|
-| refund-alt.svg | `Receipt` | Fechamento de Caixa |
-| review.svg | `UserSearch`, `UserPlus`, `UserCheck` | Clientes |
-| receipt.svg | `FileText` | Transações (Finance tab) |
-| order-history.svg | `ShoppingCart`, `ShoppingBag` | Pedidos |
-| notebook-alt.svg | `CalendarDays`, `Calendar` | Agenda |
+**1. `src/index.css` — Atualizar tokens e classes de card**
 
-### Technical Details
+- **Dark theme `--card`**: Shift do verde escuro atual (`160 6% 8%`) para um tom mais navy/azul escuro (`220 25% 8%`), alinhando com a paleta da referência
+- **`.card-base` / `.card-surface` (dark)**: Atualizar background para navy translúcido com borda sutil cyan/blue glow:
+  - `background: hsl(220 30% 6% / 0.7)`
+  - `border: 1px solid hsl(200 60% 50% / 0.12)`
+  - `backdrop-filter: blur(24px)`
+  - Border-radius mantido em `20px`
+- **`.dash-kpi-card`**: Mesmo tratamento navy glass com borda cyan sutil
+- **`.dash-section-body`**: Background navy glass consistente
+- **Accent color glow**: Adicionar sutil `box-shadow` com cyan (`hsl(200 80% 60% / 0.06)`) nos cards para o efeito de brilho da referência
 
-1. **`src/lib/iconMap.ts`** — Add 5 new entries to `CUSTOM_SVG_PATHS`:
-   - `Receipt`: single path from refund-alt.svg (dollar sign with circular arrow)
-   - `UserSearch`: two paths from review.svg (person + star rating)
-   - `FileText`: single path from receipt.svg (receipt with torn bottom)
-   - `ShoppingCart`: single path from order-history.svg (cart with clock)
-   - `CalendarDays`: single path from notebook-alt.svg (spiral notebook)
-   - Also alias `ShoppingBag` → same paths as `ShoppingCart`, `Calendar` → same as `CalendarDays`
+**2. Tokens de cor dark ajustados**
+- `--background`: Mais deep navy (`225 20% 3%`)
+- `--card`: Navy escuro (`220 20% 7%`)
+- `--border`: Tom azulado sutil (`220 15% 15%`)
+- `--muted`: Navy médio (`220 15% 12%`)
+- Manter `--primary` emerald como está (funciona bem como accent contra navy)
 
-2. No changes to `app-icon.tsx` — the existing custom SVG rendering logic already handles multi-path SVGs with `fill="currentColor"` and the `tab-icon-galaxy` active state fix.
+**3. Componentes afetados (sem mudanças de código, apenas CSS)**
+- Dashboard KPI cards
+- Dashboard section wrappers
+- AI Insights widget
+- Agenda widget
+- Copilot widget
+- Checklist widget
+- Todos os `card-surface` / `card-base` globais
+
+### O que NÃO muda
+- Light theme permanece igual
+- Estrutura dos componentes React inalterada
+- Fontes, ícones e animações mantidos
+- Finance hero card (já tem estilo próprio)
+
+### Resultado esperado
+Cards com fundo deep navy semitransparente, bordas sutis luminosas, e sensação premium glassmorphic igual à referência — mantendo todo o accent emerald do Garden.
 
