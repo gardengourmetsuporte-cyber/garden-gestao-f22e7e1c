@@ -140,7 +140,7 @@ export function BottomTabBar() {
           </div>
 
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[14px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[26px] z-20">
             <div className="fab-cradle-ring">
               <button
                 aria-label={fabAction?.label || 'Ação rápida'}
@@ -153,7 +153,7 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
                   "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
@@ -162,7 +162,7 @@ export function BottomTabBar() {
               >
                 <AppIcon
                   name={fabAction?.icon || 'Plus'}
-                  size={22}
+                  size={20}
                   className="relative z-10 text-white"
                 />
               </button>
