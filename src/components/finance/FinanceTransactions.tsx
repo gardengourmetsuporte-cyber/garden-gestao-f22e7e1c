@@ -51,11 +51,22 @@ function groupByCategory(transactions: FinanceTransaction[], categories: Finance
     if (t.type === 'transfer') {
       key = '__transfer';
     } else {
-      // Resolve to parent category
+      // Resolve to parent category via lookup first, then fallback to category.parent_id
       const parent = t.category_id ? parentLookup.get(t.category_id) : undefined;
-      key = parent?.id || t.category_id || '__none';
-      if (parent && !groupCategory.has(key)) {
-        groupCategory.set(key, parent);
+      if (parent) {
+        key = parent.id;
+        if (!groupCategory.has(key)) groupCategory.set(key, parent);
+      } else if (t.category?.parent_id) {
+        // Category not in lookup but has parent_id — group by parent_id
+        key = t.category.parent_id;
+        // Try to find parent info from other transactions or lookup
+        if (!groupCategory.has(key)) {
+          const parentFromLookup = parentLookup.get(t.category.parent_id);
+          if (parentFromLookup) groupCategory.set(key, parentFromLookup);
+        }
+      } else {
+        key = t.category_id || '__none';
+        if (t.category && !groupCategory.has(key)) groupCategory.set(key, t.category);
       }
     }
     if (!map.has(key)) {
