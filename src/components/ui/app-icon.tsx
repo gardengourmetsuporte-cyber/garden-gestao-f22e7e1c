@@ -18,14 +18,20 @@ export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
     const customPaths = CUSTOM_SVG_PATHS[name];
 
     if (customPaths) {
+      const hasGalaxyClass = (className ?? '').includes('tab-icon-galaxy');
+      const safeClassName = hasGalaxyClass
+        ? (className ?? '').replace('tab-icon-galaxy', '').trim()
+        : className;
+
       return (
         <span
           ref={ref}
-          className={cn("select-none leading-none", className)}
+          className={cn("select-none leading-none", safeClassName)}
           style={{
             width: size,
             height: size,
             display: 'inline-block',
+            color: hasGalaxyClass ? 'hsl(var(--primary))' : undefined,
             ...style,
           }}
         >
