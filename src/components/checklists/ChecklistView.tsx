@@ -37,7 +37,7 @@ interface ChecklistViewProps {
   getUserActiveTimer?: (itemId: string, userId: string) => ActiveTimer | undefined;
   onStartTimer?: (itemId: string, userId: string) => Promise<void>;
   onFinishTimer?: (itemId: string, userId: string, onComplete: (itemId: string, points: number, completedByUserId: string) => void, basePoints: number) => Promise<void>;
-  onCancelTimer?: (itemId: string) => Promise<void>;
+  onCancelTimer?: (itemId: string, options?: { includeFinished?: boolean }) => Promise<void>;
   validatePin?: (pin: string) => Promise<{ userId: string; userName: string } | null>;
   timeStats?: Map<string, ItemTimeStats>;
   timerMinExecutions?: number;
@@ -597,7 +597,7 @@ export function ChecklistView({
                                       setOpenPopover(null);
                                       setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                       const togglePromise = onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                      const cancelPromise = onCancelTimer(item.id);
+                                      const cancelPromise = onCancelTimer(item.id, { includeFinished: true });
                                       await Promise.all([togglePromise, cancelPromise]);
                                     }}
                                     className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
@@ -1113,7 +1113,7 @@ export function ChecklistView({
                                               setOpenPopover(null);
                                               setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                               const togglePromise = onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                              const cancelPromise = onCancelTimer(item.id);
+                                              const cancelPromise = onCancelTimer(item.id, { includeFinished: true });
                                               await Promise.all([togglePromise, cancelPromise]);
                                             }}
                                             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
