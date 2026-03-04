@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useSyncExternalStore } from 'react';
 import { ALL_MODULES } from '@/lib/modules';
 
 const STORAGE_KEY = 'bottombar-pinned-tabs';
@@ -31,7 +31,6 @@ function readFromStorage(): string[] {
     if (!raw) return DEFAULT_KEYS;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.every((k: unknown) => typeof k === 'string')) {
-      // Take only the first PINNED_COUNT items
       const trimmed = parsed.slice(0, PINNED_COUNT);
       if (trimmed.length === PINNED_COUNT) return trimmed;
     }
@@ -39,14 +38,31 @@ function readFromStorage(): string[] {
   return DEFAULT_KEYS;
 }
 
+// Shared reactive store so all consumers stay in sync
+let _snapshot = readFromStorage();
+const _listeners = new Set<() => void>();
+
+function notify() {
+  _snapshot = readFromStorage();
+  _listeners.forEach(fn => fn());
+}
+
+function subscribe(cb: () => void) {
+  _listeners.add(cb);
+  return () => { _listeners.delete(cb); };
+}
+
+function getSnapshot() {
+  return _snapshot;
+}
+
 export function useBottomBarTabs() {
-  const [pinnedKeys, setPinnedKeysState] = useState<string[]>(readFromStorage);
+  const pinnedKeys = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   const pinnedTabs: BottomTabDef[] = pinnedKeys
     .map(resolveTab)
     .filter((t): t is BottomTabDef => t !== null);
 
-  // If resolution failed (module removed etc), fall back
   if (pinnedTabs.length < PINNED_COUNT) {
     const fallbacks = DEFAULT_KEYS.map(resolveTab).filter((t): t is BottomTabDef => t !== null);
     while (pinnedTabs.length < PINNED_COUNT && fallbacks.length > 0) {
@@ -57,7 +73,7 @@ export function useBottomBarTabs() {
 
   const setPinnedTabs = useCallback((keys: string[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
-    setPinnedKeysState(keys);
+    notify();
   }, []);
 
   return { pinnedTabs, pinnedKeys, setPinnedTabs };
