@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -31,6 +31,17 @@ export function DeadlineSettingPopover({ type, currentSetting, onSave, isSaving 
   const [isNextDay, setIsNextDay] = useState(currentSetting?.is_next_day ?? defaults.nextDay);
   const [isActive, setIsActive] = useState(currentSetting?.is_active ?? true);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setHour(currentSetting?.deadline_hour ?? defaults.hour);
+    setMinute(currentSetting?.deadline_minute ?? defaults.minute);
+    setIsNextDay(currentSetting?.is_next_day ?? defaults.nextDay);
+    setIsActive(currentSetting?.is_active ?? true);
+  }, [currentSetting, defaults.hour, defaults.minute, defaults.nextDay]);
+
+  const displayLabel = isActive
+    ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}${isNextDay ? ' (dia seguinte)' : ''}`
+    : 'Desativado';
 
   const handleSave = () => {
     onSave({
@@ -66,7 +77,7 @@ export function DeadlineSettingPopover({ type, currentSetting, onSave, isSaving 
         <div>
           <h4 className="text-sm font-semibold mb-1">Horário Limite</h4>
           <p className="text-[11px] text-muted-foreground">
-            {currentSetting ? formatDeadlineSetting(currentSetting) : 'Sem limite configurado'}
+            {displayLabel}
           </p>
         </div>
 
