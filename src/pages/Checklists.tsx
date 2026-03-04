@@ -505,7 +505,6 @@ export default function ChecklistsPage() {
             <div className="grid grid-cols-2 gap-3">
               {/* Abertura Card */}
               <button
-                onPointerDown={(e) => { if (e.pointerType !== 'mouse') { e.preventDefault(); setChecklistType('abertura'); } }}
                 onClick={() => setChecklistType('abertura')}
                 className={cn(
                   "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
@@ -603,7 +602,6 @@ export default function ChecklistsPage() {
 
               {/* Fechamento Card */}
               <button
-                onPointerDown={(e) => { if (e.pointerType !== 'mouse') { e.preventDefault(); setChecklistType('fechamento'); } }}
                 onClick={() => setChecklistType('fechamento')}
                 className={cn(
                   "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
@@ -702,7 +700,6 @@ export default function ChecklistsPage() {
 
             {/* Bônus Card */}
             <button
-              onPointerDown={(e) => { if (e.pointerType !== 'mouse') { e.preventDefault(); setChecklistType('bonus'); } }}
               onClick={() => setChecklistType('bonus')}
               className={cn(
                 "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
