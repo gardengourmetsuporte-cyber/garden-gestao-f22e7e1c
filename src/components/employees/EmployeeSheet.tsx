@@ -67,6 +67,7 @@ interface EmployeeSheetProps {
 interface FormData {
   full_name: string; cpf: string; role: string; department: string;
   admission_date: string; base_salary: number; is_active: boolean; notes: string; user_id: string;
+  quick_pin: string;
 }
 
 export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: EmployeeSheetProps) {
@@ -74,16 +75,16 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
   const { activeUnitId } = useUnit();
   
   const { register, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<FormData>({
-    defaultValues: { full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '' },
+    defaultValues: { full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '' },
   });
 
   const selectedUserId = watch('user_id');
 
   useEffect(() => {
     if (employee) {
-      reset({ full_name: employee.full_name, cpf: employee.cpf || '', role: employee.role || '', department: employee.department || '', admission_date: employee.admission_date || '', base_salary: employee.base_salary, is_active: employee.is_active, notes: employee.notes || '', user_id: employee.user_id || '' });
+      reset({ full_name: employee.full_name, cpf: employee.cpf || '', role: employee.role || '', department: employee.department || '', admission_date: employee.admission_date || '', base_salary: employee.base_salary, is_active: employee.is_active, notes: employee.notes || '', user_id: employee.user_id || '', quick_pin: (employee as any).quick_pin || '' });
     } else {
-      reset({ full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '' });
+      reset({ full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '' });
     }
   }, [employee, reset]);
 
@@ -96,7 +97,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
 
   const onSubmit = async (data: FormData) => {
     try {
-      const payload = { full_name: data.full_name, cpf: data.cpf || null, role: data.role || null, department: data.department || null, admission_date: data.admission_date || null, base_salary: data.base_salary, is_active: data.is_active, notes: data.notes || null, user_id: data.user_id || null, unit_id: activeUnitId || null };
+      const payload = { full_name: data.full_name, cpf: data.cpf || null, role: data.role || null, department: data.department || null, admission_date: data.admission_date || null, base_salary: data.base_salary, is_active: data.is_active, notes: data.notes || null, user_id: data.user_id || null, unit_id: activeUnitId || null, quick_pin: data.quick_pin || null };
       if (employee) { await updateEmployee({ id: employee.id, ...payload }); } else { await addEmployee(payload); }
       onOpenChange(false);
     } catch { /* Error handled in hook */ }
@@ -135,6 +136,14 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
           <div className="space-y-2"><Label htmlFor="admission_date">Data de admissão</Label><Input id="admission_date" type="date" {...register('admission_date')} /></div>
           <div className="space-y-2"><Label htmlFor="base_salary">Salário base</Label><Input id="base_salary" type="number" step="0.01" min="0" {...register('base_salary', { valueAsNumber: true })} placeholder="0,00" /></div>
           <div className="flex items-center justify-between py-2"><Label htmlFor="is_active">Funcionário ativo</Label><Switch id="is_active" checked={watch('is_active')} onCheckedChange={(checked) => setValue('is_active', checked)} /></div>
+          <div className="space-y-2">
+            <Label htmlFor="quick_pin" className="flex items-center gap-2">
+              <AppIcon name="Lock" size={16} className="text-primary" />
+              PIN rápido (4 dígitos)
+            </Label>
+            <Input id="quick_pin" {...register('quick_pin', { pattern: /^\d{0,4}$/ })} placeholder="Ex: 1234" maxLength={4} inputMode="numeric" />
+            <p className="text-xs text-muted-foreground">Usado para identificação rápida no modo timer do checklist</p>
+          </div>
           <div className="space-y-2"><Label htmlFor="notes">Observações</Label><Textarea id="notes" {...register('notes')} placeholder="Anotações sobre o funcionário..." rows={3} /></div>
           <LoadingButton type="submit" className="w-full" loading={isSubmitting} loadingText="Salvando...">{employee ? 'Salvar alterações' : 'Cadastrar'}</LoadingButton>
         </form>

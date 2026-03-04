@@ -14,6 +14,9 @@ import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { ActiveTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
+import { TimerBadge, TimerStatsIndicator } from '@/components/checklists/TimerBadge';
+import { PinDialog } from '@/components/checklists/PinDialog';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -28,6 +31,15 @@ interface ChecklistViewProps {
   deadlinePassed?: boolean;
   onContestCompletion?: (completionId: string, reason: string) => Promise<void>;
   onSplitCompletion?: (itemId: string, date: string, checklistType: ChecklistType, userIds: string[]) => Promise<void>;
+  // Timer mode props
+  isTimerMode?: boolean;
+  getActiveTimer?: (itemId: string) => ActiveTimer | undefined;
+  getUserActiveTimer?: (itemId: string, userId: string) => ActiveTimer | undefined;
+  onStartTimer?: (itemId: string, userId: string) => Promise<void>;
+  onFinishTimer?: (itemId: string, userId: string, onComplete: (itemId: string, points: number, completedByUserId: string) => void, basePoints: number) => Promise<void>;
+  validatePin?: (pin: string) => Promise<{ userId: string; userName: string } | null>;
+  timeStats?: Map<string, ItemTimeStats>;
+  timerMinExecutions?: number;
 }
 
 const isToday = (dateStr: string): boolean => {
@@ -81,6 +93,14 @@ export function ChecklistView({
   currentUserId,
   isAdmin,
   deadlinePassed = false,
+  isTimerMode = false,
+  getActiveTimer,
+  getUserActiveTimer,
+  onStartTimer,
+  onFinishTimer,
+  validatePin,
+  timeStats,
+  timerMinExecutions = 3,
 }: ChecklistViewProps) {
   const { triggerCoin } = useCoinAnimation();
   const { activeUnitId } = useUnit();
@@ -99,6 +119,10 @@ export function ChecklistView({
   const [splittingItemId, setSplittingItemId] = useState<string | null>(null);
   const [splitSelectedUsers, setSplitSelectedUsers] = useState<Set<string>>(new Set());
   const [splitLoading, setSplitLoading] = useState(false);
+  // Timer PIN state
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [pendingTimerItemId, setPendingTimerItemId] = useState<string | null>(null);
+  const [pendingTimerPoints, setPendingTimerPoints] = useState(0);
   // Photo capture state
   const [photoSheetOpen, setPhotoSheetOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -682,27 +706,69 @@ export function ChecklistView({
                       );
                     }
 
+                    // Timer mode: check if item has active timer
+                    const activeTimer = isTimerMode && getActiveTimer ? getActiveTimer(item.id) : undefined;
+                    const itemStats = isTimerMode && timeStats ? timeStats.get(item.id) : undefined;
+
+                    // Timer mode: handle click differently
+                    const handleTimerClick = () => {
+                      if (!canToggle) return;
+                      if (activeTimer) {
+                        // Has active timer → ask PIN to finish
+                        setPendingTimerItemId(item.id);
+                        setPendingTimerPoints(configuredPoints);
+                        setPinDialogOpen(true);
+                      } else if (isTimerMode && onStartTimer && validatePin) {
+                        // No active timer → ask PIN to start
+                        setPendingTimerItemId(item.id);
+                        setPendingTimerPoints(configuredPoints);
+                        setPinDialogOpen(true);
+                      } else {
+                        // Standard mode
+                        setOpenPopover(openPopover === item.id ? null : item.id);
+                      }
+                    };
+
                     return (
                       <div key={item.id}>
                         <button
                           disabled={!canToggle}
-                          onClick={() => canToggle && setOpenPopover(openPopover === item.id ? null : item.id)}
+                          onClick={handleTimerClick}
                           className={cn(
                             "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
                             !canToggle && "cursor-not-allowed opacity-80",
                             canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
                             "card-base border-2",
+                            activeTimer && "border-primary/50 bg-primary/5",
                             openPopover === item.id && "border-primary/50 shadow-md"
                           )}
                           style={{ animationDelay: `${itemIndex * 40}ms` }}
                         >
-                          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
+                          {activeTimer ? (
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-primary/15 border-2 border-primary/30">
+                              <AppIcon name="Timer" className="w-4 h-4 text-primary animate-pulse" />
+                            </div>
+                          ) : (
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
+                          )}
                           <div className="flex-1 text-left">
                             <div className="flex items-center gap-1.5">
                               <p className="font-medium text-foreground">{item.name}</p>
                               {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
+                              {isTimerMode && !activeTimer && <AppIcon name="Timer" className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
                             </div>
                             {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                            {activeTimer && (
+                              <div className="mt-1.5 flex items-center gap-2">
+                                <TimerBadge timer={activeTimer} stats={itemStats} minExecutions={timerMinExecutions} />
+                                <span className="text-[10px] text-muted-foreground">{activeTimer.userName}</span>
+                              </div>
+                            )}
+                            {!activeTimer && itemStats && isTimerMode && (
+                              <div className="mt-1">
+                                <TimerStatsIndicator stats={itemStats} minExecutions={timerMinExecutions} />
+                              </div>
+                            )}
                           </div>
                           {configuredPoints > 0 ? (
                             <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200 animate-pulse")}
@@ -1301,6 +1367,42 @@ export function ChecklistView({
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Timer PIN Dialog */}
+      {isTimerMode && validatePin && (
+        <PinDialog
+          open={pinDialogOpen}
+          onOpenChange={(open) => { if (!open) { setPinDialogOpen(false); setPendingTimerItemId(null); } }}
+          title={pendingTimerItemId && getActiveTimer?.(pendingTimerItemId) ? 'Finalizar tarefa' : 'Iniciar tarefa'}
+          subtitle="Digite seu PIN de 4 dígitos"
+          onSubmit={async (pin) => {
+            const employee = await validatePin(pin);
+            if (!employee) return false;
+            if (!pendingTimerItemId) return false;
+            const activeT = getActiveTimer?.(pendingTimerItemId);
+            if (activeT) {
+              // Finishing: must be same user
+              if (activeT.userId !== employee.userId) {
+                toast.error('Este timer foi iniciado por outro funcionário');
+                return false;
+              }
+              if (onFinishTimer) {
+                await onFinishTimer(pendingTimerItemId, employee.userId, (itemId, pts, uid) => {
+                  onToggleItem(itemId, pts, uid);
+                }, pendingTimerPoints);
+              }
+            } else {
+              // Starting
+              if (onStartTimer) {
+                await onStartTimer(pendingTimerItemId, employee.userId);
+              }
+            }
+            setPinDialogOpen(false);
+            setPendingTimerItemId(null);
+            return true;
+          }}
+        />
+      )}
     </div>
   );
 }

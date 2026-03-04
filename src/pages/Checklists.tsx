@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { getDeadlineInfo, shouldAutoClose } from '@/lib/checklistTiming';
 import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
 import { DeadlineSettingPopover } from '@/components/checklists/DeadlineSettingPopover';
+import { useChecklistTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
+import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
 
 function DateStrip({ days, selectedDate, onSelectDate }: {
   days: Date[];
@@ -108,6 +110,33 @@ export default function ChecklistsPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const currentDate = format(selectedDate, 'yyyy-MM-dd');
+
+  // Timer mode
+  const {
+    isTimerMode, timerSettings, activeTimers,
+    validatePin, startTimer, finishTimer, getActiveTimer, getUserActiveTimer, getTimeStats,
+  } = useChecklistTimer(checklistType, currentDate);
+
+  const [timeStatsMap, setTimeStatsMap] = useState<Map<string, ItemTimeStats>>(new Map());
+
+  // Fetch time stats when timer mode is active
+  useEffect(() => {
+    if (!isTimerMode || sectors.length === 0) return;
+    const itemIds: string[] = [];
+    sectors.forEach((s: any) => {
+      s.subcategories?.forEach((sub: any) => {
+        sub.items?.forEach((item: any) => {
+          if (item.is_active && item.checklist_type === checklistType) itemIds.push(item.id);
+        });
+      });
+    });
+    if (itemIds.length === 0) return;
+    getTimeStats(itemIds).then(stats => {
+      const map = new Map<string, ItemTimeStats>();
+      stats.forEach(s => map.set(s.itemId, s));
+      setTimeStatsMap(map);
+    });
+  }, [isTimerMode, sectors, checklistType, getTimeStats]);
 
   // The settings type follows the checklist type
   const settingsType = checklistType;
@@ -607,23 +636,27 @@ export default function ChecklistsPage() {
             {/* Content area — either checklist view or settings */}
             <div className="pt-3">
               {settingsMode ? (
-                <ChecklistSettings
-                  sectors={sectors.filter((s: any) => settingsType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
-                  selectedType={settingsType}
-                  onTypeChange={setSettingsType}
-                  onAddSector={handleAddSector}
-                  onUpdateSector={handleUpdateSector}
-                  onDeleteSector={handleDeleteSector}
-                  onReorderSectors={reorderSectors}
-                  onAddSubcategory={handleAddSubcategory}
-                  onUpdateSubcategory={handleUpdateSubcategory}
-                  onDeleteSubcategory={handleDeleteSubcategory}
-                  onReorderSubcategories={reorderSubcategories}
-                  onAddItem={handleAddItem}
-                  onUpdateItem={handleUpdateItem}
-                  onDeleteItem={handleDeleteItem}
-                  onReorderItems={reorderItems}
-                />
+                <div className="space-y-4">
+                  <ChecklistSettings
+                    sectors={sectors.filter((s: any) => settingsType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
+                    selectedType={settingsType}
+                    onTypeChange={setSettingsType}
+                    onAddSector={handleAddSector}
+                    onUpdateSector={handleUpdateSector}
+                    onDeleteSector={handleDeleteSector}
+                    onReorderSectors={reorderSectors}
+                    onAddSubcategory={handleAddSubcategory}
+                    onUpdateSubcategory={handleUpdateSubcategory}
+                    onDeleteSubcategory={handleDeleteSubcategory}
+                    onReorderSubcategories={reorderSubcategories}
+                    onAddItem={handleAddItem}
+                    onUpdateItem={handleUpdateItem}
+                    onDeleteItem={handleDeleteItem}
+                    onReorderItems={reorderItems}
+                  />
+                  {/* Timer Settings */}
+                  <TimerSettingsPanel checklistType={checklistType} />
+                </div>
               ) : (
                 <ChecklistView
                   sectors={sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
@@ -638,6 +671,14 @@ export default function ChecklistsPage() {
                   deadlinePassed={deadlinePassed}
                   onContestCompletion={contestCompletion}
                   onSplitCompletion={splitCompletion}
+                  isTimerMode={isTimerMode}
+                  getActiveTimer={getActiveTimer}
+                  getUserActiveTimer={getUserActiveTimer}
+                  onStartTimer={startTimer}
+                  onFinishTimer={finishTimer}
+                  validatePin={validatePin}
+                  timeStats={timeStatsMap}
+                  timerMinExecutions={timerSettings?.minExecutionsForStats ?? 3}
                 />
               )}
             </div>

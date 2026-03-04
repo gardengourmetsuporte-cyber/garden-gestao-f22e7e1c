@@ -802,6 +802,107 @@ export type Database = {
           },
         ]
       }
+      checklist_task_times: {
+        Row: {
+          bonus_awarded: number | null
+          checklist_type: string
+          created_at: string
+          date: string
+          duration_seconds: number | null
+          finished_at: string | null
+          id: string
+          item_id: string
+          started_at: string
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          bonus_awarded?: number | null
+          checklist_type: string
+          created_at?: string
+          date: string
+          duration_seconds?: number | null
+          finished_at?: string | null
+          id?: string
+          item_id: string
+          started_at: string
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          bonus_awarded?: number | null
+          checklist_type?: string
+          created_at?: string
+          date?: string
+          duration_seconds?: number | null
+          finished_at?: string | null
+          id?: string
+          item_id?: string
+          started_at?: string
+          unit_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_task_times_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_task_times_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_timer_settings: {
+        Row: {
+          bonus_points_avg: number
+          bonus_points_record: number
+          checklist_type: string
+          created_at: string
+          id: string
+          is_enabled: boolean
+          min_executions_for_stats: number
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          bonus_points_avg?: number
+          bonus_points_record?: number
+          checklist_type: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          min_executions_for_stats?: number
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          bonus_points_avg?: number
+          bonus_points_record?: number
+          checklist_type?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          min_executions_for_stats?: number
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_timer_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       copilot_conversations: {
         Row: {
           created_at: string
@@ -1275,6 +1376,7 @@ export type Database = {
           id: string
           is_active: boolean
           notes: string | null
+          quick_pin: string | null
           role: string | null
           unit_id: string | null
           updated_at: string
@@ -1291,6 +1393,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
+          quick_pin?: string | null
           role?: string | null
           unit_id?: string | null
           updated_at?: string
@@ -1307,6 +1410,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
+          quick_pin?: string | null
           role?: string | null
           unit_id?: string | null
           updated_at?: string
@@ -4677,6 +4781,16 @@ export type Database = {
       get_chat_conversation_type: {
         Args: { _conversation_id: string }
         Returns: Database["public"]["Enums"]["chat_conversation_type"]
+      }
+      get_checklist_time_stats: {
+        Args: { p_item_ids: string[] }
+        Returns: {
+          avg_seconds: number
+          execution_count: number
+          item_id: string
+          record_holder: string
+          record_seconds: number
+        }[]
       }
       get_dashboard_stats: {
         Args: { p_is_admin?: boolean; p_unit_id: string; p_user_id: string }
