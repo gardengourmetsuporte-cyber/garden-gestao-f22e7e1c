@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { format, parseISO, startOfMonth, subMonths, addMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -227,73 +227,123 @@ function TimeBlock({
 
 // ---- Records List ----
 function RecordsList({ records, isAdmin }: { records: TimeRecord[]; isAdmin: boolean }) {
-  if (records.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground py-10">
-        <AppIcon name="Clock" size={28} className="mx-auto mb-2 opacity-40" />
-        <p className="text-sm">Nenhum registro encontrado</p>
-      </div>
-    );
-  }
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const filteredRecords = useMemo(() => {
+    return records.filter(r => {
+      const recordDate = parseISO(r.date);
+      return isSameMonth(recordDate, selectedMonth);
+    });
+  }, [records, selectedMonth]);
+
+  // Group by date
+  const groupedRecords = useMemo(() => {
+    const groups: Record<string, TimeRecord[]> = {};
+    filteredRecords.forEach(r => {
+      if (!groups[r.date]) groups[r.date] = [];
+      groups[r.date].push(r);
+    });
+    return Object.entries(groups).sort(([a], [b]) => b.localeCompare(a));
+  }, [filteredRecords]);
+
+  const monthTotal = useMemo(() => {
+    return filteredRecords.reduce((sum, r) => sum + r.points_awarded, 0);
+  }, [filteredRecords]);
+
+  const handlePrevMonth = () => setSelectedMonth(prev => subMonths(prev, 1));
+  const handleNextMonth = () => setSelectedMonth(prev => addMonths(prev, 1));
 
   return (
-    <div className="space-y-2">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">Histórico</p>
-      <div className="space-y-1.5">
-        {records.map(record => (
-          <div
-            key={record.id}
-            className="flex items-center gap-3 rounded-xl bg-card border border-border/40 px-3.5 py-3 transition-colors"
-          >
-            {/* Status dot */}
-            <div className={cn(
-              'w-2 h-2 rounded-full shrink-0',
-              record.status === 'completed' ? 'bg-success' :
-              record.status === 'checked_in' ? 'bg-primary' :
-              record.status === 'absent' ? 'bg-destructive' : 'bg-muted-foreground/40'
-            )} />
-
-            {/* Date & name */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                {isAdmin && record.profile && (
-                  <span className="text-sm font-medium truncate">{record.profile.full_name}</span>
-                )}
-                <span className="text-xs text-muted-foreground">
-                  {format(parseISO(record.date), 'dd/MM')}
-                </span>
-                {record.manual_entry && (
-                  <span className="text-[10px] text-muted-foreground bg-muted/60 rounded px-1 py-px">manual</span>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                {record.check_in && <span>{record.check_in.substring(0, 5)}</span>}
-                {record.check_out && <span>→ {record.check_out.substring(0, 5)}</span>}
-                {record.late_minutes > 0 && (
-                  <span className="text-destructive">{record.late_minutes}min atraso</span>
-                )}
-                {record.early_departure_minutes > 0 && (
-                  <span className="text-destructive">{record.early_departure_minutes}min antecipado</span>
-                )}
-              </div>
-            </div>
-
-            {/* Points */}
-            {record.points_awarded !== 0 && (
-              <span className={cn(
-                'text-xs font-semibold tabular-nums shrink-0',
-                record.points_awarded > 0 ? 'text-success' : 'text-destructive'
-              )}>
-                {record.points_awarded > 0 ? '+' : ''}{record.points_awarded}
-              </span>
-            )}
-          </div>
-        ))}
+    <div className="space-y-3">
+      {/* Month Selector */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">Histórico</p>
+        <div className="flex items-center gap-1">
+          <button onClick={handlePrevMonth} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+            <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
+          </button>
+          <span className="text-xs font-semibold min-w-[100px] text-center capitalize">
+            {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
+          </span>
+          <button onClick={handleNextMonth} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+          </button>
+        </div>
       </div>
+
+      {/* Month summary */}
+      {filteredRecords.length > 0 && (
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-secondary/30 border border-border/20">
+          <span className="text-xs text-muted-foreground">{filteredRecords.length} registro{filteredRecords.length !== 1 ? 's' : ''}</span>
+          <span className={cn(
+            'text-xs font-bold tabular-nums',
+            monthTotal > 0 ? 'text-success' : monthTotal < 0 ? 'text-destructive' : 'text-muted-foreground'
+          )}>
+            {monthTotal > 0 ? '+' : ''}{monthTotal} pts
+          </span>
+        </div>
+      )}
+
+      {filteredRecords.length === 0 ? (
+        <div className="text-center text-muted-foreground py-10">
+          <AppIcon name="Clock" size={28} className="mx-auto mb-2 opacity-40" />
+          <p className="text-sm">Nenhum registro neste mês</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {groupedRecords.map(([date, dayRecords]) => (
+            <div key={date} className="space-y-1.5">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+                {format(parseISO(date), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+              </p>
+              {dayRecords.map(record => (
+                <div
+                  key={record.id}
+                  className="flex items-center gap-3 rounded-xl bg-card border border-border/40 px-3.5 py-3 transition-colors"
+                >
+                  <div className={cn(
+                    'w-2 h-2 rounded-full shrink-0',
+                    record.status === 'completed' ? 'bg-success' :
+                    record.status === 'checked_in' ? 'bg-primary' :
+                    record.status === 'absent' ? 'bg-destructive' : 'bg-muted-foreground/40'
+                  )} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      {isAdmin && record.profile && (
+                        <span className="text-sm font-medium truncate">{record.profile.full_name}</span>
+                      )}
+                      {record.manual_entry && (
+                        <span className="text-[10px] text-muted-foreground bg-muted/60 rounded px-1 py-px">manual</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                      {record.check_in && <span>{record.check_in.substring(0, 5)}</span>}
+                      {record.check_out && <span>→ {record.check_out.substring(0, 5)}</span>}
+                      {record.late_minutes > 0 && (
+                        <span className="text-destructive">{record.late_minutes}min atraso</span>
+                      )}
+                      {record.early_departure_minutes > 0 && (
+                        <span className="text-destructive">{record.early_departure_minutes}min antecipado</span>
+                      )}
+                    </div>
+                  </div>
+                  {record.points_awarded !== 0 && (
+                    <span className={cn(
+                      'text-xs font-semibold tabular-nums shrink-0',
+                      record.points_awarded > 0 ? 'text-success' : 'text-destructive'
+                    )}>
+                      {record.points_awarded > 0 ? '+' : ''}{record.points_awarded}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-
 // ---- Manual Entry Form ----
 function ManualEntryForm({
   employees,
