@@ -256,21 +256,42 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     }));
   }, []);
 
-  // Cancel/reset timer for an item via backend RPC (bypasses restrictive RLS safely)
+  // Cancel/reset timer for an item with resilient fallback
   const cancelTimer = useCallback(async (itemId: string) => {
-    if (!activeUnitId) return;
-
-    const { data: deletedCount, error } = await supabase.rpc('reset_checklist_timer', {
-      p_unit_id: activeUnitId,
-      p_item_id: itemId,
-      p_date: date,
-      p_checklist_type: checklistType,
-    });
-
-    if (error) {
-      toast.error('Erro ao resetar timer');
-      console.error(error);
+    if (!activeUnitId) {
+      toast.error('Unidade não selecionada');
       return;
+    }
+
+    // 1) Try direct delete first (fast path)
+    const { data: directDeleted, error: directError } = await supabase
+      .from('checklist_task_times')
+      .delete()
+      .eq('unit_id', activeUnitId)
+      .eq('item_id', itemId)
+      .eq('date', date)
+      .eq('checklist_type', checklistType)
+      .is('finished_at', null)
+      .select('id');
+
+    let deletedCount = Array.isArray(directDeleted) ? directDeleted.length : 0;
+
+    // 2) If direct path fails, fallback to secure RPC
+    if (directError) {
+      const { data: rpcDeletedCount, error: rpcError } = await supabase.rpc('reset_checklist_timer', {
+        p_unit_id: activeUnitId,
+        p_item_id: itemId,
+        p_date: date,
+        p_checklist_type: checklistType,
+      });
+
+      if (rpcError) {
+        toast.error('Erro ao resetar timer');
+        console.error('cancelTimer direct+rpc error:', { directError, rpcError, itemId, activeUnitId, checklistType, date });
+        return;
+      }
+
+      deletedCount = Number(rpcDeletedCount || 0);
     }
 
     if (!deletedCount || Number(deletedCount) <= 0) {
