@@ -14,7 +14,7 @@ interface AppIconProps {
 }
 
 export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
-  ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
+  ({ name, size = 24, className, style, fill = 1, weight = 300 }, ref) => {
     const materialName = ICON_MAP[name] || name;
 
     return (
@@ -27,7 +27,7 @@ export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
           height: size,
           overflow: 'hidden',
           display: 'inline-block',
-          fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' 0, 'opsz' ${size > 32 ? 48 : 24}`,
+          fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' -25, 'opsz' ${size > 32 ? 48 : 24}`,
           ...style,
         }}
       >
