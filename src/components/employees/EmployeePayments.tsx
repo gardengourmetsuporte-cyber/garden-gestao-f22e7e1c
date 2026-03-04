@@ -139,7 +139,7 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
 
       {/* Action Button */}
       <Button className="w-full h-12" onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
-        <AppIcon name="FileText" size={18} className="mr-2" />Gerar Holerite
+        <AppIcon name="Plus" size={18} className="mr-2" />Novo Lançamento
       </Button>
 
       {sortedGroups.map((group) => (
@@ -205,8 +205,8 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         <div className="text-center py-12 text-muted-foreground">
           <AppIcon name="DollarSign" size={48} className="mx-auto mb-3 opacity-50" />
           <p>Nenhum pagamento registrado</p>
-          <Button variant="outline" className="mt-4" onClick={() => { setEditingPayment(null); setSheetOpen(true); }}>
-            <AppIcon name="Plus" size={16} className="mr-2" />Adicionar primeiro pagamento
+          <Button variant="outline" className="mt-4" onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
+            <AppIcon name="Plus" size={16} className="mr-2" />Adicionar primeiro lançamento
           </Button>
         </div>
       )}
