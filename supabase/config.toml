@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.import-daily-sales]
 verify_jwt = false
+
+[functions.delivery-ocr]
+verify_jwt = false

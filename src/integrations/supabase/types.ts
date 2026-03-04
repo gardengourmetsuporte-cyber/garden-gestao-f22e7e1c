@@ -1235,6 +1235,119 @@ export type Database = {
         }
         Relationships: []
       }
+      deliveries: {
+        Row: {
+          address_id: string
+          assigned_to: string | null
+          created_at: string
+          created_by: string
+          delivered_at: string | null
+          id: string
+          items_summary: string | null
+          notes: string | null
+          photo_url: string | null
+          status: Database["public"]["Enums"]["delivery_status"]
+          total: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          address_id: string
+          assigned_to?: string | null
+          created_at?: string
+          created_by: string
+          delivered_at?: string | null
+          id?: string
+          items_summary?: string | null
+          notes?: string | null
+          photo_url?: string | null
+          status?: Database["public"]["Enums"]["delivery_status"]
+          total?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          address_id?: string
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string
+          delivered_at?: string | null
+          id?: string
+          items_summary?: string | null
+          notes?: string | null
+          photo_url?: string | null
+          status?: Database["public"]["Enums"]["delivery_status"]
+          total?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_addresses: {
+        Row: {
+          city: string
+          created_at: string
+          customer_name: string
+          full_address: string
+          id: string
+          lat: number | null
+          lng: number | null
+          neighborhood: string
+          reference: string | null
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          customer_name?: string
+          full_address?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          neighborhood?: string
+          reference?: string | null
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          customer_name?: string
+          full_address?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          neighborhood?: string
+          reference?: string | null
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_addresses_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_payments: {
         Row: {
           advance_deduction: number | null
@@ -4888,6 +5001,7 @@ export type Database = {
       chat_conversation_type: "direct" | "group" | "announcement"
       checklist_type: "abertura" | "fechamento" | "limpeza" | "bonus"
       day_period: "morning" | "afternoon" | "evening"
+      delivery_status: "pending" | "out" | "delivered" | "cancelled"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
       quotation_status:
@@ -5048,6 +5162,7 @@ export const Constants = {
       chat_conversation_type: ["direct", "group", "announcement"],
       checklist_type: ["abertura", "fechamento", "limpeza", "bonus"],
       day_period: ["morning", "afternoon", "evening"],
+      delivery_status: ["pending", "out", "delivered", "cancelled"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
       quotation_status: ["draft", "sent", "comparing", "contested", "resolved"],
