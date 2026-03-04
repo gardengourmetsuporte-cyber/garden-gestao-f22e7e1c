@@ -1,17 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { formatCurrency } from '@/lib/format';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Employee, EmployeePayment, MONTHS } from '@/types/employee';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface PayslipSheetProps {
   open: boolean;
@@ -27,115 +25,243 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
   const [isLoading, setIsLoading] = useState(false);
   const [referenceMonth, setReferenceMonth] = useState(new Date().getMonth() + 1);
   const [referenceYear, setReferenceYear] = useState(new Date().getFullYear());
-  const [paymentDate, setPaymentDate] = useState<Date>(new Date());
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [baseSalary, setBaseSalary] = useState('');
-  const [regularHours, setRegularHours] = useState('');
-  const [nightHours, setNightHours] = useState('');
-  const [nightBonus, setNightBonus] = useState('');
-  const [overtimeHours, setOvertimeHours] = useState('');
-  const [overtimeBonus, setOvertimeBonus] = useState('');
-  const [mealAllowance, setMealAllowance] = useState('');
-  const [transportAllowance, setTransportAllowance] = useState('');
-  const [otherEarnings, setOtherEarnings] = useState('');
-  const [otherEarningsDesc, setOtherEarningsDesc] = useState('');
-  const [inssDeduction, setInssDeduction] = useState('');
-  const [irrfDeduction, setIrrfDeduction] = useState('');
-  const [advanceDeduction, setAdvanceDeduction] = useState('');
-  const [otherDeductions, setOtherDeductions] = useState('');
-  const [otherDeductionsDesc, setOtherDeductionsDesc] = useState('');
-  const [fgtsAmount, setFgtsAmount] = useState('');
+  const [amount, setAmount] = useState('');
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
       if (editingPayment) {
-        setReferenceMonth(editingPayment.reference_month); setReferenceYear(editingPayment.reference_year);
-        setPaymentDate(new Date(editingPayment.payment_date)); setBaseSalary(String(editingPayment.base_salary || ''));
-        setRegularHours(String(editingPayment.regular_hours || '')); setNightHours(String(editingPayment.night_hours || ''));
-        setNightBonus(String(editingPayment.night_bonus || '')); setOvertimeHours(String(editingPayment.overtime_hours || ''));
-        setOvertimeBonus(String(editingPayment.overtime_bonus || '')); setMealAllowance(String(editingPayment.meal_allowance || ''));
-        setTransportAllowance(String(editingPayment.transport_allowance || '')); setOtherEarnings(String(editingPayment.other_earnings || ''));
-        setOtherEarningsDesc(editingPayment.other_earnings_description || ''); setInssDeduction(String(editingPayment.inss_deduction || ''));
-        setIrrfDeduction(String(editingPayment.irrf_deduction || '')); setAdvanceDeduction(String(editingPayment.advance_deduction || ''));
-        setOtherDeductions(String(editingPayment.other_deductions || '')); setOtherDeductionsDesc(editingPayment.other_deductions_description || '');
-        setFgtsAmount(String(editingPayment.fgts_amount || ''));
+        setReferenceMonth(editingPayment.reference_month);
+        setReferenceYear(editingPayment.reference_year);
+        setAmount(String(editingPayment.amount || ''));
+        setReceiptUrl(editingPayment.receipt_url || null);
+        setPreviewUrl(editingPayment.receipt_url || null);
       } else {
-        setReferenceMonth(new Date().getMonth() + 1); setReferenceYear(new Date().getFullYear()); setPaymentDate(new Date());
-        setBaseSalary(employee?.base_salary ? String(employee.base_salary) : '');
-        setRegularHours(''); setNightHours(''); setNightBonus(''); setOvertimeHours(''); setOvertimeBonus('');
-        setMealAllowance(''); setTransportAllowance(''); setOtherEarnings(''); setOtherEarningsDesc('');
-        setInssDeduction(''); setIrrfDeduction(''); setAdvanceDeduction(''); setOtherDeductions(''); setOtherDeductionsDesc(''); setFgtsAmount('');
+        setReferenceMonth(new Date().getMonth() + 1);
+        setReferenceYear(new Date().getFullYear());
+        setAmount(employee?.base_salary ? String(employee.base_salary) : '');
+        setReceiptUrl(null);
+        setPreviewUrl(null);
       }
     }
   }, [open, editingPayment, employee]);
 
-  const totalEarnings = (parseFloat(baseSalary)||0)+(parseFloat(nightBonus)||0)+(parseFloat(overtimeBonus)||0)+(parseFloat(mealAllowance)||0)+(parseFloat(transportAllowance)||0)+(parseFloat(otherEarnings)||0);
-  const totalDeductions = (parseFloat(inssDeduction)||0)+(parseFloat(irrfDeduction)||0)+(parseFloat(advanceDeduction)||0)+(parseFloat(otherDeductions)||0);
-  const netSalary = totalEarnings - totalDeductions;
-  
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !employee) return;
+
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (ev) => setPreviewUrl(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    setUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `payslips/${employee.id}/${Date.now()}.${ext}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('cash-receipts')
+        .upload(path, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('cash-receipts')
+        .getPublicUrl(path);
+
+      setReceiptUrl(urlData.publicUrl);
+      toast.success('Foto enviada!');
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('Erro ao enviar foto');
+      setPreviewUrl(receiptUrl);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSave = async () => {
-    if (!employee) return;
+    if (!employee || !amount) return;
     setIsLoading(true);
     try {
-      const data = { employee_id: employee.id, type: 'salary' as const, reference_month: referenceMonth, reference_year: referenceYear, payment_date: format(paymentDate, 'yyyy-MM-dd'), amount: netSalary, base_salary: parseFloat(baseSalary)||0, regular_hours: parseFloat(regularHours)||0, night_hours: parseFloat(nightHours)||0, night_bonus: parseFloat(nightBonus)||0, overtime_hours: parseFloat(overtimeHours)||0, overtime_bonus: parseFloat(overtimeBonus)||0, meal_allowance: parseFloat(mealAllowance)||0, transport_allowance: parseFloat(transportAllowance)||0, other_earnings: parseFloat(otherEarnings)||0, other_earnings_description: otherEarningsDesc||null, inss_deduction: parseFloat(inssDeduction)||0, irrf_deduction: parseFloat(irrfDeduction)||0, advance_deduction: parseFloat(advanceDeduction)||0, other_deductions: parseFloat(otherDeductions)||0, other_deductions_description: otherDeductionsDesc||null, total_earnings: totalEarnings, total_deductions: totalDeductions, net_salary: netSalary, fgts_amount: parseFloat(fgtsAmount)||0, is_paid: false };
-      if (editingPayment && onUpdate) await onUpdate({ id: editingPayment.id, ...data }); else await onSave(data);
+      const parsedAmount = parseFloat(amount) || 0;
+      const paymentDate = format(new Date(), 'yyyy-MM-dd');
+
+      const data = {
+        employee_id: employee.id,
+        type: 'salary' as const,
+        reference_month: referenceMonth,
+        reference_year: referenceYear,
+        payment_date: paymentDate,
+        amount: parsedAmount,
+        net_salary: parsedAmount,
+        receipt_url: receiptUrl,
+        is_paid: false,
+      };
+
+      if (editingPayment && onUpdate) {
+        await onUpdate({ id: editingPayment.id, ...data });
+      } else {
+        await onSave(data);
+      }
       onOpenChange(false);
-    } finally { setIsLoading(false); }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDelete = async () => {
     if (!editingPayment || !onDelete) return;
-    setIsLoading(true); await onDelete(editingPayment.id); setIsLoading(false); onOpenChange(false);
+    setIsLoading(true);
+    await onDelete(editingPayment.id);
+    setIsLoading(false);
+    onOpenChange(false);
   };
 
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[95vh] rounded-t-2xl overflow-y-auto">
-        <SheetHeader className="pb-4">
-          <SheetTitle>{editingPayment ? 'Editar Holerite' : 'Novo Holerite'}{employee && <span className="text-muted-foreground font-normal"> - {employee.full_name}</span>}</SheetTitle>
+      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-2xl overflow-y-auto">
+        <SheetHeader className="pb-2">
+          <SheetTitle className="flex items-center gap-2">
+            <AppIcon name="FileText" size={20} className="text-primary" />
+            {editingPayment ? 'Editar Holerite' : 'Novo Holerite'}
+          </SheetTitle>
+          {employee && (
+            <p className="text-sm text-muted-foreground">{employee.full_name}</p>
+          )}
         </SheetHeader>
-        <div className="space-y-6 pb-8">
+
+        <div className="space-y-5 pb-6 pt-2">
+          {/* Mês / Ano */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2"><Label>Mês Referência</Label><Select value={String(referenceMonth)} onValueChange={(v) => setReferenceMonth(parseInt(v))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{MONTHS.map((month, i) => (<SelectItem key={i} value={String(i + 1)}>{month}</SelectItem>))}</SelectContent></Select></div>
-            <div className="space-y-2"><Label>Ano</Label><Select value={String(referenceYear)} onValueChange={(v) => setReferenceYear(parseInt(v))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{years.map(year => (<SelectItem key={year} value={String(year)}>{year}</SelectItem>))}</SelectContent></Select></div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Mês</Label>
+              <Select value={String(referenceMonth)} onValueChange={(v) => setReferenceMonth(parseInt(v))}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {MONTHS.map((month, i) => (
+                    <SelectItem key={i} value={String(i + 1)}>{month}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Ano</Label>
+              <Select value={String(referenceYear)} onValueChange={(v) => setReferenceYear(parseInt(v))}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map(year => (
+                    <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          {/* Valor Final */}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Valor Líquido (R$)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0,00"
+              className="h-14 text-xl font-bold text-center"
+            />
+          </div>
+
+          {/* Foto do Holerite */}
           <div className="space-y-2">
-            <Label>Data de Pagamento</Label>
-            <Popover open={showCalendar} onOpenChange={setShowCalendar}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start"><AppIcon name="CalendarDays" size={16} className="mr-2" />{format(paymentDate, "dd/MM/yyyy", { locale: ptBR })}</Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={paymentDate} onSelect={(d) => { if (d) setPaymentDate(d); setShowCalendar(false); }} locale={ptBR} /></PopoverContent>
-            </Popover>
+            <Label className="text-xs text-muted-foreground">Foto do Holerite</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+
+            {previewUrl ? (
+              <div className="relative rounded-xl overflow-hidden border border-border/40">
+                <img
+                  src={previewUrl}
+                  alt="Holerite"
+                  className="w-full max-h-64 object-contain bg-black/20"
+                />
+                <div className="absolute bottom-2 right-2 flex gap-2">
+                  <Button
+                    variant="glass"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    <AppIcon name="Camera" size={14} className="mr-1" />
+                    Trocar
+                  </Button>
+                  <Button
+                    variant="glass"
+                    size="sm"
+                    onClick={() => { setPreviewUrl(null); setReceiptUrl(null); }}
+                  >
+                    <AppIcon name="Trash2" size={14} />
+                  </Button>
+                </div>
+                {uploading && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <AppIcon name="progress_activity" size={24} className="animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full h-32 rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all flex flex-col items-center justify-center gap-2 text-muted-foreground"
+              >
+                {uploading ? (
+                  <AppIcon name="progress_activity" size={28} className="animate-spin" />
+                ) : (
+                  <>
+                    <AppIcon name="Camera" size={28} className="text-primary/60" />
+                    <span className="text-sm">Tirar foto ou anexar</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
-          <Separator />
-          <div className="space-y-4">
-            <div className="flex items-center gap-2"><AppIcon name="Plus" size={16} className="text-success" /><h3 className="font-semibold text-success">Proventos</h3></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">Salário Base</Label><Input type="number" value={baseSalary} onChange={(e) => setBaseSalary(e.target.value)} placeholder="0,00" /></div><div className="space-y-1"><Label className="text-xs">Horas Normais</Label><Input type="number" value={regularHours} onChange={(e) => setRegularHours(e.target.value)} placeholder="0" /></div></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">Horas Noturnas</Label><Input type="number" value={nightHours} onChange={(e) => setNightHours(e.target.value)} placeholder="0" /></div><div className="space-y-1"><Label className="text-xs">Adicional Noturno (R$)</Label><Input type="number" value={nightBonus} onChange={(e) => setNightBonus(e.target.value)} placeholder="0,00" /></div></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">Horas Extras</Label><Input type="number" value={overtimeHours} onChange={(e) => setOvertimeHours(e.target.value)} placeholder="0" /></div><div className="space-y-1"><Label className="text-xs">Adicional H.E. (R$)</Label><Input type="number" value={overtimeBonus} onChange={(e) => setOvertimeBonus(e.target.value)} placeholder="0,00" /></div></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">Vale Alimentação</Label><Input type="number" value={mealAllowance} onChange={(e) => setMealAllowance(e.target.value)} placeholder="0,00" /></div><div className="space-y-1"><Label className="text-xs">Vale Transporte</Label><Input type="number" value={transportAllowance} onChange={(e) => setTransportAllowance(e.target.value)} placeholder="0,00" /></div></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">Outros Proventos</Label><Input type="number" value={otherEarnings} onChange={(e) => setOtherEarnings(e.target.value)} placeholder="0,00" /></div><div className="space-y-1"><Label className="text-xs">Descrição</Label><Input value={otherEarningsDesc} onChange={(e) => setOtherEarningsDesc(e.target.value)} placeholder="Ex: Comissão" /></div></div>
-            <div className="p-3 bg-success/10 rounded-lg flex justify-between items-center"><span className="font-medium text-success">Total Proventos</span><span className="font-bold text-success">{formatCurrency(totalEarnings)}</span></div>
-          </div>
-          <Separator />
-          <div className="space-y-4">
-            <div className="flex items-center gap-2"><AppIcon name="Minus" size={16} className="text-rose-500" /><h3 className="font-semibold text-rose-600">Descontos</h3></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">INSS</Label><Input type="number" value={inssDeduction} onChange={(e) => setInssDeduction(e.target.value)} placeholder="0,00" /></div><div className="space-y-1"><Label className="text-xs">IRRF</Label><Input type="number" value={irrfDeduction} onChange={(e) => setIrrfDeduction(e.target.value)} placeholder="0,00" /></div></div>
-            <div className="grid grid-cols-2 gap-3"><div className="space-y-1"><Label className="text-xs">Adiantamento/Vale</Label><Input type="number" value={advanceDeduction} onChange={(e) => setAdvanceDeduction(e.target.value)} placeholder="0,00" /></div><div className="space-y-1"><Label className="text-xs">Outros Descontos</Label><Input type="number" value={otherDeductions} onChange={(e) => setOtherDeductions(e.target.value)} placeholder="0,00" /></div></div>
-            {parseFloat(otherDeductions) > 0 && (<div className="space-y-1"><Label className="text-xs">Descrição do Desconto</Label><Input value={otherDeductionsDesc} onChange={(e) => setOtherDeductionsDesc(e.target.value)} placeholder="Ex: Falta, Atraso" /></div>)}
-            <div className="p-3 bg-rose-500/10 rounded-lg flex justify-between items-center"><span className="font-medium text-rose-600">Total Descontos</span><span className="font-bold text-rose-600">{formatCurrency(totalDeductions)}</span></div>
-          </div>
-          <Separator />
-          <div className="space-y-2"><Label>FGTS (8%)</Label><Input type="number" value={fgtsAmount} onChange={(e) => setFgtsAmount(e.target.value)} placeholder="0,00" /><p className="text-xs text-muted-foreground">Valor depositado na conta do FGTS</p></div>
-          <div className="p-4 bg-primary/10 rounded-xl"><div className="flex justify-between items-center"><span className="font-semibold text-lg">Salário Líquido</span><span className="font-bold text-2xl text-primary">{formatCurrency(netSalary)}</span></div></div>
-          <div className="flex gap-2">
-            {editingPayment && onDelete && (<Button variant="destructive" onClick={handleDelete} disabled={isLoading}><AppIcon name="Trash2" size={16} className="mr-2" />Excluir</Button>)}
-            <Button className="flex-1" onClick={handleSave} disabled={isLoading || !employee}>
-              {isLoading ? (<><AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" />Salvando...</>) : (<>{editingPayment ? 'Salvar alterações' : 'Criar Holerite'}</>)}
+
+          {/* Actions */}
+          <div className="flex gap-2 pt-2">
+            {editingPayment && onDelete && (
+              <Button variant="destructive" size="lg" onClick={handleDelete} disabled={isLoading}>
+                <AppIcon name="Trash2" size={16} />
+              </Button>
+            )}
+            <Button
+              className="flex-1"
+              size="lg"
+              onClick={handleSave}
+              disabled={isLoading || !employee || !amount}
+            >
+              {isLoading ? (
+                <><AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" />Salvando...</>
+              ) : (
+                <>{editingPayment ? 'Salvar' : 'Criar Holerite'}</>
+              )}
             </Button>
           </div>
         </div>
