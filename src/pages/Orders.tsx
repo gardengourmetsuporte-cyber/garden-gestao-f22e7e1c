@@ -21,6 +21,7 @@ import { SmartReceivingSheet } from '@/components/inventory/SmartReceivingSheet'
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
+import { useShoppingList } from '@/hooks/useShoppingList';
 
 export default function OrdersPage() {
   const { isAdmin } = useAuth();
@@ -29,6 +30,7 @@ export default function OrdersPage() {
   const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
   const { addInvoice } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
+  const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -40,7 +42,7 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
@@ -205,11 +207,12 @@ export default function OrdersPage() {
           <AnimatedTabs
             tabs={[
               { key: 'to-order', label: 'Sugestões', icon: <AppIcon name="Package" size={16} />, badge: lowStockItems.length },
+              { key: 'shopping-list', label: 'Lista', icon: <AppIcon name="ShoppingCart" size={16} />, badge: shoppingListItems.length || undefined },
               { key: 'quotations', label: 'Cotações', icon: <AppIcon name="Scale" size={16} /> },
               { key: 'orders', label: 'Histórico', icon: <AppIcon name="Clock" size={16} />, badge: pendingOrders.length },
             ]}
             activeTab={orderTab}
-            onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders' | 'quotations')}
+            onTabChange={(key) => setOrderTab(key as 'to-order' | 'orders' | 'quotations' | 'shopping-list')}
           />
 
           <div className="animate-fade-in" key={orderTab}>
@@ -296,6 +299,72 @@ export default function OrdersPage() {
                             </div>
                           </CollapsibleContent>
                         </Collapsible>
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            )}
+
+            {/* Lista de Compras Rápida Tab */}
+            {orderTab === 'shopping-list' && (
+              shoppingListItems.length === 0 ? (
+                <EmptyState
+                  icon="ShoppingCart"
+                  title="Lista de compras vazia"
+                  subtitle="Adicione itens pelo estoque usando o botão de carrinho"
+                />
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      {shoppingListItems.length} ite{shoppingListItems.length !== 1 ? 'ns' : 'm'} na lista
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => clearList()}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <AppIcon name="Trash2" size={14} className="mr-1" />
+                      Limpar
+                    </Button>
+                  </div>
+                  {shoppingListItems.map((sli, index) => {
+                    const inv = sli.inventory_item;
+                    const unitLabel = inv?.unit_type === 'unidade' ? 'un' : inv?.unit_type === 'kg' ? 'kg' : 'L';
+                    return (
+                      <div
+                        key={sli.id}
+                        className="bg-card rounded-2xl border border-border p-4 flex items-center justify-between animate-fade-in"
+                        style={{ animationDelay: `${index * 30}ms` }}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-foreground truncate">{inv?.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-muted-foreground">
+                              Qtd sugerida: <span className="font-semibold text-foreground">{sli.quantity} {unitLabel}</span>
+                            </span>
+                            {inv?.supplier?.name && (
+                              <span className="text-xs text-muted-foreground">
+                                · {inv.supplier.name}
+                              </span>
+                            )}
+                          </div>
+                          {sli.profile?.full_name && (
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              Adicionado por {sli.profile.full_name}
+                            </p>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeFromList(sli.id)}
+                          className="shrink-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <AppIcon name="X" size={16} />
+                        </Button>
                       </div>
                     );
                   })}
