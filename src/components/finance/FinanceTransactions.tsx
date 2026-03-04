@@ -45,12 +45,28 @@ function groupByCategory(transactions: FinanceTransaction[]): { key: string; cat
     map.get(key)!.push(t);
   }
 
-  return order.map(key => {
+  const groups = order.map(key => {
     const txns = map.get(key)!;
     const isTransfer = key === '__transfer';
     const category = isTransfer ? null : (txns[0]?.category ?? null);
-    return { key, category, isTransfer, txns };
+    const subtotal = txns.reduce((sum, t) => {
+      if (t.type === 'income') return sum + Number(t.amount);
+      if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
+      return sum;
+    }, 0);
+    return { key, category, isTransfer, txns, subtotal };
   });
+
+  // Sort: expenses first (negative), then income (positive), then transfers; within each group by absolute value desc
+  groups.sort((a, b) => {
+    const typeOrder = (g: typeof a) => g.isTransfer ? 2 : g.subtotal < 0 ? 0 : 1;
+    const ta = typeOrder(a);
+    const tb = typeOrder(b);
+    if (ta !== tb) return ta - tb;
+    return Math.abs(b.subtotal) - Math.abs(a.subtotal);
+  });
+
+  return groups;
 }
 
 function SortableTransaction({ id, children }: { id: string; children: (isDragging: boolean) => React.ReactNode }) {
