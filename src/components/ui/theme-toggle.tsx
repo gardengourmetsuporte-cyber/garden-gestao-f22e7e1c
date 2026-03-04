@@ -3,15 +3,15 @@ import { AppIcon } from "@/components/ui/app-icon";
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className={`p-2 rounded-lg hover:bg-secondary transition-all ${className}`}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className={`flex items-center justify-center transition-all ${className}`}
       aria-label="Alternar tema"
     >
-      <AppIcon name="Sun" size={20} className="hidden dark:block" />
-      <AppIcon name="Moon" size={20} className="block dark:hidden" />
+      <AppIcon name={isDark ? "Sun" : "Moon"} size={18} />
     </button>
   );
 }
