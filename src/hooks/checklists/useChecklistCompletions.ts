@@ -61,6 +61,12 @@ export function useChecklistCompletions({
       const { error: timerDeleteError } = await timerDeleteQuery;
       if (timerDeleteError) throw timerDeleteError;
 
+      // Immediate local reset so card volta para "Play" sem esperar refetch
+      queryClient.setQueriesData({ queryKey: ['checklist-active-timers'] }, (prev: any) => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.filter((t: any) => (t.item_id ?? t.itemId) !== itemId);
+      });
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['checklist-active-timers'] }),
         queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] }),
