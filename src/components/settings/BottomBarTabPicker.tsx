@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { ALL_MODULES } from '@/lib/modules';
 import { useBottomBarTabs } from '@/hooks/useBottomBarTabs';
 import { useUserModules } from '@/hooks/useAccessLevels';
-import { toast } from 'sonner';
 
 const EXCLUDED_KEYS = ['dashboard', 'settings'];
-const PINNED_COUNT = 3;
+const PINNED_COUNT = 2;
 
 interface Props {
   open: boolean;
@@ -20,31 +19,32 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
   const { hasAccess } = useUserModules();
   const [selected, setSelected] = useState<string[]>(pinnedKeys);
 
+  // Sync when opening
+  useEffect(() => {
+    if (open) setSelected(pinnedKeys);
+  }, [open, pinnedKeys]);
+
   const availableModules = ALL_MODULES.filter(
     m => !EXCLUDED_KEYS.includes(m.key) && hasAccess(m.key)
   );
 
   const toggle = (key: string) => {
     setSelected(prev => {
+      let next: string[];
       if (prev.includes(key)) {
-        return prev.filter(k => k !== key);
-      }
-      if (prev.length >= PINNED_COUNT) {
+        next = prev.filter(k => k !== key);
+      } else if (prev.length >= PINNED_COUNT) {
         // Replace oldest
-        return [...prev.slice(1), key];
+        next = [...prev.slice(1), key];
+      } else {
+        next = [...prev, key];
       }
-      return [...prev, key];
+      // Apply in real-time
+      if (next.length === PINNED_COUNT) {
+        setPinnedTabs(next);
+      }
+      return next;
     });
-  };
-
-  const handleSave = () => {
-    if (selected.length !== PINNED_COUNT) {
-      toast.error(`Selecione exatamente ${PINNED_COUNT} módulos`);
-      return;
-    }
-    setPinnedTabs(selected);
-    toast.success('Barra inferior atualizada!');
-    onOpenChange(false);
   };
 
   return (
@@ -66,7 +66,7 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
                 key={mod.key}
                 onClick={() => toggle(mod.key)}
                 className={cn(
-                  "flex flex-col items-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 border",
+                  "flex flex-col items-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 border touch-manipulation",
                   isSelected
                     ? "border-primary/60 bg-primary/10"
                     : "border-border/30 bg-[#0a1a10]/40 hover:bg-[#0a1a10]/60"
@@ -94,18 +94,9 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
           })}
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={selected.length !== PINNED_COUNT}
-          className={cn(
-            "w-full py-3.5 rounded-xl font-semibold text-sm transition-all",
-            selected.length === PINNED_COUNT
-              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-              : "bg-muted/30 text-muted-foreground cursor-not-allowed"
-          )}
-        >
-          Salvar ({selected.length}/{PINNED_COUNT})
-        </button>
+        <div className="text-center text-xs text-muted-foreground">
+          {selected.length}/{PINNED_COUNT} selecionados
+        </div>
       </SheetContent>
     </Sheet>
   );
