@@ -249,6 +249,7 @@ const TabButton = forwardRef<
 >(({ tab, active: routeActive, locked, moreOpen, slotWidth, onClick }, ref) => {
   const active = routeActive && !moreOpen;
   const [bouncing, setBouncing] = useState(false);
+  const handledByPointer = useRef(false);
 
   const handleTap = () => {
     navigator.vibrate?.(10);
@@ -276,9 +277,16 @@ const TabButton = forwardRef<
       onPointerDown={(e) => {
         if (e.pointerType === 'mouse') return;
         e.preventDefault();
+        handledByPointer.current = true;
         handleTap();
       }}
-      onClick={handleTap}
+      onClick={() => {
+        if (handledByPointer.current) {
+          handledByPointer.current = false;
+          return;
+        }
+        handleTap();
+      }}
       onMouseEnter={() => void preloadRoute(tab.path)}
       onTouchStart={() => void preloadRoute(tab.path)}
       aria-label={tab.label}
