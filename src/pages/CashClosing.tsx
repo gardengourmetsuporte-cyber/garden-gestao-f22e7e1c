@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -9,16 +9,18 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { CashClosingForm, clearCashClosingDraft } from '@/components/cashClosing/CashClosingForm';
 import { CashClosingList } from '@/components/cashClosing/CashClosingList';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
+import { MonthSelector } from '@/components/finance/MonthSelector';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function CashClosing() {
   const { isAdmin, user } = useAuth();
   const { closings, isLoading, refetch } = useCashClosing();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [cashSearchParams, setCashSearchParams] = useSearchParams();
 
   // Handle ?action=new from quick actions
@@ -35,6 +37,13 @@ export default function CashClosing() {
   const todaysClosing = closings.find(c => c.date === today && c.user_id === user?.id);
   const pendingCount = closings.filter(c => c.status === 'pending').length;
 
+  // Filter closings by selected month
+  const filteredClosings = useMemo(() => {
+    const monthStart = format(startOfMonth(selectedMonth), 'yyyy-MM-dd');
+    const monthEnd = format(endOfMonth(selectedMonth), 'yyyy-MM-dd');
+    return closings.filter(c => c.date >= monthStart && c.date <= monthEnd);
+  }, [closings, selectedMonth]);
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
@@ -47,9 +56,10 @@ export default function CashClosing() {
             </div>
           ) : isAdmin ? (
             <div className="space-y-4">
-              <WeeklySummary closings={closings} />
+              <MonthSelector selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
+              <WeeklySummary closings={filteredClosings} />
               <CashClosingList 
-                closings={closings} 
+                closings={filteredClosings} 
                 isAdmin={isAdmin}
                 onRefresh={refetch}
               />
