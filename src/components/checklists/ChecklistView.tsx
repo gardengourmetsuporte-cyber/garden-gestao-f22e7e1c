@@ -569,9 +569,12 @@ export function ChecklistView({
                               {/* Continuar (desmarcar sem zerar timer) */}
                               {canToggle && (
                                 <button
-                                  onClick={() => {
-                                    setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                    onToggleItem(item.id, 0);
+                                  onClick={async () => {
+                                    await onToggleItem(item.id, 0);
+                                    const resumeUserId = completion?.completed_by || currentUserId;
+                                    if (onStartTimer && resumeUserId) {
+                                      await onStartTimer(item.id, resumeUserId);
+                                    }
                                     setOpenPopover(null);
                                   }}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
@@ -591,8 +594,7 @@ export function ChecklistView({
                                   <div className="border-t border-border" />
                                   <button
                                     onClick={async () => {
-                                      setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                      onToggleItem(item.id, 0);
+                                      await onToggleItem(item.id, 0);
                                       await onCancelTimer(item.id);
                                       setOpenPopover(null);
                                     }}
@@ -1082,9 +1084,12 @@ export function ChecklistView({
                                     <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                                       {canToggle && (
                                         <button
-                                          onClick={() => {
-                                            setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                            onToggleItem(item.id, 0);
+                                          onClick={async () => {
+                                            await onToggleItem(item.id, 0);
+                                            const resumeUserId = completion?.completed_by || currentUserId;
+                                            if (onStartTimer && resumeUserId) {
+                                              await onStartTimer(item.id, resumeUserId);
+                                            }
                                             setOpenPopover(null);
                                           }}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
@@ -1103,8 +1108,7 @@ export function ChecklistView({
                                           <div className="border-t border-border" />
                                           <button
                                             onClick={async () => {
-                                              setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                              onToggleItem(item.id, 0);
+                                              await onToggleItem(item.id, 0);
                                               await onCancelTimer(item.id);
                                               setOpenPopover(null);
                                             }}
