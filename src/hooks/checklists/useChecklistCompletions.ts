@@ -47,6 +47,8 @@ export function useChecklistCompletions({
       if (error) throw error;
 
       // Also clean up any associated timer rows for this item/date/type
+      await queryClient.cancelQueries({ queryKey: ['checklist-active-timers'] });
+
       let timerDeleteQuery = supabase
         .from('checklist_task_times')
         .delete()
@@ -64,7 +66,19 @@ export function useChecklistCompletions({
       // Immediate local reset so card volta para "Play" sem esperar refetch
       queryClient.setQueriesData({ queryKey: ['checklist-active-timers'] }, (prev: any) => {
         if (!Array.isArray(prev)) return prev;
-        return prev.filter((t: any) => (t.item_id ?? t.itemId) !== itemId);
+        return prev.filter((t: any) => {
+          const timerItemId = t.item_id ?? t.itemId;
+          const timerDate = t.date;
+          const timerType = t.checklist_type ?? t.checklistType;
+          const timerUnitId = t.unit_id ?? t.unitId;
+
+          const sameItem = timerItemId === itemId;
+          const sameDate = timerDate ? timerDate === date : true;
+          const sameType = timerType ? timerType === checklistType : true;
+          const sameUnit = activeUnitId ? timerUnitId === activeUnitId : true;
+
+          return !(sameItem && sameDate && sameType && sameUnit);
+        });
       });
 
       await Promise.all([
