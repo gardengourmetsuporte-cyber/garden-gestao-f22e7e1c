@@ -1158,27 +1158,67 @@ export function ChecklistView({
                               );
                             }
 
+                            // Timer mode: check if item has active timer (standard)
+                            const stdActiveTimer = isTimerMode && getActiveTimer ? getActiveTimer(item.id) : undefined;
+                            const stdItemStats = isTimerMode && timeStats ? timeStats.get(item.id) : undefined;
+
+                            const handleStdTimerClick = () => {
+                              if (!canToggle) return;
+                              if (stdActiveTimer || (isTimerMode && onStartTimer && validatePin)) {
+                                setPendingTimerItemId(item.id);
+                                setPendingTimerPoints(configuredPoints);
+                                setPinDialogOpen(true);
+                              } else {
+                                setOpenPopover(openPopover === item.id ? null : item.id);
+                              }
+                            };
+
                             return (
                               <div key={item.id}>
                                 <button
                                   disabled={!canToggle}
-                                  onClick={() => canToggle && setOpenPopover(openPopover === item.id ? null : item.id)}
+                                  onClick={() => isTimerMode ? handleStdTimerClick() : (canToggle && setOpenPopover(openPopover === item.id ? null : item.id))}
                                   className={cn(
                                     "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
                                     !canToggle && "cursor-not-allowed opacity-80",
                                     canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
                                     "card-base border-2",
+                                    stdActiveTimer && "border-primary/50 bg-primary/5",
                                     openPopover === item.id && "border-primary/50 shadow-md"
                                   )}
                                   style={{ animationDelay: `${itemIndex * 40}ms` }}
                                 >
-                                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
+                                  {isTimerMode ? (
+                                    stdActiveTimer ? (
+                                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-primary/15 border-2 border-primary/30">
+                                        <AppIcon name="Timer" className="w-4 h-4 text-primary animate-pulse" />
+                                      </div>
+                                    ) : (
+                                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
+                                        <AppIcon name="Play" className="w-4 h-4 text-muted-foreground" />
+                                      </div>
+                                    )
+                                  ) : (
+                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
+                                  )}
                                   <div className="flex-1 text-left">
                                     <div className="flex items-center gap-1.5">
                                       <p className="font-medium text-foreground">{item.name}</p>
                                       {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                      {isTimerMode && !stdActiveTimer && <AppIcon name="Timer" className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
                                     </div>
                                     {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                                    {stdActiveTimer && (
+                                      <div className="mt-1.5 flex items-center gap-2">
+                                        <TimerBadge timer={stdActiveTimer} stats={stdItemStats} minExecutions={timerMinExecutions} />
+                                        <span className="text-[10px] text-muted-foreground">{stdActiveTimer.userName}</span>
+                                      </div>
+                                    )}
+                                    {!stdActiveTimer && stdItemStats && isTimerMode && (
+                                      <div className="mt-1">
+                                        <TimerStatsIndicator stats={stdItemStats} minExecutions={timerMinExecutions} />
+                                      </div>
+                                    )}
                                   </div>
                                   {configuredPoints > 0 ? (
                                     <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
