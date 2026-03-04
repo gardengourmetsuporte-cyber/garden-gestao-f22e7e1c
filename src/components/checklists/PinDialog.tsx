@@ -88,7 +88,7 @@ export function PinDialog({ open, onOpenChange, onSubmit, title = 'Digite seu PI
         )}
 
         {/* Numpad */}
-        <div className="grid grid-cols-3 gap-4 max-w-[320px] mx-auto">
+        <div className="grid grid-cols-3 gap-4 w-full max-w-[420px] mx-auto px-3 sm:px-0">
           {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'back'].map((key) => {
             if (key === '') return <div key="empty" />;
             if (key === 'back') {
@@ -96,9 +96,9 @@ export function PinDialog({ open, onOpenChange, onSubmit, title = 'Digite seu PI
                 <button
                   key="back"
                   onClick={handleBackspace}
-                  className="h-16 rounded-2xl flex items-center justify-center hover:bg-secondary transition-colors active:scale-95"
+                  className="h-20 rounded-2xl flex items-center justify-center hover:bg-secondary transition-colors active:scale-95"
                 >
-                  <AppIcon name="Delete" className="w-7 h-7 text-muted-foreground" />
+                  <AppIcon name="Delete" className="w-8 h-8 text-muted-foreground" />
                 </button>
               );
             }
@@ -107,7 +107,7 @@ export function PinDialog({ open, onOpenChange, onSubmit, title = 'Digite seu PI
                 key={key}
                 onClick={() => handleKey(key)}
                 disabled={loading}
-                className="h-16 rounded-2xl bg-secondary/50 hover:bg-secondary text-2xl font-bold text-foreground transition-all active:scale-95 active:bg-primary/20"
+                className="h-20 rounded-2xl bg-secondary/50 hover:bg-secondary text-4xl font-bold text-foreground transition-all active:scale-95 active:bg-primary/20"
               >
                 {key}
               </button>
