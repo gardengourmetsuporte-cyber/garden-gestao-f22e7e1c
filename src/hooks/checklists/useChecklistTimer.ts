@@ -256,22 +256,28 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     }));
   }, []);
 
-  // Cancel/reset timer for an item — deletes ALL timer rows (active or finished) for this item+date
+  // Cancel/reset timer for an item via backend RPC (bypasses restrictive RLS safely)
   const cancelTimer = useCallback(async (itemId: string) => {
     if (!activeUnitId) return;
-    // Delete any timer rows for this item on this date (both active and finished)
-    const { error } = await supabase
-      .from('checklist_task_times')
-      .delete()
-      .eq('item_id', itemId)
-      .eq('unit_id', activeUnitId)
-      .eq('checklist_type', checklistType)
-      .eq('date', date);
+
+    const { data: deletedCount, error } = await supabase.rpc('reset_checklist_timer', {
+      p_unit_id: activeUnitId,
+      p_item_id: itemId,
+      p_date: date,
+      p_checklist_type: checklistType,
+    });
+
     if (error) {
       toast.error('Erro ao resetar timer');
       console.error(error);
       return;
     }
+
+    if (!deletedCount || Number(deletedCount) <= 0) {
+      toast.error('Não foi possível resetar este timer');
+      return;
+    }
+
     // Remove from local state immediately
     setActiveTimers(prev => prev.filter(t => t.itemId !== itemId));
     queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
