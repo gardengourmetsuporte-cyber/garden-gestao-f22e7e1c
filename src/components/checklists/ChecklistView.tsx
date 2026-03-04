@@ -771,7 +771,7 @@ export function ChecklistView({
                             )}
                           </div>
                           {configuredPoints > 0 ? (
-                            <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200 animate-pulse")}
+                            <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
                               style={{
                                 backgroundColor: getItemPointsColors(configuredPoints).bg,
                                 color: getItemPointsColors(configuredPoints).color,
