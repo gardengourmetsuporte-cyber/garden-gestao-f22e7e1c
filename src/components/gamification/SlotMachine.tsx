@@ -110,10 +110,10 @@ export function SlotMachine({ prizes, onResult, disabled }: SlotMachineProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-5 w-full max-w-xs mx-auto">
       {/* Machine frame */}
       <div
-        className="relative rounded-2xl p-1"
+        className="relative rounded-2xl p-1 w-full"
         style={{
           background: 'linear-gradient(145deg, #d4a017, #b8860b, #d4a017)',
           boxShadow: '0 0 30px rgba(212, 160, 23, 0.4), inset 0 0 20px rgba(0,0,0,0.3)',
@@ -180,7 +180,7 @@ export function SlotMachine({ prizes, onResult, disabled }: SlotMachineProps) {
 
             {/* Reels */}
             <div
-              className="flex gap-1 rounded-lg overflow-hidden"
+              className="grid grid-cols-3 gap-0 rounded-lg overflow-hidden"
               style={{
                 height: `${VISIBLE_ROWS * SYMBOL_HEIGHT}px`,
                 background: 'linear-gradient(180deg, #1a0000, #2a0000)',
@@ -281,7 +281,7 @@ function Reel({ symbols, prizes, offset, transitioning, duration, reelIndex, onS
 
   return (
     <div
-      className="flex-1 overflow-hidden relative"
+      className="overflow-hidden relative"
       style={{
         height: `${VISIBLE_ROWS * SYMBOL_HEIGHT}px`,
         borderRight: reelIndex < 2 ? '1px solid rgba(212, 160, 23, 0.3)' : undefined,
@@ -305,7 +305,7 @@ function Reel({ symbols, prizes, offset, transitioning, duration, reelIndex, onS
             style={{
               height: `${SYMBOL_HEIGHT}px`,
               width: '100%',
-              fontSize: '40px',
+              fontSize: '36px',
               textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}
           >

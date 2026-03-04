@@ -247,6 +247,12 @@ export default function DigitalMenu() {
       {/* Game tab */}
       {activeTab === 'game' && (
         <div className="px-4 pt-6 pb-28 flex flex-col items-center gap-6">
+          {/* Unit logo */}
+          {unit?.store_info?.logo_url && (
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/30 shadow-lg">
+              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover" />
+            </div>
+          )}
           <div className="text-center">
             <h2 className="text-xl font-bold text-foreground">🎰 Roleta da Sorte</h2>
             <p className="text-sm text-muted-foreground mt-1">
