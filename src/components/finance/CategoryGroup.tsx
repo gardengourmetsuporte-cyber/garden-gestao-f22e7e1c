@@ -22,6 +22,9 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
     return sum;
   }, 0);
 
+  const pendingCount = transactions.filter(t => !t.is_paid).length;
+  const allPaid = pendingCount === 0;
+
   const icon = isTransfer ? 'SwapHoriz' : category?.icon || 'Category';
   const name = isTransfer ? 'Transferências' : category?.name || 'Sem categoria';
   const color = isTransfer ? 'hsl(var(--muted-foreground))' : category?.color || 'hsl(var(--muted-foreground))';
@@ -40,6 +43,15 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 shrink-0">
             {transactions.length}
           </Badge>
+          {allPaid ? (
+            <div className="w-4 h-4 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+              <AppIcon name="Check" size={10} className="text-success" />
+            </div>
+          ) : (
+            <Badge className="text-[9px] px-1.5 py-0 h-4 shrink-0 bg-warning/15 text-warning border-warning/30 hover:bg-warning/20">
+              {pendingCount} pendente{pendingCount > 1 ? 's' : ''}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           <span className={cn(
