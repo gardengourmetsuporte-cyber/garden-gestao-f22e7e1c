@@ -348,9 +348,9 @@ export default function ChecklistsPage() {
     };
   }, [currentDate, activeUnitId, checklistType, queryClient, fetchCompletions]);
 
-  const handleToggleItem = async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean) => {
+  const handleToggleItem = async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => {
     try {
-      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck);
+      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao marcar item');
     }

@@ -24,7 +24,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean) => Promise<void>;
+  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => Promise<void>;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -572,10 +572,14 @@ export function ChecklistView({
                                   onClick={async () => {
                                     setOpenPopover(null);
                                     setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                    const resumeUserId = completion?.completed_by || currentUserId;
-                                    const startPromise = (onStartTimer && resumeUserId) ? onStartTimer(item.id, resumeUserId) : Promise.resolve();
-                                    const togglePromise = onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                    await Promise.all([startPromise, togglePromise]);
+                                    try {
+                                      const resumeUserId = completion?.completed_by || currentUserId;
+                                      await onToggleItem(item.id, 0, undefined, undefined, undefined, true, true);
+                                      if (onStartTimer && resumeUserId) await onStartTimer(item.id, resumeUserId);
+                                    } catch (error: any) {
+                                      setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
+                                      toast.error(error.message || 'Erro ao continuar tarefa');
+                                    }
                                   }}
                                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                 >
@@ -598,10 +602,11 @@ export function ChecklistView({
                                       setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                       try {
                                         await onCancelTimer(item.id, { includeFinished: true });
-                                        await onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                      } catch (error) {
-                                        console.error('Erro ao resetar tarefa no card:', error);
-                                        toast.error('Erro ao resetar tarefa');
+                                        await onToggleItem(item.id, 0, undefined, undefined, undefined, true, true);
+                                      } catch (error: any) {
+                                        setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
+                                        toast.error(error.message || 'Erro ao resetar tarefa');
+                                        console.error('Reset error:', error);
                                       }
                                     }}
                                     className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
@@ -1096,10 +1101,14 @@ export function ChecklistView({
                                           onClick={async () => {
                                             setOpenPopover(null);
                                             setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                            const resumeUserId = completion?.completed_by || currentUserId;
-                                            const startPromise = (onStartTimer && resumeUserId) ? onStartTimer(item.id, resumeUserId) : Promise.resolve();
-                                            const togglePromise = onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                            await Promise.all([startPromise, togglePromise]);
+                                            try {
+                                              const resumeUserId = completion?.completed_by || currentUserId;
+                                              await onToggleItem(item.id, 0, undefined, undefined, undefined, true, true);
+                                              if (onStartTimer && resumeUserId) await onStartTimer(item.id, resumeUserId);
+                                            } catch (error: any) {
+                                              setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
+                                              toast.error(error.message || 'Erro ao continuar tarefa');
+                                            }
                                           }}
                                           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                         >
@@ -1119,9 +1128,14 @@ export function ChecklistView({
                                             onClick={async () => {
                                               setOpenPopover(null);
                                               setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
-                                              const togglePromise = onToggleItem(item.id, 0, undefined, undefined, undefined, true);
-                                              const cancelPromise = onCancelTimer(item.id, { includeFinished: true });
-                                              await Promise.all([togglePromise, cancelPromise]);
+                                              try {
+                                                await onCancelTimer(item.id, { includeFinished: true });
+                                                await onToggleItem(item.id, 0, undefined, undefined, undefined, true, true);
+                                              } catch (error: any) {
+                                                setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
+                                                toast.error(error.message || 'Erro ao resetar tarefa');
+                                                console.error('Reset error:', error);
+                                              }
                                             }}
                                             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
                                           >
