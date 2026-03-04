@@ -358,6 +358,23 @@ export function useTimeTracking() {
     }
   };
 
+  // Delete a time record
+  const deleteRecord = async (recordId: string) => {
+    try {
+      const { error } = await supabase
+        .from('time_records' as any)
+        .delete()
+        .eq('id', recordId);
+      if (error) throw error;
+      invalidate();
+      toast.success('Registro de ponto excluído');
+      return true;
+    } catch {
+      toast.error('Erro ao excluir registro');
+      return false;
+    }
+  };
+
   // Today's record for current user
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const todayRecord = records.find(r => r.user_id === user?.id && r.date === todayStr) || null;
@@ -370,6 +387,7 @@ export function useTimeTracking() {
     checkIn,
     checkOut,
     createManualEntry,
+    deleteRecord,
     saveSettings,
     refetch: invalidate,
   };
