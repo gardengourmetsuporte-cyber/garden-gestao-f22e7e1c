@@ -34,7 +34,6 @@ export function TimerBadge({ timer, stats, minExecutions = 3, className }: Timer
           : "bg-primary/10 text-primary border-primary/30",
       className
     )}>
-      <AppIcon name="Timer" className="w-3.5 h-3.5" />
       <span className="tabular-nums">{formatDuration(elapsed)}</span>
       {hasStats && (
         <span className="text-[10px] font-normal opacity-70">
