@@ -238,4 +238,7 @@ export const ICON_MAP: Record<string, string> = {
   Edit2: 'edit',
   FileImage: 'image',
   ImageIcon: 'image',
+  Play: 'play_arrow',
+  Pause: 'pause',
+  Power: 'power_settings_new',
 };
