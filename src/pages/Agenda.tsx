@@ -321,6 +321,33 @@ export default function Agenda() {
               </div>
             )}
             <div className="flex items-center gap-2 ml-auto">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-xl w-10 h-10"
+                title="Ordenar por data"
+                onClick={() => {
+                  const sorted = [...pendingTasks]
+                    .sort((a, b) => {
+                      if (!a.due_date && !b.due_date) return 0;
+                      if (!a.due_date) return 1;
+                      if (!b.due_date) return -1;
+                      const cmp = a.due_date.localeCompare(b.due_date);
+                      if (cmp !== 0) return cmp;
+                      return (a.due_time || '').localeCompare(b.due_time || '');
+                    });
+                  reorderTasks(sorted.map((t, i) => ({ id: t.id, sort_order: i })));
+                  setTempTasks(prev => {
+                    const base = prev || tasks;
+                    const orderMap = new Map(sorted.map((t, i) => [t.id, i]));
+                    return base.map(t => orderMap.has(t.id) ? { ...t, sort_order: orderMap.get(t.id)! } : t)
+                      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+                  });
+                  import('sonner').then(({ toast }) => toast.success('Tarefas ordenadas por data!'));
+                }}
+              >
+                <AppIcon name="Sort" size={20} />
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="ghost" className="rounded-xl w-10 h-10">
