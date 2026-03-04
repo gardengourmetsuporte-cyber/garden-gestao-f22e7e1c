@@ -146,6 +146,141 @@ export type Database = {
           },
         ]
       }
+      brand_assets: {
+        Row: {
+          created_at: string
+          description: string
+          file_url: string
+          id: string
+          sort_order: number
+          tags: string[]
+          title: string
+          type: Database["public"]["Enums"]["brand_asset_type"]
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          file_url: string
+          id?: string
+          sort_order?: number
+          tags?: string[]
+          title?: string
+          type?: Database["public"]["Enums"]["brand_asset_type"]
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          file_url?: string
+          id?: string
+          sort_order?: number
+          tags?: string[]
+          title?: string
+          type?: Database["public"]["Enums"]["brand_asset_type"]
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_assets_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_identity: {
+        Row: {
+          colors: Json
+          created_at: string
+          id: string
+          institutional_phrases: string[]
+          tagline: string
+          tone_of_voice: string
+          typography: Json
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          colors?: Json
+          created_at?: string
+          id?: string
+          institutional_phrases?: string[]
+          tagline?: string
+          tone_of_voice?: string
+          typography?: Json
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          colors?: Json
+          created_at?: string
+          id?: string
+          institutional_phrases?: string[]
+          tagline?: string
+          tone_of_voice?: string
+          typography?: Json
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_identity_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_references: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          media_urls: string[]
+          sort_order: number
+          title: string
+          type: Database["public"]["Enums"]["brand_reference_type"]
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          media_urls?: string[]
+          sort_order?: number
+          title?: string
+          type?: Database["public"]["Enums"]["brand_reference_type"]
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          media_urls?: string[]
+          sort_order?: number
+          title?: string
+          type?: Database["public"]["Enums"]["brand_reference_type"]
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_references_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cash_closings: {
         Row: {
           cash_amount: number
@@ -4627,6 +4762,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "funcionario" | "super_admin"
+      brand_asset_type:
+        | "logo"
+        | "product_photo"
+        | "environment"
+        | "menu"
+        | "manual"
+        | "reference"
+      brand_reference_type: "strategy" | "campaign_history" | "visual_reference"
       cash_closing_status: "pending" | "approved" | "divergent"
       chat_conversation_type: "direct" | "group" | "announcement"
       checklist_type: "abertura" | "fechamento" | "limpeza" | "bonus"
@@ -4774,6 +4917,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "funcionario", "super_admin"],
+      brand_asset_type: [
+        "logo",
+        "product_photo",
+        "environment",
+        "menu",
+        "manual",
+        "reference",
+      ],
+      brand_reference_type: [
+        "strategy",
+        "campaign_history",
+        "visual_reference",
+      ],
       cash_closing_status: ["pending", "approved", "divergent"],
       chat_conversation_type: ["direct", "group", "announcement"],
       checklist_type: ["abertura", "fechamento", "limpeza", "bonus"],

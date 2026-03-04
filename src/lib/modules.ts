@@ -124,11 +124,12 @@ export const ALL_MODULES: ModuleDef[] = [
     key: 'ranking', label: 'Ranking', icon: 'Trophy', route: '/ranking', routes: ['/ranking'], group: 'Pessoas',
   },
   {
-    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing'], group: 'Premium',
+    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Premium',
     children: [
       { key: 'marketing.calendar', label: 'Calendário de posts', icon: 'Calendar' },
       { key: 'marketing.create', label: 'Criar/editar posts', icon: 'PenSquare' },
       { key: 'marketing.ai', label: 'Sugestões de IA', icon: 'Sparkles' },
+      { key: 'marketing.brand_core', label: 'Brand Core', icon: 'Palette' },
     ],
   },
   {
