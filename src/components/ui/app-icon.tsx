@@ -27,7 +27,7 @@ export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
           height: size,
           overflow: 'hidden',
           display: 'inline-block',
-          fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' 0, 'opsz' 24`,
+          fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' 200, 'opsz' 20`,
           ...style,
         }}
       >
