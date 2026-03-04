@@ -267,26 +267,48 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     }
 
     const includeFinished = options?.includeFinished ?? false;
+    let deletedCount = 0;
 
-    // 1) Try direct delete first (fast path)
-    let directQuery = supabase
+    // includeFinished precisa sempre passar pelo RPC seguro (RLS bloqueia DELETE direto)
+    if (includeFinished) {
+      const { data: rpcDeletedCount, error: rpcError } = await supabase.rpc('reset_checklist_timer', {
+        p_unit_id: activeUnitId,
+        p_item_id: itemId,
+        p_date: date,
+        p_checklist_type: checklistType,
+      });
+
+      if (rpcError) {
+        toast.error('Erro ao resetar tarefa');
+        console.error('cancelTimer includeFinished rpc error:', { rpcError, itemId, activeUnitId, checklistType, date });
+        return;
+      }
+
+      deletedCount = Number(rpcDeletedCount || 0);
+
+      // Se não havia linha de timer, não deve bloquear o reset da tarefa
+      setActiveTimers(prev => prev.filter(t => t.itemId !== itemId));
+      queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
+      queryClient.invalidateQueries({ queryKey: ['checklist-time-stats'] });
+      toast.success('✅ Tarefa resetada');
+      return;
+    }
+
+    // 1) Try direct delete first (fast path for active timer only)
+    const { data: directDeleted, error: directError } = await supabase
       .from('checklist_task_times')
       .delete()
       .eq('unit_id', activeUnitId)
       .eq('item_id', itemId)
       .eq('date', date)
-      .eq('checklist_type', checklistType);
+      .eq('checklist_type', checklistType)
+      .is('finished_at', null)
+      .select('id');
 
-    directQuery = includeFinished
-      ? directQuery
-      : directQuery.is('finished_at', null);
+    deletedCount = Array.isArray(directDeleted) ? directDeleted.length : 0;
 
-    const { data: directDeleted, error: directError } = await directQuery.select('id');
-
-    let deletedCount = Array.isArray(directDeleted) ? directDeleted.length : 0;
-
-    // 2) If direct path fails, fallback to secure RPC (active timers only)
-    if (directError && !includeFinished) {
+    // 2) Fallback to secure RPC (covers RLS and race conditions)
+    if (directError || deletedCount <= 0) {
       const { data: rpcDeletedCount, error: rpcError } = await supabase.rpc('reset_checklist_timer', {
         p_unit_id: activeUnitId,
         p_item_id: itemId,
@@ -296,7 +318,7 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
 
       if (rpcError) {
         toast.error('Erro ao resetar timer');
-        console.error('cancelTimer direct+rpc error:', { directError, rpcError, itemId, activeUnitId, checklistType, date, includeFinished });
+        console.error('cancelTimer direct+rpc error:', { directError, rpcError, itemId, activeUnitId, checklistType, date });
         return;
       }
 
@@ -304,7 +326,7 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     }
 
     if (!deletedCount || Number(deletedCount) <= 0) {
-      toast.error(includeFinished ? 'Não foi possível resetar esta tarefa' : 'Não foi possível resetar este timer');
+      toast.error('Não foi possível resetar este timer');
       return;
     }
 
@@ -312,7 +334,7 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     setActiveTimers(prev => prev.filter(t => t.itemId !== itemId));
     queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
     queryClient.invalidateQueries({ queryKey: ['checklist-time-stats'] });
-    toast.success(includeFinished ? '✅ Tarefa resetada' : '⏱️ Timer resetado');
+    toast.success('⏱️ Timer resetado');
   }, [activeUnitId, checklistType, date, queryClient]);
 
   // Check if an item has an active timer
