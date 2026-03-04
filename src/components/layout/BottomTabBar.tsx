@@ -61,14 +61,14 @@ export function BottomTabBar() {
     resolvedTabs.push(HOME_TAB);
     // Add pinned tabs (always show them, regardless of access — locked state handled visually)
     for (const pt of pinnedTabs) {
-      if (resolvedTabs.length < 4) {
+      if (resolvedTabs.length < 3) {
         resolvedTabs.push(pt);
       }
     }
     // Fill remaining slots with fallback modules to guarantee 4 tabs
-    if (resolvedTabs.length < 4) {
+    if (resolvedTabs.length < 3) {
       for (const key of FALLBACK_MODULE_KEYS) {
-        if (resolvedTabs.length >= 4) break;
+        if (resolvedTabs.length >= 3) break;
         if (resolvedTabs.some(t => t.moduleKey === key)) continue;
         const mod = ALL_MODULES.find(m => m.key === key);
         if (!mod) continue;
