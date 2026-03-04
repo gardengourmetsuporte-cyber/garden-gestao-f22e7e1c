@@ -740,7 +740,7 @@ export function ChecklistView({
                     const itemStats = isTimerMode && timeStats ? timeStats.get(item.id) : undefined;
 
                     // Timer mode: handle click differently
-                    const handleTimerClick = () => {
+                    const handleTimerClick = (event: React.MouseEvent<HTMLButtonElement>) => {
                       if (!canToggle) return;
                       if (activeTimer) {
                         // Has active timer → toggle popover with finish/reset options
@@ -750,8 +750,11 @@ export function ChecklistView({
                         setPendingTimerItemId(item.id);
                         setPendingTimerPoints(configuredPoints);
                         setPinDialogOpen(true);
+                      } else if (!isAdmin) {
+                        // Standard mode for non-admin: single tap completes directly
+                        handleComplete(item.id, configuredPoints, configuredPoints, undefined, event.currentTarget);
                       } else {
-                        // Standard mode
+                        // Standard mode for admin keeps the action panel
                         setOpenPopover(openPopover === item.id ? null : item.id);
                       }
                     };
