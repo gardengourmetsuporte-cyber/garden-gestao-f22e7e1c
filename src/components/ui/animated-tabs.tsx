@@ -33,11 +33,14 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
     }
   }, [activeTab, tabs]);
 
+  const isCompact = tabs.length >= 4;
+
   return (
     <div
       ref={containerRef}
       className={cn(
-        "relative flex bg-muted/50 rounded-2xl p-1 border border-border overflow-hidden",
+        "relative flex bg-muted/50 rounded-2xl p-1 border border-border",
+        isCompact ? "overflow-x-auto scrollbar-none" : "overflow-hidden",
         className
       )}
     >
@@ -57,15 +60,17 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
           ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
           onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
           className={cn(
-            "relative flex-1 flex items-center justify-center gap-1.5 py-3 px-1 min-h-[44px] min-w-0 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
+            "relative flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
+            isCompact ? "min-w-0 shrink-0 px-3 flex-1" : "flex-1 px-1",
+            "min-h-[44px]",
             activeTab === tab.key ? 'text-emerald-400' : 'text-muted-foreground'
           )}
         >
           {tab.icon}
-          <span className="truncate">{tab.label}</span>
+          <span className={cn(isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
           {tab.badge !== undefined && tab.badge > 0 && (
             <span className={cn(
-              "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center",
+              "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0",
               activeTab === tab.key
                 ? "bg-emerald-500/15 text-emerald-400"
                 : "bg-muted text-muted-foreground"
