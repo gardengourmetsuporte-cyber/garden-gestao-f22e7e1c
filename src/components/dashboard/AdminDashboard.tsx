@@ -122,9 +122,9 @@ export function AdminDashboard() {
 
           case 'bills-due':
             return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
-              <DashboardSection key={widget.key} title="Contas a vencer" icon="AlertTriangle" iconColor="text-amber-400" onNavigate={() => navigate('/finance')}>
-                <BillsDueWidget bills={stats.billsDueSoon || []} />
-              </DashboardSection>
+              <div key={widget.key} className="animate-spring-in">
+                <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
+              </div>
             ) : null;
 
           case 'calendar':

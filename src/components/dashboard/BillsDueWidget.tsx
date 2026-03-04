@@ -6,61 +6,12 @@ import type { BillDueSoon } from '@/hooks/useDashboardStats';
 
 interface Props {
   bills: BillDueSoon[];
-}
-
-function GroupedView({ bills }: { bills: BillDueSoon[] }) {
-  const groups: { label: string; items: BillDueSoon[] }[] = [];
-  const today: BillDueSoon[] = [];
-  const tomorrow: BillDueSoon[] = [];
-  const later: BillDueSoon[] = [];
-
-  bills.forEach(b => {
-    if (b.daysUntilDue <= 0) today.push(b);
-    else if (b.daysUntilDue === 1) tomorrow.push(b);
-    else later.push(b);
-  });
-
-  if (today.length) groups.push({ label: 'Vence hoje', items: today });
-  if (tomorrow.length) groups.push({ label: 'Vence amanhã', items: tomorrow });
-  if (later.length) groups.push({ label: 'Próximos dias', items: later });
-
-  return (
-    <div className="space-y-3">
-      {groups.map(group => {
-        const subtotal = group.items.reduce((s, b) => s + b.amount, 0);
-        return (
-          <div key={group.label} className="space-y-1">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                {group.label} ({group.items.length})
-              </span>
-              <span className="text-[10px] font-bold text-warning">{formatCurrency(subtotal)}</span>
-            </div>
-            <div className="space-y-1">
-              {group.items.map(bill => (
-                <BillRow key={bill.id} bill={bill} />
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function ListView({ bills }: { bills: BillDueSoon[] }) {
-  return (
-    <div className="space-y-1.5">
-      {bills.map(bill => (
-        <BillRow key={bill.id} bill={bill} />
-      ))}
-    </div>
-  );
+  onNavigate?: () => void;
 }
 
 function BillRow({ bill }: { bill: BillDueSoon }) {
   return (
-    <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/40">
+    <div className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/40">
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-foreground truncate">{bill.description}</p>
         <p className="text-[10px] text-muted-foreground">
@@ -81,9 +32,61 @@ function BillRow({ bill }: { bill: BillDueSoon }) {
   );
 }
 
-export function BillsDueWidget({ bills }: Props) {
+function GroupedView({ bills }: { bills: BillDueSoon[] }) {
+  const today: BillDueSoon[] = [];
+  const tomorrow: BillDueSoon[] = [];
+  const later: BillDueSoon[] = [];
+
+  bills.forEach(b => {
+    if (b.daysUntilDue <= 0) today.push(b);
+    else if (b.daysUntilDue === 1) tomorrow.push(b);
+    else later.push(b);
+  });
+
+  const groups = [
+    { label: 'Vence hoje', items: today },
+    { label: 'Vence amanhã', items: tomorrow },
+    { label: 'Próximos dias', items: later },
+  ].filter(g => g.items.length > 0);
+
+  return (
+    <div className="space-y-3">
+      {groups.map(group => {
+        const subtotal = group.items.reduce((s, b) => s + b.amount, 0);
+        return (
+          <div key={group.label} className="space-y-1.5">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                {group.label} ({group.items.length})
+              </span>
+              <span className="text-[10px] font-bold text-destructive">{formatCurrency(subtotal)}</span>
+            </div>
+            <div className="space-y-1">
+              {group.items.map(bill => (
+                <BillRow key={bill.id} bill={bill} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ListView({ bills }: { bills: BillDueSoon[] }) {
+  const sorted = [...bills].sort((a, b) => a.daysUntilDue - b.daysUntilDue);
+  return (
+    <div className="space-y-1">
+      {sorted.map(bill => (
+        <BillRow key={bill.id} bill={bill} />
+      ))}
+    </div>
+  );
+}
+
+export function BillsDueWidget({ bills, onNavigate }: Props) {
   const [viewMode, setViewMode] = useState<'grouped' | 'list'>(() => {
-    return (localStorage.getItem('bills-due-view') as 'grouped' | 'list') || 'list';
+    return (localStorage.getItem('bills-due-view') as 'grouped' | 'list') || 'grouped';
   });
 
   const toggleView = () => {
@@ -99,22 +102,29 @@ export function BillsDueWidget({ bills }: Props) {
   return (
     <div className="card-command p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <button
+          onClick={onNavigate}
+          className={cn("flex items-center gap-2", onNavigate ? 'cursor-pointer' : 'cursor-default')}
+          disabled={!onNavigate}
+          type="button"
+        >
           <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center">
             <AppIcon name="AlertTriangle" size={16} className="text-warning" />
           </div>
-          <div>
+          <div className="text-left">
             <h3 className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
               Contas a Vencer
             </h3>
             <span className="text-[10px] text-muted-foreground">Próximos 7 dias</span>
           </div>
-        </div>
+          {onNavigate && <AppIcon name="ChevronRight" size={12} className="ml-1 text-muted-foreground/40" />}
+        </button>
         <div className="flex items-center gap-2">
           <button
-            onClick={toggleView}
-            className="p-1.5 rounded-lg bg-secondary/60 hover:bg-secondary transition-colors"
+            onClick={(e) => { e.stopPropagation(); toggleView(); }}
+            className="p-1.5 rounded-lg bg-secondary/60 hover:bg-secondary transition-colors touch-manipulation"
             title={viewMode === 'list' ? 'Agrupar' : 'Lista'}
+            type="button"
           >
             <AppIcon
               name={viewMode === 'list' ? 'LayoutGrid' : 'List'}
