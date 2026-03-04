@@ -121,21 +121,27 @@ function PickerTaskList({ availableTasks, pickerHour, allocateTask }: {
       })}
       {uncategorized.length > 0 && (
         <div>
-          {grouped.size > 0 && (
-            <button
-              onClick={() => toggleGroup('__uncategorized__')}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-all"
-            >
-              <div className="flex items-center gap-2">
-                <AppIcon name="Folder" size={14} className="text-muted-foreground" />
-                <span className="text-sm font-semibold">Sem categoria</span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{uncategorized.length}</span>
-              </div>
-              <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", expandedGroups.has('__uncategorized__') ? "rotate-0" : "-rotate-90")} />
-            </button>
-          )}
-          <div className={cn("overflow-hidden transition-all duration-200", 
-            grouped.size === 0 || expandedGroups.has('__uncategorized__') ? "max-h-[2000px] opacity-100 mt-1.5" : "max-h-0 opacity-0"
+          <button
+            onClick={() => toggleGroup('__uncategorized__')}
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-all"
+          >
+            <div className="flex items-center gap-2">
+              <AppIcon name="Folder" size={14} className="text-muted-foreground" />
+              <span className="text-sm font-semibold">Sem categoria</span>
+              <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{uncategorized.length}</span>
+            </div>
+            <AppIcon
+              name="ChevronDown"
+              size={16}
+              className={cn(
+                "text-muted-foreground transition-transform duration-200",
+                expandedGroups.has('__uncategorized__') ? "rotate-0" : "-rotate-90"
+              )}
+            />
+          </button>
+          <div className={cn(
+            "overflow-hidden transition-all duration-200",
+            expandedGroups.has('__uncategorized__') ? "max-h-[2000px] opacity-100 mt-1.5" : "max-h-0 opacity-0"
           )}>
             <div className="space-y-1.5 ml-2">
               {uncategorized.map(task => (
@@ -422,7 +428,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
           />
 
           {/* Close button */}
-          <div className="sticky bottom-0 pb-4 pt-2">
+          <div className="pt-3 pb-1 border-t border-border/60 bg-background/95 backdrop-blur-sm">
             <Button variant="outline" className="w-full rounded-xl border-border" onClick={() => setPickerHour(null)}>
               Fechar
             </Button>
