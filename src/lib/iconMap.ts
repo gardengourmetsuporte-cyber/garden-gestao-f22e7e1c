@@ -70,6 +70,7 @@ export const ICON_MAP: Record<string, string> = {
   UserPlus: 'person_add',
   Users: 'group',
   UserSearch: 'contacts',
+  UserCheck: 'how_to_reg',
   MessageCircle: 'chat',
   MessageSquare: 'forum',
   Mail: 'mail',
