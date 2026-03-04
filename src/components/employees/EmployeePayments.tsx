@@ -126,23 +126,21 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
 
   return (
     <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+        <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
           <AppIcon name="ArrowLeft" size={20} />
         </Button>
-        <div className="flex-1">
-          <h2 className="font-semibold">{employee.full_name}</h2>
+        <div className="flex-1 min-w-0">
+          <h2 className="font-semibold text-lg truncate">{employee.full_name}</h2>
           <p className="text-sm text-muted-foreground">{employee.role || 'Funcionário'} • {formatCurrency(employee.base_salary)}/mês</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => { setEditingPayment(null); setSheetOpen(true); }}>
-            <AppIcon name="Plus" size={16} className="mr-2" />Vale/Bônus
-          </Button>
-          <Button onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
-            <AppIcon name="FileText" size={16} className="mr-2" />Holerite
-          </Button>
-        </div>
       </div>
+
+      {/* Action Button */}
+      <Button className="w-full h-12" onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
+        <AppIcon name="FileText" size={18} className="mr-2" />Gerar Holerite
+      </Button>
 
       {sortedGroups.map((group) => (
         <div key={`${group.year}-${group.month}`} className="space-y-2">
