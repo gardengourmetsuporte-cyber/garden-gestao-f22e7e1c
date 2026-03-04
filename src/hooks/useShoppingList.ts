@@ -38,7 +38,7 @@ export function useShoppingList() {
       if (!activeUnitId) return [];
       const { data, error } = await supabase
         .from('shopping_list_items')
-        .select('*, inventory_items:item_id(id, name, unit_type, current_stock, min_stock, supplier_id, category:category_id(name, color), supplier:supplier_id(name)), profiles:added_by(full_name)')
+        .select('*, inventory_items:item_id(id, name, unit_type, current_stock, min_stock, supplier_id, category:category_id(name, color), supplier:supplier_id(name))')
         .eq('unit_id', activeUnitId)
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
@@ -46,7 +46,7 @@ export function useShoppingList() {
       return (data || []).map((row: any) => ({
         ...row,
         inventory_item: row.inventory_items,
-        profile: row.profiles,
+        profile: null,
       })) as ShoppingListItem[];
     },
     enabled: !!activeUnitId,
