@@ -11,8 +11,7 @@ import { QuickActionSheet } from './QuickActionSheet';
 import { preloadRoute } from '@/lib/routePreload';
 import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
 import { useAuth } from '@/contexts/AuthContext';
-import { getModuleKeyFromRoute } from '@/lib/modules';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { getModuleKeyFromRoute, ALL_MODULES } from '@/lib/modules';
 import { useUnit } from '@/contexts/UnitContext';
 
 interface TabDef {
@@ -34,6 +33,9 @@ const CARDAPIO_TABS: TabDef[] = [
 
 const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
 
+// Modules to use as fallback when pinned tabs aren't accessible
+const FALLBACK_MODULE_KEYS = ['checklists', 'finance', 'ranking', 'inventory', 'employees', 'agenda', 'rewards'];
+
 export function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,40 +47,55 @@ export function BottomTabBar() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null);
 
   const isHidden = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r)) || location.pathname.startsWith('/tablet');
 
   const isCardapioRoute = location.pathname.startsWith('/cardapio');
 
+  // Build resolved tabs — always exactly 4 tabs (Home + 3 pinned)
   const resolvedTabs: TabDef[] = [];
 
   if (isCardapioRoute) {
     resolvedTabs.push(...CARDAPIO_TABS);
   } else {
     resolvedTabs.push(HOME_TAB);
-    // Use pinned tabs from user preference, filtering by access
+    // Add pinned tabs the user has access to
     for (const pt of pinnedTabs) {
-      if (hasAccess(pt.moduleKey)) {
+      if (hasAccess(pt.moduleKey) && resolvedTabs.length < 4) {
         resolvedTabs.push(pt);
+      }
+    }
+    // Fill remaining slots with fallback modules
+    if (resolvedTabs.length < 4) {
+      for (const key of FALLBACK_MODULE_KEYS) {
+        if (resolvedTabs.length >= 4) break;
+        if (resolvedTabs.some(t => t.moduleKey === key)) continue;
+        if (!hasAccess(key)) continue;
+        const mod = ALL_MODULES.find(m => m.key === key);
+        if (!mod) continue;
+        resolvedTabs.push({
+          key: mod.key,
+          icon: mod.icon,
+          label: mod.label,
+          path: mod.route,
+          moduleKey: mod.key,
+        });
       }
     }
   }
 
+  // Split tabs: first 2 on left of FAB, rest on right
   const leftTabs = resolvedTabs.slice(0, 2);
   const rightTabs = resolvedTabs.slice(2);
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/';
-    // Handle query param based tabs (e.g. /cardapio?tab=pedidos)
     if (path.includes('?')) {
       const [basePath, query] = path.split('?');
       const params = new URLSearchParams(query);
       const tabParam = params.get('tab');
       return location.pathname.startsWith(basePath) && new URLSearchParams(location.search).get('tab') === tabParam;
     }
-    // For /cardapio without ?tab, only match when no tab param is set
     if (isCardapioRoute && path === '/cardapio') {
       return location.pathname.startsWith('/cardapio') && !new URLSearchParams(location.search).get('tab');
     }
@@ -94,31 +111,11 @@ export function BottomTabBar() {
     return !planSatisfies(plan, required);
   };
 
-  const activeKey = resolvedTabs.find(t => isActive(t.path))?.key ?? null;
-
-  const updatePill = useCallback(() => {
-    if (!activeKey || !containerRef.current) {
-      setPillStyle(null);
-      return;
-    }
-    const activeEl = tabRefs.current[activeKey];
-    if (!activeEl) { setPillStyle(null); return; }
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const tabRect = activeEl.getBoundingClientRect();
-    setPillStyle({
-      left: tabRect.left - containerRect.left + (tabRect.width - 48) / 2,
-      width: 48,
-    });
-  }, [activeKey]);
-
-  useEffect(() => {
-    updatePill();
-    const t = setTimeout(updatePill, 100);
-    window.addEventListener('resize', updatePill);
-    return () => { window.removeEventListener('resize', updatePill); clearTimeout(t); };
-  }, [updatePill]);
-
   if (isHidden) return null;
+
+  // Total slots: leftTabs.length + FAB(1) + rightTabs.length + More(1)
+  const totalSlots = leftTabs.length + 1 + rightTabs.length + 1;
+  const slotWidth = `${100 / totalSlots}%`;
 
   return createPortal(
     <>
@@ -131,35 +128,33 @@ export function BottomTabBar() {
         {/* Subtle top separator */}
         <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
 
-        {/* Bar background — full width, edge to edge with strong glassmorphism */}
+        {/* Bar background */}
         <div
           className="relative bg-background/90 backdrop-blur-[32px]"
           style={{
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          {/* Animated ambient glow — clipped independently */}
+          {/* Animated ambient glow */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-0 tabbar-ambient-glow opacity-60 mix-blend-screen" />
           </div>
           <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10">
-            {/* No pill — active state is icon glow only */}
-
             {/* Left tabs */}
             {leftTabs.map(tab => (
               <TabButton
                 key={tab.key}
-                ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
                 locked={isTabLocked(tab.path)}
                 moreOpen={moreOpen}
+                slotWidth={slotWidth}
                 onClick={() => { setMoreOpen(false); isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path); }}
               />
             ))}
 
-            {/* Center FAB — context-aware */}
-            <div className="flex items-center justify-center" style={{ width: '20%' }}>
+            {/* Center FAB */}
+            <div className="flex items-center justify-center" style={{ width: slotWidth }}>
               <button
                 aria-label={fabAction?.label || 'Ação rápida'}
                 onClick={() => {
@@ -190,22 +185,22 @@ export function BottomTabBar() {
             {rightTabs.map(tab => (
               <TabButton
                 key={tab.key}
-                ref={(el) => { tabRefs.current[tab.key] = el; }}
                 tab={tab}
                 active={isActive(tab.path)}
                 locked={isTabLocked(tab.path)}
                 moreOpen={moreOpen}
+                slotWidth={slotWidth}
                 onClick={() => { setMoreOpen(false); isTabLocked(tab.path) ? navigate('/plans') : navigate(tab.path); }}
               />
             ))}
 
-            {/* "Mais" tab — 3-dot menu for cardápio, drawer for others */}
+            {/* "Mais" tab — always far right */}
             {isCardapioRoute ? (
               <button
                 onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }}
                 aria-label="Configurações"
                 className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
-                style={{ width: '20%' }}
+                style={{ width: slotWidth }}
               >
                 <span className="material-symbols-rounded text-muted-foreground transition-colors" style={{ fontSize: 22 }}>settings</span>
                 <span className="text-[10px] font-normal text-muted-foreground">Config</span>
@@ -215,7 +210,7 @@ export function BottomTabBar() {
                 onClick={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }}
                 aria-label="Mais opções"
                 className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
-                style={{ width: '20%' }}
+                style={{ width: slotWidth }}
               >
                 <div
                   style={{
@@ -243,20 +238,19 @@ const TabButton = forwardRef<
     active: boolean;
     locked?: boolean;
     moreOpen?: boolean;
+    slotWidth: string;
     onClick: () => void;
   }
->(({ tab, active: routeActive, locked, moreOpen, onClick }, ref) => {
+>(({ tab, active: routeActive, locked, moreOpen, slotWidth, onClick }, ref) => {
   const active = routeActive && !moreOpen;
   const [bouncing, setBouncing] = useState(false);
 
   const handleTap = () => {
     navigator.vibrate?.(10);
     setBouncing(true);
-    // If the More drawer is open, always navigate (close drawer + go to page)
     if (moreOpen) {
       onClick();
     } else if (active) {
-      // Already on this page — scroll to top
       const scrollable = document.querySelector('[data-scroll-container]')
         || document.querySelector('.flex-1.overflow-y-auto')
         || document.querySelector('main');
@@ -282,7 +276,7 @@ const TabButton = forwardRef<
         "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
         "text-muted-foreground"
       )}
-      style={{ width: '20%' }}
+      style={{ width: slotWidth }}
     >
       <div
         className="relative"
