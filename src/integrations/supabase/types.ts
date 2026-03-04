@@ -5030,6 +5030,15 @@ export type Database = {
         Args: { p_customer_id: string }
         Returns: undefined
       }
+      reset_checklist_timer: {
+        Args: {
+          p_checklist_type: string
+          p_date: string
+          p_item_id: string
+          p_unit_id: string
+        }
+        Returns: number
+      }
       user_has_unit_access: {
         Args: { _unit_id: string; _user_id: string }
         Returns: boolean
