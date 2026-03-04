@@ -611,7 +611,7 @@ export function ChecklistView({
                                       setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                       try {
                                         await onCancelTimer(item.id, { includeFinished: true });
-                                        await onToggleItem(item.id, 0, undefined, undefined, undefined, true, true);
+                                        await onToggleItem(item.id, 0, undefined, undefined, undefined, false, true);
                                       } catch (error: any) {
                                         setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
                                         toast.error(error.message || 'Erro ao resetar tarefa');
@@ -1139,7 +1139,7 @@ export function ChecklistView({
                                               setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                               try {
                                                 await onCancelTimer(item.id, { includeFinished: true });
-                                                await onToggleItem(item.id, 0, undefined, undefined, undefined, true, true);
+                                                await onToggleItem(item.id, 0, undefined, undefined, undefined, false, true);
                                               } catch (error: any) {
                                                 setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
                                                 toast.error(error.message || 'Erro ao resetar tarefa');
