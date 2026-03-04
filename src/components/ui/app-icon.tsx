@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { ICON_MAP } from '@/lib/iconMap';
+import { ICON_MAP, CUSTOM_SVG_ICONS } from '@/lib/iconMap';
 
 interface AppIconProps {
   name: string;
@@ -15,6 +15,33 @@ interface AppIconProps {
 
 export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
   ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
+    const customSvg = CUSTOM_SVG_ICONS[name];
+
+    if (customSvg) {
+      return (
+        <span
+          ref={ref}
+          className={cn("select-none leading-none inline-block", className)}
+          style={{
+            width: size,
+            height: size,
+            overflow: 'hidden',
+            display: 'inline-block',
+            maskImage: `url(${customSvg})`,
+            WebkitMaskImage: `url(${customSvg})`,
+            maskSize: 'contain',
+            WebkitMaskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            WebkitMaskRepeat: 'no-repeat',
+            maskPosition: 'center',
+            WebkitMaskPosition: 'center',
+            backgroundColor: 'currentColor',
+            ...style,
+          }}
+        />
+      );
+    }
+
     const materialName = ICON_MAP[name] || name;
 
     return (
