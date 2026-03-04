@@ -127,13 +127,6 @@ export default function Agenda() {
     updateTask({ id, title, notes: notes || undefined });
   };
 
-  const handleAddSubtask = (parentId: string, title: string) => {
-    addTask({ title, parent_id: parentId });
-  };
-
-  const handleUpdateSubtask = (id: string, title: string) => {
-    updateTask({ id, title });
-  };
 
   const handleCloseSheet = (open: boolean) => {
     setTaskSheetOpen(open);
@@ -196,8 +189,6 @@ export default function Agenda() {
         onDelete={deleteTask}
         onClick={() => handleEditTask(task)}
         onInlineUpdate={handleInlineUpdate}
-        onAddSubtask={handleAddSubtask}
-        onUpdateSubtask={handleUpdateSubtask}
       />
     </SortableTaskItem>
   );
@@ -290,8 +281,6 @@ export default function Agenda() {
                     onDelete={deleteTask}
                     onClick={() => handleEditTask(task)}
                     onInlineUpdate={handleInlineUpdate}
-                    onAddSubtask={handleAddSubtask}
-                    onUpdateSubtask={handleUpdateSubtask}
                   />
                 ))}
               </CollapsibleContent>

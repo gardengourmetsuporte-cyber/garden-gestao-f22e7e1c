@@ -47,13 +47,6 @@ export function AgendaDashboardWidget() {
     updateTask({ id, title, notes: notes || undefined });
   };
 
-  const handleAddSubtask = (parentId: string, title: string) => {
-    addTask({ title, parent_id: parentId });
-  };
-
-  const handleUpdateSubtask = (id: string, title: string) => {
-    updateTask({ id, title });
-  };
 
   const handleCloseSheet = (open: boolean) => {
     setTaskSheetOpen(open);
@@ -111,8 +104,6 @@ export function AgendaDashboardWidget() {
                 onDelete={deleteTask}
                 onClick={() => handleEditTask(task)}
                 onInlineUpdate={handleInlineUpdate}
-                onAddSubtask={handleAddSubtask}
-                onUpdateSubtask={handleUpdateSubtask}
               />
             ))}
           </div>
