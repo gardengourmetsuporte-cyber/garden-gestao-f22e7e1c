@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -18,6 +19,7 @@ import type { MarketingPost } from '@/types/marketing';
 
 export default function Marketing() {
   const { hasPlan } = useAuth();
+  const navigate = useNavigate();
   const { posts, isLoading, createPost, updatePost, deletePost, markPublished, uploadMedia } = useMarketing();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<MarketingPost | null>(null);
@@ -77,15 +79,20 @@ export default function Marketing() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-4">
-          <AnimatedTabs
-            tabs={[
-              { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
-              { key: 'feed', label: 'Feed', icon: <AppIcon name="LayoutList" size={16} /> },
-              { key: 'ideas', label: 'Ideias IA', icon: <AppIcon name="Sparkles" size={16} /> },
-            ]}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          />
+          <div className="flex items-center justify-between mb-1">
+            <AnimatedTabs
+              tabs={[
+                { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
+                { key: 'feed', label: 'Feed', icon: <AppIcon name="LayoutList" size={16} /> },
+                { key: 'ideas', label: 'Ideias IA', icon: <AppIcon name="Sparkles" size={16} /> },
+              ]}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
+            <button onClick={() => navigate('/brand-core')} className="shrink-0 ml-2 flex items-center gap-1 text-xs text-primary hover:underline">
+              <AppIcon name="Palette" size={14} /> Brand Core
+            </button>
+          </div>
 
           <div className="animate-fade-in" key={activeTab}>
             {activeTab === 'calendar' && (

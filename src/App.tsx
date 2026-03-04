@@ -66,6 +66,7 @@ const WhatsApp = lazy(() => lazyRetry(() => import("./pages/WhatsApp")));
 const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
 const Orders = lazy(() => lazyRetry(() => import("./pages/Orders")));
 const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
+const BrandCore = lazy(() => lazyRetry(() => import("./pages/BrandCore")));
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
@@ -197,6 +198,7 @@ function AppRoutes() {
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
           <Route path="/cardapio" element={<ProtectedRoute><CardapioHub /></ProtectedRoute>} />
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
+          <Route path="/brand-core" element={<ProtectedRoute><BrandCore /></ProtectedRoute>} />
           <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
 
