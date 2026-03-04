@@ -146,7 +146,7 @@ export function FinanceChartWidget() {
                 background: 'hsl(var(--destructive) / 0.15)',
               }}
             >
-              <AppIcon name="PieChart" size={18} className="text-destructive" />
+              <img src="/icons/chart-pie.png" alt="" className="w-[18px] h-[18px] dark:invert opacity-70" />
             </div>
             <div>
               <span className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Despesas do mês</span>
