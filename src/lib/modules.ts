@@ -46,6 +46,15 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'customers', label: 'Clientes', icon: 'UserSearch', route: '/customers', routes: ['/customers'], group: 'Gestão',
+    children: [
+      { key: 'customers.view', label: 'Ver clientes', icon: 'Eye' },
+      { key: 'customers.create', label: 'Criar/editar clientes', icon: 'PenSquare' },
+      { key: 'customers.import', label: 'Importar CSV', icon: 'Upload' },
+      { key: 'customers.delete', label: 'Excluir clientes', icon: 'Trash2' },
+    ],
+  },
+  {
     key: 'inventory', label: 'Estoque', icon: 'Package', route: '/inventory', routes: ['/inventory'], group: 'Gestão',
     children: [
       { key: 'inventory.view', label: 'Ver itens', icon: 'Eye' },
@@ -54,15 +63,6 @@ export const ALL_MODULES: ModuleDef[] = [
       { key: 'inventory.movements', label: 'Entradas e saídas', icon: 'ArrowLeftRight' },
       { key: 'inventory.invoices', label: 'Notas fiscais', icon: 'FileText' },
       { key: 'inventory.smart_receiving', label: 'Recebimento inteligente', icon: 'Camera' },
-    ],
-  },
-  {
-    key: 'customers', label: 'Clientes', icon: 'UserSearch', route: '/customers', routes: ['/customers'], group: 'Gestão',
-    children: [
-      { key: 'customers.view', label: 'Ver clientes', icon: 'Eye' },
-      { key: 'customers.create', label: 'Criar/editar clientes', icon: 'PenSquare' },
-      { key: 'customers.import', label: 'Importar CSV', icon: 'Upload' },
-      { key: 'customers.delete', label: 'Excluir clientes', icon: 'Trash2' },
     ],
   },
   {
