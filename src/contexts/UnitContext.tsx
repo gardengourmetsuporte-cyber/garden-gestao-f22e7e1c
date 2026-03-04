@@ -37,6 +37,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const hasInitialized = useRef(false);
+  const hasLoadedOnce = useRef(false);
   // Read isSuperAdmin via ref so fetchUnits doesn't re-create when role loads
   const isSuperAdminRef = useRef(isSuperAdmin);
   isSuperAdminRef.current = isSuperAdmin;
@@ -51,7 +52,10 @@ export function UnitProvider({ children }: { children: ReactNode }) {
     }
 
     const fetchId = ++fetchIdRef.current;
-    setIsLoading(true);
+    // Only show loading spinner on first load, not on refetches
+    if (!hasLoadedOnce.current) {
+      setIsLoading(true);
+    }
 
     try {
       const { data: userUnitsData } = await supabase
@@ -185,6 +189,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
     } finally {
       // Only the latest fetch sets loading to false
       if (fetchId === fetchIdRef.current) {
+        hasLoadedOnce.current = true;
         setIsLoading(false);
       }
     }
