@@ -749,15 +749,16 @@ export function ChecklistView({
                               <AppIcon name="Timer" className="w-4 h-4 text-primary animate-pulse" />
                             </div>
                           ) : (
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
-                          )}
-                          <div className="flex-1 text-left">
-                            <div className="flex items-center gap-1.5">
-                              <p className="font-medium text-foreground">{item.name}</p>
-                              {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
-                              {isTimerMode && !activeTimer && <AppIcon name="Timer" className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
+                              <AppIcon name="PlayArrow" className="w-4 h-4 text-muted-foreground" />
                             </div>
-                            {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                          )}
+                          <div className="flex-1 text-left min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-medium text-foreground truncate">{item.name}</p>
+                              {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
+                            </div>
+                            {item.description && <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>}
                             {activeTimer && (
                               <div className="mt-1.5 flex items-center gap-2">
                                 <TimerBadge timer={activeTimer} stats={itemStats} minExecutions={timerMinExecutions} />
@@ -1195,19 +1196,18 @@ export function ChecklistView({
                                       </div>
                                     ) : (
                                       <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
-                                        <AppIcon name="Play" className="w-4 h-4 text-muted-foreground" />
+                                        <AppIcon name="PlayArrow" className="w-4 h-4 text-muted-foreground" />
                                       </div>
                                     )
                                   ) : (
                                     <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
                                   )}
-                                  <div className="flex-1 text-left">
+                                  <div className="flex-1 text-left min-w-0">
                                     <div className="flex items-center gap-1.5">
-                                      <p className="font-medium text-foreground">{item.name}</p>
+                                      <p className="font-medium text-foreground truncate">{item.name}</p>
                                       {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
-                                      {isTimerMode && !stdActiveTimer && <AppIcon name="Timer" className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
                                     </div>
-                                    {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                                    {item.description && <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>}
                                     {stdActiveTimer && (
                                       <div className="mt-1.5 flex items-center gap-2">
                                         <TimerBadge timer={stdActiveTimer} stats={stdItemStats} minExecutions={timerMinExecutions} />
