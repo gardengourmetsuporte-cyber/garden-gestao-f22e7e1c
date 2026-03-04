@@ -163,11 +163,17 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                   </div>
                 </div>
 
-                {/* Salary + Menu */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <span className="text-sm font-medium text-muted-foreground hidden sm:block">
-                    {formatCurrency(employee.base_salary)}
-                  </span>
+                {/* Actions */}
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 text-xs"
+                    onClick={(e) => { e.stopPropagation(); onSelectEmployee(employee); }}
+                  >
+                    <AppIcon name="Receipt" size={14} className="mr-1" />
+                    Pagamentos
+                  </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
