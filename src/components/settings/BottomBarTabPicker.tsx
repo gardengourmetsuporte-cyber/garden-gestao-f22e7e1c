@@ -8,6 +8,7 @@ import { useUserModules } from '@/hooks/useAccessLevels';
 import { toast } from 'sonner';
 
 const EXCLUDED_KEYS = ['dashboard', 'settings'];
+const PINNED_COUNT = 3;
 
 interface Props {
   open: boolean;
@@ -28,17 +29,17 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
       if (prev.includes(key)) {
         return prev.filter(k => k !== key);
       }
-      if (prev.length >= 2) {
+      if (prev.length >= PINNED_COUNT) {
         // Replace oldest
-        return [prev[1], key];
+        return [...prev.slice(1), key];
       }
       return [...prev, key];
     });
   };
 
   const handleSave = () => {
-    if (selected.length !== 2) {
-      toast.error('Selecione exatamente 2 módulos');
+    if (selected.length !== PINNED_COUNT) {
+      toast.error(`Selecione exatamente ${PINNED_COUNT} módulos`);
       return;
     }
     setPinnedTabs(selected);
@@ -54,7 +55,7 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
         </SheetHeader>
 
         <p className="text-sm text-muted-foreground mt-1 mb-4">
-          Escolha 2 módulos para acesso rápido na barra inferior.
+          Escolha {PINNED_COUNT} módulos para acesso rápido na barra inferior.
         </p>
 
         <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-[50vh] pb-4">
@@ -95,15 +96,15 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
 
         <button
           onClick={handleSave}
-          disabled={selected.length !== 2}
+          disabled={selected.length !== PINNED_COUNT}
           className={cn(
             "w-full py-3.5 rounded-xl font-semibold text-sm transition-all",
-            selected.length === 2
+            selected.length === PINNED_COUNT
               ? "bg-primary text-primary-foreground hover:bg-primary/90"
               : "bg-muted/30 text-muted-foreground cursor-not-allowed"
           )}
         >
-          Salvar ({selected.length}/2)
+          Salvar ({selected.length}/{PINNED_COUNT})
         </button>
       </SheetContent>
     </Sheet>
