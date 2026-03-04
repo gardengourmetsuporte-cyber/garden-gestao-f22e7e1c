@@ -19,6 +19,16 @@ import {
 } from '@/components/ui/select';
 import { TIER_CONFIG, TIER_CONFIG_DARK, type MedalTier } from '@/lib/medals';
 import { useTheme } from 'next-themes';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function useTierConfig() {
   const { resolvedTheme } = useTheme();
@@ -70,6 +80,7 @@ export function MedalSettings() {
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedMedal, setSelectedMedal] = useState<string>('');
   const [isGranting, setIsGranting] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Fetch users in current unit
   const { data: users } = useQuery({
@@ -142,6 +153,22 @@ export function MedalSettings() {
       toast({ title: 'Erro ao conceder medalha', variant: 'destructive' });
     } finally {
       setIsGranting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const { error } = await supabase.from('bonus_points').delete().eq('id', deleteId);
+      if (error) throw error;
+      toast({ title: 'Ponto removido com sucesso' });
+      queryClient.invalidateQueries({ queryKey: ['granted-medals'] });
+      invalidateGamificationCaches(queryClient);
+    } catch (error) {
+      console.error(error);
+      toast({ title: 'Erro ao remover ponto', variant: 'destructive' });
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -245,22 +272,30 @@ export function MedalSettings() {
               const tier = medal ? getTier(medal.tier) : null;
               return (
                 <div key={gm.id} className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/30 border border-border/20">
-                  <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2">
                     {medal && tier && (
                       <AppIcon name={medal.icon} size={14} style={{ color: tier.color }} />
                     )}
                     <div>
                       <p className="text-xs font-medium">{getUserName(gm.user_id)}</p>
-                      <p className="text-[10px] text-muted-foreground">{medal?.title || gm.badge_id}</p>
+                      <p className="text-[10px] text-muted-foreground">{medal?.title || gm.reason || gm.badge_id}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge variant="outline" className="text-[10px]" style={tier ? { borderColor: tier.border, color: tier.color } : undefined}>
-                      +{gm.points} pts
-                    </Badge>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {format(new Date(gm.created_at), "dd/MM/yy", { locale: ptBR })}
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <Badge variant="outline" className="text-[10px]" style={tier ? { borderColor: tier.border, color: tier.color } : undefined}>
+                        +{gm.points} pts
+                      </Badge>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {format(new Date(gm.created_at), "dd/MM/yy", { locale: ptBR })}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setDeleteId(gm.id)}
+                      className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <AppIcon name="Trash2" size={14} />
+                    </button>
                   </div>
                 </div>
               );
@@ -268,6 +303,23 @@ export function MedalSettings() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover pontos?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Os pontos serão removidos permanentemente do histórico do funcionário.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

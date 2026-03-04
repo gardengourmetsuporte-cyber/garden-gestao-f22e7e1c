@@ -236,6 +236,7 @@ export const ICON_MAP: Record<string, string> = {
   ToggleLeft: 'toggle_off',
   ToggleRight: 'toggle_on',
   Edit2: 'edit',
+  PenLine: 'edit_note',
   FileImage: 'image',
   ImageIcon: 'image',
   Play: 'play_arrow',
