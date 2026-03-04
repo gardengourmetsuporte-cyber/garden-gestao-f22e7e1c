@@ -130,19 +130,19 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
           }}
         >
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[14px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[26px] z-20">
             <div className="fab-cradle-ring">
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
-                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
                   boxShadow: '0 4px 20px rgba(16,185,129,0.35), 0 8px 32px rgba(0,0,0,0.2)',
                 }}
               >
-                <AppIcon name="Plus" size={22} className="relative z-10 text-white" />
+                <AppIcon name="Plus" size={20} className="relative z-10 text-white" />
               </button>
             </div>
           </div>
