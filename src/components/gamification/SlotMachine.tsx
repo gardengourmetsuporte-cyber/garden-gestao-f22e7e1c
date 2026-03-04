@@ -110,7 +110,7 @@ export function SlotMachine({ prizes, onResult, disabled }: SlotMachineProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-5 w-full max-w-xs mx-auto">
+    <div className="flex flex-col items-center gap-5 w-full max-w-sm mx-auto px-4">
       {/* Machine frame */}
       <div
         className="relative rounded-2xl p-1 w-full"
