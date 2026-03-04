@@ -256,6 +256,24 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     }));
   }, []);
 
+  // Cancel/reset an active timer without completing the task
+  const cancelTimer = useCallback(async (itemId: string) => {
+    if (!activeUnitId) return;
+    const timer = activeTimers.find(t => t.itemId === itemId);
+    if (!timer) return;
+    const { error } = await supabase
+      .from('checklist_task_times')
+      .delete()
+      .eq('id', timer.id);
+    if (error) {
+      toast.error('Erro ao resetar timer');
+      console.error(error);
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
+    toast.success('⏱️ Timer resetado');
+  }, [activeUnitId, activeTimers, checklistType, date, queryClient]);
+
   // Check if an item has an active timer
   const getActiveTimer = useCallback((itemId: string): ActiveTimer | undefined => {
     return activeTimers.find(t => t.itemId === itemId);
@@ -273,6 +291,7 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     validatePin,
     startTimer,
     finishTimer,
+    cancelTimer,
     getActiveTimer,
     getUserActiveTimer,
     getTimeStats,

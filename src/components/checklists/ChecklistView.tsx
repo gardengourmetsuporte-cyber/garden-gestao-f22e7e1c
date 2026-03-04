@@ -37,6 +37,7 @@ interface ChecklistViewProps {
   getUserActiveTimer?: (itemId: string, userId: string) => ActiveTimer | undefined;
   onStartTimer?: (itemId: string, userId: string) => Promise<void>;
   onFinishTimer?: (itemId: string, userId: string, onComplete: (itemId: string, points: number, completedByUserId: string) => void, basePoints: number) => Promise<void>;
+  onCancelTimer?: (itemId: string) => Promise<void>;
   validatePin?: (pin: string) => Promise<{ userId: string; userName: string } | null>;
   timeStats?: Map<string, ItemTimeStats>;
   timerMinExecutions?: number;
@@ -98,6 +99,7 @@ export function ChecklistView({
   getUserActiveTimer,
   onStartTimer,
   onFinishTimer,
+  onCancelTimer,
   validatePin,
   timeStats,
   timerMinExecutions = 3,
@@ -714,10 +716,8 @@ export function ChecklistView({
                     const handleTimerClick = () => {
                       if (!canToggle) return;
                       if (activeTimer) {
-                        // Has active timer → ask PIN to finish
-                        setPendingTimerItemId(item.id);
-                        setPendingTimerPoints(configuredPoints);
-                        setPinDialogOpen(true);
+                        // Has active timer → toggle popover with finish/reset options
+                        setOpenPopover(openPopover === item.id ? null : item.id);
                       } else if (isTimerMode && onStartTimer && validatePin) {
                         // No active timer → ask PIN to start
                         setPendingTimerItemId(item.id);
@@ -786,7 +786,45 @@ export function ChecklistView({
                             <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
                           )}
                         </button>
-                        {openPopover === item.id && (
+                        {openPopover === item.id && activeTimer && onCancelTimer && (
+                          <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
+                            {/* Finalizar timer */}
+                            <button
+                              onClick={() => {
+                                setPendingTimerItemId(item.id);
+                                setPendingTimerPoints(configuredPoints);
+                                setPinDialogOpen(true);
+                                setOpenPopover(null);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]"
+                            >
+                              <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20">
+                                <AppIcon name="CheckCircle" className="w-5 h-5 text-success-foreground" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-success">Finalizar tarefa</p>
+                                <p className="text-xs text-muted-foreground">Concluir e parar o timer</p>
+                              </div>
+                            </button>
+                            {/* Resetar timer */}
+                            <button
+                              onClick={async () => {
+                                await onCancelTimer(item.id);
+                                setOpenPopover(null);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]"
+                            >
+                              <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center">
+                                <AppIcon name="RotateCcw" className="w-5 h-5 text-destructive" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-destructive">Resetar tarefa</p>
+                                <p className="text-xs text-muted-foreground">Zerar o timer sem concluir</p>
+                              </div>
+                            </button>
+                          </div>
+                        )}
+                        {openPopover === item.id && !activeTimer && (
                           <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
                             {isAdmin && profiles.length > 0 && (
                               <>
