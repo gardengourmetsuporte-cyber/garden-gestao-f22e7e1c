@@ -49,6 +49,116 @@ function formatDateLabel(date: Date): string {
   return format(date, "EEEE, d 'de' MMM", { locale: ptBR });
 }
 
+function PickerTaskList({ availableTasks, pickerHour, allocateTask }: {
+  availableTasks: ManagerTask[];
+  pickerHour: number | null;
+  allocateTask: (hour: number, taskId: string) => void;
+}) {
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
+  if (availableTasks.length === 0) {
+    return <p className="text-sm text-muted-foreground text-center py-6">Todas as tarefas já foram alocadas</p>;
+  }
+
+  const grouped = new Map<string, { category: ManagerTask['category']; tasks: ManagerTask[] }>();
+  const uncategorized: ManagerTask[] = [];
+  availableTasks.forEach(task => {
+    if (task.category) {
+      const key = task.category.id || task.category.name;
+      if (!grouped.has(key)) grouped.set(key, { category: task.category, tasks: [] });
+      grouped.get(key)!.tasks.push(task);
+    } else {
+      uncategorized.push(task);
+    }
+  });
+
+  const toggleGroup = (key: string) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  return (
+    <div className="space-y-1.5 mt-3 pb-4">
+      {[...grouped.values()].map(({ category, tasks: catTasks }) => {
+        const key = category!.id || category!.name;
+        const isOpen = expandedGroups.has(key);
+        return (
+          <div key={key}>
+            <button
+              onClick={() => toggleGroup(key)}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-all"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category!.color }} />
+                <span className="text-sm font-semibold">{category!.name}</span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{catTasks.length}</span>
+              </div>
+              <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", isOpen ? "rotate-0" : "-rotate-90")} />
+            </button>
+            <div className={cn("overflow-hidden transition-all duration-200", isOpen ? "max-h-[2000px] opacity-100 mt-1.5" : "max-h-0 opacity-0")}>
+              <div className="space-y-1.5 ml-2">
+                {catTasks.map(task => (
+                  <button
+                    key={task.id}
+                    onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10 hover:border-primary/25 transition-all text-left"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <span className="text-sm font-medium truncate block">{task.title}</span>
+                      {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
+                    </div>
+                    <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {uncategorized.length > 0 && (
+        <div>
+          {grouped.size > 0 && (
+            <button
+              onClick={() => toggleGroup('__uncategorized__')}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <AppIcon name="Folder" size={14} className="text-muted-foreground" />
+                <span className="text-sm font-semibold">Sem categoria</span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{uncategorized.length}</span>
+              </div>
+              <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", expandedGroups.has('__uncategorized__') ? "rotate-0" : "-rotate-90")} />
+            </button>
+          )}
+          <div className={cn("overflow-hidden transition-all duration-200", 
+            grouped.size === 0 || expandedGroups.has('__uncategorized__') ? "max-h-[2000px] opacity-100 mt-1.5" : "max-h-0 opacity-0"
+          )}>
+            <div className="space-y-1.5 ml-2">
+              {uncategorized.map(task => (
+                <button
+                  key={task.id}
+                  onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10 hover:border-primary/25 transition-all text-left"
+                >
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-medium truncate block">{task.title}</span>
+                    {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
+                  </div>
+                  <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksViewProps) {
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const dateStr = format(currentDate, 'yyyy-MM-dd');
@@ -305,83 +415,18 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
             </div>
           )}
 
-          <div className="space-y-2 mt-3 pb-4">
-            {availableTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">Todas as tarefas já foram alocadas</p>
-            ) : (
-              (() => {
-                // Group by category
-                const grouped = new Map<string, { category: ManagerTask['category']; tasks: ManagerTask[] }>();
-                const uncategorized: ManagerTask[] = [];
-                availableTasks.forEach(task => {
-                  if (task.category) {
-                    const key = task.category.id || task.category.name;
-                    if (!grouped.has(key)) grouped.set(key, { category: task.category, tasks: [] });
-                    grouped.get(key)!.tasks.push(task);
-                  } else {
-                    uncategorized.push(task);
-                  }
-                });
-                return (
-                  <>
-                    {[...grouped.values()].map(({ category, tasks: catTasks }) => (
-                      <div key={category!.id || category!.name}>
-                        <div className="flex items-center gap-2 px-1 mb-1.5 mt-3 first:mt-0">
-                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: category!.color }} />
-                           <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{category!.name}</span>
-                         </div>
-                        {catTasks.map(task => (
-                          <button
-                            key={task.id}
-                            onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
-                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:border-emerald-500/25 transition-all text-left mb-1.5"
-                          >
-                            <div className="min-w-0 flex-1">
-                              <span className="text-sm font-medium truncate block">{task.title}</span>
-                              {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
-                            </div>
-                            <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-                    ))}
-                    {uncategorized.length > 0 && (
-                      <div>
-                        {grouped.size > 0 && (
-                          <div className="flex items-center gap-2 px-1 mb-1.5 mt-2">
-                            <AppIcon name="Folder" size={14} className="text-muted-foreground" />
-                            <span className="text-xs font-semibold text-muted-foreground">Sem categoria</span>
-                          </div>
-                        )}
-                        {uncategorized.map(task => (
-                          <button
-                            key={task.id}
-                            onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:border-emerald-500/25 transition-all text-left mb-1.5"
-                          >
-                            <div className="min-w-0 flex-1">
-                              <span className="text-sm font-medium truncate block">{task.title}</span>
-                              {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
-                            </div>
-                            <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                );
-              })()
-            )}
-          </div>
+          <PickerTaskList
+            availableTasks={availableTasks}
+            pickerHour={pickerHour}
+            allocateTask={allocateTask}
+          />
 
           {/* Close button */}
-          {availableTasks.length > 0 && (
-            <div className="sticky bottom-0 pb-4 pt-2 bg-transparent">
-              <Button variant="outline" className="w-full rounded-xl" onClick={() => setPickerHour(null)}>
-                Fechar
-              </Button>
-            </div>
-          )}
+          <div className="sticky bottom-0 pb-4 pt-2">
+            <Button variant="outline" className="w-full rounded-xl border-border" onClick={() => setPickerHour(null)}>
+              Fechar
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
     </div>
