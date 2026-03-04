@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InventoryItem } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useShoppingList } from '@/hooks/useShoppingList';
 
 interface QuickMovementSheetProps {
   item: InventoryItem | null;
@@ -18,6 +19,7 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
   const [type, setType] = useState<'entrada' | 'saida'>('entrada');
   const [quantity, setQuantity] = useState<number>(0);
   const [notes, setNotes] = useState('');
+  const { addToList, isAdding } = useShoppingList();
 
   const handleConfirm = () => {
     if (!item || quantity <= 0) return;
@@ -30,6 +32,12 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
 
   const incrementQuantity = (value: number) => {
     setQuantity(prev => Math.max(0, prev + value));
+  };
+
+  const handleAddToShoppingList = async () => {
+    if (!item) return;
+    const suggestedQty = Math.max(1, item.min_stock - item.current_stock);
+    await addToList({ itemId: item.id, quantity: suggestedQty });
   };
 
   if (!item) return null;
@@ -136,6 +144,18 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
             }`}
           >
             Confirmar {type === 'entrada' ? 'Entrada' : 'Saída'}
+          </Button>
+
+          {/* Shopping List Button */}
+          <Button
+            variant="outline"
+            onClick={handleAddToShoppingList}
+            disabled={isAdding}
+            className="w-full h-12 rounded-xl gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <AppIcon name="ShoppingCart" size={18} />
+            <AppIcon name="Plus" size={14} />
+            Adicionar à Lista de Compras
           </Button>
         </div>
       </SheetContent>

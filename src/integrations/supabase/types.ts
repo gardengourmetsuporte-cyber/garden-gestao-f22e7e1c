@@ -3504,6 +3504,54 @@ export type Database = {
           },
         ]
       }
+      shopping_list_items: {
+        Row: {
+          added_by: string | null
+          created_at: string | null
+          id: string
+          item_id: string
+          notes: string | null
+          quantity: number | null
+          status: string | null
+          unit_id: string | null
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string | null
+          id?: string
+          item_id: string
+          notes?: string | null
+          quantity?: number | null
+          status?: string | null
+          unit_id?: string | null
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          notes?: string | null
+          quantity?: number | null
+          status?: string | null
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_list_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       smart_receiving_items: {
         Row: {
           confidence: number | null
