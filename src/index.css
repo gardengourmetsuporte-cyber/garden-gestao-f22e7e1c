@@ -238,6 +238,16 @@
     text-size-adjust: 100%;
   }
 
+  /* Mobile: evita “duplo toque” para acionar clique em elementos interativos */
+  a,
+  button,
+  [role='button'],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'] {
+    touch-action: manipulation;
+  }
+
   /* Hide the Lovable preview banner when keyboard is open */
   [data-lovable-preview-banner] {
     display: none !important;
