@@ -78,9 +78,9 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
     staleTime: 10_000,
   });
 
-  // Build activeTimers with names
+  // Build activeTimers with names — clear when timer mode is off
   useEffect(() => {
-    if (!rawActiveTimers.length) {
+    if (!isTimerMode || !rawActiveTimers.length) {
       setActiveTimers([]);
       return;
     }
