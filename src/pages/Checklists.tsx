@@ -125,7 +125,7 @@ export default function ChecklistsPage() {
   // Timer mode
   const {
     isTimerMode, timerSettings, activeTimers,
-    validatePin, startTimer, finishTimer, getActiveTimer, getUserActiveTimer, getTimeStats,
+    validatePin, startTimer, finishTimer, cancelTimer, getActiveTimer, getUserActiveTimer, getTimeStats,
   } = useChecklistTimer(checklistType, currentDate);
 
   const [timeStatsMap, setTimeStatsMap] = useState<Map<string, ItemTimeStats>>(new Map());
@@ -801,8 +801,9 @@ export default function ChecklistsPage() {
                   isTimerMode={isTimerMode}
                   getActiveTimer={getActiveTimer}
                   getUserActiveTimer={getUserActiveTimer}
-                  onStartTimer={startTimer}
-                  onFinishTimer={finishTimer}
+                   onStartTimer={startTimer}
+                   onFinishTimer={finishTimer}
+                   onCancelTimer={cancelTimer}
                   validatePin={validatePin}
                   timeStats={timeStatsMap}
                   timerMinExecutions={timerSettings?.minExecutionsForStats ?? 3}
