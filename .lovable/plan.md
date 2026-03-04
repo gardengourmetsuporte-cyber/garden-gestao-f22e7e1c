@@ -1,84 +1,87 @@
 
 
-# Brand Core — Central de Branding Inteligente
+# Sistema de Rotas de Entrega com IA (OCR de Fotos)
 
-## Contexto
-Você não tem acesso à Meta Marketing API ainda (requer App Review que leva semanas). Vamos começar pelo **Brand Core** que é 100% viável agora e será a base para qualquer integração futura de tráfego.
+## Resumo
+Sistema onde o operador tira foto de um pedido/comanda (papel, tela, etc.) e a IA extrai automaticamente o endereço, cadastra a entrega e organiza todas as entregas pendentes em rotas agrupadas por proximidade geográfica.
 
-O módulo de IA de Tráfego (Meta Ads) será um roadmap futuro — quando você tiver o App ID aprovado pela Meta, criaremos a integração OAuth e o painel de campanhas.
+## Fluxo do Usuário
+1. Entregador/operador abre a tela de **Rotas de Entrega**
+2. Toca em "+" e tira foto ou seleciona imagem do pedido
+3. A IA (Lovable AI via Edge Function) lê a foto e extrai: nome do cliente, endereço, bairro, e itens (se visíveis)
+4. O sistema cadastra a entrega automaticamente, pedindo apenas confirmação
+5. Todas as entregas pendentes aparecem agrupadas por **bairro/região** (proximidade)
+6. O entregador vê as rotas organizadas e pode marcar como "saiu" e "entregue"
 
-## O que será construído
+## Banco de Dados
 
-### 1. Banco de dados — Tabelas novas
-- **`brand_assets`** — Fotos, logos, manuais (tipo, URL no storage, tags, descrição)
-- **`brand_identity`** — Cores, tipografia, tom de voz, frases institucionais, slogan (1 registro por unidade)
-- **`brand_references`** — Referências visuais, estratégias, histórico de campanhas
+### Tabela `delivery_addresses`
+Cadastro de endereços já reconhecidos pela IA, evitando re-processamento.
 
-### 2. Storage
-- Bucket **`brand-assets`** (público) para logos, fotos de produtos, ambiente, cardápio
-
-### 3. Página Brand Core (`/brand-core`)
-Nova rota dentro do módulo Marketing com 3 abas:
-- **Identidade** — Cores da marca, tipografia, tom de voz, frases, slogan
-- **Galeria** — Upload e organização de fotos (logo, produtos, ambiente, cardápio) com tags
-- **Referências** — Estratégias de marketing, referências visuais, histórico
-
-### 4. IA integrada (Lovable AI)
-Edge Function **`brand-ai-generate`** que:
-- Lê a identidade da marca + assets do banco
-- Gera copies padronizadas no tom de voz da marca
-- Sugere criativos com base nas fotos e produtos reais
-- Gera prompts otimizados para ferramentas de design
-- Integra com o módulo de Marketing existente (ao criar post, puxa contexto do Brand Core)
-
-### 5. Integração com módulos existentes
-- **Marketing** → Ao gerar ideias IA, usa dados do Brand Core como contexto
-- **Cardápio** → Puxa fotos de produtos automaticamente para a galeria
-
-## Detalhes técnicos
-
-### Estrutura do banco
 ```text
-brand_identity (1 por unit)
-├── colors (jsonb: primary, secondary, accent, bg)
-├── typography (jsonb: headings, body)
-├── tone_of_voice (text)
-├── tagline (text)
-├── institutional_phrases (text[])
-└── unit_id (fk)
-
-brand_assets
-├── type (enum: logo, product_photo, environment, menu, manual, reference)
-├── file_url (text)
-├── title, description, tags (text[])
-└── unit_id (fk)
-
-brand_references
-├── type (enum: strategy, campaign_history, visual_reference)
-├── title, content (text)
-├── media_urls (text[])
-└── unit_id (fk)
+delivery_addresses
+├── id (uuid, PK)
+├── unit_id (uuid, FK units)
+├── customer_name (text)
+├── full_address (text)
+├── neighborhood (text) ← chave de agrupamento
+├── city (text)
+├── reference (text, nullable) ← ponto de referência
+├── lat / lng (numeric, nullable) ← futuro geocoding
+├── created_at / updated_at
 ```
 
-### RLS
-- Filtro por `user_has_unit_access` em todas as tabelas
-- Políticas CRUD para membros autenticados da unidade
+### Tabela `deliveries`
+Cada entrega individual.
 
-### Edge Function `brand-ai-generate`
-- Recebe `action` (generate_copy, suggest_creative, generate_prompt)
-- Consulta `brand_identity` + `brand_assets` da unidade
-- Envia contexto completo para Lovable AI (Gemini)
-- Retorna sugestões formatadas
+```text
+deliveries
+├── id (uuid, PK)
+├── unit_id (uuid, FK units)
+├── address_id (uuid, FK delivery_addresses)
+├── status (enum: pending, out, delivered, cancelled)
+├── items_summary (text, nullable) ← resumo extraído pela IA
+├── photo_url (text, nullable) ← foto original
+├── total (numeric, default 0)
+├── notes (text, nullable)
+├── assigned_to (uuid, nullable, FK auth.users)
+├── delivered_at (timestamptz, nullable)
+├── created_by (uuid, FK auth.users)
+├── created_at / updated_at
+```
 
-### Módulo no sistema
-- Adicionado ao `ALL_MODULES` como submódulo de Marketing ou módulo independente
-- Acessível via aba dentro de Marketing ou rota dedicada
+### Storage
+- Bucket **`delivery-photos`** (privado) para as fotos dos pedidos
 
-## Sobre a IA de Tráfego (Meta Ads) — Roadmap
-Isso será fase 2. Quando você tiver:
-1. Conta Business Manager da Meta
-2. App ID criado no Meta for Developers
-3. App Review aprovado (permissões: `ads_management`, `ads_read`, `business_management`)
+## Edge Function `delivery-ocr`
+- Recebe `image_base64` da foto do pedido
+- Envia para Lovable AI (Gemini Flash) com prompt instruindo para extrair: nome, endereço completo, bairro, itens, valor
+- Retorna dados estruturados via tool calling (JSON limpo)
+- Padrão já usado no `smart-receiving-ocr` existente
 
-Aí criaremos: OAuth flow via Edge Function, sincronização de campanhas, dashboard de métricas e otimização automática.
+## Página `/deliveries` (nova rota)
+**3 seções principais:**
+
+1. **Header** com botão de "Nova Entrega" (abre câmera/galeria)
+2. **Entregas agrupadas por bairro** — cards colapsáveis mostrando quantidade e endereços
+3. **Status visual** — cores para pending/out/delivered
+
+**Interações:**
+- Swipe ou botão para mudar status (pending → out → delivered)
+- Ao adicionar foto, mostra preview + dados extraídos pela IA para confirmação antes de salvar
+- Filtro por status (Pendentes / Em rota / Entregues)
+
+## Agrupamento por Proximidade
+- Fase 1 (agora): Agrupamento por **bairro** (campo `neighborhood` extraído pela IA)
+- Fase 2 (futuro): Geocoding real com lat/lng para agrupamento por distância
+
+## Integração com Módulos Existentes
+- Adicionado ao `ALL_MODULES` como módulo "Entregas" no grupo "Operação"
+- Acessível via menu lateral / barra inferior
+
+## Detalhes Técnicos
+- RLS: filtro por `user_has_unit_access` em ambas as tabelas
+- A Edge Function reutiliza o padrão do `smart-receiving-ocr` (auth + Lovable AI + tool calling)
+- Hook `useDeliveries` com React Query para CRUD + agrupamento client-side por bairro
+- Componente de confirmação pós-OCR permite editar antes de salvar
 
