@@ -93,6 +93,14 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'deliveries', label: 'Entregas', icon: 'Truck', route: '/deliveries', routes: ['/deliveries'], group: 'Operação',
+    children: [
+      { key: 'deliveries.view', label: 'Ver entregas', icon: 'Eye' },
+      { key: 'deliveries.create', label: 'Cadastrar entregas', icon: 'Camera' },
+      { key: 'deliveries.manage', label: 'Gerenciar status', icon: 'ArrowLeftRight' },
+    ],
+  },
+  {
     key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Operação',
     children: [
       { key: 'recipes.view', label: 'Ver fichas', icon: 'Eye' },
