@@ -47,15 +47,19 @@ export function useChecklistCompletions({
       if (error) throw error;
 
       // Also clean up any associated timer rows for this item/date/type
-      await supabase
-        .from('checklist_task_times')
-        .delete()
-        .eq('item_id', itemId)
-        .eq('date', date)
-        .eq('checklist_type', checklistType)
-        .eq('unit_id', activeUnitId!);
-      
-      queryClient.invalidateQueries({ queryKey: ['checklist-active-timers'] });
+      if (activeUnitId) {
+        const { error: timerDeleteError } = await supabase
+          .from('checklist_task_times')
+          .delete()
+          .eq('item_id', itemId)
+          .eq('date', date)
+          .eq('checklist_type', checklistType)
+          .eq('unit_id', activeUnitId);
+
+        if (timerDeleteError) throw timerDeleteError;
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
     } else {
       const targetUserId = completedByUserId || userId;
       const { error } = await supabase
