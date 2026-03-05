@@ -152,9 +152,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* Animated ambient glow */}
           <div className="absolute inset-0 pointer-events-none header-ambient-glow" />
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
-            {/* Left: Back button (on module pages) or spacer */}
+            {/* Left: Logo (dashboard) or Back button (module pages) */}
             <div className="w-10 flex items-center">
-              {!isDashboard && (
+              {isDashboard ? (
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm active:scale-90 transition-transform"
+                >
+                  <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                </button>
+              ) : (
                 <button
                   onClick={() => navigate('/')}
                   className="p-2 rounded-lg hover:bg-white/10 transition-all active:scale-90"
@@ -164,23 +171,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               )}
             </div>
 
-            {/* Center: Logo on dashboard, Module name on other pages */}
+            {/* Center: Module name on module pages, empty on dashboard */}
             <div className="flex-1 flex items-center justify-center min-w-0">
-              {isDashboard ? (
-                <button
-                  onClick={() => navigate('/')}
-                  className="flex items-center gap-2 active:scale-95 transition-transform"
-                >
-                  <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
-                    <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
-                  </div>
-                  <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
-                    {activeUnit?.name || 'Garden'}
-                  </span>
-                </button>
-              ) : (
+              {!isDashboard && (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
-                  {moduleTitle || activeUnit?.name || 'Garden'}
+                  {moduleTitle || 'Garden'}
                 </span>
               )}
             </div>
