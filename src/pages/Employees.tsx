@@ -23,14 +23,14 @@ export default function Employees() {
     { key: 'employees', label: 'Funcionários', icon: 'Users', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
     { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10' },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
   ];
 
   const employeeTabs = [
     { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
     { key: 'payslips', label: 'Holerites', icon: 'FileText', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10' },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
   ];
 
   const tabs = isAdmin ? adminTabs : employeeTabs;
@@ -60,7 +60,7 @@ export default function Employees() {
                     )}
                   >
                     <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", activeTab === tab.key ? "bg-primary/20" : tab.bg)}>
-                      <AppIcon name={tab.icon} size={20} className={activeTab === tab.key ? "text-primary" : tab.color} />
+                      <AppIcon name={tab.icon} size={20} fill={(tab as any).iconFill ?? 1} className={activeTab === tab.key ? "text-primary" : tab.color} />
                     </div>
                     <span className={cn("text-xs font-semibold", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
                   </button>
