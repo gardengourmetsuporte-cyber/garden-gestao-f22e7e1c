@@ -78,14 +78,28 @@ self.addEventListener('fetch', function(event) {
       try {
         const formData = await event.request.formData();
         const file = formData.get('receipt');
-        if (file && file instanceof File) {
-          // Store the image in Cache Storage
-          const cache = await caches.open('shared-receipts');
+        const sharedText = formData.get('text') || '';
+        const sharedTitle = formData.get('title') || '';
+        const sharedUrl = formData.get('url') || '';
+
+        const cache = await caches.open('shared-receipts');
+
+        if (file && file instanceof File && file.size > 0) {
+          // Store the image/PDF in Cache Storage
           const arrayBuffer = await file.arrayBuffer();
           const response = new Response(arrayBuffer, {
             headers: { 'Content-Type': file.type || 'image/jpeg' },
           });
           await cache.put('/shared-receipt-image', response);
+        }
+
+        // Store text data (bank apps often share text with transaction details)
+        const textContent = [sharedTitle, sharedText, sharedUrl].filter(Boolean).join('\n');
+        if (textContent.trim()) {
+          const textResponse = new Response(textContent, {
+            headers: { 'Content-Type': 'text/plain' },
+          });
+          await cache.put('/shared-receipt-text', textResponse);
         }
       } catch (e) {
         console.error('[Push-SW] Error handling share target:', e);
