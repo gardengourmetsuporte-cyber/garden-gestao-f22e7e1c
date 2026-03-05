@@ -1,4 +1,5 @@
 import gardenLogo from '@/assets/logo.png';
+import gardenIcon from '@/assets/garden-icon.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
 import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -169,11 +170,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="active:scale-95 transition-transform"
+                  className="active:scale-95 transition-transform relative"
                 >
-                  <div className="w-9 h-9 rounded-lg overflow-hidden bg-white flex items-center justify-center shadow-sm">
-                    <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} />
-                  </div>
+                  <div className="absolute inset-0 m-auto w-10 h-10 rounded-full header-icon-glow" />
+                  <img alt="Garden Gestão" className="w-10 h-10 object-contain relative z-10 drop-shadow-lg" src={gardenIcon} />
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
