@@ -22,6 +22,7 @@ interface AuthContextType {
   hasPlan: (required: PlanTier) => boolean;
   setEffectivePlan: (plan: PlanTier) => void;
   refreshSubscription: () => Promise<void>;
+  refreshUserData: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string, redirectTo?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -373,6 +374,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCachedAuth(profile, role, newPlan, planStatus);
   }, [profile, role, planStatus]);
 
+  const refreshUserData = useCallback(async () => {
+    if (user) {
+      fetchingRef.current = false; // allow re-fetch
+      await fetchUserDataRef.current?.(user.id);
+    }
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -392,6 +400,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasPlan,
         setEffectivePlan,
         refreshSubscription,
+        refreshUserData,
         signIn,
         signUp,
         signOut,
