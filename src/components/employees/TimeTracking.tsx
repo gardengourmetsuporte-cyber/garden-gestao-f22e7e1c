@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import { format, parseISO, startOfMonth, subMonths, addMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -569,44 +570,168 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
   const [parsedData, setParsedData] = useState<any[] | null>(null);
   const [parsing, setParsing] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [detectedFormat, setDetectedFormat] = useState<'csv' | 'xls-grid' | null>(null);
   const [result, setResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Extract date range from XLS header like "01-02-2026~28-02-2026"
+  const extractDateRange = (sheet: XLSX.WorkSheet): { year: number; month: number } | null => {
+    const range = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false }) as string[][];
+    for (const row of range.slice(0, 5)) {
+      for (const cell of row) {
+        if (!cell) continue;
+        const match = String(cell).match(/(\d{2})-(\d{2})-(\d{4})/);
+        if (match) {
+          return { month: parseInt(match[2]), year: parseInt(match[3]) };
+        }
+      }
+    }
+    return null;
+  };
+
+  // Parse XLS grid format (employee rows with day columns)
+  const parseXlsGrid = useCallback(async (f: File) => {
+    const buffer = await f.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array' });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false }) as string[][];
+
+    const dateInfo = extractDateRange(sheet);
+    if (!dateInfo) {
+      toast.error('Não foi possível detectar o período (mês/ano) no arquivo');
+      return [];
+    }
+
+    const records: any[] = [];
+    let currentEmployee: string | null = null;
+    let dayHeaderRow: number[] = [];
+
+    for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+      const row = rows[rowIdx];
+      if (!row || row.length === 0) continue;
+
+      const rowStr = row.map(c => String(c ?? '').trim());
+
+      // Detect employee name row: has "Nome:" followed by name
+      const nomeIdx = rowStr.findIndex(c => c.toLowerCase().includes('nome:'));
+      if (nomeIdx >= 0) {
+        // Name is in the next non-empty cell after "Nome:"
+        const nameCell = rowStr.slice(nomeIdx + 1).find(c => c && c.toLowerCase() !== 'dep.:' && !c.match(/^dep\d/i));
+        if (nameCell) currentEmployee = nameCell.trim();
+        continue;
+      }
+
+      // Detect day header row (1, 2, 3, ... 28/30/31)
+      const numericCells = rowStr.filter(c => /^\d{1,2}$/.test(c)).map(Number);
+      if (numericCells.length >= 20 && numericCells[0] === 1) {
+        dayHeaderRow = [];
+        for (let ci = 0; ci < rowStr.length; ci++) {
+          const n = parseInt(rowStr[ci]);
+          if (n >= 1 && n <= 31) dayHeaderRow.push(ci);
+        }
+        continue;
+      }
+
+      // If we have an employee and day headers, this row contains time data
+      if (currentEmployee && dayHeaderRow.length > 0) {
+        const hasTimeData = rowStr.some(c => /\d{1,2}:\d{2}/.test(c) || /FOLGA|FALTA|ATESTADO/i.test(c));
+        if (!hasTimeData) continue;
+
+        for (let di = 0; di < dayHeaderRow.length; di++) {
+          const ci = dayHeaderRow[di];
+          const cellValue = rowStr[ci];
+          if (!cellValue) continue;
+
+          const day = di + 1;
+          const dateStr = `${dateInfo.year}-${String(dateInfo.month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+          // Check for status keywords
+          const upper = cellValue.toUpperCase().trim();
+          if (['FOLGA', 'FALTA', 'ATESTADO'].includes(upper)) {
+            records.push({ employee_name: currentEmployee, date: dateStr, check_in: null, check_out: null, status: upper });
+            continue;
+          }
+
+          // Parse times from cell (can have multiple times separated by line breaks or spaces)
+          const timeMatches = cellValue.match(/\d{1,2}[;:]\d{2}/g);
+          if (timeMatches && timeMatches.length >= 1) {
+            // Normalize semicolons to colons
+            const times = timeMatches.map(t => t.replace(';', ':'));
+            
+            // Filter out times that look like midnight (00:xx) - these are often next-day check-outs
+            // Sort times to get first check-in and last check-out
+            const sorted = [...times].sort();
+            
+            // Simple heuristic: first time is check-in, last is check-out
+            // If 3+ times, first is check-in, last is check-out (middle ones are breaks)
+            const checkIn = sorted[0];
+            const checkOut = sorted.length > 1 ? sorted[sorted.length - 1] : null;
+
+            records.push({
+              employee_name: currentEmployee,
+              date: dateStr,
+              check_in: checkIn,
+              check_out: checkOut,
+              status: null,
+            });
+          }
+        }
+
+        // Reset after processing time row (next row might be another employee)
+        // Don't reset currentEmployee here - the day header row detection will handle transitions
+        dayHeaderRow = [];
+      }
+    }
+
+    return records;
+  }, []);
+
+  // Parse CSV format
+  const parseCsv = useCallback(async (f: File) => {
+    const text = await f.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const separator = lines[0]?.includes('\t') ? '\t' : lines[0]?.includes(';') ? ';' : ',';
+    const headers = lines[0]?.split(separator).map(h => h.trim().toLowerCase());
+
+    if (!headers) return [];
+
+    const nameIdx = headers.findIndex(h => h.includes('nome') || h.includes('funcionario') || h.includes('employee'));
+    const dateIdx = headers.findIndex(h => h.includes('data') || h.includes('date'));
+
+    const records: any[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(separator).map(c => c.trim());
+      if (cols.length < 2) continue;
+
+      const employeeName = nameIdx >= 0 ? cols[nameIdx] : cols[0];
+      const dateStr = dateIdx >= 0 ? cols[dateIdx] : cols[1];
+      let checkIn = cols[2] || null;
+      let checkOut = cols[3] || null;
+      let status = cols[4]?.toUpperCase() || null;
+
+      if (['FOLGA', 'FALTA', 'ATESTADO'].includes(checkIn?.toUpperCase() || '')) {
+        status = checkIn!.toUpperCase();
+        checkIn = null;
+        checkOut = null;
+      }
+
+      records.push({ employee_name: employeeName, date: dateStr, check_in: checkIn, check_out: checkOut, status });
+    }
+    return records;
+  }, []);
 
   const parseFile = useCallback(async (f: File) => {
     setParsing(true);
     try {
-      const text = await f.text();
-      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-      const separator = lines[0]?.includes('\t') ? '\t' : lines[0]?.includes(';') ? ';' : ',';
-      const headers = lines[0]?.split(separator).map(h => h.trim().toLowerCase());
+      const isXls = /\.(xls|xlsx)$/i.test(f.name);
 
-      if (!headers) {
-        toast.error('Arquivo vazio ou formato inválido');
-        setParsing(false);
-        return;
-      }
-
-      const nameIdx = headers.findIndex(h => h.includes('nome') || h.includes('funcionario') || h.includes('employee'));
-      const dateIdx = headers.findIndex(h => h.includes('data') || h.includes('date'));
-
-      const records: any[] = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(separator).map(c => c.trim());
-        if (cols.length < 2) continue;
-
-        const employeeName = nameIdx >= 0 ? cols[nameIdx] : cols[0];
-        const dateStr = dateIdx >= 0 ? cols[dateIdx] : cols[1];
-        let checkIn = cols[2] || null;
-        let checkOut = cols[3] || null;
-        let status = cols[4]?.toUpperCase() || null;
-
-        if (['FOLGA', 'FALTA', 'ATESTADO'].includes(checkIn?.toUpperCase() || '')) {
-          status = checkIn!.toUpperCase();
-          checkIn = null;
-          checkOut = null;
-        }
-
-        records.push({ employee_name: employeeName, date: dateStr, check_in: checkIn, check_out: checkOut, status });
+      let records: any[];
+      if (isXls) {
+        records = await parseXlsGrid(f);
+        setDetectedFormat('xls-grid');
+      } else {
+        records = await parseCsv(f);
+        setDetectedFormat('csv');
       }
 
       setParsedData(records);
@@ -620,7 +745,7 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
       toast.error('Erro ao processar arquivo');
     }
     setParsing(false);
-  }, []);
+  }, [parseXlsGrid, parseCsv]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -628,6 +753,7 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
       setFile(f);
       setParsedData(null);
       setResult(null);
+      setDetectedFormat(null);
       parseFile(f);
     }
   };
@@ -656,14 +782,17 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
     <div className="space-y-4 pt-4 overflow-y-auto h-[calc(85vh-80px)] pb-6">
       <div className="rounded-xl bg-secondary/30 border border-border/20 p-4">
         <p className="text-sm text-muted-foreground">
-          Envie um arquivo CSV com colunas: <strong className="text-foreground">Nome, Data, Entrada, Saída, Status</strong>.
-          {' '}Status pode ser <strong className="text-foreground">FOLGA</strong>, <strong className="text-foreground">FALTA</strong> ou <strong className="text-foreground">ATESTADO</strong>.
+          Formatos aceitos:
         </p>
+        <ul className="text-sm text-muted-foreground mt-1 space-y-0.5 list-disc pl-4">
+          <li><strong className="text-foreground">XLS</strong> — Grade mensal (ponto eletrônico)</li>
+          <li><strong className="text-foreground">CSV</strong> — Colunas: Nome, Data, Entrada, Saída, Status</li>
+        </ul>
       </div>
 
       {/* Styled file upload area */}
       <div>
-        <Label className="mb-1.5 block">Arquivo (.csv)</Label>
+        <Label className="mb-1.5 block">Arquivo</Label>
         <div
           onClick={() => fileRef.current?.click()}
           className={cn(
@@ -682,20 +811,25 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
             <>
               <AppIcon name="FileSpreadsheet" size={28} className="text-primary mb-2" />
               <p className="text-sm font-medium text-foreground">{file.name}</p>
+              {detectedFormat && (
+                <Badge variant="secondary" className="mt-1 text-[10px]">
+                  {detectedFormat === 'xls-grid' ? 'Grade Mensal (XLS)' : 'CSV'}
+                </Badge>
+              )}
               <p className="text-xs text-muted-foreground mt-0.5">Toque para trocar o arquivo</p>
             </>
           ) : (
             <>
               <AppIcon name="Upload" size={28} className="text-muted-foreground/40 mb-2" />
               <p className="text-sm font-medium text-foreground">Escolher arquivo</p>
-              <p className="text-xs text-muted-foreground mt-0.5">CSV, TSV ou TXT</p>
+              <p className="text-xs text-muted-foreground mt-0.5">XLS, XLSX, CSV ou TXT</p>
             </>
           )}
         </div>
         <input
           ref={fileRef}
           type="file"
-          accept=".csv,.txt,.tsv"
+          accept=".xls,.xlsx,.csv,.txt,.tsv"
           onChange={handleFileChange}
           className="hidden"
         />
