@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
 import { FinanceCategory } from '@/types/finance';
 
 export interface CategorizeResult {
@@ -17,12 +18,13 @@ interface CategorizeContext {
   employees?: { id: string; full_name: string }[];
 }
 
-const CACHE_KEY = 'finance-categorize-cache';
+const CACHE_PREFIX = 'finance-categorize-cache';
 const BATCH_SIZE = 20;
 
-function loadCache(): Map<string, CategorizeResult> {
+function loadCache(unitId?: string): Map<string, CategorizeResult> {
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
+    const key = unitId ? `${CACHE_PREFIX}_${unitId}` : CACHE_PREFIX;
+    const raw = localStorage.getItem(key);
     if (!raw) return new Map();
     const entries = JSON.parse(raw) as [string, CategorizeResult][];
     return new Map(entries);
@@ -31,18 +33,19 @@ function loadCache(): Map<string, CategorizeResult> {
   }
 }
 
-function saveCache(cache: Map<string, CategorizeResult>) {
+function saveCache(cache: Map<string, CategorizeResult>, unitId?: string) {
   try {
-    // Keep max 200 entries
+    const key = unitId ? `${CACHE_PREFIX}_${unitId}` : CACHE_PREFIX;
     const entries = [...cache.entries()].slice(-200);
-    localStorage.setItem(CACHE_KEY, JSON.stringify(entries));
+    localStorage.setItem(key, JSON.stringify(entries));
   } catch {
     // ignore quota errors
   }
 }
 
 export function useFinanceCategorize() {
-  const cacheRef = useRef<Map<string, CategorizeResult>>(loadCache());
+  const { activeUnitId } = useUnit();
+  const cacheRef = useRef<Map<string, CategorizeResult>>(loadCache(activeUnitId ?? undefined));
 
   const categorize = useCallback(async (
     descriptions: string[],
@@ -121,9 +124,9 @@ export function useFinanceCategorize() {
       }
     }
 
-    saveCache(cache);
+    saveCache(cache, activeUnitId ?? undefined);
     return results;
-  }, []);
+  }, [activeUnitId]);
 
   return { categorize };
 }

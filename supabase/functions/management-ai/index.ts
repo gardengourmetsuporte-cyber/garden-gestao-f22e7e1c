@@ -337,11 +337,15 @@ async function executeCreateTransaction(
   let employeeId: string | null = null;
 
   if (args.category_name) {
-    const { data } = await sb.from("finance_categories").select("id").ilike("name", String(args.category_name)).eq("user_id", userId).limit(1).maybeSingle();
+    const q = sb.from("finance_categories").select("id").ilike("name", String(args.category_name)).eq("user_id", userId).limit(1);
+    if (unitId) q.eq("unit_id", unitId);
+    const { data } = await q.maybeSingle();
     if (data) categoryId = data.id;
   }
   if (args.account_name) {
-    const { data } = await sb.from("finance_accounts").select("id").ilike("name", String(args.account_name)).eq("user_id", userId).limit(1).maybeSingle();
+    const q = sb.from("finance_accounts").select("id").ilike("name", String(args.account_name)).eq("user_id", userId).limit(1);
+    if (unitId) q.eq("unit_id", unitId);
+    const { data } = await q.maybeSingle();
     if (data) accountId = data.id;
   }
   if (args.supplier_name) {
@@ -797,7 +801,9 @@ async function executeUpdateTransaction(
     changes.push(`✅ Status: ${tx.is_paid ? 'Pago' : 'Pendente'} → ${args.new_is_paid ? 'Pago' : 'Pendente'}`);
   }
   if (args.new_category_name) {
-    const { data: cat } = await sb.from("finance_categories").select("id").ilike("name", String(args.new_category_name)).eq("user_id", userId).limit(1).maybeSingle();
+    const q = sb.from("finance_categories").select("id").ilike("name", String(args.new_category_name)).eq("user_id", userId).limit(1);
+    if (unitId) q.eq("unit_id", unitId);
+    const { data: cat } = await q.maybeSingle();
     if (cat) {
       updates.category_id = cat.id;
       changes.push(`📂 Categoria: ${args.new_category_name}`);
