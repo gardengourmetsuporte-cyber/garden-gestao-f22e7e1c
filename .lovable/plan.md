@@ -1,45 +1,65 @@
 
 
-## Atualizar Layout dos Cards para Estilo Premium Dark Glass
+## Sistema de Lançamento por Comprovante com Web Share Target
 
-A imagem de referência mostra cards com estética **deep navy/dark blue glassmorphic** com bordas sutis em cyan/azul e cantos muito arredondados. Vou adaptar o design system existente para aproximar desse visual.
+O usuário quer duas formas de enviar comprovantes:
+1. **Compartilhar direto do app do banco** → abre o Garden automaticamente com a imagem
+2. **Tirar foto ou escolher da galeria** dentro do próprio módulo financeiro
 
-### Mudanças Planejadas
+### Arquitetura
 
-**1. `src/index.css` — Atualizar tokens e classes de card**
+```text
+App do Banco → "Compartilhar" → Garden (PWA Share Target)
+                                    ↓
+                              /share-receipt (rota)
+                                    ↓
+                         Redireciona para /finance?receipt=shared
+                                    ↓
+                         ReceiptOCRSheet abre automaticamente
+                                    ↓
+                    Edge Function receipt-ocr (Gemini Flash)
+                                    ↓
+                         Dados extraídos + confirmação rápida
+                                    ↓
+                         Transação criada no financeiro
+```
 
-- **Dark theme `--card`**: Shift do verde escuro atual (`160 6% 8%`) para um tom mais navy/azul escuro (`220 25% 8%`), alinhando com a paleta da referência
-- **`.card-base` / `.card-surface` (dark)**: Atualizar background para navy translúcido com borda sutil cyan/blue glow:
-  - `background: hsl(220 30% 6% / 0.7)`
-  - `border: 1px solid hsl(200 60% 50% / 0.12)`
-  - `backdrop-filter: blur(24px)`
-  - Border-radius mantido em `20px`
-- **`.dash-kpi-card`**: Mesmo tratamento navy glass com borda cyan sutil
-- **`.dash-section-body`**: Background navy glass consistente
-- **Accent color glow**: Adicionar sutil `box-shadow` com cyan (`hsl(200 80% 60% / 0.06)`) nos cards para o efeito de brilho da referência
+### Componentes a Criar/Modificar
 
-**2. Tokens de cor dark ajustados**
-- `--background`: Mais deep navy (`225 20% 3%`)
-- `--card`: Navy escuro (`220 20% 7%`)
-- `--border`: Tom azulado sutil (`220 15% 15%`)
-- `--muted`: Navy médio (`220 15% 12%`)
-- Manter `--primary` emerald como está (funciona bem como accent contra navy)
+| Ação | Arquivo | Descrição |
+|------|---------|-----------|
+| Criar | `supabase/functions/receipt-ocr/index.ts` | Edge function que recebe imagem base64, usa Gemini Flash para extrair valor, data, beneficiário, tipo |
+| Criar | `src/components/finance/ReceiptOCRSheet.tsx` | Sheet com 2 etapas: captura de imagem + card de confirmação com dados pré-preenchidos |
+| Criar | `src/pages/ShareReceiptHandler.tsx` | Página que recebe o POST do Share Target, guarda a imagem em memória e redireciona para `/finance?receipt=shared` |
+| Modificar | `vite.config.ts` | Adicionar `share_target` no manifest PWA para receber imagens compartilhadas |
+| Modificar | `src/App.tsx` | Adicionar rota `/share-receipt` |
+| Modificar | `src/pages/Finance.tsx` | Detectar `?receipt=shared`, abrir `ReceiptOCRSheet`; adicionar botão de câmera no FAB menu |
+| Modificar | `src/pages/PersonalFinance.tsx` | Mesma integração do receipt sheet |
+| Modificar | `src/components/finance/FinanceBottomNav.tsx` | Adicionar botão "Comprovante" (ícone câmera) no menu FAB expandido |
 
-**3. Componentes afetados (sem mudanças de código, apenas CSS)**
-- Dashboard KPI cards
-- Dashboard section wrappers
-- AI Insights widget
-- Agenda widget
-- Copilot widget
-- Checklist widget
-- Todos os `card-surface` / `card-base` globais
+### Detalhes Técnicos
 
-### O que NÃO muda
-- Light theme permanece igual
-- Estrutura dos componentes React inalterada
-- Fontes, ícones e animações mantidos
-- Finance hero card (já tem estilo próprio)
+**Web Share Target (manifest)**:
+```json
+"share_target": {
+  "action": "/share-receipt",
+  "method": "POST",
+  "enctype": "multipart/form-data",
+  "params": {
+    "files": [{ "name": "receipt", "accept": ["image/*"] }]
+  }
+}
+```
 
-### Resultado esperado
-Cards com fundo deep navy semitransparente, bordas sutis luminosas, e sensação premium glassmorphic igual à referência — mantendo todo o accent emerald do Garden.
+**Service Worker**: Intercepta o POST em `/share-receipt`, salva a imagem no Cache Storage e redireciona para `/finance?receipt=shared`. O React lê do cache ao montar.
+
+**Edge Function `receipt-ocr`**: Usa `google/gemini-2.5-flash` via Lovable AI (sem API key) com tool calling para extrair JSON estruturado: `amount`, `date`, `description`, `suggested_type`, `suggested_category_name`.
+
+**ReceiptOCRSheet**: 
+- Etapa 1: Input file (câmera/galeria) + loading animado
+- Etapa 2: Card de confirmação com valor, descrição, data, tipo, categoria, conta — tudo editável inline
+- Botão "Lançar" cria a transação via `addTransaction` existente
+- `is_paid = true` sempre (é comprovante)
+
+**FAB expandido**: Novo quarto botão "Comprovante" com ícone `Camera` ao lado de Receita/Despesa/Transferência.
 
