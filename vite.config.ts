@@ -48,6 +48,15 @@ export default defineConfig(({ mode }) => ({
             purpose: "maskable",
           },
         ],
+        // @ts-ignore - share_target is a valid PWA manifest field
+        share_target: {
+          action: "/share-receipt",
+          method: "POST",
+          enctype: "multipart/form-data",
+          params: {
+            files: [{ name: "receipt", accept: ["image/*"] }],
+          },
+        },
       },
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/],

@@ -70,5 +70,32 @@ self.addEventListener('message', function(event) {
   }
 });
 
+// Handle Share Target POST requests
+self.addEventListener('fetch', function(event) {
+  const url = new URL(event.request.url);
+  if (url.pathname === '/share-receipt' && event.request.method === 'POST') {
+    event.respondWith((async () => {
+      try {
+        const formData = await event.request.formData();
+        const file = formData.get('receipt');
+        if (file && file instanceof File) {
+          // Store the image in Cache Storage
+          const cache = await caches.open('shared-receipts');
+          const arrayBuffer = await file.arrayBuffer();
+          const response = new Response(arrayBuffer, {
+            headers: { 'Content-Type': file.type || 'image/jpeg' },
+          });
+          await cache.put('/shared-receipt-image', response);
+        }
+      } catch (e) {
+        console.error('[Push-SW] Error handling share target:', e);
+      }
+      // Redirect to finance with receipt flag
+      return Response.redirect('/finance?receipt=shared', 303);
+    })());
+    return;
+  }
+});
+
 // Log that push-sw.js was loaded successfully
-console.log('[Push-SW] Push notification handler loaded successfully v3 (sound enabled)');
+console.log('[Push-SW] Push notification handler loaded successfully v4 (share target enabled)');
