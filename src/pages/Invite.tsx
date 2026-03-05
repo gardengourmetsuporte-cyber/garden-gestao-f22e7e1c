@@ -76,12 +76,20 @@ export default function Invite() {
         return;
       }
 
+      // Check if user already has units to avoid overriding their default
+      const { count } = await supabase
+        .from('user_units')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      const hasExistingUnits = (count ?? 0) > 0;
+
       // Create user_units association
       await supabase.from('user_units').insert({
         user_id: userId,
         unit_id: invite!.unit_id,
         role: invite!.role || 'member',
-        is_default: true,
+        is_default: !hasExistingUnits,
       });
 
       // Mark invite as accepted
