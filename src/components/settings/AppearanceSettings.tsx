@@ -27,6 +27,7 @@ export function AppearanceSettings() {
 
   const [selectedColor, setSelectedColor] = useState(storeInfo?.theme_color || '156 72% 40%');
   const [logoUrl, setLogoUrl] = useState<string>(storeInfo?.logo_url || '');
+  const [displayName, setDisplayName] = useState<string>(storeInfo?.display_name || '');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -34,6 +35,7 @@ export function AppearanceSettings() {
   useEffect(() => {
     setSelectedColor(storeInfo?.theme_color || '156 72% 40%');
     setLogoUrl(storeInfo?.logo_url || '');
+    setDisplayName(storeInfo?.display_name || '');
   }, [activeUnit?.id]); // eslint-disable-line
 
   // Live preview of color
@@ -90,6 +92,7 @@ export function AppearanceSettings() {
         ...(storeInfo || {}),
         theme_color: selectedColor,
         logo_url: logoUrl || null,
+        display_name: displayName.trim() || null,
       };
 
       const { error } = await supabase
@@ -110,6 +113,18 @@ export function AppearanceSettings() {
 
   return (
     <div className="space-y-8 max-w-lg">
+      {/* Display name */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold">Nome exibido no app</Label>
+        <p className="text-sm text-muted-foreground">Substitui "Garden" pelo nome da sua empresa no cabeçalho e sidebar.</p>
+        <Input
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          placeholder={activeUnit?.name || 'Nome da empresa'}
+          className="max-w-[300px]"
+        />
+      </div>
+
       {/* Color picker */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Cor primária</Label>
