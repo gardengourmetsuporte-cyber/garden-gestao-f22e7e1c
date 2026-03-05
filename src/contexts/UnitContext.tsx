@@ -220,9 +220,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!activeUnit) return;
     const theme = getUnitTheme(activeUnit.slug);
-    const storeInfo = (activeUnit as any)?.store_info as Record<string, any> | undefined;
-    const colorOverride = storeInfo?.theme_color;
-    applyUnitTheme(theme, colorOverride);
+    applyUnitTheme(theme);
 
     if (hasInitialized.current) {
       setIsTransitioning(true);

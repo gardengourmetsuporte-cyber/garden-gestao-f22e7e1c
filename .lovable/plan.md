@@ -1,71 +1,82 @@
 
 
-# Configuração de Aparência
+## Plano: Sistema de Advertencias Trabalhistas (CLT)
 
-## Visão geral
+### Contexto Legal (CLT)
 
-Criar uma nova seção "Aparência" nas Configurações que permite ao admin personalizar:
-1. **Cor primária do sistema** -- trocar o verde padrão por qualquer cor, aplicando em todo o app
-2. **Logo da empresa** -- upload que substitui o logo Garden na barra superior (mobile + desktop) e no loading interno (PageLoader)
+O sistema seguira a progressao disciplinar prevista na legislacao brasileira:
+1. **Advertencia Verbal** - registro informal, primeira ocorrencia
+2. **Advertencia Escrita** - documento formal, reincidencia
+3. **Suspensao** (1 a 30 dias) - falta grave ou reincidencia de advertencias
+4. **Demissao por Justa Causa** (Art. 482 CLT) - ultimo recurso
 
-## Arquitetura
+Motivos tipificados no Art. 482 da CLT: ato de improbidade, incontinencia de conduta, negociacao habitual, condenacao criminal, desidia, embriaguez, violacao de segredo, indisciplina, insubordinacao, abandono de emprego, ato lesivo da honra, pratica de jogos de azar, perda de habilitacao profissional.
 
-### 1. Banco de dados
+---
 
-Adicionar campos no `store_info` (JSONB) da tabela `units` -- sem necessidade de nova tabela nem migration SQL (já é JSONB livre). Os dados ficam assim:
+### 1. Migracao de Banco de Dados
 
-```json
-{
-  "logo_url": "https://...",
-  "theme_color": "220 80% 50%",
-  ...
-}
-```
+**Nova tabela `employee_warnings`:**
+- `id`, `employee_id` (FK employees), `unit_id` (FK units)
+- `type`: enum `verbal`, `written`, `suspension`, `dismissal`
+- `severity`: enum `light`, `moderate`, `serious`
+- `reason`: text (motivo livre)
+- `legal_basis`: text (artigo CLT, ex: "Art. 482, alínea e - Desídia")
+- `description`: text (descricao detalhada do ocorrido)
+- `date`: date (data da ocorrencia)
+- `suspension_days`: integer (dias de suspensao, se aplicavel)
+- `witness_1`, `witness_2`: text (nomes das testemunhas)
+- `document_url`: text (foto/scan do documento assinado)
+- `employee_acknowledged`: boolean (funcionario tomou ciencia)
+- `acknowledged_at`: timestamptz
+- `issued_by`: uuid (admin que aplicou)
+- `notes`: text
+- `created_at`, `updated_at`
 
-### 2. Novo componente: `AppearanceSettings.tsx`
+RLS: admins da unidade podem CRUD, funcionario ve apenas as proprias.
 
-- Paleta de cores pré-definidas (Verde, Azul, Roxo, Laranja, Vermelho, Rosa, Ciano) + picker livre
-- Upload de logo da empresa (usando bucket `brand-assets` já existente)
-- Preview ao vivo da cor selecionada
-- Botão salvar grava em `units.store_info` via `supabase.from('units').update()`
+---
 
-### 3. Registrar na página Settings
+### 2. Hook `useEmployeeWarnings.ts`
 
-- Adicionar item "Aparência" (ícone `Palette`) na seção "Conta" do menu de configurações
-- Lazy-load do componente `AppearanceSettings`
+- Fetch warnings por employee ou por unidade
+- Criar advertencia com upload de documento
+- Marcar ciencia do funcionario
+- Contar advertencias por tipo para exibir historico progressivo
 
-### 4. Aplicação global da cor
+---
 
-- Modificar `UnitContext.tsx`: ao carregar a unit, ler `store_info.theme_color` e aplicar via CSS custom properties (`--primary`, `--ring`, `--neon-cyan`, etc.) no `document.documentElement`
-- Atualizar `applyUnitTheme` em `unitThemes.ts` para aceitar override de cor vindo do `store_info`
+### 3. Componente `EmployeeWarnings.tsx`
 
-### 5. Logo dinâmico
+**Visao Admin:**
+- Nova aba "Advertencias" na pagina de Funcionarios (icon: AlertTriangle, cor vermelha)
+- Listagem de advertencias com filtro por funcionario e tipo
+- Botao "Nova Advertencia" abre Sheet com:
+  - Selecao do funcionario
+  - Tipo (Verbal / Escrita / Suspensao / Justa Causa)
+  - Gravidade (Leve / Moderada / Grave)
+  - Motivo com sugestoes baseadas no Art. 482 CLT
+  - Data da ocorrencia
+  - Dias de suspensao (quando tipo = suspensao)
+  - Testemunhas (2 campos)
+  - Upload de documento (foto da advertencia assinada)
+  - Descricao detalhada
+- Card de advertencia mostra: tipo (badge colorido), data, motivo, status de ciencia
+- Indicador de progressao: quantas advertencias o funcionario ja tem
 
-- Modificar `AppLayout.tsx`: em vez de sempre importar `gardenLogo`, verificar se `activeUnit?.store_info?.logo_url` existe; se sim, usar essa URL; senão, fallback para o logo padrão
-- Modificar `PageLoader.tsx`: receber logo via prop ou contexto (criar um pequeno hook `useUnitLogo()` que retorna a URL do logo ou o fallback)
-- Aplicar a mesma lógica no sidebar desktop
+**Visao Funcionario:**
+- Pode ver suas proprias advertencias na aba
+- Botao "Ciente" para registrar ciencia digital
 
-### 6. Paleta de cores disponíveis
+---
 
-```text
-Verde (padrão)  → 156 72% 40%
-Azul            → 220 80% 50%
-Roxo            → 262 70% 55%
-Laranja         → 25 95% 53%
-Vermelho        → 0 72% 50%
-Rosa            → 330 80% 55%
-Ciano           → 190 85% 45%
-```
+### 4. Arquivos Modificados
 
-### Arquivos impactados
-
-| Arquivo | Mudança |
+| Arquivo | Mudanca |
 |---|---|
-| `src/components/settings/AppearanceSettings.tsx` | Novo -- formulário de aparência |
-| `src/pages/Settings.tsx` | Adicionar item + lazy load |
-| `src/contexts/UnitContext.tsx` | Ler `store_info` e aplicar tema |
-| `src/lib/unitThemes.ts` | Função para aplicar cor dinâmica |
-| `src/components/layout/AppLayout.tsx` | Logo dinâmico (mobile header + desktop sidebar) |
-| `src/components/PageLoader.tsx` | Logo dinâmico via hook/prop |
-| `src/hooks/useUnitLogo.ts` | Novo -- retorna logo_url ou fallback |
+| Nova migracao SQL | Tabela `employee_warnings` + RLS |
+| `src/hooks/useEmployeeWarnings.ts` | Novo hook CRUD |
+| `src/components/employees/EmployeeWarnings.tsx` | Novo componente |
+| `src/pages/Employees.tsx` | Nova aba "Advertencias" |
+| `src/types/employee.ts` | Tipos de advertencia |
 

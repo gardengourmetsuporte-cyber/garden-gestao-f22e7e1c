@@ -40,12 +40,11 @@ export function getThemeColor(slug: string): string {
   return `hsl(${theme.primary})`;
 }
 
-export function applyUnitTheme(theme: UnitTheme, colorOverride?: string) {
-  const color = colorOverride || theme.primary;
+export function applyUnitTheme(theme: UnitTheme) {
   const root = document.documentElement.style;
-  root.setProperty('--primary', color);
-  root.setProperty('--neon-cyan', color);
-  root.setProperty('--ring', color);
-  root.setProperty('--glow-primary', `0 0 24px hsl(${color} / 0.25), 0 0 48px hsl(${color} / 0.12)`);
-  root.setProperty('--glow-cyan', `0 0 24px hsl(${color} / 0.25), 0 0 48px hsl(${color} / 0.12)`);
+  root.setProperty('--primary', theme.primary);
+  root.setProperty('--neon-cyan', theme.neonCyan);
+  root.setProperty('--ring', theme.ring);
+  root.setProperty('--glow-primary', theme.glowPrimary);
+  root.setProperty('--glow-cyan', theme.glowCyan);
 }

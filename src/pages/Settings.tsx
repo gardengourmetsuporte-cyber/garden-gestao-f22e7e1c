@@ -22,7 +22,6 @@ const NotificationSettings = lazy(() => import('@/components/settings/Notificati
 const AuditLogSettings = lazy(() => import('@/components/settings/AuditLogSettings').then(m => ({ default: m.AuditLogSettings })));
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const LoyaltySettings = lazy(() => import('@/components/settings/LoyaltySettings').then(m => ({ default: m.LoyaltySettings })));
-const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings').then(m => ({ default: m.AppearanceSettings })));
 interface MenuItem {
   value: string;
   icon: string;
@@ -37,7 +36,6 @@ const allMenuItems: MenuItem[] = [
   { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
-  { value: 'appearance', icon: 'Palette', label: 'Aparência', description: 'Cor e logo da empresa', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'team', icon: 'Users', label: 'Equipe', description: 'Membros, convites e níveis de acesso', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
@@ -89,7 +87,6 @@ export default function SettingsPage() {
 
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'plan') return true;
-    if (item.value === 'appearance') return isAdmin;
     if (item.value === 'units') return isSuperAdmin;
     if (item.value === 'team') return isAdmin;
     if (item.value === 'audit-log') return isAdmin;
@@ -139,7 +136,6 @@ export default function SettingsPage() {
       {activeSection === 'audit-log' && <AuditLogSettings />}
       {activeSection === 'cardapio-digital' && <CardapioSettings />}
       {activeSection === 'loyalty' && <LoyaltySettings />}
-      {activeSection === 'appearance' && <AppearanceSettings />}
     </Suspense>
   ) : null;
 
