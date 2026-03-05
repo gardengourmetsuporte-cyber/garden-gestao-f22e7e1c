@@ -45,23 +45,23 @@ if ('serviceWorker' in navigator) {
         banner.setAttribute('style', [
           'position:fixed', 'bottom:calc(80px + env(safe-area-inset-bottom, 0px))', 'left:16px', 'right:16px',
           'z-index:9999', 'display:flex', 'align-items:center', 'gap:12px',
-          'padding:12px 16px', 'border-radius:14px',
-          'background:hsl(142 50% 14%)', 'border:1px solid hsl(142 40% 25%)',
+          'padding:14px 18px', 'border-radius:16px',
+          'background:hsl(var(--card))', 'border:1px solid hsl(var(--border))',
           'box-shadow:0 8px 30px rgba(0,0,0,0.4)',
-          'color:hsl(142 60% 85%)', 'font-family:system-ui,sans-serif', 'font-size:13px',
+          'color:hsl(var(--foreground))', 'font-family:system-ui,sans-serif', 'font-size:13px',
           'animation:slideUp .3s ease-out',
         ].join(';'));
 
         banner.innerHTML = `
           <span style="flex:1;line-height:1.4">Nova versão disponível ✨</span>
           <button id="sw-update-btn" style="
-            padding:6px 14px;border-radius:8px;font-weight:600;font-size:12px;
-            background:hsl(142 70% 45%);color:hsl(142 50% 10%);border:none;cursor:pointer;
+            padding:8px 16px;border-radius:10px;font-weight:600;font-size:13px;
+            background:hsl(var(--primary));color:hsl(var(--primary-foreground));border:none;cursor:pointer;
             white-space:nowrap;
           ">Atualizar</button>
           <button id="sw-update-dismiss" style="
-            background:none;border:none;color:hsl(142 30% 55%);cursor:pointer;
-            font-size:18px;line-height:1;padding:0 2px;
+            background:none;border:none;color:hsl(var(--muted-foreground));cursor:pointer;
+            font-size:18px;line-height:1;padding:0 4px;
           ">×</button>
         `;
 
@@ -73,9 +73,15 @@ if ('serviceWorker' in navigator) {
         document.body.appendChild(banner);
 
         document.getElementById('sw-update-btn')!.onclick = () => {
-          navigator.serviceWorker.addEventListener('controllerchange', doReload, { once: true });
-          waitingSW.postMessage({ type: 'SKIP_WAITING' });
           banner.remove();
+          // Try SKIP_WAITING then force reload
+          waitingSW.postMessage({ type: 'SKIP_WAITING' });
+          // Listen for controller change with timeout fallback
+          const timeout = setTimeout(() => doReload(), 2000);
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            clearTimeout(timeout);
+            doReload();
+          }, { once: true });
         };
 
         document.getElementById('sw-update-dismiss')!.onclick = () => {
