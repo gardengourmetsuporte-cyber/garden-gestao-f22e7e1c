@@ -392,6 +392,48 @@ export default function ChecklistsPage() {
   };
 
   const [closingType, setClosingType] = useState<ChecklistType | null>(null);
+  const [sendingReminder, setSendingReminder] = useState(false);
+
+  const handleSendReminder = async () => {
+    if (!user?.id || !activeUnitId) return;
+    setSendingReminder(true);
+    try {
+      // Get all users in this unit (except current admin)
+      const { data: unitUsers } = await supabase
+        .from('user_units')
+        .select('user_id')
+        .eq('unit_id', activeUnitId)
+        .neq('user_id', user.id);
+
+      if (!unitUsers || unitUsers.length === 0) {
+        toast.info('Nenhum funcionário encontrado na unidade');
+        return;
+      }
+
+      const typeLabel = checklistType === 'abertura' ? 'Abertura' : checklistType === 'fechamento' ? 'Fechamento' : 'Bônus';
+      const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+      const pending = progress.total - progress.completed;
+
+      const rows = unitUsers.map((u: any) => ({
+        user_id: u.user_id,
+        type: 'alert' as const,
+        title: `⏰ Finalize o Checklist de ${typeLabel}!`,
+        description: `Faltam ${pending} tarefa(s) e o prazo está acabando. Corra para completar!`,
+        origin: 'checklist' as const,
+        read: false,
+      }));
+
+      const { error } = await supabase.from('notifications').insert(rows as any);
+      if (error) throw error;
+
+      toast.success(`Lembrete enviado para ${unitUsers.length} funcionário(s)!`);
+    } catch (err) {
+      console.error('Reminder error:', err);
+      toast.error('Erro ao enviar lembrete');
+    } finally {
+      setSendingReminder(false);
+    }
+  };
 
   const handleManualClose = async (type: ChecklistType) => {
     if (!user?.id || !activeUnitId) return;
@@ -676,7 +718,27 @@ export default function ChecklistsPage() {
                       )}>
                         {getTypeProgress.fechamento.percent}%
                       </span>
-                    </div>
+            </div>
+
+            {/* Reminder Button — admin only, when checklist not complete */}
+            {!settingsMode && isAdmin && checklistType !== 'bonus' && (() => {
+              const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+              if (progress.percent === 100 || progress.total === 0) return null;
+              return (
+                <button
+                  onClick={handleSendReminder}
+                  disabled={sendingReminder}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all",
+                    "bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+                    sendingReminder && "opacity-60 pointer-events-none"
+                  )}
+                >
+                  <AppIcon name="Bell" size={16} className={sendingReminder ? "animate-bounce" : ""} />
+                  {sendingReminder ? 'Enviando...' : 'Lembrar equipe de completar'}
+                </button>
+              );
+            })()}
                   </div>
                 )}
                 {checklistType === 'fechamento' && getTypeProgress.fechamento.percent < 100 && !settingsMode && (
