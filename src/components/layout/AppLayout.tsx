@@ -2,7 +2,6 @@ import gardenLogo from '@/assets/logo.png';
 import gardenIcon from '@/assets/garden-icon.png';
 import gardenLogoFull from '@/assets/garden-logo-full.png';
 import gardenText from '@/assets/garden-text.png';
-import gardenHeaderLogo from '@/assets/garden-header-logo.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
 import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -175,7 +174,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   onClick={() => navigate('/')}
                   className="active:scale-95 transition-transform"
                 >
-                  <img alt="Garden" className="h-[4.5rem] object-contain opacity-90" src={gardenHeaderLogo} />
+                  <img alt="Garden" className="h-10 object-contain" style={{ mixBlendMode: 'screen' }} src={gardenIcon} />
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
