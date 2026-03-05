@@ -2693,3 +2693,20 @@ select:focus {
 
 .finance-hero-chip:nth-child(1) { animation-delay: 400ms; }
 .finance-hero-chip:nth-child(2) { animation-delay: 500ms; }
+
+/* Page loader animations */
+@keyframes loader-sway {
+  0%, 100% { transform: rotate(-2deg) scale(1); }
+  50% { transform: rotate(2deg) scale(1.04); }
+}
+
+@keyframes loader-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.15); }
+}
+
+@keyframes loader-float {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  30% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-60px) scale(0); }
+}
