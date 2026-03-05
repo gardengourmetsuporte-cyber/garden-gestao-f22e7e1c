@@ -253,20 +253,47 @@ export function TransactionSheet({
   };
 
   const handleSave = async () => {
-    console.log('[TransactionSheet] handleSave called', { description, amount, isLoading, editingTransaction: !!editingTransaction, isRecurring: editingTransaction?.is_recurring, installmentGroupId: editingTransaction?.installment_group_id });
     const numAmount = getNumericAmount();
     const hasErrors = { description: !description.trim(), amount: !numAmount || numAmount <= 0 };
     if (hasErrors.description || hasErrors.amount) {
-      console.log('[TransactionSheet] validation failed', hasErrors);
       setValidationErrors(hasErrors);
       toast.error('Preencha a descrição e o valor');
       return;
     }
     setValidationErrors({});
 
-    // If editing a recurring transaction, show the edit mode dialog
-    if (editingTransaction && editingTransaction.is_recurring && editingTransaction.installment_group_id) {
-      setShowRecurringEditDialog(true);
+    const baseData: TransactionFormData = {
+      type,
+      amount: numAmount,
+      description: description.trim(),
+      category_id: categoryId,
+      account_id: accountId,
+      to_account_id: type === 'transfer' ? toAccountId : null,
+      date: format(date, 'yyyy-MM-dd'),
+      is_paid: type === 'credit_card' ? false : isPaid,
+      is_fixed: isFixed,
+      is_recurring: isRecurring,
+      recurring_interval: isRecurring ? recurringInterval : undefined,
+      notes: notes.trim() || undefined,
+      supplier_id: supplierId || undefined,
+      employee_id: employeeId || undefined,
+    };
+
+    // Fallback seguro: ao editar transação recorrente, salva esta ocorrência direto
+    // para não bloquear o usuário em casos de dialog não visível no mobile.
+    if (editingTransaction && editingTransaction.is_recurring && editingTransaction.installment_group_id && onUpdateRecurring) {
+      setIsLoading(true);
+      try {
+        await onUpdateRecurring(editingTransaction.id, baseData, 'single');
+        clearDraft();
+        toast.success('Transação atualizada!');
+        onOpenChange(false);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Não foi possível salvar a transação';
+        toast.error(message);
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -299,42 +326,19 @@ export function TransactionSheet({
           const txIsPaid = (i === 0 && startOfDay(txDate) <= today) ? isPaid : false;
 
           await onSave({
-            type,
-            amount: numAmount,
+            ...baseData,
             description: `${description.trim()} (${i + 1}/${count})`,
-            category_id: categoryId,
-            account_id: accountId,
-            to_account_id: type === 'transfer' ? toAccountId : null,
             date: format(txDate, 'yyyy-MM-dd'),
             is_paid: txIsPaid,
-            is_fixed: isFixed,
             is_recurring: true,
             recurring_interval: recurringInterval,
-            notes: notes.trim() || undefined,
-            supplier_id: supplierId || undefined,
-            employee_id: employeeId || undefined,
             installment_number: i + 1,
             total_installments: count,
-            installment_group_id: groupId
+            installment_group_id: groupId,
           });
         }
       } else {
-        await onSave({
-          type,
-          amount: numAmount,
-          description: description.trim(),
-          category_id: categoryId,
-          account_id: accountId,
-          to_account_id: type === 'transfer' ? toAccountId : null,
-          date: format(date, 'yyyy-MM-dd'),
-          is_paid: type === 'credit_card' ? false : isPaid,
-          is_fixed: isFixed,
-          is_recurring: isRecurring,
-          recurring_interval: isRecurring ? recurringInterval : undefined,
-          notes: notes.trim() || undefined,
-          supplier_id: supplierId || undefined,
-          employee_id: employeeId || undefined,
-        });
+        await onSave(baseData);
       }
 
       clearDraft();
