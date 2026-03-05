@@ -1,5 +1,5 @@
-import gardenLogo from '@/assets/logo.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
+import { useUnitLogo } from '@/hooks/useUnitLogo';
 import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PageTransition } from './PageTransition';
@@ -46,6 +46,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
   const isMobile = useIsMobile();
+  const unitLogo = useUnitLogo();
   const [isLgScreen, setIsLgScreen] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');
@@ -124,7 +125,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   if (isSigningOut) {
     return (
       <div className="animate-fade-in">
-        <PageLoader />
+        <PageLoader logoUrl={unitLogo} />
       </div>
     );
   }
@@ -156,7 +157,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               className="flex items-center gap-2 active:scale-95 transition-transform min-w-0"
             >
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
-                <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                <img alt="Logo" className="w-6 h-6 object-contain" src={unitLogo} />
               </div>
               <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
                 {activeUnit?.name || 'Garden'}
@@ -214,7 +215,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               onClick={() => navigate('/')}
               className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
             >
-              <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} />
+              <img alt="Logo" className="w-7 h-7 object-contain" src={unitLogo} />
             </button>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
