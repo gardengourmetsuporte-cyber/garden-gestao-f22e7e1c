@@ -84,12 +84,21 @@ export default function Invite() {
 
       const hasExistingUnits = (count ?? 0) > 0;
 
-      // Create user_units association
+      // Fetch default access level for the unit
+      const { data: defaultLevel } = await supabase
+        .from('access_levels')
+        .select('id')
+        .eq('unit_id', invite!.unit_id)
+        .eq('is_default', true)
+        .maybeSingle();
+
+      // Create user_units association with default access level
       await supabase.from('user_units').insert({
         user_id: userId,
         unit_id: invite!.unit_id,
         role: invite!.role || 'member',
         is_default: !hasExistingUnits,
+        access_level_id: defaultLevel?.id || null,
       });
 
       // Mark invite as accepted
