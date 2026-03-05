@@ -15,6 +15,7 @@ interface PaymentSetting {
   settlement_day_of_week: number | null;
   fee_percentage: number;
   create_transaction: boolean;
+  account_id: string | null;
 }
 
 // ---- Fetch helper (eliminates N+1) ----
@@ -234,9 +235,17 @@ export function useCashClosing() {
         .from('finance_accounts').select('*').eq('user_id', user.id).eq('is_active', true);
 
       const carteiraAccount = accounts?.find(a => a.name.toLowerCase().includes('carteira') || a.type === 'wallet');
-      const itauAccount = accounts?.find(a => a.name.toLowerCase().includes('itaú') || a.name.toLowerCase().includes('itau'));
-      const carteiraAccountId = carteiraAccount?.id || accounts?.[0]?.id || null;
-      const bankAccountId = itauAccount?.id || accounts?.[0]?.id || null;
+      const firstBankAccount = accounts?.find(a => a.type === 'checking' || a.type === 'savings') || accounts?.[0];
+      const defaultCarteiraId = carteiraAccount?.id || accounts?.[0]?.id || null;
+      const defaultBankId = firstBankAccount?.id || accounts?.[0]?.id || null;
+
+      // Helper to resolve account: uses setting's account_id if configured, otherwise falls back
+      const getAccountId = (methodKey: string, fallback: string | null): string | null => {
+        const setting = getPaymentSetting(methodKey);
+        return setting?.account_id || fallback;
+      };
+      const carteiraAccountId = defaultCarteiraId;
+      const bankAccountId = defaultBankId;
 
       const balcaoCategory = categories?.find(c => c.name === 'Vendas Balcão' && !c.parent_id);
       const deliveryCategory = categories?.find(c => c.name === 'Vendas Delivery' && !c.parent_id);
@@ -325,55 +334,58 @@ export function useCashClosing() {
       // Cash
       if (closing.cash_amount > 0 && getPaymentSetting('cash_amount')?.create_transaction !== false) {
         const s = getPaymentSetting('cash_amount');
-        addIncomeTx(applyFee(closing.cash_amount, s), `Dinheiro (${formatDateLabel(closing.date)})`, dinheiroSubcat?.id || balcaoCategory?.id || null, carteiraAccountId, s);
+        addIncomeTx(applyFee(closing.cash_amount, s), `Dinheiro (${formatDateLabel(closing.date)})`, dinheiroSubcat?.id || balcaoCategory?.id || null, getAccountId('cash_amount', carteiraAccountId), s);
       }
 
       // Debit
       if (closing.debit_amount > 0 && getPaymentSetting('debit_amount')?.create_transaction !== false) {
         const s = getPaymentSetting('debit_amount');
+        const accId = getAccountId('debit_amount', bankAccountId);
         const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
         transactions.push({
           user_id: user.id, unit_id: activeUnitId, type: 'income',
           amount: closing.debit_amount, description: `Débito (${formatDateLabel(closing.date)})`,
-          category_id: debitoSubcat?.id || balcaoCategory?.id || null, account_id: bankAccountId,
+          category_id: debitoSubcat?.id || balcaoCategory?.id || null, account_id: accId,
           date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
         });
-        if (s?.fee_percentage) await addFeeTx(closing.debit_amount, s.fee_percentage, `Taxa Débito - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`, bankAccountId, s);
+        if (s?.fee_percentage) await addFeeTx(closing.debit_amount, s.fee_percentage, `Taxa Débito - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`, accId, s);
       }
 
       // Credit
       if (closing.credit_amount > 0 && getPaymentSetting('credit_amount')?.create_transaction !== false) {
         const s = getPaymentSetting('credit_amount');
+        const accId = getAccountId('credit_amount', bankAccountId);
         const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
         transactions.push({
           user_id: user.id, unit_id: activeUnitId, type: 'income',
           amount: closing.credit_amount, description: `Crédito (${formatDateLabel(closing.date)})`,
-          category_id: creditoSubcat?.id || balcaoCategory?.id || null, account_id: bankAccountId,
+          category_id: creditoSubcat?.id || balcaoCategory?.id || null, account_id: accId,
           date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
         });
-        if (s?.fee_percentage) await addFeeTx(closing.credit_amount, s.fee_percentage, `Taxa Crédito - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`, bankAccountId, s);
+        if (s?.fee_percentage) await addFeeTx(closing.credit_amount, s.fee_percentage, `Taxa Crédito - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`, accId, s);
       }
 
       // Pix
       if (closing.pix_amount > 0 && getPaymentSetting('pix_amount')?.create_transaction !== false) {
         const s = getPaymentSetting('pix_amount');
-        addIncomeTx(applyFee(closing.pix_amount, s), `Pix (${formatDateLabel(closing.date)})`, pixSubcat?.id || balcaoCategory?.id || null, bankAccountId, s);
+        addIncomeTx(applyFee(closing.pix_amount, s), `Pix (${formatDateLabel(closing.date)})`, pixSubcat?.id || balcaoCategory?.id || null, getAccountId('pix_amount', bankAccountId), s);
       }
 
       // Meal voucher
       if (closing.meal_voucher_amount && closing.meal_voucher_amount > 0 && getPaymentSetting('meal_voucher_amount')?.create_transaction !== false) {
         const s = getPaymentSetting('meal_voucher_amount');
-        addIncomeTx(applyFee(closing.meal_voucher_amount, s), `Vale Alimentação (${formatDateLabel(closing.date)})`, voucherSubcat?.id || balcaoCategory?.id || null, bankAccountId, s);
+        addIncomeTx(applyFee(closing.meal_voucher_amount, s), `Vale Alimentação (${formatDateLabel(closing.date)})`, voucherSubcat?.id || balcaoCategory?.id || null, getAccountId('meal_voucher_amount', bankAccountId), s);
       }
 
       // Delivery
       if (closing.delivery_amount > 0 && getPaymentSetting('delivery_amount')?.create_transaction !== false) {
         const s = getPaymentSetting('delivery_amount');
+        const accId = getAccountId('delivery_amount', bankAccountId);
         const { date: settlementDate, isPaid } = calculateSettlementDate(closing.date, s);
         transactions.push({
           user_id: user.id, unit_id: activeUnitId, type: 'income',
           amount: closing.delivery_amount, description: `Delivery (${formatDateLabel(closing.date)})`,
-          category_id: ifoodSubcat?.id || deliveryCategory?.id || null, account_id: bankAccountId,
+          category_id: ifoodSubcat?.id || deliveryCategory?.id || null, account_id: accId,
           date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
         });
         if (s?.fee_percentage) {
@@ -384,7 +396,7 @@ export function useCashClosing() {
             transactions.push({
               user_id: user.id, unit_id: activeUnitId, type: 'expense',
               amount: feeAmount, description: `Taxa Delivery - ${s.fee_percentage}% (${formatDateLabel(closing.date)})`,
-              category_id: deliveryFeeSubcat || parentId, account_id: bankAccountId,
+              category_id: deliveryFeeSubcat || parentId, account_id: accId,
               date: settlementDate, is_paid: isPaid,
               notes: `Taxa automática sobre R$ ${closing.delivery_amount.toFixed(2)}`,
             });
@@ -400,7 +412,7 @@ export function useCashClosing() {
         transactions.push({
           user_id: user.id, unit_id: activeUnitId, type: 'income',
           amount: (closing as any).signed_account_amount, description: `Conta Assinada (${formatDateLabel(closing.date)})`,
-          category_id: signedSubcat?.id || balcaoCategory?.id || null, account_id: bankAccountId,
+          category_id: signedSubcat?.id || balcaoCategory?.id || null, account_id: getAccountId('signed_account_amount', bankAccountId),
           date: settlementDate, is_paid: isPaid, notes: 'Fechamento de caixa',
         });
       }

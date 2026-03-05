@@ -2878,6 +2878,7 @@ export type Database = {
       }
       payment_method_settings: {
         Row: {
+          account_id: string | null
           create_transaction: boolean
           created_at: string
           fee_percentage: number | null
@@ -2893,6 +2894,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           create_transaction?: boolean
           created_at?: string
           fee_percentage?: number | null
@@ -2908,6 +2910,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           create_transaction?: boolean
           created_at?: string
           fee_percentage?: number | null
@@ -2923,6 +2926,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payment_method_settings_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "finance_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payment_method_settings_unit_id_fkey"
             columns: ["unit_id"]
