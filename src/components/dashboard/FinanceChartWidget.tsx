@@ -33,36 +33,72 @@ function useExpensesByCategory() {
   return useQuery({
     queryKey: ['expenses-by-category', user?.id, activeUnitId, startDate],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('finance_transactions')
-        .select('amount, category:finance_categories(id, name, color, icon)')
-        .eq('user_id', user!.id)
-        .eq('unit_id', activeUnitId!)
-        .in('type', ['expense', 'credit_card'])
-        .eq('is_paid', true)
-        .gte('date', startDate)
-        .lte('date', endDate);
+      const [transactionsRes, categoriesRes] = await Promise.all([
+        supabase
+          .from('finance_transactions')
+          .select('amount, category:finance_categories(id, name, color, icon, parent_id)')
+          .eq('user_id', user!.id)
+          .eq('unit_id', activeUnitId!)
+          .in('type', ['expense', 'credit_card'])
+          .eq('is_paid', true)
+          .gte('date', startDate)
+          .lte('date', endDate),
+        supabase
+          .from('finance_categories')
+          .select('id, name, color, icon, parent_id')
+          .eq('user_id', user!.id)
+          .eq('unit_id', activeUnitId!),
+      ]);
 
-      if (error) throw error;
+      if (transactionsRes.error) throw transactionsRes.error;
+      if (categoriesRes.error) throw categoriesRes.error;
+
+      const categories = (categoriesRes.data || []) as Array<{
+        id: string;
+        name: string;
+        color: string | null;
+        icon: string | null;
+        parent_id: string | null;
+      }>;
+
+      const parentLookup = new Map<string, { id: string; name: string; color: string; icon: string }>();
+      categories.forEach((c) => {
+        parentLookup.set(c.id, {
+          id: c.id,
+          name: c.name,
+          color: c.color || '#64748b',
+          icon: c.icon || 'Circle',
+        });
+      });
 
       const catMap = new Map<string, { id: string; name: string; color: string; icon: string; amount: number }>();
       let total = 0;
 
-      (data || []).forEach((t: any) => {
+      (transactionsRes.data || []).forEach((t: any) => {
         const cat = t.category;
-        const catId = cat?.id || 'uncategorized';
         const amount = Number(t.amount) || 0;
         total += amount;
 
+        let resolved = cat ? parentLookup.get(cat.id) : undefined;
+        if (!resolved && cat?.parent_id) {
+          resolved = parentLookup.get(cat.parent_id);
+        }
+
+        if (resolved && cat?.parent_id) {
+          const parent = parentLookup.get(cat.parent_id);
+          if (parent) resolved = parent;
+        }
+
+        const catId = resolved?.id || cat?.id || 'uncategorized';
         const existing = catMap.get(catId);
         if (existing) {
           existing.amount += amount;
         } else {
           catMap.set(catId, {
             id: catId,
-            name: cat?.name || 'Sem categoria',
-            color: cat?.color || '#64748b',
-            icon: cat?.icon || 'Circle',
+            name: resolved?.name || cat?.name || 'Sem categoria',
+            color: resolved?.color || cat?.color || '#64748b',
+            icon: resolved?.icon || cat?.icon || 'Circle',
             amount,
           });
         }
