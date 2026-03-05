@@ -2,6 +2,7 @@ import gardenLogo from '@/assets/logo.png';
 import gardenIcon from '@/assets/garden-icon.png';
 import gardenLogoFull from '@/assets/garden-logo-full.png';
 import gardenText from '@/assets/garden-text.png';
+import gardenHeaderLogo from '@/assets/garden-header-logo.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
 import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -165,21 +166,18 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <AppIcon name="ChevronLeft" size={20} className="text-white/70" />
                 </button>
               )}
-              {isDashboard && (
+            </div>
+
+            {/* Center: Logo on dashboard, Module name on other pages */}
+            <div className="flex-1 flex items-center justify-center min-w-0">
+              {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
                   className="active:scale-95 transition-transform"
                 >
-                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-sm">
-                    <img alt="Garden" className="w-[130%] h-[130%] object-contain" src={gardenIcon} />
-                  </div>
+                  <img alt="Garden" className="h-9 object-contain opacity-90" src={gardenHeaderLogo} />
                 </button>
-              )}
-            </div>
-
-            {/* Center: Module name on other pages */}
-            <div className="flex-1 flex items-center justify-center min-w-0">
-              {!isDashboard && (
+              ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
                   {moduleTitle || activeUnit?.name || 'Garden'}
                 </span>
