@@ -100,7 +100,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
         className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
         style={{
           paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
-          background: 'linear-gradient(180deg, #050a05 0%, #0a1a12 180px, #102a1d 350px, hsl(var(--background)) 550px)',
+          background: 'linear-gradient(180deg, #050a05 0%, #0a1a12 40%, #102a1d 100%)',
         }}
       >
         <div className="overflow-y-auto h-full">
