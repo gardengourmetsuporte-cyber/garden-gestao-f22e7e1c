@@ -1,6 +1,11 @@
 import gardenLogo from "@/assets/logo.png";
 
-export function PageLoader() {
+interface PageLoaderProps {
+  logoUrl?: string;
+}
+
+export function PageLoader({ logoUrl }: PageLoaderProps) {
+  const logo = logoUrl || gardenLogo;
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative" style={{ background: 'radial-gradient(ellipse at center, hsl(156 40% 8%) 0%, hsl(0 0% 2%) 60%, hsl(0 0% 0%) 100%)' }}>
       {/* Super subtle center glow */}
@@ -18,9 +23,9 @@ export function PageLoader() {
         {/* Circular Logo Mask */}
         <div className="relative w-12 h-12 rounded-full overflow-hidden bg-black/50 border border-white/5 flex items-center justify-center backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.2)]">
           <img
-            alt="Garden Gestão"
+            alt="Logo"
             className="w-full h-full object-cover animate-pulse"
-            src={gardenLogo}
+            src={logo}
             style={{ animationDuration: '2s' }}
           />
         </div>
