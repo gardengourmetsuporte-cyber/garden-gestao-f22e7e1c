@@ -1,25 +1,29 @@
 
 
-## Plano: Redesign do cradle/notch da barra inferior
+## Plano: Refazer visual da barra inferior do zero
 
-### O que o usuário quer
-Na imagem de referência, o FAB flutua **acima** da barra com um **contorno circular visível ao redor do botão** que **não encosta** na superfície da barra — há um gap/espaço entre o anel do FAB e a barra. Atualmente o `fab-cradle-ring` funciona como fundo sólido colado na barra, sem gap visível.
+O usuário quer um redesign completo do layout e visual da bottom bar (mantendo os ícones). Baseado na imagem de referência (IMG_3469), o design correto é:
 
-### Mudanças necessárias
+- Barra sólida com fundo opaco, sem transparência/blur excessivo
+- FAB com **fundo de background** formando um "U" invertido (cradle) que se conecta à barra — não um anel transparente com borda
+- O FAB flutua com um contorno circular sólido (mesma cor do fundo da barra) criando a ilusão de que a barra "abraça" o botão com um gap
 
-**1. CSS (`src/index.css`) — Ajustar cradle e notch**
-- Aumentar o raio do recorte (mask) no `.tabbar-notch-shell` para criar um buraco maior na barra (ex: `circle 36px` → `circle 34px` com gap)
-- No `.fab-cradle-ring`: adicionar uma borda/contorno visível (ex: `border: 3px solid hsl(var(--background))`) e um `box-shadow` que simule o anel externo
-- Adicionar gap entre o anel e a barra elevando o FAB um pouco mais (`-top-[28px]`)
+### Mudanças
 
-**2. `BottomTabBar.tsx` — Ajustar posição do FAB**
-- Subir o FAB levemente (`-top-[28px]` ou `-top-[30px]`) para que o contorno do anel não toque a superfície da barra
+**1. CSS (`src/index.css`) — Refazer cradle e notch**
+- `.tabbar-notch-shell`: manter mask com `circle 38px at 50% 0` para o recorte
+- `.fab-cradle-ring`: voltar para `background: hsl(var(--background))` (fundo sólido, não transparente), remover border, adicionar padding de 5px para criar o gap visual entre o anel e o botão interno
+- Remover ambient glow da barra (simplificar)
 
-**3. `FinanceBottomNav.tsx` — Mesmas alterações de posição**
-- Aplicar a mesma elevação do FAB para manter consistência
+**2. `BottomTabBar.tsx` — Simplificar layout**
+- Remover ambient glow div
+- Barra com fundo sólido `bg-background` (sem /90 e backdrop-blur)
+- FAB posicionado `-top-[28px]` com cradle sólido
+- Manter separador top sutil
 
-### Detalhes técnicos
-- O gap será criado pela combinação de: mask-image com raio maior na barra + FAB posicionado mais alto + anel com borda visível
-- O anel terá `border: 3px solid` com cor do background, criando a separação visual entre botão e barra
-- O recorte da máscara será ajustado para `circle 36px` (atualmente 40px) garantindo que a barra tenha o "U" invertido sem tocar o anel
+**3. `FinanceBottomNav.tsx` — Mesmas mudanças**
+- Aplicar mesmo design sólido e posicionamento
+
+### Resultado esperado
+Barra limpa e sólida com o FAB flutuando acima, envolvido por um anel sólido da mesma cor do background que cria separação visual natural — visual profissional e padronizado.
 
