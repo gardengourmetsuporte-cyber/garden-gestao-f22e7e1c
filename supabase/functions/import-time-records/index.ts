@@ -86,18 +86,80 @@ Deno.serve(async (req) => {
         (employees || []).map((e: any) => e.user_id).filter(Boolean)
       );
 
-    // Build name → user_id map (lowercase)
+    // Build name → user_id map with robust normalization (lowercase + no accents)
+    const normalizeName = (value: string) =>
+      value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
     const nameMap = new Map<string, string>();
-    (employees || []).forEach((e: any) => {
-      if (e.user_id && e.full_name) {
-        nameMap.set(e.full_name.toLowerCase().trim(), e.user_id);
+    const allNames: Array<{ normalized: string; userId: string }> = [];
+
+    const registerName = (rawName: string | null | undefined, userId: string | null | undefined) => {
+      if (!rawName || !userId) return;
+      const normalized = normalizeName(rawName);
+      if (!normalized) return;
+      nameMap.set(normalized, userId);
+      allNames.push({ normalized, userId });
+    };
+
+    (employees || []).forEach((e: any) => registerName(e.full_name, e.user_id));
+    (profiles || []).forEach((p: any) => registerName(p.full_name, p.user_id));
+
+    const findBestUserId = (employeeName: string) => {
+      const normalized = normalizeName(employeeName);
+      if (!normalized) return null;
+
+      // 1) exact
+      const exact = nameMap.get(normalized);
+      if (exact) return exact;
+
+      // 2) contains
+      for (const { normalized: candidate, userId } of allNames) {
+        if (candidate.includes(normalized) || normalized.includes(candidate)) {
+          return userId;
+        }
       }
-    });
-    (profiles || []).forEach((p: any) => {
-      if (p.user_id && p.full_name) {
-        nameMap.set(p.full_name.toLowerCase().trim(), p.user_id);
+
+      // 3) token overlap (handles abbreviations like "lucilene p souza")
+      const queryTokens = normalized.split(" ").filter(Boolean);
+      let bestScore = 0;
+      let bestUserId: string | null = null;
+
+      for (const { normalized: candidate, userId } of allNames) {
+        const candidateTokens = candidate.split(" ").filter(Boolean);
+        let score = 0;
+
+        for (const q of queryTokens) {
+          if (candidateTokens.includes(q)) {
+            score += 2;
+            continue;
+          }
+
+          // Match initials ("p" -> "pereira")
+          if (q.length === 1 && candidateTokens.some((t) => t.startsWith(q))) {
+            score += 1;
+            continue;
+          }
+
+          // Prefix match for partial names
+          if (q.length >= 3 && candidateTokens.some((t) => t.startsWith(q) || q.startsWith(t))) {
+            score += 1;
+          }
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestUserId = userId;
+        }
       }
-    });
+
+      return bestScore >= Math.max(2, queryTokens.length) ? bestUserId : null;
+    };
 
     // Process records
     let imported = 0;
@@ -110,21 +172,7 @@ Deno.serve(async (req) => {
       // Find user_id by name
       let userId = rec.user_id;
       if (!userId && employee_name) {
-        const normalizedName = employee_name.toLowerCase().trim();
-        userId = nameMap.get(normalizedName);
-
-        // Fuzzy: try partial match
-        if (!userId) {
-          for (const [name, uid] of nameMap.entries()) {
-            if (
-              name.includes(normalizedName) ||
-              normalizedName.includes(name)
-            ) {
-              userId = uid;
-              break;
-            }
-          }
-        }
+        userId = findBestUserId(employee_name);
       }
 
       if (!userId) {
