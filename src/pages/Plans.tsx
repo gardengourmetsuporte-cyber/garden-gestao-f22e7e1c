@@ -4,18 +4,20 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { PLANS } from '@/lib/plans';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export default function Plans() {
-  const { profile, plan: userPlan, session, isSuperAdmin, isAdmin } = useAuth();
+  const { profile, plan: userPlan, session, isSuperAdmin } = useAuth();
+  const { userUnitRole } = useUnit();
   const navigate = useNavigate();
   const [yearly, setYearly] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
 
-  const isOwner = isSuperAdmin;
+  const isOwner = isSuperAdmin || userUnitRole === 'owner';
 
   const isPaid = userPlan === 'pro' || userPlan === 'business';
 
