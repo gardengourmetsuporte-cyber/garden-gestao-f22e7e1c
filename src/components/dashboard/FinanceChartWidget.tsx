@@ -61,42 +61,60 @@ function useExpensesByCategory() {
         parent_id: string | null;
       }>;
 
-      const parentLookup = new Map<string, { id: string; name: string; color: string; icon: string }>();
+      const categoriesById = new Map<string, {
+        id: string;
+        name: string;
+        color: string;
+        icon: string;
+        parent_id: string | null;
+      }>();
+
       categories.forEach((c) => {
-        parentLookup.set(c.id, {
+        categoriesById.set(c.id, {
           id: c.id,
           name: c.name,
           color: c.color || '#64748b',
           icon: c.icon || 'Circle',
+          parent_id: c.parent_id,
         });
       });
 
+      // Consolidate by canonical parent name to avoid visual duplication
       const catMap = new Map<string, { id: string; name: string; color: string; icon: string; amount: number }>();
       let total = 0;
+
+      const normalizeKey = (value: string) => value.trim().toLowerCase();
 
       (transactionsRes.data || []).forEach((t: any) => {
         const cat = t.category;
         const amount = Number(t.amount) || 0;
         total += amount;
 
-        let resolved = cat ? parentLookup.get(cat.id) : undefined;
-        if (!resolved && cat?.parent_id) {
-          resolved = parentLookup.get(cat.parent_id);
-        }
+        const categoryFromDb = cat?.id ? categoriesById.get(cat.id) : undefined;
+        const parentId = cat?.parent_id ?? categoryFromDb?.parent_id ?? null;
+        const parent = parentId ? categoriesById.get(parentId) : undefined;
 
-        if (resolved && cat?.parent_id) {
-          const parent = parentLookup.get(cat.parent_id);
-          if (parent) resolved = parent;
-        }
+        // Priority: explicit parent > category resolved from DB > transaction category > fallback
+        const resolved = parent || categoryFromDb || (cat
+          ? {
+              id: cat.id,
+              name: cat.name,
+              color: cat.color || '#64748b',
+              icon: cat.icon || 'Circle',
+              parent_id: cat.parent_id || null,
+            }
+          : undefined);
 
-        const catId = resolved?.id || cat?.id || 'uncategorized';
-        const existing = catMap.get(catId);
+        const displayName = resolved?.name || 'Sem categoria';
+        const mapKey = normalizeKey(displayName);
+        const existing = catMap.get(mapKey);
+
         if (existing) {
           existing.amount += amount;
         } else {
-          catMap.set(catId, {
-            id: catId,
-            name: resolved?.name || cat?.name || 'Sem categoria',
+          catMap.set(mapKey, {
+            id: resolved?.id || cat?.id || mapKey,
+            name: displayName,
             color: resolved?.color || cat?.color || '#64748b',
             icon: resolved?.icon || cat?.icon || 'Circle',
             amount,
