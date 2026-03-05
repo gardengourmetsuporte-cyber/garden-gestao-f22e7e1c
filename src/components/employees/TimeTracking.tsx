@@ -44,6 +44,32 @@ export function TimeTracking() {
 
   const pendingCerts = certificates.filter(c => c.status === 'pending');
 
+  const handleExportRecords = () => {
+    if (records.length === 0) {
+      toast.error('Nenhum registro para exportar');
+      return;
+    }
+    const data = records.map(r => ({
+      Data: r.date,
+      Funcionário: r.profile?.full_name || r.user_id,
+      Entrada: r.check_in?.substring(0, 5) || '',
+      Saída: r.check_out?.substring(0, 5) || '',
+      'Entrada Esperada': r.expected_start?.substring(0, 5) || '',
+      'Saída Esperada': r.expected_end?.substring(0, 5) || '',
+      'Atraso (min)': r.late_minutes || 0,
+      'Saída Antecipada (min)': r.early_departure_minutes || 0,
+      Pontos: r.points_awarded,
+      Status: r.status === 'completed' ? 'Completo' : r.status === 'checked_in' ? 'Trabalhando' : r.status === 'absent' ? 'Falta' : r.status === 'day_off' ? 'Folga' : r.status,
+      Manual: r.manual_entry ? 'Sim' : 'Não',
+      Observações: r.notes || '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Ponto');
+    XLSX.writeFile(wb, `ponto-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+    toast.success('Relatório exportado!');
+  };
+
   return (
     <div className="space-y-5">
       {!isAdmin && <EmployeeCheckInCard todayRecord={todayRecord} onCheckIn={checkIn} onCheckOut={checkOut} />}
@@ -70,22 +96,26 @@ export function TimeTracking() {
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowImportSheet(true)}>
               <AppIcon name="upload" size={16} className="mr-2" />
-              Importar Ponto
+              Importar
             </Button>
-            <Button
-              variant="outline"
-              className="flex-1 rounded-xl h-11 relative"
-              onClick={() => setShowCertificateList(true)}
-            >
-              <AppIcon name="clinical_notes" size={16} className="mr-2" />
-              Atestados
-              {pendingCerts.length > 0 && (
-                <Badge className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 text-[10px]" variant="destructive">
-                  {pendingCerts.length}
-                </Badge>
-              )}
+            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => handleExportRecords()}>
+              <AppIcon name="download" size={16} className="mr-2" />
+              Exportar
             </Button>
           </div>
+          <Button
+            variant="outline"
+            className="w-full rounded-xl h-11 relative"
+            onClick={() => setShowCertificateList(true)}
+          >
+            <AppIcon name="clinical_notes" size={16} className="mr-2" />
+            Atestados
+            {pendingCerts.length > 0 && (
+              <Badge className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 text-[10px]" variant="destructive">
+                {pendingCerts.length}
+              </Badge>
+            )}
+          </Button>
         </div>
       )}
 
