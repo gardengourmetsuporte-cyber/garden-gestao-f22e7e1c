@@ -3,17 +3,18 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Plus, Truck, MapPin, ChevronDown, Package, Clock, CheckCircle2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { PageLoader } from '@/components/PageLoader';
+import { useFabAction } from '@/contexts/FabActionContext';
 
-const STATUS_TABS: { key: DeliveryStatus | 'all'; label: string; icon: React.ReactNode }[] = [
-  { key: 'all', label: 'Todas', icon: <Package className="w-3.5 h-3.5" /> },
-  { key: 'pending', label: 'Pendentes', icon: <Clock className="w-3.5 h-3.5" /> },
-  { key: 'out', label: 'Em rota', icon: <Truck className="w-3.5 h-3.5" /> },
-  { key: 'delivered', label: 'Entregues', icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+const STATUS_TABS: { key: DeliveryStatus | 'all'; label: string; icon: string }[] = [
+  { key: 'all', label: 'Todas', icon: 'package_2' },
+  { key: 'pending', label: 'Pendentes', icon: 'schedule' },
+  { key: 'out', label: 'Em rota', icon: 'local_shipping' },
+  { key: 'delivered', label: 'Entregues', icon: 'check_circle' },
 ];
 
 export default function Deliveries() {
@@ -33,6 +34,12 @@ export default function Deliveries() {
 
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  // Register FAB action
+  useFabAction(
+    { icon: 'add', label: 'Nova Entrega', onClick: () => setSheetOpen(true) },
+    []
+  );
+
   const handleConfirm = async (ocrResult: any, file: File) => {
     try {
       let photoUrl: string | null = null;
@@ -47,18 +54,18 @@ export default function Deliveries() {
 
   return (
     <AppLayout>
-      <div className="space-y-4 pb-24">
+      <div className="space-y-4 pb-24 px-4 pt-3">
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="card-base p-3 text-center">
+          <div className="rounded-2xl border border-border/60 bg-card p-3 text-center">
             <p className="text-2xl font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{stats.pending}</p>
             <p className="text-[10px] text-muted-foreground">Pendentes</p>
           </div>
-          <div className="card-base p-3 text-center">
+          <div className="rounded-2xl border border-border/60 bg-card p-3 text-center">
             <p className="text-2xl font-bold" style={{ color: 'hsl(var(--color-transfer))' }}>{stats.out}</p>
             <p className="text-[10px] text-muted-foreground">Em rota</p>
           </div>
-          <div className="card-base p-3 text-center">
+          <div className="rounded-2xl border border-border/60 bg-card p-3 text-center">
             <p className="text-2xl font-bold" style={{ color: 'hsl(var(--color-income))' }}>{stats.delivered}</p>
             <p className="text-[10px] text-muted-foreground">Entregues</p>
           </div>
@@ -71,10 +78,10 @@ export default function Deliveries() {
               key={tab.key}
               variant={statusFilter === tab.key ? 'default' : 'outline'}
               size="sm"
-              className="h-8 text-xs gap-1 shrink-0"
+              className="h-8 text-xs gap-1.5 shrink-0 rounded-full"
               onClick={() => setStatusFilter(tab.key)}
             >
-              {tab.icon} {tab.label}
+              <AppIcon name={tab.icon} size={14} /> {tab.label}
             </Button>
           ))}
         </div>
@@ -82,23 +89,23 @@ export default function Deliveries() {
         {/* Grouped deliveries */}
         {groupedByNeighborhood.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <MapPin className="w-12 h-12 text-muted-foreground/30 mb-3" />
-            <p className="text-sm text-muted-foreground">Nenhuma entrega encontrada</p>
+            <AppIcon name="location_on" size={48} className="text-muted-foreground/30 mb-3" />
+            <p className="text-sm font-medium text-muted-foreground">Nenhuma entrega encontrada</p>
             <p className="text-xs text-muted-foreground/60 mt-1">Tire foto de um pedido para começar</p>
           </div>
         ) : (
           groupedByNeighborhood.map((group) => (
             <Collapsible key={group.neighborhood} defaultOpen>
               <CollapsibleTrigger className="w-full">
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors">
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary" />
+                    <AppIcon name="location_on" size={16} className="text-primary" />
                     <span className="font-semibold text-sm">{group.neighborhood}</span>
                     <Badge variant="secondary" className="text-[10px] h-5">
                       {group.deliveries.length}
                     </Badge>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform [[data-state=open]_&]:rotate-180" />
+                  <AppIcon name="expand_more" size={16} className="text-muted-foreground transition-transform [[data-state=open]_&]:rotate-180" />
                 </div>
               </CollapsibleTrigger>
               <CollapsibleContent>
@@ -116,15 +123,6 @@ export default function Deliveries() {
           ))
         )}
       </div>
-
-      {/* FAB */}
-      <Button
-        className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg shadow-primary/30"
-        onClick={() => setSheetOpen(true)}
-        disabled={isCreating}
-      >
-        <Plus className="w-6 h-6" />
-      </Button>
 
       <DeliveryOcrSheet
         open={sheetOpen}
