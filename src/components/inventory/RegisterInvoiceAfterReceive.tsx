@@ -124,17 +124,17 @@ export function RegisterInvoiceAfterReceive({
           {/* Due Date */}
           <div className="space-y-2">
             <Label className="text-foreground flex items-center gap-2">
-              <AppIcon name="CalendarMonth" size={16} />
+              <AppIcon name="Calendar" size={16} />
               Data de Vencimento
             </Label>
-            <Popover open={showDueCalendar} onOpenChange={setShowDueCalendar}>
+            <Popover open={showDueCalendar} onOpenChange={setShowDueCalendar} modal={true}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full h-12 justify-start">
-                  <AppIcon name="CalendarMonth" size={16} className="mr-2" />
+                  <AppIcon name="Calendar" size={16} className="mr-2" />
                   {format(dueDate, "dd/MM/yyyy", { locale: ptBR })}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-[9999]" align="center" side="top">
                 <Calendar
                   mode="single"
                   selected={dueDate}
