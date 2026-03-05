@@ -30,7 +30,7 @@ export function LandingNavbar() {
         <Link to="/landing" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center border border-white/10 shadow-sm relative group">
             <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <img src={logoImg} alt="Garden" className="w-[90%] h-[90%] object-contain" />
+            <img src={logoImg} alt="Garden" className="w-[85%] h-[85%] object-contain" />
           </div>
           <span className="font-display font-bold text-lg text-white tracking-tight">
             Garden

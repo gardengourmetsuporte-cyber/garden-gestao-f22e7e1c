@@ -2694,19 +2694,56 @@ select:focus {
 .finance-hero-chip:nth-child(1) { animation-delay: 400ms; }
 .finance-hero-chip:nth-child(2) { animation-delay: 500ms; }
 
-/* Page loader animations */
-@keyframes loader-sway {
-  0%, 100% { transform: rotate(-2deg) scale(1); }
-  50% { transform: rotate(2deg) scale(1.04); }
+/* ═══ Modern Page Loader ═══ */
+.loader-blob {
+  background: radial-gradient(circle, hsl(156 60% 35% / 0.4) 0%, transparent 70%);
+  animation: loader-blob-morph 4s ease-in-out infinite;
+  filter: blur(30px);
 }
 
-@keyframes loader-glow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.15); }
+@keyframes loader-blob-morph {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; opacity: 0.6; }
+  33% { transform: translate(-50%, -50%) scale(1.1) rotate(120deg); border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; opacity: 0.8; }
+  66% { transform: translate(-50%, -50%) scale(0.95) rotate(240deg); border-radius: 50% 30% 50% 70% / 40% 70% 30% 60%; opacity: 0.5; }
 }
 
-@keyframes loader-float {
-  0% { opacity: 0; transform: translateY(0) scale(0.5); }
-  30% { opacity: 0.7; }
-  100% { opacity: 0; transform: translateY(-60px) scale(0); }
+.loader-orbit-ring {
+  animation: loader-ring-pulse 3s ease-in-out infinite;
+}
+
+@keyframes loader-ring-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+.loader-orbit-dot {
+  animation: loader-spin 2.4s linear infinite;
+}
+
+@keyframes loader-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loader-logo-entrance {
+  animation: loader-logo-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both, loader-logo-breathe 3s ease-in-out 0.8s infinite;
+}
+
+@keyframes loader-logo-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes loader-logo-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.loader-progress {
+  animation: loader-bar 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loader-bar {
+  0% { width: 0%; transform: translateX(0); }
+  50% { width: 100%; }
+  100% { width: 0%; transform: translateX(500%); }
 }
