@@ -2000,23 +2000,25 @@
   /* ========== BOTTOM BAR NOTCH / CRADLE ========== */
 
   .tabbar-notch-shell {
-    mask-image: radial-gradient(circle 40px at 50% 0, transparent 38px, black 39px);
-    -webkit-mask-image: radial-gradient(circle 40px at 50% 0, transparent 38px, black 39px);
+    mask-image: radial-gradient(circle 36px at 50% 0, transparent 34px, black 35px);
+    -webkit-mask-image: radial-gradient(circle 36px at 50% 0, transparent 34px, black 35px);
   }
 
   .fab-cradle-ring {
-    width: 58px;
-    height: 58px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: hsl(var(--background));
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    background: transparent;
+    border: 2.5px solid hsl(var(--border) / 0.25);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   }
 
   .dark .fab-cradle-ring {
-    box-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 0 0 1px hsl(200 60% 50% / 0.08);
+    border-color: hsl(200 60% 50% / 0.15);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
   }
 
   .light .header-ambient-glow {

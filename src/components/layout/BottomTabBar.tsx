@@ -140,7 +140,7 @@ export function BottomTabBar() {
           </div>
 
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[26px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[30px] z-20">
             <div className="fab-cradle-ring">
               <button
                 aria-label={fabAction?.label || 'Ação rápida'}
