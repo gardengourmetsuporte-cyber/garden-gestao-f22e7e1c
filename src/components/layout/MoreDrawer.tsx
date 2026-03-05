@@ -95,22 +95,14 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
         className="fixed inset-0 z-40 bg-black/60 animate-fade-in"
         onClick={() => onOpenChange(false)}
       />
+      {/* Panel */}
       <div
         className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
         style={{
           paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
-          background: '#050a05',
+          background: 'linear-gradient(to bottom, #050a05 0px, #102a1d 280px, hsl(var(--background)) 280px)',
         }}
       >
-        {/* Animated background effects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[40%] rounded-full opacity-[0.07] animate-[subtleFloat_8s_ease-in-out_infinite]"
-            style={{ background: 'radial-gradient(circle, hsl(160 60% 40%), transparent 70%)' }} />
-          <div className="absolute bottom-[10%] right-[-15%] w-[50%] h-[35%] rounded-full opacity-[0.05] animate-[subtleFloat_10s_ease-in-out_2s_infinite]"
-            style={{ background: 'radial-gradient(circle, hsl(140 50% 35%), transparent 70%)' }} />
-          <div className="absolute top-[40%] left-[50%] w-[30%] h-[25%] rounded-full opacity-[0.04] animate-[subtleFloat_12s_ease-in-out_4s_infinite]"
-            style={{ background: 'radial-gradient(circle, hsl(45 80% 50%), transparent 70%)' }} />
-        </div>
         <div className="overflow-y-auto h-full">
           {/* Dark emerald gradient header area */}
           <div
@@ -201,7 +193,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
           </div>
 
           {/* Module grid — adaptive cards */}
-          <div className="px-4 pt-5 pb-8 space-y-3 relative z-10">
+          <div className="px-4 pt-5 pb-8 space-y-3 bg-background -mt-3 relative z-10">
             {groupedNav.map(group => {
               const count = group.items.length;
               const useCols3 = count >= 3 && count !== 4;
