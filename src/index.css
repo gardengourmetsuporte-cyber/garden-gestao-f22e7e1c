@@ -105,7 +105,7 @@
     --ring: 156 72% 40%;
 
     /* Ultra-refined Glows (Apple/Vercel style) */
-    --glow-primary: 0 0 40px hsl(156 72% 40% / 0.15), 0 0 20px hsl(156 72% 40% / 0.1);
+    --glow-primary: 0 0 40px hsl(var(--primary) / 0.15), 0 0 20px hsl(var(--primary) / 0.1);
     --glow-accent: 0 0 30px hsl(250 89% 65% / 0.1), 0 0 15px hsl(250 89% 65% / 0.05);
     --glow-success: 0 0 40px hsl(156 72% 45% / 0.15), 0 0 20px hsl(156 72% 45% / 0.1);
     --glow-destructive: 0 0 40px hsl(348 83% 53% / 0.15), 0 0 20px hsl(348 83% 53% / 0.1);
@@ -113,8 +113,8 @@
     --glow-cyan: 0 0 40px hsl(190 90% 50% / 0.15), 0 0 20px hsl(190 90% 50% / 0.1);
 
     /* Subtle Gradients */
-    --gradient-brand: linear-gradient(135deg, hsl(156 72% 35%), hsl(160 80% 45%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(156 72% 40% / 0.15), hsl(160 80% 45% / 0.05));
+    --gradient-brand: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05));
     --gradient-surface: linear-gradient(180deg, hsl(220 15% 10%), hsl(225 20% 5%));
     --gradient-gold: linear-gradient(135deg, hsl(43 90% 45%), hsl(45 95% 55%), hsl(40 85% 40%));
     --gradient-gold-subtle: linear-gradient(135deg, hsl(43 90% 45% / 0.15), hsl(45 95% 55% / 0.05));
@@ -124,7 +124,7 @@
     --shadow-card-hover: 0 4px 20px hsl(220 30% 0% / 0.6), 0 12px 40px hsl(220 30% 0% / 0.4), inset 0 1px 1px hsl(0 0% 100% / 0.06);
     --shadow-elevated: 0 10px 40px hsl(220 30% 0% / 0.8), 0 20px 60px hsl(220 30% 0% / 0.5), inset 0 1px 1px hsl(0 0% 100% / 0.08);
     --shadow-floating: 0 10px 40px hsl(220 30% 0% / 0.5), inset 0 1px 1px hsl(0 0% 100% / 0.06);
-    --shadow-glow: 0 0 30px hsl(156 72% 40% / 0.2), inset 0 1px 1px hsl(0 0% 100% / 0.08);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2), inset 0 1px 1px hsl(0 0% 100% / 0.08);
   }
 
   /* ===== LIGHT THEME ===== */
@@ -191,11 +191,11 @@
     --shadow-floating: 0 8px 32px hsl(234 20% 30% / 0.08), 0 2px 8px hsl(234 20% 30% / 0.04);
 
     /* Gradient tokens — light: flat, minimal */
-    --gradient-brand: linear-gradient(135deg, hsl(160 30% 15%), hsl(156 50% 22%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(156 50% 25% / 0.06), hsl(156 60% 30% / 0.03));
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(156 5% 97%));
-    --gradient-gold: linear-gradient(135deg, hsl(160 30% 12%), hsl(156 50% 18%), hsl(160 35% 14%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(156 40% 20% / 0.08), hsl(156 50% 25% / 0.04));
+    --gradient-brand: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(var(--primary) / 0.06), hsl(var(--primary) / 0.03));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 97%));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--primary) / 0.8), hsl(var(--primary)), hsl(var(--primary) / 0.8));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--primary) / 0.04));
     --shadow-glow: none;
   }
 
@@ -276,18 +276,19 @@
 
   .gradient-primary {
     background: linear-gradient(135deg,
-        hsl(160 30% 6%) 0%,
-        hsl(156 50% 16%) 18%,
-        hsl(156 60% 24%) 36%,
-        hsl(156 45% 18%) 54%,
-        hsl(160 40% 10%) 72%,
-        hsl(156 60% 22%) 88%,
-        hsl(160 30% 6%) 100%);
+        hsl(var(--primary) / 0.06) 0%,
+        hsl(var(--primary) / 0.16) 18%,
+        hsl(var(--primary) / 0.24) 36%,
+        hsl(var(--primary) / 0.18) 54%,
+        hsl(var(--primary) / 0.10) 72%,
+        hsl(var(--primary) / 0.22) 88%,
+        hsl(var(--primary) / 0.06) 100%),
+      hsl(var(--background));
     background-size: 350% 350%;
     animation: navyCardFlow 12s ease-in-out infinite;
     color: hsl(0 0% 95%);
-    border: 1px solid hsl(156 40% 28% / 0.4);
-    box-shadow: 0 4px 20px hsl(156 60% 5% / 0.5);
+    border: 1px solid hsl(var(--primary) / 0.4);
+    box-shadow: 0 4px 20px hsl(var(--primary) / 0.1);
     --foreground: 0 0% 95%;
     --muted-foreground: 0 0% 70%;
     --secondary: 0 0% 20%;
@@ -306,18 +307,18 @@
     background: linear-gradient(145deg,
         hsl(0 0% 97%) 0%,
         hsl(0 0% 95%) 25%,
-        hsl(156 30% 90%) 50%,
-        hsl(156 35% 87%) 65%,
+        hsl(var(--primary) / 0.1) 50%,
+        hsl(var(--primary) / 0.13) 65%,
         hsl(0 0% 96%) 80%,
         hsl(0 0% 98%) 100%);
     background-size: 200% 200%;
     animation: darkCardShimmer 8s ease-in-out infinite;
-    color: hsl(160 30% 15%);
+    color: hsl(var(--foreground));
     box-shadow:
       0 4px 24px hsl(0 0% 0% / 0.15),
-      0 12px 48px hsl(156 60% 40% / 0.08),
+      0 12px 48px hsl(var(--primary) / 0.08),
       inset 0 1px 0 hsl(0 0% 100% / 0.9);
-    border-color: hsl(156 30% 70% / 0.25);
+    border-color: hsl(var(--primary) / 0.25);
     --foreground: 160 30% 15%;
     --muted-foreground: 160 15% 45%;
     --secondary: 160 20% 85%;
@@ -337,9 +338,9 @@
     inset: 0;
     background: linear-gradient(115deg,
         transparent 25%,
-        hsl(156 60% 50% / 0.06) 45%,
-        hsl(156 80% 70% / 0.12) 50%,
-        hsl(156 60% 50% / 0.06) 55%,
+        hsl(var(--primary) / 0.06) 45%,
+        hsl(var(--primary) / 0.12) 50%,
+        hsl(var(--primary) / 0.06) 55%,
         transparent 75%);
     background-size: 250% 100%;
     animation: cardShineSwipe 6s ease-in-out infinite;
@@ -476,12 +477,12 @@
 
   .finance-hero-card {
     @apply relative overflow-hidden rounded-2xl border transition-all duration-300 active:scale-[0.98];
-    background: linear-gradient(145deg, #0a1a12 0%, #102a1d 50%, #0a1a12 100%);
+    background: linear-gradient(145deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.15) 50%, hsl(var(--primary) / 0.08) 100%), hsl(var(--background));
     background-size: 200% 200%;
     animation: navyCardFlow 12s ease-in-out infinite;
     backdrop-filter: blur(16px);
-    border-color: rgba(16, 185, 129, 0.25);
-    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05), 0 8px 32px rgba(16, 185, 129, 0.08);
+    border-color: hsl(var(--primary) / 0.25);
+    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05), 0 8px 32px hsl(var(--primary) / 0.08);
     color: hsl(0 0% 98%) !important;
   }
 
@@ -515,8 +516,8 @@
   @media (hover: hover) {
     .finance-hero-card:hover {
       transform: scale(1.01);
-      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1), 0 12px 40px rgba(16, 185, 129, 0.1);
-      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1), 0 12px 40px hsl(var(--primary) / 0.1);
+      border-color: hsl(var(--primary) / 0.3);
     }
   }
 
@@ -539,20 +540,20 @@
   }
 
   .finance-hero-card--personal {
-    background: linear-gradient(145deg, #030603 0%, #060c06 50%, #030603 100%);
+    background: linear-gradient(145deg, hsl(var(--primary) / 0.04) 0%, hsl(var(--primary) / 0.08) 50%, hsl(var(--primary) / 0.04) 100%), hsl(var(--background));
     box-shadow:
-      0 4px 24px rgba(16, 185, 129, 0.05),
-      0 8px 48px rgba(16, 185, 129, 0.02),
+      0 4px 24px hsl(var(--primary) / 0.05),
+      0 8px 48px hsl(var(--primary) / 0.02),
       inset 0 1px 0 rgba(255, 255, 255, 0.02);
-    border-color: rgba(16, 185, 129, 0.1);
+    border-color: hsl(var(--primary) / 0.1);
   }
 
   @media (hover: hover) {
     .finance-hero-card--personal:hover {
-      border-color: rgba(16, 185, 129, 0.2);
+      border-color: hsl(var(--primary) / 0.2);
       box-shadow:
-        0 6px 32px rgba(16, 185, 129, 0.1),
-        0 12px 56px rgba(16, 185, 129, 0.04),
+        0 6px 32px hsl(var(--primary) / 0.1),
+        0 12px 56px hsl(var(--primary) / 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
   }
@@ -570,8 +571,8 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(156 60% 40% / 0.1) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(156 50% 35% / 0.06) 0%, transparent 45%);
+    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(var(--primary) / 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(var(--primary) / 0.06) 0%, transparent 45%);
     pointer-events: none;
   }
 
@@ -945,7 +946,7 @@
 
   .action-button-primary {
     @apply action-button gradient-primary;
-    box-shadow: 0 4px 14px hsl(156 60% 35% / 0.12);
+    box-shadow: 0 4px 14px hsl(var(--primary) / 0.12);
   }
 
   .action-button-success {
@@ -968,17 +969,17 @@
 
   .fab-neon-border {
     background: linear-gradient(135deg,
-        hsl(160 30% 15%),
-        hsl(156 50% 20%),
-        hsl(160 30% 15%));
+        hsl(var(--primary) / 0.15),
+        hsl(var(--primary) / 0.2),
+        hsl(var(--primary) / 0.15));
     opacity: 0.7;
   }
 
   .fab-neon-border-personal {
     background: linear-gradient(135deg,
-        hsl(160 30% 15%),
-        hsl(156 50% 20%),
-        hsl(160 30% 15%));
+        hsl(var(--primary) / 0.15),
+        hsl(var(--primary) / 0.2),
+        hsl(var(--primary) / 0.15));
     opacity: 0.7;
   }
 
@@ -1111,13 +1112,13 @@
 
     0%,
     100% {
-      border-color: hsl(156 60% 40% / 0.2);
-      box-shadow: var(--shadow-card), 0 0 16px hsl(156 60% 40% / 0.1);
+      border-color: hsl(var(--primary) / 0.2);
+      box-shadow: var(--shadow-card), 0 0 16px hsl(var(--primary) / 0.1);
     }
 
     50% {
-      border-color: hsl(156 60% 40% / 0.4);
-      box-shadow: var(--shadow-card), 0 0 24px hsl(156 60% 40% / 0.2);
+      border-color: hsl(var(--primary) / 0.4);
+      box-shadow: var(--shadow-card), 0 0 24px hsl(var(--primary) / 0.2);
     }
   }
 
@@ -1201,11 +1202,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 6px hsl(156 60% 40% / 0.2), 0 0 2px hsl(156 60% 40% / 0.15);
+      box-shadow: 0 0 6px hsl(var(--primary) / 0.2), 0 0 2px hsl(var(--primary) / 0.15);
     }
 
     50% {
-      box-shadow: 0 0 14px hsl(156 60% 40% / 0.35), 0 0 4px hsl(156 60% 40% / 0.25);
+      box-shadow: 0 0 14px hsl(var(--primary) / 0.35), 0 0 4px hsl(var(--primary) / 0.25);
     }
   }
 
@@ -1660,9 +1661,9 @@
   .achievement-shimmer {
     background: linear-gradient(110deg,
         transparent 25%,
-        hsl(156 60% 40% / 0.08) 37%,
-        hsl(156 60% 40% / 0.15) 50%,
-        hsl(156 60% 40% / 0.08) 63%,
+        hsl(var(--primary) / 0.08) 37%,
+        hsl(var(--primary) / 0.15) 50%,
+        hsl(var(--primary) / 0.08) 63%,
         transparent 75%);
     background-size: 250% 100%;
     animation: achievementShimmer 8s ease-in-out infinite;
@@ -1987,12 +1988,12 @@
   }
 
   .header-ambient-glow {
-    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(156 60% 40% / 0.35) 0%, transparent 70%);
+    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(var(--primary) / 0.35) 0%, transparent 70%);
     animation: ambientGlow 8s ease-in-out infinite;
   }
 
   .tabbar-ambient-glow {
-    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(156 60% 40% / 0.18) 0%, transparent 70%);
+    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(var(--primary) / 0.18) 0%, transparent 70%);
     animation: ambientGlow 8s ease-in-out infinite;
     animation-delay: -4s;
   }
@@ -2021,11 +2022,11 @@
   }
 
   .light .header-ambient-glow {
-    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(156 60% 40% / 0.12) 0%, transparent 70%);
+    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(var(--primary) / 0.12) 0%, transparent 70%);
   }
 
   .light .tabbar-ambient-glow {
-    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(156 60% 40% / 0.06) 0%, transparent 70%);
+    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(var(--primary) / 0.06) 0%, transparent 70%);
   }
 
 
