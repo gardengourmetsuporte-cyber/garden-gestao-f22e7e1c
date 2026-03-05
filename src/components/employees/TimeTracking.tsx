@@ -767,7 +767,16 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
       const { data, error } = await supabase.functions.invoke('import-time-records', {
         body: { unit_id: unitId, records: parsedData },
       });
-      if (error) throw error;
+
+      if (error) {
+        const status = (error as any)?.context?.status;
+        if (status === 403) {
+          toast.error('Sem permissão para importar neste setor');
+          return;
+        }
+        throw error;
+      }
+
       setResult(data);
       toast.success(`${data.imported} registros importados`);
       if (data.imported > 0) {
@@ -775,9 +784,10 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
       }
     } catch (err: any) {
       console.error('Import error:', err);
-      toast.error('Erro ao importar registros');
+      toast.error(err?.message || 'Erro ao importar registros');
+    } finally {
+      setImporting(false);
     }
-    setImporting(false);
   };
 
   return (
