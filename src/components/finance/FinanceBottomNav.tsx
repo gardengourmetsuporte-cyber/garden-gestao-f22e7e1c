@@ -35,7 +35,7 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
         }}
       >
         {tab.icon.startsWith('/') ? (
-          <img src={tab.icon} alt="" className={cn("w-[24px] h-[24px] object-contain dark:invert", active ? 'tab-icon-galaxy opacity-100' : 'opacity-50')} />
+          <img src={tab.icon} alt="" style={{ width: 22, height: 22 }} className={cn("object-contain dark:invert", active ? 'tab-icon-galaxy opacity-100' : 'opacity-50')} />
         ) : (
           <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={active ? 'tab-icon-galaxy' : ''} />
         )}
