@@ -1477,6 +1477,87 @@ export type Database = {
           },
         ]
       }
+      employee_warnings: {
+        Row: {
+          acknowledged_at: string | null
+          created_at: string
+          date: string
+          description: string | null
+          document_url: string | null
+          employee_acknowledged: boolean
+          employee_id: string
+          id: string
+          issued_by: string | null
+          legal_basis: string | null
+          notes: string | null
+          reason: string
+          severity: Database["public"]["Enums"]["warning_severity"]
+          suspension_days: number | null
+          type: Database["public"]["Enums"]["warning_type"]
+          unit_id: string
+          updated_at: string
+          witness_1: string | null
+          witness_2: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          document_url?: string | null
+          employee_acknowledged?: boolean
+          employee_id: string
+          id?: string
+          issued_by?: string | null
+          legal_basis?: string | null
+          notes?: string | null
+          reason: string
+          severity?: Database["public"]["Enums"]["warning_severity"]
+          suspension_days?: number | null
+          type?: Database["public"]["Enums"]["warning_type"]
+          unit_id: string
+          updated_at?: string
+          witness_1?: string | null
+          witness_2?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          document_url?: string | null
+          employee_acknowledged?: boolean
+          employee_id?: string
+          id?: string
+          issued_by?: string | null
+          legal_basis?: string | null
+          notes?: string | null
+          reason?: string
+          severity?: Database["public"]["Enums"]["warning_severity"]
+          suspension_days?: number | null
+          type?: Database["public"]["Enums"]["warning_type"]
+          unit_id?: string
+          updated_at?: string
+          witness_1?: string | null
+          witness_2?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_warnings_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_warnings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           admission_date: string | null
@@ -5144,6 +5225,8 @@ export type Database = {
       task_priority: "low" | "medium" | "high"
       transaction_type: "income" | "expense" | "transfer" | "credit_card"
       unit_type: "unidade" | "kg" | "litro"
+      warning_severity: "light" | "moderate" | "serious"
+      warning_type: "verbal" | "written" | "suspension" | "dismissal"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5300,6 +5383,8 @@ export const Constants = {
       task_priority: ["low", "medium", "high"],
       transaction_type: ["income", "expense", "transfer", "credit_card"],
       unit_type: ["unidade", "kg", "litro"],
+      warning_severity: ["light", "moderate", "serious"],
+      warning_type: ["verbal", "written", "suspension", "dismissal"],
     },
   },
 } as const

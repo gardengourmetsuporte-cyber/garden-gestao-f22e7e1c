@@ -1,4 +1,7 @@
-// Employee and Payroll Types
+// Employee, Payroll, and Warning Types
+
+export type WarningType = 'verbal' | 'written' | 'suspension' | 'dismissal';
+export type WarningSeverity = 'light' | 'moderate' | 'serious';
 
 export type PaymentType = 'salary' | 'vale' | 'bonus' | 'discount' | 'other';
 
