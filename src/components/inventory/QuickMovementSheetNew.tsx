@@ -40,124 +40,126 @@ export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: Q
     await addToList({ itemId: item.id, quantity: suggestedQty });
   };
 
-  if (!item) return null;
-
-  const unitLabel = item.unit_type === 'unidade' ? 'un' : item.unit_type === 'kg' ? 'kg' : 'L';
+  const unitLabel = item ? (item.unit_type === 'unidade' ? 'un' : item.unit_type === 'kg' ? 'kg' : 'L') : 'un';
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open && !!item} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh]">
-        <SheetHeader className="pb-4">
-          <SheetTitle className="text-xl text-center">{item.name}</SheetTitle>
-          <p className="text-sm text-muted-foreground text-center">
-            Estoque atual: <span className="font-semibold text-foreground">
-              {item.current_stock.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}
-            </span>
-          </p>
-        </SheetHeader>
+        {item && (
+          <>
+            <SheetHeader className="pb-4">
+              <SheetTitle className="text-xl text-center">{item.name}</SheetTitle>
+              <p className="text-sm text-muted-foreground text-center">
+                Estoque atual: <span className="font-semibold text-foreground">
+                  {item.current_stock.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}
+                </span>
+              </p>
+            </SheetHeader>
 
-        <div className="space-y-6">
-          {/* Type Selection */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setType('entrada')}
-              className={`flex items-center justify-center gap-2 p-4 rounded-xl font-semibold transition-all ${
-                type === 'entrada'
-                  ? 'bg-success text-white shadow-lg'
-                  : 'bg-secondary text-secondary-foreground'
-              }`}
-            >
-              <AppIcon name="ArrowDownCircle" size={20} />
-              Entrada
-            </button>
-            <button
-              onClick={() => setType('saida')}
-              className={`flex items-center justify-center gap-2 p-4 rounded-xl font-semibold transition-all ${
-                type === 'saida'
-                  ? 'bg-destructive text-white shadow-lg'
-                  : 'bg-secondary text-secondary-foreground'
-              }`}
-            >
-              <AppIcon name="ArrowUpCircle" size={20} />
-              Saída
-            </button>
-          </div>
+            <div className="space-y-6">
+              {/* Type Selection */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setType('entrada')}
+                  className={`flex items-center justify-center gap-2 p-4 rounded-xl font-semibold transition-all ${
+                    type === 'entrada'
+                      ? 'bg-success text-white shadow-lg'
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}
+                >
+                  <AppIcon name="ArrowDownCircle" size={20} />
+                  Entrada
+                </button>
+                <button
+                  onClick={() => setType('saida')}
+                  className={`flex items-center justify-center gap-2 p-4 rounded-xl font-semibold transition-all ${
+                    type === 'saida'
+                      ? 'bg-destructive text-white shadow-lg'
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}
+                >
+                  <AppIcon name="ArrowUpCircle" size={20} />
+                  Saída
+                </button>
+              </div>
 
-          {/* Quick Values */}
-          <div className="grid grid-cols-4 gap-2">
-            {quickValues.map((value) => (
-              <button
-                key={value}
-                onClick={() => incrementQuantity(value)}
-                className="h-14 rounded-xl bg-secondary font-bold text-lg hover:bg-secondary/80 transition-colors"
-              >
-                +{value}
-              </button>
-            ))}
-          </div>
+              {/* Quick Values */}
+              <div className="grid grid-cols-4 gap-2">
+                {quickValues.map((value) => (
+                  <button
+                    key={value}
+                    onClick={() => incrementQuantity(value)}
+                    className="h-14 rounded-xl bg-secondary font-bold text-lg hover:bg-secondary/80 transition-colors"
+                  >
+                    +{value}
+                  </button>
+                ))}
+              </div>
 
-          {/* Quantity Input */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => incrementQuantity(-1)}
-              className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center hover:bg-secondary/80"
-            >
-              <AppIcon name="Minus" size={24} />
-            </button>
-            <div className="flex-1 relative">
+              {/* Quantity Input */}
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => incrementQuantity(-1)}
+                  className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center hover:bg-secondary/80"
+                >
+                  <AppIcon name="Minus" size={24} />
+                </button>
+                <div className="flex-1 relative">
+                  <Input
+                    type="number"
+                    value={quantity || ''}
+                    onChange={(e) => setQuantity(Math.max(0, parseFloat(e.target.value) || 0))}
+                    className="h-16 text-center text-2xl font-bold rounded-xl"
+                    placeholder="0"
+                    step={item.unit_type === 'unidade' ? 1 : 0.1}
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    {unitLabel}
+                  </span>
+                </div>
+                <button
+                  onClick={() => incrementQuantity(1)}
+                  className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center hover:bg-secondary/80"
+                >
+                  <AppIcon name="Plus" size={24} />
+                </button>
+              </div>
+
+              {/* Notes */}
               <Input
-                type="number"
-                value={quantity || ''}
-                onChange={(e) => setQuantity(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="h-16 text-center text-2xl font-bold rounded-xl"
-                placeholder="0"
-                step={item.unit_type === 'unidade' ? 1 : 0.1}
+                placeholder="Observação (opcional)"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="h-12 rounded-xl"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                {unitLabel}
-              </span>
+
+              {/* Confirm Button */}
+              <Button
+                onClick={handleConfirm}
+                disabled={quantity <= 0}
+                className={`w-full h-14 text-lg font-semibold rounded-xl ${
+                  type === 'entrada' 
+                    ? 'bg-success hover:bg-success/90' 
+                    : 'bg-destructive hover:bg-destructive/90'
+                }`}
+              >
+                Confirmar {type === 'entrada' ? 'Entrada' : 'Saída'}
+              </Button>
+
+              {/* Shopping List Button */}
+              <Button
+                variant="outline"
+                onClick={handleAddToShoppingList}
+                disabled={isAdding}
+                className="w-full h-12 rounded-xl gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <AppIcon name="ShoppingCart" size={18} />
+                <AppIcon name="Plus" size={14} />
+                Adicionar à Lista de Compras
+              </Button>
             </div>
-            <button
-              onClick={() => incrementQuantity(1)}
-              className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center hover:bg-secondary/80"
-            >
-              <AppIcon name="Plus" size={24} />
-            </button>
-          </div>
-
-          {/* Notes */}
-          <Input
-            placeholder="Observação (opcional)"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="h-12 rounded-xl"
-          />
-
-          {/* Confirm Button */}
-          <Button
-            onClick={handleConfirm}
-            disabled={quantity <= 0}
-            className={`w-full h-14 text-lg font-semibold rounded-xl ${
-              type === 'entrada' 
-                ? 'bg-success hover:bg-success/90' 
-                : 'bg-destructive hover:bg-destructive/90'
-            }`}
-          >
-            Confirmar {type === 'entrada' ? 'Entrada' : 'Saída'}
-          </Button>
-
-          {/* Shopping List Button */}
-          <Button
-            variant="outline"
-            onClick={handleAddToShoppingList}
-            disabled={isAdding}
-            className="w-full h-12 rounded-xl gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <AppIcon name="ShoppingCart" size={18} />
-            <AppIcon name="Plus" size={14} />
-            Adicionar à Lista de Compras
-          </Button>
-        </div>
+          </>
+        )}
       </SheetContent>
     </Sheet>
   );
