@@ -34,11 +34,7 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
           transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        {tab.icon.startsWith('/') ? (
-          <img src={tab.icon} alt="" style={{ width: 22, height: 22 }} className={cn("object-contain dark:invert", active ? 'tab-icon-galaxy opacity-100' : 'opacity-50')} />
-        ) : (
-          <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={active ? 'tab-icon-galaxy' : ''} />
-        )}
+        <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={active ? 'tab-icon-galaxy' : ''} />
       </div>
       <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>
     </button>
@@ -56,7 +52,7 @@ interface FinanceBottomNavProps {
 const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Principal' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
-  { id: 'charts', icon: '/icons/chart-pie.png', label: 'Gráficos' },
+  { id: 'charts', icon: 'PieChart', label: 'Gráficos' },
   { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 
