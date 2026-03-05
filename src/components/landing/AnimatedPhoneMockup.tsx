@@ -1,5 +1,6 @@
 import mockupFinanceiro from "@/assets/mockup-financeiro.png";
 import mockupChecklist from "@/assets/mockup-checklist.png";
+import mockupPedidos from "@/assets/mockup-pedidos.png";
 
 interface Props {
   type: "finance" | "checklist" | "inventory";
@@ -8,7 +9,7 @@ interface Props {
 const MOCKUPS: Record<Props["type"], string> = {
   finance: mockupFinanceiro,
   checklist: mockupChecklist,
-  inventory: mockupFinanceiro, // placeholder until inventory mockup is provided
+  inventory: mockupPedidos,
 };
 
 export function AnimatedPhoneMockup({ type }: Props) {
