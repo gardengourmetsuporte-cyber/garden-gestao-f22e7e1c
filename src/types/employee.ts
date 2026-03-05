@@ -16,6 +16,8 @@ export interface Employee {
   base_salary: number;
   is_active: boolean;
   notes: string | null;
+  shift_start: string;
+  shift_end: string;
   created_at: string;
   updated_at: string;
   // Joined data

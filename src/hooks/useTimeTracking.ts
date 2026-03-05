@@ -156,15 +156,35 @@ export function useTimeTracking() {
     return { lateMinutes, earlyMinutes, points };
   };
 
+  // Get employee shift for current user
+  const getEmployeeShift = useCallback(async (): Promise<{ start: string; end: string }> => {
+    if (!user || !activeUnitId) return { start: '08:00', end: '17:00' };
+    try {
+      const { data } = await supabase
+        .from('employees')
+        .select('shift_start, shift_end')
+        .eq('user_id', user.id)
+        .eq('unit_id', activeUnitId)
+        .is('deleted_at' as any, null)
+        .maybeSingle();
+      if (data) {
+        return { start: (data as any).shift_start || '08:00', end: (data as any).shift_end || '17:00' };
+      }
+    } catch { /* fallback */ }
+    return { start: '08:00', end: '17:00' };
+  }, [user, activeUnitId]);
+
   // Check-in
-  const checkIn = async (expectedStart = '08:00', expectedEnd = '17:00') => {
+  const checkIn = async () => {
     if (!user || !activeUnitId) return false;
     const now = new Date();
     const timeStr = format(now, 'HH:mm:ss');
     const dateStr = format(now, 'yyyy-MM-dd');
 
+    const shift = await getEmployeeShift();
+
     try {
-      const { lateMinutes, points } = calculatePoints(expectedStart, expectedEnd, timeStr, null);
+      const { lateMinutes, points } = calculatePoints(shift.start, shift.end, timeStr, null);
 
       const { error } = await supabase
         .from('time_records' as any)
@@ -172,8 +192,8 @@ export function useTimeTracking() {
           user_id: user.id,
           unit_id: activeUnitId,
           date: dateStr,
-          expected_start: expectedStart,
-          expected_end: expectedEnd,
+          expected_start: shift.start,
+          expected_end: shift.end,
           check_in: timeStr,
           late_minutes: lateMinutes,
           status: 'checked_in',

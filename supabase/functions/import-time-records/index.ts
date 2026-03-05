@@ -71,10 +71,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get all employees for name matching
+    // Get all employees for name matching (including shift info)
     const { data: employees } = await supabase
       .from("employees")
-      .select("user_id, full_name")
+      .select("user_id, full_name, shift_start, shift_end")
       .eq("unit_id", unit_id)
       .eq("is_active", true);
 
@@ -98,16 +98,20 @@ Deno.serve(async (req) => {
 
     const nameMap = new Map<string, string>();
     const allNames: Array<{ normalized: string; userId: string }> = [];
+    const shiftMap = new Map<string, { start: string; end: string }>();
 
-    const registerName = (rawName: string | null | undefined, userId: string | null | undefined) => {
+    const registerName = (rawName: string | null | undefined, userId: string | null | undefined, shiftStart?: string, shiftEnd?: string) => {
       if (!rawName || !userId) return;
       const normalized = normalizeName(rawName);
       if (!normalized) return;
       nameMap.set(normalized, userId);
       allNames.push({ normalized, userId });
+      if (!shiftMap.has(userId)) {
+        shiftMap.set(userId, { start: shiftStart || "08:00", end: shiftEnd || "17:00" });
+      }
     };
 
-    (employees || []).forEach((e: any) => registerName(e.full_name, e.user_id));
+    (employees || []).forEach((e: any) => registerName(e.full_name, e.user_id, e.shift_start, e.shift_end));
     (profiles || []).forEach((p: any) => registerName(p.full_name, p.user_id));
 
     const findBestUserId = (employeeName: string) => {
@@ -189,12 +193,15 @@ Deno.serve(async (req) => {
       else if (check_in && check_out) dbStatus = "completed";
       else if (check_in) dbStatus = "checked_in";
 
+      // Use employee's configured shift or fallback to provided/default
+      const empShift = shiftMap.get(userId) || { start: "08:00", end: "17:00" };
+
       const row: any = {
         user_id: userId,
         unit_id,
         date,
-        expected_start: rec.expected_start || "08:00",
-        expected_end: rec.expected_end || "17:00",
+        expected_start: rec.expected_start || empShift.start,
+        expected_end: rec.expected_end || empShift.end,
         check_in: check_in || null,
         check_out: check_out || null,
         status: dbStatus,
