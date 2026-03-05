@@ -48,14 +48,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { data: access } = await supabase
+    const { data: membership } = await supabase
       .from("user_units")
       .select("role")
       .eq("user_id", user.id)
       .eq("unit_id", unit_id)
-      .single();
+      .maybeSingle();
 
-    if (!access || !["owner", "admin"].includes(access.role)) {
+    const hasUnitAdminRole = !!membership && ["owner", "admin"].includes(membership.role);
+
+    const { data: userRoles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    const hasGlobalAdminRole = (userRoles || []).some((r: any) => ["admin", "super_admin"].includes(r.role));
+
+    if (!membership || (!hasUnitAdminRole && !hasGlobalAdminRole)) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
