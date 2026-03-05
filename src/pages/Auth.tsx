@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { lovable } from '@/integrations/lovable/index';
-import gardenLogo from '@/assets/logo.png';
+import gardenLogoFull from '@/assets/garden-logo-full.png';
 
 const emailSchema = z.string().email('Email inválido');
 const passwordSchema = z.string().min(6, 'Senha deve ter no mínimo 6 caracteres');
@@ -49,7 +49,7 @@ function BrandPanel() {
             boxShadow: '0 0 100px hsl(142 71% 45% / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
           }}
         >
-          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
+          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogoFull} />
         </div>
 
         {/* Headline */}
@@ -155,7 +155,7 @@ function MobileBrandHeader() {
             boxShadow: '0 0 80px hsl(142 71% 45% / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
           }}
         >
-          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
+          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogoFull} />
         </div>
 
         {/* Title with staggered entrance */}
