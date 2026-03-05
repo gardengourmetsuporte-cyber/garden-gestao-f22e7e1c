@@ -1572,6 +1572,8 @@ export type Database = {
           notes: string | null
           quick_pin: string | null
           role: string | null
+          shift_end: string
+          shift_start: string
           unit_id: string | null
           updated_at: string
           user_id: string | null
@@ -1589,6 +1591,8 @@ export type Database = {
           notes?: string | null
           quick_pin?: string | null
           role?: string | null
+          shift_end?: string
+          shift_start?: string
           unit_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -1606,6 +1610,8 @@ export type Database = {
           notes?: string | null
           quick_pin?: string | null
           role?: string | null
+          shift_end?: string
+          shift_start?: string
           unit_id?: string | null
           updated_at?: string
           user_id?: string | null

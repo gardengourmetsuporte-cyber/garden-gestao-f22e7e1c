@@ -199,7 +199,7 @@ export default function Finance() {
   }, [addSupplier]);
 
   const handleQuickAddEmployee = useCallback(async (name: string) => {
-    await addEmployee({ full_name: name, base_salary: 0, is_active: true, user_id: null, cpf: null, role: null, department: null, admission_date: null, notes: null });
+    await addEmployee({ full_name: name, base_salary: 0, is_active: true, user_id: null, cpf: null, role: null, department: null, admission_date: null, notes: null, shift_start: '08:00', shift_end: '17:00' });
   }, [addEmployee]);
 
   if (isLoading) {

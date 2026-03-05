@@ -1,0 +1,3 @@
+ALTER TABLE public.employees 
+ADD COLUMN IF NOT EXISTS shift_start text NOT NULL DEFAULT '08:00',
+ADD COLUMN IF NOT EXISTS shift_end text NOT NULL DEFAULT '17:00';
