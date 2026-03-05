@@ -141,14 +141,13 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
 
         {/* Bar background */}
         <div
-          className="relative"
+          className="relative bg-background"
           style={{
-            background: 'hsl(var(--background))',
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[30px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[28px] z-20">
             <div className="fab-cradle-ring">
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}

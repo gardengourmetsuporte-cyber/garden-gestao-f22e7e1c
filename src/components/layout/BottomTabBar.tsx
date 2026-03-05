@@ -125,22 +125,17 @@ export function BottomTabBar() {
         className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
       >
         {/* Subtle top separator */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-border/10" />
 
         {/* Bar background */}
         <div
-          className="relative bg-background/90 backdrop-blur-[32px]"
+          className="relative bg-background"
           style={{
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-        {/* Animated ambient glow */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
-            <div className="absolute inset-0 tabbar-ambient-glow opacity-60 mix-blend-screen" />
-          </div>
-
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[30px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[28px] z-20">
             <div className="fab-cradle-ring">
               <button
                 aria-label={fabAction?.label || 'Ação rápida'}
