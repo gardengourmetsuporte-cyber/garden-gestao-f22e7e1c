@@ -30,7 +30,7 @@ const UnitContext = createContext<UnitContextType | undefined>(undefined);
 const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
-  const { user, isSuperAdmin, isLoading: authLoading, setEffectivePlan } = useAuth();
+  const { user, isSuperAdmin, isLoading: authLoading, setEffectivePlan, refreshUserData } = useAuth();
   const queryClient = useQueryClient();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
@@ -121,6 +121,9 @@ export function UnitProvider({ children }: { children: ReactNode }) {
                   setActiveUnitIdState(newUnits[0].id);
                   localStorage.setItem(ACTIVE_UNIT_KEY, newUnits[0].id);
                 }
+
+                // Re-fetch user data so role upgrades (owner→admin) take effect
+                await refreshUserData();
               }
             } catch (err) {
               console.error('Auto-provision failed:', err);
