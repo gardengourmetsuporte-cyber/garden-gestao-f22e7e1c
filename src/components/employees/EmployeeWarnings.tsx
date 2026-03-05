@@ -112,12 +112,6 @@ export function EmployeeWarnings() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-foreground">Advertências</h2>
-        {isAdmin && (
-          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5">
-            <AppIcon name="add" size={16} />
-            Nova Advertência
-          </Button>
-        )}
       </div>
 
       {/* Filters (admin only) */}
