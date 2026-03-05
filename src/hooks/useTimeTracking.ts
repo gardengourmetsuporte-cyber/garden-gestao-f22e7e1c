@@ -290,12 +290,15 @@ export function useTimeTracking() {
     check_in: string;
     check_out: string;
     notes?: string;
+    _status?: string;
   }) => {
     if (!user || !activeUnitId || !isAdmin) return false;
 
-    const { lateMinutes, earlyMinutes, points } = calculatePoints(
-      data.expected_start, data.expected_end, data.check_in, data.check_out
-    );
+    const isAbsence = data._status === 'day_off' || data._status === 'absent';
+
+    const { lateMinutes, earlyMinutes, points } = isAbsence
+      ? { lateMinutes: 0, earlyMinutes: 0, points: 0 }
+      : calculatePoints(data.expected_start, data.expected_end, data.check_in, data.check_out);
 
     try {
       const { error } = await supabase
@@ -306,12 +309,12 @@ export function useTimeTracking() {
           date: data.date,
           expected_start: data.expected_start,
           expected_end: data.expected_end,
-          check_in: data.check_in,
-          check_out: data.check_out,
+          check_in: isAbsence ? null : data.check_in,
+          check_out: isAbsence ? null : data.check_out,
           late_minutes: lateMinutes,
           early_departure_minutes: earlyMinutes,
           points_awarded: points,
-          status: 'manual',
+          status: data._status || 'manual',
           manual_entry: true,
           adjusted_by: user.id,
           notes: data.notes || null,
