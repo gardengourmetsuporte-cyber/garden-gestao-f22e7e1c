@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const ROUTE_TITLES: Record<string, string> = {
+export const ROUTE_TITLES: Record<string, string> = {
   '/': 'Dashboard',
   '/finance': 'Financeiro',
   '/personal-finance': 'Finanças Pessoais',
@@ -23,15 +23,28 @@ const ROUTE_TITLES: Record<string, string> = {
   '/plans': 'Planos',
   '/calendar': 'Calendário',
   '/menu-admin': 'Cardápio',
+  '/customers': 'Clientes',
+  '/deliveries': 'Entregas',
+  '/brand': 'Marca',
+  '/notifications': 'Notificações',
+  
 };
 
 const APP_NAME = 'Garden Gestão';
+
+export function getRouteTitle(pathname: string): string | null {
+  // Exact match first
+  if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname];
+  // Try base path (e.g. /profile/me → /profile)
+  const base = '/' + pathname.split('/').filter(Boolean)[0];
+  return ROUTE_TITLES[base] || null;
+}
 
 export function useDocumentTitle() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const title = ROUTE_TITLES[pathname];
+    const title = getRouteTitle(pathname);
     document.title = title ? `${title} · ${APP_NAME}` : APP_NAME;
   }, [pathname]);
 }

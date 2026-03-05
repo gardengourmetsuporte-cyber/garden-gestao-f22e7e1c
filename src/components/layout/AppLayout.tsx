@@ -27,6 +27,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { preloadRoute, preloadRoutes } from '@/lib/routePreload';
 import { lazy, Suspense, memo } from 'react';
 import { NAV_ITEMS, filterNavItems, groupNavItems } from '@/lib/navItems';
+import { getRouteTitle } from '@/hooks/useDocumentTitle';
 
 // Lazy-load BottomTabBar — only used on mobile
 const LazyBottomTabBar = lazy(() => import('./BottomTabBar').then(m => ({ default: m.BottomTabBar })));
@@ -45,7 +46,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { unreadCount } = useNotifications();
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
-  const isMobile = useIsMobile();
+  const isDashboard = location.pathname === '/';
+  const moduleTitle = useMemo(() => getRouteTitle(location.pathname), [location.pathname]);
   const [isLgScreen, setIsLgScreen] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');
@@ -150,18 +152,38 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* Animated ambient glow */}
           <div className="absolute inset-0 pointer-events-none header-ambient-glow" />
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
-            {/* Left: Logo + Unit Name */}
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 active:scale-95 transition-transform min-w-0"
-            >
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
-                <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
-              </div>
-              <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
-                {activeUnit?.name || 'Garden'}
-              </span>
-            </button>
+            {/* Left: Back button (on module pages) or spacer */}
+            <div className="w-10 flex items-center">
+              {!isDashboard && (
+                <button
+                  onClick={() => navigate('/')}
+                  className="p-2 rounded-lg hover:bg-white/10 transition-all active:scale-90"
+                >
+                  <AppIcon name="ChevronLeft" size={20} className="text-white/70" />
+                </button>
+              )}
+            </div>
+
+            {/* Center: Logo on dashboard, Module name on other pages */}
+            <div className="flex-1 flex items-center justify-center min-w-0">
+              {isDashboard ? (
+                <button
+                  onClick={() => navigate('/')}
+                  className="flex items-center gap-2 active:scale-95 transition-transform"
+                >
+                  <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
+                    <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                  </div>
+                  <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
+                    {activeUnit?.name || 'Garden'}
+                  </span>
+                </button>
+              ) : (
+                <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
+                  {moduleTitle || activeUnit?.name || 'Garden'}
+                </span>
+              )}
+            </div>
 
             {/* Right: Notifications + Avatar */}
             <div className="flex items-center gap-1">
