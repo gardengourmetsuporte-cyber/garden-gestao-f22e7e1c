@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useFinanceCategorize } from './useFinanceCategorize';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { CashClosing, CashClosingFormData } from '@/types/cashClosing';
@@ -59,6 +60,7 @@ export function useCashClosing() {
   const { user, isAdmin } = useAuth();
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
+  const { categorize } = useFinanceCategorize();
 
   const queryKey = ['cash-closings', activeUnitId];
 
@@ -403,17 +405,65 @@ export function useCashClosing() {
         });
       }
 
-      // Expenses from closing
+      // Expenses from closing — AI auto-categorization
       if (closing.expenses && Array.isArray(closing.expenses)) {
-        for (const expense of closing.expenses as any[]) {
-          if (expense.amount && expense.amount > 0) {
-            transactions.push({
-              user_id: user.id, unit_id: activeUnitId, type: 'expense',
-              amount: expense.amount, description: expense.description || 'Gasto do dia',
-              category_id: null, account_id: carteiraAccountId,
-              date: closing.date, is_paid: true,
-              notes: 'Lançamento automático do fechamento de caixa',
-            });
+        const validExpenses = (closing.expenses as any[]).filter(e => e.amount && e.amount > 0);
+        if (validExpenses.length > 0) {
+          // Fetch employees and suppliers for AI context
+          const [{ data: employeesData }, { data: suppliersData }] = await Promise.all([
+            supabase.from('employees').select('id, full_name').eq('unit_id', activeUnitId).eq('is_active', true).is('deleted_at', null),
+            supabase.from('suppliers').select('id, name').eq('unit_id', activeUnitId),
+          ]);
+
+          // Build category context from already-fetched finance categories
+          const { data: finCategories } = await supabase
+            .from('finance_categories').select('*').eq('user_id', user.id).eq('type', 'expense');
+          const catContext = (finCategories || [])
+            .filter((c: any) => !c.parent_id)
+            .map((parent: any) => ({
+              id: parent.id, name: parent.name, type: parent.type,
+              subcategories: (finCategories || [])
+                .filter((s: any) => s.parent_id === parent.id)
+                .map((s: any) => ({ id: s.id, name: s.name })),
+            }));
+
+          try {
+            const aiResults = await categorize(
+              validExpenses.map(e => e.description || 'Gasto do dia'),
+              {
+                categories: catContext as any,
+                employees: employeesData || [],
+                suppliers: (suppliersData || []).map((s: any) => ({ id: s.id, name: s.name })),
+              },
+            );
+
+            for (let i = 0; i < validExpenses.length; i++) {
+              const expense = validExpenses[i];
+              const ai = aiResults[i];
+              const useCat = ai && ai.confidence >= 0.8 ? (ai.category_id || null) : null;
+              const useEmp = ai && ai.confidence >= 0.8 ? (ai.employee_id || null) : null;
+              transactions.push({
+                user_id: user.id, unit_id: activeUnitId, type: 'expense',
+                amount: expense.amount, description: expense.description || 'Gasto do dia',
+                category_id: useCat, employee_id: useEmp, account_id: carteiraAccountId,
+                date: closing.date, is_paid: true,
+                notes: ai && ai.confidence < 0.8 && ai.question
+                  ? `⚠️ IA: ${ai.question}`
+                  : 'Lançamento automático do fechamento de caixa (categorizado por IA)',
+              });
+            }
+          } catch (err) {
+            console.error('AI categorize failed, falling back:', err);
+            // Fallback: insert without categories
+            for (const expense of validExpenses) {
+              transactions.push({
+                user_id: user.id, unit_id: activeUnitId, type: 'expense',
+                amount: expense.amount, description: expense.description || 'Gasto do dia',
+                category_id: null, account_id: carteiraAccountId,
+                date: closing.date, is_paid: true,
+                notes: 'Lançamento automático do fechamento de caixa',
+              });
+            }
           }
         }
       }

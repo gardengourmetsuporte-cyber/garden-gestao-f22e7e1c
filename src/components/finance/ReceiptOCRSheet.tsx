@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { FinanceCategory, FinanceAccount, TransactionFormData, TransactionType } from '@/types/finance';
 import { format } from 'date-fns';
+import { useFinanceCategorize } from '@/hooks/useFinanceCategorize';
 
 interface ExtractedData {
   amount: number;
@@ -35,6 +36,8 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { categorize } = useFinanceCategorize();
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
 
   // Editable fields
   const [amount, setAmount] = useState('');
@@ -100,6 +103,7 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
   const processImage = async (base64: string) => {
     setLoading(true);
     setStep('confirm');
+    setAiSuggestion(null);
     try {
       const { data, error } = await supabase.functions.invoke('receipt-ocr', {
         body: { image_base64: base64 },
@@ -114,8 +118,29 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
       setDescription(ext.description || '');
       setDate(ext.date || format(new Date(), 'yyyy-MM-dd'));
       setType(ext.suggested_type || 'expense');
-      setCategoryId(matchCategory(ext.suggested_category_name, ext.suggested_type || 'expense'));
       setAccountId(getDefaultAccount());
+
+      // Use AI categorization for exact ID matching
+      const descToMatch = ext.description || ext.suggested_category_name || '';
+      if (descToMatch) {
+        try {
+          const aiResults = await categorize([descToMatch], { categories });
+          const ai = aiResults[0];
+          if (ai && ai.category_id && ai.confidence >= 0.6) {
+            setCategoryId(ai.category_id);
+            if (ai.question) setAiSuggestion(ai.question);
+          } else {
+            // Fallback to simple matching
+            setCategoryId(matchCategory(ext.suggested_category_name, ext.suggested_type || 'expense'));
+            if (ai?.question) setAiSuggestion(ai.question);
+          }
+        } catch {
+          // Fallback to simple matching if AI fails
+          setCategoryId(matchCategory(ext.suggested_category_name, ext.suggested_type || 'expense'));
+        }
+      } else {
+        setCategoryId(null);
+      }
     } catch (err: any) {
       toast.error(err.message || 'Erro ao analisar comprovante');
       setStep('capture');
@@ -329,7 +354,13 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
                   ))}
                 </SelectContent>
               </Select>
-              {extracted?.suggested_category_name && !categoryId && (
+              {aiSuggestion && (
+                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                  <AppIcon name="HelpCircle" size={12} />
+                  {aiSuggestion}
+                </p>
+              )}
+              {extracted?.suggested_category_name && !categoryId && !aiSuggestion && (
                 <p className="text-xs text-muted-foreground mt-1">
                   Sugestão IA: <span className="text-primary">{extracted.suggested_category_name}</span>
                 </p>
