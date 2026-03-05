@@ -174,8 +174,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   className="active:scale-95 transition-transform relative"
                 >
                   <div className="absolute inset-0 m-auto w-12 h-12 rounded-full header-icon-glow" />
-                  <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center relative z-10 shadow-lg">
-                    <img alt="Garden Gestão" className="w-9 h-9 object-contain" src={gardenLogoFull} />
+                  <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center relative z-10 shadow-lg overflow-hidden">
+                    <img alt="Garden Gestão" className="w-[130%] h-[130%] object-contain" src={gardenLogoFull} />
                   </div>
                 </button>
               ) : (
