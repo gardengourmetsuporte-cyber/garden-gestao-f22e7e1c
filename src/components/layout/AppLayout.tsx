@@ -175,7 +175,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   onClick={() => navigate('/')}
                   className="active:scale-95 transition-transform"
                 >
-                  <img alt="Garden" className="h-9 object-contain opacity-90" src={gardenHeaderLogo} />
+                  <img alt="Garden" className="h-14 object-contain opacity-90" src={gardenHeaderLogo} />
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
