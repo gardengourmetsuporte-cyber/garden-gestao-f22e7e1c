@@ -572,24 +572,11 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
   const [result, setResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) {
-      setFile(f);
-      setParsedData(null);
-      setResult(null);
-    }
-  };
-
-  const handleParse = async () => {
-    if (!file) return;
+  const parseFile = useCallback(async (f: File) => {
     setParsing(true);
     try {
-      // Read file as text for CSV, or as base64 for XLS
-      const text = await file.text();
+      const text = await f.text();
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-
-      // Simple CSV/TSV parser - detect separator
       const separator = lines[0]?.includes('\t') ? '\t' : lines[0]?.includes(';') ? ';' : ',';
       const headers = lines[0]?.split(separator).map(h => h.trim().toLowerCase());
 
@@ -599,11 +586,9 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
         return;
       }
 
-      // Try to detect columns
       const nameIdx = headers.findIndex(h => h.includes('nome') || h.includes('funcionario') || h.includes('employee'));
       const dateIdx = headers.findIndex(h => h.includes('data') || h.includes('date'));
 
-      // Parse rows
       const records: any[] = [];
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(separator).map(c => c.trim());
@@ -611,26 +596,17 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
 
         const employeeName = nameIdx >= 0 ? cols[nameIdx] : cols[0];
         const dateStr = dateIdx >= 0 ? cols[dateIdx] : cols[1];
-
-        // Find check_in / check_out columns or use remaining
         let checkIn = cols[2] || null;
         let checkOut = cols[3] || null;
         let status = cols[4]?.toUpperCase() || null;
 
-        // Detect special statuses
         if (['FOLGA', 'FALTA', 'ATESTADO'].includes(checkIn?.toUpperCase() || '')) {
           status = checkIn!.toUpperCase();
           checkIn = null;
           checkOut = null;
         }
 
-        records.push({
-          employee_name: employeeName,
-          date: dateStr,
-          check_in: checkIn,
-          check_out: checkOut,
-          status,
-        });
+        records.push({ employee_name: employeeName, date: dateStr, check_in: checkIn, check_out: checkOut, status });
       }
 
       setParsedData(records);
@@ -644,6 +620,16 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
       toast.error('Erro ao processar arquivo');
     }
     setParsing(false);
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) {
+      setFile(f);
+      setParsedData(null);
+      setResult(null);
+      parseFile(f);
+    }
   };
 
   const handleImport = async () => {
@@ -667,43 +653,66 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
   };
 
   return (
-    <div className="space-y-4 pt-4 overflow-y-auto h-[calc(85vh-80px)]">
+    <div className="space-y-4 pt-4 overflow-y-auto h-[calc(85vh-80px)] pb-6">
       <div className="rounded-xl bg-secondary/30 border border-border/20 p-4">
         <p className="text-sm text-muted-foreground">
-          Envie um arquivo CSV com colunas: <strong>Nome, Data, Entrada, Saída, Status</strong>.
-          Status pode ser FOLGA, FALTA ou ATESTADO.
+          Envie um arquivo CSV com colunas: <strong className="text-foreground">Nome, Data, Entrada, Saída, Status</strong>.
+          {' '}Status pode ser <strong className="text-foreground">FOLGA</strong>, <strong className="text-foreground">FALTA</strong> ou <strong className="text-foreground">ATESTADO</strong>.
         </p>
       </div>
 
+      {/* Styled file upload area */}
       <div>
-        <Label>Arquivo (.csv)</Label>
-        <Input
+        <Label className="mb-1.5 block">Arquivo (.csv)</Label>
+        <div
+          onClick={() => fileRef.current?.click()}
+          className={cn(
+            "flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 cursor-pointer transition-colors",
+            file
+              ? "border-primary/40 bg-primary/5"
+              : "border-border/60 bg-secondary/20 hover:bg-secondary/30"
+          )}
+        >
+          {parsing ? (
+            <>
+              <AppIcon name="Loader2" size={28} className="text-primary animate-spin mb-2" />
+              <p className="text-sm text-muted-foreground">Processando arquivo...</p>
+            </>
+          ) : file ? (
+            <>
+              <AppIcon name="FileSpreadsheet" size={28} className="text-primary mb-2" />
+              <p className="text-sm font-medium text-foreground">{file.name}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Toque para trocar o arquivo</p>
+            </>
+          ) : (
+            <>
+              <AppIcon name="Upload" size={28} className="text-muted-foreground/40 mb-2" />
+              <p className="text-sm font-medium text-foreground">Escolher arquivo</p>
+              <p className="text-xs text-muted-foreground mt-0.5">CSV, TSV ou TXT</p>
+            </>
+          )}
+        </div>
+        <input
           ref={fileRef}
           type="file"
           accept=".csv,.txt,.tsv"
           onChange={handleFileChange}
-          className="cursor-pointer"
+          className="hidden"
         />
       </div>
 
-      {file && !parsedData && (
-        <Button onClick={handleParse} disabled={parsing} className="w-full h-11 rounded-xl" variant="outline">
-          {parsing ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="FileSearch" size={16} className="mr-2" />}
-          Processar Arquivo
-        </Button>
-      )}
-
+      {/* Preview table */}
       {parsedData && parsedData.length > 0 && (
         <>
           <div className="rounded-xl bg-card border border-border/40 max-h-60 overflow-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-border/30">
-                  <th className="text-left p-2 text-muted-foreground">Nome</th>
-                  <th className="text-left p-2 text-muted-foreground">Data</th>
-                  <th className="text-left p-2 text-muted-foreground">Entrada</th>
-                  <th className="text-left p-2 text-muted-foreground">Saída</th>
-                  <th className="text-left p-2 text-muted-foreground">Status</th>
+                <tr className="border-b border-border/30 sticky top-0 bg-card">
+                  <th className="text-left p-2 text-muted-foreground font-medium">Nome</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Data</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Entrada</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Saída</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
