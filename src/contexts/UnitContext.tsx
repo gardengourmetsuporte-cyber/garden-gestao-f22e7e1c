@@ -47,12 +47,13 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const fetchUnits = useCallback(async () => {
     if (!user) {
       setUnits([]);
+      hasLoadedOnce.current = false; // Reset on logout so next login shows loading
       setIsLoading(false);
       return;
     }
 
     const fetchId = ++fetchIdRef.current;
-    // Only show loading spinner on first load, not on refetches
+    // Always show loading on first load for this user session
     if (!hasLoadedOnce.current) {
       setIsLoading(true);
     }
@@ -197,6 +198,19 @@ export function UnitProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [user]); // Only depends on user, not isSuperAdmin
+
+  // Reset loading gate when user changes (new login after logout)
+  const prevUserIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (user?.id !== prevUserIdRef.current) {
+      if (prevUserIdRef.current !== null) {
+        // User changed — reset so loading gate works for new user
+        hasLoadedOnce.current = false;
+        setIsLoading(true);
+      }
+      prevUserIdRef.current = user?.id ?? null;
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     fetchUnits();
