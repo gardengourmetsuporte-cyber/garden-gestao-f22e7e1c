@@ -81,7 +81,7 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
   // Build activeTimers with names — clear when timer mode is off
   useEffect(() => {
     if (!isTimerMode || !rawActiveTimers.length) {
-      setActiveTimers([]);
+      setActiveTimers(prev => prev.length === 0 ? prev : []);
       return;
     }
     const userIds = [...new Set(rawActiveTimers.map(t => t.user_id))];
@@ -96,7 +96,7 @@ export function useChecklistTimer(checklistType: ChecklistType, date: string) {
         elapsedSeconds: Math.floor((Date.now() - new Date(t.started_at).getTime()) / 1000),
       })));
     });
-  }, [rawActiveTimers]);
+  }, [rawActiveTimers, isTimerMode]);
 
   // Tick every second to update elapsed
   useEffect(() => {
