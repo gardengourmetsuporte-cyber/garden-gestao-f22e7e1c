@@ -9,6 +9,7 @@ import { FinanceCharts } from '@/components/finance/FinanceCharts';
 import { FinanceMore } from '@/components/finance/FinanceMore';
 import { FinancePlanning } from '@/components/finance/FinancePlanning';
 import { TransactionSheet } from '@/components/finance/TransactionSheet';
+import { ReceiptOCRSheet } from '@/components/finance/ReceiptOCRSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { usePersonalFinance } from '@/hooks/usePersonalFinance';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
@@ -45,6 +46,7 @@ export default function PersonalFinance() {
   const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
   const [accountManagementOpen, setAccountManagementOpen] = useState(false);
   const [transactionInitialFilters, setTransactionInitialFilters] = useState<Partial<TransactionFiltersState>>({});
+  const [receiptSheetOpen, setReceiptSheetOpen] = useState(false);
 
   const handleFinanceNavigate = useCallback((tab: FinanceTab, filter?: { type?: 'income' | 'expense'; status?: 'pending' }) => {
     if (filter) {
@@ -206,6 +208,7 @@ export default function PersonalFinance() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onAddTransaction={handleAddTransaction}
+        onReceiptCapture={() => setReceiptSheetOpen(true)}
         variant="personal"
       />
 
@@ -232,6 +235,14 @@ export default function PersonalFinance() {
         onAdd={addAccount}
         onUpdate={updateAccount}
         onDelete={deleteAccount}
+      />
+
+      <ReceiptOCRSheet
+        open={receiptSheetOpen}
+        onOpenChange={setReceiptSheetOpen}
+        categories={categories}
+        accounts={accounts}
+        onSave={handleSaveTransaction}
       />
     </AppLayout>
   );

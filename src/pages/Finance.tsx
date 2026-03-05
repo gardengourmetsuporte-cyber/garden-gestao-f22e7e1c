@@ -10,6 +10,7 @@ import { FinanceCharts } from '@/components/finance/FinanceCharts';
 import { FinanceMore } from '@/components/finance/FinanceMore';
 import { FinancePlanning } from '@/components/finance/FinancePlanning';
 import { TransactionSheet } from '@/components/finance/TransactionSheet';
+import { ReceiptOCRSheet } from '@/components/finance/ReceiptOCRSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
 import { usePreviousMonthStats } from '@/hooks/usePreviousMonthStats';
@@ -33,15 +34,43 @@ export default function Finance() {
   const [editingTransaction, setEditingTransaction] = useState<FinanceTransaction | null>(null);
   const [accountManagementOpen, setAccountManagementOpen] = useState(false);
   const [transactionInitialFilters, setTransactionInitialFilters] = useState<Partial<TransactionFiltersState>>({});
+  const [receiptSheetOpen, setReceiptSheetOpen] = useState(false);
+  const [receiptInitialImage, setReceiptInitialImage] = useState<string | null>(null);
 
-  // Handle ?action=income|expense from quick actions
+  // Handle ?action=income|expense or ?receipt=shared from quick actions / share target
   useEffect(() => {
     const action = searchParams.get('action');
+    const receipt = searchParams.get('receipt');
     if (action === 'income' || action === 'expense') {
       setTransactionType(action === 'income' ? 'income' : 'expense');
       setEditingTransaction(null);
       setTransactionSheetOpen(true);
       setSearchParams({}, { replace: true });
+    }
+    if (receipt === 'shared') {
+      setSearchParams({}, { replace: true });
+      // Try to load image from cache (shared via PWA Share Target)
+      (async () => {
+        try {
+          const cache = await caches.open('shared-receipts');
+          const response = await cache.match('/shared-receipt-image');
+          if (response) {
+            const blob = await response.blob();
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setReceiptInitialImage(reader.result as string);
+              setReceiptSheetOpen(true);
+            };
+            reader.readAsDataURL(blob);
+            await cache.delete('/shared-receipt-image');
+          } else {
+            // No cached image, just open the capture sheet
+            setReceiptSheetOpen(true);
+          }
+        } catch {
+          setReceiptSheetOpen(true);
+        }
+      })();
     }
   }, [searchParams, setSearchParams]);
 
@@ -283,6 +312,7 @@ export default function Finance() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onAddTransaction={handleAddTransaction}
+        onReceiptCapture={() => { setReceiptInitialImage(null); setReceiptSheetOpen(true); }}
       />
 
       {/* Transaction Sheet */}
@@ -312,6 +342,16 @@ export default function Finance() {
         onAdd={addAccount}
         onUpdate={updateAccount}
         onDelete={deleteAccount}
+      />
+
+      {/* Receipt OCR Sheet */}
+      <ReceiptOCRSheet
+        open={receiptSheetOpen}
+        onOpenChange={setReceiptSheetOpen}
+        categories={categories}
+        accounts={accounts}
+        onSave={handleSaveTransaction}
+        initialImage={receiptInitialImage}
       />
     </AppLayout>
   );

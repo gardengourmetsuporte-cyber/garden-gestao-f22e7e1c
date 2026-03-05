@@ -45,6 +45,7 @@ interface FinanceBottomNavProps {
   activeTab: FinanceTab;
   onTabChange: (tab: FinanceTab) => void;
   onAddTransaction: (type: TransactionType) => void;
+  onReceiptCapture?: () => void;
   variant?: 'business' | 'personal';
 }
 
@@ -55,7 +56,7 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 
-export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, variant = 'business' }: FinanceBottomNavProps) {
+export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onReceiptCapture, variant = 'business' }: FinanceBottomNavProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -82,6 +83,11 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
   const handleAction = (type: TransactionType) => {
     setMenuOpen(false);
     onAddTransaction(type);
+  };
+
+  const handleReceipt = () => {
+    setMenuOpen(false);
+    onReceiptCapture?.();
   };
 
   return createPortal(
@@ -111,6 +117,14 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, var
               </div>
               <span className="text-[11px] font-bold text-white">Transf.</span>
             </button>
+            {onReceiptCapture && (
+              <button onClick={handleReceipt} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '150ms' }}>
+                <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg bg-muted-foreground">
+                  <AppIcon name="Camera" size={24} fill={1} style={{ color: 'white' }} />
+                </div>
+                <span className="text-[11px] font-bold text-white">Comprov.</span>
+              </button>
+            )}
           </div>
         </div>
       )}
