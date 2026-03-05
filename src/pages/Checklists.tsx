@@ -504,8 +504,16 @@ export default function ChecklistsPage() {
             {/* Checklist Type Cards — always visible */}
             <div className="grid grid-cols-2 gap-3">
               {/* Abertura Card */}
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setChecklistType('abertura')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setChecklistType('abertura');
+                  }
+                }}
                 className={cn(
                   "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                   checklistType === 'abertura'
@@ -570,6 +578,7 @@ export default function ChecklistsPage() {
                     <AlertDialogTrigger asChild>
                       <div
                         role="button"
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => e.stopPropagation()}
                         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/15 hover:bg-destructive/25 flex items-center justify-center transition-colors cursor-pointer"
                       >
@@ -598,11 +607,19 @@ export default function ChecklistsPage() {
                 {checklistType === 'abertura' && getTypeProgress.abertura.percent === 100 && (
                   <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success animate-pulse" />
                 )}
-              </button>
+              </div>
 
               {/* Fechamento Card */}
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setChecklistType('fechamento')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setChecklistType('fechamento');
+                  }
+                }}
                 className={cn(
                   "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
                   checklistType === 'fechamento'
@@ -667,6 +684,7 @@ export default function ChecklistsPage() {
                     <AlertDialogTrigger asChild>
                       <div
                         role="button"
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => e.stopPropagation()}
                         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/15 hover:bg-destructive/25 flex items-center justify-center transition-colors cursor-pointer"
                       >
@@ -695,7 +713,7 @@ export default function ChecklistsPage() {
                 {checklistType === 'fechamento' && getTypeProgress.fechamento.percent === 100 && (
                   <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success animate-pulse" />
                 )}
-              </button>
+              </div>
             </div>
 
             {/* Bônus Card */}
