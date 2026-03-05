@@ -43,13 +43,13 @@ function BrandPanel() {
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
         {/* Logo */}
         <div
-          className="relative w-44 h-44 rounded-[2.5rem] overflow-hidden flex items-center justify-center"
+          className="relative w-56 h-56 rounded-[2.5rem] overflow-hidden flex items-center justify-center"
           style={{
             background: 'white',
             boxShadow: '0 0 100px hsl(142 71% 45% / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
           }}
         >
-          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
+          <img alt="Garden Gestão" className="w-[90%] h-[90%] object-contain" src={gardenLogo} style={{ imageRendering: 'auto' }} />
         </div>
 
         {/* Headline */}
@@ -149,13 +149,13 @@ function MobileBrandHeader() {
       <div className="relative z-10 flex flex-col items-center gap-6 pt-16 pb-12">
         {/* Logo with entrance animation */}
         <div
-          className="w-32 h-32 rounded-[1.75rem] overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
+          className="w-40 h-40 rounded-[2rem] overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
           style={{
             background: 'white',
             boxShadow: '0 0 80px hsl(142 71% 45% / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
           }}
         >
-          <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
+          <img alt="Garden Gestão" className="w-[90%] h-[90%] object-contain" src={gardenLogo} style={{ imageRendering: 'auto' }} />
         </div>
 
         {/* Title with staggered entrance */}
