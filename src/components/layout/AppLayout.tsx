@@ -1,7 +1,4 @@
 import gardenLogo from '@/assets/logo.png';
-import gardenIcon from '@/assets/garden-icon.png';
-import gardenLogoFull from '@/assets/garden-logo-full.png';
-import gardenText from '@/assets/garden-text.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
 import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -172,9 +169,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="active:scale-95 transition-transform"
+                  className="flex items-center gap-2 active:scale-95 transition-transform"
                 >
-                  <img alt="Garden" className="h-10 object-contain" style={{ mixBlendMode: 'screen' }} src={gardenIcon} />
+                  <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
+                    <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                  </div>
+                  <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
+                    {activeUnit?.name || 'Garden'}
+                  </span>
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
