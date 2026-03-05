@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { ChecklistType } from '@/types/database';
 import { fetchSectorsData, fetchCompletionsData } from './useChecklistFetch';
 import { useChecklistCRUD } from './useChecklistCRUD';
@@ -29,6 +29,7 @@ export function useChecklists() {
     queryFn: () => fetchCompletionsData(currentDate, currentType, activeUnitId),
     enabled: !!user && !!currentDate && !!currentType && !!activeUnitId,
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 
   const isLoading = unitLoading || sectorsLoading || (!activeUnitId && !!user);
