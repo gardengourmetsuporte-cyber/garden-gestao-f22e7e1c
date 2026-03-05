@@ -308,6 +308,10 @@ export default function Invite() {
                       {/[^A-Za-z0-9]/.test(password) ? <AppIcon name="Check" size={12} /> : <AppIcon name="Circle" size={12} />}
                       Um símbolo (@, !, #, etc.)
                     </li>
+                    <li className="flex items-center gap-1.5 text-muted-foreground/60">
+                      <AppIcon name="ShieldAlert" size={12} />
+                      Não pode ser uma senha comum (ex: Senha@123)
+                    </li>
                   </ul>
                 </div>
               </div>
