@@ -60,16 +60,16 @@ export function TimeTracking() {
         <div className="space-y-2">
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowManualSheet(true)}>
-              <AppIcon name="PenLine" size={16} className="mr-2" />
+              <AppIcon name="edit" size={16} className="mr-2" />
               Lançamento Manual
             </Button>
             <Button variant="outline" size="icon" className="rounded-xl h-11 w-11" onClick={() => setShowSettingsSheet(true)}>
-              <AppIcon name="Settings" size={16} />
+              <AppIcon name="settings" size={16} />
             </Button>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowImportSheet(true)}>
-              <AppIcon name="Upload" size={16} className="mr-2" />
+              <AppIcon name="upload" size={16} className="mr-2" />
               Importar Ponto
             </Button>
             <Button
@@ -191,7 +191,7 @@ export function EmployeeCheckInCard({
       <div className="rounded-2xl bg-card border border-border/60 p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
-            <AppIcon name="CheckCircle2" size={20} className="text-success" />
+            <AppIcon name="check_circle" size={20} className="text-success" />
           </div>
           <div>
             <p className="font-semibold text-sm">Ponto Completo</p>
@@ -218,7 +218,7 @@ export function EmployeeCheckInCard({
       <div className="rounded-2xl bg-card border border-primary/20 p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <AppIcon name="Clock" size={20} className="text-primary" />
+            <AppIcon name="schedule" size={20} className="text-primary" />
           </div>
           <div className="flex-1">
             <p className="font-semibold text-sm">Trabalhando</p>
@@ -235,7 +235,7 @@ export function EmployeeCheckInCard({
           <TimeBlock label="Saída prevista" value={todayRecord.expected_end?.substring(0, 5) ?? '--:--'} muted />
         </div>
         <Button onClick={handleCheckOut} disabled={loading} className="w-full h-11 rounded-xl" variant="destructive">
-          {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="LogOut" size={16} className="mr-2" />}
+          {loading ? <AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" /> : <AppIcon name="logout" size={16} className="mr-2" />}
           Registrar Saída • {currentTime}
         </Button>
       </div>
@@ -248,7 +248,7 @@ export function EmployeeCheckInCard({
     <div className="rounded-2xl bg-card border border-border/60 p-6 space-y-4">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <AppIcon name="Clock" size={20} className="text-primary" />
+          <AppIcon name="schedule" size={20} className="text-primary" />
         </div>
         <div>
           <p className="font-semibold text-sm">{greeting} 👋</p>
@@ -258,7 +258,7 @@ export function EmployeeCheckInCard({
         </div>
       </div>
       <Button onClick={handleCheckIn} disabled={loading} className="w-full h-11 rounded-xl">
-        {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="LogIn" size={16} className="mr-2" />}
+        {loading ? <AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" /> : <AppIcon name="login" size={16} className="mr-2" />}
         Registrar Entrada • {currentTime}
       </Button>
     </div>
@@ -330,13 +330,13 @@ function RecordsList({ records, isAdmin, onDelete }: { records: TimeRecord[]; is
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">Histórico</p>
         <div className="flex items-center gap-1">
           <button onClick={handlePrevMonth} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-            <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
+            <AppIcon name="chevron_left" size={16} className="text-muted-foreground" />
           </button>
           <span className="text-xs font-semibold min-w-[100px] text-center capitalize">
             {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
           </span>
           <button onClick={handleNextMonth} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+            <AppIcon name="chevron_right" size={16} className="text-muted-foreground" />
           </button>
         </div>
       </div>
@@ -355,7 +355,7 @@ function RecordsList({ records, isAdmin, onDelete }: { records: TimeRecord[]; is
 
       {filteredRecords.length === 0 ? (
         <div className="text-center text-muted-foreground py-10">
-          <AppIcon name="Clock" size={28} className="mx-auto mb-2 opacity-40" />
+          <AppIcon name="schedule" size={28} className="mx-auto mb-2 opacity-40" />
           <p className="text-sm">Nenhum registro neste mês</p>
         </div>
       ) : (
@@ -427,7 +427,7 @@ function RecordsList({ records, isAdmin, onDelete }: { records: TimeRecord[]; is
                         }}
                         className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors shrink-0"
                       >
-                        <AppIcon name="Trash2" size={14} className="text-destructive/60" />
+                        <AppIcon name="delete" size={14} className="text-destructive/60" />
                       </button>
                     )}
                   </div>
@@ -490,7 +490,7 @@ function ManualEntryForm({
   };
 
   return (
-    <div className="space-y-4 pt-4 overflow-y-auto h-[calc(85vh-80px)]">
+    <div className="space-y-4 pt-4 overflow-y-auto pb-6" style={{ maxHeight: 'calc(85vh - 80px)' }}>
       <div>
         <Label>Funcionário *</Label>
         <Select value={userId} onValueChange={setUserId}>
@@ -557,7 +557,7 @@ function ManualEntryForm({
         disabled={loading || !userId || (!isAbsence && (!checkInTime || !checkOutTime))}
         className="w-full h-12 rounded-xl"
       >
-        {loading && <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" />}
+        {loading && <AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" />}
         Salvar Registro
       </Button>
     </div>
@@ -816,7 +816,7 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
         >
           {parsing ? (
             <>
-              <AppIcon name="Loader2" size={28} className="text-primary animate-spin mb-2" />
+              <AppIcon name="progress_activity" size={28} className="text-primary animate-spin mb-2" />
               <p className="text-sm text-muted-foreground">Processando arquivo...</p>
             </>
           ) : file ? (
@@ -832,7 +832,7 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
             </>
           ) : (
             <>
-              <AppIcon name="Upload" size={28} className="text-muted-foreground/40 mb-2" />
+              <AppIcon name="upload_file" size={28} className="text-muted-foreground/40 mb-2" />
               <p className="text-sm font-medium text-foreground">Escolher arquivo</p>
               <p className="text-xs text-muted-foreground mt-0.5">XLS, XLSX, CSV ou TXT</p>
             </>
@@ -881,7 +881,7 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
           </div>
 
           <Button onClick={handleImport} disabled={importing} className="w-full h-12 rounded-xl">
-            {importing ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="Upload" size={16} className="mr-2" />}
+            {importing ? <AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" /> : <AppIcon name="upload" size={16} className="mr-2" />}
             Importar {parsedData.length} Registros
           </Button>
         </>
@@ -973,7 +973,7 @@ function CertificateForm({ onSubmit }: { onSubmit: (data: any) => Promise<boolea
       </div>
 
       <Button onClick={handleSubmit} disabled={loading} className="w-full h-12 rounded-xl">
-        {loading ? <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" /> : <AppIcon name="Send" size={16} className="mr-2" />}
+        {loading ? <AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" /> : <AppIcon name="send" size={16} className="mr-2" />}
         Enviar Atestado
       </Button>
     </div>
@@ -1055,7 +1055,7 @@ function CertificateListView({
                   setReviewing(null);
                 }}
               >
-                <AppIcon name="Check" size={14} className="mr-1" />
+                <AppIcon name="check" size={14} className="mr-1" />
                 Aprovar
               </Button>
               <Button
@@ -1069,7 +1069,7 @@ function CertificateListView({
                   setReviewing(null);
                 }}
               >
-                <AppIcon name="X" size={14} className="mr-1" />
+                <AppIcon name="close" size={14} className="mr-1" />
                 Rejeitar
               </Button>
             </div>
