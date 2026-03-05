@@ -4,7 +4,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Force update: when a new service worker is installed, reload — but only after a grace period
+// Force update: when a new service worker is installed, activate + do one safe reload
+const SW_CONTROLLER_RELOAD_TS_KEY = 'sw_controller_reload_ts';
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready
     .then((reg) => {
@@ -23,10 +25,21 @@ if ('serviceWorker' in navigator) {
         }
       });
 
-      // When a new SW is installed and waiting, activate it silently
-      // The new version will be active on next natural navigation
+      const canReloadNow = () => {
+        const lastReloadTs = Number(sessionStorage.getItem(SW_CONTROLLER_RELOAD_TS_KEY) || '0');
+        return Date.now() - lastReloadTs > 15000;
+      };
+
+      // When a new SW is installed and waiting, activate it and reload once to sync chunks/cache
       const activateWaiting = () => {
         if (reg.waiting) {
+          const onControllerChange = () => {
+            if (!canReloadNow()) return;
+            sessionStorage.setItem(SW_CONTROLLER_RELOAD_TS_KEY, String(Date.now()));
+            window.location.reload();
+          };
+
+          navigator.serviceWorker.addEventListener('controllerchange', onControllerChange, { once: true });
           reg.waiting.postMessage({ type: 'SKIP_WAITING' });
         }
       };
@@ -35,7 +48,6 @@ if ('serviceWorker' in navigator) {
         const newSW = reg.installing;
         newSW?.addEventListener('statechange', () => {
           if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // New version ready — activate silently without reload
             activateWaiting();
           }
         });
