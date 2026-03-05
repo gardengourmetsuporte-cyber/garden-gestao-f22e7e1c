@@ -2455,6 +2455,56 @@ export type Database = {
           },
         ]
       }
+      medical_certificates: {
+        Row: {
+          created_at: string
+          date_end: string
+          date_start: string
+          days_count: number
+          document_url: string | null
+          id: string
+          notes: string | null
+          reviewed_by: string | null
+          status: string
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_end: string
+          date_start: string
+          days_count?: number
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          reviewed_by?: string | null
+          status?: string
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_end?: string
+          date_start?: string
+          days_count?: number
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          reviewed_by?: string | null
+          status?: string
+          unit_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_certificates_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_categories: {
         Row: {
           color: string
@@ -4316,6 +4366,7 @@ export type Database = {
       time_records: {
         Row: {
           adjusted_by: string | null
+          certificate_id: string | null
           check_in: string | null
           check_out: string | null
           created_at: string
@@ -4336,6 +4387,7 @@ export type Database = {
         }
         Insert: {
           adjusted_by?: string | null
+          certificate_id?: string | null
           check_in?: string | null
           check_out?: string | null
           created_at?: string
@@ -4356,6 +4408,7 @@ export type Database = {
         }
         Update: {
           adjusted_by?: string | null
+          certificate_id?: string | null
           check_in?: string | null
           check_out?: string | null
           created_at?: string
@@ -4375,6 +4428,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "time_records_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "medical_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "time_records_unit_id_fkey"
             columns: ["unit_id"]
