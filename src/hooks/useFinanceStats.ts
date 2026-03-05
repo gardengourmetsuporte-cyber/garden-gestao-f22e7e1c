@@ -55,6 +55,12 @@ export function useFinanceStats(
         const resolved = parentLookup[categoryData.id];
         if (resolved) {
           categoryData = resolved;
+        } else if (categoryData.parent_id) {
+          // Fallback: if not in lookup, try resolving via parent_id
+          const parentResolved = parentLookup[categoryData.parent_id];
+          if (parentResolved) {
+            categoryData = parentResolved;
+          }
         }
       }
       
@@ -205,6 +211,11 @@ export function useFinanceStats(
         const resolved = parentLookup[categoryData.id];
         if (resolved) {
           categoryData = resolved;
+        } else if (categoryData.parent_id) {
+          const parentResolved = parentLookup[categoryData.parent_id];
+          if (parentResolved) {
+            categoryData = parentResolved;
+          }
         }
       }
       
