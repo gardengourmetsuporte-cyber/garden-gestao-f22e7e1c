@@ -9,6 +9,7 @@ import { MyPayslips } from '@/components/employees/MyPayslips';
 import { EmployeeScheduleRequest } from '@/components/employees/EmployeeScheduleRequest';
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
 import { TimeTracking } from '@/components/employees/TimeTracking';
+import { EmployeeWarnings } from '@/components/employees/EmployeeWarnings';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
@@ -22,12 +23,14 @@ export default function Employees() {
     { key: 'employees', label: 'Funcionários', icon: 'Users', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
     { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10' },
   ];
 
   const employeeTabs = [
     { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
     { key: 'payslips', label: 'Holerites', icon: 'FileText', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10' },
   ];
 
   const tabs = isAdmin ? adminTabs : employeeTabs;
@@ -44,7 +47,7 @@ export default function Employees() {
           ) : (
             <>
               {/* Navigation Cards */}
-              <div className={cn("grid gap-3", tabs.length <= 3 ? "grid-cols-3" : "grid-cols-2")}>
+              <div className={cn("grid gap-3", tabs.length <= 3 ? "grid-cols-3" : "grid-cols-4")}>
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
@@ -59,7 +62,7 @@ export default function Employees() {
                     <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", activeTab === tab.key ? "bg-primary/20" : tab.bg)}>
                       <AppIcon name={tab.icon} size={20} className={activeTab === tab.key ? "text-primary" : tab.color} />
                     </div>
-                    <span className={cn("text-sm font-semibold", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
+                    <span className={cn("text-xs font-semibold", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
                   </button>
                 ))}
               </div>
@@ -69,6 +72,7 @@ export default function Employees() {
                 {activeTab === 'time-tracking' && <TimeTracking />}
                 {activeTab === 'schedules' && (isAdmin ? <ScheduleManagement /> : <EmployeeScheduleRequest />)}
                 {activeTab === 'payslips' && !isAdmin && <MyPayslips />}
+                {activeTab === 'warnings' && <EmployeeWarnings />}
               </div>
             </>
           )}
