@@ -1,70 +1,82 @@
 
 
-## Plano: Importacao de Ponto + Sistema de Atestados com Upload de Foto
+## Plano: Sistema de Advertencias Trabalhistas (CLT)
 
-### Resumo
+### Contexto Legal (CLT)
 
-Criar 3 funcionalidades no modulo de Ponto:
+O sistema seguira a progressao disciplinar prevista na legislacao brasileira:
+1. **Advertencia Verbal** - registro informal, primeira ocorrencia
+2. **Advertencia Escrita** - documento formal, reincidencia
+3. **Suspensao** (1 a 30 dias) - falta grave ou reincidencia de advertencias
+4. **Demissao por Justa Causa** (Art. 482 CLT) - ultimo recurso
 
-1. **Importacao de registros de ponto** via arquivo XLS/CSV (admin)
-2. **Registro de atestados medicos** com upload de foto (camera/galeria nativo)
-3. **Registro de ausencias** (folga, falta, atestado) com documentacao
+Motivos tipificados no Art. 482 da CLT: ato de improbidade, incontinencia de conduta, negociacao habitual, condenacao criminal, desidia, embriaguez, violacao de segredo, indisciplina, insubordinacao, abandono de emprego, ato lesivo da honra, pratica de jogos de azar, perda de habilitacao profissional.
 
 ---
 
 ### 1. Migracao de Banco de Dados
 
-**Nova tabela `medical_certificates`:**
-- `id`, `user_id`, `unit_id`, `date_start`, `date_end`, `days_count`
-- `document_url` (foto do atestado no Storage)
-- `notes`, `status` (pending/approved/rejected), `reviewed_by`
-- `created_at`
+**Nova tabela `employee_warnings`:**
+- `id`, `employee_id` (FK employees), `unit_id` (FK units)
+- `type`: enum `verbal`, `written`, `suspension`, `dismissal`
+- `severity`: enum `light`, `moderate`, `serious`
+- `reason`: text (motivo livre)
+- `legal_basis`: text (artigo CLT, ex: "Art. 482, alínea e - Desídia")
+- `description`: text (descricao detalhada do ocorrido)
+- `date`: date (data da ocorrencia)
+- `suspension_days`: integer (dias de suspensao, se aplicavel)
+- `witness_1`, `witness_2`: text (nomes das testemunhas)
+- `document_url`: text (foto/scan do documento assinado)
+- `employee_acknowledged`: boolean (funcionario tomou ciencia)
+- `acknowledged_at`: timestamptz
+- `issued_by`: uuid (admin que aplicou)
+- `notes`: text
+- `created_at`, `updated_at`
 
-**Novo bucket de Storage:** `medical-certificates` (privado, com RLS)
-
-**Coluna adicional em `time_records`:** `certificate_id uuid` (FK opcional para `medical_certificates`)
-
----
-
-### 2. Importacao de Ponto (Admin)
-
-- Botao "Importar Ponto" na tela de TimeTracking (admin only)
-- Abre Sheet com upload de arquivo (.xls, .csv)
-- **Edge Function `import-time-records`**: recebe JSON estruturado, faz matching por nome de funcionario (`employees.full_name`), upsert em `time_records`
-- Client-side: parsing com `document--parse_document` para XLS, preview antes de confirmar
-- Mapeamento: FOLGA → `day_off`, ATESTADO → `day_off` + nota, FALTA → `absent`, horarios → `check_in`/`check_out`
-
----
-
-### 3. Sistema de Atestados
-
-- Funcionario: botao "Enviar Atestado" na tela de Ponto
-- Abre Sheet com:
-  - Periodo (data inicio/fim)
-  - Upload de foto: usa `<input type="file" accept="image/*" capture="environment">` para acesso nativo a camera/galeria
-  - Observacoes
-- Upload da imagem para bucket `medical-certificates`
-- Cria registro em `medical_certificates` + registros `day_off` em `time_records` para cada dia do periodo
-
-- Admin: visualiza atestados pendentes, pode aprovar/rejeitar, ve a foto do documento
+RLS: admins da unidade podem CRUD, funcionario ve apenas as proprias.
 
 ---
 
-### 4. Registro Rapido de Ausencias (Admin)
+### 2. Hook `useEmployeeWarnings.ts`
 
-- No formulario de Lancamento Manual, adicionar opcao de tipo: `Ponto Normal`, `Folga`, `Falta`, `Atestado`
-- Ao selecionar Folga/Falta: nao exige horarios de entrada/saida
-- Ao selecionar Atestado: exibe campo de upload de foto
+- Fetch warnings por employee ou por unidade
+- Criar advertencia com upload de documento
+- Marcar ciencia do funcionario
+- Contar advertencias por tipo para exibir historico progressivo
 
 ---
 
-### Arquivos Modificados
+### 3. Componente `EmployeeWarnings.tsx`
+
+**Visao Admin:**
+- Nova aba "Advertencias" na pagina de Funcionarios (icon: AlertTriangle, cor vermelha)
+- Listagem de advertencias com filtro por funcionario e tipo
+- Botao "Nova Advertencia" abre Sheet com:
+  - Selecao do funcionario
+  - Tipo (Verbal / Escrita / Suspensao / Justa Causa)
+  - Gravidade (Leve / Moderada / Grave)
+  - Motivo com sugestoes baseadas no Art. 482 CLT
+  - Data da ocorrencia
+  - Dias de suspensao (quando tipo = suspensao)
+  - Testemunhas (2 campos)
+  - Upload de documento (foto da advertencia assinada)
+  - Descricao detalhada
+- Card de advertencia mostra: tipo (badge colorido), data, motivo, status de ciencia
+- Indicador de progressao: quantas advertencias o funcionario ja tem
+
+**Visao Funcionario:**
+- Pode ver suas proprias advertencias na aba
+- Botao "Ciente" para registrar ciencia digital
+
+---
+
+### 4. Arquivos Modificados
 
 | Arquivo | Mudanca |
 |---|---|
-| Nova migracao SQL | Tabela `medical_certificates`, bucket storage, RLS |
-| `src/hooks/useTimeTracking.ts` | Funcoes de importacao e atestados |
-| `src/components/employees/TimeTracking.tsx` | Botoes importar/atestado, Sheet de atestado, Sheet de importacao |
-| Nova edge function `import-time-records` | Parsing e upsert em batch |
-| Novo hook `useMedicalCertificates.ts` | CRUD de atestados com upload |
+| Nova migracao SQL | Tabela `employee_warnings` + RLS |
+| `src/hooks/useEmployeeWarnings.ts` | Novo hook CRUD |
+| `src/components/employees/EmployeeWarnings.tsx` | Novo componente |
+| `src/pages/Employees.tsx` | Nova aba "Advertencias" |
+| `src/types/employee.ts` | Tipos de advertencia |
 
