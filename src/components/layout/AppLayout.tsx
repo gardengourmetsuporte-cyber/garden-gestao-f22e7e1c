@@ -41,6 +41,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
   const { user, profile, isAdmin, isSuperAdmin, signOut, plan } = useAuth();
   const { units, activeUnit, setActiveUnitId, isTransitioning } = useUnit();
+  const storeInfo = (activeUnit as any)?.store_info as Record<string, any> | undefined;
+  const brandName = storeInfo?.display_name || activeUnit?.name || 'Garden';
   const { isPulsing } = useCoinAnimation();
   const { unreadCount } = useNotifications();
   const { earned: earnedPoints } = usePoints();
@@ -160,7 +162,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 <img alt="Logo" className="w-6 h-6 object-contain" src={unitLogo} />
               </div>
               <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
-                {activeUnit?.name || 'Garden'}
+                {brandName}
               </span>
             </button>
 
@@ -218,7 +220,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <img alt="Logo" className="w-7 h-7 object-contain" src={unitLogo} />
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
+              <p className="text-sm font-bold text-white truncate">{brandName}</p>
               <p className="text-[10px] text-emerald-400/50 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
           </div>
