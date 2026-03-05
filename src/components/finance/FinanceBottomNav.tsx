@@ -52,7 +52,7 @@ interface FinanceBottomNavProps {
 const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Principal' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
-  { id: 'charts', icon: 'PieChart', label: 'Gráficos' },
+  { id: 'charts', icon: 'ChartPie', label: 'Gráficos' },
   { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
 ];
 
