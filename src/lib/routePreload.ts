@@ -18,9 +18,13 @@ const routeImporters: Record<string, RouteImporter> = {
   '/cardapio': () => import('@/pages/CardapioHub'),
   '/personal-finance': () => import('@/pages/PersonalFinance'),
   '/ranking': () => import('@/pages/Ranking'),
-  
   '/plans': () => import('@/pages/Plans'),
-  
+  '/deliveries': () => import('@/pages/Deliveries'),
+  '/brand-core': () => import('@/pages/BrandCore'),
+  '/calendar': () => import('@/pages/CalendarFull'),
+  '/customers': () => import('@/pages/Customers'),
+  '/notifications': () => import('@/pages/Notifications'),
+  '/profile/:userId': () => import('@/pages/Profile'),
 };
 
 const preloadedRoutes = new Set<string>();
