@@ -14,6 +14,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { useEmployeeWarnings, WARNING_TYPE_LABELS, WARNING_TYPE_COLORS, SEVERITY_LABELS, CLT_REASONS } from '@/hooks/useEmployeeWarnings';
 import { useEmployees } from '@/hooks/useEmployees';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFabAction } from '@/contexts/FabActionContext';
 import type { WarningType, WarningSeverity } from '@/types/employee';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -25,6 +26,12 @@ export function EmployeeWarnings() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [filterEmployee, setFilterEmployee] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+
+  // Register FAB action
+  useFabAction(
+    isAdmin ? { icon: 'add', label: 'Nova Advertência', onClick: () => setSheetOpen(true) } : null,
+    [isAdmin]
+  );
 
   // Form state
   const [form, setForm] = useState({
@@ -97,7 +104,7 @@ export function EmployeeWarnings() {
   });
 
   if (isLoading) {
-    return <div className="flex justify-center py-12"><AppIcon name="Loader2" className="animate-spin text-muted-foreground" size={24} /></div>;
+     return <div className="flex justify-center py-12"><AppIcon name="progress_activity" className="animate-spin text-muted-foreground" size={24} /></div>;
   }
 
   return (
@@ -107,7 +114,7 @@ export function EmployeeWarnings() {
         <h2 className="text-lg font-bold text-foreground">Advertências</h2>
         {isAdmin && (
           <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5">
-            <AppIcon name="Plus" size={16} />
+            <AppIcon name="add" size={16} />
             Nova Advertência
           </Button>
         )}
@@ -144,8 +151,8 @@ export function EmployeeWarnings() {
 
       {/* Warnings list */}
       {visibleWarnings.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <AppIcon name="ShieldCheck" size={40} className="mx-auto mb-3 opacity-40" />
+      <div className="text-center py-12 text-muted-foreground">
+          <AppIcon name="verified_user" size={40} className="mx-auto mb-3 opacity-40" />
           <p className="text-sm">Nenhuma advertência registrada</p>
         </div>
       ) : (
@@ -166,7 +173,7 @@ export function EmployeeWarnings() {
                         </Badge>
                         {w.employee_acknowledged ? (
                           <Badge variant="secondary" className="text-xs gap-1">
-                            <AppIcon name="CheckCircle2" size={12} /> Ciente
+                            <AppIcon name="check_circle" size={12} /> Ciente
                           </Badge>
                         ) : (
                           <Badge variant="outline" className="text-xs text-amber-400 border-amber-500/30">
@@ -207,7 +214,7 @@ export function EmployeeWarnings() {
                         className="text-xs gap-1"
                         onClick={() => acknowledgeWarning(w.id)}
                       >
-                        <AppIcon name="CheckCircle2" size={14} />
+                        <AppIcon name="check_circle" size={14} />
                         Registrar Ciência
                       </Button>
                     )}
@@ -225,7 +232,7 @@ export function EmployeeWarnings() {
                           if (confirm('Remover esta advertência?')) deleteWarning(w.id);
                         }}
                       >
-                        <AppIcon name="Trash2" size={14} />
+                        <AppIcon name="delete" size={14} />
                       </Button>
                     )}
                   </div>
@@ -378,7 +385,7 @@ export function EmployeeWarnings() {
               if (counts.written >= 3 && form.type !== 'suspension' && form.type !== 'dismissal') {
                 return (
                   <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 flex gap-2 items-start">
-                    <AppIcon name="AlertTriangle" size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                    <AppIcon name="warning" size={16} className="text-amber-400 shrink-0 mt-0.5" />
                     <p className="text-xs text-amber-300">
                       Este funcionário já possui {counts.written} advertência(s) escrita(s). Considere aplicar uma suspensão conforme progressão disciplinar da CLT.
                     </p>
