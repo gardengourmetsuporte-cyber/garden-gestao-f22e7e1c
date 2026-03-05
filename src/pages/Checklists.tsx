@@ -32,10 +32,11 @@ import { DeadlineSettingPopover } from '@/components/checklists/DeadlineSettingP
 import { useChecklistTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
 import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
 
-function DateStrip({ days, selectedDate, onSelectDate }: {
+function DateStrip({ days, selectedDate, onSelectDate, trailing }: {
   days: Date[];
   selectedDate: Date;
   onSelectDate: (d: Date) => void;
+  trailing?: React.ReactNode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -92,9 +93,12 @@ function DateStrip({ days, selectedDate, onSelectDate }: {
           })}
         </div>
       </div>
-      <p className="text-center text-xs text-muted-foreground capitalize">
-        {isDateToday(selectedDate) ? '📍 ' : ''}{format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-      </p>
+      <div className="flex items-center justify-center gap-1.5">
+        <p className="text-center text-xs text-muted-foreground capitalize">
+          {isDateToday(selectedDate) ? '📍 ' : ''}{format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+        </p>
+        {trailing}
+      </div>
     </div>
   );
 }
@@ -515,36 +519,35 @@ export default function ChecklistsPage() {
               const today = new Date();
               const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
 
-              return (
-                <DateStrip
-                  days={days}
-                  selectedDate={selectedDate}
-                  onSelectDate={setSelectedDate}
-                />
-              );
-            })()}
-
-            {/* Reminder icon — admin only, outside cards */}
-            {!settingsMode && isAdmin && checklistType !== 'bonus' && (() => {
-              const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
-              if (progress.percent === 100 || progress.total === 0) return null;
-              return (
-                <div className="flex justify-end -mb-3">
+              const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
+                const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+                if (progress.percent === 100 || progress.total === 0) return null;
+                return (
                   <button
                     onClick={handleSendReminder}
                     disabled={sendingReminder}
                     title="Lembrar equipe de completar o checklist"
                     className={cn(
-                      "w-9 h-9 rounded-full flex items-center justify-center transition-all",
-                      "bg-amber-500/10 hover:bg-amber-500/20 active:scale-95",
+                      "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
+                      "hover:bg-amber-500/10 active:scale-95",
                       sendingReminder && "opacity-60 pointer-events-none"
                     )}
                   >
-                    <AppIcon name="BellRing" size={18} className={cn("text-amber-500 dark:text-amber-400", sendingReminder && "animate-bounce")} />
+                    <AppIcon name="notifications" size={14} fill={0} className={cn("text-muted-foreground/60", sendingReminder && "animate-bounce text-amber-500")} />
                   </button>
-                </div>
+                );
+              })() : null;
+
+              return (
+                <DateStrip
+                  days={days}
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                  trailing={reminderBtn}
+                />
               );
             })()}
+
 
             {/* Settings mode header banner */}
             {settingsMode && (
