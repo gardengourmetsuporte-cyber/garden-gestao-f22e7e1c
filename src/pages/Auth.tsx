@@ -536,17 +536,13 @@ export default function Auth() {
 
               {/* Toggle login/signup */}
               <div className="text-center pt-2">
-                {isResetPassword ? (
+              {isResetPassword ? (
                   <button type="button" onClick={() => { setIsResetPassword(false); setErrors({}); }} className="text-sm text-primary font-medium hover:text-primary/80 transition-colors">
                     ← Voltar para o login
                   </button>
-                ) : canSignUp ? (
+                ) : (
                   <button type="button" onClick={() => { setIsLogin(!isLogin); setErrors({}); setPassword(''); setFullName(''); }} className="text-sm text-muted-foreground">
                     {isLogin ? <>Não tem conta? <span className="font-medium text-primary">Cadastre-se</span></> : <>Já tem conta? <span className="font-medium text-primary">Entrar</span></>}
-                  </button>
-                ) : (
-                  <button type="button" onClick={() => navigate('/landing')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    ← Voltar para o site
                   </button>
                 )}
               </div>
