@@ -148,7 +148,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
           }}
         >
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[26px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[30px] z-20">
             <div className="fab-cradle-ring">
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
