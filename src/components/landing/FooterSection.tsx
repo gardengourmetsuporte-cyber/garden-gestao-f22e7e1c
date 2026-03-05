@@ -8,7 +8,7 @@ export function FooterSection() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shadow-sm">
-              <img src={logoImg} alt="Garden" className="w-6 h-6 object-contain" />
+              <img src={logoImg} alt="Garden" className="w-7 h-7 object-contain" />
             </div>
             <span className="text-sm font-bold text-foreground font-display">Garden Gestão</span>
           </div>

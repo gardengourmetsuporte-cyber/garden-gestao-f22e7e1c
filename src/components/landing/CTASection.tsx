@@ -23,8 +23,8 @@ export function CTASection() {
           <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] rounded-full blur-[80px] opacity-[0.1] mix-blend-screen pointer-events-none" style={{ background: 'hsl(190 90% 50%)', animation: 'float-orb-2 10s ease-in-out infinite' }} />
 
           <div className="relative z-10">
-            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-8 shadow-lg" style={{ boxShadow: '0 0 60px hsl(156 72% 40% / 0.2)' }}>
-              <img src={logoImg} alt="Garden" className="w-11 h-11 object-contain" />
+            <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mx-auto mb-8 shadow-lg" style={{ boxShadow: '0 0 60px hsl(156 72% 40% / 0.2)' }}>
+              <img src={logoImg} alt="Garden" className="w-16 h-16 object-contain" />
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight font-display">
