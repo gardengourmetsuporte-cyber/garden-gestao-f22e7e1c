@@ -67,21 +67,21 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
   if (visibleCards.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-spring-in spring-stagger-3">
-      {visibleCards.map(card => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {visibleCards.map((card, i) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
-          className="dash-kpi-card group"
+          className={`dash-kpi-card group animate-card-reveal dash-stagger-${i + 2}`}
         >
-          <div className={`dash-kpi-icon ${card.bgColor} ${card.color}`}>
+          <div className={`dash-kpi-icon ${card.bgColor} ${card.color} animate-subtle-float`} style={{ animationDelay: `${i * 200}ms` }}>
             <AppIcon name={card.icon} size={18} />
           </div>
           <div className="mt-2.5">
             {isLoading ? (
               <Skeleton className="h-7 w-10 rounded-lg" />
             ) : (
-              <span className={`text-2xl font-extrabold tracking-tight ${card.value > 0 ? card.color : 'text-muted-foreground/40'}`}>
+              <span className={`text-2xl font-extrabold tracking-tight animate-number-reveal ${card.value > 0 ? card.color : 'text-muted-foreground/40'}`} style={{ animationDelay: `${200 + i * 100}ms` }}>
                 {card.value}
               </span>
             )}
