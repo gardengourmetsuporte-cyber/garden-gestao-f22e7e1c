@@ -19,6 +19,7 @@ interface UnitContextType {
   units: Unit[];
   activeUnit: Unit | null;
   activeUnitId: string | null;
+  userUnitRole: string | null; // 'owner' | 'admin' | 'member'
   setActiveUnitId: (id: string) => void;
   isLoading: boolean;
   isTransitioning: boolean;
@@ -34,6 +35,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
+  const [userUnitRole, setUserUnitRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const hasInitialized = useRef(false);
@@ -221,17 +223,34 @@ export function UnitProvider({ children }: { children: ReactNode }) {
 
   const activeUnit = units.find(u => u.id === activeUnitId) || null;
 
-  // Resolve effective plan from unit owner whenever activeUnitId changes
+  // Resolve effective plan and user's unit role whenever activeUnitId changes
   useEffect(() => {
-    if (!activeUnitId) return;
+    if (!activeUnitId || !user) {
+      setUserUnitRole(null);
+      return;
+    }
     let cancelled = false;
+
+    // Fetch unit role for the current user
+    supabase
+      .from('user_units')
+      .select('role')
+      .eq('unit_id', activeUnitId)
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setUserUnitRole(data?.role ?? null);
+      });
+
+    // Fetch effective plan
     supabase.rpc('get_unit_plan', { p_unit_id: activeUnitId }).then(({ data }) => {
       if (!cancelled && data) {
         setEffectivePlan(data as any);
       }
     });
+
     return () => { cancelled = true; };
-  }, [activeUnitId, setEffectivePlan]);
+  }, [activeUnitId, user, setEffectivePlan]);
 
   // Apply theme when activeUnit changes
   useEffect(() => {
@@ -262,6 +281,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
         units,
         activeUnit,
         activeUnitId,
+        userUnitRole,
         setActiveUnitId,
         isLoading: effectiveLoading,
         isTransitioning,
