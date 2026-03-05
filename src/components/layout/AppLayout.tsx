@@ -173,7 +173,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   className="active:scale-95 transition-transform relative"
                 >
                   <div className="absolute inset-0 m-auto w-10 h-10 rounded-full header-icon-glow" />
-                  <img alt="Garden Gestão" className="w-10 h-10 object-contain relative z-10 drop-shadow-lg" src={gardenIcon} />
+                  <img alt="Garden Gestão" className="w-10 h-10 object-contain relative z-10 drop-shadow-lg" style={{ mixBlendMode: 'screen' }} src={gardenIcon} />
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
