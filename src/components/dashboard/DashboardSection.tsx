@@ -1,4 +1,5 @@
 import { AppIcon } from '@/components/ui/app-icon';
+import { cn } from '@/lib/utils';
 
 interface DashboardSectionProps {
   title: string;
@@ -6,11 +7,12 @@ interface DashboardSectionProps {
   iconColor?: string;
   children: React.ReactNode;
   onNavigate?: () => void;
+  className?: string;
 }
 
-export function DashboardSection({ title, icon, iconColor = 'text-primary', children, onNavigate }: DashboardSectionProps) {
+export function DashboardSection({ title, icon, iconColor = 'text-primary', children, onNavigate, className }: DashboardSectionProps) {
   return (
-    <div className="animate-spring-in">
+    <div className={cn(className)}>
       <button
         onClick={onNavigate}
         className={`dash-section-header ${onNavigate ? 'cursor-pointer' : 'cursor-default'}`}

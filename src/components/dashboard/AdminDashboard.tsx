@@ -41,6 +41,14 @@ function LazyWidget({ children }: { children: React.ReactNode }) {
   );
 }
 
+const MOTIVATIONAL_PHRASES = [
+  'Vamos fazer acontecer! 🚀',
+  'Dia de grandes resultados! 💪',
+  'Foco e determinação! 🎯',
+  'Hoje vai ser incrível! ⭐',
+  'Bora pra cima! 🔥',
+];
+
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -59,6 +67,7 @@ export function AdminDashboard() {
   })();
 
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
+  const motivational = MOTIVATIONAL_PHRASES[new Date().getDate() % MOTIVATIONAL_PHRASES.length];
 
   if (!isReady) {
     return (
@@ -68,16 +77,20 @@ export function AdminDashboard() {
     );
   }
 
+  let staggerIndex = 0;
+  const nextStagger = () => `dash-stagger-${++staggerIndex}`;
+
   return (
     <div className="space-y-6 px-4 py-3 lg:px-6">
       {/* Welcome */}
-      <div className="animate-spring-in spring-stagger-1">
+      <div className={`animate-card-reveal ${nextStagger()}`}>
         <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
-          {greeting}, {firstName} 👋
+          {greeting}, {firstName} <span className="animate-wave-hand">👋</span>
         </h2>
         <p className="text-muted-foreground text-xs capitalize mt-0.5">
           {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
         </p>
+        <p className="text-xs text-muted-foreground/70 mt-1 animate-motivational">{motivational}</p>
       </div>
 
       {/* Setup Onboarding */}
@@ -94,63 +107,65 @@ export function AdminDashboard() {
 
       {widgets.map((widget) => {
         if (!widget.visible) return null;
+        const stagger = nextStagger();
 
         switch (widget.key) {
           case 'finance':
             return hasAccess('finance') ? (
-              <DashboardHeroFinance
-                key={widget.key}
-                balance={stats.monthBalance}
-                pendingExpenses={stats.pendingExpenses}
-                isLoading={statsLoading}
-              />
+              <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
+                <DashboardHeroFinance
+                  balance={stats.monthBalance}
+                  pendingExpenses={stats.pendingExpenses}
+                  isLoading={statsLoading}
+                />
+              </div>
             ) : null;
 
           case 'checklist':
             return hasAccess('checklists') ? (
-              <DashboardSection key={widget.key} title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')}>
+              <DashboardSection key={widget.key} title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
                 <LazyWidget><LazyChecklist /></LazyWidget>
               </DashboardSection>
             ) : null;
 
           case 'finance-chart':
             return hasAccess('finance') ? (
-              <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')}>
+              <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
                 <FinanceChartWidget />
               </DashboardSection>
             ) : null;
 
           case 'bills-due':
             return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
-              <div key={widget.key} className="animate-spring-in">
+              <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
                 <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
               </div>
             ) : null;
 
           case 'calendar':
             return hasAccess('agenda') ? (
-              <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')}>
+              <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
                 <LazyWidget><LazyCalendar /></LazyWidget>
               </DashboardSection>
             ) : null;
 
           case 'agenda':
             return hasAccess('agenda') ? (
-              <DashboardSection key={widget.key} title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')}>
+              <DashboardSection key={widget.key} title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
                 <LazyWidget><LazyAgenda /></LazyWidget>
               </DashboardSection>
             ) : null;
 
           case 'weekly-summary':
             return hasAccess('cash-closing') ? (
-              <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')}>
+              <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
                 <LazyWidget><LazyWeeklySummary /></LazyWidget>
               </DashboardSection>
             ) : null;
 
           case 'leaderboard':
             return hasAccess('ranking') ? (
-              <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')}>
+              <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
                 <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
               </DashboardSection>
             ) : null;

@@ -29,7 +29,7 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
           {isLoading ? (
             <Skeleton className="h-10 w-44 bg-white/10 rounded-xl" />
           ) : (
-            <p className="text-[2rem] font-extrabold tracking-tight leading-tight" style={{ color: balance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
+            <p className="text-[2rem] font-extrabold tracking-tight leading-tight animate-number-reveal" style={{ color: balance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
               {formatCurrency(balance)}
             </p>
           )}
