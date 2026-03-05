@@ -165,18 +165,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <AppIcon name="ChevronLeft" size={20} className="text-white/70" />
                 </button>
               )}
-            </div>
-
-            {/* Center: Logo on dashboard, Module name on other pages */}
-            <div className="flex-1 flex items-center justify-center min-w-0">
-              {isDashboard ? (
+              {isDashboard && (
                 <button
                   onClick={() => navigate('/')}
                   className="active:scale-95 transition-transform"
                 >
-                  <img alt="Garden" className="h-10 object-contain" style={{ mixBlendMode: 'screen' }} src={gardenIcon} />
+                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-sm">
+                    <img alt="Garden" className="w-[130%] h-[130%] object-contain" src={gardenIcon} />
+                  </div>
                 </button>
-              ) : (
+              )}
+            </div>
+
+            {/* Center: Module name on other pages */}
+            <div className="flex-1 flex items-center justify-center min-w-0">
+              {!isDashboard && (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
                   {moduleTitle || activeUnit?.name || 'Garden'}
                 </span>
