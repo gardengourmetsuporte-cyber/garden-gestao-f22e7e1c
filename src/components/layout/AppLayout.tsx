@@ -169,14 +169,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="flex items-center gap-2 active:scale-95 transition-transform"
+                  className="active:scale-95 transition-transform"
                 >
-                  <div className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm">
-                    <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                  <div className="w-9 h-9 rounded-lg overflow-hidden bg-white flex items-center justify-center shadow-sm">
+                    <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} />
                   </div>
-                  <span className="text-sm font-bold text-white truncate max-w-[140px] font-display" style={{ letterSpacing: '-0.02em' }}>
-                    {activeUnit?.name || 'Garden'}
-                  </span>
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
