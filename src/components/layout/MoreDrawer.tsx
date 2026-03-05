@@ -110,12 +110,12 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
           >
             {/* Theme toggle + Close button */}
             <div className="absolute top-[calc(env(safe-area-inset-top,12px)+12px)] right-4 flex items-center gap-1.5 z-10">
-              <ThemeToggle className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80" />
+              <ThemeToggle className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 text-foreground/80" />
               <button
                 onClick={() => onOpenChange(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
               >
-                <AppIcon name="X" size={18} className="text-white/80" />
+                <AppIcon name="X" size={18} className="text-foreground/80" />
               </button>
             </div>
 
@@ -127,8 +127,8 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
               >
                 <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={48} userName={profile?.full_name || 'Usuário'} userId={user?.id} />
                 <div className="text-left min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white truncate font-display">{profile?.full_name || 'Usuário'}</p>
-                  <p className="text-[11px] font-medium text-white/70">{rank.title} · {earnedPoints} pts</p>
+                  <p className="text-sm font-bold text-foreground truncate font-display">{profile?.full_name || 'Usuário'}</p>
+                  <p className="text-[11px] font-medium text-muted-foreground">{rank.title} · {earnedPoints} pts</p>
                 </div>
               </button>
               
@@ -149,14 +149,14 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                       className={cn(
                         "flex items-center justify-center gap-1.5 px-2 py-2 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all min-w-0",
                         isActive
-                          ? "bg-white/20 text-white border border-white/30"
-                          : "bg-white/10 text-white/60 hover:bg-white/15"
+                          ? "bg-primary/15 text-foreground border border-primary/30"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
                       )}
                     >
                       <span
                         className={cn(
                           "w-2 h-2 rounded-full shrink-0",
-                          isActive ? "bg-emerald-400" : "bg-white/40"
+                          isActive ? "bg-emerald-400" : "bg-muted-foreground/40"
                         )}
                       />
                       <span className="truncate">{unit.name}</span>
@@ -170,20 +170,20 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
             {(plan === 'free') && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-muted hover:bg-muted/80 transition-all"
               >
                 <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
-                <span className="text-sm font-semibold text-white">Upgrade de Plano</span>
+                <span className="text-sm font-semibold text-foreground">Upgrade de Plano</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
               </button>
             )}
             {(plan !== 'free' && isAdmin) && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-muted hover:bg-muted/80 transition-all"
               >
                 <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
-                <span className="text-sm font-semibold text-white">Planos</span>
+                <span className="text-sm font-semibold text-foreground">Planos</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>{plan?.toUpperCase()}</span>
               </button>
             )}
