@@ -472,7 +472,7 @@ export function TransactionSheet({
             </SheetTitle>
           </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto space-y-6 pb-2 px-1 -mx-1">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 pb-2 px-1 -mx-1">
             {/* Type selector */}
             <Tabs value={type} onValueChange={(v) => {
               setType(v as TransactionType);

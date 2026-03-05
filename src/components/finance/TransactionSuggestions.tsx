@@ -74,7 +74,7 @@ export function TransactionSuggestions({
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden">
+    <div className="absolute top-full left-0 right-0 z-[100] mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-[220px] overflow-y-auto">
       {suggestions.map((suggestion, index) => (
         <button
           key={index}
