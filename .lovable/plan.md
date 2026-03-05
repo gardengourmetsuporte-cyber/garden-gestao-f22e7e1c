@@ -1,65 +1,81 @@
 
 
-## Sistema de Lançamento por Comprovante com Web Share Target
+## Sistema de IA Financeira para Auto-Categorização
 
-O usuário quer duas formas de enviar comprovantes:
-1. **Compartilhar direto do app do banco** → abre o Garden automaticamente com a imagem
-2. **Tirar foto ou escolher da galeria** dentro do próprio módulo financeiro
+O sistema atual tem dois problemas claros:
+1. **Despesas do fechamento de caixa** são inseridas com `category_id: null` e sem `employee_id` (linhas 406-418 do `useCashClosing.ts`)
+2. **Não existe inteligência** para categorizar transações automaticamente baseada no histórico
 
-### Arquitetura
+### Arquitetura Proposta
 
 ```text
-App do Banco → "Compartilhar" → Garden (PWA Share Target)
-                                    ↓
-                              /share-receipt (rota)
-                                    ↓
-                         Redireciona para /finance?receipt=shared
-                                    ↓
-                         ReceiptOCRSheet abre automaticamente
-                                    ↓
-                    Edge Function receipt-ocr (Gemini Flash)
-                                    ↓
-                         Dados extraídos + confirmação rápida
-                                    ↓
-                         Transação criada no financeiro
+Transação nova (qualquer origem)
+         ↓
+  Edge Function "finance-categorize"
+         ↓
+  IA recebe: descrição + lista de categorias + fornecedores + funcionários do usuário
+         ↓
+  Retorna: category_id sugerido, supplier_id, employee_id, confidence (0-1)
+         ↓
+  Se confidence >= 0.8 → aplica direto
+  Se confidence < 0.8 → marca como "pendente de revisão" (campo suggestions no front)
 ```
 
 ### Componentes a Criar/Modificar
 
 | Ação | Arquivo | Descrição |
 |------|---------|-----------|
-| Criar | `supabase/functions/receipt-ocr/index.ts` | Edge function que recebe imagem base64, usa Gemini Flash para extrair valor, data, beneficiário, tipo |
-| Criar | `src/components/finance/ReceiptOCRSheet.tsx` | Sheet com 2 etapas: captura de imagem + card de confirmação com dados pré-preenchidos |
-| Criar | `src/pages/ShareReceiptHandler.tsx` | Página que recebe o POST do Share Target, guarda a imagem em memória e redireciona para `/finance?receipt=shared` |
-| Modificar | `vite.config.ts` | Adicionar `share_target` no manifest PWA para receber imagens compartilhadas |
-| Modificar | `src/App.tsx` | Adicionar rota `/share-receipt` |
-| Modificar | `src/pages/Finance.tsx` | Detectar `?receipt=shared`, abrir `ReceiptOCRSheet`; adicionar botão de câmera no FAB menu |
-| Modificar | `src/pages/PersonalFinance.tsx` | Mesma integração do receipt sheet |
-| Modificar | `src/components/finance/FinanceBottomNav.tsx` | Adicionar botão "Comprovante" (ícone câmera) no menu FAB expandido |
+| Criar | `supabase/functions/finance-categorize/index.ts` | Edge function que recebe descrição + contexto do negócio (categorias, fornecedores, funcionários) e retorna categorização via IA (Gemini Flash) |
+| Modificar | `src/hooks/useCashClosing.ts` | Na integração financeira (linhas 406-418), chamar a IA para categorizar cada despesa antes de inserir, atribuindo `category_id` e `employee_id` |
+| Modificar | `src/components/finance/ReceiptOCRSheet.tsx` | Usar a mesma edge function para enriquecer as sugestões do OCR com match exato de IDs de categoria/fornecedor/funcionário |
+| Criar | `src/hooks/useFinanceCategorize.ts` | Hook reutilizável que chama a edge function, faz cache local de mapeamentos já conhecidos (descrição→categoria) para evitar chamadas repetidas |
 
-### Detalhes Técnicos
+### Edge Function `finance-categorize`
 
-**Web Share Target (manifest)**:
+Recebe:
 ```json
-"share_target": {
-  "action": "/share-receipt",
-  "method": "POST",
-  "enctype": "multipart/form-data",
-  "params": {
-    "files": [{ "name": "receipt", "accept": ["image/*"] }]
-  }
+{
+  "descriptions": ["Rafael", "Moto", "Julia", "Gabriel"],
+  "categories": [{ "id": "...", "name": "Folha de Pagamento", "subcategories": [...] }, ...],
+  "suppliers": [{ "id": "...", "name": "Fornecedor X" }],
+  "employees": [{ "id": "...", "name": "Rafael Silva" }]
 }
 ```
 
-**Service Worker**: Intercepta o POST em `/share-receipt`, salva a imagem no Cache Storage e redireciona para `/finance?receipt=shared`. O React lê do cache ao montar.
+Retorna:
+```json
+{
+  "results": [
+    { "description": "Rafael", "category_id": "...", "employee_id": "...", "confidence": 0.95 },
+    { "description": "Moto", "category_id": "...", "supplier_id": null, "confidence": 0.7, "question": "Moto é um gasto com transporte ou pagamento de motoboy?" }
+  ]
+}
+```
 
-**Edge Function `receipt-ocr`**: Usa `google/gemini-2.5-flash` via Lovable AI (sem API key) com tool calling para extrair JSON estruturado: `amount`, `date`, `description`, `suggested_type`, `suggested_category_name`.
+- Usa `google/gemini-2.5-flash` com tool calling
+- O prompt inclui todo o contexto do negócio (categorias, subcategorias, fornecedores, funcionários)
+- Faz batch (múltiplas descrições de uma vez) para otimizar chamadas
+- Quando confiança é baixa, retorna uma `question` para o usuário confirmar
 
-**ReceiptOCRSheet**: 
-- Etapa 1: Input file (câmera/galeria) + loading animado
-- Etapa 2: Card de confirmação com valor, descrição, data, tipo, categoria, conta — tudo editável inline
-- Botão "Lançar" cria a transação via `addTransaction` existente
-- `is_paid = true` sempre (é comprovante)
+### Fluxo no Fechamento de Caixa
 
-**FAB expandido**: Novo quarto botão "Comprovante" com ícone `Camera` ao lado de Receita/Despesa/Transferência.
+1. Ao aprovar o fechamento, antes de inserir as despesas, chama `finance-categorize` com todas as descrições das despesas + nomes que parecem funcionários
+2. IA identifica: "Rafael" → funcionário Rafael → categoria "Folha de Pagamento > Salários"; "Moto" → categoria "Taxas Operacionais > App Delivery"
+3. Transações são inseridas já categorizadas
+4. Se houver dúvidas da IA, exibe um dialog rápido de confirmação antes de finalizar
+
+### Fluxo no Receipt OCR
+
+O `ReceiptOCRSheet` já sugere categoria por nome. Com a nova function, faz match exato com IDs reais das categorias/fornecedores do usuário, eliminando o fuzzy matching atual.
+
+### Cache Inteligente
+
+O hook `useFinanceCategorize` mantém um mapa local `Map<string, CategorizeResult>` que persiste no `localStorage` por sessão. Descrições já categorizadas não chamam a IA novamente, tornando o sistema progressivamente mais rápido.
+
+### Detalhes Técnicos
+
+- **Modelo**: `google/gemini-2.5-flash` (rápido, barato, bom para classificação)
+- **Batch**: Até 20 descrições por chamada para reduzir latência
+- **Fallback**: Se a IA falhar, mantém `category_id: null` (comportamento atual) sem bloquear o fluxo
+- **Segurança**: JWT validado na edge function, dados do usuário isolados
 
