@@ -51,7 +51,7 @@ export function TimeTracking() {
       {/* Employee: Send Certificate */}
       {!isAdmin && (
         <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => setShowCertificateSheet(true)}>
-          <AppIcon name="FileHeart" size={16} className="mr-2" />
+          <AppIcon name="clinical_notes" size={16} className="mr-2" />
           Enviar Atestado
         </Button>
       )}
@@ -77,7 +77,7 @@ export function TimeTracking() {
               className="flex-1 rounded-xl h-11 relative"
               onClick={() => setShowCertificateList(true)}
             >
-              <AppIcon name="FileHeart" size={16} className="mr-2" />
+              <AppIcon name="clinical_notes" size={16} className="mr-2" />
               Atestados
               {pendingCerts.length > 0 && (
                 <Badge className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 text-[10px]" variant="destructive">
@@ -1004,7 +1004,7 @@ function CertificateListView({
   if (certificates.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-10">
-        <AppIcon name="FileHeart" size={28} className="mx-auto mb-2 opacity-40" />
+        <AppIcon name="clinical_notes" size={32} className="mx-auto mb-2 opacity-40" />
         <p className="text-sm">Nenhum atestado registrado</p>
       </div>
     );
@@ -1037,7 +1037,7 @@ function CertificateListView({
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs text-primary hover:underline"
             >
-              <AppIcon name="Image" size={14} />
+              <AppIcon name="image" size={14} />
               Ver documento
             </a>
           )}
