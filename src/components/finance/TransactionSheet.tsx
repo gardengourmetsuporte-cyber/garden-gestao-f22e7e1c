@@ -253,9 +253,11 @@ export function TransactionSheet({
   };
 
   const handleSave = async () => {
+    console.log('[TransactionSheet] handleSave called', { description, amount, isLoading, editingTransaction: !!editingTransaction, isRecurring: editingTransaction?.is_recurring, installmentGroupId: editingTransaction?.installment_group_id });
     const numAmount = getNumericAmount();
     const hasErrors = { description: !description.trim(), amount: !numAmount || numAmount <= 0 };
     if (hasErrors.description || hasErrors.amount) {
+      console.log('[TransactionSheet] validation failed', hasErrors);
       setValidationErrors(hasErrors);
       toast.error('Preencha a descrição e o valor');
       return;
