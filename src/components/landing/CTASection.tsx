@@ -24,7 +24,7 @@ export function CTASection() {
 
           <div className="relative z-10">
             <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mx-auto mb-8 shadow-lg" style={{ boxShadow: '0 0 60px hsl(156 72% 40% / 0.2)' }}>
-              <img src={logoImg} alt="Garden" className="w-16 h-16 object-contain" />
+              <img src={logoImg} alt="Garden" className="w-[85%] h-[85%] object-contain" />
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight font-display">
