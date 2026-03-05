@@ -100,16 +100,13 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
         className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
         style={{
           paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
-          background: 'linear-gradient(to bottom, #050a05 0px, #102a1d 280px, hsl(var(--background)) 280px)',
+          background: 'hsl(var(--background))',
         }}
       >
         <div className="overflow-y-auto h-full">
-          {/* Dark emerald gradient header area */}
+          {/* Header area */}
           <div
             className="relative px-4 pt-[calc(env(safe-area-inset-top,12px)+12px)] pb-6 space-y-3"
-            style={{
-              background: 'linear-gradient(135deg, #050a05 0%, #0a1a12 30%, #102a1d 70%, #050a05 100%)',
-            }}
           >
             {/* Theme toggle + Close button */}
             <div className="absolute top-[calc(env(safe-area-inset-top,12px)+12px)] right-4 flex items-center gap-1.5 z-10">
@@ -193,7 +190,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
           </div>
 
           {/* Module grid — adaptive cards */}
-          <div className="px-4 pt-5 pb-8 space-y-3 bg-background -mt-3 relative z-10">
+          <div className="px-4 pt-5 pb-8 space-y-3 relative z-10">
             {groupedNav.map(group => {
               const count = group.items.length;
               const useCols3 = count >= 3 && count !== 4;
