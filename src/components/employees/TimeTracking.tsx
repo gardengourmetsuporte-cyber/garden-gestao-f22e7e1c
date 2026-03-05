@@ -578,6 +578,7 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
   const extractDateRange = (sheet: XLSX.WorkSheet): { year: number; month: number } | null => {
     const range = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false }) as string[][];
     for (const row of range.slice(0, 5)) {
+      if (!row) continue;
       for (const cell of row) {
         if (!cell) continue;
         const match = String(cell).match(/(\d{2})-(\d{2})-(\d{4})/);
@@ -607,10 +608,11 @@ function ImportTimeRecordsForm({ unitId, onDone }: { unitId: string; onDone: () 
     let dayHeaderRow: number[] = [];
 
     for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
-      const row = rows[rowIdx];
-      if (!row || row.length === 0) continue;
+      const rawRow = rows[rowIdx];
+      if (!rawRow || rawRow.length === 0) continue;
 
-      const rowStr = row.map(c => String(c ?? '').trim());
+      // Use Array.from to handle sparse arrays from XLSX
+      const rowStr = Array.from({ length: rawRow.length }, (_, i) => String(rawRow[i] ?? '').trim());
 
       // Detect employee name row: has "Nome:" followed by name
       const nomeIdx = rowStr.findIndex(c => c.toLowerCase().includes('nome:'));
