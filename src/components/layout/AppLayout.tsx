@@ -172,9 +172,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="active:scale-95 transition-transform relative"
+                  className="active:scale-95 transition-transform"
                 >
-                  <img alt="Garden" className="h-10 object-contain" style={{ mixBlendMode: 'screen' }} src={gardenText} />
+                  <img alt="Garden" className="h-10 object-contain" style={{ mixBlendMode: 'screen' }} src={gardenIcon} />
                 </button>
               ) : (
                 <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
