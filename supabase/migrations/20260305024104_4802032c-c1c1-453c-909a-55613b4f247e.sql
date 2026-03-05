@@ -1,0 +1,1 @@
+ALTER TABLE public.payment_method_settings ADD COLUMN account_id uuid REFERENCES public.finance_accounts(id) ON DELETE SET NULL DEFAULT NULL;

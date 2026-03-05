@@ -1,12 +1,15 @@
- import { useState } from 'react';
- import { usePaymentSettings, PaymentMethodSetting } from '@/hooks/usePaymentSettings';
- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
- import { Input } from '@/components/ui/input';
- import { Label } from '@/components/ui/label';
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
- import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+import { usePaymentSettings, PaymentMethodSetting } from '@/hooks/usePaymentSettings';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
- import { AppIcon } from '@/components/ui/app-icon';
+import { AppIcon } from '@/components/ui/app-icon';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
  
  const ICON_MAP: Record<string, string> = {
    cash_amount: 'Banknote',
@@ -36,35 +39,40 @@ import { Switch } from '@/components/ui/switch';
    { value: 6, label: 'Sábado' },
  ];
  
- interface PaymentCardProps {
-   setting: PaymentMethodSetting;
-   onSave: (id: string, updates: Partial<PaymentMethodSetting>) => Promise<boolean>;
- }
- 
- function PaymentCard({ setting, onSave }: PaymentCardProps) {
-   const [localSetting, setLocalSetting] = useState(setting);
-   const [isSaving, setIsSaving] = useState(false);
-   const iconName = ICON_MAP[setting.method_key] || 'Banknote';
-   const color = COLORS[setting.method_key] || '#6366f1';
- 
-   const handleSave = async () => {
-     setIsSaving(true);
-     await onSave(setting.id, {
-       settlement_type: localSetting.settlement_type,
-       settlement_days: localSetting.settlement_days,
-       settlement_day_of_week: localSetting.settlement_day_of_week,
-       fee_percentage: localSetting.fee_percentage,
-      create_transaction: localSetting.create_transaction,
-     });
-     setIsSaving(false);
-   };
- 
-   const hasChanges = 
-     localSetting.settlement_type !== setting.settlement_type ||
-     localSetting.settlement_days !== setting.settlement_days ||
-     localSetting.settlement_day_of_week !== setting.settlement_day_of_week ||
-    localSetting.fee_percentage !== setting.fee_percentage ||
-    localSetting.create_transaction !== setting.create_transaction;
+interface FinanceAccountMin { id: string; name: string; type: string; }
+
+interface PaymentCardProps {
+  setting: PaymentMethodSetting;
+  onSave: (id: string, updates: Partial<PaymentMethodSetting>) => Promise<boolean>;
+  accounts: FinanceAccountMin[];
+}
+
+function PaymentCard({ setting, onSave, accounts }: PaymentCardProps) {
+  const [localSetting, setLocalSetting] = useState(setting);
+  const [isSaving, setIsSaving] = useState(false);
+  const iconName = ICON_MAP[setting.method_key] || 'Banknote';
+  const color = COLORS[setting.method_key] || '#6366f1';
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    await onSave(setting.id, {
+      settlement_type: localSetting.settlement_type,
+      settlement_days: localSetting.settlement_days,
+      settlement_day_of_week: localSetting.settlement_day_of_week,
+      fee_percentage: localSetting.fee_percentage,
+     create_transaction: localSetting.create_transaction,
+     account_id: localSetting.account_id,
+    });
+    setIsSaving(false);
+  };
+
+  const hasChanges = 
+    localSetting.settlement_type !== setting.settlement_type ||
+    localSetting.settlement_days !== setting.settlement_days ||
+    localSetting.settlement_day_of_week !== setting.settlement_day_of_week ||
+   localSetting.fee_percentage !== setting.fee_percentage ||
+   localSetting.create_transaction !== setting.create_transaction ||
+   localSetting.account_id !== setting.account_id;
  
    return (
      <Card className="relative overflow-hidden">
@@ -142,6 +150,25 @@ import { Switch } from '@/components/ui/switch';
            )}
          </div>
  
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Conta destino</Label>
+          <Select
+            value={localSetting.account_id || '__auto__'}
+            onValueChange={(v) => setLocalSetting(prev => ({ ...prev, account_id: v === '__auto__' ? null : v }))}
+          >
+            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__auto__">Automático</SelectItem>
+              {accounts.map(acc => (
+                <SelectItem key={acc.id} value={acc.id}>{acc.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            {localSetting.account_id ? '' : setting.method_key === 'cash_amount' ? 'Padrão: Carteira' : 'Padrão: Conta bancária'}
+          </p>
+        </div>
+
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="space-y-0.5">
             <Label className="text-sm">Lançar no financeiro</Label>
@@ -162,31 +189,44 @@ import { Switch } from '@/components/ui/switch';
    );
  }
  
- export function PaymentMethodSettings() {
-   const { settings, isLoading, updateSetting } = usePaymentSettings();
- 
-   if (isLoading) {
-     return (
-       <div className="flex items-center justify-center py-12">
-         <AppIcon name="progress_activity" size={32} className="animate-spin text-muted-foreground" />
-       </div>
-     );
-   }
- 
-   return (
-     <div className="space-y-4">
-       <div className="mb-4">
-         <h2 className="text-lg font-semibold">Meios de Pagamento</h2>
-         <p className="text-sm text-muted-foreground">
-           Configure quando cada meio de pagamento cai na conta e as taxas aplicadas
-         </p>
-       </div>
- 
-       <div className="grid gap-4 sm:grid-cols-2">
-         {settings.map(setting => (
-           <PaymentCard key={setting.id} setting={setting} onSave={updateSetting} />
-         ))}
-       </div>
-     </div>
-   );
- }
+export function PaymentMethodSettings() {
+  const { settings, isLoading, updateSetting } = usePaymentSettings();
+  const { user } = useAuth();
+  const { activeUnitId } = useUnit();
+  const [accounts, setAccounts] = useState<FinanceAccountMin[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('finance_accounts')
+      .select('id, name, type')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .then(({ data }) => setAccounts((data || []) as FinanceAccountMin[]));
+  }, [user]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <AppIcon name="progress_activity" size={32} className="animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Meios de Pagamento</h2>
+        <p className="text-sm text-muted-foreground">
+          Configure quando cada meio de pagamento cai na conta e as taxas aplicadas
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {settings.map(setting => (
+          <PaymentCard key={setting.id} setting={setting} onSave={updateSetting} accounts={accounts} />
+        ))}
+      </div>
+    </div>
+  );
+}
