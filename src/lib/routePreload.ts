@@ -15,9 +15,8 @@ const routeImporters: Record<string, RouteImporter> = {
   '/marketing': () => import('@/pages/Marketing'),
   '/copilot': () => import('@/pages/Copilot'),
   '/whatsapp': () => import('@/pages/WhatsApp'),
-  '/cardapio': () => import('@/pages/MenuAdmin'),
-  '/tablet-admin': () => import('@/pages/TabletAdmin'),
-  '/gamification': () => import('@/pages/Gamification'),
+  '/cardapio': () => import('@/pages/CardapioHub'),
+  '/personal-finance': () => import('@/pages/PersonalFinance'),
   '/ranking': () => import('@/pages/Ranking'),
   
   '/plans': () => import('@/pages/Plans'),

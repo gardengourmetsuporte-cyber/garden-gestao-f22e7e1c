@@ -132,6 +132,9 @@ export const ALL_MODULES: ModuleDef[] = [
     key: 'ranking', label: 'Ranking', icon: 'Trophy', route: '/ranking', routes: ['/ranking'], group: 'Pessoas',
   },
   {
+    key: 'personal-finance', label: 'Finanças Pessoais', icon: 'Wallet', route: '/personal-finance', routes: ['/personal-finance'], group: 'Gestão',
+  },
+  {
     key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Premium',
     children: [
       { key: 'marketing.calendar', label: 'Calendário de posts', icon: 'Calendar' },
