@@ -5,8 +5,6 @@ import App from "./App.tsx";
 import "./index.css";
 
 // Force update: when a new service worker is installed, show update banner
-const SW_CONTROLLER_RELOAD_TS_KEY = 'sw_controller_reload_ts';
-
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready
     .then((reg) => {
@@ -25,16 +23,15 @@ if ('serviceWorker' in navigator) {
         }
       });
 
-      const canReloadNow = () => {
-        const lastReloadTs = Number(sessionStorage.getItem(SW_CONTROLLER_RELOAD_TS_KEY) || '0');
-        return Date.now() - lastReloadTs > 15000;
-      };
+      // Flag: only reload when user explicitly clicks Update
+      let userRequestedUpdate = false;
 
-      const doReload = () => {
-        if (!canReloadNow()) return;
-        sessionStorage.setItem(SW_CONTROLLER_RELOAD_TS_KEY, String(Date.now()));
-        window.location.reload();
-      };
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (userRequestedUpdate) {
+          window.location.reload();
+        }
+        // If user didn't request, do NOT reload — prevents random screen jumps
+      });
 
       const showUpdateBanner = (waitingSW: ServiceWorker) => {
         // Remove any existing banner
@@ -73,15 +70,13 @@ if ('serviceWorker' in navigator) {
         document.body.appendChild(banner);
 
         document.getElementById('sw-update-btn')!.onclick = () => {
+          userRequestedUpdate = true;
           banner.remove();
-          // Try SKIP_WAITING then force reload
           waitingSW.postMessage({ type: 'SKIP_WAITING' });
-          // Listen for controller change with timeout fallback
-          const timeout = setTimeout(() => doReload(), 2000);
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            clearTimeout(timeout);
-            doReload();
-          }, { once: true });
+          // Fallback: if controllerchange doesn't fire in 3s, force reload
+          setTimeout(() => {
+            if (userRequestedUpdate) window.location.reload();
+          }, 3000);
         };
 
         document.getElementById('sw-update-dismiss')!.onclick = () => {
