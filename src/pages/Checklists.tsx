@@ -524,6 +524,28 @@ export default function ChecklistsPage() {
               );
             })()}
 
+            {/* Reminder icon — admin only, outside cards */}
+            {!settingsMode && isAdmin && checklistType !== 'bonus' && (() => {
+              const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+              if (progress.percent === 100 || progress.total === 0) return null;
+              return (
+                <div className="flex justify-end -mb-3">
+                  <button
+                    onClick={handleSendReminder}
+                    disabled={sendingReminder}
+                    title="Lembrar equipe de completar o checklist"
+                    className={cn(
+                      "w-9 h-9 rounded-full flex items-center justify-center transition-all",
+                      "bg-amber-500/10 hover:bg-amber-500/20 active:scale-95",
+                      sendingReminder && "opacity-60 pointer-events-none"
+                    )}
+                  >
+                    <AppIcon name="BellRing" size={18} className={cn("text-amber-500 dark:text-amber-400", sendingReminder && "animate-bounce")} />
+                  </button>
+                </div>
+              );
+            })()}
+
             {/* Settings mode header banner */}
             {settingsMode && (
               <div className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 border border-primary/20">
@@ -719,26 +741,6 @@ export default function ChecklistsPage() {
                         {getTypeProgress.fechamento.percent}%
                       </span>
             </div>
-
-            {/* Reminder Button — admin only, when checklist not complete */}
-            {!settingsMode && isAdmin && checklistType !== 'bonus' && (() => {
-              const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
-              if (progress.percent === 100 || progress.total === 0) return null;
-              return (
-                <button
-                  onClick={handleSendReminder}
-                  disabled={sendingReminder}
-                  className={cn(
-                    "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all",
-                    "bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-                    sendingReminder && "opacity-60 pointer-events-none"
-                  )}
-                >
-                  <AppIcon name="Bell" size={16} className={sendingReminder ? "animate-bounce" : ""} />
-                  {sendingReminder ? 'Enviando...' : 'Lembrar equipe de completar'}
-                </button>
-              );
-            })()}
                   </div>
                 )}
                 {checklistType === 'fechamento' && getTypeProgress.fechamento.percent < 100 && !settingsMode && (
