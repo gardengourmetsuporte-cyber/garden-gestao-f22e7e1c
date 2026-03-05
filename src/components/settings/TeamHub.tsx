@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { useAccessLevels, AccessLevel } from '@/hooks/useAccessLevels';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -562,10 +563,13 @@ function LevelsTab() {
     staleTime: 60 * 1000,
   });
 
-  const openCreate = () => {
+  const openCreate = useCallback(() => {
     setEditingLevel(null); setIsCreating(true); setFormName(''); setFormDescription(''); setFormModules([]);
     setExpandedModules(new Set());
-  };
+  }, []);
+
+  // Register FAB action
+  useFabAction({ icon: 'Plus', label: 'Criar nível', onClick: openCreate }, [openCreate]);
 
   const openEdit = (level: AccessLevel) => {
     setEditingLevel(level); setIsCreating(true); setFormName(level.name); setFormDescription(level.description || ''); setFormModules([...level.modules]);
@@ -662,12 +666,7 @@ function LevelsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">Crie níveis customizados para controlar o acesso a módulos específicos.</p>
-        <Button size="sm" onClick={openCreate} className="gap-1.5 shrink-0">
-          <AppIcon name="Plus" size={14} />Criar
-        </Button>
-      </div>
+      <p className="text-xs text-muted-foreground">Crie níveis customizados para controlar o acesso a módulos específicos.</p>
 
       {accessLevels.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
