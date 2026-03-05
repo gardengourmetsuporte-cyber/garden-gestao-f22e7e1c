@@ -17,34 +17,7 @@ import type { PlanTier } from '@/lib/plans';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { toast } from 'sonner';
 import { BottomBarTabPicker } from '@/components/settings/BottomBarTabPicker';
-
-interface NavItem {
-  icon: string;
-  customIcon?: string;
-  label: string;
-  href: string;
-  adminOnly?: boolean;
-  group: string;
-  groupLabel: string;
-}
-
-const navItems: NavItem[] = [
-  { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'UserSearch', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Users', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Gift', customIcon: '/icons/gift.png', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'BookOpen', label: 'Cardápio Digital', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-  { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
-];
+import { NAV_ITEMS, filterNavItems, groupNavItems } from '@/lib/navItems';
 
 interface MoreDrawerProps {
   open: boolean;
@@ -65,33 +38,16 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
   const hasAccessLevel = allowedModules !== null && allowedModules !== undefined;
 
   const filteredNavItems = useMemo(() => {
-    return navItems.filter(item => {
-      const moduleKey = getModuleKeyFromRoute(item.href);
-      if (isSuperAdmin) return true;
-      if (hasAccessLevel) {
-        if (moduleKey === 'dashboard') return true;
-        if (moduleKey === 'settings') return true; // Always accessible for profile editing
-        if (moduleKey && !allowedModules!.includes(moduleKey)) return false;
-        if (!moduleKey && item.adminOnly && !isAdmin) return false;
-        return true;
-      }
-      if (item.group === 'premium') return isAdmin;
-      if (item.adminOnly && !isAdmin) return false;
-      return true;
+    return filterNavItems(NAV_ITEMS, {
+      isSuperAdmin,
+      isAdmin,
+      hasAccessLevel,
+      allowedModules,
+      getModuleKeyFromRoute,
     });
   }, [isSuperAdmin, isAdmin, hasAccessLevel, allowedModules]);
 
-  const groupedNav: { label: string; items: typeof filteredNavItems }[] = [];
-  const seenGroups = new Set<string>();
-  filteredNavItems.forEach(item => {
-    if (!seenGroups.has(item.group)) {
-      seenGroups.add(item.group);
-      groupedNav.push({
-        label: item.groupLabel,
-        items: filteredNavItems.filter(i => i.group === item.group),
-      });
-    }
-  });
+  const groupedNav = useMemo(() => groupNavItems(filteredNavItems), [filteredNavItems]);
 
   const isModuleLocked = (href: string): boolean => {
     const moduleKey = getModuleKeyFromRoute(href);

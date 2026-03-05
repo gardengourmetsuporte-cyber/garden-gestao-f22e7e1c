@@ -9,6 +9,7 @@ import { UnitProvider, useUnit } from "@/contexts/UnitContext";
 import { PageLoader } from "@/components/PageLoader";
 import { useUserModules } from "@/hooks/useAccessLevels";
 import { getModuleKeyFromRoute } from "@/lib/modules";
+import { MODULE_REQUIRED_PLAN, planSatisfies } from "@/lib/plans";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
@@ -108,7 +109,7 @@ function RouteErrorBoundary({ children }: { children: React.ReactNode }) {
 }
 
 function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNode; skipOnboarding?: boolean }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, plan } = useAuth();
   const location = useLocation();
   const { hasAccess, isLoading: modulesLoading } = useUserModules();
   const { units, isLoading: unitsLoading } = useUnit();
@@ -122,7 +123,6 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
   }
 
   // Do not block forever when auto-provision/recovery cannot attach a unit.
-  // Let downstream screens handle empty-unit states instead of infinite loader.
   if (!skipOnboarding && units.length === 0) {
     console.warn('[ProtectedRoute] No units available after load; continuing without blocking');
   }
@@ -132,6 +132,14 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
     const moduleKey = getModuleKeyFromRoute(location.pathname);
     if (moduleKey && !hasAccess(moduleKey)) {
       return <Navigate to="/" replace />;
+    }
+
+    // Check plan-based access (redirect to /plans if module requires higher plan)
+    if (moduleKey) {
+      const requiredPlan = MODULE_REQUIRED_PLAN[moduleKey];
+      if (requiredPlan && !planSatisfies(plan, requiredPlan)) {
+        return <Navigate to="/plans" replace />;
+      }
     }
   }
 
