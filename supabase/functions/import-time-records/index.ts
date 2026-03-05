@@ -74,9 +74,24 @@ Deno.serve(async (req) => {
     // Get all employees for name matching (including shift info)
     const { data: employees } = await supabase
       .from("employees")
-      .select("user_id, full_name, shift_start, shift_end")
+      .select("id, user_id, full_name, shift_start, shift_end")
       .eq("unit_id", unit_id)
       .eq("is_active", true);
+
+    // Load per-day schedules for all employees
+    const empIds = (employees || []).map((e: any) => e.id).filter(Boolean);
+    const { data: daySchedules } = empIds.length > 0
+      ? await supabase.from("employee_schedules").select("*").in("employee_id", empIds)
+      : { data: [] };
+
+    // Build employee_id → day_of_week → schedule map
+    const dayScheduleMap = new Map<string, Map<number, { start: string; end: string; is_day_off: boolean }>>();
+    (daySchedules || []).forEach((ds: any) => {
+      if (!dayScheduleMap.has(ds.employee_id)) dayScheduleMap.set(ds.employee_id, new Map());
+      dayScheduleMap.get(ds.employee_id)!.set(ds.day_of_week, {
+        start: ds.shift_start, end: ds.shift_end, is_day_off: ds.is_day_off,
+      });
+    });
 
     const { data: profiles } = await supabase
       .from("profiles")
@@ -99,8 +114,9 @@ Deno.serve(async (req) => {
     const nameMap = new Map<string, string>();
     const allNames: Array<{ normalized: string; userId: string }> = [];
     const shiftMap = new Map<string, { start: string; end: string }>();
+    const empIdByUserId = new Map<string, string>();
 
-    const registerName = (rawName: string | null | undefined, userId: string | null | undefined, shiftStart?: string, shiftEnd?: string) => {
+    const registerName = (rawName: string | null | undefined, userId: string | null | undefined, empId?: string, shiftStart?: string, shiftEnd?: string) => {
       if (!rawName || !userId) return;
       const normalized = normalizeName(rawName);
       if (!normalized) return;
@@ -109,9 +125,10 @@ Deno.serve(async (req) => {
       if (!shiftMap.has(userId)) {
         shiftMap.set(userId, { start: shiftStart || "08:00", end: shiftEnd || "17:00" });
       }
+      if (empId) empIdByUserId.set(userId, empId);
     };
 
-    (employees || []).forEach((e: any) => registerName(e.full_name, e.user_id, e.shift_start, e.shift_end));
+    (employees || []).forEach((e: any) => registerName(e.full_name, e.user_id, e.id, e.shift_start, e.shift_end));
     (profiles || []).forEach((p: any) => registerName(p.full_name, p.user_id));
 
     const findBestUserId = (employeeName: string) => {
@@ -193,8 +210,18 @@ Deno.serve(async (req) => {
       else if (check_in && check_out) dbStatus = "completed";
       else if (check_in) dbStatus = "checked_in";
 
-      // Use employee's configured shift or fallback to provided/default
-      const empShift = shiftMap.get(userId) || { start: "08:00", end: "17:00" };
+      // Use per-day schedule if available, else fallback to employee default
+      let empShift = shiftMap.get(userId) || { start: "08:00", end: "17:00" };
+      if (date) {
+        const dow = new Date(date + "T12:00:00").getDay();
+        const empId = empIdByUserId.get(userId);
+        if (empId && dayScheduleMap.has(empId)) {
+          const dayEntry = dayScheduleMap.get(empId)!.get(dow);
+          if (dayEntry && !dayEntry.is_day_off) {
+            empShift = { start: dayEntry.start, end: dayEntry.end };
+          }
+        }
+      }
 
       const row: any = {
         user_id: userId,

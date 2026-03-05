@@ -156,20 +156,34 @@ export function useTimeTracking() {
     return { lateMinutes, earlyMinutes, points };
   };
 
-  // Get employee shift for current user
+  // Get employee shift for current user (checks per-day schedule first)
   const getEmployeeShift = useCallback(async (): Promise<{ start: string; end: string }> => {
     if (!user || !activeUnitId) return { start: '08:00', end: '17:00' };
+    const todayDow = new Date().getDay(); // 0=Sun, 6=Sat
     try {
-      const { data } = await supabase
+      const { data: emp } = await supabase
         .from('employees')
-        .select('shift_start, shift_end')
+        .select('id, shift_start, shift_end')
         .eq('user_id', user.id)
         .eq('unit_id', activeUnitId)
         .is('deleted_at' as any, null)
         .maybeSingle();
-      if (data) {
-        return { start: (data as any).shift_start || '08:00', end: (data as any).shift_end || '17:00' };
+      if (!emp) return { start: '08:00', end: '17:00' };
+
+      // Check per-day schedule
+      const { data: daySchedule } = await supabase
+        .from('employee_schedules' as any)
+        .select('shift_start, shift_end, is_day_off')
+        .eq('employee_id', (emp as any).id)
+        .eq('day_of_week', todayDow)
+        .maybeSingle();
+
+      if (daySchedule && !(daySchedule as any).is_day_off) {
+        return { start: (daySchedule as any).shift_start || '08:00', end: (daySchedule as any).shift_end || '17:00' };
       }
+
+      // Fallback to default shift
+      return { start: (emp as any).shift_start || '08:00', end: (emp as any).shift_end || '17:00' };
     } catch { /* fallback */ }
     return { start: '08:00', end: '17:00' };
   }, [user, activeUnitId]);

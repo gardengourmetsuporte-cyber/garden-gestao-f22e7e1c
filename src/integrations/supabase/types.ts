@@ -1477,6 +1477,47 @@ export type Database = {
           },
         ]
       }
+      employee_schedules: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          employee_id: string
+          id: string
+          is_day_off: boolean
+          shift_end: string
+          shift_start: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          employee_id: string
+          id?: string
+          is_day_off?: boolean
+          shift_end?: string
+          shift_start?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          employee_id?: string
+          id?: string
+          is_day_off?: boolean
+          shift_end?: string
+          shift_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_schedules_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_warnings: {
         Row: {
           acknowledged_at: string | null
