@@ -1,5 +1,6 @@
 import gardenLogo from '@/assets/logo.png';
 import gardenIcon from '@/assets/garden-icon.png';
+import gardenLogoFull from '@/assets/garden-logo-full.png';
 import { ReactNode, useState, useMemo, useRef, useEffect } from 'react';
 import { PageLoader } from '@/components/PageLoader';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -174,7 +175,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 >
                   <div className="absolute inset-0 m-auto w-12 h-12 rounded-full header-icon-glow" />
                   <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center relative z-10 shadow-lg">
-                    <img alt="Garden Gestão" className="w-9 h-9 object-contain" src={gardenIcon} />
+                    <img alt="Garden Gestão" className="w-9 h-9 object-contain" src={gardenLogoFull} />
                   </div>
                 </button>
               ) : (
