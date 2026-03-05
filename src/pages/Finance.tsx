@@ -49,13 +49,15 @@ export default function Finance() {
     }
     if (receipt === 'shared') {
       setSearchParams({}, { replace: true });
-      // Try to load image from cache (shared via PWA Share Target)
+      // Try to load image or text from cache (shared via PWA Share Target)
       (async () => {
         try {
           const cache = await caches.open('shared-receipts');
-          const response = await cache.match('/shared-receipt-image');
-          if (response) {
-            const blob = await response.blob();
+          const imageResponse = await cache.match('/shared-receipt-image');
+          const textResponse = await cache.match('/shared-receipt-text');
+
+          if (imageResponse) {
+            const blob = await imageResponse.blob();
             const reader = new FileReader();
             reader.onloadend = () => {
               setReceiptInitialImage(reader.result as string);
@@ -63,8 +65,28 @@ export default function Finance() {
             };
             reader.readAsDataURL(blob);
             await cache.delete('/shared-receipt-image');
+            await cache.delete('/shared-receipt-text');
+          } else if (textResponse) {
+            // Bank shared text (e.g. Pix receipt details) — open transaction sheet with info
+            const text = await textResponse.text();
+            await cache.delete('/shared-receipt-text');
+            // Try to extract amount from text (common patterns: R$ 1.234,56 or 1234.56)
+            const amountMatch = text.match(/R\$\s*([\d.,]+)/i) || text.match(/([\d]+[.,]\d{2})/);
+            const amount = amountMatch ? parseFloat(amountMatch[1].replace(/\./g, '').replace(',', '.')) : undefined;
+            // Extract description from first meaningful line
+            const lines = text.split('\n').filter(l => l.trim());
+            const description = lines.find(l => !l.match(/^R\$/) && l.length > 3) || lines[0] || '';
+
+            setTransactionType('expense');
+            setEditingTransaction(null);
+            setTransactionSheetOpen(true);
+            if (amount || description) {
+              toast.info('Comprovante recebido', {
+                description: amount ? `Valor detectado: R$ ${amount.toFixed(2).replace('.', ',')}` : 'Dados extraídos do compartilhamento',
+              });
+            }
           } else {
-            // No cached image, just open the capture sheet
+            // No cached data, just open the capture sheet
             setReceiptSheetOpen(true);
           }
         } catch {
