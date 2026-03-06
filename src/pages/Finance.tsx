@@ -227,9 +227,9 @@ export default function Finance() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-32">
+      <div className="min-h-screen bg-background pb-32 lg:pb-12">
       {/* Desktop top tabs */}
-      <div className="hidden lg:flex items-center gap-1 px-6 py-2 border-b border-border/40 bg-card/50">
+      <div className="hidden lg:flex items-center gap-1 px-8 py-2 border-b border-border/40 bg-card/50 max-w-7xl mx-auto">
         {desktopTabs.map(tab => (
           <button
             key={tab.id}
@@ -252,7 +252,7 @@ export default function Finance() {
           </Button>
         </div>
       </div>
-      <div>
+      <div className="lg:max-w-7xl lg:mx-auto lg:px-8">
         {activeTab === 'home' && (
           <FinanceHome
             selectedMonth={selectedMonth}
