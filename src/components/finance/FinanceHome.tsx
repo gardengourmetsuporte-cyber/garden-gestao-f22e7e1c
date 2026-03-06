@@ -86,7 +86,7 @@ export function FinanceHome({
 
           {/* Balance */}
           <p className="text-[2rem] font-extrabold tracking-tight leading-tight" style={{ color: totalBalance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
-            {formatCurrency(totalBalance)}
+            {fmtCurrency(totalBalance)}
           </p>
 
           {/* Sub-stats row */}
@@ -95,7 +95,7 @@ export function FinanceHome({
               <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Lucro líquido</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold" style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
-                  {formatCurrency(Math.abs(profit))}
+                  {fmtCurrency(Math.abs(profit))}
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold px-1 py-0.5 rounded",
@@ -111,7 +111,7 @@ export function FinanceHome({
               <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Despesas</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold" style={{ color: 'var(--gp-negative)' }}>
-                  {formatCurrency(monthStats.totalExpense)}
+                  {fmtCurrency(monthStats.totalExpense)}
                 </span>
               </div>
             </div>
