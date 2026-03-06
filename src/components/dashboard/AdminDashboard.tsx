@@ -105,7 +105,7 @@ export function AdminDashboard() {
           case 'finance-chart':
             return hasAccess('finance') ? (
               <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
-                <FinanceChartWidget />
+                <LazyWidget><FinanceChartWidget /></LazyWidget>
               </DashboardSection>
             ) : null;
 
