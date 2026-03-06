@@ -49,6 +49,9 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'BookOpen', label: 'Cardápio Digital', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
   { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Premium' },
+
+  // ── Sistema ──
+  { icon: 'Settings', label: 'Configurações', href: '/settings', group: 'sistema', groupLabel: 'Sistema' },
 ];
 
 /**
