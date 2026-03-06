@@ -157,14 +157,24 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm active:scale-90 transition-transform"
+                  className="flex items-center gap-2 h-8 rounded-lg overflow-hidden bg-white shrink-0 shadow-sm active:scale-95 transition-all duration-300 ease-out"
+                  style={{ 
+                    paddingLeft: isScrolled ? 0 : '0.375rem',
+                    paddingRight: isScrolled ? 0 : '0.5rem',
+                    width: isScrolled ? '2rem' : 'auto',
+                  }}
                 >
-                  <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                  <img alt="Garden Gestão" className="w-6 h-6 object-contain shrink-0 transition-all duration-300" src={gardenLogo} />
+                  <span
+                    className="text-[11px] font-bold text-gray-800 whitespace-nowrap transition-all duration-300 ease-out overflow-hidden"
+                    style={{
+                      maxWidth: isScrolled ? 0 : '7rem',
+                      opacity: isScrolled ? 0 : 1,
+                    }}
+                  >
+                    Garden Gestão
+                  </span>
                 </button>
-              ) : (
-                <button
-                  onClick={() => navigate('/')}
-                  className="p-2 rounded-lg hover:bg-muted/50 transition-all active:scale-90"
                 >
                   <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
                 </button>
