@@ -44,27 +44,66 @@ async function geocodeAddress(
   city: string,
   unitName: string,
 ): Promise<{ lat: number; lng: number } | null> {
-  const fallbackCity = city || unitName || '';
+  const normalizedCity = city?.trim().length >= 4 ? city.trim() : unitName.trim();
   const queries = [
-    `${address}, ${neighborhood}, ${fallbackCity}, SP, Brasil`,
-    `${address}, ${fallbackCity}, SP, Brasil`,
-    `${address}, ${unitName}, Brasil`,
-    `${neighborhood}, ${fallbackCity}, SP, Brasil`,
+    `${address}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
+    `${address}, ${normalizedCity}, SP, Brasil`,
+    `${address}, ${normalizedCity}, Brasil`,
+    `${address}, Brasil`,
   ];
+
+  let anchor: { lat: number; lng: number } | null = null;
+  if (normalizedCity) {
+    try {
+      const anchorParams = new URLSearchParams({
+        q: `${normalizedCity}, SP, Brasil`,
+        format: 'json',
+        limit: '1',
+        countrycodes: 'br',
+      });
+      const anchorRes = await fetch(`https://nominatim.openstreetmap.org/search?${anchorParams.toString()}`, {
+        headers: { 'User-Agent': 'GardenGestao/1.0' },
+      });
+      const anchorResults = await anchorRes.json();
+      if (anchorResults?.[0]) {
+        anchor = {
+          lat: parseFloat(anchorResults[0].lat),
+          lng: parseFloat(anchorResults[0].lon),
+        };
+      }
+    } catch (error) {
+      console.warn('Falha ao obter âncora da cidade', error);
+    }
+  }
 
   for (const q of queries) {
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=br`,
-        { headers: { 'User-Agent': 'GardenGestao/1.0' } },
-      );
+      const params = new URLSearchParams({
+        q,
+        format: 'json',
+        limit: '1',
+        countrycodes: 'br',
+      });
+
+      if (anchor) {
+        params.set('viewbox', `${anchor.lng - 0.7},${anchor.lat + 0.7},${anchor.lng + 0.7},${anchor.lat - 0.7}`);
+        params.set('bounded', '1');
+      }
+
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+        headers: { 'User-Agent': 'GardenGestao/1.0' },
+      });
       const results = await res.json();
       if (results?.[0]) {
         return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
       }
-    } catch {}
-    await new Promise(r => setTimeout(r, 1100));
+    } catch (error) {
+      console.warn('Falha ao geocodificar endereço', error);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1100));
   }
+
   return null;
 }
 

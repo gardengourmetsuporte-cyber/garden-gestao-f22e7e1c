@@ -55,7 +55,7 @@ export interface NeighborhoodGroup {
 
 export function useDeliveries() {
   const { user } = useAuth();
-  const { activeUnitId } = useUnit();
+  const { activeUnitId, activeUnit } = useUnit();
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<DeliveryStatus | 'all'>('all');
