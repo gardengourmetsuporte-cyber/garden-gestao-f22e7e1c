@@ -121,19 +121,18 @@ export function BottomTabBar() {
       <MoreDrawer open={moreOpen} onOpenChange={setMoreOpen} />
       <QuickActionSheet open={quickOpen} onOpenChange={setQuickOpen} />
 
-      <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
-      >
-        {/* Subtle top separator */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-border/10" />
-
+      <nav className="fixed bottom-0 left-0 right-0 lg:hidden z-50">
         {/* Bar background */}
         <div
           className="relative bg-background"
-          style={{
-            paddingBottom: 'env(safe-area-inset-bottom)',
-          }}
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
+          {/* Ambient glow line at top */}
+          <div className="absolute top-0 left-0 right-0 h-px">
+            <div className="absolute inset-0 bg-border/8" />
+            <div className="absolute left-1/2 -translate-x-1/2 w-32 h-px bg-primary/20 blur-sm" />
+          </div>
+
           {/* FAB floating above the notch */}
           <div className="absolute left-1/2 -translate-x-1/2 -top-[22px] z-20">
             <div className="fab-cradle-ring">
@@ -148,12 +147,9 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200",
-                  "bg-primary hover:scale-[1.08] active:scale-[0.92]"
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center",
+                  "bg-primary hover:scale-[1.08] active:scale-[0.92] fab-button-glow"
                 )}
-                style={{
-                  boxShadow: '0 4px 16px hsl(var(--primary) / 0.35)',
-                }}
               >
                 <AppIcon
                   name={fabAction?.icon || 'Plus'}
@@ -164,7 +160,7 @@ export function BottomTabBar() {
             </div>
           </div>
 
-          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10 tabbar-notch-shell overflow-visible">
+          <div ref={containerRef} className="flex items-center h-[64px] max-w-lg mx-auto relative z-10 tabbar-notch-shell overflow-visible">
             {/* Left tabs */}
             {leftTabs.map(tab => (
               <TabButton
@@ -199,34 +195,14 @@ export function BottomTabBar() {
               <button
                 onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }}
                 aria-label="Configurações"
-                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
+                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative"
                 style={{ width: slotWidth }}
               >
                 <span className="material-symbols-rounded text-muted-foreground transition-colors" style={{ fontSize: 22 }}>settings</span>
                 <span className="text-[10px] font-normal text-muted-foreground">Config</span>
               </button>
             ) : (
-              <button
-                onClick={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }}
-                aria-label="Mais opções"
-                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative z-10"
-                style={{ width: slotWidth }}
-              >
-                <div
-                  className="relative"
-                  style={{
-                    transform: moreOpen ? 'scale(1.08)' : 'scale(1)',
-                    transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                >
-                  <div className={cn(
-                    "absolute -inset-x-2.5 -inset-y-1.5 rounded-2xl bg-primary/12 transition-all duration-300",
-                    moreOpen ? "opacity-100 scale-100" : "opacity-0 scale-75"
-                  )} />
-                  <AppIcon name="Menu" size={22} fill={moreOpen ? 1 : 0} weight={moreOpen ? 600 : 400} className={cn("relative z-10", moreOpen ? 'text-primary' : 'text-muted-foreground transition-colors')} />
-                </div>
-                <span className={cn("text-[10px]", moreOpen ? "font-semibold text-primary" : "font-normal text-muted-foreground")}>Mais</span>
-              </button>
+              <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
             )}
           </div>
         </div>
@@ -236,6 +212,50 @@ export function BottomTabBar() {
   );
 }
 
+/* ─── More Button ─── */
+function MoreButton({ moreOpen, slotWidth, onToggle }: { moreOpen: boolean; slotWidth: string; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label="Mais opções"
+      className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative"
+      style={{ width: slotWidth }}
+    >
+      {/* Bump effect for More when open */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 bottom-full pointer-events-none transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          moreOpen ? "w-14 h-3.5 opacity-100 duration-400" : "w-8 h-0 opacity-0 duration-200"
+        )}
+      >
+        <div className="w-full h-full bg-background rounded-t-[14px]" />
+      </div>
+
+      {/* Green dot */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          moreOpen ? "-top-1 opacity-100 scale-100 duration-400" : "top-2 opacity-0 scale-0 duration-200"
+        )}
+      >
+        <div className="w-[5px] h-[5px] rounded-full bg-primary tab-dot-glow" />
+      </div>
+
+      <div
+        className="relative"
+        style={{
+          transform: moreOpen ? 'scale(1.1) translateY(-1px)' : 'scale(1)',
+          transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        }}
+      >
+        <AppIcon name="Menu" size={22} fill={moreOpen ? 1 : 0} weight={moreOpen ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", moreOpen ? 'text-primary' : 'text-muted-foreground')} />
+      </div>
+      <span className={cn("text-[10px] transition-all duration-300", moreOpen ? "font-semibold text-primary" : "font-normal text-muted-foreground")}>{moreOpen ? 'Mais' : 'Mais'}</span>
+    </button>
+  );
+}
+
+/* ─── Tab Button ─── */
 const TabButton = forwardRef<
   HTMLButtonElement,
   {
@@ -268,7 +288,7 @@ const TabButton = forwardRef<
     } else {
       onClick();
     }
-    setTimeout(() => setBouncing(false), 160);
+    setTimeout(() => setBouncing(false), 180);
   };
 
   return (
@@ -296,45 +316,75 @@ const TabButton = forwardRef<
       )}
       style={{ width: slotWidth }}
     >
-      {/* Active bump — background surface rises behind icon */}
+      {/* Active bump — surface rises behind icon with smooth spring */}
       <div
         className={cn(
-          "absolute left-1/2 -translate-x-1/2 bottom-full w-12 transition-all duration-300 ease-out pointer-events-none",
-          active ? "h-3 opacity-100" : "h-0 opacity-0"
+          "absolute left-1/2 -translate-x-1/2 bottom-full pointer-events-none transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          active ? "w-14 h-3.5 opacity-100 duration-400" : "w-8 h-0 opacity-0 duration-200"
         )}
       >
-        <div className="w-full h-full bg-background rounded-t-2xl" />
+        <div className="w-full h-full bg-background rounded-t-[14px]" />
       </div>
 
-      {/* Green dot on top */}
+      {/* Green dot indicator with glow */}
       <div
         className={cn(
-          "absolute left-1/2 -translate-x-1/2 transition-all duration-300 ease-out",
-          active ? "-top-0.5 opacity-100 scale-100" : "top-1 opacity-0 scale-0"
+          "absolute left-1/2 -translate-x-1/2 transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          active ? "-top-1 opacity-100 scale-100 duration-400" : "top-2 opacity-0 scale-0 duration-200"
         )}
+        style={{ transitionDelay: active ? '50ms' : '0ms' }}
       >
-        <div className="w-[5px] h-[5px] rounded-full bg-primary" />
+        <div className="w-[5px] h-[5px] rounded-full bg-primary tab-dot-glow" />
       </div>
 
+      {/* Icon container */}
       <div
         className="relative"
         style={{
-          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.08)' : 'scale(1)'),
-          transition: bouncing ? 'transform 80ms cubic-bezier(0.2, 0, 0, 1)' : 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: bouncing
+            ? 'scale(0.82) translateY(1px)'
+            : active
+              ? 'scale(1.12) translateY(-2px)'
+              : 'scale(1)',
+          transition: bouncing
+            ? 'transform 100ms cubic-bezier(0.2, 0, 0, 1)'
+            : 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
+        {/* Soft ambient glow behind active icon */}
+        <div
+          className={cn(
+            "absolute inset-0 rounded-full transition-all duration-500",
+            active ? "opacity-100 scale-[2.2]" : "opacity-0 scale-100"
+          )}
+          style={{
+            background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
+          }}
+        />
         <AppIcon
           name={tab.icon}
           size={22}
           fill={active ? 1 : 0}
           weight={active ? 600 : 400}
-          className={cn("relative z-10", active ? 'text-primary' : '')}
+          className={cn(
+            "relative z-10 transition-colors duration-300",
+            active ? 'text-primary' : ''
+          )}
         />
         {locked && (
           <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2 z-10" style={{ color: 'hsl(45 90% 55%)' }} />
         )}
       </div>
-      <span className={cn("text-[10px]", active ? "font-semibold text-primary" : "font-normal")}>{tab.label}</span>
+
+      {/* Label with fade transition */}
+      <span
+        className={cn(
+          "text-[10px] transition-all duration-300",
+          active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal"
+        )}
+      >
+        {tab.label}
+      </span>
     </button>
   );
 });
