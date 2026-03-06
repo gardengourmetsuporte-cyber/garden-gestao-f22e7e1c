@@ -10,7 +10,7 @@ import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
-import { Truck, Clock, CheckCircle2, Package, MapPin, Filter } from 'lucide-react';
+import { Truck, Clock, CheckCircle2, Package, MapPin, Filter, ChevronDown } from 'lucide-react';
 
 const FILTERS: { key: DeliveryStatus | 'all'; label: string; icon: typeof Package }[] = [
   { key: 'all', label: 'Todas', icon: Package },
@@ -193,27 +193,36 @@ function NeighborhoodGroup({
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
 }) {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="rounded-2xl border border-border/30 bg-card/50 overflow-hidden">
-      <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-border/20 bg-card/80">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2.5 px-3.5 py-2.5 w-full border-b border-border/20 bg-card/80 hover:bg-card transition-colors"
+      >
         <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
           <MapPin className="w-4 h-4 text-primary" />
         </div>
-        <span className="font-semibold text-[13px] flex-1 truncate">{neighborhood}</span>
+        <span className="font-semibold text-[13px] flex-1 truncate text-left">{neighborhood}</span>
         <Badge className="bg-primary/10 text-primary border-0 text-[10px] h-5 px-2 font-bold tabular-nums">
           {deliveries.length}
         </Badge>
-      </div>
-      <div className="p-2 space-y-1.5">
-        {deliveries.map((delivery) => (
-          <DeliveryCard
-            key={delivery.id}
-            delivery={delivery}
-            onStatusChange={onStatusChange}
-            onCardClick={onCardClick}
-          />
-        ))}
-      </div>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="p-2 space-y-1.5">
+          {deliveries.map((delivery) => (
+            <DeliveryCard
+              key={delivery.id}
+              delivery={delivery}
+              onStatusChange={onStatusChange}
+              onCardClick={onCardClick}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
