@@ -199,13 +199,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
 
             {/* Right: Notifications + Avatar */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
                 <DrawerTrigger asChild>
-                  <button className="relative p-2.5 rounded-lg hover:bg-muted/50 transition-all">
-                    <AppIcon name="Bell" size={22} className="text-foreground/70" />
+                  <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted/40 transition-colors active:scale-90">
+                    <AppIcon name="Bell" size={21} className="text-foreground/60" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                      <span className="absolute top-1 right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center shadow-sm">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -219,11 +219,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
               <button
                 onClick={() => navigate('/profile/me')}
-                className="p-1 rounded-full active:scale-90 transition-transform"
+                className="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-transform"
               >
-                <Avatar className="w-8 h-8 border-2 border-border/40">
+                <Avatar className="w-[34px] h-[34px] ring-2 ring-border/30 ring-offset-1 ring-offset-background">
                   {profile?.avatar_url ? (
-                    <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Avatar'} />
+                    <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Avatar'} className="object-cover" />
                   ) : null}
                   <AvatarFallback className="text-[11px] font-bold bg-muted text-foreground">
                     {initials}
