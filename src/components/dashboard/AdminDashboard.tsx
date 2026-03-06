@@ -12,10 +12,9 @@ import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardKPIGrid } from './DashboardKPIGrid';
 import { DashboardSection } from './DashboardSection';
 const FinanceChartWidget = lazy(() => import('./FinanceChartWidget').then(m => ({ default: m.FinanceChartWidget })));
-import { BillsDueWidget } from './BillsDueWidget';
-import { AIInsightsWidget } from './AIInsightsWidget';
-import { PendingOrdersWidget } from './PendingOrdersWidget';
-import { AppIcon } from '@/components/ui/app-icon';
+const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
+const AIInsightsWidget = lazy(() => import('./AIInsightsWidget').then(m => ({ default: m.AIInsightsWidget })));
+const PendingOrdersWidget = lazy(() => import('./PendingOrdersWidget').then(m => ({ default: m.PendingOrdersWidget })));
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 
