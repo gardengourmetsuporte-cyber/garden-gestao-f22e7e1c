@@ -11,7 +11,7 @@ import { useBrandCore } from '@/hooks/useBrandCore';
 export function BrandIdentityTab() {
   const { identity, identityLoading, upsertIdentity } = useBrandCore();
 
-  const [colors, setColors] = useState({ primary: '#22c55e', secondary: '#0a1a10', accent: '#f59e0b', background: '#ffffff' });
+  const [colors, setColors] = useState({ primary: '#c8ff00', secondary: '#1a1024', accent: '#f59e0b', background: '#ffffff' });
   const [typography, setTypography] = useState({ headings: 'Inter', body: 'Inter' });
   const [toneOfVoice, setToneOfVoice] = useState('');
   const [tagline, setTagline] = useState('');
@@ -20,7 +20,7 @@ export function BrandIdentityTab() {
 
   useEffect(() => {
     if (identity) {
-      setColors(identity.colors || { primary: '#22c55e', secondary: '#0a1a10', accent: '#f59e0b', background: '#ffffff' });
+      setColors(identity.colors || { primary: '#c8ff00', secondary: '#1a1024', accent: '#f59e0b', background: '#ffffff' });
       setTypography(identity.typography || { headings: 'Inter', body: 'Inter' });
       setToneOfVoice(identity.tone_of_voice || '');
       setTagline(identity.tagline || '');

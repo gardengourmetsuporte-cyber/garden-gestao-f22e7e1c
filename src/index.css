@@ -533,7 +533,7 @@
     --gp-sublabel: hsl(220 10% 55%);
     --gp-value: hsl(0 0% 98%);
     --gp-icon: hsl(0 0% 70%);
-    --gp-positive: hsl(156 60% 55%);
+    --gp-positive: hsl(68 80% 55%);
     --gp-negative: hsl(0 70% 60%);
   }
 
@@ -549,7 +549,7 @@
     --gp-sublabel: hsl(220 10% 50%);
     --gp-value: hsl(220 20% 12%);
     --gp-icon: hsl(220 10% 55%);
-    --gp-positive: hsl(156 60% 35%);
+    --gp-positive: hsl(68 80% 35%);
     --gp-negative: hsl(0 70% 45%);
   }
 
@@ -754,8 +754,8 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(156 60% 40% / 0.1) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(156 50% 35% / 0.06) 0%, transparent 45%);
+    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(68 80% 50% / 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(68 60% 40% / 0.06) 0%, transparent 45%);
     pointer-events: none;
   }
 
@@ -765,13 +765,13 @@
   }
 
   .finance-hero-chip--success {
-    background: hsl(140 40% 50% / 0.12);
-    border: 1px solid hsl(140 40% 50% / 0.2);
+    background: hsl(68 60% 50% / 0.12);
+    border: 1px solid hsl(68 60% 50% / 0.2);
   }
 
   .dark .finance-hero-chip--success {
-    background: hsl(140 40% 40% / 0.08);
-    border: 1px solid hsl(140 40% 40% / 0.15);
+    background: hsl(68 60% 45% / 0.08);
+    border: 1px solid hsl(68 60% 45% / 0.15);
   }
 
   .finance-hero-chip--neutral {
@@ -797,9 +797,9 @@
   .card-command-success {
     @apply rounded-2xl border transition-all duration-300 active:scale-[0.98] hover:shadow-md hover:border-success/30;
     background: linear-gradient(135deg, hsl(var(--card) / 0.6) 0%, hsl(var(--card) / 0.2) 100%);
-    border-color: hsl(142 71% 45% / 0.2);
+    border-color: hsl(68 80% 50% / 0.2);
     backdrop-filter: blur(12px);
-    box-shadow: inset 0 1px 1px 0 hsl(142 71% 45% / 0.1);
+    box-shadow: inset 0 1px 1px 0 hsl(68 80% 50% / 0.1);
   }
 
   .card-command-danger {
@@ -1129,12 +1129,12 @@
 
   .action-button-primary {
     @apply action-button gradient-primary;
-    box-shadow: 0 4px 14px hsl(156 60% 35% / 0.12);
+    box-shadow: 0 4px 14px hsl(68 80% 40% / 0.12);
   }
 
   .action-button-success {
     @apply action-button bg-success text-success-foreground hover:bg-success/90;
-    box-shadow: 0 4px 14px hsl(142 71% 45% / 0.25);
+    box-shadow: 0 4px 14px hsl(68 80% 45% / 0.25);
   }
 
   .action-button-destructive {
@@ -1152,17 +1152,17 @@
 
   .fab-neon-border {
     background: linear-gradient(135deg,
-        hsl(160 30% 15%),
-        hsl(156 50% 20%),
-        hsl(160 30% 15%));
+        hsl(68 30% 15%),
+        hsl(68 50% 25%),
+        hsl(68 30% 15%));
     opacity: 0.7;
   }
 
   .fab-neon-border-personal {
     background: linear-gradient(135deg,
-        hsl(160 30% 15%),
-        hsl(156 50% 20%),
-        hsl(160 30% 15%));
+        hsl(68 30% 15%),
+        hsl(68 50% 25%),
+        hsl(68 30% 15%));
     opacity: 0.7;
   }
 
@@ -1295,13 +1295,13 @@
 
     0%,
     100% {
-      border-color: hsl(156 60% 40% / 0.2);
-      box-shadow: var(--shadow-card), 0 0 16px hsl(156 60% 40% / 0.1);
+      border-color: hsl(68 80% 50% / 0.2);
+      box-shadow: var(--shadow-card), 0 0 16px hsl(68 80% 50% / 0.1);
     }
 
     50% {
-      border-color: hsl(156 60% 40% / 0.4);
-      box-shadow: var(--shadow-card), 0 0 24px hsl(156 60% 40% / 0.2);
+      border-color: hsl(68 80% 50% / 0.4);
+      box-shadow: var(--shadow-card), 0 0 24px hsl(68 80% 50% / 0.2);
     }
   }
 
@@ -1385,11 +1385,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 6px hsl(156 60% 40% / 0.2), 0 0 2px hsl(156 60% 40% / 0.15);
+      box-shadow: 0 0 6px hsl(68 80% 50% / 0.2), 0 0 2px hsl(68 80% 50% / 0.15);
     }
 
     50% {
-      box-shadow: 0 0 14px hsl(156 60% 40% / 0.35), 0 0 4px hsl(156 60% 40% / 0.25);
+      box-shadow: 0 0 14px hsl(68 80% 50% / 0.35), 0 0 4px hsl(68 80% 50% / 0.25);
     }
   }
 
@@ -1844,9 +1844,9 @@
   .achievement-shimmer {
     background: linear-gradient(110deg,
         transparent 25%,
-        hsl(156 60% 40% / 0.08) 37%,
-        hsl(156 60% 40% / 0.15) 50%,
-        hsl(156 60% 40% / 0.08) 63%,
+        hsl(68 80% 50% / 0.08) 37%,
+        hsl(68 80% 50% / 0.15) 50%,
+        hsl(68 80% 50% / 0.08) 63%,
         transparent 75%);
     background-size: 250% 100%;
     animation: achievementShimmer 8s ease-in-out infinite;
@@ -2171,12 +2171,12 @@
   }
 
   .header-ambient-glow {
-    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(156 60% 40% / 0.35) 0%, transparent 70%);
+    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(68 80% 50% / 0.35) 0%, transparent 70%);
     animation: ambientGlow 8s ease-in-out infinite;
   }
 
   .tabbar-ambient-glow {
-    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(156 60% 40% / 0.18) 0%, transparent 70%);
+    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(68 80% 50% / 0.18) 0%, transparent 70%);
     animation: ambientGlow 8s ease-in-out infinite;
     animation-delay: -4s;
   }
@@ -2201,26 +2201,26 @@
   }
 
   .dark .fab-cradle-ring {
-    box-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 0 0 1px hsl(200 60% 50% / 0.08);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 0 0 1px hsl(270 60% 50% / 0.08);
   }
 
   .light .header-ambient-glow {
-    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(156 60% 40% / 0.12) 0%, transparent 70%);
+    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(68 80% 50% / 0.12) 0%, transparent 70%);
   }
 
   .light .tabbar-ambient-glow {
-    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(156 60% 40% / 0.06) 0%, transparent 70%);
+    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(68 80% 50% / 0.06) 0%, transparent 70%);
   }
 
 
   .tab-icon-galaxy {
     color: transparent !important;
     background: linear-gradient(135deg,
-        #0a150a 0%,
-        #102a1a 35%,
-        #153f25 55%,
-        #102a1a 75%,
-        #0a150a 100%);
+        #1a1a05 0%,
+        #2a2a0a 35%,
+        #3f3f10 55%,
+        #2a2a0a 75%,
+        #1a1a05 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -2231,9 +2231,9 @@
   .tab-icon-galaxy-text {
     color: transparent !important;
     background: linear-gradient(135deg,
-        #0a150a 0%,
-        #102a1a 50%,
-        #0a150a 100%);
+        #1a1a05 0%,
+        #2a2a0a 50%,
+        #1a1a05 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -2241,15 +2241,15 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /* Dark mode: vibrant emerald gradient on dark card */
+  /* Dark mode: vibrant chartreuse gradient on dark card */
   .dark .tab-icon-galaxy {
     background: linear-gradient(135deg,
-        rgba(16, 185, 129, 0.8) 0%,
-        rgba(52, 211, 153, 1) 25%,
-        rgba(16, 185, 129, 1) 45%,
-        rgba(4, 120, 87, 1) 55%,
-        rgba(52, 211, 153, 1) 70%,
-        rgba(16, 185, 129, 0.8) 100%);
+        rgba(180, 230, 0, 0.8) 0%,
+        rgba(200, 255, 0, 1) 25%,
+        rgba(180, 230, 0, 1) 45%,
+        rgba(120, 160, 0, 1) 55%,
+        rgba(200, 255, 0, 1) 70%,
+        rgba(180, 230, 0, 0.8) 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -2259,9 +2259,9 @@
 
   .dark .tab-icon-galaxy-text {
     background: linear-gradient(135deg,
-        rgba(52, 211, 153, 1) 0%,
-        rgba(16, 185, 129, 1) 50%,
-        rgba(52, 211, 153, 1) 100%);
+        rgba(200, 255, 0, 1) 0%,
+        rgba(180, 230, 0, 1) 50%,
+        rgba(200, 255, 0, 1) 100%);
     background-size: 400% 400%;
     animation: fabGradientSpin 16s ease-in-out infinite;
     -webkit-background-clip: text;
@@ -2308,16 +2308,16 @@
   /* Neon glow border for bottom nav bar */
   .nav-bar-neon-glow {
     background: linear-gradient(135deg,
-        hsl(156 40% 18% / 0.7),
-        hsl(156 50% 22% / 0.5),
-        hsl(156 40% 18% / 0.2),
-        hsl(156 50% 22% / 0.5),
-        hsl(156 40% 18% / 0.7));
+        hsl(68 40% 18% / 0.7),
+        hsl(68 50% 25% / 0.5),
+        hsl(68 40% 18% / 0.2),
+        hsl(68 50% 25% / 0.5),
+        hsl(68 40% 18% / 0.7));
     box-shadow:
-      0 0 15px hsl(156 40% 18% / 0.35),
-      0 0 30px hsl(156 40% 18% / 0.15),
-      0 0 60px hsl(156 50% 22% / 0.1),
-      inset 0 0 15px hsl(156 40% 18% / 0.05);
+      0 0 15px hsl(68 40% 18% / 0.35),
+      0 0 30px hsl(68 40% 18% / 0.15),
+      0 0 60px hsl(68 50% 25% / 0.1),
+      inset 0 0 15px hsl(68 40% 18% / 0.05);
   }
 
   @keyframes neonPulse {
