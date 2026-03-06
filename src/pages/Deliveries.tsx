@@ -7,7 +7,7 @@ import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
 import { useUnit } from '@/contexts/UnitContext';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
-import { DeliveryMap } from '@/components/deliveries/DeliveryMap';
+import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Truck, Clock, CheckCircle2, Package, MapPin, Filter } from 'lucide-react';
