@@ -24,6 +24,20 @@ export default {
         display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
+        /* Override emerald palette → chartreuse/lime to unify the system */
+        emerald: {
+          50: 'hsl(68 80% 95%)',
+          100: 'hsl(68 80% 88%)',
+          200: 'hsl(68 85% 78%)',
+          300: 'hsl(68 90% 65%)',
+          400: 'hsl(68 95% 55%)',
+          500: 'hsl(68 100% 50%)',
+          600: 'hsl(68 90% 42%)',
+          700: 'hsl(68 80% 34%)',
+          800: 'hsl(68 70% 26%)',
+          900: 'hsl(68 60% 18%)',
+          950: 'hsl(68 50% 10%)',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
