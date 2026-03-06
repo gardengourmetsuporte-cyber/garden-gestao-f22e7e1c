@@ -201,7 +201,6 @@ export function useDeliveries() {
       if (delError) throw delError;
       return delivery as Delivery;
     },
-    },
     onSuccess: () => {
       invalidate();
       toast.success('Entrega cadastrada!');
