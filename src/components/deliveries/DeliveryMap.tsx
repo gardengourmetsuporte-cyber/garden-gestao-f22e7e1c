@@ -272,7 +272,11 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
         .addAttribution('© <a href="https://openstreetmap.org">OSM</a>')
         .addTo(map);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      // Clean, minimal map tiles (CartoDB Positron)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(map);
 
       Object.values(markersRef.current).forEach(m => m.remove());
       markersRef.current = {};
@@ -288,13 +292,16 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
         const icon = L.divIcon({
           className: '',
           html: `
-            <div style="position:relative;width:36px;height:36px;">
-              <div style="width:28px;height:28px;background:${color}25;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-              <div style="width:14px;height:14px;background:${color};border:2.5px solid white;border-radius:50%;box-shadow:0 2px 8px ${color}40;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+            <div style="position:relative;width:32px;height:42px;">
+              <svg width="32" height="42" viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26C32 7.163 24.837 0 16 0z" fill="${color}"/>
+                <circle cx="16" cy="16" r="8" fill="white"/>
+                <circle cx="16" cy="16" r="5" fill="${color}"/>
+              </svg>
             </div>`,
-          iconSize: [36, 36],
-          iconAnchor: [18, 18],
-          popupAnchor: [0, -14],
+          iconSize: [32, 42],
+          iconAnchor: [16, 42],
+          popupAnchor: [0, -36],
         });
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
@@ -306,7 +313,7 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
         map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
       }
 
-      // ── Current location with motorbike icon ──
+      // ── Current location as motorcycle SVG ──
       if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
@@ -315,17 +322,25 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
             const motoIcon = L.divIcon({
               className: '',
               html: `
-                <div style="position:relative;width:44px;height:44px;">
-                  <div style="width:40px;height:40px;background:rgba(59,130,246,0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-                  <div style="width:32px;height:32px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 10px rgba(59,130,246,0.4);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:16px;">🏍️</div>
+                <div style="position:relative;width:48px;height:48px;">
+                  <div style="width:44px;height:44px;background:rgba(59,130,246,0.12);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+                  <div style="width:36px;height:36px;background:white;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.15);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="5" cy="17" r="3"/>
+                      <circle cx="19" cy="17" r="3"/>
+                      <path d="M9 17h6"/>
+                      <path d="M19 17l-2-5h-4l-4 5"/>
+                      <path d="M13 12V7h2l3 5"/>
+                      <path d="M5 17l2-5"/>
+                    </svg>
+                  </div>
                 </div>`,
-              iconSize: [44, 44],
-              iconAnchor: [22, 22],
+              iconSize: [48, 48],
+              iconAnchor: [24, 24],
             });
             const myMarker = L.marker([latitude, longitude], { icon: motoIcon, zIndexOffset: 1000 }).addTo(map);
-            myMarker.bindPopup('<div style="font-family:system-ui;font-size:12px;font-weight:600;text-align:center;">📍 Você está aqui</div>');
+            myMarker.bindPopup('<div style="font-family:system-ui;font-size:12px;font-weight:600;text-align:center;padding:4px 0;">🏍️ Você está aqui</div>');
 
-            // Re-fit bounds including current location
             if (bounds.length > 0) {
               bounds.push([latitude, longitude]);
               map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
