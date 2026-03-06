@@ -107,6 +107,13 @@ export function LandingNavbar() {
             Entrar
           </Link>
           <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Alternar tema"
+          >
+            <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={16} />
+          </button>
+          <button
             onClick={() => setOpen(!open)}
             className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10 bg-white/5 border border-white/10"
           >
