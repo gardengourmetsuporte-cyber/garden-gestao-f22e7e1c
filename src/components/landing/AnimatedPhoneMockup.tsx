@@ -18,7 +18,7 @@ export function AnimatedPhoneMockup({ type }: Props) {
       <img
         src={MOCKUPS[type]}
         alt={`Mockup ${type}`}
-        className="w-full h-auto object-contain drop-shadow-[0_20px_60px_rgba(16,185,129,0.15)]"
+        className="w-full h-auto object-contain drop-shadow-[0_20px_60px_hsl(68_100%_50%/0.15)]"
         loading="lazy"
       />
     </div>

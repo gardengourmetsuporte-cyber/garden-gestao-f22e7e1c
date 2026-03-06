@@ -2133,14 +2133,14 @@
 
   .fab-gradient {
     background: linear-gradient(135deg,
-        #064e3b 0%,
-        #059669 35%,
-        #10b981 50%,
-        #059669 65%,
-        #064e3b 100%);
+        hsl(68 90% 20%) 0%,
+        hsl(68 95% 40%) 35%,
+        hsl(68 100% 50%) 50%,
+        hsl(68 95% 40%) 65%,
+        hsl(68 90% 20%) 100%);
     background-size: 300% 300%;
     animation: navyCardFlow 8s ease-in-out infinite;
-    border: 1px solid rgba(52, 211, 153, 0.3);
+    border: 1px solid hsl(68 80% 50% / 0.3);
   }
 
   /* ========== AMBIENT GLOW EFFECTS ========== */
@@ -2403,7 +2403,7 @@
 
   /* Indigo shimmer text — use on headings */
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(156 50% 18%), hsl(156 60% 25%), hsl(160 45% 22%));
+    background: linear-gradient(135deg, hsl(68 50% 18%), hsl(68 60% 25%), hsl(68 45% 22%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -2419,7 +2419,7 @@
 
   /* Animated gradient background */
   .bg-gradient-animated {
-    background: linear-gradient(135deg, hsl(160 30% 10%), hsl(156 50% 18%), hsl(160 40% 12%), hsl(160 30% 10%));
+    background: linear-gradient(135deg, hsl(68 30% 10%), hsl(68 50% 18%), hsl(68 40% 12%), hsl(68 30% 10%));
     background-size: 300% 300%;
     animation: gradientFlow 18s ease-in-out infinite;
   }
@@ -2439,9 +2439,9 @@
     height: 100%;
     background: linear-gradient(90deg,
         transparent,
-        hsl(156 60% 40% / 0.08),
-        hsl(156 60% 40% / 0.15),
-        hsl(156 60% 40% / 0.08),
+        hsl(68 60% 40% / 0.08),
+        hsl(68 60% 40% / 0.15),
+        hsl(68 60% 40% / 0.08),
         transparent);
     animation: goldShimmerSlide 4s ease-in-out infinite;
   }
@@ -2489,11 +2489,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 8px hsl(156 60% 40% / 0.15);
+      box-shadow: 0 0 8px hsl(68 60% 40% / 0.15);
     }
 
     50% {
-      box-shadow: 0 0 20px hsl(156 60% 40% / 0.3), 0 0 40px hsl(156 60% 40% / 0.12);
+      box-shadow: 0 0 20px hsl(68 60% 40% / 0.3), 0 0 40px hsl(68 60% 40% / 0.12);
     }
   }
 
@@ -2509,7 +2509,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(var(--neon-angle, 0deg), hsl(160 30% 15%), hsl(156 50% 20%), hsl(160 40% 12%), hsl(160 30% 15%));
+    background: linear-gradient(var(--neon-angle, 0deg), hsl(68 30% 15%), hsl(68 50% 20%), hsl(68 40% 12%), hsl(68 30% 15%));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -2840,7 +2840,7 @@ select:focus {
   right: -20px;
   width: 120px;
   height: 120px;
-  background: radial-gradient(circle, hsl(160 80% 50% / 0.08) 1px, transparent 1px);
+  background: radial-gradient(circle, hsl(68 80% 50% / 0.08) 1px, transparent 1px);
   background-size: 12px 12px;
   animation: dotPulse 4s ease-in-out infinite;
   pointer-events: none;
