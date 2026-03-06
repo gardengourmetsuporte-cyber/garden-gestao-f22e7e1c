@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,15 @@ export function BatchMovementSheet({ open, onOpenChange, items, categories, onCo
   const [search, setSearch] = useState('');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [collapsedCats, setCollapsedCats] = useState<Set<string> | null>(null);
+
+  const toggleCat = useCallback((cat: string) => {
+    setCollapsedCats(prev => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat); else next.add(cat);
+      return next;
+    });
+  }, []);
 
   const filteredItems = useMemo(() => {
     if (!search) return items;
@@ -54,6 +63,12 @@ export function BatchMovementSheet({ open, onOpenChange, items, categories, onCo
       return (catA?.sort_order ?? 999) - (catB?.sort_order ?? 999);
     });
   }, [grouped, categories]);
+
+  // Start all categories collapsed by default
+  const resolvedCollapsed = useMemo(() => {
+    if (collapsedCats !== null) return collapsedCats;
+    return new Set(sortedCats);
+  }, [collapsedCats, sortedCats]);
 
   const filledCount = useMemo(() => {
     let count = 0;
@@ -130,7 +145,7 @@ export function BatchMovementSheet({ open, onOpenChange, items, categories, onCo
                   : 'bg-secondary text-muted-foreground'
               )}
             >
-              <AppIcon name="ArrowDown" size={14} className="inline mr-1" />
+              <AppIcon name="ArrowDownCircle" size={14} className="inline mr-1" />
               Entrada
             </button>
             <button
@@ -142,7 +157,7 @@ export function BatchMovementSheet({ open, onOpenChange, items, categories, onCo
                   : 'bg-secondary text-muted-foreground'
               )}
             >
-              <AppIcon name="ArrowUp" size={14} className="inline mr-1" />
+              <AppIcon name="ArrowUpCircle" size={14} className="inline mr-1" />
               Saída
             </button>
           </div>
@@ -168,11 +183,15 @@ export function BatchMovementSheet({ open, onOpenChange, items, categories, onCo
 
             return (
               <div key={catName} className="space-y-1.5">
-                <div className="flex items-center gap-2 px-1">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{catName}</span>
-                </div>
-                {catItems.map(item => {
+                <button
+                  onClick={() => toggleCat(catName)}
+                  className="flex items-center gap-2 px-1 w-full text-left"
+                >
+                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex-1">{catName}</span>
+                  <AppIcon name={resolvedCollapsed.has(catName) ? 'ChevronRight' : 'ChevronDown'} size={14} className="text-muted-foreground" />
+                </button>
+                {!resolvedCollapsed.has(catName) && catItems.map(item => {
                   const qty = getQty(item.id);
                   return (
                     <div
