@@ -134,16 +134,20 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
 
-      {/* ======= Mobile Header with Navy Brand Strip ======= */}
+      {/* ======= Mobile Header — Transparent with Blur ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-border/30"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50"
         style={{
           paddingTop: 'env(safe-area-inset-top)',
-          background: 'hsl(var(--background))',
         }}
       >
-        <div className="relative overflow-hidden">
-          <div className="flex items-center justify-between h-14 px-3 relative z-10">
+        <div
+          className="backdrop-blur-2xl"
+          style={{
+            background: 'hsl(var(--background) / 0.6)',
+          }}
+        >
+          <div className="flex items-center justify-between h-14 px-3">
             {/* Left: Logo (dashboard) or Back button (module pages) */}
             <div className="w-10 flex items-center">
               {isDashboard ? (
@@ -156,7 +160,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               ) : (
                 <button
                   onClick={() => navigate('/')}
-                  className="p-2 rounded-lg hover:bg-muted/50 transition-all active:scale-90"
+                  className="p-2 rounded-lg hover:bg-foreground/5 transition-all active:scale-90"
                 >
                   <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
                 </button>
@@ -176,7 +180,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <div className="flex items-center gap-1">
               <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
                 <DrawerTrigger asChild>
-                  <button className="relative p-2.5 rounded-lg hover:bg-muted/50 transition-all">
+                  <button className="relative p-2.5 rounded-lg hover:bg-foreground/5 transition-all">
                     <AppIcon name="Bell" size={22} className="text-foreground/70" />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
