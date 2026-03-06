@@ -1,5 +1,8 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { Navigation } from 'lucide-react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { Navigation, LocateFixed } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
 
 declare global {
@@ -25,8 +28,6 @@ const STATUS_LABELS: Record<DeliveryStatus, string> = {
 function loadLeaflet(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.L) { resolve(); return; }
-
-    // CSS already loaded via index.html
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.onload = () => resolve();
@@ -35,19 +36,36 @@ function loadLeaflet(): Promise<void> {
   });
 }
 
+async function geocodeAddress(address: string, city: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const query = encodeURIComponent(`${address}, ${city}, Brasil`);
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
+      headers: { 'User-Agent': 'GardenGestao/1.0' },
+    });
+    const results = await res.json();
+    if (results?.[0]) {
+      return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 interface Props {
   deliveries: Delivery[];
   onStatusChange: (id: string, status: DeliveryStatus) => void;
+  onRefresh?: () => void;
 }
 
-export function DeliveryMap({ deliveries, onStatusChange }: Props) {
+export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
-  const deliveriesWithCoords = deliveries.filter(
-    (d) => d.address?.lat && d.address?.lng
-  );
+  const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
+  const withoutCoords = deliveries.filter(d => d.address && (!d.address.lat || !d.address.lng));
 
   const buildPopup = useCallback((delivery: Delivery) => {
     const addr = delivery.address;
@@ -55,34 +73,33 @@ export function DeliveryMap({ deliveries, onStatusChange }: Props) {
     const lng = addr!.lng!;
     const statusColor = STATUS_COLORS[delivery.status];
     const statusLabel = STATUS_LABELS[delivery.status];
-
     const nextStatus: DeliveryStatus | null =
       delivery.status === 'pending' ? 'out' :
       delivery.status === 'out' ? 'delivered' : null;
 
     return `
-      <div style="font-family: inherit; min-width: 200px;">
-        <p style="font-weight: 700; font-size: 14px; margin: 0 0 4px;">${addr?.customer_name || 'Sem nome'}</p>
-        <p style="font-size: 11px; color: #888; margin: 0 0 2px;">${addr?.full_address || '—'}</p>
-        ${addr?.reference ? `<p style="font-size: 11px; color: #aaa; font-style: italic; margin: 0 0 6px;">${addr.reference}</p>` : ''}
-        ${delivery.items_summary ? `<p style="font-size: 11px; color: #666; margin: 0 0 6px;">${delivery.items_summary}</p>` : ''}
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-          <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: ${statusColor}20; color: ${statusColor};">${statusLabel}</span>
-          ${delivery.total > 0 ? `<span style="font-size: 12px; font-weight: 700;">R$ ${delivery.total.toFixed(2)}</span>` : ''}
+      <div style="font-family:inherit;min-width:200px;">
+        <p style="font-weight:700;font-size:14px;margin:0 0 4px;">${addr?.customer_name || 'Sem nome'}</p>
+        <p style="font-size:11px;color:#888;margin:0 0 2px;">${addr?.full_address || '—'}</p>
+        ${addr?.reference ? `<p style="font-size:11px;color:#aaa;font-style:italic;margin:0 0 6px;">${addr.reference}</p>` : ''}
+        ${delivery.items_summary ? `<p style="font-size:11px;color:#666;margin:0 0 6px;">${delivery.items_summary}</p>` : ''}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:${statusColor}20;color:${statusColor};">${statusLabel}</span>
+          ${delivery.total > 0 ? `<span style="font-size:12px;font-weight:700;">R$ ${delivery.total.toFixed(2)}</span>` : ''}
         </div>
-        <div style="display: flex; gap: 6px; margin-bottom: ${nextStatus ? '8px' : '0'};">
+        <div style="display:flex;gap:6px;margin-bottom:${nextStatus ? '8px' : '0'};">
           <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}" target="_blank" rel="noopener"
-             style="flex: 1; text-align: center; font-size: 11px; font-weight: 500; padding: 6px 8px; border-radius: 8px; background: #eff6ff; color: #2563eb; text-decoration: none;">
+             style="flex:1;text-align:center;font-size:11px;font-weight:500;padding:6px 8px;border-radius:8px;background:#eff6ff;color:#2563eb;text-decoration:none;">
             🌍 Street View
           </a>
           <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" rel="noopener"
-             style="flex: 1; text-align: center; font-size: 11px; font-weight: 500; padding: 6px 8px; border-radius: 8px; background: #f0fdf4; color: #16a34a; text-decoration: none;">
+             style="flex:1;text-align:center;font-size:11px;font-weight:500;padding:6px 8px;border-radius:8px;background:#f0fdf4;color:#16a34a;text-decoration:none;">
             📍 Rota
           </a>
         </div>
         ${nextStatus ? `
-          <button onclick="window.__deliveryStatusChange__('${delivery.id}', '${nextStatus}')"
-                  style="width: 100%; font-size: 12px; font-weight: 600; padding: 6px; border-radius: 8px; border: none; color: white; background: ${STATUS_COLORS[nextStatus]}; cursor: pointer;">
+          <button onclick="window.__deliveryStatusChange__('${delivery.id}','${nextStatus}')"
+                  style="width:100%;font-size:12px;font-weight:600;padding:6px;border-radius:8px;border:none;color:white;background:${STATUS_COLORS[nextStatus]};cursor:pointer;">
             ${nextStatus === 'out' ? 'Marcar Saiu →' : 'Marcar Entregue ✓'}
           </button>
         ` : ''}
@@ -90,7 +107,6 @@ export function DeliveryMap({ deliveries, onStatusChange }: Props) {
     `;
   }, []);
 
-  // Expose status change handler globally for popup buttons
   useEffect(() => {
     (window as any).__deliveryStatusChange__ = (id: string, status: DeliveryStatus) => {
       onStatusChange(id, status);
@@ -98,35 +114,39 @@ export function DeliveryMap({ deliveries, onStatusChange }: Props) {
     return () => { delete (window as any).__deliveryStatusChange__; };
   }, [onStatusChange]);
 
+  // Initialize map always
   useEffect(() => {
-    if (!mapRef.current || deliveriesWithCoords.length === 0) return;
-
+    if (!mapRef.current) return;
     let cancelled = false;
 
     loadLeaflet().then(() => {
       if (cancelled || !mapRef.current) return;
       const L = window.L;
 
-      // Destroy previous map
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
 
-      const map = L.map(mapRef.current, { zoomControl: true });
+      // Default: São Paulo center
+      const defaultCenter: [number, number] = [-23.5505, -46.6333];
+      const map = L.map(mapRef.current, { zoomControl: true }).setView(defaultCenter, 12);
       mapInstanceRef.current = map;
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap',
       }).addTo(map);
 
+      // Clear old markers
+      markersRef.current.forEach(m => m.remove());
+      markersRef.current = [];
+
       const bounds: [number, number][] = [];
 
-      deliveriesWithCoords.forEach((delivery) => {
+      withCoords.forEach((delivery) => {
         const lat = delivery.address!.lat!;
         const lng = delivery.address!.lng!;
         const color = STATUS_COLORS[delivery.status];
-
         bounds.push([lat, lng]);
 
         const icon = L.divIcon({
@@ -156,27 +176,72 @@ export function DeliveryMap({ deliveries, onStatusChange }: Props) {
         mapInstanceRef.current = null;
       }
     };
-  }, [deliveriesWithCoords, buildPopup]);
+  }, [withCoords, buildPopup]);
 
-  if (deliveriesWithCoords.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-border/60 bg-card">
-        <Navigation className="w-12 h-12 text-muted-foreground/30 mb-3" />
-        <p className="text-sm font-medium text-muted-foreground">
-          Nenhuma entrega com coordenadas
-        </p>
-        <p className="text-xs text-muted-foreground/60 mt-1">
-          As coordenadas são extraídas automaticamente ao cadastrar entregas
-        </p>
-      </div>
-    );
-  }
+  const handleGeocode = async () => {
+    if (withoutCoords.length === 0) return;
+    setIsGeocoding(true);
+    let success = 0;
+
+    for (const delivery of withoutCoords) {
+      const addr = delivery.address;
+      if (!addr) continue;
+
+      const coords = await geocodeAddress(
+        addr.full_address,
+        addr.city || addr.neighborhood
+      );
+
+      if (coords) {
+        await supabase
+          .from('delivery_addresses')
+          .update({ lat: coords.lat, lng: coords.lng })
+          .eq('id', addr.id);
+        success++;
+      }
+
+      // Nominatim rate limit: 1 req/sec
+      await new Promise(r => setTimeout(r, 1100));
+    }
+
+    setIsGeocoding(false);
+    if (success > 0) {
+      toast.success(`${success} endereço(s) localizado(s) no mapa`);
+      onRefresh?.();
+    } else {
+      toast.error('Não foi possível localizar os endereços');
+    }
+  };
 
   return (
-    <div
-      ref={mapRef}
-      className="rounded-2xl overflow-hidden border border-border/60"
-      style={{ height: 'calc(100vh - 320px)', minHeight: 400 }}
-    />
+    <div className="space-y-2">
+      {/* Geocode banner */}
+      {withoutCoords.length > 0 && (
+        <div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border/60 bg-card">
+          <div className="flex items-center gap-2 min-w-0">
+            <LocateFixed className="w-4 h-4 text-primary shrink-0" />
+            <p className="text-xs text-muted-foreground truncate">
+              {withoutCoords.length} entrega(s) sem localização
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs shrink-0"
+            onClick={handleGeocode}
+            disabled={isGeocoding}
+          >
+            {isGeocoding ? 'Localizando...' : 'Localizar'}
+          </Button>
+        </div>
+      )}
+
+      {/* Map */}
+      <div
+        ref={mapRef}
+        className="rounded-2xl overflow-hidden border border-border/60"
+        style={{ height: 'calc(100vh - 340px)', minHeight: 350 }}
+      />
+    </div>
   );
 }
