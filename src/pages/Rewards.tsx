@@ -56,8 +56,8 @@ export default function RewardsPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-3 lg:px-6 space-y-4">
+      <div className="min-h-screen bg-background pb-24 lg:pb-12">
+        <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           {/* Hero — Saldo */}
           <div className="card-surface p-5">
             <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-medium">Seu saldo</p>

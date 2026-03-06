@@ -77,8 +77,8 @@ export default function ChecklistsPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-3 lg:px-6 space-y-5 lg:max-w-4xl lg:mx-auto">
+      <div className="min-h-screen bg-background pb-24 lg:pb-12">
+        <div className="px-4 py-3 lg:px-8 space-y-5 lg:max-w-4xl lg:mx-auto">
           <div className="animate-fade-in space-y-5" key={settingsMode ? 'settings' : 'view'}>
             {/* Date Strip */}
             {!settingsMode && (

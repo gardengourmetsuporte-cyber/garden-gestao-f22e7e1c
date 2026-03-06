@@ -181,8 +181,8 @@ export default function Recipes() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-3 lg:px-6 space-y-4">
+      <div className="min-h-screen bg-background pb-24 lg:pb-12">
+        <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="rounded-2xl border bg-card p-3">
