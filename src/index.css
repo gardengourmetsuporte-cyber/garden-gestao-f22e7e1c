@@ -2198,6 +2198,49 @@
     background: hsl(var(--background));
     padding: 5px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    position: relative;
+  }
+
+  .fab-cradle-ring::before,
+  .fab-cradle-ring::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .fab-cradle-ring::before {
+    background: radial-gradient(circle, hsl(var(--primary) / 0.5) 0%, transparent 70%);
+    animation: fabPulseGlow 3s ease-in-out infinite;
+  }
+
+  .fab-cradle-ring::after {
+    border: 2px solid hsl(var(--primary) / 0.3);
+    animation: fabPulseRing 3s ease-in-out infinite 0.3s;
+  }
+
+  @keyframes fabPulseGlow {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.35);
+    }
+  }
+
+  @keyframes fabPulseRing {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.5);
+    }
   }
 
   .dark .fab-cradle-ring {
