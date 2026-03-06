@@ -148,11 +148,11 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
-                  "hover:scale-[1.08] active:scale-[0.92]"
+                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200",
+                  "bg-primary hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
-                  boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
+                  boxShadow: '0 4px 16px hsl(var(--primary) / 0.35)',
                 }}
               >
                 <AppIcon
@@ -213,14 +213,19 @@ export function BottomTabBar() {
                 style={{ width: slotWidth }}
               >
                 <div
+                  className="relative"
                   style={{
-                    transform: moreOpen ? 'scale(1.15)' : 'scale(1)',
+                    transform: moreOpen ? 'scale(1.08)' : 'scale(1)',
                     transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
                   }}
                 >
-                  <AppIcon name="Menu" size={22} fill={moreOpen ? 1 : 0} weight={moreOpen ? 600 : 400} className={moreOpen ? 'tab-icon-galaxy' : 'text-muted-foreground transition-colors'} />
+                  <div className={cn(
+                    "absolute -inset-x-2.5 -inset-y-1.5 rounded-2xl bg-primary/12 transition-all duration-300",
+                    moreOpen ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                  )} />
+                  <AppIcon name="Menu" size={22} fill={moreOpen ? 1 : 0} weight={moreOpen ? 600 : 400} className={cn("relative z-10", moreOpen ? 'text-primary' : 'text-muted-foreground transition-colors')} />
                 </div>
-                <span className={cn("text-[10px]", moreOpen ? "font-semibold tab-icon-galaxy-text" : "font-normal text-muted-foreground")}>Mais</span>
+                <span className={cn("text-[10px]", moreOpen ? "font-semibold text-primary" : "font-normal text-muted-foreground")}>Mais</span>
               </button>
             )}
           </div>
@@ -294,22 +299,29 @@ const TabButton = forwardRef<
       <div
         className="relative"
         style={{
-          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.15)' : 'scale(1)'),
+          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.08)' : 'scale(1)'),
           transition: bouncing ? 'transform 80ms cubic-bezier(0.2, 0, 0, 1)' : 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
+        {/* Active pill indicator */}
+        <div
+          className={cn(
+            "absolute -inset-x-2.5 -inset-y-1.5 rounded-2xl bg-primary/12 transition-all duration-300",
+            active ? "opacity-100 scale-100" : "opacity-0 scale-75"
+          )}
+        />
         <AppIcon
           name={tab.icon}
           size={22}
           fill={active ? 1 : 0}
           weight={active ? 600 : 400}
-          className={active ? 'tab-icon-galaxy' : ''}
+          className={cn("relative z-10", active ? 'text-primary' : '')}
         />
         {locked && (
-          <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2" style={{ color: 'hsl(45 90% 55%)' }} />
+          <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2 z-10" style={{ color: 'hsl(45 90% 55%)' }} />
         )}
       </div>
-      <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>
+      <span className={cn("text-[10px]", active ? "font-semibold text-primary" : "font-normal")}>{tab.label}</span>
     </button>
   );
 });
