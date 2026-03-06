@@ -1,0 +1,1 @@
+UPDATE delivery_addresses SET lat = NULL, lng = NULL WHERE id = '5b7054d9-b428-48fd-b872-afe1b6628340';

@@ -76,11 +76,13 @@ function pickValidResult(
   const lng = Number.parseFloat(result?.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-  if (anchor && distanceKm(anchor, { lat, lng }) > 45) return null;
+  // Strict: max 25km from city anchor to avoid cross-city matches
+  if (anchor && distanceKm(anchor, { lat, lng }) > 25) return null;
 
   const cityToken = normalizeText(city);
   const displayName = normalizeText(String(result?.display_name || ''));
-  if (cityToken && displayName && !displayName.includes(cityToken) && !anchor) return null;
+  // Always validate city name when we have one, even with anchor
+  if (cityToken && displayName && !displayName.includes(cityToken)) return null;
 
   return { lat, lng };
 }
