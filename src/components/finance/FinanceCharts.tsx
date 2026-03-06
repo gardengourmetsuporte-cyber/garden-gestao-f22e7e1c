@@ -58,7 +58,7 @@ export function FinanceCharts({
   transactions,
   categories: categoriesProp = [],
 }: FinanceChartsProps) {
-  const [viewType, setViewType] = useState<'categories' | 'timeline' | 'bars' | 'weekly'>('categories');
+  const [viewType, setViewType] = useState<'categories' | 'timeline' | 'cumulative' | 'weekly'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
   const [drillDownCategory, setDrillDownCategory] = useState<FinanceCategory | null>(null);
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
@@ -168,7 +168,7 @@ export function FinanceCharts({
       </div>
 
       {/* Data Type Toggle — hidden on weekly view */}
-      {viewType !== 'weekly' && (
+      {viewType !== 'weekly' && viewType !== 'timeline' && viewType !== 'cumulative' && (
         <div className="px-4">
           <div className="tab-command">
             {['expense', 'income'].map(type => (
@@ -190,12 +190,12 @@ export function FinanceCharts({
           {[
             { value: 'categories', label: 'Categorias' },
             { value: 'timeline', label: 'Linha' },
-            { value: 'bars', label: 'Barras' },
+            { value: 'cumulative', label: 'Acumulado' },
             { value: 'weekly', label: 'Semanal' },
           ].map(tab => (
             <button
               key={tab.value}
-              onClick={() => setViewType(tab.value as 'categories' | 'timeline' | 'bars' | 'weekly')}
+              onClick={() => setViewType(tab.value as 'categories' | 'timeline' | 'cumulative' | 'weekly')}
               className={cn("tab-command-item", viewType === tab.value && "tab-command-item-active")}
             >
               {tab.label}
@@ -203,6 +203,8 @@ export function FinanceCharts({
           ))}
         </div>
       </div>
+
+
 
       {/* Drill-down header */}
       {(drillDownCategory || entityView) && (
@@ -420,68 +422,88 @@ export function FinanceCharts({
           </div>
         )}
 
-        {/* ═══ BAR CHART ═══ */}
-        {viewType === 'bars' && (
+        {/* ═══ CUMULATIVE CHART ═══ */}
+        {viewType === 'cumulative' && (
           <div className="space-y-3">
-            {barData.length > 0 ? (
-              <>
-                <div className="card-base p-3" style={{ height: Math.max(300, barData.length * 50) }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={barData}
-                      layout="vertical"
-                      margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="hsl(var(--border))"
-                        opacity={0.3}
-                        horizontal={false}
-                      />
-                      <XAxis
-                        type="number"
-                        tickFormatter={formatCompact}
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={100}
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                      />
-                      <RechartsTooltip
-                        content={<CustomTooltip labelFormatter={(_: any, p: any) => p[0]?.payload?.name || ''} />}
-                        cursor={{ fill: 'hsl(var(--muted))', opacity: 0.15 }}
-                      />
-                      <Bar dataKey="amount" radius={[0, 6, 6, 0]} barSize={28}>
-                        {barData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+            {mergedTimelineData.length > 0 ? (() => {
+              const cumulativeData = mergedTimelineData.reduce((acc, curr, i) => {
+                const prevIncome = i > 0 ? acc[i - 1].cumulativeIncome : 0;
+                const prevExpense = i > 0 ? acc[i - 1].cumulativeExpense : 0;
+                acc.push({
+                  ...curr,
+                  cumulativeIncome: prevIncome + curr.income,
+                  cumulativeExpense: prevExpense + curr.expense,
+                  balance: (prevIncome + curr.income) - (prevExpense + curr.expense),
+                });
+                return acc;
+              }, [] as (typeof mergedTimelineData[0] & { cumulativeIncome: number; cumulativeExpense: number; balance: number })[]);
+              const finalBalance = cumulativeData.length > 0 ? cumulativeData[cumulativeData.length - 1].balance : 0;
+              return (
+                <>
+                  <div className="card-base p-3" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={cumulativeData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="cumIncomeGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#22c55e" stopOpacity={0.25} />
+                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0.02} />
+                          </linearGradient>
+                          <linearGradient id="cumExpenseGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#ef4444" stopOpacity={0.25} />
+                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
+                        <XAxis dataKey="day" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <YAxis tickFormatter={formatCompact} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} width={45} />
+                        <RechartsTooltip
+                          content={({ active, payload, label }) => {
+                            if (!active || !payload?.length) return null;
+                            const inc = payload.find(p => p.dataKey === 'cumulativeIncome')?.value as number || 0;
+                            const exp = payload.find(p => p.dataKey === 'cumulativeExpense')?.value as number || 0;
+                            const bal = inc - exp;
+                            return (
+                              <div className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 shadow-xl space-y-0.5">
+                                <p className="text-xs font-medium text-foreground">Dia {label}</p>
+                                <p className="text-xs" style={{ color: '#22c55e' }}>Receita acum.: {formatCurrency(inc)}</p>
+                                <p className="text-xs" style={{ color: '#ef4444' }}>Despesa acum.: {formatCurrency(exp)}</p>
+                                <p className={cn("text-xs font-bold", bal >= 0 ? "text-green-500" : "text-red-500")}>
+                                  Saldo: {bal >= 0 ? '+' : ''}{formatCurrency(bal)}
+                                </p>
+                              </div>
+                            );
+                          }}
+                        />
+                        <Area type="monotone" dataKey="cumulativeIncome" stroke="#22c55e" strokeWidth={2.5} fill="url(#cumIncomeGrad)" dot={false} activeDot={{ r: 4, fill: '#22c55e', stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
+                        <Area type="monotone" dataKey="cumulativeExpense" stroke="#ef4444" strokeWidth={2.5} fill="url(#cumExpenseGrad)" dot={false} activeDot={{ r: 4, fill: '#ef4444', stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
 
-                {/* Legend below */}
-                <div className="space-y-1.5">
-                  {barData.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between px-1">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: item.color }} />
-                        <span className="text-xs text-muted-foreground">{item.name}</span>
-                      </div>
-                      <span className="text-xs font-medium tabular-nums">{formatCurrency(item.amount)}</span>
+                  {/* Cumulative summary */}
+                  <div className="card-base p-4 grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-0.5">Receita acum.</p>
+                      <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
+                        {formatCurrency(cumulativeData[cumulativeData.length - 1]?.cumulativeIncome || 0)}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              </>
-            ) : (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-0.5">Despesa acum.</p>
+                      <p className="text-sm font-bold tabular-nums" style={{ color: '#ef4444' }}>
+                        {formatCurrency(cumulativeData[cumulativeData.length - 1]?.cumulativeExpense || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-0.5">Saldo</p>
+                      <p className={cn("text-sm font-bold tabular-nums", finalBalance >= 0 ? "text-green-500" : "text-red-500")}>
+                        {finalBalance >= 0 ? '+' : ''}{formatCurrency(finalBalance)}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              );
+            })() : (
               <div className="text-center py-16 text-muted-foreground">
                 <p>Sem dados para exibir</p>
               </div>
