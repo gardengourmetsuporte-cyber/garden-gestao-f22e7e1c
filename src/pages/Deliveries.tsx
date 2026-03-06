@@ -161,6 +161,7 @@ export default function Deliveries() {
                     neighborhood={group.neighborhood}
                     deliveries={group.deliveries}
                     onStatusChange={(id, status) => updateStatus({ id, status })}
+                    onCardClick={handleCardClick}
                   />
                 ))}
               </div>
