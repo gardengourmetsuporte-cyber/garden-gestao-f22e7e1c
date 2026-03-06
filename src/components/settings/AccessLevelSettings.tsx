@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ListPicker } from '@/components/ui/list-picker';
 import { cn } from '@/lib/utils';
@@ -315,14 +315,14 @@ export function AccessLevelSettings() {
         )}
       </div>
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={isCreating} onOpenChange={setIsCreating}>
-        <DialogContent className="max-w-lg p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</DialogTitle>
-          </DialogHeader>
+      {/* Create/Edit Sheet */}
+      <Sheet open={isCreating} onOpenChange={setIsCreating}>
+        <SheetContent side="bottom" className="max-h-[90vh] flex flex-col">
+          <SheetHeader>
+            <SheetTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</SheetTitle>
+          </SheetHeader>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 py-2 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label>Nome</Label>
               <Input
@@ -476,12 +476,12 @@ export function AccessLevelSettings() {
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
-            <Button onClick={handleSave}>{editingLevel ? 'Salvar' : 'Criar'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <div className="flex gap-2 pt-3 border-t border-border/30">
+            <Button variant="outline" onClick={() => setIsCreating(false)} className="flex-1">Cancelar</Button>
+            <Button onClick={handleSave} className="flex-1">{editingLevel ? 'Salvar' : 'Criar'}</Button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Access Level Picker */}
       <ListPicker
