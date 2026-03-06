@@ -156,14 +156,3 @@ export default function Deliveries() {
   );
 }
 
-/* ── Inline stat pill ── */
-function StatPill({ value, label, color }: { value: number; label: string; color: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-lg font-bold leading-none" style={{ color: `hsl(${color})` }}>
-        {value}
-      </span>
-      <span className="text-[10px] text-muted-foreground leading-tight">{label}</span>
-    </div>
-  );
-}
