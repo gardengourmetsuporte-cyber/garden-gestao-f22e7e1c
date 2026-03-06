@@ -292,22 +292,21 @@ const TabButton = forwardRef<
       style={{ width: slotWidth }}
     >
       <div
-        className="relative flex items-center justify-center"
+        className="relative"
         style={{
-          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.08)' : 'scale(1)'),
+          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.15)' : 'scale(1)'),
           transition: bouncing ? 'transform 80ms cubic-bezier(0.2, 0, 0, 1)' : 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        {active && <div className="tab-active-pill" />}
         <AppIcon
           name={tab.icon}
           size={22}
           fill={active ? 1 : 0}
           weight={active ? 600 : 400}
-          className={cn('relative z-10', active ? 'tab-icon-galaxy' : '')}
+          className={active ? 'tab-icon-galaxy' : ''}
         />
         {locked && (
-          <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2 z-10" style={{ color: 'hsl(45 90% 55%)' }} />
+          <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2" style={{ color: 'hsl(45 90% 55%)' }} />
         )}
       </div>
       <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>

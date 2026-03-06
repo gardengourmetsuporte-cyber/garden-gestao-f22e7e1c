@@ -2085,38 +2085,6 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /* ========== TAB ACTIVE PILL ========== */
-  .tab-active-pill {
-    @apply absolute rounded-full;
-    inset: 2px -4px;
-    background: hsl(var(--primary) / 0.12);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .dark .tab-active-pill {
-    background: hsl(var(--primary) / 0.15);
-    box-shadow: 0 0 12px hsl(var(--primary) / 0.1);
-  }
-
-  /* ========== CARD FEATURE (Tool Packs style) ========== */
-  .card-feature {
-    @apply relative rounded-3xl p-5 flex flex-col items-center text-center gap-3 transition-all duration-300;
-    background: hsl(var(--card) / 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--border) / 0.5);
-    box-shadow: var(--shadow-card);
-  }
-  .card-feature:hover {
-    box-shadow: var(--shadow-card-hover);
-  }
-  .dark .card-feature {
-    background: hsl(220 20% 8% / 0.7);
-    border-color: hsl(0 0% 100% / 0.06);
-  }
-  .card-feature .card-feature-icon {
-    @apply w-14 h-14 rounded-2xl flex items-center justify-center text-white;
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.25);
-  }
-
   /* Check pop animation */
   .animate-check-pop {
     animation: checkPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
