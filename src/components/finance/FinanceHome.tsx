@@ -107,14 +107,6 @@ export function FinanceHome({
                 </span>
               </div>
             </div>
-            <div className="finance-hero-chip finance-hero-chip--neutral">
-              <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Despesas</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold" style={{ color: 'var(--gp-negative)' }}>
-                  {fmtCurrency(monthStats.totalExpense)}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </button>
