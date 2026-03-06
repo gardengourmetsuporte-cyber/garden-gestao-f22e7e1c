@@ -1,5 +1,6 @@
 // Auth page v4 — Modern SaaS split-screen layout
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
