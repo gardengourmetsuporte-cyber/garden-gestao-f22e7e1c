@@ -247,7 +247,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               onClick={() => navigate('/')}
               className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
             >
-              <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} />
+              <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} loading="lazy" decoding="async" />
             </button>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
