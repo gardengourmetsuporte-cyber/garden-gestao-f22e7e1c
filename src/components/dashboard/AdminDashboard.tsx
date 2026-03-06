@@ -15,6 +15,7 @@ const FinanceChartWidget = lazy(() => import('./FinanceChartWidget').then(m => (
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
 const AIInsightsWidget = lazy(() => import('./AIInsightsWidget').then(m => ({ default: m.AIInsightsWidget })));
 const PendingOrdersWidget = lazy(() => import('./PendingOrdersWidget').then(m => ({ default: m.PendingOrdersWidget })));
+import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 
