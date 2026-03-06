@@ -17,6 +17,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
 
   const [prices, setPrices] = useState<QuotationPrice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resolving, setResolving] = useState(false);
 
   const loadPrices = async () => {
     try {
@@ -118,7 +119,15 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   };
 
   const handleResolve = async () => {
-    await resolveQuotation(quotation.id);
+    setResolving(true);
+    try {
+      await resolveQuotation(quotation.id);
+      toast.success('Pedidos gerados com sucesso!');
+    } catch {
+      toast.error('Erro ao gerar pedidos');
+    } finally {
+      setResolving(false);
+    }
   };
 
   const allResponded = suppliers.every(s => s.status === 'responded');
@@ -263,10 +272,14 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
             {canResolve && (
               <Button
                 onClick={handleResolve}
+                disabled={resolving}
                 className="rounded-xl gap-1.5 shadow-lg shadow-emerald-500/20"
               >
-                <AppIcon name="Trophy" className="w-4 h-4" />
-                Gerar Pedidos Otimizados
+                {resolving ? (
+                  <><AppIcon name="Loader2" className="w-4 h-4 animate-spin" /> Gerando pedidos...</>
+                ) : (
+                  <><AppIcon name="Trophy" className="w-4 h-4" /> Gerar Pedidos Otimizados</>
+                )}
               </Button>
             )}
           </div>
