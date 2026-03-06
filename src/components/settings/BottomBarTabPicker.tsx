@@ -69,7 +69,7 @@ export function BottomBarTabPicker({ open, onOpenChange }: Props) {
                   "flex flex-col items-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 border touch-manipulation",
                   isSelected
                     ? "border-primary/60 bg-primary/10"
-                    : "border-border/30 bg-[#0a1a10]/40 hover:bg-[#0a1a10]/60"
+                    : "border-border/30 bg-secondary/40 hover:bg-secondary/60"
                 )}
               >
                 <div className={cn(

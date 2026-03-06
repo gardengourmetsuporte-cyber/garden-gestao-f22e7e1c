@@ -168,13 +168,13 @@ export default function Customers() {
             <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: 18 }}>
               search
             </span>
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11 border-emerald-500/10 bg-[#0a1a10]/40 focus:border-emerald-500/30" />
+            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11 border-border/20 bg-secondary/40 focus:border-primary/30" />
           </div>
           <Select
             value={segmentFilter || 'all'}
             onValueChange={v => setSegmentFilter(v === 'all' ? null : v as CustomerSegment)}
           >
-            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold border-emerald-500/10 bg-[#0a1a10]/40">
+            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold border-border/20 bg-secondary/40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
