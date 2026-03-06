@@ -3,7 +3,6 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AppIcon } from '@/components/ui/app-icon';
 import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
 import { useUnit } from '@/contexts/UnitContext';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
@@ -11,19 +10,13 @@ import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap } from '@/components/deliveries/DeliveryMap';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
-import { Truck, Clock, CheckCircle2, Package } from 'lucide-react';
+import { Truck, Clock, CheckCircle2, Package, MapPin, Filter } from 'lucide-react';
 
-const STATUS_CHIPS: { key: DeliveryStatus | 'all'; label: string; icon: string }[] = [
-  { key: 'all', label: 'Todas', icon: 'package_2' },
-  { key: 'pending', label: 'Pendentes', icon: 'schedule' },
-  { key: 'out', label: 'Em rota', icon: 'local_shipping' },
-  { key: 'delivered', label: 'Entregues', icon: 'check_circle' },
-];
-
-const STAT_CONFIG = [
-  { key: 'pending' as const, label: 'Pendentes', icon: Clock, colorClass: 'text-amber-400', bgClass: 'bg-amber-500/10' },
-  { key: 'out' as const, label: 'Em rota', icon: Truck, colorClass: 'text-blue-400', bgClass: 'bg-blue-500/10' },
-  { key: 'delivered' as const, label: 'Entregues', icon: CheckCircle2, colorClass: 'text-emerald-400', bgClass: 'bg-emerald-500/10' },
+const FILTERS: { key: DeliveryStatus | 'all'; label: string; icon: typeof Package }[] = [
+  { key: 'all', label: 'Todas', icon: Package },
+  { key: 'pending', label: 'Pendentes', icon: Clock },
+  { key: 'out', label: 'Em rota', icon: Truck },
+  { key: 'delivered', label: 'Entregues', icon: CheckCircle2 },
 ];
 
 export default function Deliveries() {
@@ -62,60 +55,72 @@ export default function Deliveries() {
 
   return (
     <AppLayout>
-      <div className="pb-24 lg:pb-12 px-4 pt-3 lg:px-8 lg:max-w-7xl lg:mx-auto">
+      <div className="pb-28 lg:pb-12 px-4 pt-2 lg:px-8 lg:max-w-7xl lg:mx-auto space-y-4">
         <DesktopActionBar label="Nova Entrega" onClick={() => setSheetOpen(true)} />
 
-        {/* Stats + Filters row */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 lg:flex lg:gap-3 lg:shrink-0">
-            {STAT_CONFIG.map(({ key, label, icon: Icon, colorClass, bgClass }) => (
+        {/* ── KPI Row ── */}
+        <div className="grid grid-cols-3 gap-2.5">
+          {[
+            { value: stats.pending, label: 'Pendentes', icon: Clock, gradient: 'from-amber-500/20 to-amber-600/5', text: 'text-amber-400', iconBg: 'bg-amber-500/15' },
+            { value: stats.out, label: 'Em rota', icon: Truck, gradient: 'from-blue-500/20 to-blue-600/5', text: 'text-blue-400', iconBg: 'bg-blue-500/15' },
+            { value: stats.delivered, label: 'Entregues', icon: CheckCircle2, gradient: 'from-emerald-500/20 to-emerald-600/5', text: 'text-emerald-400', iconBg: 'bg-emerald-500/15' },
+          ].map(({ value, label, icon: Icon, gradient, text, iconBg }) => (
+            <div
+              key={label}
+              className={`relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br ${gradient} p-3 lg:p-4`}
+            >
+              <div className={`w-8 h-8 rounded-xl ${iconBg} flex items-center justify-center mb-2`}>
+                <Icon className={`w-4 h-4 ${text}`} />
+              </div>
+              <p className={`text-2xl lg:text-3xl font-extrabold tabular-nums leading-none ${text}`}>
+                {value}
+              </p>
+              <p className="text-[10px] lg:text-xs text-muted-foreground font-medium mt-1 uppercase tracking-wider">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Filters ── */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+          {FILTERS.map(({ key, label, icon: Icon }) => {
+            const active = statusFilter === key;
+            return (
               <button
                 key={key}
-                onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
-                className={`rounded-2xl border p-3 text-center transition-all duration-200 ${
-                  statusFilter === key
-                    ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20'
-                    : 'border-border/40 bg-card/60 hover:bg-card/80'
-                } lg:min-w-[110px]`}
+                onClick={() => setStatusFilter(key)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${
+                  active
+                    ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                    : 'bg-card/70 text-muted-foreground border border-border/40 hover:bg-card hover:text-foreground'
+                }`}
               >
-                <div className={`inline-flex items-center justify-center w-8 h-8 rounded-xl ${bgClass} mb-1.5`}>
-                  <Icon className={`w-4 h-4 ${colorClass}`} />
-                </div>
-                <p className={`text-2xl font-bold tabular-nums ${colorClass}`}>{stats[key]}</p>
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-0.5">{label}</p>
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+                {key !== 'all' && (
+                  <span className={`text-[10px] tabular-nums ${active ? 'opacity-80' : 'opacity-50'}`}>
+                    {stats[key]}
+                  </span>
+                )}
               </button>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
-          {/* Filter chips */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-medium text-muted-foreground">Filtrar</span>
-              <Badge variant="secondary" className="text-[10px] h-5 px-2 tabular-nums">
+        {/* ── Main Content: Map + List ── */}
+        <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-5 gap-4">
+          {/* Map Section */}
+          <div className="lg:col-span-5 lg:sticky lg:top-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MapPin className="w-3.5 h-3.5 text-primary" />
+              </div>
+              <h2 className="text-sm font-semibold">Mapa de entregas</h2>
+              <Badge variant="secondary" className="text-[10px] h-5 px-1.5 tabular-nums ml-auto">
                 {stats.total} total
               </Badge>
             </div>
-            <div className="flex gap-1.5 flex-wrap">
-              {STATUS_CHIPS.map((chip) => (
-                <Button
-                  key={chip.key}
-                  variant={statusFilter === chip.key ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-8 text-xs gap-1.5 rounded-full px-3"
-                  onClick={() => setStatusFilter(chip.key)}
-                >
-                  <AppIcon name={chip.icon} size={14} /> {chip.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop: Map + List side by side / Mobile: stacked */}
-        <div className="mt-4 flex flex-col lg:grid lg:grid-cols-5 lg:gap-4 lg:items-start gap-4">
-          {/* Map */}
-          <div className="lg:col-span-2 lg:sticky lg:top-4">
             <DeliveryMap
               deliveries={deliveries}
               unitName={activeUnit?.name || ''}
@@ -124,41 +129,34 @@ export default function Deliveries() {
             />
           </div>
 
-          {/* List */}
-          <div className="lg:col-span-3">
+          {/* List Section */}
+          <div className="lg:col-span-7 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Filter className="w-3.5 h-3.5 text-primary" />
+              </div>
+              <h2 className="text-sm font-semibold">Entregas por bairro</h2>
+            </div>
+
             {groupedByNeighborhood.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-dashed border-border/40 bg-card/30">
-                <div className="w-14 h-14 rounded-2xl bg-muted/30 flex items-center justify-center mb-3">
-                  <Package className="w-7 h-7 text-muted-foreground/30" />
+              <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-border/30 bg-card/20">
+                <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mb-4">
+                  <Package className="w-8 h-8 text-muted-foreground/20" />
                 </div>
-                <p className="text-sm font-medium text-muted-foreground">Nenhuma entrega encontrada</p>
-                <p className="text-xs text-muted-foreground/60 mt-1 max-w-[200px]">
-                  Tire foto de um pedido para começar
+                <p className="text-sm font-semibold text-muted-foreground">Nenhuma entrega</p>
+                <p className="text-xs text-muted-foreground/50 mt-1.5 max-w-[220px] leading-relaxed">
+                  Tire foto de um pedido para cadastrar automaticamente
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {groupedByNeighborhood.map((group) => (
-                  <div key={group.neighborhood} className="rounded-2xl border border-border/40 bg-card/40 overflow-hidden">
-                    <div className="flex items-center gap-2 px-3 py-2.5 bg-card/60 border-b border-border/30">
-                      <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <AppIcon name="location_on" size={14} className="text-primary" />
-                      </div>
-                      <span className="font-semibold text-sm flex-1">{group.neighborhood}</span>
-                      <Badge variant="secondary" className="text-[10px] h-5 px-2 tabular-nums">
-                        {group.deliveries.length}
-                      </Badge>
-                    </div>
-                    <div className="p-2 space-y-2">
-                      {group.deliveries.map((delivery) => (
-                        <DeliveryCard
-                          key={delivery.id}
-                          delivery={delivery}
-                          onStatusChange={(id, status) => updateStatus({ id, status })}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <NeighborhoodGroup
+                    key={group.neighborhood}
+                    neighborhood={group.neighborhood}
+                    deliveries={group.deliveries}
+                    onStatusChange={(id, status) => updateStatus({ id, status })}
+                  />
                 ))}
               </div>
             )}
@@ -174,5 +172,42 @@ export default function Deliveries() {
         isProcessing={isProcessing}
       />
     </AppLayout>
+  );
+}
+
+/* ── Neighborhood Group ── */
+function NeighborhoodGroup({
+  neighborhood,
+  deliveries,
+  onStatusChange,
+}: {
+  neighborhood: string;
+  deliveries: import('@/hooks/useDeliveries').Delivery[];
+  onStatusChange: (id: string, status: DeliveryStatus) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-border/30 bg-card/50 overflow-hidden">
+      {/* Group Header */}
+      <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-border/20 bg-card/80">
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <MapPin className="w-4 h-4 text-primary" />
+        </div>
+        <span className="font-semibold text-[13px] flex-1 truncate">{neighborhood}</span>
+        <Badge className="bg-primary/10 text-primary border-0 text-[10px] h-5 px-2 font-bold tabular-nums">
+          {deliveries.length}
+        </Badge>
+      </div>
+
+      {/* Cards */}
+      <div className="p-2 space-y-1.5">
+        {deliveries.map((delivery) => (
+          <DeliveryCard
+            key={delivery.id}
+            delivery={delivery}
+            onStatusChange={onStatusChange}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
