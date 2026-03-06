@@ -1319,13 +1319,13 @@ export function ChecklistView({
                                     )}
                                     {configuredPoints > 0 && (
                                       <div className="mt-1.5">
-                                        <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
+                                        <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
                                           style={{
                                             backgroundColor: getItemPointsColors(configuredPoints).bg,
                                             color: getItemPointsColors(configuredPoints).color,
                                             borderColor: getItemPointsColors(configuredPoints).border,
                                           }}>
-                                          {isBonus ? <AppIcon name="Zap" className="w-3 h-3" /> : <AppIcon name="Star" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
+                                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
                                           +{configuredPoints} pts
                                         </span>
                                       </div>
