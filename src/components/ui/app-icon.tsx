@@ -13,7 +13,7 @@ interface AppIconProps {
   weight?: number;
 }
 
-export const AppIcon = forwardRef<HTMLSpanElement, AppIconProps>(
+export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
   ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
     const customPaths = CUSTOM_SVG_PATHS[name];
 
