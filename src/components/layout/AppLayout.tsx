@@ -240,7 +240,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
               <p className="text-[10px] text-emerald-400/50 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
-            {/* Desktop notification bell */}
+            {/* Desktop theme toggle + notification bell */}
+            <ThemeToggle className="w-8 h-8 rounded-lg hover:bg-white/10 text-foreground/60" />
             <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
               <DrawerTrigger asChild>
                 <button className="relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
