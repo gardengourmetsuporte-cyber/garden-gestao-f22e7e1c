@@ -64,96 +64,96 @@ export function AdminDashboard() {
   let staggerIndex = 0;
   const nextStagger = () => `dash-stagger-${++staggerIndex}`;
 
-  return (
-    <div className="space-y-6 px-4 py-3 lg:px-6">
+  // Categorize widgets into full-width vs grid-able
+  const renderWidget = (widget: typeof widgets[number], stagger: string) => {
+    if (!widget.visible) return null;
 
-      {/* Setup Onboarding */}
+    switch (widget.key) {
+      case 'finance':
+        return hasAccess('finance') ? (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <DashboardHeroFinance
+              balance={stats.monthBalance}
+              pendingExpenses={stats.pendingExpenses}
+              isLoading={statsLoading}
+            />
+          </div>
+        ) : null;
+
+      case 'checklist':
+        return hasAccess('checklists') ? (
+          <DashboardSection key={widget.key} title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyChecklist /></LazyWidget>
+          </DashboardSection>
+        ) : null;
+
+      case 'finance-chart':
+        return hasAccess('finance') ? (
+          <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><FinanceChartWidget /></LazyWidget>
+          </DashboardSection>
+        ) : null;
+
+      case 'bills-due':
+        return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
+          <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
+            <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
+              <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
+            </Suspense>
+          </div>
+        ) : null;
+
+      case 'calendar':
+        return hasAccess('agenda') ? (
+          <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyCalendar /></LazyWidget>
+          </DashboardSection>
+        ) : null;
+
+      case 'agenda':
+        return hasAccess('agenda') ? (
+          <DashboardSection key={widget.key} title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyAgenda /></LazyWidget>
+          </DashboardSection>
+        ) : null;
+
+      case 'weekly-summary':
+        return hasAccess('cash-closing') ? (
+          <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyWeeklySummary /></LazyWidget>
+          </DashboardSection>
+        ) : null;
+
+      case 'leaderboard':
+        return hasAccess('ranking') ? (
+          <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
+          </DashboardSection>
+        ) : null;
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="px-4 py-3 lg:px-8 lg:py-6 max-w-[1400px] mx-auto">
+
+      {/* Setup Onboarding — full width */}
       <SetupChecklistWidget />
 
-      {/* Hero Finance */}
-      {false && (
-        <DashboardHeroFinance
-          balance={stats.monthBalance}
-          pendingExpenses={stats.pendingExpenses}
-          isLoading={statsLoading}
-        />
-      )}
+      {/* Widgets Grid — 2 columns on desktop */}
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+        {widgets.map((widget) => {
+          const stagger = nextStagger();
+          return renderWidget(widget, stagger);
+        })}
+      </div>
 
-      {widgets.map((widget) => {
-        if (!widget.visible) return null;
-        const stagger = nextStagger();
-
-        switch (widget.key) {
-          case 'finance':
-            return hasAccess('finance') ? (
-              <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
-                <DashboardHeroFinance
-                  balance={stats.monthBalance}
-                  pendingExpenses={stats.pendingExpenses}
-                  isLoading={statsLoading}
-                />
-              </div>
-            ) : null;
-
-          case 'checklist':
-            return hasAccess('checklists') ? (
-              <DashboardSection key={widget.key} title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
-                <LazyWidget><LazyChecklist /></LazyWidget>
-              </DashboardSection>
-            ) : null;
-
-          case 'finance-chart':
-            return hasAccess('finance') ? (
-              <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
-                <LazyWidget><FinanceChartWidget /></LazyWidget>
-              </DashboardSection>
-            ) : null;
-
-          case 'bills-due':
-            return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
-              <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
-                <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
-                  <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
-                </Suspense>
-              </div>
-            ) : null;
-
-          case 'calendar':
-            return hasAccess('agenda') ? (
-              <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
-                <LazyWidget><LazyCalendar /></LazyWidget>
-              </DashboardSection>
-            ) : null;
-
-          case 'agenda':
-            return hasAccess('agenda') ? (
-              <DashboardSection key={widget.key} title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
-                <LazyWidget><LazyAgenda /></LazyWidget>
-              </DashboardSection>
-            ) : null;
-
-          case 'weekly-summary':
-            return hasAccess('cash-closing') ? (
-              <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
-                <LazyWidget><LazyWeeklySummary /></LazyWidget>
-              </DashboardSection>
-            ) : null;
-
-          case 'leaderboard':
-            return hasAccess('ranking') ? (
-              <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
-                <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
-              </DashboardSection>
-            ) : null;
-
-          default:
-            return null;
-        }
-      })}
       {/* Manage button */}
       <button
         onClick={() => setManagerOpen(true)}
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+        className="flex items-center justify-center gap-2 w-full py-3 mt-6 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
       >
         <AppIcon name="Settings" size={16} />
         Gerenciar tela inicial
