@@ -246,19 +246,33 @@ export function FinanceChartWidget() {
             </div>
 
             {/* Legend */}
-            <div className="flex-1 space-y-1.5 min-w-0">
+            <div className="flex-1 space-y-2 min-w-0">
               {chartData.map((item) => (
-                <div key={item.id} className="flex items-center gap-2">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-[11px] text-foreground truncate flex-1">
-                    {item.name}
-                  </span>
-                  <span className="text-[10px] font-semibold text-muted-foreground tabular-nums shrink-0">
-                    {item.percentage > 0 ? `${item.percentage.toFixed(0)}%` : ''}
-                  </span>
+                <div key={item.id} className="space-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-[11px] text-foreground truncate">
+                        {item.name}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-muted-foreground tabular-nums shrink-0 ml-2">
+                      {item.percentage > 0 ? `${item.percentage.toFixed(0)}%` : ''}
+                    </span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="h-1 rounded-full bg-muted/30 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.max(item.percentage, 2)}%`,
+                        backgroundColor: item.color,
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
