@@ -4,6 +4,42 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+
+// Garantir que os ícones Material Symbols só apareçam quando a fonte estiver realmente carregada
+(function ensureMaterialSymbolsReady() {
+  const root = document.documentElement;
+  const fontQuery = '24px "Material Symbols Rounded"';
+
+  const markReady = () => {
+    root.classList.add('material-font-ready');
+  };
+
+  const tryMarkReady = () => {
+    if ('fonts' in document && document.fonts.check(fontQuery)) {
+      markReady();
+    }
+  };
+
+  // Fallback para navegadores com bug no <link media="print" onload>
+  if (!document.getElementById('material-symbols-runtime-fallback')) {
+    const fallbackLink = document.createElement('link');
+    fallbackLink.id = 'material-symbols-runtime-fallback';
+    fallbackLink.rel = 'stylesheet';
+    fallbackLink.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap';
+    document.head.appendChild(fallbackLink);
+  }
+
+  if ('fonts' in document) {
+    document.fonts.ready.then(tryMarkReady).catch(() => {});
+    document.fonts.load(fontQuery).then(tryMarkReady).catch(() => {});
+    setTimeout(tryMarkReady, 3500);
+    return;
+  }
+
+  // Fallback extremo: manter ícones visíveis em navegadores legados
+  markReady();
+})();
+
 // Force update: when a new service worker is installed, show update banner
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready

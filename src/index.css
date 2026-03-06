@@ -20,8 +20,8 @@
   transition: opacity 0.15s ease;
 }
 
-/* Reveal icons once font is loaded */
-.fonts-loaded .material-symbols-rounded {
+/* Reveal icons only when Material Symbols font is confirmed ready */
+.material-font-ready .material-symbols-rounded {
   opacity: 1;
 }
 
