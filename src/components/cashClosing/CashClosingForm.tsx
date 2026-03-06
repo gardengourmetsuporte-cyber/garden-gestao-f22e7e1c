@@ -70,13 +70,13 @@ function DateInline({ selectedDate, onSelect, todayDate, minAllowedDate }: {
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div>
+    <div className="relative">
       <Button variant="outline" size="sm" className="gap-2 font-medium" onClick={() => setOpen(!open)}>
-        <AppIcon name="CalendarIcon" className="w-4 h-4" />
+        <AppIcon name="Calendar" size={16} />
         {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
       </Button>
       {open && (
-        <div className="mt-2 rounded-xl border bg-card p-2">
+        <div className="absolute left-0 top-full mt-1 z-50 rounded-xl border bg-card p-2 shadow-lg">
           <Calendar mode="single" selected={selectedDate} onSelect={(d) => { if (d) { onSelect(d); setOpen(false); } }} locale={ptBR} disabled={(date) => date > todayDate || date < minAllowedDate} className="p-3 pointer-events-auto" />
           <p className="text-xs text-muted-foreground px-3 pb-2">Disponível até 7 dias anteriores.</p>
         </div>
