@@ -404,24 +404,24 @@ export function ChecklistView({
             <button
               onClick={() => toggleSector(sector.id)}
               className={cn(
-                "w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300",
+                "w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300",
                 sectorComplete 
-                  ? "card-command-success ring-1 ring-success/20" 
-                  : "card-command hover:shadow-lg"
+                  ? "card-stat-holo !border-success/30" 
+                  : "card-stat-holo"
               )}
             >
-              <div className="flex items-stretch gap-3">
-                {/* Lateral color bar */}
-                <div
-                  className="w-[3px] rounded-full shrink-0 transition-colors duration-500"
-                  style={{ backgroundColor: sectorComplete ? 'hsl(var(--success))' : sector.color }}
-                />
-                {/* Monochrome icon */}
-                <div className="shrink-0">
+              <div className="flex items-center gap-3">
+                {/* Icon */}
+                <div className={cn(
+                  "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
+                  sectorComplete ? "bg-success/15" : "bg-muted/30"
+                )}
+                  style={!sectorComplete ? { borderLeft: `3px solid ${sector.color}` } : undefined}
+                >
                   {sectorComplete ? (
                     <AppIcon name="check_circle" size={22} fill={1} className="text-success animate-scale-in" />
                   ) : (
-                    <AppIcon name={getSectorIcon(sector)} size={22} fill={0} className="text-muted-foreground" />
+                    <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-muted-foreground" />
                   )}
                 </div>
                 <div className="text-left">
@@ -436,11 +436,11 @@ export function ChecklistView({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-1.5 bg-secondary rounded-full overflow-hidden">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-1.5 bg-secondary rounded-full overflow-hidden">
                   <div
                     className={cn(
-                      "h-full transition-all duration-500",
+                      "h-full transition-all duration-500 rounded-full",
                       sectorComplete ? "bg-success" : "bg-primary"
                     )}
                     style={{ width: `${progress.total > 0 ? (progress.completed / progress.total) * 100 : 0}%` }}
@@ -774,30 +774,21 @@ export function ChecklistView({
                           disabled={!canToggle}
                           onClick={handleTimerClick}
                           className={cn(
-                            "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
+                            "w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-200",
                             !canToggle && "cursor-not-allowed opacity-80",
-                            canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
-                            "card-base border-2",
-                            activeTimer && "border-primary/50 bg-primary/5",
-                            openPopover === item.id && "border-primary/50 shadow-md"
+                            canToggle && "active:scale-[0.97]",
+                            "card-stat-holo",
+                            activeTimer && "!border-primary/40 bg-primary/5",
+                            openPopover === item.id && "!border-primary/40"
                           )}
                           style={{ animationDelay: `${itemIndex * 40}ms` }}
                         >
-                          {activeTimer ? (
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-primary/15 border-2 border-primary/30">
-                              <AppIcon name="Timer" className="w-4 h-4 text-primary animate-pulse" />
-                            </div>
-                          ) : (
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
-                              <AppIcon name="Play" className="w-4 h-4 text-muted-foreground" />
-                            </div>
-                          )}
                           <div className="flex-1 text-left min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <p className="font-medium text-foreground truncate">{item.name}</p>
+                              <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
                               {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
                             </div>
-                            {item.description && <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>}
+                            {item.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>}
                             {activeTimer && (
                               <div className="mt-1.5 flex items-center gap-2">
                                 <TimerBadge timer={activeTimer} stats={itemStats} minExecutions={timerMinExecutions} />
@@ -809,20 +800,28 @@ export function ChecklistView({
                                 <TimerStatsIndicator stats={itemStats} minExecutions={timerMinExecutions} />
                               </div>
                             )}
+                            {configuredPoints > 0 && (
+                              <div className="mt-1.5">
+                                <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
+                                  style={{
+                                    backgroundColor: getItemPointsColors(configuredPoints).bg,
+                                    color: getItemPointsColors(configuredPoints).color,
+                                    borderColor: getItemPointsColors(configuredPoints).border,
+                                  }}>
+                                  <AppIcon name="Zap" className="w-3 h-3" />
+                                  +{configuredPoints} pts
+                                </span>
+                              </div>
+                            )}
                           </div>
-                          {configuredPoints > 0 ? (
-                            <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
-                              style={{
-                                backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                color: getItemPointsColors(configuredPoints).color,
-                                borderColor: getItemPointsColors(configuredPoints).border,
-                                boxShadow: `0 0 12px ${getItemPointsColors(configuredPoints).glow}`,
-                              }}>
-                              <AppIcon name="Zap" className="w-3 h-3" />
-                              <span>+{configuredPoints}</span>
+                          {activeTimer ? (
+                            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-primary/15 border border-primary/30">
+                              <AppIcon name="Timer" className="w-5 h-5 text-primary animate-pulse" />
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
+                            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
+                              <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
+                            </div>
                           )}
                         </button>
                         {openPopover === item.id && activeTimer && onCancelTimer && (
@@ -1293,34 +1292,21 @@ export function ChecklistView({
                                   disabled={!canToggle}
                                   onClick={() => isTimerMode ? handleStdTimerClick() : (canToggle && setOpenPopover(openPopover === item.id ? null : item.id))}
                                   className={cn(
-                                    "w-full flex items-start gap-4 p-4 rounded-xl transition-all duration-200",
+                                    "w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-200",
                                     !canToggle && "cursor-not-allowed opacity-80",
-                                    canToggle && "active:scale-[0.97] hover:shadow-md hover:border-primary/40",
-                                    "card-base border-2",
-                                    stdActiveTimer && "border-primary/50 bg-primary/5",
-                                    openPopover === item.id && "border-primary/50 shadow-md"
+                                    canToggle && "active:scale-[0.97]",
+                                    "card-stat-holo",
+                                    stdActiveTimer && "!border-primary/40 bg-primary/5",
+                                    openPopover === item.id && "!border-primary/40"
                                   )}
                                   style={{ animationDelay: `${itemIndex * 40}ms` }}
                                 >
-                                  {isTimerMode ? (
-                                    stdActiveTimer ? (
-                                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-primary/15 border-2 border-primary/30">
-                                        <AppIcon name="Timer" className="w-4 h-4 text-primary animate-pulse" />
-                                      </div>
-                                    ) : (
-                                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
-                                        <AppIcon name="Play" className="w-4 h-4 text-muted-foreground" />
-                                      </div>
-                                    )
-                                  ) : (
-                                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/30 bg-background transition-all duration-300 hover:border-primary/50 hover:bg-primary/5" />
-                                  )}
                                   <div className="flex-1 text-left min-w-0">
                                     <div className="flex items-center gap-1.5">
-                                      <p className="font-medium text-foreground truncate">{item.name}</p>
+                                      <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
                                       {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
                                     </div>
-                                    {item.description && <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>}
+                                    {item.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>}
                                     {stdActiveTimer && (
                                       <div className="mt-1.5 flex items-center gap-2">
                                         <TimerBadge timer={stdActiveTimer} stats={stdItemStats} minExecutions={timerMinExecutions} />
@@ -1332,20 +1318,34 @@ export function ChecklistView({
                                         <TimerStatsIndicator stats={stdItemStats} minExecutions={timerMinExecutions} />
                                       </div>
                                     )}
+                                    {configuredPoints > 0 && (
+                                      <div className="mt-1.5">
+                                        <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
+                                          style={{
+                                            backgroundColor: getItemPointsColors(configuredPoints).bg,
+                                            color: getItemPointsColors(configuredPoints).color,
+                                            borderColor: getItemPointsColors(configuredPoints).border,
+                                          }}>
+                                          {isBonus ? <AppIcon name="Zap" className="w-3 h-3" /> : <AppIcon name="Star" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
+                                          +{configuredPoints} pts
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
-                                  {configuredPoints > 0 ? (
-                                    <div className={cn("flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 border transition-all duration-200", isBonus && "animate-pulse")}
-                                      style={{
-                                        backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                        color: getItemPointsColors(configuredPoints).color,
-                                        borderColor: getItemPointsColors(configuredPoints).border,
-                                        boxShadow: isBonus ? `0 0 12px ${getItemPointsColors(configuredPoints).glow}` : undefined,
-                                      }}>
-                                      {isBonus ? <AppIcon name="Zap" className="w-3 h-3" /> : <AppIcon name="Star" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
-                                      <span>+{configuredPoints}</span>
-                                    </div>
+                                  {isTimerMode ? (
+                                    stdActiveTimer ? (
+                                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-primary/15 border border-primary/30">
+                                        <AppIcon name="Timer" className="w-5 h-5 text-primary animate-pulse" />
+                                      </div>
+                                    ) : (
+                                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
+                                        <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
+                                      </div>
+                                    )
                                   ) : (
-                                    <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shrink-0 bg-muted text-muted-foreground"><span>sem pts</span></div>
+                                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
+                                      <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
+                                    </div>
                                   )}
                                 </button>
                                 {openPopover === item.id && (
