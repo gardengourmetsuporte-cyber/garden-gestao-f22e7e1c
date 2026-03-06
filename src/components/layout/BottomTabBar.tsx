@@ -164,7 +164,7 @@ export function BottomTabBar() {
             </div>
           </div>
 
-          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10 tabbar-notch-shell">
+          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10 tabbar-notch-shell overflow-visible">
             {/* Left tabs */}
             {leftTabs.map(tab => (
               <TabButton
