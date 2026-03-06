@@ -228,7 +228,7 @@ export function useDeliveries() {
     // First pass: bounded
     for (const query of queries) {
       try {
-        const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
+        const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
         if (anchor) {
           params.set('viewbox', `${anchor.lng - 0.35},${anchor.lat + 0.35},${anchor.lng + 0.35},${anchor.lat - 0.35}`);
           params.set('bounded', '1');
