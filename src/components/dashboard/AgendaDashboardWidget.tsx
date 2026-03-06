@@ -25,6 +25,13 @@ export function AgendaDashboardWidget() {
 
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
+  const [scrollUnlocked, setScrollUnlocked] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Lock scroll again when user scrolls away (touch ends outside)
+  const handleBlur = useCallback(() => {
+    setTimeout(() => setScrollUnlocked(false), 300);
+  }, []);
 
   const pendingTasks = useMemo(() =>
     (tasks || [])
