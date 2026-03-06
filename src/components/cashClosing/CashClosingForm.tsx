@@ -78,7 +78,7 @@ function DateInline({ selectedDate, onSelect, todayDate, minAllowedDate }: {
       {open && (
         <div className="mt-2 rounded-xl border bg-card p-2">
           <Calendar mode="single" selected={selectedDate} onSelect={(d) => { if (d) { onSelect(d); setOpen(false); } }} locale={ptBR} disabled={(date) => date > todayDate || date < minAllowedDate} className="p-3 pointer-events-auto" />
-          <p className="text-xs text-muted-foreground px-3 pb-2">Disponível até 3 dias anteriores.</p>
+          <p className="text-xs text-muted-foreground px-3 pb-2">Disponível até 7 dias anteriores.</p>
         </div>
       )}
     </div>
@@ -93,7 +93,7 @@ export function CashClosingForm({ onSuccess }: Props) {
   
   const now = new Date();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const minAllowedDate = subDays(todayDate, 3);
+  const minAllowedDate = subDays(todayDate, 7);
   const currentHour = now.getHours();
   const defaultDate = currentHour < 6 ? subDays(todayDate, 1) : todayDate;
 
