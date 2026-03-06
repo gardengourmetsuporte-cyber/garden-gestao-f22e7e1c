@@ -46,12 +46,6 @@ export default function Profile() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Back button only - no title bar */}
-        <div className="px-4 pt-3">
-          <button onClick={() => navigate(-1)} className="p-2 rounded-xl hover:bg-secondary transition-all">
-            <AppIcon name="ArrowLeft" size={20} className="text-muted-foreground" />
-          </button>
-        </div>
 
         <div className="p-4 space-y-4 max-w-lg mx-auto">
           {/* Profile Header - Avatar + Name + Rank Progress */}
