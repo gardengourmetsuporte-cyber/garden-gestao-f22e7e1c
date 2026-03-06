@@ -1,5 +1,6 @@
 // Auth page v4 — Modern SaaS split-screen layout
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -222,6 +223,7 @@ export default function Auth() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { user, signIn, signUp, isLoading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const planFromUrl = searchParams.get('plan');
@@ -370,12 +372,19 @@ export default function Auth() {
 
       {/* ── RIGHT: Form Panel ── */}
       <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0 bg-background">
-        {/* Top bar - absolute on mobile to overlay the navy banner seamlessly */}
+        {/* Top bar */}
         <div className="flex items-center justify-between px-5 absolute top-0 left-0 right-0 z-20 lg:relative" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
           <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-white/60 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary"
+            aria-label="Alternar tema"
+          >
+            <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={18} />
+          </button>
         </div>
 
         <div className="flex-1 flex flex-col items-center lg:justify-center relative z-10">
