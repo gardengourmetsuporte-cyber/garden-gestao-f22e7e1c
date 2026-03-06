@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,6 +7,8 @@ import { useAgenda } from '@/hooks/useAgenda';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { TaskSheet } from '@/components/agenda/TaskSheet';
 import type { ManagerTask } from '@/types/agenda';
+
+const MAX_VISIBLE_TASKS = 4;
 
 export function AgendaDashboardWidget() {
   const navigate = useNavigate();
@@ -25,13 +27,6 @@ export function AgendaDashboardWidget() {
 
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [scrollUnlocked, setScrollUnlocked] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Lock scroll again when user scrolls away (touch ends outside)
-  const handleBlur = useCallback(() => {
-    setTimeout(() => setScrollUnlocked(false), 300);
-  }, []);
 
   const pendingTasks = useMemo(() =>
     (tasks || [])
@@ -45,6 +40,9 @@ export function AgendaDashboardWidget() {
     [tasks]
   );
 
+  const visibleTasks = pendingTasks.slice(0, MAX_VISIBLE_TASKS);
+  const remainingCount = pendingTasks.length - MAX_VISIBLE_TASKS;
+
   const handleEditTask = (task: ManagerTask) => {
     setEditingTask(task);
     setTaskSheetOpen(true);
@@ -53,7 +51,6 @@ export function AgendaDashboardWidget() {
   const handleInlineUpdate = (id: string, title: string, notes: string) => {
     updateTask({ id, title, notes: notes || undefined });
   };
-
 
   const handleCloseSheet = (open: boolean) => {
     setTaskSheetOpen(open);
@@ -96,32 +93,14 @@ export function AgendaDashboardWidget() {
           </div>
         </div>
 
-        {/* Task list */}
+        {/* Task list — no internal scroll, max 4 items */}
         {isLoading ? (
           <div className="space-y-1 px-3 pb-3">
             {[1,2,3].map(i => <Skeleton key={i} className="h-14 w-full rounded-2xl" />)}
           </div>
         ) : pendingTasks.length > 0 ? (
-          <div
-            ref={scrollRef}
-            className="px-3 pb-3 space-y-1 scrollbar-thin transition-all relative"
-            style={{
-              maxHeight: '260px',
-              overflowY: scrollUnlocked ? 'auto' : 'hidden',
-            }}
-            onPointerLeave={handleBlur}
-          >
-            {!scrollUnlocked && pendingTasks.length > 4 && (
-              <div
-                className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent z-10 flex items-end justify-center pb-3 cursor-pointer"
-                onClick={(e) => { e.stopPropagation(); setScrollUnlocked(true); }}
-              >
-                <span className="text-[10px] font-medium text-muted-foreground bg-secondary/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                  Toque para rolar a lista
-                </span>
-              </div>
-            )}
-            {pendingTasks.map(task => (
+          <div className="px-3 pb-3 space-y-1">
+            {visibleTasks.map(task => (
               <TaskItem
                 key={task.id}
                 task={task}
@@ -131,6 +110,14 @@ export function AgendaDashboardWidget() {
                 onInlineUpdate={handleInlineUpdate}
               />
             ))}
+            {remainingCount > 0 && (
+              <button
+                onClick={() => navigate('/agenda')}
+                className="w-full text-center py-2 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Ver mais {remainingCount} tarefa{remainingCount > 1 ? 's' : ''}
+              </button>
+            )}
           </div>
         ) : (
           <div className="text-center px-4 pb-5">
