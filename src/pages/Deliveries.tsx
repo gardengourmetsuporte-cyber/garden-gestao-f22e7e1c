@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Button } from '@/components/ui/button';
