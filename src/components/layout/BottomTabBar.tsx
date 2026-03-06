@@ -135,7 +135,7 @@ export function BottomTabBar() {
           }}
         >
           {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[28px] z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[22px] z-20">
             <div className="fab-cradle-ring">
               <button
                 aria-label={fabAction?.label || 'Ação rápida'}
@@ -148,7 +148,7 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200",
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200",
                   "bg-primary hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
@@ -164,7 +164,7 @@ export function BottomTabBar() {
             </div>
           </div>
 
-          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10 tabbar-notch-shell">
+          <div ref={containerRef} className="flex items-center h-[68px] max-w-lg mx-auto relative z-10 tabbar-notch-shell overflow-visible">
             {/* Left tabs */}
             {leftTabs.map(tab => (
               <TabButton
@@ -291,11 +291,31 @@ const TabButton = forwardRef<
       onTouchStart={() => void preloadRoute(tab.path)}
       aria-label={tab.label}
       className={cn(
-        "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
+        "flex flex-col items-center justify-center h-full gap-0.5 relative",
         "text-muted-foreground"
       )}
       style={{ width: slotWidth }}
     >
+      {/* Active bump — background surface rises behind icon */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 bottom-full w-12 transition-all duration-300 ease-out pointer-events-none",
+          active ? "h-3 opacity-100" : "h-0 opacity-0"
+        )}
+      >
+        <div className="w-full h-full bg-background rounded-t-2xl" />
+      </div>
+
+      {/* Green dot on top */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 transition-all duration-300 ease-out",
+          active ? "-top-0.5 opacity-100 scale-100" : "top-1 opacity-0 scale-0"
+        )}
+      >
+        <div className="w-[5px] h-[5px] rounded-full bg-primary" />
+      </div>
+
       <div
         className="relative"
         style={{
@@ -303,13 +323,6 @@ const TabButton = forwardRef<
           transition: bouncing ? 'transform 80ms cubic-bezier(0.2, 0, 0, 1)' : 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        {/* Active pill indicator */}
-        <div
-          className={cn(
-            "absolute -inset-x-2.5 -inset-y-1.5 rounded-2xl bg-primary/12 transition-all duration-300",
-            active ? "opacity-100 scale-100" : "opacity-0 scale-75"
-          )}
-        />
         <AppIcon
           name={tab.icon}
           size={22}
