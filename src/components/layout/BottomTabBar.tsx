@@ -326,16 +326,6 @@ const TabButton = forwardRef<
         <div className="w-full h-full bg-background rounded-t-[14px]" />
       </div>
 
-      {/* Green dot indicator with glow */}
-      <div
-        className={cn(
-          "absolute left-1/2 -translate-x-1/2 transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-          active ? "-top-1 opacity-100 scale-100 duration-400" : "top-2 opacity-0 scale-0 duration-200"
-        )}
-        style={{ transitionDelay: active ? '50ms' : '0ms' }}
-      >
-        <div className="w-[5px] h-[5px] rounded-full bg-primary tab-dot-glow" />
-      </div>
 
       {/* Icon container */}
       <div
