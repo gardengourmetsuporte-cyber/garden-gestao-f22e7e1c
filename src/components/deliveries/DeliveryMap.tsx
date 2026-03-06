@@ -107,19 +107,35 @@ async function geocodeAddress(
   return null;
 }
 
-interface Props {
-  deliveries: Delivery[];
-  unitName?: string;
-  onStatusChange: (id: string, status: DeliveryStatus) => void;
-  onRefresh?: () => void;
+export interface DeliveryMapHandle {
+  focusDelivery: (deliveryId: string) => void;
 }
 
-export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }: Props) {
+export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function DeliveryMap(
+  { deliveries, unitName, onStatusChange, onRefresh },
+  ref,
+) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const markersRef = useRef<Record<string, any>>({});
   const [isGeocoding, setIsGeocoding] = useState(false);
   const geocodedRef = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    focusDelivery(deliveryId: string) {
+      const marker = markersRef.current[deliveryId];
+      const map = mapInstanceRef.current;
+      if (!marker || !map) return;
+
+      // Scroll map container into view on mobile
+      mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      setTimeout(() => {
+        map.flyTo(marker.getLatLng(), 16, { duration: 0.6 });
+        marker.openPopup();
+      }, 300);
+    },
+  }));
 
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
   const withoutCoords = deliveries.filter(d => d.address && (!d.address.lat || !d.address.lng));
