@@ -102,7 +102,24 @@ export function AgendaDashboardWidget() {
             {[1,2,3].map(i => <Skeleton key={i} className="h-14 w-full rounded-2xl" />)}
           </div>
         ) : pendingTasks.length > 0 ? (
-          <div className="px-3 pb-3 max-h-[260px] overflow-y-auto space-y-1 scrollbar-thin">
+          <div
+            ref={scrollRef}
+            className="px-3 pb-3 space-y-1 scrollbar-thin transition-all relative"
+            style={{
+              maxHeight: '260px',
+              overflowY: scrollUnlocked ? 'auto' : 'hidden',
+              touchAction: scrollUnlocked ? 'pan-y' : 'none',
+            }}
+            onClick={() => !scrollUnlocked && setScrollUnlocked(true)}
+            onPointerLeave={handleBlur}
+          >
+            {!scrollUnlocked && pendingTasks.length > 4 && (
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent z-10 pointer-events-none flex items-end justify-center pb-3">
+                <span className="text-[10px] font-medium text-muted-foreground bg-secondary/80 backdrop-blur-sm px-3 py-1 rounded-full pointer-events-auto">
+                  Toque para rolar a lista
+                </span>
+              </div>
+            )}
             {pendingTasks.map(task => (
               <TaskItem
                 key={task.id}
