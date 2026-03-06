@@ -5,6 +5,7 @@ import { useFabAction } from '@/contexts/FabActionContext';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { CashClosingForm, clearCashClosingDraft } from '@/components/cashClosing/CashClosingForm';
 import { CashClosingList } from '@/components/cashClosing/CashClosingList';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
