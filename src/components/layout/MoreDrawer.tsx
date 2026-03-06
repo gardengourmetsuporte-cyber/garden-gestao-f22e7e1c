@@ -97,10 +97,11 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
       />
       {/* Panel */}
       <div
-        className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
+        className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col"
         style={{
           paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
           background: 'hsl(var(--background))',
+          animation: 'moreDrawerIn 0.35s cubic-bezier(0.16,1,0.3,1) both',
         }}
       >
         <div className="overflow-y-auto h-full">
