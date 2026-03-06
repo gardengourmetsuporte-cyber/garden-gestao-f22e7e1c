@@ -1,83 +1,30 @@
 
 
-## Plan: Dashboard Premium com Personalidade e Animações
+## Relatório Semanal: Receita vs Despesa
 
-### Visao Geral
+Adicionar um novo tipo de visualização **"Semanal"** na aba de gráficos do financeiro, mostrando receitas e despesas lado a lado por semana dentro do mês selecionado.
 
-Adicionar personalidade visual ao Dashboard Admin com animações de entrada escalonadas, micro-interações nos cards, efeitos visuais premium e um greeting mais vivo. Tudo com CSS puro + classes existentes para manter performance mobile.
+### O que muda
 
-### Mudancas
+**Arquivo: `src/components/finance/FinanceCharts.tsx`**
 
-**1. CSS — Novas animações e efeitos (`src/index.css`)**
+1. Adicionar `'weekly'` como nova opção no seletor de tipo de visualização (ao lado de Categorias, Linha, Barras)
+2. O novo gráfico será um **BarChart agrupado** (grouped bars) com barras verdes (receita) e vermelhas (despesa) lado a lado para cada semana
+3. A lógica agrupa as transações pagas do mês em semanas (Sem 1, Sem 2, Sem 3, Sem 4, Sem 5) baseado no dia
+4. Abaixo do gráfico, cards de resumo por semana mostrando: receita, despesa e saldo da semana
+5. O toggle Despesas/Receitas fica **escondido** nessa view (pois mostra ambos juntos)
 
-Adicionar ao final da seção de animações:
+### Detalhes do gráfico
 
-- **`@keyframes cardReveal`** — Cards entram com fade + slide lateral sutil + scale (mais orgânico que só slide-up)
-- **`@keyframes countUp`** — Efeito de "blur to sharp" nos números do hero financeiro
-- **`@keyframes subtleFloat`** — Micro-flutuação em ícones decorativos
-- **`.dash-card-reveal`** — Classe que combina cardReveal com stagger delays
-- **`.dash-kpi-card` hover upgrade** — Adicionar sutil glow colorido no hover baseado na cor do KPI (border-glow + translateY(-2px))
-- **`.dash-section-body` entrada** — Transição de borda que "acende" ao entrar na viewport
-- **`.finance-hero-card` melhoria** — Adicionar partículas/dots decorativos via `::before` com gradiente animado sutil
+- Tipo: `BarChart` vertical com 2 barras por semana (receita + despesa)
+- Eixo X: Semanas (Sem 1, Sem 2, etc.)
+- Eixo Y: Valores
+- Cores: verde `#22c55e` para receita, vermelho `#ef4444` para despesa
+- Tooltip customizado mostrando receita e despesa da semana
+- Cards abaixo com saldo semanal (receita - despesa) e indicador visual positivo/negativo
+- Totais do mês no rodapé
 
-**2. AdminDashboard (`src/components/dashboard/AdminDashboard.tsx`)**
+### Dados
 
-- Greeting: Adicionar um emoji animado (wave) e uma frase motivacional curta rotativa abaixo da data (ex: "Vamos fazer acontecer!", "Dia de resultados!")
-- Envolver os widgets com classes `dash-card-reveal` e stagger delays incrementais em vez de usar `animate-spring-in` repetitivo
-- Adicionar um efeito de "counter reveal" ao hero financeiro onde os números aparecem com blur-to-sharp
-
-**3. DashboardHeroFinance (`src/components/dashboard/DashboardHeroFinance.tsx`)**
-
-- Adicionar dots decorativos animados no background (CSS pseudo-elements)
-- Número do saldo: classe `animate-number-reveal` para efeito de blur→clear
-- Chips de lucro/despesas: entrada com stagger independente
-
-**4. DashboardSection (`src/components/dashboard/DashboardSection.tsx`)**
-
-- Envolver com `dash-card-reveal` com delay baseado na posição
-- Header: ícone com micro-animação de scale ao montar
-
-**5. DashboardKPIGrid (`src/components/dashboard/DashboardKPIGrid.tsx`)**
-
-- Cada KPI card recebe stagger delay individual
-- Números grandes: efeito `animate-number-reveal`
-- Ícones: `subtleFloat` animation no idle
-
-### Detalhes Técnicos
-
-Todas as animações usam `will-change: transform, opacity` e `animation-fill-mode: both` para GPU compositing. Sem JS de animação, tudo CSS puro. Os delays usam o sistema `spring-stagger` existente expandido.
-
-Novas keyframes no CSS:
-
-```css
-@keyframes cardReveal {
-  0% { opacity: 0; transform: translateY(16px) scale(0.97); }
-  100% { opacity: 1; transform: none; }
-}
-
-@keyframes numberReveal {
-  0% { opacity: 0; filter: blur(8px); transform: translateY(4px); }
-  100% { opacity: 1; filter: blur(0); transform: none; }
-}
-
-@keyframes subtleFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-@keyframes dotPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
-```
-
-### Resumo
-
-| Arquivo | Mudanca |
-|---------|---------|
-| `src/index.css` | Novas keyframes e classes de animação para dashboard |
-| `src/components/dashboard/AdminDashboard.tsx` | Frases motivacionais, stagger melhorado, classes premium |
-| `src/components/dashboard/DashboardHeroFinance.tsx` | Number reveal, dots decorativos, stagger nos chips |
-| `src/components/dashboard/DashboardSection.tsx` | Entrada animada com card reveal |
-| `src/components/dashboard/DashboardKPIGrid.tsx` | Stagger individual, float nos ícones, number reveal |
+Usa `dailyExpenses` e `dailyIncome` já disponíveis como props, agrupando por semana (dias 1-7, 8-14, 15-21, 22-28, 29+).
 
