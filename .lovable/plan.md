@@ -1,35 +1,46 @@
 
 
-## Corrigir tela de cadastro de boleto e adicionar captura de foto
+## Lançamento em Lote no Estoque
 
-### Problemas identificados
-1. O sheet `RegisterInvoiceAfterReceive` tem layout com espaço vazio embaixo (visualização bugada)
-2. Falta a opção de tirar foto do boleto/nota para preencher automaticamente os dados
+### Problema
+A equipe marca itens em uma lousa durante o dia e precisa lançar tudo de uma vez no final da noite. Hoje, precisa abrir item por item para registrar cada movimentação.
+
+### Solução
+Criar um **sheet de "Lançamento em Lote"** acessível por um botão no estoque. O fluxo:
+
+1. Abre sheet com lista de todos os itens do estoque agrupados por categoria
+2. Cada item tem um campo de quantidade ao lado (inicialmente vazio/zero)
+3. Usuário toca no item ou digita a quantidade — só os que tiver valor serão lançados
+4. Toggle no topo para escolher se é Entrada ou Saída (default: Entrada)
+5. Botão "Confirmar X lançamentos" no final
+6. Registra todas as movimentações de uma vez
+
+### UI
+- Botão "Lançar em lote" na barra de busca ou como segundo FAB/botão fixo
+- Sheet fullscreen com busca no topo
+- Itens em lista compacta: `[nome do item] [estoque atual] [+/-] [input qty]`
+- Botões rápidos +1, +5 ao lado de cada item
+- Badge mostrando quantos itens foram preenchidos
+- Botão fixo no rodapé: "Confirmar 5 lançamentos"
 
 ### Mudanças
 
-**Arquivo: `src/components/inventory/RegisterInvoiceAfterReceive.tsx`**
+**Novo arquivo: `src/components/inventory/BatchMovementSheet.tsx`**
+- Sheet fullscreen com lista de itens agrupados por categoria
+- Campo de quantidade por item com botões +1/+5
+- Toggle entrada/saída no topo
+- Busca para filtrar itens
+- Botão de confirmação que chama `registerMovement` para cada item com qty > 0
+- Campo de observação geral (opcional)
 
-1. **Adicionar captura de foto** -- dois botões no topo do formulário:
-   - "Foto da Nota" (nota fiscal) -- para dar entrada no estoque via OCR
-   - "Foto do Boleto" -- para preencher valor e vencimento automaticamente via OCR
-   - Usa `<input type="file" accept="image/*" capture="environment">` para abrir câmera no mobile
-   - Preview da imagem capturada com opção de remover
+**Arquivo: `src/pages/Inventory.tsx`**
+- Adicionar botão "Lançar em lote" (ícone `ListChecks`) ao lado da busca ou nas tabs
+- State para controlar abertura do BatchMovementSheet
+- Passar `items`, `categories` e `registerMovement` para o sheet
 
-2. **Integrar com OCR existente** -- reutilizar o hook `useSmartReceiving` (já tem `processImage` e `uploadImage`) para:
-   - Extrair valor e data de vencimento do boleto automaticamente
-   - Preencher os campos do formulário com os dados extraídos
-   - Armazenar a imagem no storage
-
-3. **Corrigir layout** -- ajustar o `max-h` e padding do SheetContent para não deixar espaço vazio, e garantir que o conteúdo ocupe o espaço correto com `pb-safe` para mobile
-
-4. **Fluxo simplificado**:
-   - Usuário tira foto → OCR extrai dados → campos preenchidos automaticamente → usuário confirma/ajusta → salva
-   - Se não quiser tirar foto, preenche manual normalmente (fluxo atual mantido)
-
-### Detalhes técnicos
-- Reutiliza `useSmartReceiving` para OCR (já conectado ao edge function `smart-receiving-ocr`)
-- Usa `receipt-ocr` edge function para processar boleto (extrair valor + vencimento)
-- Imagens salvas no bucket `smart-receiving` existente
-- Botões de câmera com ícones `Camera` e `FileText`
+### Fluxo técnico
+- Mantém um `Map<string, number>` com itemId → quantidade
+- No confirmar, itera sobre as entradas com qty > 0 e chama `registerMovement` sequencialmente
+- Toast com resumo: "X movimentações registradas"
+- Limpa o estado e fecha o sheet
 
