@@ -137,6 +137,40 @@ export function useDeliveries() {
     return urlData.publicUrl;
   }, [activeUnitId]);
 
+  const normalizeText = useCallback((value: string): string => {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }, []);
+
+  const distanceKm = useCallback((a: { lat: number; lng: number }, b: { lat: number; lng: number }): number => {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const x =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * earthRadiusKm * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+  }, []);
+
+  const pickValidResult = useCallback((result: any, anchor: { lat: number; lng: number } | null, city: string) => {
+    const lat = Number.parseFloat(result?.lat);
+    const lng = Number.parseFloat(result?.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+    if (anchor && distanceKm(anchor, { lat, lng }) > 45) return null;
+
+    const cityToken = normalizeText(city);
+    const displayName = normalizeText(String(result?.display_name || ''));
+    if (cityToken && displayName && !displayName.includes(cityToken) && !anchor) return null;
+
+    return { lat, lng };
+  }, [distanceKm, normalizeText]);
+
   // Strip apartment/unit/complement info that confuses geocoders
   const cleanAddress = useCallback((addr: string): string => {
     return addr
@@ -151,11 +185,15 @@ export function useDeliveries() {
   const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
     const fallbackCity = city?.trim().length >= 4 ? city.trim() : (activeUnit?.name || '').trim();
     const cleaned = cleanAddress(address);
-    const queries = [
+    const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
+
+    const queries = Array.from(new Set([
       `${cleaned}, ${fallbackCity}, SP, Brasil`,
+      `${streetOnly}, ${fallbackCity}, SP, Brasil`,
       `${cleaned}, ${fallbackCity}, Brasil`,
+      `${streetOnly}, ${fallbackCity}, Brasil`,
       `${cleaned}, Brasil`,
-    ];
+    ].filter((q) => q.replace(/[,\s]/g, '').length > 0)));
 
     let anchor: { lat: number; lng: number } | null = null;
     if (fallbackCity) {
@@ -170,12 +208,8 @@ export function useDeliveries() {
           headers: { 'User-Agent': 'GardenGestao/1.0' },
         });
         const anchorResults = await anchorRes.json();
-        if (anchorResults?.[0]) {
-          anchor = {
-            lat: parseFloat(anchorResults[0].lat),
-            lng: parseFloat(anchorResults[0].lon),
-          };
-        }
+        const parsedAnchor = pickValidResult(anchorResults?.[0], null, fallbackCity);
+        if (parsedAnchor) anchor = parsedAnchor;
       } catch (error) {
         console.warn('Falha ao obter âncora da cidade para geocoding', error);
       }
@@ -186,16 +220,15 @@ export function useDeliveries() {
       try {
         const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
         if (anchor) {
-          params.set('viewbox', `${anchor.lng - 0.7},${anchor.lat + 0.7},${anchor.lng + 0.7},${anchor.lat - 0.7}`);
+          params.set('viewbox', `${anchor.lng - 0.35},${anchor.lat + 0.35},${anchor.lng + 0.35},${anchor.lat - 0.35}`);
           params.set('bounded', '1');
         }
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
           headers: { 'User-Agent': 'GardenGestao/1.0' },
         });
         const results = await res.json();
-        if (results?.[0]) {
-          return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
-        }
+        const parsed = pickValidResult(results?.[0], anchor, fallbackCity);
+        if (parsed) return parsed;
       } catch (error) {
         console.warn('Falha ao geocodificar endereço', error);
       }
@@ -203,24 +236,23 @@ export function useDeliveries() {
 
     // Second pass: unbounded fallback
     if (anchor) {
-      for (const query of queries.slice(0, 2)) {
+      for (const query of queries) {
         try {
           const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
           const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
             headers: { 'User-Agent': 'GardenGestao/1.0' },
           });
           const results = await res.json();
-          if (results?.[0]) {
-            return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
-          }
+          const parsed = pickValidResult(results?.[0], anchor, fallbackCity);
+          if (parsed) return parsed;
         } catch (error) {
-          console.warn('Falha ao geocodificar endereço (unbounded)', error);
+          console.warn('Falha ao geocodificar endereço (fallback)', error);
         }
       }
     }
 
     return null;
-  }, [activeUnit?.name, cleanAddress]);
+  }, [activeUnit?.name, cleanAddress, pickValidResult]);
 
   // Create delivery
   const createDelivery = useMutation({
