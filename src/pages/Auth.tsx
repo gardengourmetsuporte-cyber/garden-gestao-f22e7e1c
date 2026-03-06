@@ -364,7 +364,7 @@ export default function Auth() {
           : 'Preencha os dados para começar';
 
   return (
-    <div className="dark min-h-[100dvh] flex flex-row bg-[#000000] text-foreground">
+    <div className="min-h-[100dvh] flex flex-row bg-background text-foreground">
       {/* ── LEFT: Brand Panel (desktop) ── */}
       <BrandPanel />
 
