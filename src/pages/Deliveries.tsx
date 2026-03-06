@@ -53,71 +53,95 @@ export default function Deliveries() {
 
   return (
     <AppLayout>
-      <div className="space-y-3 pb-24 lg:pb-12 px-4 pt-3 lg:px-8 lg:max-w-6xl lg:mx-auto">
+      <div className="space-y-4 pb-24 lg:pb-12 px-4 pt-3 lg:px-8 lg:max-w-6xl lg:mx-auto">
         <DesktopActionBar label="Nova Entrega" onClick={() => setSheetOpen(true)} />
 
-        {/* ── Compact stats row ── */}
-        <div className="flex items-center gap-3 px-1">
-          <StatPill value={stats.pending} label="Pendentes" color="var(--neon-amber)" />
-          <StatPill value={stats.out} label="Em rota" color="var(--color-transfer)" />
-          <StatPill value={stats.delivered} label="Entregues" color="var(--color-income)" />
-          <span className="ml-auto text-xs text-muted-foreground font-medium">{stats.total} total</span>
+        {/* Resumo */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-sm p-3 text-center">
+            <p className="text-xl font-bold" style={{ color: 'hsl(var(--neon-amber))' }}>{stats.pending}</p>
+            <p className="text-[11px] text-muted-foreground">Pendentes</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-sm p-3 text-center">
+            <p className="text-xl font-bold" style={{ color: 'hsl(var(--color-transfer))' }}>{stats.out}</p>
+            <p className="text-[11px] text-muted-foreground">Em rota</p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-sm p-3 text-center">
+            <p className="text-xl font-bold" style={{ color: 'hsl(var(--color-income))' }}>{stats.delivered}</p>
+            <p className="text-[11px] text-muted-foreground">Entregues</p>
+          </div>
         </div>
 
-        {/* ── Filter chips ── */}
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
-          {STATUS_CHIPS.map((chip) => (
-            <Button
-              key={chip.key}
-              variant={statusFilter === chip.key ? 'default' : 'outline'}
-              size="sm"
-              className="h-7 text-[11px] gap-1 shrink-0 rounded-full px-3"
-              onClick={() => setStatusFilter(chip.key)}
-            >
-              <AppIcon name={chip.icon} size={13} /> {chip.label}
-            </Button>
-          ))}
+        {/* Filtros */}
+        <div className="rounded-2xl border border-border/60 bg-card/50 p-2">
+          <div className="flex items-center justify-between gap-2 px-1 pb-1">
+            <p className="text-xs font-medium text-muted-foreground">Filtrar entregas</p>
+            <span className="text-xs text-muted-foreground">{stats.total} total</span>
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+            {STATUS_CHIPS.map((chip) => (
+              <Button
+                key={chip.key}
+                variant={statusFilter === chip.key ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 text-xs gap-1.5 shrink-0 rounded-full px-3"
+                onClick={() => setStatusFilter(chip.key)}
+              >
+                <AppIcon name={chip.icon} size={14} /> {chip.label}
+              </Button>
+            ))}
+          </div>
         </div>
 
-        {/* ── Map (always visible, compact) ── */}
-        <DeliveryMap
-          deliveries={deliveries}
-          onStatusChange={(id, status) => updateStatus({ id, status })}
-          onRefresh={invalidate}
-        />
+        {/* Mapa */}
+        <section className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <AppIcon name="map" size={16} className="text-primary" />
+            <h2 className="text-sm font-semibold">Rota no mapa</h2>
+          </div>
+          <DeliveryMap
+            deliveries={deliveries}
+            onStatusChange={(id, status) => updateStatus({ id, status })}
+            onRefresh={invalidate}
+          />
+        </section>
 
-        {/* ── Delivery list by neighborhood ── */}
+        {/* Lista */}
         {groupedByNeighborhood.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 text-center">
+          <div className="flex flex-col items-center justify-center py-10 text-center rounded-2xl border border-border/60 bg-card/40">
             <AppIcon name="location_on" size={40} className="text-muted-foreground/20 mb-2" />
             <p className="text-sm font-medium text-muted-foreground">Nenhuma entrega encontrada</p>
             <p className="text-xs text-muted-foreground/60 mt-1">Tire foto de um pedido para começar</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {groupedByNeighborhood.map((group) => (
-              <div key={group.neighborhood}>
-                {/* Neighborhood header */}
-                <div className="flex items-center gap-2 px-1 py-1.5">
-                  <AppIcon name="location_on" size={14} className="text-primary" />
-                  <span className="font-semibold text-xs">{group.neighborhood}</span>
-                  <Badge variant="secondary" className="text-[10px] h-4 px-1.5 min-w-0">
-                    {group.deliveries.length}
-                  </Badge>
+          <section className="space-y-3">
+            <div className="flex items-center gap-2 px-1">
+              <AppIcon name="view_list" size={16} className="text-primary" />
+              <h2 className="text-sm font-semibold">Entregas por bairro</h2>
+            </div>
+            <div className="space-y-3">
+              {groupedByNeighborhood.map((group) => (
+                <div key={group.neighborhood} className="rounded-2xl border border-border/60 bg-card/30 p-2">
+                  <div className="flex items-center gap-2 px-1 py-1.5">
+                    <AppIcon name="location_on" size={14} className="text-primary" />
+                    <span className="font-semibold text-sm">{group.neighborhood}</span>
+                    <Badge variant="secondary" className="text-[10px] h-5 px-2">
+                      {group.deliveries.length}
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {group.deliveries.map((delivery) => (
+                      <DeliveryCard
+                        key={delivery.id}
+                        delivery={delivery}
+                        onStatusChange={(id, status) => updateStatus({ id, status })}
+                      />
+                    ))}
+                  </div>
                 </div>
-                {/* Cards */}
-                <div className="space-y-1.5">
-                  {group.deliveries.map((delivery) => (
-                    <DeliveryCard
-                      key={delivery.id}
-                      delivery={delivery}
-                      onStatusChange={(id, status) => updateStatus({ id, status })}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         )}
       </div>
 
