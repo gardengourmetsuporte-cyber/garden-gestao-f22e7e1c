@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
@@ -5,6 +6,9 @@ import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import type { PrevMonthStats } from '@/hooks/usePreviousMonthStats';
+import { useBudgets } from '@/hooks/useBudgets';
+import { formatCurrency } from '@/lib/format';
+import { Progress } from '@/components/ui/progress';
 
 interface FinanceHomeProps {
   selectedMonth: Date;
@@ -29,7 +33,7 @@ export function FinanceHome({
   variant = 'business',
   prevMonthStats,
 }: FinanceHomeProps) {
-  const formatCurrency = (value: number) => 
+  const fmtCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
   const profit = monthStats.totalIncome - monthStats.totalExpense;
@@ -43,6 +47,23 @@ export function FinanceHome({
   const expenseVariation = prevMonthStats && prevMonthStats.totalExpense > 0
     ? ((monthStats.totalExpense - prevMonthStats.totalExpense) / prevMonthStats.totalExpense) * 100
     : null;
+
+  // Budget data for planning card
+  const budgetMonth = selectedMonth.getMonth() + 1;
+  const budgetYear = selectedMonth.getFullYear();
+  const { budgets } = useBudgets(budgetMonth, budgetYear);
+  const hasBudgets = budgets.length > 0;
+
+  const budgetSummary = useMemo(() => {
+    if (!hasBudgets) return null;
+    const totalPlanned = budgets.reduce((s, b) => s + b.planned_amount, 0);
+    const totalSpent = budgets.reduce((s, b) => {
+      // Simple spent calc — actual spending tracked in planning tab
+      return s;
+    }, 0);
+    const percent = totalPlanned > 0 ? (monthStats.totalExpense / totalPlanned) * 100 : 0;
+    return { totalPlanned, spent: monthStats.totalExpense, percent, count: budgets.length };
+  }, [budgets, hasBudgets, monthStats.totalExpense]);
 
   return (
     <div className="px-4 py-3 lg:px-6 space-y-4">
@@ -65,7 +86,7 @@ export function FinanceHome({
 
           {/* Balance */}
           <p className="text-[2rem] font-extrabold tracking-tight leading-tight" style={{ color: totalBalance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
-            {formatCurrency(totalBalance)}
+            {fmtCurrency(totalBalance)}
           </p>
 
           {/* Sub-stats row */}
@@ -74,7 +95,7 @@ export function FinanceHome({
               <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Lucro líquido</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold" style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
-                  {formatCurrency(Math.abs(profit))}
+                  {fmtCurrency(Math.abs(profit))}
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold px-1 py-0.5 rounded",
@@ -90,7 +111,7 @@ export function FinanceHome({
               <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Despesas</span>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold" style={{ color: 'var(--gp-negative)' }}>
-                  {formatCurrency(monthStats.totalExpense)}
+                  {fmtCurrency(monthStats.totalExpense)}
                 </span>
               </div>
             </div>
@@ -111,7 +132,7 @@ export function FinanceHome({
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
           <p className="text-lg font-bold text-success">
-            {formatCurrency(monthStats.totalIncome)}
+            {fmtCurrency(monthStats.totalIncome)}
           </p>
           {incomeVariation !== null && (
             <p className={cn("text-[10px] font-semibold mt-1", incomeVariation >= 0 ? "text-success/70" : "text-destructive/70")}>
@@ -130,7 +151,7 @@ export function FinanceHome({
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
           <p className="text-lg font-bold text-destructive">
-            {formatCurrency(monthStats.totalExpense)}
+            {fmtCurrency(monthStats.totalExpense)}
           </p>
           {expenseVariation !== null && (
             <p className={cn("text-[10px] font-semibold mt-1", expenseVariation <= 0 ? "text-success/70" : "text-destructive/70")}>
@@ -140,21 +161,69 @@ export function FinanceHome({
         </button>
       </div>
 
-      {/* Planning Quick Access */}
+      {/* Planning Quick Access — conditional card */}
       <button
         onClick={() => onNavigate?.('planning')}
-        className="w-full p-4 rounded-xl bg-card border border-border/50 text-left cursor-pointer transition-all duration-200 animate-slide-up stagger-3"
+        className={cn(
+          "w-full text-left cursor-pointer transition-all duration-200 animate-slide-up stagger-3",
+          hasBudgets
+            ? "card-command p-4 space-y-3"
+            : "p-4 rounded-xl bg-card border border-border/50"
+        )}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="Target" size={22} className="text-primary" />
+        {hasBudgets && budgetSummary ? (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center">
+                  <AppIcon name="Target" size={18} className="text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm font-bold text-foreground">Orçamento</span>
+                  <span className="text-[10px] text-muted-foreground block">{budgetSummary.count} categoria(s)</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={cn(
+                  "text-xs font-bold px-2 py-0.5 rounded-full",
+                  budgetSummary.percent > 100 ? "bg-destructive/15 text-destructive" :
+                  budgetSummary.percent > 80 ? "bg-warning/15 text-warning" :
+                  "bg-success/15 text-success"
+                )}>
+                  {budgetSummary.percent.toFixed(0)}%
+                </span>
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-[11px]">
+                <span className="text-muted-foreground">
+                  {formatCurrency(budgetSummary.spent)} de {formatCurrency(budgetSummary.totalPlanned)}
+                </span>
+                <span className={cn(
+                  "font-semibold",
+                  budgetSummary.spent > budgetSummary.totalPlanned ? "text-destructive" : "text-success"
+                )}>
+                  {budgetSummary.spent > budgetSummary.totalPlanned
+                    ? `Excedido em ${formatCurrency(budgetSummary.spent - budgetSummary.totalPlanned)}`
+                    : `Resta ${formatCurrency(budgetSummary.totalPlanned - budgetSummary.spent)}`}
+                </span>
+              </div>
+              <Progress value={Math.min(budgetSummary.percent, 100)} className="h-1.5" />
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
+              <AppIcon name="Target" size={22} className="text-primary" />
+            </div>
+            <div className="flex-1">
+              <span className="font-semibold text-sm text-foreground">Planejar</span>
+              <p className="text-[11px] text-muted-foreground">Orçamentos, DRE e Fluxo de Caixa</p>
+            </div>
+            <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
           </div>
-          <div className="flex-1">
-            <span className="font-semibold text-sm text-foreground">Planejar</span>
-            <p className="text-[11px] text-muted-foreground">Orçamentos, DRE e Fluxo de Caixa</p>
-          </div>
-          <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
-        </div>
+        )}
       </button>
 
       {/* Pending Alerts */}
@@ -175,13 +244,13 @@ export function FinanceHome({
           {monthStats.pendingExpenses > 0 && (
             <div className="flex items-center justify-between pl-9 text-sm">
               <span className="text-muted-foreground">Despesas a pagar</span>
-              <span className="font-semibold text-destructive">{formatCurrency(monthStats.pendingExpenses)}</span>
+              <span className="font-semibold text-destructive">{fmtCurrency(monthStats.pendingExpenses)}</span>
             </div>
           )}
           {monthStats.pendingIncome > 0 && (
             <div className="flex items-center justify-between pl-9 text-sm">
               <span className="text-muted-foreground">Receitas a receber</span>
-              <span className="font-semibold text-success">{formatCurrency(monthStats.pendingIncome)}</span>
+              <span className="font-semibold text-success">{fmtCurrency(monthStats.pendingIncome)}</span>
             </div>
           )}
         </button>
