@@ -203,7 +203,12 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
       const addr = delivery.address;
       if (!addr) continue;
 
-      const coords = await geocodeAddress(addr.full_address, addr.city || addr.neighborhood);
+      const coords = await geocodeAddress(
+        addr.full_address,
+        addr.neighborhood,
+        addr.city,
+        unitName || ''
+      );
       if (coords) {
         await supabase
           .from('delivery_addresses')
@@ -211,7 +216,6 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
           .eq('id', addr.id);
         success++;
       }
-      await new Promise(r => setTimeout(r, 1100));
     }
 
     setIsGeocoding(false);
