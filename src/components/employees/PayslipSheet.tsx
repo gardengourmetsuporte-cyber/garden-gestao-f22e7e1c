@@ -191,7 +191,7 @@ export function PayslipSheet({ open, onOpenChange, employee, editingPayment, onS
           {/* Foto */}
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Foto do Holerite</Label>
-            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} />
+            <input ref={fileInputRef} type="file" accept="image/*,application/pdf,.pdf" className="hidden" onChange={handlePhotoUpload} />
 
             {previewUrl ? (
               <div className="relative rounded-xl overflow-hidden border border-border/40">
