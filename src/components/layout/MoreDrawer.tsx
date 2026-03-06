@@ -97,10 +97,11 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
       />
       {/* Panel */}
       <div
-        className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col animate-fade-in"
+        className="fixed inset-x-0 top-0 bottom-0 z-50 overflow-hidden flex flex-col"
         style={{
           paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))',
           background: 'hsl(var(--background))',
+          animation: 'moreDrawerIn 0.35s cubic-bezier(0.16,1,0.3,1) both',
         }}
       >
         <div className="overflow-y-auto h-full">
@@ -190,7 +191,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
           </div>
 
           {/* Module grid — adaptive cards */}
-          <div className="px-4 pt-5 pb-8 space-y-3 relative z-10">
+          <div className="px-4 pt-5 pb-8 space-y-3 relative z-10 more-drawer-modules">
             {groupedNav.map(group => {
               const count = group.items.length;
               const useCols3 = count >= 3 && count !== 4;
@@ -262,8 +263,16 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                 );
               };
 
+              const groupIndex = groupedNav.indexOf(group);
               return (
-                <div key={group.label} className="mb-3">
+                <div
+                  key={group.label}
+                  className="mb-3"
+                  style={{
+                    opacity: 0,
+                    animation: `moduleGroupIn 0.4s cubic-bezier(0.16,1,0.3,1) ${150 + groupIndex * 80}ms both`,
+                  }}
+                >
                   <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2 block text-muted-foreground/50 font-display">
                     {group.label}
                   </span>
