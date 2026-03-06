@@ -1,0 +1,1 @@
+UPDATE delivery_addresses SET lat = NULL, lng = NULL WHERE lat IS NOT NULL;
