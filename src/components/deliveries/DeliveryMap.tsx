@@ -55,6 +55,31 @@ function normalizeText(value: string): string {
     .trim();
 }
 
+function getSignificantCityWords(city: string): string[] {
+  return normalizeText(city)
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !['de', 'da', 'do', 'das', 'dos'].includes(w));
+}
+
+function resolveGeocodeCity(city: string, unitName: string): string {
+  const cityTrimmed = city?.trim() || '';
+  const unitTrimmed = unitName?.trim() || '';
+  const cityWords = getSignificantCityWords(cityTrimmed);
+  const unitWords = getSignificantCityWords(unitTrimmed);
+
+  if (!cityTrimmed) return unitTrimmed;
+  if (!unitTrimmed) return cityTrimmed;
+
+  // If OCR gives ambiguous city like "SAO JOAO", prefer full unit city
+  if (cityWords.length < 3 && unitWords.length >= cityWords.length) return unitTrimmed;
+
+  const cityBase = normalizeText(cityTrimmed);
+  const unitBase = normalizeText(unitTrimmed);
+  if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) return unitTrimmed;
+
+  return cityTrimmed;
+}
+
 function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const earthRadiusKm = 6371;
@@ -98,7 +123,7 @@ async function geocodeAddress(
   city: string,
   unitName: string,
 ): Promise<{ lat: number; lng: number } | null> {
-  const normalizedCity = city?.trim().length >= 4 ? city.trim() : unitName.trim();
+  const normalizedCity = resolveGeocodeCity(city, unitName);
   const cleaned = cleanAddress(address);
   const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
@@ -330,16 +355,9 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
               className: '',
               html: `
                 <div style="position:relative;width:48px;height:48px;">
-                  <div style="width:44px;height:44px;background:rgba(59,130,246,0.12);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-                  <div style="width:36px;height:36px;background:white;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.15);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="5" cy="17" r="3"/>
-                      <circle cx="19" cy="17" r="3"/>
-                      <path d="M9 17h6"/>
-                      <path d="M19 17l-2-5h-4l-4 5"/>
-                      <path d="M13 12V7h2l3 5"/>
-                      <path d="M5 17l2-5"/>
-                    </svg>
+                  <div style="width:44px;height:44px;background:hsl(142 71% 45% / 0.12);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+                  <div style="width:36px;height:36px;background:hsl(var(--background));border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.15);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <img src="/icons/motocicleta.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;" />
                   </div>
                 </div>`,
               iconSize: [48, 48],
