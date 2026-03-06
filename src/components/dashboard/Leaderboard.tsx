@@ -5,8 +5,9 @@ import { getRank } from '@/lib/ranks';
 import { Link } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Podium } from '@/components/ranking/Podium';
-import { format, addMonths, subMonths, isSameMonth } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { Badge } from '@/components/ui/badge';
 
 interface LeaderboardProps {
