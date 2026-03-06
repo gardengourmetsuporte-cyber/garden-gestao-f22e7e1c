@@ -315,14 +315,14 @@ export function AccessLevelSettings() {
         )}
       </div>
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={isCreating} onOpenChange={setIsCreating}>
-        <DialogContent className="max-w-lg p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</DialogTitle>
-          </DialogHeader>
+      {/* Create/Edit Sheet */}
+      <Sheet open={isCreating} onOpenChange={setIsCreating}>
+        <SheetContent side="bottom" className="max-h-[90vh] flex flex-col">
+          <SheetHeader>
+            <SheetTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</SheetTitle>
+          </SheetHeader>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 py-2 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label>Nome</Label>
               <Input
