@@ -30,35 +30,35 @@ export function DeliveryCard({ delivery, onStatusChange }: Props) {
   const next = nextStatus();
 
   return (
-    <div className="card-base p-3.5 space-y-2">
+    <div className="rounded-xl border border-border/60 bg-card/80 p-3 space-y-2.5 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm truncate">{addr?.customer_name || 'Sem nome'}</p>
-          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+          <p className="font-semibold text-base leading-tight truncate">{addr?.customer_name || 'Sem nome'}</p>
+          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
             <MapPin className="w-3 h-3 shrink-0" />
             <span className="truncate">{addr?.full_address || '—'}</span>
           </p>
         </div>
-        <Badge variant="outline" className={`shrink-0 ${cfg.color} text-[10px] gap-1`}>
+        <Badge variant="outline" className={`shrink-0 ${cfg.color} text-[10px] gap-1 h-6 px-2`}>
           {cfg.icon} {cfg.label}
         </Badge>
       </div>
 
       {delivery.items_summary && (
-        <p className="text-xs text-muted-foreground flex items-center gap-1">
-          <Package className="w-3 h-3 shrink-0" />
-          <span className="truncate">{delivery.items_summary}</span>
+        <p className="text-xs text-muted-foreground flex items-start gap-1">
+          <Package className="w-3 h-3 shrink-0 mt-0.5" />
+          <span className="line-clamp-2">{delivery.items_summary}</span>
         </p>
       )}
 
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] text-muted-foreground">
+      <div className="flex items-center justify-between gap-2 pt-1">
+        <span className="text-[11px] text-muted-foreground">
           {formatDistanceToNow(new Date(delivery.created_at), { addSuffix: true, locale: ptBR })}
         </span>
 
         <div className="flex items-center gap-2">
           {delivery.total > 0 && (
-            <span className="text-xs font-semibold text-primary">
+            <span className="text-base font-bold text-primary whitespace-nowrap">
               R$ {delivery.total.toFixed(2)}
             </span>
           )}
@@ -66,7 +66,7 @@ export function DeliveryCard({ delivery, onStatusChange }: Props) {
             <Button
               size="sm"
               variant={next === 'delivered' ? 'default' : 'outline'}
-              className="h-7 text-xs px-2.5"
+              className="h-8 text-xs px-3"
               onClick={() => onStatusChange(delivery.id, next)}
             >
               {next === 'out' ? 'Saiu →' : 'Entregue ✓'}
