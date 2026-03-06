@@ -148,7 +148,7 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200",
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200",
                   "bg-primary hover:scale-[1.08] active:scale-[0.92]"
                 )}
                 style={{
