@@ -151,7 +151,7 @@ export function FinanceHome({
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
           <p className="text-lg font-bold text-destructive">
-            {formatCurrency(monthStats.totalExpense)}
+            {fmtCurrency(monthStats.totalExpense)}
           </p>
           {expenseVariation !== null && (
             <p className={cn("text-[10px] font-semibold mt-1", expenseVariation <= 0 ? "text-success/70" : "text-destructive/70")}>
