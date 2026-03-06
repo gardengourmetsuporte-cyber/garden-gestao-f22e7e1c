@@ -153,24 +153,29 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="relative overflow-hidden">
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
             {/* Left: Logo (dashboard) or Back button (module pages) */}
-            <div className="flex items-center" style={{ minWidth: isScrolled || !isDashboard ? '2.5rem' : 'auto' }}>
+            <div className="flex items-center" style={{ minWidth: '2.5rem' }}>
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="flex items-center gap-2 h-8 rounded-lg overflow-hidden bg-white shrink-0 shadow-sm active:scale-95 transition-all duration-300 ease-out"
-                  style={{ 
-                    paddingLeft: isScrolled ? 0 : '0.375rem',
-                    paddingRight: isScrolled ? 0 : '0.5rem',
-                    width: isScrolled ? '2rem' : 'auto',
-                  }}
+                  className={cn(
+                    "flex items-center h-9 rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                    isScrolled
+                      ? "w-9 bg-transparent p-0 justify-center"
+                      : "bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
+                  )}
                 >
-                  <img alt="Garden Gestão" className="w-6 h-6 object-contain shrink-0 transition-all duration-300" src={gardenLogo} />
+                  <div className={cn(
+                    "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
+                    isScrolled ? "w-8 h-8" : "w-6 h-6"
+                  )}>
+                    <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} />
+                  </div>
                   <span
-                    className="text-[11px] font-bold text-gray-800 whitespace-nowrap transition-all duration-300 ease-out overflow-hidden"
-                    style={{
-                      maxWidth: isScrolled ? 0 : '7rem',
-                      opacity: isScrolled ? 0 : 1,
-                    }}
+                    className={cn(
+                      "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
+                      isScrolled ? "max-w-0 opacity-0" : "max-w-[7rem] opacity-100"
+                    )}
+                    style={{ letterSpacing: '-0.01em' }}
                   >
                     Garden Gestão
                   </span>
