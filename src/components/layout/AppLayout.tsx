@@ -153,7 +153,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="relative overflow-hidden">
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
             {/* Left: Logo (dashboard) or Back button (module pages) */}
-            <div className="w-10 flex items-center">
+            <div className="flex items-center" style={{ minWidth: isScrolled || !isDashboard ? '2.5rem' : 'auto' }}>
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
@@ -175,6 +175,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     Garden Gestão
                   </span>
                 </button>
+              ) : (
+                <button
+                  onClick={() => navigate('/')}
+                  className="p-2 rounded-lg hover:bg-muted/50 transition-all active:scale-90"
                 >
                   <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
                 </button>
