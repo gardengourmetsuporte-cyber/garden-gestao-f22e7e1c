@@ -181,13 +181,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
 
-            {/* Center: Module title — fades in AFTER logo settles (staggered delay) */}
-            <div className="flex-1 flex items-center justify-center min-w-0">
+            {/* Center: Module title — absolutely centered relative to header */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
               <span
                 className={cn(
-                  "text-sm font-bold text-foreground truncate font-display ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                  "text-sm font-bold text-foreground truncate font-display ease-[cubic-bezier(0.25,0.1,0.25,1)] max-w-[60%]",
                   isDashboard
-                    ? "opacity-0 translate-y-3 scale-95 pointer-events-none transition-all duration-150"
+                    ? "opacity-0 translate-y-3 scale-95 transition-all duration-150"
                     : "opacity-100 translate-y-0 scale-100 transition-all duration-400 delay-[200ms]"
                 )}
                 style={{ letterSpacing: '-0.01em' }}
