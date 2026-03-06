@@ -507,6 +507,7 @@ export function FinanceCharts({
                       <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                       <YAxis tickFormatter={formatCompact} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} width={45} />
                       <RechartsTooltip
+                        cursor={{ fill: 'hsl(var(--muted))', opacity: 0.15 }}
                         content={({ active, payload, label }) => {
                           if (!active || !payload?.length) return null;
                           const inc = payload.find(p => p.dataKey === 'income')?.value as number || 0;
