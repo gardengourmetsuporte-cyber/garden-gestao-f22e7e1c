@@ -440,11 +440,11 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
       )}
 
       {/* Map container */}
-      <div className="relative rounded-2xl overflow-hidden border border-border/30 shadow-sm">
+      <div className="relative z-0 isolate rounded-2xl overflow-hidden border border-border/30 shadow-sm">
         <div
           ref={mapRef}
           style={{ height: 260 }}
-          className="w-full"
+          className="w-full relative z-0"
         />
         {withCoords.length === 0 && !isGeocoding && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/60 backdrop-blur-sm">
