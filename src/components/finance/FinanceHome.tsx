@@ -250,7 +250,7 @@ export function FinanceHome({
           {monthStats.pendingIncome > 0 && (
             <div className="flex items-center justify-between pl-9 text-sm">
               <span className="text-muted-foreground">Receitas a receber</span>
-              <span className="font-semibold text-success">{formatCurrency(monthStats.pendingIncome)}</span>
+              <span className="font-semibold text-success">{fmtCurrency(monthStats.pendingIncome)}</span>
             </div>
           )}
         </button>
