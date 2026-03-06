@@ -101,7 +101,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
               className={cn(
                 'aspect-square flex flex-col items-center justify-start p-1 rounded-xl transition-all',
                 'hover:bg-primary/5 hover:border hover:border-primary/20',
-                isToday(day) && 'card-surface shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-primary/30',
+                isToday(day) && 'card-surface shadow-[0_0_12px_hsl(68_100%_50%/0.3)] border border-primary/30',
                 isOverdue && 'bg-rose-500/10 border border-rose-500/20',
                 !isSameMonth(day, currentMonth) && 'opacity-40'
               )}
@@ -127,7 +127,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
                       className="w-1.5 h-1.5 rounded-full shadow-sm"
                       style={{
                         backgroundColor: isOverdue ? 'hsl(348, 83%, 65%)' : (task.category?.color || 'transparent'),
-                        boxShadow: `0 0 4px ${isOverdue ? 'rgba(251,113,133,0.8)' : task.category?.color ? task.category.color + '80' : 'rgba(16,185,129,0.6)'}`
+                        boxShadow: `0 0 4px ${isOverdue ? 'rgba(251,113,133,0.8)' : task.category?.color ? task.category.color + '80' : 'hsl(68 100% 50% / 0.6)'}`
                       }}
                     />
                   ))}

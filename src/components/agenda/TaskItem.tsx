@@ -60,7 +60,7 @@ export function TaskItem({ task, onToggle, onDelete, onClick, onInlineUpdate, is
         className={cn(
           'card-surface rounded-xl overflow-hidden transition-all duration-300',
           task.is_completed && 'opacity-45',
-          isDragging && 'shadow-[0_0_30px_rgba(16,185,129,0.15)] ring-1 ring-primary/40 scale-[1.02]',
+          isDragging && 'shadow-[0_0_30px_hsl(68_100%_50%/0.15)] ring-1 ring-primary/40 scale-[1.02]',
         )}
       >
         <div className="flex items-start gap-2.5 p-3">
