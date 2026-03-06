@@ -22,6 +22,7 @@ const NotificationSettings = lazy(() => import('@/components/settings/Notificati
 const AuditLogSettings = lazy(() => import('@/components/settings/AuditLogSettings').then(m => ({ default: m.AuditLogSettings })));
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const LoyaltySettings = lazy(() => import('@/components/settings/LoyaltySettings').then(m => ({ default: m.LoyaltySettings })));
+const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings').then(m => ({ default: m.AppearanceSettings })));
 interface MenuItem {
   value: string;
   icon: string;
