@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCashClosing } from '@/hooks/useCashClosing';
 import { PAYMENT_METHODS } from '@/types/cashClosing';
 import { useAuth } from '@/contexts/AuthContext';
@@ -69,19 +70,37 @@ function DateInline({ selectedDate, onSelect, todayDate, minAllowedDate }: {
   selectedDate: Date; onSelect: (d: Date) => void; todayDate: Date; minAllowedDate: Date;
 }) {
   const [open, setOpen] = useState(false);
+
   return (
-    <div className="relative">
-      <Button variant="outline" size="sm" className="gap-2 font-medium" onClick={() => setOpen(!open)}>
-        <AppIcon name="Calendar" size={16} />
-        {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
-      </Button>
-      {open && (
-        <div className="absolute left-0 top-full mt-1 z-50 rounded-xl border bg-card p-2 shadow-lg">
-          <Calendar mode="single" selected={selectedDate} onSelect={(d) => { if (d) { onSelect(d); setOpen(false); } }} locale={ptBR} disabled={(date) => date > todayDate || date < minAllowedDate} className="p-3 pointer-events-auto" />
-          <p className="text-xs text-muted-foreground px-3 pb-2">Disponível até 7 dias anteriores.</p>
-        </div>
-      )}
-    </div>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2 font-medium">
+          <AppIcon name="Calendar" size={16} />
+          {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        side="bottom"
+        sideOffset={8}
+        className="w-auto p-2 z-[120]"
+      >
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(d) => {
+            if (d) {
+              onSelect(d);
+              setOpen(false);
+            }
+          }}
+          locale={ptBR}
+          disabled={(date) => date > todayDate || date < minAllowedDate}
+          className="p-3 pointer-events-auto"
+        />
+        <p className="text-xs text-muted-foreground px-3 pb-2">Disponível até 7 dias anteriores.</p>
+      </PopoverContent>
+    </Popover>
   );
 }
 
