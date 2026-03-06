@@ -200,7 +200,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
             {/* Center: Module name on module pages */}
             <div className="flex-1 flex items-center justify-center min-w-0">
-              {!isDashboard && isScrolled && (
+              {!isDashboard && (
                 <span className="text-sm font-bold text-foreground truncate font-display animate-fade-in" style={{ letterSpacing: '-0.01em' }}>
                   {moduleTitle || 'Garden'}
                 </span>
