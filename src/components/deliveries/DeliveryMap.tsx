@@ -215,6 +215,36 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
+      // ── Current location with motorbike icon ──
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            if (cancelled) return;
+            const { latitude, longitude } = pos.coords;
+            const motoIcon = L.divIcon({
+              className: '',
+              html: `
+                <div style="position:relative;width:40px;height:40px;">
+                  <div style="width:36px;height:36px;background:hsl(var(--primary) / 0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse-ring 2s ease-out infinite;"></div>
+                  <div style="width:32px;height:32px;background:hsl(var(--primary));border:2.5px solid white;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,0.3);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:16px;">🏍️</div>
+                </div>`,
+              iconSize: [40, 40],
+              iconAnchor: [20, 20],
+            });
+            const myMarker = L.marker([latitude, longitude], { icon: motoIcon, zIndexOffset: 1000 }).addTo(map);
+            myMarker.bindPopup('<div style="font-family:system-ui;font-size:12px;font-weight:600;text-align:center;">📍 Você está aqui</div>');
+
+            // Include in bounds
+            if (bounds.length > 0) {
+              bounds.push([latitude, longitude]);
+              map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+            }
+          },
+          () => { /* permission denied or error – ignore silently */ },
+          { enableHighAccuracy: true, timeout: 8000 },
+        );
+      }
+
       Object.values(markersRef.current).forEach(m => m.remove());
       markersRef.current = {};
 
