@@ -296,7 +296,7 @@ export function useDeliveries() {
     }) => {
       const { ocrResult, photoUrl } = params;
 
-      const normalizedCity = (ocrResult.city || '').trim() || (activeUnit?.name || '').trim();
+      const normalizedCity = resolveGeocodeCity(ocrResult.city || '', activeUnit?.name || '');
 
       // Geocode the address
       const coords = await geocodeAddress(ocrResult.full_address, normalizedCity);
