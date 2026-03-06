@@ -237,7 +237,7 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
             size="sm"
             variant="outline"
             className="h-7 text-xs shrink-0 px-2.5"
-            onClick={handleGeocode}
+            onClick={() => handleGeocode(withoutCoords)}
             disabled={isGeocoding}
           >
             {isGeocoding ? 'Aguarde' : 'Localizar'}
