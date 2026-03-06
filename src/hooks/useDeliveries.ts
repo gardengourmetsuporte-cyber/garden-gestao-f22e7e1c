@@ -162,11 +162,21 @@ export function useDeliveries() {
     const lng = Number.parseFloat(result?.lon);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-    if (anchor && distanceKm(anchor, { lat, lng }) > 45) return null;
+    if (anchor && distanceKm(anchor, { lat, lng }) > 25) return null;
 
+    // Validate using all significant words of the city name to avoid
+    // partial matches like "São João" matching "Jardim Nova São João" in SP
     const cityToken = normalizeText(city);
     const displayName = normalizeText(String(result?.display_name || ''));
-    if (cityToken && displayName && !displayName.includes(cityToken) && !anchor) return null;
+    if (cityToken && displayName) {
+      const cityWords = cityToken.split(/\s+/).filter(w => w.length > 2 && !['de','da','do','das','dos'].includes(w));
+      const allMatch = cityWords.every(w => displayName.includes(w));
+      if (!allMatch) return null;
+      // Extra: reject if display_name has the city words only as part of a neighborhood name
+      // by checking the result's address components
+      const addressCity = normalizeText(String(result?.address?.city || result?.address?.town || result?.address?.municipality || ''));
+      if (addressCity && !cityWords.every(w => addressCity.includes(w))) return null;
+    }
 
     return { lat, lng };
   }, [distanceKm, normalizeText]);
@@ -218,7 +228,7 @@ export function useDeliveries() {
     // First pass: bounded
     for (const query of queries) {
       try {
-        const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
+        const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
         if (anchor) {
           params.set('viewbox', `${anchor.lng - 0.35},${anchor.lat + 0.35},${anchor.lng + 0.35},${anchor.lat - 0.35}`);
           params.set('bounded', '1');
@@ -238,7 +248,7 @@ export function useDeliveries() {
     if (anchor) {
       for (const query of queries) {
         try {
-          const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
+          const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
           const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
             headers: { 'User-Agent': 'GardenGestao/1.0' },
           });

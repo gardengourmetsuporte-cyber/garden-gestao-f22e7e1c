@@ -76,13 +76,18 @@ function pickValidResult(
   const lng = Number.parseFloat(result?.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-  // Strict: max 25km from city anchor to avoid cross-city matches
   if (anchor && distanceKm(anchor, { lat, lng }) > 25) return null;
 
   const cityToken = normalizeText(city);
   const displayName = normalizeText(String(result?.display_name || ''));
-  // Always validate city name when we have one, even with anchor
-  if (cityToken && displayName && !displayName.includes(cityToken)) return null;
+  if (cityToken && displayName) {
+    const cityWords = cityToken.split(/\s+/).filter(w => w.length > 2 && !['de','da','do','das','dos'].includes(w));
+    const allMatch = cityWords.every(w => displayName.includes(w));
+    if (!allMatch) return null;
+    // Check address components to reject neighborhood-only matches
+    const addressCity = normalizeText(String(result?.address?.city || result?.address?.town || result?.address?.municipality || ''));
+    if (addressCity && !cityWords.every(w => addressCity.includes(w))) return null;
+  }
 
   return { lat, lng };
 }
@@ -130,7 +135,7 @@ async function geocodeAddress(
 
   for (const q of queries) {
     try {
-      const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
+      const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
       if (anchor) {
         params.set('viewbox', `${anchor.lng - 0.35},${anchor.lat + 0.35},${anchor.lng + 0.35},${anchor.lat - 0.35}`);
         params.set('bounded', '1');
@@ -151,7 +156,7 @@ async function geocodeAddress(
   if (anchor) {
     for (const q of queries) {
       try {
-        const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
+        const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
           headers: { 'User-Agent': 'GardenGestao/1.0' },
         });
