@@ -15,12 +15,12 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
   return (
     <button
       onClick={() => navigate('/finance')}
-      className="finance-hero-card w-full text-left animate-spring-in spring-stagger-2"
+      className="card-holographic w-full text-left animate-spring-in spring-stagger-2"
     >
-      <div className="finance-hero-inner p-5 pb-4">
+      <div className="finance-hero-inner p-5 pb-4 relative z-10">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>
-            Saldo em contas
+            Holographic Garden Card
           </span>
           <AppIcon name="ChevronRight" size={18} style={{ color: 'var(--gp-icon)' }} />
         </div>

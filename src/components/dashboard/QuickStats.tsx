@@ -41,20 +41,20 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
         const variant = stat.variant || 'default';
 
         return (
-          <div key={index} className="card-surface p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[11px] font-medium text-muted-foreground mb-1 uppercase tracking-wide">{stat.title}</p>
+          <div key={index} className="card-stat-holo">
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "stat-holo-icon",
+                  variantStyles[variant]
+                )}>
+                  <AppIcon name={stat.icon} size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{stat.title}</p>
                   <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}><AnimatedStatValue value={stat.value} /></p>
                   {stat.subtitle && (
                     <p className="text-[10px] text-muted-foreground mt-0.5">{stat.subtitle}</p>
                   )}
-                </div>
-                <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center",
-                  variantStyles[variant]
-                )}>
-                  <AppIcon name={stat.icon} size={20} />
                 </div>
               </div>
           </div>
