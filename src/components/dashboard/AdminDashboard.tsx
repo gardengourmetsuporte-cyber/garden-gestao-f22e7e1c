@@ -7,6 +7,7 @@ import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { useLazyVisible } from '@/hooks/useLazyVisible';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
 import { SetupChecklistWidget } from './SetupChecklistWidget';
+import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardKPIGrid } from './DashboardKPIGrid';
 import { DashboardSection } from './DashboardSection';
@@ -17,8 +18,6 @@ import { PendingOrdersWidget } from './PendingOrdersWidget';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
@@ -41,13 +40,6 @@ function LazyWidget({ children }: { children: React.ReactNode }) {
   );
 }
 
-const MOTIVATIONAL_PHRASES = [
-  'Vamos fazer acontecer! 🚀',
-  'Dia de grandes resultados! 💪',
-  'Foco e determinação! 🎯',
-  'Hoje vai ser incrível! ⭐',
-  'Bora pra cima! 🔥',
-];
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -59,15 +51,7 @@ export function AdminDashboard() {
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
 
-  const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return 'Bom dia';
-    if (h < 18) return 'Boa tarde';
-    return 'Boa noite';
-  })();
-
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
-  const motivational = MOTIVATIONAL_PHRASES[new Date().getDate() % MOTIVATIONAL_PHRASES.length];
 
   if (!isReady) {
     return (
@@ -82,15 +66,9 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6 px-4 py-3 lg:px-6">
-      {/* Welcome */}
+      {/* Context Bar */}
       <div className={`animate-card-reveal ${nextStagger()}`}>
-        <h2 className="text-xl font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
-          {greeting}, {firstName} <span className="animate-wave-hand">👋</span>
-        </h2>
-        <p className="text-muted-foreground text-xs capitalize mt-0.5">
-          {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
-        </p>
-        <p className="text-xs text-muted-foreground/70 mt-1 animate-motivational">{motivational}</p>
+        <DashboardContextBar firstName={firstName} stats={stats} />
       </div>
 
       {/* Setup Onboarding */}
