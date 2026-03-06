@@ -152,59 +152,59 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="relative overflow-hidden">
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
-            {/* Left: Back button (module pages) + Animated Logo */}
-            <div className="flex items-center gap-1" style={{ minWidth: '2.5rem' }}>
-              {!isDashboard && (
-                <button
-                  onClick={() => navigate('/')}
-                  className="p-1.5 -ml-1 rounded-lg hover:bg-muted/50 transition-all active:scale-90"
-                >
-                  <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
-                </button>
-              )}
-              {isDashboard ? (
-                <button
-                  onClick={() => navigate('/')}
-                  className={cn(
-                    "flex items-center h-9 rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
-                    isScrolled
-                      ? "w-9 bg-transparent p-0 justify-center"
-                      : "bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
-                  )}
-                >
-                  <div className={cn(
-                    "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
-                    isScrolled ? "w-8 h-8" : "w-6 h-6"
-                  )}>
-                    <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} />
-                  </div>
-                  <span
-                    className={cn(
-                      "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
-                      isScrolled ? "max-w-0 opacity-0" : "max-w-[7rem] opacity-100"
-                    )}
-                    style={{ letterSpacing: '-0.01em' }}
-                  >
-                    Garden Gestão
-                  </span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shrink-0 active:scale-95 transition-transform"
-                >
+            {/* Left: Back button + Logo — always rendered, animated between states */}
+            <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
+              {/* Back chevron — slides in/out */}
+              <button
+                onClick={() => navigate('/')}
+                className={cn(
+                  "p-1.5 -ml-1 rounded-lg hover:bg-muted/50 active:scale-90 transition-all duration-400 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                  isDashboard ? "opacity-0 -translate-x-3 pointer-events-none w-0 p-0 -ml-0" : "opacity-100 translate-x-0"
+                )}
+                tabIndex={isDashboard ? -1 : 0}
+              >
+                <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
+              </button>
+
+              {/* Logo — morphs between expanded pill (dashboard) and compact icon (modules) */}
+              <button
+                onClick={() => navigate('/')}
+                className={cn(
+                  "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                  isDashboard && !isScrolled
+                    ? "h-9 bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
+                    : "h-8 w-8 bg-transparent p-0 justify-center"
+                )}
+              >
+                <div className={cn(
+                  "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
+                  isDashboard && !isScrolled ? "w-6 h-6" : "w-8 h-8"
+                )}>
                   <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} />
-                </button>
-              )}
+                </div>
+                <span
+                  className={cn(
+                    "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
+                    isDashboard && !isScrolled ? "max-w-[7rem] opacity-100" : "max-w-0 opacity-0"
+                  )}
+                  style={{ letterSpacing: '-0.01em' }}
+                >
+                  Garden Gestão
+                </span>
+              </button>
             </div>
 
-            {/* Center: Module name on module pages */}
+            {/* Center: Module title — fades in/out */}
             <div className="flex-1 flex items-center justify-center min-w-0">
-              {!isDashboard && (
-                <span className="text-sm font-bold text-foreground truncate font-display animate-fade-in" style={{ letterSpacing: '-0.01em' }}>
-                  {moduleTitle || 'Garden'}
-                </span>
-              )}
+              <span
+                className={cn(
+                  "text-sm font-bold text-foreground truncate font-display transition-all duration-400 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                  isDashboard ? "opacity-0 translate-y-2 pointer-events-none" : "opacity-100 translate-y-0"
+                )}
+                style={{ letterSpacing: '-0.01em' }}
+              >
+                {moduleTitle || 'Garden'}
+              </span>
             </div>
 
             {/* Right: Notifications + Avatar */}
