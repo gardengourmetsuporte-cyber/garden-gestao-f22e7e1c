@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
@@ -5,6 +6,9 @@ import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import type { PrevMonthStats } from '@/hooks/usePreviousMonthStats';
+import { useBudgets } from '@/hooks/useBudgets';
+import { formatCurrency } from '@/lib/format';
+import { Progress } from '@/components/ui/progress';
 
 interface FinanceHomeProps {
   selectedMonth: Date;
