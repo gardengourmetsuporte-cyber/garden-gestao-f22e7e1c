@@ -2,14 +2,24 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications, AppNotification } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isToday, isYesterday, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 
 const typeConfig = {
-  alert: { icon: 'AlertTriangle' as const, color: 'text-destructive', bg: 'bg-destructive/10', ring: 'ring-destructive/20' },
-  info: { icon: 'Info' as const, color: 'text-primary', bg: 'bg-primary/10', ring: 'ring-primary/20' },
-  success: { icon: 'CheckCircle2' as const, color: 'text-success', bg: 'bg-success/10', ring: 'ring-success/20' },
+  alert: { icon: 'AlertTriangle', color: 'text-destructive', bg: 'bg-destructive/10', border: 'border-destructive/15' },
+  info: { icon: 'Info', color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/15' },
+  success: { icon: 'CheckCircle2', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/15' },
+} as const;
+
+const originConfig: Record<string, { icon: string; label: string; route: string }> = {
+  financeiro: { icon: 'Wallet', label: 'Financeiro', route: '/finance' },
+  checklists: { icon: 'CheckSquare', label: 'Checklists', route: '/checklists' },
+  checklist: { icon: 'CheckSquare', label: 'Checklists', route: '/checklists' },
+  estoque: { icon: 'Package', label: 'Estoque', route: '/inventory' },
+  agenda: { icon: 'Calendar', label: 'Agenda', route: '/agenda' },
+  caixa: { icon: 'Calculator', label: 'Caixa', route: '/cash-closing' },
+  sistema: { icon: 'Settings', label: 'Sistema', route: '/' },
 };
 
 interface GroupedNotification {
@@ -53,76 +63,107 @@ function groupNotifications(notifications: AppNotification[]): GroupedNotificati
   return Array.from(groups.values()).sort((a, b) => b.latestDate.localeCompare(a.latestDate));
 }
 
-/** Clean, short summary for finance notifications */
 function cleanTitle(title: string): string {
-  return title
-    .replace(/[🔔💰🔴🟡📊🧾💳]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return title.replace(/[🔔💰🔴🟡📊🧾💳📋✅❌⚠️🎯📌]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function getActionRoute(group: GroupedNotification): string | null {
-  if (group.origin === 'financeiro') return '/finance';
-  if (group.origin === 'checklists') return '/checklists';
-  if (group.origin === 'estoque') return '/inventory';
-  if (group.origin === 'agenda') return '/agenda';
-  return null;
+function formatSmartTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (isToday(date)) return formatDistanceToNow(date, { addSuffix: true, locale: ptBR });
+  if (isYesterday(date)) return `Ontem, ${format(date, 'HH:mm')}`;
+  return format(date, "dd/MM 'às' HH:mm");
 }
 
-function getActionLabel(group: GroupedNotification): string {
-  if (group.origin === 'financeiro') return 'Ver financeiro';
-  if (group.origin === 'checklists') return 'Ver checklists';
-  if (group.origin === 'estoque') return 'Ver estoque';
-  if (group.origin === 'agenda') return 'Ver agenda';
-  return 'Abrir';
+/* ─── Grouped by time sections ─── */
+function groupByTime(groups: GroupedNotification[]): { label: string; items: GroupedNotification[] }[] {
+  const sections: { label: string; items: GroupedNotification[] }[] = [];
+  const today: GroupedNotification[] = [];
+  const yesterday: GroupedNotification[] = [];
+  const older: GroupedNotification[] = [];
+
+  for (const g of groups) {
+    const d = new Date(g.latestDate);
+    if (isToday(d)) today.push(g);
+    else if (isYesterday(d)) yesterday.push(g);
+    else older.push(g);
+  }
+
+  if (today.length) sections.push({ label: 'Hoje', items: today });
+  if (yesterday.length) sections.push({ label: 'Ontem', items: yesterday });
+  if (older.length) sections.push({ label: 'Anteriores', items: older });
+
+  return sections;
 }
 
-function NotificationGroupItem({ group, onMarkRead, index }: { group: GroupedNotification; onMarkRead: (ids: string[]) => void; index: number }) {
+/* ─── Single notification row ─── */
+function NotificationRow({ group, onMarkRead, index }: { group: GroupedNotification; onMarkRead: (ids: string[]) => void; index: number }) {
   const navigate = useNavigate();
   const config = typeConfig[group.type] || typeConfig.info;
-  const route = getActionRoute(group);
-  const timeAgo = formatDistanceToNow(new Date(group.latestDate), { addSuffix: true, locale: ptBR });
+  const origin = originConfig[group.origin] || originConfig.sistema;
+  const timeAgo = formatSmartTime(group.latestDate);
 
   return (
     <button
       onClick={() => {
         onMarkRead(group.ids);
-        if (route) navigate(route);
+        if (origin.route) navigate(origin.route);
       }}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-2xl transition-all duration-150 text-left",
-        "bg-secondary/40 hover:bg-secondary/70 active:scale-[0.98]",
-        "animate-slide-up"
+        "w-full flex items-start gap-3 p-3.5 rounded-2xl transition-all duration-200 text-left group",
+        "bg-card border border-border/40 hover:border-border/60 active:scale-[0.98]",
+        "animate-fade-in"
       )}
-      style={{ animationDelay: `${index * 40}ms`, animationFillMode: 'both' }}
+      style={{ animationDelay: `${index * 30}ms`, animationFillMode: 'both' }}
     >
-      {/* Icon */}
+      {/* Type icon */}
       <div className={cn(
-        "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ring-1",
-        config.bg, config.ring
+        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
+        config.bg, config.border
       )}>
-        <AppIcon name={config.icon} className={cn("w-[18px] h-[18px]", config.color)} />
+        <AppIcon name={config.icon} size={18} className={config.color} />
       </div>
 
-      {/* Text */}
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-[13px] text-foreground leading-tight truncate">
-          {cleanTitle(group.title)}
-          {group.count > 1 && <span className="text-muted-foreground font-normal"> ({group.count})</span>}
-        </p>
-        <p className="text-[11px] text-muted-foreground mt-0.5">{timeAgo}</p>
+      {/* Content */}
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-start justify-between gap-2">
+          <p className="font-semibold text-[13px] text-foreground leading-snug">
+            {cleanTitle(group.title)}
+            {group.count > 1 && (
+              <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-muted text-[10px] font-bold text-muted-foreground align-middle">
+                {group.count}
+              </span>
+            )}
+          </p>
+        </div>
+
+        {group.description && (
+          <p className="text-[11px] text-muted-foreground/70 line-clamp-2 leading-relaxed">
+            {group.description}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2 pt-0.5">
+          <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/50 font-medium">
+            <AppIcon name={origin.icon} size={11} className="opacity-60" />
+            {origin.label}
+          </span>
+          <span className="text-muted-foreground/20">·</span>
+          <span className="text-[10px] text-muted-foreground/50">{timeAgo}</span>
+        </div>
       </div>
 
-      {/* Arrow */}
-      <AppIcon name="ChevronRight" className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+      {/* Swipe hint */}
+      <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/20 shrink-0 mt-2.5 group-hover:text-muted-foreground/40 transition-colors" />
     </button>
   );
 }
+
+/* ─── Main export ─── */
 export function NotificationCard() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-  const [expanded, setExpanded] = useState(true);
 
   const grouped = useMemo(() => groupNotifications(notifications), [notifications]);
+  const sections = useMemo(() => groupByTime(grouped), [grouped]);
 
   const handleMarkRead = async (ids: string[]) => {
     for (const id of ids) {
@@ -131,55 +172,60 @@ export function NotificationCard() {
   };
 
   if (unreadCount === 0) return (
-    <div className="py-10 flex flex-col items-center gap-3">
-      <div className="w-14 h-14 rounded-3xl bg-muted/50 flex items-center justify-center">
-        <AppIcon name="Bell" className="w-6 h-6 text-muted-foreground/30" />
+    <div className="py-16 flex flex-col items-center gap-4">
+      <div className="w-16 h-16 rounded-3xl bg-muted/30 flex items-center justify-center">
+        <AppIcon name="BellOff" size={28} className="text-muted-foreground/25" />
       </div>
-      <p className="text-sm text-muted-foreground/60 font-medium">Tudo limpo por aqui ✨</p>
+      <div className="text-center space-y-1">
+        <p className="text-sm font-semibold text-foreground/60">Tudo em dia</p>
+        <p className="text-xs text-muted-foreground/40">Nenhuma notificação pendente</p>
+      </div>
     </div>
   );
 
   return (
-    <div className="space-y-3">
-      {/* Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-1 py-1 group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center relative ring-1 ring-primary/20">
-            <AppIcon name="Bell" className="w-[18px] h-[18px] text-primary" />
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
+    <div className="space-y-4">
+      {/* Quick stats bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+              <AppIcon name="Bell" size={16} className="text-primary" />
+            </div>
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
               {grouped.length}
             </span>
           </div>
-          <div className="text-left">
-            <h3 className="font-semibold text-sm text-foreground">Notificações</h3>
-            <p className="text-[11px] text-muted-foreground/60">{grouped.length} pendente{grouped.length > 1 ? 's' : ''}</p>
-          </div>
+          <span className="text-xs text-muted-foreground">
+            {grouped.length} pendente{grouped.length > 1 ? 's' : ''}
+          </span>
         </div>
-        <div className="flex items-center gap-3">
-          {grouped.length > 1 && (
-            <span
-              onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
-              className="text-[11px] text-primary font-semibold hover:text-primary/80 cursor-pointer transition-colors"
-            >
-              Limpar todas
-            </span>
-          )}
-          <div className="w-7 h-7 rounded-xl bg-muted/50 flex items-center justify-center group-hover:bg-muted transition-colors">
-            {expanded ? <AppIcon name="ChevronUp" className="w-4 h-4 text-muted-foreground" /> : <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />}
-          </div>
-        </div>
-      </button>
 
-      {expanded && (
-        <div className="space-y-2 max-h-[340px] overflow-y-auto pr-0.5">
-          {grouped.slice(0, 10).map((g, i) => (
-            <NotificationGroupItem key={g.key} group={g} onMarkRead={handleMarkRead} index={i} />
-          ))}
-        </div>
-      )}
+        {grouped.length > 1 && (
+          <button
+            onClick={markAllAsRead}
+            className="text-[11px] text-primary font-semibold hover:text-primary/80 transition-colors px-2 py-1 rounded-lg hover:bg-primary/5 active:scale-95"
+          >
+            Limpar todas
+          </button>
+        )}
+      </div>
+
+      {/* Notification sections */}
+      <div className="space-y-5">
+        {sections.map(section => (
+          <div key={section.label} className="space-y-2">
+            <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider px-1">
+              {section.label}
+            </p>
+            <div className="space-y-2">
+              {section.items.map((g, i) => (
+                <NotificationRow key={g.key} group={g} onMarkRead={handleMarkRead} index={i} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
