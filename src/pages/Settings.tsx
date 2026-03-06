@@ -93,7 +93,7 @@ export default function SettingsPage() {
     if (item.value === 'team') return isAdmin;
     if (item.value === 'audit-log') return isAdmin;
     if (item.value === 'medals') return isAdmin;
-    if (item.value === 'profile' || item.value === 'notifications') return true;
+    if (item.value === 'profile' || item.value === 'notifications' || item.value === 'appearance') return true;
     return isAdmin;
   });
 
