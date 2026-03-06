@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { LocateFixed, Loader2 } from 'lucide-react';
+import { LocateFixed, Loader2, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -38,27 +38,31 @@ function loadLeaflet(): Promise<void> {
   });
 }
 
-async function geocodeAddress(address: string, neighborhood: string, city: string, unitName: string): Promise<{ lat: number; lng: number } | null> {
-  // Try multiple query strategies for better results
+async function geocodeAddress(
+  address: string,
+  neighborhood: string,
+  city: string,
+  unitName: string,
+): Promise<{ lat: number; lng: number } | null> {
+  const fallbackCity = city || unitName || '';
   const queries = [
-    `${address}, ${neighborhood}, ${city || unitName}, SP, Brasil`,
-    `${address}, ${city || unitName}, SP, Brasil`,
+    `${address}, ${neighborhood}, ${fallbackCity}, SP, Brasil`,
+    `${address}, ${fallbackCity}, SP, Brasil`,
     `${address}, ${unitName}, Brasil`,
-    `${neighborhood}, ${city || unitName}, SP, Brasil`,
-  ].filter(Boolean);
+    `${neighborhood}, ${fallbackCity}, SP, Brasil`,
+  ];
 
   for (const q of queries) {
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=br`,
-        { headers: { 'User-Agent': 'GardenGestao/1.0' } }
+        { headers: { 'User-Agent': 'GardenGestao/1.0' } },
       );
       const results = await res.json();
       if (results?.[0]) {
         return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
       }
     } catch {}
-    // Rate limit between attempts
     await new Promise(r => setTimeout(r, 1100));
   }
   return null;
@@ -81,41 +85,40 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
   const withoutCoords = deliveries.filter(d => d.address && (!d.address.lat || !d.address.lng));
 
+  /* ── Popup builder ── */
   const buildPopup = useCallback((delivery: Delivery) => {
-    const addr = delivery.address;
-    const lat = addr!.lat!;
-    const lng = addr!.lng!;
-    const statusColor = STATUS_COLORS[delivery.status];
-    const statusLabel = STATUS_LABELS[delivery.status];
-    const nextStatus: DeliveryStatus | null =
+    const addr = delivery.address!;
+    const lat = addr.lat!;
+    const lng = addr.lng!;
+    const color = STATUS_COLORS[delivery.status];
+    const label = STATUS_LABELS[delivery.status];
+    const next: DeliveryStatus | null =
       delivery.status === 'pending' ? 'out' :
       delivery.status === 'out' ? 'delivered' : null;
 
     return `
-      <div style="font-family:system-ui,-apple-system,sans-serif;min-width:180px;max-width:240px;">
-        <p style="font-weight:700;font-size:13px;margin:0 0 3px;line-height:1.3;">${addr?.customer_name || 'Sem nome'}</p>
-        <p style="font-size:10px;color:#999;margin:0 0 2px;">${addr?.full_address || '—'}</p>
-        ${addr?.reference ? `<p style="font-size:10px;color:#bbb;font-style:italic;margin:0 0 6px;">${addr.reference}</p>` : ''}
-        <div style="display:flex;align-items:center;gap:6px;margin:6px 0;">
-          <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:99px;background:${statusColor}20;color:${statusColor};">${statusLabel}</span>
+      <div style="font-family:system-ui,-apple-system,sans-serif;min-width:170px;max-width:230px;">
+        <p style="font-weight:700;font-size:13px;margin:0 0 2px;">${addr.customer_name || 'Sem nome'}</p>
+        <p style="font-size:10px;color:#888;margin:0 0 4px;">${addr.full_address || '—'}</p>
+        <div style="display:flex;align-items:center;gap:6px;margin:4px 0;">
+          <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:99px;background:${color}20;color:${color};">${label}</span>
           ${delivery.total > 0 ? `<span style="font-size:12px;font-weight:700;margin-left:auto;">R$ ${delivery.total.toFixed(2)}</span>` : ''}
         </div>
-        <div style="display:flex;gap:4px;margin-top:6px;">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" rel="noopener"
-             style="flex:1;text-align:center;font-size:10px;font-weight:600;padding:5px;border-radius:6px;background:#f0fdf4;color:#16a34a;text-decoration:none;">
-            📍 Navegar
-          </a>
-        </div>
-        ${nextStatus ? `
-          <button onclick="window.__deliveryStatusChange__('${delivery.id}','${nextStatus}')"
-                  style="width:100%;margin-top:6px;font-size:11px;font-weight:600;padding:5px;border-radius:6px;border:none;color:white;background:${STATUS_COLORS[nextStatus]};cursor:pointer;">
-            ${nextStatus === 'out' ? 'Marcar Saiu →' : 'Marcar Entregue ✓'}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" rel="noopener"
+           style="display:block;text-align:center;margin-top:6px;font-size:10px;font-weight:600;padding:5px;border-radius:6px;background:#f0fdf4;color:#16a34a;text-decoration:none;">
+          📍 Abrir rota
+        </a>
+        ${next ? `
+          <button onclick="window.__deliveryStatusChange__('${delivery.id}','${next}')"
+                  style="width:100%;margin-top:4px;font-size:11px;font-weight:600;padding:5px;border-radius:6px;border:none;color:white;background:${STATUS_COLORS[next]};cursor:pointer;">
+            ${next === 'out' ? '🚚 Saiu para entrega' : '✅ Marcar entregue'}
           </button>
         ` : ''}
       </div>
     `;
   }, []);
 
+  /* ── Global status change handler ── */
   useEffect(() => {
     (window as any).__deliveryStatusChange__ = (id: string, status: DeliveryStatus) => {
       onStatusChange(id, status);
@@ -123,6 +126,7 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
     return () => { delete (window as any).__deliveryStatusChange__; };
   }, [onStatusChange]);
 
+  /* ── Map init ── */
   useEffect(() => {
     if (!mapRef.current) return;
     let cancelled = false;
@@ -136,11 +140,10 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
         mapInstanceRef.current = null;
       }
 
-      const defaultCenter: [number, number] = [-23.5505, -46.6333];
       const map = L.map(mapRef.current, {
         zoomControl: false,
         attributionControl: false,
-      }).setView(defaultCenter, 12);
+      }).setView([-23.5505, -46.6333], 12);
       mapInstanceRef.current = map;
 
       L.control.zoom({ position: 'topright' }).addTo(map);
@@ -164,22 +167,22 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
         const icon = L.divIcon({
           className: '',
           html: `
-            <div style="position:relative;width:32px;height:32px;">
-              <div style="width:12px;height:12px;background:${color};border:2.5px solid white;border-radius:50%;box-shadow:0 1px 6px rgba(0,0,0,0.3);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-              <div style="width:24px;height:24px;background:${color}20;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+            <div style="position:relative;width:36px;height:36px;">
+              <div style="width:28px;height:28px;background:${color}25;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+              <div style="width:14px;height:14px;background:${color};border:2.5px solid white;border-radius:50%;box-shadow:0 2px 8px ${color}40;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
             </div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
-          popupAnchor: [0, -12],
+          iconSize: [36, 36],
+          iconAnchor: [18, 18],
+          popupAnchor: [0, -14],
         });
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
-        marker.bindPopup(buildPopup(delivery), { maxWidth: 260, minWidth: 180 });
+        marker.bindPopup(buildPopup(delivery), { maxWidth: 250, minWidth: 170 });
         markersRef.current.push(marker);
       });
 
       if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
       }
     });
 
@@ -194,6 +197,7 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
     };
   }, [withCoords, buildPopup]);
 
+  /* ── Geocoding ── */
   const handleGeocode = useCallback(async (toGeocode: Delivery[]) => {
     if (toGeocode.length === 0) return;
     setIsGeocoding(true);
@@ -207,7 +211,7 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
         addr.full_address,
         addr.neighborhood,
         addr.city,
-        unitName || ''
+        unitName || '',
       );
       if (coords) {
         await supabase
@@ -220,7 +224,7 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
 
     setIsGeocoding(false);
     if (success > 0) {
-      toast.success(`${success} endereço(s) localizado(s)`);
+      toast.success(`${success} endereço(s) localizado(s) no mapa`);
       onRefresh?.();
     } else {
       toast.error('Não foi possível localizar os endereços');
@@ -234,28 +238,29 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
     }
   }, [withoutCoords.length, handleGeocode, isGeocoding]);
 
+  /* ── Render ── */
   return (
     <div className="space-y-2">
       {/* Geocode banner */}
       {withoutCoords.length > 0 && (
-        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-border/40 bg-card/60">
+        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-border/30 bg-card/50">
           <div className="flex items-center gap-2 min-w-0">
             {isGeocoding ? (
-              <Loader2 className="w-3.5 h-3.5 text-primary shrink-0 animate-spin" />
+              <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
             ) : (
-              <LocateFixed className="w-3.5 h-3.5 text-primary shrink-0" />
+              <LocateFixed className="w-4 h-4 text-primary shrink-0" />
             )}
-            <p className="text-[11px] text-muted-foreground truncate">
+            <p className="text-[11px] text-muted-foreground">
               {isGeocoding
-                ? 'Localizando endereços…'
-                : `${withoutCoords.length} sem localização`}
+                ? 'Localizando endereços no mapa…'
+                : `${withoutCoords.length} entrega(s) sem localização`}
             </p>
           </div>
           {!isGeocoding && (
             <Button
               size="sm"
               variant="outline"
-              className="h-6 text-[10px] shrink-0 px-2 rounded-lg"
+              className="h-7 text-[10px] px-2.5 rounded-lg shrink-0"
               onClick={() => handleGeocode(withoutCoords)}
             >
               Localizar
@@ -264,12 +269,20 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
         </div>
       )}
 
-      {/* Map */}
-      <div
-        ref={mapRef}
-        className="rounded-2xl overflow-hidden border border-border/40 shadow-sm"
-        style={{ height: 280 }}
-      />
+      {/* Map container */}
+      <div className="relative rounded-2xl overflow-hidden border border-border/30 shadow-sm">
+        <div
+          ref={mapRef}
+          style={{ height: 260 }}
+          className="w-full"
+        />
+        {withCoords.length === 0 && !isGeocoding && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/60 backdrop-blur-sm">
+            <Map className="w-8 h-8 text-muted-foreground/20 mb-2" />
+            <p className="text-xs text-muted-foreground/40 font-medium">Aguardando localização</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

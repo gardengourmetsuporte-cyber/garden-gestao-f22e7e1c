@@ -1,15 +1,14 @@
-import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation } from 'lucide-react';
+import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
 
-const STATUS_CONFIG: Record<DeliveryStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: 'Pendente', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', icon: <Clock className="w-3 h-3" /> },
-  out: { label: 'Em rota', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', icon: <Truck className="w-3 h-3" /> },
-  delivered: { label: 'Entregue', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: <CheckCircle2 className="w-3 h-3" /> },
-  cancelled: { label: 'Cancelada', color: 'bg-red-500/10 text-red-400 border-red-500/20', icon: <XCircle className="w-3 h-3" /> },
+const STATUS_CONFIG: Record<DeliveryStatus, { label: string; bg: string; text: string; icon: typeof Clock }> = {
+  pending: { label: 'Pendente', bg: 'bg-amber-500/10', text: 'text-amber-400', icon: Clock },
+  out: { label: 'Em rota', bg: 'bg-blue-500/10', text: 'text-blue-400', icon: Truck },
+  delivered: { label: 'Entregue', bg: 'bg-emerald-500/10', text: 'text-emerald-400', icon: CheckCircle2 },
+  cancelled: { label: 'Cancelada', bg: 'bg-red-500/10', text: 'text-red-400', icon: XCircle },
 };
 
 interface Props {
@@ -20,6 +19,7 @@ interface Props {
 export function DeliveryCard({ delivery, onStatusChange }: Props) {
   const addr = delivery.address;
   const cfg = STATUS_CONFIG[delivery.status];
+  const StatusIcon = cfg.icon;
 
   const nextStatus: DeliveryStatus | null =
     delivery.status === 'pending' ? 'out' :
@@ -31,73 +31,73 @@ export function DeliveryCard({ delivery, onStatusChange }: Props) {
     : null;
 
   return (
-    <div className="rounded-xl border border-border/30 bg-background/60 p-3 space-y-2 hover:bg-background/80 transition-colors">
-      {/* Header: Name + Status */}
-      <div className="flex items-start justify-between gap-2">
+    <div className="group rounded-xl bg-background/50 hover:bg-background/80 border border-border/20 hover:border-border/40 transition-all duration-200 p-3">
+      {/* Top row: avatar + info + status */}
+      <div className="flex items-start gap-3">
+        {/* Status indicator */}
+        <div className={`w-9 h-9 rounded-xl ${cfg.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+          <StatusIcon className={`w-4 h-4 ${cfg.text}`} />
+        </div>
+
+        {/* Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm leading-tight truncate">
-            {addr?.customer_name || 'Sem nome'}
-          </p>
-          <div className="flex items-center gap-1 mt-1 text-muted-foreground">
+          <div className="flex items-start justify-between gap-2">
+            <p className="font-semibold text-sm leading-snug truncate">
+              {addr?.customer_name || 'Sem nome'}
+            </p>
+            {delivery.total > 0 && (
+              <span className="text-sm font-bold text-primary whitespace-nowrap tabular-nums shrink-0">
+                R$ {delivery.total.toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 mt-0.5 text-muted-foreground">
             <MapPin className="w-3 h-3 shrink-0" />
             <span className="text-[11px] truncate">{addr?.full_address || '—'}</span>
           </div>
+
           {addr?.reference && (
-            <p className="text-[10px] text-muted-foreground/60 italic mt-0.5 truncate">
-              Ref: {addr.reference}
+            <p className="text-[10px] text-muted-foreground/50 mt-0.5 truncate italic">
+              {addr.reference}
             </p>
           )}
-        </div>
-        <Badge variant="outline" className={`shrink-0 ${cfg.color} text-[10px] gap-1 h-5 px-1.5 border`}>
-          {cfg.icon} {cfg.label}
-        </Badge>
-      </div>
 
-      {/* Items */}
-      {delivery.items_summary && (
-        <div className="flex items-start gap-1.5 text-muted-foreground">
-          <Package className="w-3 h-3 shrink-0 mt-0.5" />
-          <span className="text-[11px] line-clamp-2">{delivery.items_summary}</span>
-        </div>
-      )}
-
-      {/* Footer: time + value + actions */}
-      <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/20">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-[10px] text-muted-foreground/60 whitespace-nowrap">
-            {formatDistanceToNow(new Date(delivery.created_at), { addSuffix: true, locale: ptBR })}
-          </span>
-          {delivery.total > 0 && (
-            <span className="text-xs font-bold text-primary whitespace-nowrap tabular-nums">
-              R$ {delivery.total.toFixed(2)}
-            </span>
+          {delivery.items_summary && (
+            <div className="flex items-center gap-1 mt-1 text-muted-foreground/70">
+              <Package className="w-3 h-3 shrink-0" />
+              <span className="text-[10px] line-clamp-1">{delivery.items_summary}</span>
+            </div>
           )}
         </div>
+      </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+      {/* Bottom row: time + actions */}
+      <div className="flex items-center justify-between gap-2 mt-2.5 pt-2 border-t border-border/10">
+        <span className="text-[10px] text-muted-foreground/40 tabular-nums">
+          {formatDistanceToNow(new Date(delivery.created_at), { addSuffix: true, locale: ptBR })}
+        </span>
+
+        <div className="flex items-center gap-1">
           {mapsUrl && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-7 w-7 p-0"
-              asChild
-            >
-              <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
-                <Navigation className="w-3.5 h-3.5" />
+            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-lg" asChild>
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Abrir rota">
+                <Navigation className="w-3.5 h-3.5 text-emerald-400" />
               </a>
             </Button>
           )}
+
           {nextStatus && (
             <Button
               size="sm"
               variant={nextStatus === 'delivered' ? 'default' : 'outline'}
-              className="h-7 text-[11px] px-2.5 gap-1"
+              className="h-7 text-[11px] px-3 gap-1.5 rounded-lg font-semibold"
               onClick={() => onStatusChange(delivery.id, nextStatus)}
             >
               {nextStatus === 'out' ? (
-                <><Truck className="w-3 h-3" /> Saiu</>
+                <><Truck className="w-3.5 h-3.5" /> Saiu</>
               ) : (
-                <><CheckCircle2 className="w-3 h-3" /> Entregue</>
+                <><CheckCircle2 className="w-3.5 h-3.5" /> Entregue</>
               )}
             </Button>
           )}
