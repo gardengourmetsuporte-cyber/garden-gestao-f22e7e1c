@@ -1,6 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { LocateFixed, Loader2, Map } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2, Map } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
@@ -56,13 +55,18 @@ async function geocodeAddress(
 ): Promise<{ lat: number; lng: number } | null> {
   const normalizedCity = city?.trim().length >= 4 ? city.trim() : unitName.trim();
   const cleaned = cleanAddress(address);
+  const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
-  const queries = [
+  const queries = Array.from(new Set([
     `${cleaned}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, ${normalizedCity}, SP, Brasil`,
+    `${streetOnly}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
+    `${streetOnly}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, ${normalizedCity}, Brasil`,
+    `${streetOnly}, ${normalizedCity}, Brasil`,
+    `${neighborhood}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, Brasil`,
-  ];
+  ].filter((q) => q.replace(/[,\s]/g, '').length > 0)));
 
   let anchor: { lat: number; lng: number } | null = null;
   if (normalizedCity) {
@@ -111,7 +115,7 @@ async function geocodeAddress(
 
   // Second pass: unbounded fallback (broader search)
   if (anchor) {
-    for (const q of queries.slice(0, 2)) {
+    for (const q of queries) {
       try {
         const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
@@ -149,6 +153,7 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
+  const geocodeRunningRef = useRef(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -316,47 +321,64 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
   /* ── Geocoding ── */
   const handleGeocode = useCallback(async (toGeocode: Delivery[]) => {
-    if (toGeocode.length === 0) return;
+    if (toGeocode.length === 0 || geocodeRunningRef.current) return;
+
+    geocodeRunningRef.current = true;
     setIsGeocoding(true);
     let success = 0;
 
-    for (const delivery of toGeocode) {
-      const addr = delivery.address;
-      if (!addr) continue;
+    try {
+      for (const delivery of toGeocode) {
+        const addr = delivery.address;
+        if (!addr) continue;
 
-      const normalizedCity = addr.city?.trim() || unitName?.trim() || '';
-      const coords = await geocodeAddress(
-        addr.full_address,
-        addr.neighborhood,
-        normalizedCity,
-        unitName || '',
-      );
-      if (coords) {
-        await supabase
-          .from('delivery_addresses')
-          .update({ lat: coords.lat, lng: coords.lng })
-          .eq('id', addr.id);
-        success++;
+        const normalizedCity = addr.city?.trim() || unitName?.trim() || '';
+        const coords = await geocodeAddress(
+          addr.full_address,
+          addr.neighborhood,
+          normalizedCity,
+          unitName || '',
+        );
+
+        if (coords) {
+          const { error } = await supabase
+            .from('delivery_addresses')
+            .update({ lat: coords.lat, lng: coords.lng })
+            .eq('id', addr.id);
+
+          if (error) {
+            toast.error('Erro ao salvar localização no mapa');
+            continue;
+          }
+
+          success++;
+        }
       }
-    }
 
-    setIsGeocoding(false);
-    if (success > 0) {
-      toast.success(`${success} endereço(s) localizado(s) no mapa`);
-      onRefresh?.();
-    } else {
-      toast.error('Não foi possível localizar os endereços');
+      if (success > 0) {
+        toast.success(`${success} endereço(s) localizado(s) no mapa`);
+        onRefresh?.();
+      }
+    } finally {
+      geocodeRunningRef.current = false;
+      setIsGeocoding(false);
     }
   }, [onRefresh, unitName]);
 
-  // Auto-geocode whenever there are addresses without coords
-  const withoutCoordsIds = useMemo(() => withoutCoords.map(d => d.id).join(','), [withoutCoords]);
+  // Auto-geocode on load and retry every 20s while there are pending addresses
+  const withoutCoordsIds = useMemo(() => withoutCoords.map((d) => d.id).join(','), [withoutCoords]);
   useEffect(() => {
-    if (withoutCoords.length > 0 && !isGeocoding) {
+    if (withoutCoords.length === 0) return;
+
+    handleGeocode(withoutCoords);
+    const retryTimer = window.setInterval(() => {
       handleGeocode(withoutCoords);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withoutCoordsIds]);
+    }, 20000);
+
+    return () => {
+      window.clearInterval(retryTimer);
+    };
+  }, [withoutCoordsIds, handleGeocode]);
 
   /* ── Render ── */
   return (
