@@ -341,4 +341,4 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
       </div>
     </div>
   );
-}
+});
