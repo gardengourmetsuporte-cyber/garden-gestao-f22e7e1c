@@ -55,7 +55,7 @@ export interface NeighborhoodGroup {
 
 export function useDeliveries() {
   const { user } = useAuth();
-  const { activeUnitId } = useUnit();
+  const { activeUnitId, activeUnit } = useUnit();
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<DeliveryStatus | 'all'>('all');
@@ -139,20 +139,65 @@ export function useDeliveries() {
 
   // Geocode address using Nominatim (free)
   const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
-    try {
-      const query = encodeURIComponent(`${address}, ${city}, Brasil`);
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
-        headers: { 'User-Agent': 'GardenGestao/1.0' },
-      });
-      const results = await res.json();
-      if (results?.[0]) {
-        return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+    const fallbackCity = city?.trim().length >= 4 ? city.trim() : (activeUnit?.name || '').trim();
+    const queries = [
+      `${address}, ${fallbackCity}, SP, Brasil`,
+      `${address}, ${fallbackCity}, Brasil`,
+      `${address}, Brasil`,
+    ];
+
+    let anchor: { lat: number; lng: number } | null = null;
+    if (fallbackCity) {
+      try {
+        const anchorParams = new URLSearchParams({
+          q: `${fallbackCity}, SP, Brasil`,
+          format: 'json',
+          limit: '1',
+          countrycodes: 'br',
+        });
+        const anchorRes = await fetch(`https://nominatim.openstreetmap.org/search?${anchorParams.toString()}`, {
+          headers: { 'User-Agent': 'GardenGestao/1.0' },
+        });
+        const anchorResults = await anchorRes.json();
+        if (anchorResults?.[0]) {
+          anchor = {
+            lat: parseFloat(anchorResults[0].lat),
+            lng: parseFloat(anchorResults[0].lon),
+          };
+        }
+      } catch (error) {
+        console.warn('Falha ao obter âncora da cidade para geocoding', error);
       }
-      return null;
-    } catch {
-      return null;
     }
-  }, []);
+
+    for (const query of queries) {
+      try {
+        const params = new URLSearchParams({
+          q: query,
+          format: 'json',
+          limit: '1',
+          countrycodes: 'br',
+        });
+
+        if (anchor) {
+          params.set('viewbox', `${anchor.lng - 0.7},${anchor.lat + 0.7},${anchor.lng + 0.7},${anchor.lat - 0.7}`);
+          params.set('bounded', '1');
+        }
+
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+          headers: { 'User-Agent': 'GardenGestao/1.0' },
+        });
+        const results = await res.json();
+        if (results?.[0]) {
+          return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+        }
+      } catch (error) {
+        console.warn('Falha ao geocodificar endereço', error);
+      }
+    }
+
+    return null;
+  }, [activeUnit?.name]);
 
   // Create delivery
   const createDelivery = useMutation({
@@ -162,8 +207,10 @@ export function useDeliveries() {
     }) => {
       const { ocrResult, photoUrl } = params;
 
+      const normalizedCity = (ocrResult.city || '').trim() || (activeUnit?.name || '').trim();
+
       // Geocode the address
-      const coords = await geocodeAddress(ocrResult.full_address, ocrResult.city || ocrResult.neighborhood);
+      const coords = await geocodeAddress(ocrResult.full_address, normalizedCity);
 
       // Create or find address
       const { data: address, error: addrError } = await supabase
@@ -173,7 +220,7 @@ export function useDeliveries() {
           customer_name: ocrResult.customer_name,
           full_address: ocrResult.full_address,
           neighborhood: ocrResult.neighborhood,
-          city: ocrResult.city || '',
+          city: normalizedCity,
           reference: ocrResult.reference || null,
           lat: coords?.lat ?? null,
           lng: coords?.lng ?? null,
