@@ -109,7 +109,11 @@ export function AgendaDashboardWidget() {
               maxHeight: '260px',
               overflowY: scrollUnlocked ? 'auto' : 'hidden',
             }}
-            onClick={() => !scrollUnlocked && setScrollUnlocked(true)}
+            onClick={(e) => {
+              if (!scrollUnlocked && e.target === e.currentTarget) {
+                setScrollUnlocked(true);
+              }
+            }}
             onPointerLeave={handleBlur}
           >
             {!scrollUnlocked && pendingTasks.length > 4 && (
