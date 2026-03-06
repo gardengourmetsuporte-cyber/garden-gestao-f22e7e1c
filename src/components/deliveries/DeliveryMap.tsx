@@ -1,14 +1,12 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { Navigation, LocateFixed } from 'lucide-react';
+import { LocateFixed, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
 
 declare global {
-  interface Window {
-    L: any;
-  }
+  interface Window { L: any; }
 }
 
 const STATUS_COLORS: Record<DeliveryStatus, string> = {
@@ -28,6 +26,10 @@ const STATUS_LABELS: Record<DeliveryStatus, string> = {
 function loadLeaflet(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.L) { resolve(); return; }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.onload = () => resolve();
@@ -47,9 +49,7 @@ async function geocodeAddress(address: string, city: string): Promise<{ lat: num
       return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
     }
     return null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 interface Props {
@@ -79,28 +79,23 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
       delivery.status === 'out' ? 'delivered' : null;
 
     return `
-      <div style="font-family:inherit;min-width:200px;">
-        <p style="font-weight:700;font-size:14px;margin:0 0 4px;">${addr?.customer_name || 'Sem nome'}</p>
-        <p style="font-size:11px;color:#888;margin:0 0 2px;">${addr?.full_address || '—'}</p>
-        ${addr?.reference ? `<p style="font-size:11px;color:#aaa;font-style:italic;margin:0 0 6px;">${addr.reference}</p>` : ''}
-        ${delivery.items_summary ? `<p style="font-size:11px;color:#666;margin:0 0 6px;">${delivery.items_summary}</p>` : ''}
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:${statusColor}20;color:${statusColor};">${statusLabel}</span>
-          ${delivery.total > 0 ? `<span style="font-size:12px;font-weight:700;">R$ ${delivery.total.toFixed(2)}</span>` : ''}
+      <div style="font-family:system-ui,-apple-system,sans-serif;min-width:180px;max-width:240px;">
+        <p style="font-weight:700;font-size:13px;margin:0 0 3px;line-height:1.3;">${addr?.customer_name || 'Sem nome'}</p>
+        <p style="font-size:10px;color:#999;margin:0 0 2px;">${addr?.full_address || '—'}</p>
+        ${addr?.reference ? `<p style="font-size:10px;color:#bbb;font-style:italic;margin:0 0 6px;">${addr.reference}</p>` : ''}
+        <div style="display:flex;align-items:center;gap:6px;margin:6px 0;">
+          <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:99px;background:${statusColor}20;color:${statusColor};">${statusLabel}</span>
+          ${delivery.total > 0 ? `<span style="font-size:12px;font-weight:700;margin-left:auto;">R$ ${delivery.total.toFixed(2)}</span>` : ''}
         </div>
-        <div style="display:flex;gap:6px;margin-bottom:${nextStatus ? '8px' : '0'};">
-          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}" target="_blank" rel="noopener"
-             style="flex:1;text-align:center;font-size:11px;font-weight:500;padding:6px 8px;border-radius:8px;background:#eff6ff;color:#2563eb;text-decoration:none;">
-            🌍 Street View
-          </a>
+        <div style="display:flex;gap:4px;margin-top:6px;">
           <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" rel="noopener"
-             style="flex:1;text-align:center;font-size:11px;font-weight:500;padding:6px 8px;border-radius:8px;background:#f0fdf4;color:#16a34a;text-decoration:none;">
-            📍 Rota
+             style="flex:1;text-align:center;font-size:10px;font-weight:600;padding:5px;border-radius:6px;background:#f0fdf4;color:#16a34a;text-decoration:none;">
+            📍 Navegar
           </a>
         </div>
         ${nextStatus ? `
           <button onclick="window.__deliveryStatusChange__('${delivery.id}','${nextStatus}')"
-                  style="width:100%;font-size:12px;font-weight:600;padding:6px;border-radius:8px;border:none;color:white;background:${STATUS_COLORS[nextStatus]};cursor:pointer;">
+                  style="width:100%;margin-top:6px;font-size:11px;font-weight:600;padding:5px;border-radius:6px;border:none;color:white;background:${STATUS_COLORS[nextStatus]};cursor:pointer;">
             ${nextStatus === 'out' ? 'Marcar Saiu →' : 'Marcar Entregue ✓'}
           </button>
         ` : ''}
@@ -115,7 +110,6 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
     return () => { delete (window as any).__deliveryStatusChange__; };
   }, [onStatusChange]);
 
-  // Initialize map always
   useEffect(() => {
     if (!mapRef.current) return;
     let cancelled = false;
@@ -129,16 +123,20 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
         mapInstanceRef.current = null;
       }
 
-      // Default: São Paulo center
       const defaultCenter: [number, number] = [-23.5505, -46.6333];
-      const map = L.map(mapRef.current, { zoomControl: true }).setView(defaultCenter, 12);
+      const map = L.map(mapRef.current, {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView(defaultCenter, 12);
       mapInstanceRef.current = map;
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-      }).addTo(map);
+      L.control.zoom({ position: 'topright' }).addTo(map);
+      L.control.attribution({ position: 'bottomright', prefix: false })
+        .addAttribution('© <a href="https://openstreetmap.org">OSM</a>')
+        .addTo(map);
 
-      // Clear old markers
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
       markersRef.current.forEach(m => m.remove());
       markersRef.current = [];
 
@@ -152,19 +150,23 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
 
         const icon = L.divIcon({
           className: '',
-          html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-          popupAnchor: [0, -16],
+          html: `
+            <div style="position:relative;width:32px;height:32px;">
+              <div style="width:12px;height:12px;background:${color};border:2.5px solid white;border-radius:50%;box-shadow:0 1px 6px rgba(0,0,0,0.3);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+              <div style="width:24px;height:24px;background:${color}20;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+            </div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+          popupAnchor: [0, -12],
         });
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
-        marker.bindPopup(buildPopup(delivery), { maxWidth: 280, minWidth: 200 });
+        marker.bindPopup(buildPopup(delivery), { maxWidth: 260, minWidth: 180 });
         markersRef.current.push(marker);
       });
 
       if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
       }
     });
 
@@ -188,11 +190,7 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
       const addr = delivery.address;
       if (!addr) continue;
 
-      const coords = await geocodeAddress(
-        addr.full_address,
-        addr.city || addr.neighborhood
-      );
-
+      const coords = await geocodeAddress(addr.full_address, addr.city || addr.neighborhood);
       if (coords) {
         await supabase
           .from('delivery_addresses')
@@ -200,21 +198,18 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
           .eq('id', addr.id);
         success++;
       }
-
-      // Nominatim rate limit: 1 req/sec
       await new Promise(r => setTimeout(r, 1100));
     }
 
     setIsGeocoding(false);
     if (success > 0) {
-      toast.success(`${success} endereço(s) localizado(s) no mapa`);
+      toast.success(`${success} endereço(s) localizado(s)`);
       onRefresh?.();
     } else {
       toast.error('Não foi possível localizar os endereços');
     }
   }, [onRefresh]);
 
-  // Auto-geocode on first render when deliveries lack coords
   useEffect(() => {
     if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
       geocodedRef.current = true;
@@ -226,30 +221,37 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
     <div className="space-y-2">
       {/* Geocode banner */}
       {withoutCoords.length > 0 && (
-        <div className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/60 bg-card/70 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-border/40 bg-card/60">
           <div className="flex items-center gap-2 min-w-0">
-            <LocateFixed className="w-4 h-4 text-primary shrink-0" />
-            <p className="text-xs text-muted-foreground truncate">
-              {isGeocoding ? 'Localizando endereços no mapa…' : `${withoutCoords.length} entrega(s) sem localização`}
+            {isGeocoding ? (
+              <Loader2 className="w-3.5 h-3.5 text-primary shrink-0 animate-spin" />
+            ) : (
+              <LocateFixed className="w-3.5 h-3.5 text-primary shrink-0" />
+            )}
+            <p className="text-[11px] text-muted-foreground truncate">
+              {isGeocoding
+                ? 'Localizando endereços…'
+                : `${withoutCoords.length} sem localização`}
             </p>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 text-xs shrink-0 px-2.5"
-            onClick={() => handleGeocode(withoutCoords)}
-            disabled={isGeocoding}
-          >
-            {isGeocoding ? 'Aguarde' : 'Localizar'}
-          </Button>
+          {!isGeocoding && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-[10px] shrink-0 px-2 rounded-lg"
+              onClick={() => handleGeocode(withoutCoords)}
+            >
+              Localizar
+            </Button>
+          )}
         </div>
       )}
 
-      {/* Map — compact */}
+      {/* Map */}
       <div
         ref={mapRef}
-        className="rounded-2xl overflow-hidden border border-border/60 shadow-sm"
-        style={{ height: 230 }}
+        className="rounded-2xl overflow-hidden border border-border/40 shadow-sm"
+        style={{ height: 280 }}
       />
     </div>
   );
