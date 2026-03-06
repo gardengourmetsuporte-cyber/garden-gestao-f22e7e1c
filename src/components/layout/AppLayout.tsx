@@ -136,21 +136,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
       {/* ======= Mobile Header with Navy Brand Strip ======= */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-emerald-500/10"
+        className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-border/30"
         style={{
           paddingTop: 'env(safe-area-inset-top)',
-          background: 'linear-gradient(145deg, #031208 0%, #082618 50%, #031208 100%)',
+          background: 'hsl(var(--background))',
         }}
       >
-        {/* Premium gradient brand bar */}
-        <div
-          className="relative overflow-hidden backdrop-blur-3xl"
-          style={{
-            background: 'linear-gradient(145deg, rgba(3,18,8,0.92) 0%, rgba(8,38,24,0.92) 50%, rgba(3,18,8,0.92) 100%)',
-          }}
-        >
-          {/* Animated ambient glow */}
-          <div className="absolute inset-0 pointer-events-none header-ambient-glow" />
+        <div className="relative overflow-hidden">
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
             {/* Left: Logo (dashboard) or Back button (module pages) */}
             <div className="w-10 flex items-center">
@@ -164,9 +156,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               ) : (
                 <button
                   onClick={() => navigate('/')}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-all active:scale-90"
+                  className="p-2 rounded-lg hover:bg-muted/50 transition-all active:scale-90"
                 >
-                  <AppIcon name="ChevronLeft" size={20} className="text-white/70" />
+                  <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
                 </button>
               )}
             </div>
@@ -174,7 +166,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             {/* Center: Module name on module pages, empty on dashboard */}
             <div className="flex-1 flex items-center justify-center min-w-0">
               {!isDashboard && (
-                <span className="text-sm font-bold text-white truncate font-display" style={{ letterSpacing: '-0.01em' }}>
+                <span className="text-sm font-bold text-foreground truncate font-display" style={{ letterSpacing: '-0.01em' }}>
                   {moduleTitle || 'Garden'}
                 </span>
               )}
@@ -184,10 +176,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             <div className="flex items-center gap-1">
               <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
                 <DrawerTrigger asChild>
-                  <button className="relative p-2.5 rounded-lg hover:bg-white/10 transition-all">
-                    <AppIcon name="Bell" size={22} className="text-white/70" />
+                  <button className="relative p-2.5 rounded-lg hover:bg-muted/50 transition-all">
+                    <AppIcon name="Bell" size={22} className="text-foreground/70" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                      <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -203,11 +195,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 onClick={() => navigate('/profile/me')}
                 className="p-1 rounded-full active:scale-90 transition-transform"
               >
-                <Avatar className="w-8 h-8 border-2 border-white/20">
+                <Avatar className="w-8 h-8 border-2 border-border/40">
                   {profile?.avatar_url ? (
                     <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Avatar'} />
                   ) : null}
-                  <AvatarFallback className="text-[11px] font-bold bg-white/15 text-white">
+                  <AvatarFallback className="text-[11px] font-bold bg-muted text-foreground">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
