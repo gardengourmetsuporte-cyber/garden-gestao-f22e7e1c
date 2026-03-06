@@ -191,7 +191,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
           </div>
 
           {/* Module grid — adaptive cards */}
-          <div className="px-4 pt-5 pb-8 space-y-3 relative z-10">
+          <div className="px-4 pt-5 pb-8 space-y-3 relative z-10 more-drawer-modules">
             {groupedNav.map(group => {
               const count = group.items.length;
               const useCols3 = count >= 3 && count !== 4;
