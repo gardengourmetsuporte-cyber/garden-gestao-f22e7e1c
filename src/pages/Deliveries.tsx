@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
+
+const DeliveryMap = lazy(() => import('@/components/deliveries/DeliveryMap').then(m => ({ default: m.DeliveryMap })));
 
 const STATUS_TABS: { key: DeliveryStatus | 'all'; label: string; icon: string }[] = [
   { key: 'all', label: 'Todas', icon: 'package_2' },
