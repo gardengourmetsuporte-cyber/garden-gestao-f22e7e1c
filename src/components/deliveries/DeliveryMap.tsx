@@ -246,10 +246,11 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
       const addr = delivery.address;
       if (!addr) continue;
 
+      const normalizedCity = addr.city?.trim() || unitName?.trim() || '';
       const coords = await geocodeAddress(
         addr.full_address,
         addr.neighborhood,
-        addr.city,
+        normalizedCity,
         unitName || '',
       );
       if (coords) {
