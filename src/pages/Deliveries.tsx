@@ -22,6 +22,7 @@ const STATUS_TABS: { key: DeliveryStatus | 'all'; label: string; icon: string }[
 
 export default function Deliveries() {
   const {
+    deliveries,
     groupedByNeighborhood,
     isLoading,
     isProcessing,
