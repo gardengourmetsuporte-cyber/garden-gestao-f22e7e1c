@@ -36,7 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   // ── Operação ──
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Truck', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'ChefHat', label: 'Fichas Técnicas', href: '/recipes', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
 
   // ── Pessoas ──
