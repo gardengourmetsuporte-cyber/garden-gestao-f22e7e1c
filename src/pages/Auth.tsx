@@ -223,6 +223,7 @@ export default function Auth() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { user, signIn, signUp, isLoading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const planFromUrl = searchParams.get('plan');
