@@ -158,42 +158,27 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 onClick={() => navigate('/')}
                 className={cn(
                   "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
-                  !isScrolled && isDashboard
+                  !isScrolled
                     ? "h-9 bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
                     : "h-8 w-8 bg-transparent p-0 justify-center"
                 )}
               >
                 <div className={cn(
                   "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
-                  !isScrolled && isDashboard ? "w-6 h-6" : "w-8 h-8"
+                  !isScrolled ? "w-6 h-6" : "w-8 h-8"
                 )}>
                   <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} fetchPriority="high" decoding="async" />
                 </div>
                 <span
                   className={cn(
                     "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
-                    !isScrolled && isDashboard ? "max-w-[7rem] opacity-100" : "max-w-0 opacity-0"
+                    !isScrolled ? "max-w-[10rem] opacity-100" : "max-w-0 opacity-0"
                   )}
                   style={{ letterSpacing: '-0.01em' }}
                 >
-                  Garden Gestão
+                  {isDashboard ? 'Garden Gestão' : (moduleTitle || 'Garden Gestão')}
                 </span>
               </button>
-            </div>
-
-            {/* Center: Module title — absolutely centered relative to header */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-              <span
-                className={cn(
-                  "text-sm font-bold text-foreground truncate font-display ease-[cubic-bezier(0.25,0.1,0.25,1)] max-w-[60%]",
-                  isDashboard
-                    ? "opacity-0 translate-y-3 scale-95 transition-all duration-150"
-                    : "opacity-100 translate-y-0 scale-100 transition-all duration-400 delay-[200ms]"
-                )}
-                style={{ letterSpacing: '-0.01em' }}
-              >
-                {moduleTitle || 'Garden'}
-              </span>
             </div>
 
             {/* Right: Notifications + Avatar */}
