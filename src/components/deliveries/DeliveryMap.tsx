@@ -154,6 +154,7 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
+  const geocodeRunningRef = useRef(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useImperativeHandle(ref, () => ({
