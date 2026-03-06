@@ -66,7 +66,7 @@ export function Leaderboard({ entries, currentUserId, isLoading, maxEntries, sel
           )}
         </div>
         {selectedMonth && onMonthChange && (
-          <MonthSelector month={selectedMonth} onChange={onMonthChange} />
+          <LeaderboardMonthNav month={selectedMonth} onChange={onMonthChange} />
         )}
       </div>
 
