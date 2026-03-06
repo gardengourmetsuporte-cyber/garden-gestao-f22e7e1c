@@ -11,7 +11,7 @@ import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardKPIGrid } from './DashboardKPIGrid';
 import { DashboardSection } from './DashboardSection';
-import { FinanceChartWidget } from './FinanceChartWidget';
+const FinanceChartWidget = lazy(() => import('./FinanceChartWidget').then(m => ({ default: m.FinanceChartWidget })));
 import { BillsDueWidget } from './BillsDueWidget';
 import { AIInsightsWidget } from './AIInsightsWidget';
 import { PendingOrdersWidget } from './PendingOrdersWidget';
