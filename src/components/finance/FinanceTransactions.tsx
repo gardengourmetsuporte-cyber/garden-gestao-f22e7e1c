@@ -305,7 +305,7 @@ export function FinanceTransactions({
       <div className="space-y-4">
         {/* Month Selector */}
         <div className="px-4 pt-3 lg:px-6 flex flex-col items-center gap-2">
-          <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
+          <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
           <div className="flex items-center gap-1 self-end">
             {(canUndo || canRedo) && (
               <>

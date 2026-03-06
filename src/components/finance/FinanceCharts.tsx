@@ -164,7 +164,7 @@ export function FinanceCharts({
   return (
     <div className="space-y-4">
       <div className="px-4 pt-3 lg:px-6">
-        <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
+        <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
       </div>
 
       {/* Data Type Toggle — hidden on weekly view */}

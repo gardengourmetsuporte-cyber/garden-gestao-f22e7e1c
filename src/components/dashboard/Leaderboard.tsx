@@ -22,24 +22,9 @@ interface LeaderboardProps {
   showUnitBadge?: boolean;
 }
 
-function MonthSelector({ month, onChange }: { month: Date; onChange: (m: Date) => void }) {
-  const isCurrentMonth = isSameMonth(month, new Date());
+function LeaderboardMonthNav({ month, onChange }: { month: Date; onChange: (m: Date) => void }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <button onClick={() => onChange(subMonths(month, 1))} className="p-1 rounded-lg hover:bg-secondary transition-colors">
-        <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
-      </button>
-      <span className="text-xs font-semibold text-muted-foreground capitalize min-w-[80px] text-center">
-        {format(month, 'MMM yyyy', { locale: ptBR })}
-      </span>
-      <button
-        onClick={() => !isCurrentMonth && onChange(addMonths(month, 1))}
-        disabled={isCurrentMonth}
-        className="p-1 rounded-lg hover:bg-secondary transition-colors disabled:opacity-30"
-      >
-        <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
-      </button>
-    </div>
+    <UnifiedMonthNav currentMonth={month} onMonthChange={onChange} compact />
   );
 }
 
