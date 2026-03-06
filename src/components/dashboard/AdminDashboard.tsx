@@ -112,7 +112,9 @@ export function AdminDashboard() {
           case 'bills-due':
             return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
               <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
-                <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
+                <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
+                  <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
+                </Suspense>
               </div>
             ) : null;
 
