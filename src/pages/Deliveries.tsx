@@ -33,6 +33,7 @@ export default function Deliveries() {
     uploadPhoto,
     createDelivery,
     updateStatus,
+    invalidate,
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
