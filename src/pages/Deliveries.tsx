@@ -186,14 +186,15 @@ function NeighborhoodGroup({
   neighborhood,
   deliveries,
   onStatusChange,
+  onCardClick,
 }: {
   neighborhood: string;
   deliveries: import('@/hooks/useDeliveries').Delivery[];
   onStatusChange: (id: string, status: DeliveryStatus) => void;
+  onCardClick?: (deliveryId: string) => void;
 }) {
   return (
     <div className="rounded-2xl border border-border/30 bg-card/50 overflow-hidden">
-      {/* Group Header */}
       <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-border/20 bg-card/80">
         <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
           <MapPin className="w-4 h-4 text-primary" />
@@ -203,14 +204,13 @@ function NeighborhoodGroup({
           {deliveries.length}
         </Badge>
       </div>
-
-      {/* Cards */}
       <div className="p-2 space-y-1.5">
         {deliveries.map((delivery) => (
           <DeliveryCard
             key={delivery.id}
             delivery={delivery}
             onStatusChange={onStatusChange}
+            onCardClick={onCardClick}
           />
         ))}
       </div>
