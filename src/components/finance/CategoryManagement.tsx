@@ -242,7 +242,7 @@ export function CategoryManagement({
           </SheetHeader>
 
           {!isEditing ? (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-24">
               <Tabs value={activeType} onValueChange={(v) => setActiveType(v as 'expense' | 'income')}>
                 <TabsList className="grid grid-cols-2 w-full">
                   <TabsTrigger value="expense">Despesas</TabsTrigger>
