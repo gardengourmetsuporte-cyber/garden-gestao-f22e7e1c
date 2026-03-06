@@ -240,6 +240,23 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
               <p className="text-[10px] text-emerald-400/50 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
+            {/* Desktop notification bell */}
+            <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
+              <DrawerTrigger asChild>
+                <button className="relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+                  <AppIcon name="Bell" size={18} className="text-foreground/60" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+              </DrawerTrigger>
+              <DrawerContent className="px-4 pb-8 pt-4 max-h-[70vh] overflow-y-auto mx-auto max-w-lg">
+                <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
+                {notifOpen && <NotificationCard />}
+              </DrawerContent>
+            </Drawer>
           </div>
         </div>
 
