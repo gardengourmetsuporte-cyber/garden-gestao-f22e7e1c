@@ -263,8 +263,16 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                 );
               };
 
+              const groupIndex = groupedNav.indexOf(group);
               return (
-                <div key={group.label} className="mb-3">
+                <div
+                  key={group.label}
+                  className="mb-3"
+                  style={{
+                    opacity: 0,
+                    animation: `moduleGroupIn 0.4s cubic-bezier(0.16,1,0.3,1) ${150 + groupIndex * 80}ms both`,
+                  }}
+                >
                   <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1 mb-2 block text-muted-foreground/50 font-display">
                     {group.label}
                   </span>
