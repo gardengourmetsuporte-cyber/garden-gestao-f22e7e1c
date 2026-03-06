@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,7 +94,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
     <div className="space-y-4">
       {/* Month Selector */}
       <div className="px-4 pt-3 lg:px-6">
-        <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
+        <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
       </div>
 
       {/* Total Summary */}

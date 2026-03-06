@@ -1,6 +1,6 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
 import { cn } from '@/lib/utils';
@@ -47,7 +47,7 @@ export function FinanceHome({
   return (
     <div className="px-4 py-3 lg:px-6 space-y-4">
       {/* Month Selector */}
-      <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
+      <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
 
       {/* === HERO BALANCE CARD === */}
       <button

@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { DREReport } from './DREReport';
 import { EntityStats } from '@/hooks/useFinanceStats';
@@ -164,7 +164,7 @@ export function FinanceCharts({
   return (
     <div className="space-y-4">
       <div className="px-4 pt-3 lg:px-6">
-        <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
+        <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
       </div>
 
       {/* Data Type Toggle — hidden on weekly view */}

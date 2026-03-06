@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { TransactionItem } from './TransactionItem';
 import { FinanceTransaction, MonthlyStats } from '@/types/finance';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -305,7 +305,7 @@ export function FinanceTransactions({
       <div className="space-y-4">
         {/* Month Selector */}
         <div className="px-4 pt-3 lg:px-6 flex flex-col items-center gap-2">
-          <MonthSelector selectedMonth={selectedMonth} onMonthChange={onMonthChange} />
+          <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
           <div className="flex items-center gap-1 self-end">
             {(canUndo || canRedo) && (
               <>
