@@ -4,6 +4,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';

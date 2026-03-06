@@ -20,6 +20,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { InventoryItem } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';

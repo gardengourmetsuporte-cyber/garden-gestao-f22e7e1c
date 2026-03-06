@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';

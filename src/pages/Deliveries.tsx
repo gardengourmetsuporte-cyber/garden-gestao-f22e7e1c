@@ -54,7 +54,8 @@ export default function Deliveries() {
 
   return (
     <AppLayout>
-      <div className="space-y-4 pb-24 px-4 pt-3">
+      <div className="space-y-4 pb-24 lg:pb-12 px-4 pt-3 lg:px-8 lg:max-w-6xl lg:mx-auto">
+        <DesktopActionBar label="Nova Entrega" onClick={() => setSheetOpen(true)} />
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2">
           <div className="rounded-2xl border border-border/60 bg-card p-3 text-center">

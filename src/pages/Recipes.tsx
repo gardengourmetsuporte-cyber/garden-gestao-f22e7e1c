@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Input } from '@/components/ui/input';
