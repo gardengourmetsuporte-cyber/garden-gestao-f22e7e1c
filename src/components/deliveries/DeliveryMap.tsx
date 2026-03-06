@@ -123,7 +123,7 @@ async function geocodeAddress(
   city: string,
   unitName: string,
 ): Promise<{ lat: number; lng: number } | null> {
-  const normalizedCity = city?.trim().length >= 4 ? city.trim() : unitName.trim();
+  const normalizedCity = resolveGeocodeCity(city, unitName);
   const cleaned = cleanAddress(address);
   const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 

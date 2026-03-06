@@ -145,6 +145,30 @@ export function useDeliveries() {
       .trim();
   }, []);
 
+  const getSignificantCityWords = useCallback((city: string): string[] => {
+    return normalizeText(city)
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !['de', 'da', 'do', 'das', 'dos'].includes(w));
+  }, [normalizeText]);
+
+  const resolveGeocodeCity = useCallback((city: string, unitName: string): string => {
+    const cityTrimmed = city?.trim() || '';
+    const unitTrimmed = unitName?.trim() || '';
+    const cityWords = getSignificantCityWords(cityTrimmed);
+    const unitWords = getSignificantCityWords(unitTrimmed);
+
+    if (!cityTrimmed) return unitTrimmed;
+    if (!unitTrimmed) return cityTrimmed;
+
+    if (cityWords.length < 3 && unitWords.length >= cityWords.length) return unitTrimmed;
+
+    const cityBase = normalizeText(cityTrimmed);
+    const unitBase = normalizeText(unitTrimmed);
+    if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) return unitTrimmed;
+
+    return cityTrimmed;
+  }, [getSignificantCityWords, normalizeText]);
+
   const distanceKm = useCallback((a: { lat: number; lng: number }, b: { lat: number; lng: number }): number => {
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const earthRadiusKm = 6371;
