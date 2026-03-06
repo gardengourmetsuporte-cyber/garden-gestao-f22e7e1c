@@ -14,9 +14,10 @@ const STATUS_CONFIG: Record<DeliveryStatus, { label: string; bg: string; text: s
 interface Props {
   delivery: Delivery;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
+  onCardClick?: (deliveryId: string) => void;
 }
 
-export function DeliveryCard({ delivery, onStatusChange }: Props) {
+export function DeliveryCard({ delivery, onStatusChange, onCardClick }: Props) {
   const addr = delivery.address;
   const cfg = STATUS_CONFIG[delivery.status];
   const StatusIcon = cfg.icon;
