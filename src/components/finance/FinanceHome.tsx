@@ -244,7 +244,7 @@ export function FinanceHome({
           {monthStats.pendingExpenses > 0 && (
             <div className="flex items-center justify-between pl-9 text-sm">
               <span className="text-muted-foreground">Despesas a pagar</span>
-              <span className="font-semibold text-destructive">{formatCurrency(monthStats.pendingExpenses)}</span>
+              <span className="font-semibold text-destructive">{fmtCurrency(monthStats.pendingExpenses)}</span>
             </div>
           )}
           {monthStats.pendingIncome > 0 && (
