@@ -1,6 +1,14 @@
 import { useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { FinanceTransaction, FinanceCategory, CategoryStats } from '@/types/finance';
+import { FinanceTransaction, FinanceCategory, CategoryStats, DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES } from '@/types/finance';
+
+// Build a static map: normalized subcategory name -> normalized parent name from defaults
+const DEFAULT_SUB_TO_PARENT: Record<string, string> = {};
+[...DEFAULT_EXPENSE_CATEGORIES, ...DEFAULT_INCOME_CATEGORIES].forEach(cat => {
+  cat.subcategories.forEach(sub => {
+    DEFAULT_SUB_TO_PARENT[sub.trim().toLowerCase()] = cat.name.trim().toLowerCase();
+  });
+});
 
 export interface EntityStats {
   id: string;
@@ -57,11 +65,22 @@ export function useFinanceStats(
       if (resolvedByParentId) return resolvedByParentId;
     }
 
-    const resolvedBySubName = parentLookup.subcategoryNameToParent[normalizeCategoryName(category.name)];
+    const catNameNorm = normalizeCategoryName(category.name);
+
+    const resolvedBySubName = parentLookup.subcategoryNameToParent[catNameNorm];
     if (resolvedBySubName) return resolvedBySubName;
 
-    const resolvedByParentName = parentLookup.parentByName[normalizeCategoryName(category.name)];
+    const resolvedByParentName = parentLookup.parentByName[catNameNorm];
     if (resolvedByParentName) return resolvedByParentName;
+
+    // Fallback: use default category definitions to find the parent name
+    if (category.parent_id || DEFAULT_SUB_TO_PARENT[catNameNorm]) {
+      const defaultParentName = DEFAULT_SUB_TO_PARENT[catNameNorm];
+      if (defaultParentName) {
+        const resolvedDefault = parentLookup.parentByName[defaultParentName];
+        if (resolvedDefault) return resolvedDefault;
+      }
+    }
 
     return category;
   }, [parentLookup, normalizeCategoryName]);
