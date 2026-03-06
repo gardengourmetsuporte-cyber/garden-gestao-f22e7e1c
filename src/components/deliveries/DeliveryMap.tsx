@@ -225,7 +225,7 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
     } else {
       toast.error('Não foi possível localizar os endereços');
     }
-  }, [onRefresh]);
+  }, [onRefresh, unitName]);
 
   useEffect(() => {
     if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
