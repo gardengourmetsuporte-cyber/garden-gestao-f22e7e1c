@@ -472,17 +472,200 @@
     box-shadow: var(--shadow-card), var(--glow-primary);
   }
 
+  /* ========== HOLOGRAPHIC CARD SYSTEM ========== */
+
+  .card-holographic {
+    @apply relative overflow-hidden rounded-[24px] border transition-all duration-300 active:scale-[0.98];
+    background: linear-gradient(145deg, hsl(220 25% 6%) 0%, hsl(220 20% 10%) 40%, hsl(220 25% 6%) 100%);
+    border-color: hsl(0 0% 100% / 0.08);
+    box-shadow:
+      0 8px 32px hsl(0 0% 0% / 0.5),
+      0 2px 8px hsl(0 0% 0% / 0.3),
+      inset 0 1px 0 hsl(0 0% 100% / 0.06);
+    color: hsl(0 0% 98%) !important;
+  }
+
+  .card-holographic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      linear-gradient(125deg,
+        transparent 20%,
+        hsl(280 80% 65% / 0.08) 30%,
+        hsl(200 90% 60% / 0.1) 40%,
+        hsl(160 80% 50% / 0.08) 50%,
+        hsl(40 90% 60% / 0.06) 60%,
+        hsl(320 80% 60% / 0.08) 70%,
+        transparent 80%);
+    background-size: 250% 250%;
+    animation: holoShimmer 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .card-holographic::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, hsl(0 0% 100% / 0.04) 45%, hsl(0 0% 100% / 0.08) 50%, hsl(0 0% 100% / 0.04) 55%, transparent 65%);
+    background-size: 250% 100%;
+    animation: cardShineSwipe 6s ease-in-out infinite;
+    z-index: 2;
+  }
+
+  @keyframes holoShimmer {
+    0% { background-position: 0% 0%; }
+    25% { background-position: 100% 30%; }
+    50% { background-position: 60% 100%; }
+    75% { background-position: 0% 60%; }
+    100% { background-position: 0% 0%; }
+  }
+
+  /* Holographic card scoped tokens */
+  .card-holographic {
+    --foreground: 0 0% 98%;
+    --muted-foreground: 220 10% 65%;
+    --gp-label: hsl(220 10% 60%);
+    --gp-sublabel: hsl(220 10% 55%);
+    --gp-value: hsl(0 0% 98%);
+    --gp-icon: hsl(0 0% 70%);
+    --gp-positive: hsl(156 60% 55%);
+    --gp-negative: hsl(0 70% 60%);
+  }
+
+  /* Light mode: elegant holographic */
+  :root:not(.dark) .card-holographic {
+    background: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(220 15% 97%) 40%, hsl(0 0% 100%) 100%);
+    border-color: hsl(220 20% 90%);
+    box-shadow: 0 4px 24px hsl(220 20% 50% / 0.08), 0 1px 3px hsl(220 20% 50% / 0.06);
+    color: hsl(220 20% 12%) !important;
+    --foreground: 220 20% 12%;
+    --muted-foreground: 220 10% 50%;
+    --gp-label: hsl(220 10% 45%);
+    --gp-sublabel: hsl(220 10% 50%);
+    --gp-value: hsl(220 20% 12%);
+    --gp-icon: hsl(220 10% 55%);
+    --gp-positive: hsl(156 60% 35%);
+    --gp-negative: hsl(0 70% 45%);
+  }
+
+  :root:not(.dark) .card-holographic::before {
+    background:
+      linear-gradient(125deg,
+        transparent 20%,
+        hsl(280 60% 70% / 0.06) 30%,
+        hsl(200 70% 60% / 0.08) 40%,
+        hsl(160 60% 50% / 0.06) 50%,
+        hsl(40 70% 60% / 0.05) 60%,
+        hsl(320 60% 60% / 0.06) 70%,
+        transparent 80%);
+    background-size: 250% 250%;
+  }
+
+  @media (hover: hover) {
+    .card-holographic:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 12px 40px hsl(0 0% 0% / 0.6),
+        0 4px 12px hsl(0 0% 0% / 0.3),
+        inset 0 1px 0 hsl(0 0% 100% / 0.08);
+      border-color: hsl(0 0% 100% / 0.12);
+    }
+  }
+
+  /* ========== STAT CARD (Holographic style) ========== */
+
+  .card-stat-holo {
+    @apply relative overflow-hidden rounded-[20px] p-4 transition-all duration-300 active:scale-[0.98];
+    background: hsl(220 25% 8% / 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(0 0% 100% / 0.06);
+    box-shadow: 0 2px 12px hsl(0 0% 0% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.04);
+  }
+
+  :root:not(.dark) .card-stat-holo {
+    background: hsl(0 0% 100% / 0.9);
+    border-color: hsl(220 20% 90%);
+    box-shadow: 0 2px 12px hsl(220 20% 50% / 0.06), inset 0 1px 0 hsl(0 0% 100%);
+  }
+
+  @media (hover: hover) {
+    .card-stat-holo:hover {
+      border-color: hsl(0 0% 100% / 0.1);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.06);
+    }
+    :root:not(.dark) .card-stat-holo:hover {
+      border-color: hsl(220 20% 85%);
+      box-shadow: 0 4px 20px hsl(220 20% 50% / 0.1);
+    }
+  }
+
+  .stat-holo-icon {
+    @apply w-11 h-11 rounded-2xl flex items-center justify-center;
+  }
+
+  .stat-holo-trend {
+    @apply inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-semibold;
+  }
+
+  .stat-holo-trend--up {
+    background: hsl(156 60% 45% / 0.12);
+    color: hsl(156 60% 55%);
+  }
+
+  :root:not(.dark) .stat-holo-trend--up {
+    background: hsl(156 60% 45% / 0.1);
+    color: hsl(156 60% 35%);
+  }
+
+  .stat-holo-trend--down {
+    background: hsl(348 80% 55% / 0.12);
+    color: hsl(348 80% 60%);
+  }
+
+  :root:not(.dark) .stat-holo-trend--down {
+    background: hsl(348 80% 55% / 0.1);
+    color: hsl(348 80% 45%);
+  }
+
   /* ========== FINANCE HERO CARD ========== */
 
   .finance-hero-card {
-    @apply relative overflow-hidden rounded-2xl border transition-all duration-300 active:scale-[0.98];
-    background: linear-gradient(145deg, #0a1a12 0%, #102a1d 50%, #0a1a12 100%);
-    background-size: 200% 200%;
-    animation: navyCardFlow 12s ease-in-out infinite;
-    backdrop-filter: blur(16px);
-    border-color: rgba(16, 185, 129, 0.25);
-    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05), 0 8px 32px rgba(16, 185, 129, 0.08);
+    @apply relative overflow-hidden rounded-[24px] border transition-all duration-300 active:scale-[0.98];
+    background: linear-gradient(145deg, hsl(220 25% 6%) 0%, hsl(220 20% 10%) 40%, hsl(220 25% 6%) 100%);
+    border-color: hsl(0 0% 100% / 0.08);
+    box-shadow:
+      0 8px 32px hsl(0 0% 0% / 0.5),
+      0 2px 8px hsl(0 0% 0% / 0.3),
+      inset 0 1px 0 hsl(0 0% 100% / 0.06);
     color: hsl(0 0% 98%) !important;
+  }
+
+  /* Holographic shimmer on finance hero */
+  .finance-hero-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      linear-gradient(125deg,
+        transparent 20%,
+        hsl(280 80% 65% / 0.08) 30%,
+        hsl(200 90% 60% / 0.1) 40%,
+        hsl(160 80% 50% / 0.08) 50%,
+        hsl(40 90% 60% / 0.06) 60%,
+        hsl(320 80% 60% / 0.08) 70%,
+        transparent 80%);
+    background-size: 250% 250%;
+    animation: holoShimmer 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
   }
 
   /* Sweep reflection */
@@ -491,33 +674,34 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(105deg, transparent 40%, hsl(0 0% 100% / 0.04) 45%, hsl(0 0% 100% / 0.08) 50%, transparent 55%);
-    background-size: 200% 200%;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    border-radius: inherit;
+    background: linear-gradient(105deg, transparent 35%, hsl(0 0% 100% / 0.04) 45%, hsl(0 0% 100% / 0.08) 50%, hsl(0 0% 100% / 0.04) 55%, transparent 65%);
+    background-size: 250% 100%;
+    animation: cardShineSwipe 6s ease-in-out infinite;
+    z-index: 2;
   }
 
   @media (hover: hover) {
-    .finance-hero-card:hover::after {
-      opacity: 1;
-      animation: premiumShine 2.5s ease-out;
+    .finance-hero-card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 12px 40px hsl(0 0% 0% / 0.6),
+        0 4px 12px hsl(0 0% 0% / 0.3),
+        inset 0 1px 0 hsl(0 0% 100% / 0.08);
+      border-color: hsl(0 0% 100% / 0.12);
     }
   }
 
   /* Override Tailwind theme tokens inside these dark cards */
   .finance-hero-card {
     --foreground: 0 0% 98%;
-    --muted-foreground: 220 20% 75%;
-    --secondary: 220 40% 30%;
-    --secondary-foreground: 0 0% 98%;
-  }
-
-  @media (hover: hover) {
-    .finance-hero-card:hover {
-      transform: scale(1.01);
-      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1), 0 12px 40px rgba(16, 185, 129, 0.1);
-      border-color: rgba(16, 185, 129, 0.3);
-    }
+    --muted-foreground: 220 10% 65%;
+    --gp-label: hsl(220 10% 60%);
+    --gp-sublabel: hsl(220 10% 55%);
+    --gp-value: hsl(0 0% 98%);
+    --gp-icon: hsl(0 0% 70%);
+    --gp-positive: hsl(156 60% 55%);
+    --gp-negative: hsl(0 70% 60%);
   }
 
   .finance-hero-card:active {
@@ -539,21 +723,21 @@
   }
 
   .finance-hero-card--personal {
-    background: linear-gradient(145deg, #030603 0%, #060c06 50%, #030603 100%);
+    background: linear-gradient(145deg, hsl(220 25% 5%) 0%, hsl(220 18% 8%) 50%, hsl(220 25% 5%) 100%);
     box-shadow:
-      0 4px 24px rgba(16, 185, 129, 0.05),
-      0 8px 48px rgba(16, 185, 129, 0.02),
-      inset 0 1px 0 rgba(255, 255, 255, 0.02);
-    border-color: rgba(16, 185, 129, 0.1);
+      0 4px 24px hsl(0 0% 0% / 0.4),
+      0 8px 48px hsl(0 0% 0% / 0.2),
+      inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    border-color: hsl(0 0% 100% / 0.06);
   }
 
   @media (hover: hover) {
     .finance-hero-card--personal:hover {
-      border-color: rgba(16, 185, 129, 0.2);
+      border-color: hsl(0 0% 100% / 0.1);
       box-shadow:
-        0 6px 32px rgba(16, 185, 129, 0.1),
-        0 12px 56px rgba(16, 185, 129, 0.04),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        0 6px 32px hsl(0 0% 0% / 0.5),
+        0 12px 56px hsl(0 0% 0% / 0.25),
+        inset 0 1px 0 hsl(0 0% 100% / 0.06);
     }
   }
 

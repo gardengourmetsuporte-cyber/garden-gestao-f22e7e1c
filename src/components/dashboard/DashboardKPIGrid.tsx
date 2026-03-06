@@ -72,20 +72,22 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
-          className={`dash-kpi-card group animate-card-reveal dash-stagger-${i + 2}`}
+          className={`card-stat-holo group animate-card-reveal dash-stagger-${i + 2}`}
         >
-          <div className={`dash-kpi-icon ${card.bgColor} ${card.color} animate-subtle-float`} style={{ animationDelay: `${i * 200}ms` }}>
-            <AppIcon name={card.icon} size={18} />
-          </div>
-          <div className="mt-2.5">
-            {isLoading ? (
-              <Skeleton className="h-7 w-10 rounded-lg" />
-            ) : (
-              <span className={`text-2xl font-extrabold tracking-tight animate-number-reveal ${card.value > 0 ? card.color : 'text-muted-foreground/40'}`} style={{ animationDelay: `${200 + i * 100}ms` }}>
-                {card.value}
-              </span>
-            )}
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">{card.label}</p>
+          <div className="flex items-center gap-3">
+            <div className={`stat-holo-icon ${card.bgColor} ${card.color}`}>
+              <AppIcon name={card.icon} size={20} />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{card.label}</p>
+              {isLoading ? (
+                <Skeleton className="h-7 w-10 rounded-lg mt-0.5" />
+              ) : (
+                <span className={`text-2xl font-extrabold tracking-tight animate-number-reveal block ${card.value > 0 ? 'text-foreground' : 'text-muted-foreground/40'}`} style={{ animationDelay: `${200 + i * 100}ms` }}>
+                  {card.value}
+                </span>
+              )}
+            </div>
           </div>
         </button>
       ))}
