@@ -56,13 +56,18 @@ async function geocodeAddress(
 ): Promise<{ lat: number; lng: number } | null> {
   const normalizedCity = city?.trim().length >= 4 ? city.trim() : unitName.trim();
   const cleaned = cleanAddress(address);
+  const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
-  const queries = [
+  const queries = Array.from(new Set([
     `${cleaned}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, ${normalizedCity}, SP, Brasil`,
+    `${streetOnly}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
+    `${streetOnly}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, ${normalizedCity}, Brasil`,
+    `${streetOnly}, ${normalizedCity}, Brasil`,
+    `${neighborhood}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, Brasil`,
-  ];
+  ].filter((q) => q.replace(/[,\s]/g, '').length > 0)));
 
   let anchor: { lat: number; lng: number } | null = null;
   if (normalizedCity) {
