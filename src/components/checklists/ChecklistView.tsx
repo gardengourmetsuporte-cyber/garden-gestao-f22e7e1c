@@ -527,7 +527,7 @@ export function ChecklistView({
                                   isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                     : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
                                     : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
-                                )}
+                                 )}
                                 style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
                                   backgroundColor: getItemPointsColors(pointsAwarded).bg,
                                   color: getItemPointsColors(pointsAwarded).color,
@@ -536,7 +536,10 @@ export function ChecklistView({
                                   {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                     : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
                                     : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
-                                    : (<div className="flex items-center gap-0.5"><AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
+                                    : (<div className="flex items-center gap-1">
+                                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(pointsAwarded).color }} />
+                                        <span>+{pointsAwarded}</span>
+                                      </div>)}
                                 </div>
                               </div>
                               {isContested && contestedReason && (
