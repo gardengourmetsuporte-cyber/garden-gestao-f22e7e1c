@@ -2184,8 +2184,8 @@
   /* ========== BOTTOM BAR NOTCH / CRADLE ========== */
 
   .tabbar-notch-shell {
-    mask-image: radial-gradient(circle 38px at 50% 0, transparent 36px, black 37px);
-    -webkit-mask-image: radial-gradient(circle 38px at 50% 0, transparent 36px, black 37px);
+    mask-image: radial-gradient(circle 34px at 50% 0, transparent 32px, black 33px);
+    -webkit-mask-image: radial-gradient(circle 34px at 50% 0, transparent 32px, black 33px);
   }
 
   .fab-cradle-ring {
