@@ -158,21 +158,21 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                 onClick={() => navigate('/')}
                 className={cn(
                   "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
-                  !isScrolled
+                  !isScrolled && isDashboard
                     ? "h-9 bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
                     : "h-8 w-8 bg-transparent p-0 justify-center"
                 )}
               >
                 <div className={cn(
                   "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
-                  !isScrolled ? "w-6 h-6" : "w-8 h-8"
+                  !isScrolled && isDashboard ? "w-6 h-6" : "w-8 h-8"
                 )}>
                   <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} />
                 </div>
                 <span
                   className={cn(
                     "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
-                    !isScrolled ? "max-w-[7rem] opacity-100" : "max-w-0 opacity-0"
+                    !isScrolled && isDashboard ? "max-w-[7rem] opacity-100" : "max-w-0 opacity-0"
                   )}
                   style={{ letterSpacing: '-0.01em' }}
                 >
