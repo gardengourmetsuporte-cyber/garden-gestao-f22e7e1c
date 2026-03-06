@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
 import { useUnit } from '@/contexts/UnitContext';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
-import { DeliveryMap } from '@/components/deliveries/DeliveryMap';
+import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Truck, Clock, CheckCircle2, Package, MapPin, Filter } from 'lucide-react';
@@ -37,6 +37,11 @@ export default function Deliveries() {
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const mapHandleRef = useRef<DeliveryMapHandle>(null);
+
+  const handleCardClick = useCallback((deliveryId: string) => {
+    mapHandleRef.current?.focusDelivery(deliveryId);
+  }, []);
 
   useFabAction(
     { icon: 'add', label: 'Nova Entrega', onClick: () => setSheetOpen(true) },
@@ -121,6 +126,7 @@ export default function Deliveries() {
               </Badge>
             </div>
             <DeliveryMap
+              ref={mapHandleRef}
               deliveries={deliveries}
               unitName={activeUnit?.name || ''}
               onStatusChange={(id, status) => updateStatus({ id, status })}
@@ -155,6 +161,7 @@ export default function Deliveries() {
                     neighborhood={group.neighborhood}
                     deliveries={group.deliveries}
                     onStatusChange={(id, status) => updateStatus({ id, status })}
+                    onCardClick={handleCardClick}
                   />
                 ))}
               </div>
@@ -179,14 +186,15 @@ function NeighborhoodGroup({
   neighborhood,
   deliveries,
   onStatusChange,
+  onCardClick,
 }: {
   neighborhood: string;
   deliveries: import('@/hooks/useDeliveries').Delivery[];
   onStatusChange: (id: string, status: DeliveryStatus) => void;
+  onCardClick?: (deliveryId: string) => void;
 }) {
   return (
     <div className="rounded-2xl border border-border/30 bg-card/50 overflow-hidden">
-      {/* Group Header */}
       <div className="flex items-center gap-2.5 px-3.5 py-2.5 border-b border-border/20 bg-card/80">
         <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
           <MapPin className="w-4 h-4 text-primary" />
@@ -196,14 +204,13 @@ function NeighborhoodGroup({
           {deliveries.length}
         </Badge>
       </div>
-
-      {/* Cards */}
       <div className="p-2 space-y-1.5">
         {deliveries.map((delivery) => (
           <DeliveryCard
             key={delivery.id}
             delivery={delivery}
             onStatusChange={onStatusChange}
+            onCardClick={onCardClick}
           />
         ))}
       </div>

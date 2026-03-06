@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useImperativeHandle, forwardRef } from 'react';
 import { LocateFixed, Loader2, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -114,12 +114,35 @@ interface Props {
   onRefresh?: () => void;
 }
 
-export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }: Props) {
+export interface DeliveryMapHandle {
+  focusDelivery: (deliveryId: string) => void;
+}
+
+export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function DeliveryMap(
+  { deliveries, unitName, onStatusChange, onRefresh },
+  ref,
+) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const markersRef = useRef<Record<string, any>>({});
   const [isGeocoding, setIsGeocoding] = useState(false);
   const geocodedRef = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    focusDelivery(deliveryId: string) {
+      const marker = markersRef.current[deliveryId];
+      const map = mapInstanceRef.current;
+      if (!marker || !map) return;
+
+      // Scroll map container into view on mobile
+      mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      setTimeout(() => {
+        map.flyTo(marker.getLatLng(), 16, { duration: 0.6 });
+        marker.openPopup();
+      }, 300);
+    },
+  }));
 
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
   const withoutCoords = deliveries.filter(d => d.address && (!d.address.lat || !d.address.lng));
@@ -192,8 +215,8 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      markersRef.current.forEach(m => m.remove());
-      markersRef.current = [];
+      Object.values(markersRef.current).forEach(m => m.remove());
+      markersRef.current = {};
 
       const bounds: [number, number][] = [];
 
@@ -217,7 +240,7 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
         marker.bindPopup(buildPopup(delivery), { maxWidth: 250, minWidth: 170 });
-        markersRef.current.push(marker);
+        markersRef.current[delivery.id] = marker;
       });
 
       if (bounds.length > 0) {
@@ -227,8 +250,8 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
 
     return () => {
       cancelled = true;
-      markersRef.current.forEach(m => m.remove());
-      markersRef.current = [];
+      Object.values(markersRef.current).forEach(m => m.remove());
+      markersRef.current = {};
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -325,4 +348,4 @@ export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }:
       </div>
     </div>
   );
-}
+});
