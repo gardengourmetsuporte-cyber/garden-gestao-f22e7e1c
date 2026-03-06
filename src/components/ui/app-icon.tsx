@@ -70,5 +70,5 @@ export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
       </span>
     );
   }
-);
+));
 AppIcon.displayName = 'AppIcon';
