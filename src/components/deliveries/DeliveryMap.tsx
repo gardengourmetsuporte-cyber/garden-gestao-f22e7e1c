@@ -116,7 +116,7 @@ async function geocodeAddress(
 
   // Second pass: unbounded fallback (broader search)
   if (anchor) {
-    for (const q of queries.slice(0, 2)) {
+    for (const q of queries) {
       try {
         const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
