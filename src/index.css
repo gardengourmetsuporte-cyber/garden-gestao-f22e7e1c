@@ -2218,9 +2218,9 @@
       0 0 10px hsl(var(--primary) / 0.1);
   }
 
-  /* FAB contextual mode — warm accent when action changes */
+  /* FAB contextual mode — warm amber accent for contrast */
   .fab-contextual-glow {
-    background: linear-gradient(135deg, hsl(160 65% 35%), hsl(170 55% 30%)) !important;
+    background: linear-gradient(135deg, hsl(36 90% 50%), hsl(28 85% 45%)) !important;
     box-shadow:
       0 4px 16px hsl(160 60% 35% / 0.4),
       0 0 20px hsl(160 60% 35% / 0.2);
