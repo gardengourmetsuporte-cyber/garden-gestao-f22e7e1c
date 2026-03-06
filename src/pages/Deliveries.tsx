@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
+import { useUnit } from '@/contexts/UnitContext';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap } from '@/components/deliveries/DeliveryMap';
@@ -26,6 +27,7 @@ const STAT_CONFIG = [
 ];
 
 export default function Deliveries() {
+  const { activeUnit } = useUnit();
   const {
     deliveries,
     groupedByNeighborhood,
@@ -116,6 +118,7 @@ export default function Deliveries() {
           <div className="lg:col-span-2 lg:sticky lg:top-4">
             <DeliveryMap
               deliveries={deliveries}
+              unitName={activeUnit?.name || ''}
               onStatusChange={(id, status) => updateStatus({ id, status })}
               onRefresh={invalidate}
             />

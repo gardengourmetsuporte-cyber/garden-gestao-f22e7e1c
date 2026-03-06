@@ -38,27 +38,40 @@ function loadLeaflet(): Promise<void> {
   });
 }
 
-async function geocodeAddress(address: string, city: string): Promise<{ lat: number; lng: number } | null> {
-  try {
-    const query = encodeURIComponent(`${address}, ${city}, Brasil`);
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
-      headers: { 'User-Agent': 'GardenGestao/1.0' },
-    });
-    const results = await res.json();
-    if (results?.[0]) {
-      return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
-    }
-    return null;
-  } catch { return null; }
+async function geocodeAddress(address: string, neighborhood: string, city: string, unitName: string): Promise<{ lat: number; lng: number } | null> {
+  // Try multiple query strategies for better results
+  const queries = [
+    `${address}, ${neighborhood}, ${city || unitName}, SP, Brasil`,
+    `${address}, ${city || unitName}, SP, Brasil`,
+    `${address}, ${unitName}, Brasil`,
+    `${neighborhood}, ${city || unitName}, SP, Brasil`,
+  ].filter(Boolean);
+
+  for (const q of queries) {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=br`,
+        { headers: { 'User-Agent': 'GardenGestao/1.0' } }
+      );
+      const results = await res.json();
+      if (results?.[0]) {
+        return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+      }
+    } catch {}
+    // Rate limit between attempts
+    await new Promise(r => setTimeout(r, 1100));
+  }
+  return null;
 }
 
 interface Props {
   deliveries: Delivery[];
+  unitName?: string;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onRefresh?: () => void;
 }
 
-export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
+export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -190,7 +203,12 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
       const addr = delivery.address;
       if (!addr) continue;
 
-      const coords = await geocodeAddress(addr.full_address, addr.city || addr.neighborhood);
+      const coords = await geocodeAddress(
+        addr.full_address,
+        addr.neighborhood,
+        addr.city,
+        unitName || ''
+      );
       if (coords) {
         await supabase
           .from('delivery_addresses')
@@ -198,7 +216,6 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
           .eq('id', addr.id);
         success++;
       }
-      await new Promise(r => setTimeout(r, 1100));
     }
 
     setIsGeocoding(false);
@@ -208,7 +225,7 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
     } else {
       toast.error('Não foi possível localizar os endereços');
     }
-  }, [onRefresh]);
+  }, [onRefresh, unitName]);
 
   useEffect(() => {
     if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
