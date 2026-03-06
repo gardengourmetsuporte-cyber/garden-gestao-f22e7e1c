@@ -63,6 +63,7 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const geocodedRef = useRef(false);
 
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
   const withoutCoords = deliveries.filter(d => d.address && (!d.address.lat || !d.address.lng));
