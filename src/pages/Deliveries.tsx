@@ -113,12 +113,10 @@ export default function Deliveries() {
 
         {/* Map or List view */}
         {viewMode === 'map' ? (
-          <Suspense fallback={<PageLoader />}>
-            <DeliveryMap
-              deliveries={deliveries}
-              onStatusChange={(id, status) => updateStatus({ id, status })}
-            />
-          </Suspense>
+          <DeliveryMap
+            deliveries={deliveries}
+            onStatusChange={(id, status) => updateStatus({ id, status })}
+          />
         ) : groupedByNeighborhood.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <AppIcon name="location_on" size={48} className="text-muted-foreground/30 mb-3" />
