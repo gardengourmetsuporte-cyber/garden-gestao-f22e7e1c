@@ -8,7 +8,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
-import { useTheme } from 'next-themes';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
@@ -68,7 +68,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { leaderboard } = useLeaderboard();
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
