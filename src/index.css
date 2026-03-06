@@ -2218,24 +2218,24 @@
       0 0 10px hsl(var(--primary) / 0.1);
   }
 
-  /* FAB contextual mode — different color + pulse ring when action changes */
+  /* FAB contextual mode — warm accent when action changes */
   .fab-contextual-glow {
-    background: linear-gradient(135deg, hsl(220 70% 55%), hsl(250 70% 60%)) !important;
+    background: linear-gradient(135deg, hsl(160 65% 35%), hsl(170 55% 30%)) !important;
     box-shadow:
-      0 4px 16px hsl(230 70% 55% / 0.4),
-      0 0 20px hsl(230 70% 55% / 0.2);
-    animation: fabContextPulse 2s ease-in-out infinite;
+      0 4px 16px hsl(160 60% 35% / 0.4),
+      0 0 20px hsl(160 60% 35% / 0.2);
+    animation: fabContextPulse 2.5s ease-in-out infinite;
   }
 
   .fab-contextual-glow:active {
     box-shadow:
-      0 2px 8px hsl(230 70% 55% / 0.3),
-      0 0 10px hsl(230 70% 55% / 0.15);
+      0 2px 8px hsl(160 60% 35% / 0.3),
+      0 0 10px hsl(160 60% 35% / 0.15);
   }
 
   @keyframes fabContextPulse {
-    0%, 100% { box-shadow: 0 4px 16px hsl(230 70% 55% / 0.4), 0 0 20px hsl(230 70% 55% / 0.2); }
-    50% { box-shadow: 0 4px 20px hsl(230 70% 55% / 0.55), 0 0 28px hsl(230 70% 55% / 0.3); }
+    0%, 100% { box-shadow: 0 4px 16px hsl(160 60% 35% / 0.4), 0 0 20px hsl(160 60% 35% / 0.2); }
+    50% { box-shadow: 0 4px 22px hsl(160 60% 35% / 0.55), 0 0 30px hsl(160 60% 35% / 0.3), 0 0 0 3px hsl(160 60% 35% / 0.08); }
   }
 
   @keyframes fabMorph {

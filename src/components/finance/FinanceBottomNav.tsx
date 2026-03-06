@@ -185,11 +185,9 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
-                  "w-[44px] h-[44px] rounded-full flex items-center justify-center fab-button-glow",
-                  "bg-primary",
-                  menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-300",
+                  menuOpen ? "rotate-45 scale-95 bg-primary fab-button-glow" : "fab-contextual-glow hover:scale-[1.08] active:scale-[0.92]"
                 )}
-                style={{ transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}
               >
                 <AppIcon name="Plus" size={20} className="relative z-10 text-white" />
               </button>
