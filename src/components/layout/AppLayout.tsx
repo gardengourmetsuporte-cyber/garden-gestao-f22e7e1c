@@ -49,6 +49,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const isDashboard = location.pathname === '/';
   const moduleTitle = useMemo(() => getRouteTitle(location.pathname), [location.pathname]);
   const [isLgScreen, setIsLgScreen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');
     const onChange = () => setIsLgScreen(mql.matches);
@@ -145,13 +153,27 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="relative overflow-hidden">
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
             {/* Left: Logo (dashboard) or Back button (module pages) */}
-            <div className="w-10 flex items-center">
+            <div className="flex items-center" style={{ minWidth: isScrolled || !isDashboard ? '2.5rem' : 'auto' }}>
               {isDashboard ? (
                 <button
                   onClick={() => navigate('/')}
-                  className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0 shadow-sm active:scale-90 transition-transform"
+                  className="flex items-center gap-2 h-8 rounded-lg overflow-hidden bg-white shrink-0 shadow-sm active:scale-95 transition-all duration-300 ease-out"
+                  style={{ 
+                    paddingLeft: isScrolled ? 0 : '0.375rem',
+                    paddingRight: isScrolled ? 0 : '0.5rem',
+                    width: isScrolled ? '2rem' : 'auto',
+                  }}
                 >
-                  <img alt="Garden Gestão" className="w-6 h-6 object-contain" src={gardenLogo} />
+                  <img alt="Garden Gestão" className="w-6 h-6 object-contain shrink-0 transition-all duration-300" src={gardenLogo} />
+                  <span
+                    className="text-[11px] font-bold text-gray-800 whitespace-nowrap transition-all duration-300 ease-out overflow-hidden"
+                    style={{
+                      maxWidth: isScrolled ? 0 : '7rem',
+                      opacity: isScrolled ? 0 : 1,
+                    }}
+                  >
+                    Garden Gestão
+                  </span>
                 </button>
               ) : (
                 <button
