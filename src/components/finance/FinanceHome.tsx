@@ -1,6 +1,6 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { AccountCard } from './AccountCard';
 import { FinanceAccount, MonthlyStats, FinanceTab } from '@/types/finance';
 import { cn } from '@/lib/utils';
