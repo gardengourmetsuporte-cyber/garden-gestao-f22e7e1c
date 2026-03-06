@@ -162,11 +162,21 @@ export function useDeliveries() {
     const lng = Number.parseFloat(result?.lon);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-    if (anchor && distanceKm(anchor, { lat, lng }) > 45) return null;
+    if (anchor && distanceKm(anchor, { lat, lng }) > 25) return null;
 
+    // Validate using all significant words of the city name to avoid
+    // partial matches like "São João" matching "Jardim Nova São João" in SP
     const cityToken = normalizeText(city);
     const displayName = normalizeText(String(result?.display_name || ''));
-    if (cityToken && displayName && !displayName.includes(cityToken) && !anchor) return null;
+    if (cityToken && displayName) {
+      const cityWords = cityToken.split(/\s+/).filter(w => w.length > 2 && !['de','da','do','das','dos'].includes(w));
+      const allMatch = cityWords.every(w => displayName.includes(w));
+      if (!allMatch) return null;
+      // Extra: reject if display_name has the city words only as part of a neighborhood name
+      // by checking the result's address components
+      const addressCity = normalizeText(String(result?.address?.city || result?.address?.town || result?.address?.municipality || ''));
+      if (addressCity && !cityWords.every(w => addressCity.includes(w))) return null;
+    }
 
     return { lat, lng };
   }, [distanceKm, normalizeText]);
