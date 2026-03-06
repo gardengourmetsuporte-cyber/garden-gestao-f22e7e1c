@@ -291,11 +291,31 @@ const TabButton = forwardRef<
       onTouchStart={() => void preloadRoute(tab.path)}
       aria-label={tab.label}
       className={cn(
-        "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
+        "flex flex-col items-center justify-center h-full gap-0.5 relative",
         "text-muted-foreground"
       )}
       style={{ width: slotWidth }}
     >
+      {/* Active bump — background surface rises behind icon */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 bottom-full w-12 transition-all duration-300 ease-out pointer-events-none",
+          active ? "h-3 opacity-100" : "h-0 opacity-0"
+        )}
+      >
+        <div className="w-full h-full bg-background rounded-t-2xl" />
+      </div>
+
+      {/* Green dot on top */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 transition-all duration-300 ease-out",
+          active ? "-top-0.5 opacity-100 scale-100" : "top-1 opacity-0 scale-0"
+        )}
+      >
+        <div className="w-[5px] h-[5px] rounded-full bg-primary" />
+      </div>
+
       <div
         className="relative"
         style={{
@@ -303,13 +323,6 @@ const TabButton = forwardRef<
           transition: bouncing ? 'transform 80ms cubic-bezier(0.2, 0, 0, 1)' : 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        {/* Active pill indicator */}
-        <div
-          className={cn(
-            "absolute -inset-x-2.5 -inset-y-1.5 rounded-2xl bg-primary/12 transition-all duration-300",
-            active ? "opacity-100 scale-100" : "opacity-0 scale-75"
-          )}
-        />
         <AppIcon
           name={tab.icon}
           size={22}
