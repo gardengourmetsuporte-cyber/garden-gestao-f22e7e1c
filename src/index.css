@@ -2870,3 +2870,34 @@ select:focus {
 
 .finance-hero-chip:nth-child(1) { animation-delay: 400ms; }
 .finance-hero-chip:nth-child(2) { animation-delay: 500ms; }
+
+/* ========== MORE DRAWER ANIMATIONS ========== */
+
+@keyframes moreDrawerIn {
+  0% { opacity: 0; transform: scale(0.97); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes moduleGroupIn {
+  0% { opacity: 0; transform: translateY(18px) scale(0.96); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* Stagger individual cards inside each group */
+.more-drawer-modules .grid > a,
+.more-drawer-modules .grid > div > a {
+  opacity: 0;
+  animation: cardReveal 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.more-drawer-modules .grid > a:nth-child(1),
+.more-drawer-modules .grid > div > a:nth-child(1) { animation-delay: 200ms; }
+.more-drawer-modules .grid > a:nth-child(2),
+.more-drawer-modules .grid > div > a:nth-child(2) { animation-delay: 260ms; }
+.more-drawer-modules .grid > a:nth-child(3),
+.more-drawer-modules .grid > div > a:nth-child(3) { animation-delay: 320ms; }
+.more-drawer-modules .grid > a:nth-child(4),
+.more-drawer-modules .grid > div > a:nth-child(4) { animation-delay: 380ms; }
+.more-drawer-modules .grid > a:nth-child(5),
+.more-drawer-modules .grid > div > a:nth-child(5) { animation-delay: 440ms; }
+.more-drawer-modules .grid > a:nth-child(6),
+.more-drawer-modules .grid > div > a:nth-child(6) { animation-delay: 500ms; }
