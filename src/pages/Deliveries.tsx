@@ -76,23 +76,50 @@ export default function Deliveries() {
           </div>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
-          {STATUS_TABS.map((tab) => (
+        {/* Filter tabs + view toggle */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar flex-1">
+            {STATUS_TABS.map((tab) => (
+              <Button
+                key={tab.key}
+                variant={statusFilter === tab.key ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 text-xs gap-1.5 shrink-0 rounded-full"
+                onClick={() => setStatusFilter(tab.key)}
+              >
+                <AppIcon name={tab.icon} size={14} /> {tab.label}
+              </Button>
+            ))}
+          </div>
+          <div className="flex gap-1 shrink-0">
             <Button
-              key={tab.key}
-              variant={statusFilter === tab.key ? 'default' : 'outline'}
-              size="sm"
-              className="h-8 text-xs gap-1.5 shrink-0 rounded-full"
-              onClick={() => setStatusFilter(tab.key)}
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={() => setViewMode('list')}
             >
-              <AppIcon name={tab.icon} size={14} /> {tab.label}
+              <AppIcon name="view_list" size={16} />
             </Button>
-          ))}
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'outline'}
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={() => setViewMode('map')}
+            >
+              <AppIcon name="map" size={16} />
+            </Button>
+          </div>
         </div>
 
-        {/* Grouped deliveries */}
-        {groupedByNeighborhood.length === 0 ? (
+        {/* Map or List view */}
+        {viewMode === 'map' ? (
+          <Suspense fallback={<PageLoader />}>
+            <DeliveryMap
+              deliveries={filteredDeliveries}
+              onStatusChange={(id, status) => updateStatus({ id, status })}
+            />
+          </Suspense>
+        ) : groupedByNeighborhood.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <AppIcon name="location_on" size={48} className="text-muted-foreground/30 mb-3" />
             <p className="text-sm font-medium text-muted-foreground">Nenhuma entrega encontrada</p>
