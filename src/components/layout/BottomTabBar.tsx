@@ -147,14 +147,20 @@ export function BottomTabBar() {
                   }
                 }}
                 className={cn(
-                  "w-[44px] h-[44px] rounded-full flex items-center justify-center",
-                  "bg-primary hover:scale-[1.08] active:scale-[0.92] fab-button-glow"
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-500",
+                  fabAction
+                    ? "bg-accent-foreground fab-contextual-glow"
+                    : "bg-primary fab-button-glow",
+                  "hover:scale-[1.08] active:scale-[0.92]"
                 )}
               >
                 <AppIcon
                   name={fabAction?.icon || 'Plus'}
                   size={20}
-                  className="relative z-10 text-white"
+                  className={cn(
+                    "relative z-10 text-white transition-transform duration-500",
+                    fabAction ? "animate-fab-morph" : ""
+                  )}
                 />
               </button>
             </div>

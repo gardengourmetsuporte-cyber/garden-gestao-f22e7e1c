@@ -2218,6 +2218,35 @@
       0 0 10px hsl(var(--primary) / 0.1);
   }
 
+  /* FAB contextual mode — different color + pulse ring when action changes */
+  .fab-contextual-glow {
+    background: linear-gradient(135deg, hsl(220 70% 55%), hsl(250 70% 60%)) !important;
+    box-shadow:
+      0 4px 16px hsl(230 70% 55% / 0.4),
+      0 0 20px hsl(230 70% 55% / 0.2);
+    animation: fabContextPulse 2s ease-in-out infinite;
+  }
+
+  .fab-contextual-glow:active {
+    box-shadow:
+      0 2px 8px hsl(230 70% 55% / 0.3),
+      0 0 10px hsl(230 70% 55% / 0.15);
+  }
+
+  @keyframes fabContextPulse {
+    0%, 100% { box-shadow: 0 4px 16px hsl(230 70% 55% / 0.4), 0 0 20px hsl(230 70% 55% / 0.2); }
+    50% { box-shadow: 0 4px 20px hsl(230 70% 55% / 0.55), 0 0 28px hsl(230 70% 55% / 0.3); }
+  }
+
+  @keyframes fabMorph {
+    0% { transform: scale(0.5) rotate(-90deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  .animate-fab-morph {
+    animation: fabMorph 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
   /* Green dot glow effect */
   .tab-dot-glow {
     box-shadow: 0 0 6px hsl(var(--primary) / 0.5), 0 0 12px hsl(var(--primary) / 0.2);
