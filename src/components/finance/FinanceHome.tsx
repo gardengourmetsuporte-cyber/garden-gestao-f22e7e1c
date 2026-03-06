@@ -33,7 +33,7 @@ export function FinanceHome({
   variant = 'business',
   prevMonthStats,
 }: FinanceHomeProps) {
-  const formatCurrency = (value: number) => 
+  const fmtCurrency = (value: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
   const profit = monthStats.totalIncome - monthStats.totalExpense;
@@ -47,6 +47,23 @@ export function FinanceHome({
   const expenseVariation = prevMonthStats && prevMonthStats.totalExpense > 0
     ? ((monthStats.totalExpense - prevMonthStats.totalExpense) / prevMonthStats.totalExpense) * 100
     : null;
+
+  // Budget data for planning card
+  const budgetMonth = selectedMonth.getMonth() + 1;
+  const budgetYear = selectedMonth.getFullYear();
+  const { budgets } = useBudgets(budgetMonth, budgetYear);
+  const hasBudgets = budgets.length > 0;
+
+  const budgetSummary = useMemo(() => {
+    if (!hasBudgets) return null;
+    const totalPlanned = budgets.reduce((s, b) => s + b.planned_amount, 0);
+    const totalSpent = budgets.reduce((s, b) => {
+      // Simple spent calc — actual spending tracked in planning tab
+      return s;
+    }, 0);
+    const percent = totalPlanned > 0 ? (monthStats.totalExpense / totalPlanned) * 100 : 0;
+    return { totalPlanned, spent: monthStats.totalExpense, percent, count: budgets.length };
+  }, [budgets, hasBudgets, monthStats.totalExpense]);
 
   return (
     <div className="px-4 py-3 lg:px-6 space-y-4">
