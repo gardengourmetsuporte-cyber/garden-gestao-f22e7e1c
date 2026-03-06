@@ -1044,6 +1044,7 @@
   .tab-command {
     @apply flex gap-1 bg-card/60 backdrop-blur-sm p-1 rounded-xl;
     border: 1px solid hsl(var(--border) / 0.3);
+    max-width: 480px;
   }
 
   .tab-command-item {

@@ -152,8 +152,8 @@ export default function Customers() {
     <AppLayout>
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-24 lg:pb-12">
           <DesktopActionBar label="Novo Cliente" onClick={openNewSheet} />
-          {/* Compact stats row */}
-        <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+           {/* Compact stats row */}
+        <div className="flex items-center gap-4 lg:gap-6 text-xs text-muted-foreground flex-wrap">
           <span className="font-semibold text-foreground">{stats.total} clientes</span>
           <span>{stats.activeThisMonth} ativos</span>
           <span>{stats.inactive} inativos</span>
