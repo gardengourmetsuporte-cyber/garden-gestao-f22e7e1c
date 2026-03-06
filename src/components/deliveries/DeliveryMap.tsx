@@ -322,47 +322,64 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
   /* ── Geocoding ── */
   const handleGeocode = useCallback(async (toGeocode: Delivery[]) => {
-    if (toGeocode.length === 0) return;
+    if (toGeocode.length === 0 || geocodeRunningRef.current) return;
+
+    geocodeRunningRef.current = true;
     setIsGeocoding(true);
     let success = 0;
 
-    for (const delivery of toGeocode) {
-      const addr = delivery.address;
-      if (!addr) continue;
+    try {
+      for (const delivery of toGeocode) {
+        const addr = delivery.address;
+        if (!addr) continue;
 
-      const normalizedCity = addr.city?.trim() || unitName?.trim() || '';
-      const coords = await geocodeAddress(
-        addr.full_address,
-        addr.neighborhood,
-        normalizedCity,
-        unitName || '',
-      );
-      if (coords) {
-        await supabase
-          .from('delivery_addresses')
-          .update({ lat: coords.lat, lng: coords.lng })
-          .eq('id', addr.id);
-        success++;
+        const normalizedCity = addr.city?.trim() || unitName?.trim() || '';
+        const coords = await geocodeAddress(
+          addr.full_address,
+          addr.neighborhood,
+          normalizedCity,
+          unitName || '',
+        );
+
+        if (coords) {
+          const { error } = await supabase
+            .from('delivery_addresses')
+            .update({ lat: coords.lat, lng: coords.lng })
+            .eq('id', addr.id);
+
+          if (error) {
+            toast.error('Erro ao salvar localização no mapa');
+            continue;
+          }
+
+          success++;
+        }
       }
-    }
 
-    setIsGeocoding(false);
-    if (success > 0) {
-      toast.success(`${success} endereço(s) localizado(s) no mapa`);
-      onRefresh?.();
-    } else {
-      toast.error('Não foi possível localizar os endereços');
+      if (success > 0) {
+        toast.success(`${success} endereço(s) localizado(s) no mapa`);
+        onRefresh?.();
+      }
+    } finally {
+      geocodeRunningRef.current = false;
+      setIsGeocoding(false);
     }
   }, [onRefresh, unitName]);
 
-  // Auto-geocode whenever there are addresses without coords
-  const withoutCoordsIds = useMemo(() => withoutCoords.map(d => d.id).join(','), [withoutCoords]);
+  // Auto-geocode on load and retry every 20s while there are pending addresses
+  const withoutCoordsIds = useMemo(() => withoutCoords.map((d) => d.id).join(','), [withoutCoords]);
   useEffect(() => {
-    if (withoutCoords.length > 0 && !isGeocoding) {
+    if (withoutCoords.length === 0) return;
+
+    handleGeocode(withoutCoords);
+    const retryTimer = window.setInterval(() => {
       handleGeocode(withoutCoords);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withoutCoordsIds]);
+    }, 20000);
+
+    return () => {
+      window.clearInterval(retryTimer);
+    };
+  }, [withoutCoordsIds, handleGeocode]);
 
   /* ── Render ── */
   return (
