@@ -165,13 +165,29 @@ export function useCashClosing() {
   const deleteClosing = async (closingId: string) => {
     if (!user) return false;
     try {
+      // First delete any related finance transactions generated from this closing
+      const closing = closings.find(c => c.id === closingId);
+      if (closing?.financial_integrated) {
+        // Remove auto-generated transactions for this closing date
+        await supabase
+          .from('finance_transactions')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('date', closing.date)
+          .like('notes', '%Fechamento de caixa%');
+      }
+
       const { error } = await supabase.from('cash_closings' as any).delete().eq('id', closingId);
-      if (error) throw error;
+      if (error) {
+        console.error('Delete cash closing error:', error);
+        throw error;
+      }
       invalidate();
       toast.success('Fechamento excluído');
       return true;
-    } catch {
-      toast.error('Erro ao excluir fechamento');
+    } catch (err: any) {
+      console.error('Delete cash closing error:', err);
+      toast.error(err?.message || 'Erro ao excluir fechamento');
       return false;
     }
   };
