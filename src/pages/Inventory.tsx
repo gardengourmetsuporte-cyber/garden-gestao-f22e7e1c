@@ -13,6 +13,7 @@ import { ItemCard } from '@/components/inventory/ItemCardNew';
 import { SearchBar } from '@/components/inventory/SearchBar';
 import { QuickMovementSheetNew } from '@/components/inventory/QuickMovementSheetNew';
 import { ItemFormSheetNew } from '@/components/inventory/ItemFormSheetNew';
+import { BatchMovementSheet } from '@/components/inventory/BatchMovementSheet';
 import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -46,6 +47,7 @@ export default function InventoryPage() {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
+  const [batchSheetOpen, setBatchSheetOpen] = useState(false);
 
   // Handle ?action=move from quick actions
   useEffect(() => {
@@ -188,12 +190,24 @@ export default function InventoryPage() {
             onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
           />
 
-          {/* Search */}
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder={view === 'items' ? 'Buscar itens...' : 'Buscar movimentações...'}
-          />
+          {/* Search + Batch button */}
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <SearchBar
+                value={search}
+                onChange={setSearch}
+                placeholder={view === 'items' ? 'Buscar itens...' : 'Buscar movimentações...'}
+              />
+            </div>
+            <button
+              onClick={() => setBatchSheetOpen(true)}
+              className="shrink-0 h-10 px-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1.5 transition-colors"
+              title="Lançar em lote"
+            >
+              <AppIcon name="ListChecks" size={18} />
+              <span className="text-sm font-medium hidden sm:inline">Lote</span>
+            </button>
+          </div>
 
           {/* Content with fade transition */}
           <div className="animate-fade-in" key={view}>
@@ -303,6 +317,18 @@ export default function InventoryPage() {
           onSave={handleSaveItem}
           onDelete={editingItem ? () => handleDeleteItem(editingItem.id) : undefined}
           isAdmin={isAdmin}
+        />
+
+        <BatchMovementSheet
+          open={batchSheetOpen}
+          onOpenChange={setBatchSheetOpen}
+          items={items}
+          categories={categories}
+          onConfirm={async (entries, type, notes) => {
+            for (const { itemId, quantity } of entries) {
+              await registerMovement(itemId, type, quantity, notes);
+            }
+          }}
         />
       </div>
     </AppLayout>
