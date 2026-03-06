@@ -248,7 +248,7 @@ export function useDeliveries() {
     if (anchor) {
       for (const query of queries) {
         try {
-          const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
+          const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
           const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
             headers: { 'User-Agent': 'GardenGestao/1.0' },
           });

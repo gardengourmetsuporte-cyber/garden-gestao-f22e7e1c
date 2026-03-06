@@ -156,7 +156,7 @@ async function geocodeAddress(
   if (anchor) {
     for (const q of queries) {
       try {
-        const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
+        const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
           headers: { 'User-Agent': 'GardenGestao/1.0' },
         });
