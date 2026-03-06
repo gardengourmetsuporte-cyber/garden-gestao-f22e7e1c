@@ -44,6 +44,11 @@ function groupByCategory(transactions: FinanceTransaction[], categories: Finance
     });
   }
 
+  // Normalize name for dedup: "Taxas Operacionais" with different IDs → same group
+  const normName = (c: FinanceCategory) => (c.name || '').trim().toLowerCase();
+
+  // Map normalized name → canonical key & category (first seen wins)
+  const nameToKey = new Map<string, string>();
   const map = new Map<string, FinanceTransaction[]>();
   const order: string[] = [];
   const groupCategory = new Map<string, FinanceCategory>();
@@ -53,22 +58,35 @@ function groupByCategory(transactions: FinanceTransaction[], categories: Finance
     if (t.type === 'transfer') {
       key = '__transfer';
     } else {
-      // Resolve to parent category via lookup first, then fallback to category.parent_id
       const parent = t.category_id ? parentLookup.get(t.category_id) : undefined;
+      let resolvedParent: FinanceCategory | undefined;
+
       if (parent) {
-        key = parent.id;
-        if (!groupCategory.has(key)) groupCategory.set(key, parent);
+        resolvedParent = parent;
       } else if (t.category?.parent_id) {
-        // Category not in lookup but has parent_id — group by parent_id
-        key = t.category.parent_id;
-        // Try to find parent info from other transactions or lookup
-        if (!groupCategory.has(key)) {
-          const parentFromLookup = parentLookup.get(t.category.parent_id);
-          if (parentFromLookup) groupCategory.set(key, parentFromLookup);
+        resolvedParent = parentLookup.get(t.category.parent_id);
+      }
+
+      if (resolvedParent) {
+        const nn = normName(resolvedParent);
+        if (nameToKey.has(nn)) {
+          key = nameToKey.get(nn)!;
+        } else {
+          key = resolvedParent.id;
+          nameToKey.set(nn, key);
         }
+        if (!groupCategory.has(key)) groupCategory.set(key, resolvedParent);
+      } else if (t.category) {
+        const nn = normName(t.category);
+        if (nameToKey.has(nn)) {
+          key = nameToKey.get(nn)!;
+        } else {
+          key = t.category_id || '__none';
+          nameToKey.set(nn, key);
+        }
+        if (!groupCategory.has(key)) groupCategory.set(key, t.category);
       } else {
         key = t.category_id || '__none';
-        if (t.category && !groupCategory.has(key)) groupCategory.set(key, t.category);
       }
     }
     if (!map.has(key)) {
@@ -90,7 +108,6 @@ function groupByCategory(transactions: FinanceTransaction[], categories: Finance
     return { key, category, isTransfer, txns, subtotal };
   });
 
-  // Sort: expenses first (negative), then income (positive), then transfers; within each group by absolute value desc
   groups.sort((a, b) => {
     const typeOrder = (g: typeof a) => g.isTransfer ? 2 : g.subtotal < 0 ? 0 : 1;
     const ta = typeOrder(a);
