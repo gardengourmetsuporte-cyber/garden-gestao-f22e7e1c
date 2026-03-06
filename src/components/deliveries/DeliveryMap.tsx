@@ -214,20 +214,20 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {/* Geocode banner */}
       {withoutCoords.length > 0 && (
-        <div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border/60 bg-card">
+        <div className="flex items-center justify-between gap-3 p-2.5 rounded-xl border border-border/60 bg-card">
           <div className="flex items-center gap-2 min-w-0">
-            <LocateFixed className="w-4 h-4 text-primary shrink-0" />
-            <p className="text-xs text-muted-foreground truncate">
-              {withoutCoords.length} entrega(s) sem localização
+            <LocateFixed className="w-3.5 h-3.5 text-primary shrink-0" />
+            <p className="text-[11px] text-muted-foreground truncate">
+              {withoutCoords.length} sem localização
             </p>
           </div>
           <Button
             size="sm"
             variant="outline"
-            className="h-7 text-xs shrink-0"
+            className="h-6 text-[10px] shrink-0 px-2"
             onClick={handleGeocode}
             disabled={isGeocoding}
           >
@@ -236,11 +236,11 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
         </div>
       )}
 
-      {/* Map */}
+      {/* Map — compact */}
       <div
         ref={mapRef}
-        className="rounded-2xl overflow-hidden border border-border/60"
-        style={{ height: 'calc(100vh - 340px)', minHeight: 350 }}
+        className="rounded-xl overflow-hidden border border-border/60"
+        style={{ height: 200 }}
       />
     </div>
   );
