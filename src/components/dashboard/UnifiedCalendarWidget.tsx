@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isBefore, startOfDay, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isBefore, startOfDay, addMonths, subMonths, isAfter, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useDashboardCalendar } from '@/hooks/useDashboardCalendar';
+import { useAgenda } from '@/hooks/useAgenda';
 import { calendarEventColors } from '@/types/calendar';
 import type { CalendarDayEvents, CalendarEvent } from '@/types/calendar';
 import { cn } from '@/lib/utils';
@@ -14,9 +15,28 @@ const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 export function UnifiedCalendarWidget() {
   const navigate = useNavigate();
+  const { allTasks } = useAgenda();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const { eventsMap, isLoading } = useDashboardCalendar(currentMonth);
+
+  // Upcoming tasks: today + future, not completed, sorted by date
+  const upcomingTasks = useMemo(() => {
+    const today = startOfDay(new Date());
+    return allTasks
+      .filter(t => !t.is_completed && t.due_date)
+      .filter(t => {
+        const taskDate = new Date(t.due_date + 'T12:00:00');
+        return isSameDay(taskDate, today) || isAfter(taskDate, today);
+      })
+      .sort((a, b) => {
+        const dateA = a.due_date || '9999';
+        const dateB = b.due_date || '9999';
+        if (dateA !== dateB) return dateA.localeCompare(dateB);
+        return (a.due_time || '').localeCompare(b.due_time || '');
+      })
+      .slice(0, 6);
+  }, [allTasks]);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -160,6 +180,51 @@ export function UnifiedCalendarWidget() {
             </div>
           ))}
         </div>
+
+        {/* Upcoming tasks */}
+        {upcomingTasks.length > 0 && (
+          <div className="border-t border-border/30 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <AppIcon name="Task" size={14} className="text-primary" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Próximas tarefas</span>
+              </div>
+              <button onClick={() => navigate('/agenda')} className="text-[10px] text-primary font-medium">
+                Ver todas
+              </button>
+            </div>
+            <div className="space-y-1.5">
+              {upcomingTasks.map(task => {
+                const taskDate = new Date(task.due_date + 'T12:00:00');
+                const isTaskToday = isToday(taskDate);
+                return (
+                  <div key={task.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-secondary/30">
+                    <div
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: task.category?.color || 'hsl(var(--primary))' }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-foreground truncate">{task.title}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {task.due_time && (
+                        <span className="text-[10px] text-muted-foreground">{task.due_time}</span>
+                      )}
+                      <span className={cn(
+                        'text-[10px] font-medium px-1.5 py-0.5 rounded-full',
+                        isTaskToday
+                          ? 'bg-primary/15 text-primary'
+                          : 'bg-secondary text-muted-foreground'
+                      )}>
+                        {isTaskToday ? 'Hoje' : format(taskDate, "dd/MM", { locale: ptBR })}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Inline detail panel */}
         {selectedDate && selectedEvents && (
