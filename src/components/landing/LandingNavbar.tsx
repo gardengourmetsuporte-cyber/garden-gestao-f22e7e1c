@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
+import { cn } from "@/lib/utils";
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -27,12 +28,31 @@ export function LandingNavbar() {
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-        <Link to="/landing" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center border border-white/10 shadow-sm relative group">
-            <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <img src={logoImg} alt="Garden" className="w-[85%] h-[85%] object-contain" />
+        {/* Animated Logo */}
+        <Link
+          to="/landing"
+          className={cn(
+            "flex items-center h-10 rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+            scrolled
+              ? "w-10 bg-transparent p-0 justify-center"
+              : "bg-white/10 border border-white/15 backdrop-blur-md pl-2.5 pr-4 gap-2.5"
+          )}
+        >
+          <div className={cn(
+            "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
+            scrolled ? "w-9 h-9" : "w-7 h-7"
+          )}>
+            <div className="w-full h-full rounded-xl overflow-hidden bg-white flex items-center justify-center">
+              <img src={logoImg} alt="Garden" className="w-[85%] h-[85%] object-contain" />
+            </div>
           </div>
-          <span className="font-display font-bold text-lg text-white tracking-tight">
+          <span
+            className={cn(
+              "text-sm font-bold text-white whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
+              scrolled ? "max-w-0 opacity-0" : "max-w-[7rem] opacity-100"
+            )}
+            style={{ letterSpacing: '-0.01em' }}
+          >
             Garden
           </span>
         </Link>
