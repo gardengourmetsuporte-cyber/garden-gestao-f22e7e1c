@@ -1,19 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import { format, isToday, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useDashboardCalendar } from '@/hooks/useDashboardCalendar';
 import { calendarEventColors } from '@/types/calendar';
-import type { CalendarDayEvents, CalendarEvent } from '@/types/calendar';
+import type { CalendarEvent } from '@/types/calendar';
 import { cn } from '@/lib/utils';
 import { UnifiedMonthGrid } from '@/components/ui/unified-month-grid';
 import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
-import { addMonths, subMonths } from 'date-fns';
-
-const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 export function UnifiedCalendarWidget() {
   const navigate = useNavigate();
