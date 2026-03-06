@@ -125,6 +125,7 @@ export default function SettingsPage() {
   const settingsContent = activeSection ? (
     <Suspense fallback={<SettingsFallback />}>
       {activeSection === 'profile' && <ProfileSettings />}
+      {activeSection === 'appearance' && <AppearanceSettings />}
       {activeSection === 'categories' && <CategorySettings />}
       {activeSection === 'suppliers' && <SupplierSettings />}
       {activeSection === 'checklists' && <ChecklistSettingsManager />}
