@@ -101,9 +101,9 @@ export function UnifiedDateStrip({
 
       {/* Selected date label */}
       <div className="flex items-center justify-center gap-1.5">
-        <p className="text-center text-xs text-muted-foreground capitalize font-medium">
+        <p className="text-center text-xs text-muted-foreground font-medium">
           {isDateToday(selectedDate) ? '📍 ' : ''}
-          {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+          {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR }).replace(/^\w/, c => c.toUpperCase())}
         </p>
         {trailing}
       </div>
