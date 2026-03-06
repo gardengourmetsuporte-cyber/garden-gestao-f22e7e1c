@@ -1,11 +1,15 @@
 import { useState, useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
+import { format, isSameDay, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { DayPostsSheet } from './DayPostsSheet';
 import { getDateForDay } from '@/lib/marketingDates';
 import type { MarketingPost } from '@/types/marketing';
+import { cn } from '@/lib/utils';
+import { UnifiedMonthGrid } from '@/components/ui/unified-month-grid';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
+import { addMonths, subMonths } from 'date-fns';
 
 const statusColors: Record<string, string> = {
   draft: 'bg-muted-foreground/40',
@@ -38,24 +42,9 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
     return map;
   }, [posts]);
 
-  const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
-
-    const days: Date[] = [];
-    let day = calStart;
-    while (day <= calEnd) {
-      days.push(day);
-      day = addDays(day, 1);
-    }
-    return days;
-  }, [currentMonth]);
-
-  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-  const handleDayClick = (day: Date) => {
+  const handleDayClick = (dateKey: string) => {
+    if (!dateKey) return;
+    const day = new Date(dateKey + 'T12:00:00');
     setSelectedDate(day);
     setSheetOpen(true);
   };
@@ -66,97 +55,57 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
     return postsByDate.get(key) || [];
   }, [selectedDate, postsByDate]);
 
+  const renderDayContent = (day: Date, dateKey: string) => {
+    const dayPosts = postsByDate.get(dateKey) || [];
+    const specialDate = getDateForDay(day.getMonth() + 1, day.getDate());
+    const maxChips = 3;
+
+    return (
+      <>
+        {specialDate && (
+          <span className="text-[10px] absolute top-0.5 right-1" title={specialDate.title}>{specialDate.emoji}</span>
+        )}
+        <div className="space-y-0.5 mt-0.5">
+          {dayPosts.slice(0, maxChips).map(p => (
+            <div
+              key={p.id}
+              className={`w-full h-[14px] rounded-sm px-1 flex items-center ${statusColors[p.status] || statusColors.draft}`}
+            >
+              <span className="text-[8px] text-white truncate font-medium leading-none">
+                {p.title}
+              </span>
+            </div>
+          ))}
+          {dayPosts.length > maxChips && (
+            <span className="text-[9px] text-muted-foreground pl-0.5">
+              +{dayPosts.length - maxChips}
+            </span>
+          )}
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="space-y-3">
       {/* Month Navigation */}
       <div className="flex items-center justify-between px-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
-          <AppIcon name="ChevronLeft" size={16} />
-        </Button>
-        <div className="text-center">
-          <h2 className="text-sm font-semibold text-foreground capitalize">
-            {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
-          </h2>
-        </div>
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs h-8 px-2"
-            onClick={() => setCurrentMonth(new Date())}
-          >
-            Hoje
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
-            <AppIcon name="ChevronRight" size={16} />
-          </Button>
-        </div>
+        <UnifiedMonthNav
+          currentMonth={currentMonth}
+          onMonthChange={setCurrentMonth}
+          showToday
+          onTodayClick={() => setCurrentMonth(new Date())}
+        />
       </div>
 
       {/* Calendar Grid */}
-      <div className="rounded-xl border border-border/40 bg-card overflow-hidden">
-        {/* Week headers */}
-        <div className="grid grid-cols-7 border-b border-border/30">
-          {weekDays.map(d => (
-            <div key={d} className="text-center py-2 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-              {d}
-            </div>
-          ))}
-        </div>
-
-        {/* Day cells */}
-        <div className="grid grid-cols-7">
-          {calendarDays.map((day, i) => {
-            const key = format(day, 'yyyy-MM-dd');
-            const dayPosts = postsByDate.get(key) || [];
-            const inMonth = isSameMonth(day, currentMonth);
-            const today = isToday(day);
-            const specialDate = getDateForDay(day.getMonth() + 1, day.getDate());
-            const maxChips = 3;
-
-            return (
-              <button
-                key={i}
-                onClick={() => handleDayClick(day)}
-                className={`
-                  relative min-h-[4.5rem] p-1 border-b border-r border-border/20 text-left transition-colors
-                  ${inMonth ? 'hover:bg-secondary/50' : 'opacity-30'}
-                  ${today ? 'bg-primary/5' : ''}
-                `}
-              >
-                {/* Day number */}
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className={`text-[11px] font-medium leading-none ${today ? 'text-primary font-bold' : 'text-foreground'}`}>
-                    {format(day, 'd')}
-                  </span>
-                  {specialDate && inMonth && (
-                    <span className="text-[10px]" title={specialDate.title}>{specialDate.emoji}</span>
-                  )}
-                </div>
-
-                {/* Post chips */}
-                <div className="space-y-0.5">
-                  {dayPosts.slice(0, maxChips).map(p => (
-                    <div
-                      key={p.id}
-                      className={`w-full h-[14px] rounded-sm px-1 flex items-center ${statusColors[p.status] || statusColors.draft}`}
-                    >
-                      <span className="text-[8px] text-white truncate font-medium leading-none">
-                        {p.title}
-                      </span>
-                    </div>
-                  ))}
-                  {dayPosts.length > maxChips && (
-                    <span className="text-[9px] text-muted-foreground pl-0.5">
-                      +{dayPosts.length - maxChips}
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <UnifiedMonthGrid
+        currentMonth={currentMonth}
+        selectedDate={null}
+        onSelectDate={handleDayClick}
+        renderDayContent={renderDayContent}
+        disableOutsideMonth={false}
+      />
 
       {/* Status Legend */}
       <div className="flex gap-3 justify-center">
