@@ -471,7 +471,7 @@ export default function ChecklistsPage() {
               })() : null;
 
               return (
-                <DateStrip
+                <UnifiedDateStrip
                   days={days}
                   selectedDate={selectedDate}
                   onSelectDate={setSelectedDate}
