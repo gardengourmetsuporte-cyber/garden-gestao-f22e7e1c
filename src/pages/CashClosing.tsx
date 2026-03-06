@@ -5,6 +5,7 @@ import { useFabAction } from '@/contexts/FabActionContext';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { CashClosingForm, clearCashClosingDraft } from '@/components/cashClosing/CashClosingForm';
 import { CashClosingList } from '@/components/cashClosing/CashClosingList';
 import { WeeklySummary } from '@/components/cashClosing/WeeklySummary';
@@ -46,6 +47,7 @@ export default function CashClosing() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
+          <DesktopActionBar label="Novo Fechamento" onClick={() => setIsFormOpen(true)} />
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => (

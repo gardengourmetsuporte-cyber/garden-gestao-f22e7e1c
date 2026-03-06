@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
@@ -79,6 +80,7 @@ export default function Marketing() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
+          <DesktopActionBar label="Novo Post" onClick={() => { setEditingPost(null); setPrefillDate(null); setPrefillTitle(''); setSheetOpen(true); }} />
           <div className="flex items-center justify-between mb-1">
             <AnimatedTabs
               tabs={[

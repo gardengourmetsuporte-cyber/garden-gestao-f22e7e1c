@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Input } from '@/components/ui/input';
@@ -183,6 +184,7 @@ export default function Recipes() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
+          <DesktopActionBar label="Nova Ficha" onClick={() => { setSelectedRecipe(null); setSheetOpen(true); }} />
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="rounded-2xl border bg-card p-3">
