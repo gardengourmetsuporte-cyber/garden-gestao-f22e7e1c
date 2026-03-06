@@ -165,16 +165,35 @@ export function useCashClosing() {
   const deleteClosing = async (closingId: string) => {
     if (!user) return false;
     try {
-      // First delete any related finance transactions generated from this closing
+      // First delete related finance transactions generated from this closing
       const closing = closings.find(c => c.id === closingId);
       if (closing?.financial_integrated) {
-        // Remove auto-generated transactions for this closing date
-        await supabase
+        const dateLabel = format(new Date(`${closing.date}T12:00:00`), 'dd/MM');
+
+        let relatedTxQuery = supabase
           .from('finance_transactions')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('date', closing.date)
-          .like('notes', '%Fechamento de caixa%');
+          .select('id')
+          .eq('user_id', user.id);
+
+        if (activeUnitId) {
+          relatedTxQuery = relatedTxQuery.eq('unit_id', activeUnitId);
+        }
+
+        const { data: relatedTransactions, error: relatedTxError } = await relatedTxQuery.or(
+          `description.ilike.*(${dateLabel})*,and(notes.ilike.*Fechamento de caixa*,description.ilike.*(${dateLabel})*),and(notes.ilike.*Lançamento automático*,description.ilike.*(${dateLabel})*),and(notes.ilike.*Taxa automática sobre*,description.ilike.*(${dateLabel})*)`
+        );
+
+        if (relatedTxError) throw relatedTxError;
+
+        const relatedTxIds = (relatedTransactions || []).map((tx: { id: string }) => tx.id);
+        if (relatedTxIds.length > 0) {
+          const { error: deleteRelatedTxError } = await supabase
+            .from('finance_transactions')
+            .delete()
+            .in('id', relatedTxIds);
+
+          if (deleteRelatedTxError) throw deleteRelatedTxError;
+        }
       }
 
       const { error } = await supabase.from('cash_closings' as any).delete().eq('id', closingId);
