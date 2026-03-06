@@ -215,8 +215,8 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      markersRef.current.forEach(m => m.remove());
-      markersRef.current = [];
+      Object.values(markersRef.current).forEach(m => m.remove());
+      markersRef.current = {};
 
       const bounds: [number, number][] = [];
 
@@ -240,7 +240,7 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
         marker.bindPopup(buildPopup(delivery), { maxWidth: 250, minWidth: 170 });
-        markersRef.current.push(marker);
+        markersRef.current[delivery.id] = marker;
       });
 
       if (bounds.length > 0) {
@@ -250,8 +250,8 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
     return () => {
       cancelled = true;
-      markersRef.current.forEach(m => m.remove());
-      markersRef.current = [];
+      Object.values(markersRef.current).forEach(m => m.remove());
+      markersRef.current = {};
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
