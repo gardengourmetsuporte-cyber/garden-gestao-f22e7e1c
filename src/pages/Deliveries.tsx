@@ -126,6 +126,7 @@ export default function Deliveries() {
               </Badge>
             </div>
             <DeliveryMap
+              ref={mapHandleRef}
               deliveries={deliveries}
               unitName={activeUnit?.name || ''}
               onStatusChange={(id, status) => updateStatus({ id, status })}
