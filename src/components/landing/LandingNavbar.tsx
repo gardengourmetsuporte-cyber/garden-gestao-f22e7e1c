@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
