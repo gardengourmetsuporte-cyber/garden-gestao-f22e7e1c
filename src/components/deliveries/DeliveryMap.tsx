@@ -59,7 +59,7 @@ interface Props {
   onRefresh?: () => void;
 }
 
-export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
+export function DeliveryMap({ deliveries, unitName, onStatusChange, onRefresh }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
