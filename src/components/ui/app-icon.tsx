@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { ICON_MAP, CUSTOM_SVG_PATHS } from '@/lib/iconMap';
 
