@@ -152,42 +152,27 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       >
         <div className="relative overflow-hidden">
           <div className="flex items-center justify-between h-14 px-3 relative z-10">
-            {/* Left: Back button + Logo — always rendered, orchestrated entrance */}
+            {/* Left: Logo pill — always same style as dashboard */}
             <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
-              {/* Back chevron — slides in first (fastest) */}
-              <button
-                onClick={() => navigate('/')}
-                className={cn(
-                  "p-1.5 -ml-1 rounded-lg hover:bg-muted/50 active:scale-90 transition-all ease-[cubic-bezier(0.25,0.1,0.25,1)]",
-                  isDashboard
-                    ? "opacity-0 -translate-x-3 pointer-events-none w-0 p-0 -ml-0 duration-200"
-                    : "opacity-100 translate-x-0 duration-300 delay-[50ms]"
-                )}
-                tabIndex={isDashboard ? -1 : 0}
-              >
-                <AppIcon name="ChevronLeft" size={20} className="text-foreground/70" />
-              </button>
-
-              {/* Logo — morphs between expanded pill (dashboard) and compact icon (modules) */}
               <button
                 onClick={() => navigate('/')}
                 className={cn(
                   "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
-                  isDashboard && !isScrolled
+                  !isScrolled
                     ? "h-9 bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
                     : "h-8 w-8 bg-transparent p-0 justify-center"
                 )}
               >
                 <div className={cn(
                   "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
-                  isDashboard && !isScrolled ? "w-6 h-6" : "w-8 h-8"
+                  !isScrolled ? "w-6 h-6" : "w-8 h-8"
                 )}>
                   <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} />
                 </div>
                 <span
                   className={cn(
                     "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
-                    isDashboard && !isScrolled ? "max-w-[7rem] opacity-100" : "max-w-0 opacity-0"
+                    !isScrolled ? "max-w-[7rem] opacity-100" : "max-w-0 opacity-0"
                   )}
                   style={{ letterSpacing: '-0.01em' }}
                 >
