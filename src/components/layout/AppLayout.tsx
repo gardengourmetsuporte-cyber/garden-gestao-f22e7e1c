@@ -196,7 +196,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     )}
                   </button>
                 </DrawerTrigger>
-                <DrawerContent className="px-4 pb-8 pt-4 max-h-[70vh] overflow-y-auto">
+                <DrawerContent className="px-4 pb-8 pt-4 max-h-[70vh] overflow-y-auto mx-auto max-w-lg">
                   <div className="mx-auto w-12 h-1.5 rounded-full bg-muted mb-4" />
                   {notifOpen && <NotificationCard />}
                 </DrawerContent>
