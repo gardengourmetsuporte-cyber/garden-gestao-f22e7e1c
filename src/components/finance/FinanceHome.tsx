@@ -161,21 +161,69 @@ export function FinanceHome({
         </button>
       </div>
 
-      {/* Planning Quick Access */}
+      {/* Planning Quick Access — conditional card */}
       <button
         onClick={() => onNavigate?.('planning')}
-        className="w-full p-4 rounded-xl bg-card border border-border/50 text-left cursor-pointer transition-all duration-200 animate-slide-up stagger-3"
+        className={cn(
+          "w-full text-left cursor-pointer transition-all duration-200 animate-slide-up stagger-3",
+          hasBudgets
+            ? "card-command p-4 space-y-3"
+            : "p-4 rounded-xl bg-card border border-border/50"
+        )}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="Target" size={22} className="text-primary" />
+        {hasBudgets && budgetSummary ? (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center">
+                  <AppIcon name="Target" size={18} className="text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm font-bold text-foreground">Orçamento</span>
+                  <span className="text-[10px] text-muted-foreground block">{budgetSummary.count} categoria(s)</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={cn(
+                  "text-xs font-bold px-2 py-0.5 rounded-full",
+                  budgetSummary.percent > 100 ? "bg-destructive/15 text-destructive" :
+                  budgetSummary.percent > 80 ? "bg-warning/15 text-warning" :
+                  "bg-success/15 text-success"
+                )}>
+                  {budgetSummary.percent.toFixed(0)}%
+                </span>
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-[11px]">
+                <span className="text-muted-foreground">
+                  {formatCurrency(budgetSummary.spent)} de {formatCurrency(budgetSummary.totalPlanned)}
+                </span>
+                <span className={cn(
+                  "font-semibold",
+                  budgetSummary.spent > budgetSummary.totalPlanned ? "text-destructive" : "text-success"
+                )}>
+                  {budgetSummary.spent > budgetSummary.totalPlanned
+                    ? `Excedido em ${formatCurrency(budgetSummary.spent - budgetSummary.totalPlanned)}`
+                    : `Resta ${formatCurrency(budgetSummary.totalPlanned - budgetSummary.spent)}`}
+                </span>
+              </div>
+              <Progress value={Math.min(budgetSummary.percent, 100)} className="h-1.5" />
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
+              <AppIcon name="Target" size={22} className="text-primary" />
+            </div>
+            <div className="flex-1">
+              <span className="font-semibold text-sm text-foreground">Planejar</span>
+              <p className="text-[11px] text-muted-foreground">Orçamentos, DRE e Fluxo de Caixa</p>
+            </div>
+            <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
           </div>
-          <div className="flex-1">
-            <span className="font-semibold text-sm text-foreground">Planejar</span>
-            <p className="text-[11px] text-muted-foreground">Orçamentos, DRE e Fluxo de Caixa</p>
-          </div>
-          <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
-        </div>
+        )}
       </button>
 
       {/* Pending Alerts */}
