@@ -219,45 +219,42 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                       onOpenChange(false);
                     }}
                     className={cn(
-                      "flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 rounded-2xl transition-all active:scale-95 relative overflow-hidden",
+                      "flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 relative overflow-hidden",
                       active
-                        ? "bg-[#0d1f14] border border-emerald-500/25"
-                        : "card-surface hover:bg-card/90"
+                        ? "bg-primary/10 border border-primary/20"
+                        : "card-stat-holo"
                     )}
                     style={{
                       opacity: locked ? 0.55 : 1,
-                      ...(active ? { boxShadow: '0 0 20px rgba(16,185,129,0.08), inset 0 1px 0 rgba(255,255,255,0.04)' } : {}),
                     }}
                   >
                     {isProd && (
-                      <span className="absolute top-1 right-1 text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-orange-500/15 text-orange-500 leading-none">
+                      <span className="absolute top-1.5 right-1.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-warning/15 text-warning leading-none">
                         Beta
                       </span>
                     )}
-                    <div className="relative z-10 w-full flex justify-center">
+                    <div className="relative">
                       <div className={cn(
-                        "w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0 transition-all duration-300",
+                        "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
                         active
-                          ? "bg-emerald-500/15 border border-emerald-500/30"
-                          : "bg-card border border-white/5"
-                      )}
-                        style={active ? { boxShadow: '0 0 12px rgba(16,185,129,0.2)' } : undefined}
-                      >
+                          ? "bg-primary/15"
+                          : "bg-muted/50"
+                      )}>
                         {item.customIcon ? (
-                          <img src={item.customIcon} alt="" className={cn("w-5 h-5 transition-all", active ? "brightness-0 invert opacity-90" : "dark:invert dark:opacity-70 opacity-70")} />
+                          <img src={item.customIcon} alt="" className={cn("w-6 h-6 transition-all", active ? "brightness-0 invert opacity-90" : "dark:invert dark:opacity-70 opacity-70")} />
                         ) : (
-                          <AppIcon name={item.icon} size={20} fill={active ? 1 : 0} className={active ? "text-emerald-400" : "text-foreground/70"} />
+                          <AppIcon name={item.icon} size={22} fill={active ? 1 : 0} className={active ? "text-primary" : "text-foreground/70"} />
                         )}
                       </div>
                       {locked && (
                         <AppIcon name="Gem" size={10} className="absolute -top-1 -right-1" style={{ color: 'hsl(45 90% 55%)' }} />
                       )}
                     </div>
-                    <span className={cn("text-[11px] font-medium leading-tight text-center truncate max-w-full relative z-10", active ? "text-emerald-100 font-semibold" : locked ? "text-muted-foreground" : "text-foreground/80")}>
+                    <span className={cn("text-[11px] font-semibold leading-tight text-center truncate max-w-full", active ? "text-primary" : locked ? "text-muted-foreground" : "text-foreground/80")}>
                       {item.label}
                     </span>
                     {locked && planLabel && (
-                      <span className="text-[8px] font-bold uppercase tracking-wider -mt-1" style={{ color: 'hsl(45 90% 55%)' }}>
+                      <span className="text-[8px] font-bold uppercase tracking-wider -mt-1 px-2 py-0.5 rounded-full bg-warning/10" style={{ color: 'hsl(45 90% 55%)' }}>
                         {planLabel}
                       </span>
                     )}
