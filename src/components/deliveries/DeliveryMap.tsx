@@ -348,12 +348,14 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
     }
   }, [onRefresh, unitName]);
 
+  // Auto-geocode whenever there are addresses without coords
+  const withoutCoordsIds = useMemo(() => withoutCoords.map(d => d.id).join(','), [withoutCoords]);
   useEffect(() => {
-    if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
-      geocodedRef.current = true;
+    if (withoutCoords.length > 0 && !isGeocoding) {
       handleGeocode(withoutCoords);
     }
-  }, [withoutCoords.length, handleGeocode, isGeocoding]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withoutCoordsIds]);
 
   /* ── Render ── */
   return (
