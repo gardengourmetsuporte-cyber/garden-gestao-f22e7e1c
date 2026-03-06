@@ -115,7 +115,7 @@ export default function Deliveries() {
         {viewMode === 'map' ? (
           <Suspense fallback={<PageLoader />}>
             <DeliveryMap
-              deliveries={filteredDeliveries}
+              deliveries={deliveries}
               onStatusChange={(id, status) => updateStatus({ id, status })}
             />
           </Suspense>
