@@ -36,6 +36,7 @@ export default function Deliveries() {
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   // Register FAB action
   useFabAction(
