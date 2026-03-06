@@ -137,6 +137,23 @@ export function useDeliveries() {
     return urlData.publicUrl;
   }, [activeUnitId]);
 
+  // Geocode address using Nominatim (free)
+  const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
+    try {
+      const query = encodeURIComponent(`${address}, ${city}, Brasil`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
+        headers: { 'User-Agent': 'GardenGestao/1.0' },
+      });
+      const results = await res.json();
+      if (results?.[0]) {
+        return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }, []);
+
   // Create delivery
   const createDelivery = useMutation({
     mutationFn: async (params: {
@@ -144,6 +161,9 @@ export function useDeliveries() {
       photoUrl: string | null;
     }) => {
       const { ocrResult, photoUrl } = params;
+
+      // Geocode the address
+      const coords = await geocodeAddress(ocrResult.full_address, ocrResult.city || ocrResult.neighborhood);
 
       // Create or find address
       const { data: address, error: addrError } = await supabase
@@ -155,6 +175,8 @@ export function useDeliveries() {
           neighborhood: ocrResult.neighborhood,
           city: ocrResult.city || '',
           reference: ocrResult.reference || null,
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
         })
         .select()
         .single();
