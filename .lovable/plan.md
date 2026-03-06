@@ -1,30 +1,28 @@
 
 
-## Relatório Semanal: Receita vs Despesa
+## Mudanças no FinanceCharts
 
-Adicionar um novo tipo de visualização **"Semanal"** na aba de gráficos do financeiro, mostrando receitas e despesas lado a lado por semana dentro do mês selecionado.
+### 1. Esconder toggle Despesas/Receitas na view "Linha"
+O gráfico de linha já mostra receita e despesa juntos. Esconder o toggle assim como já é feito na view "Semanal".
 
-### O que muda
+**Arquivo:** `src/components/finance/FinanceCharts.tsx` (linha 171)
+- Alterar condição de `viewType !== 'weekly'` para `viewType !== 'weekly' && viewType !== 'timeline'`
 
-**Arquivo: `src/components/finance/FinanceCharts.tsx`**
+### 2. Substituir "Barras" por "Acumulado"
+Trocar o gráfico de barras horizontais por categoria (pouca informação nova vs Categorias) por um **gráfico acumulado** que mostra a evolução do saldo ao longo do mês.
 
-1. Adicionar `'weekly'` como nova opção no seletor de tipo de visualização (ao lado de Categorias, Linha, Barras)
-2. O novo gráfico será um **BarChart agrupado** (grouped bars) com barras verdes (receita) e vermelhas (despesa) lado a lado para cada semana
-3. A lógica agrupa as transações pagas do mês em semanas (Sem 1, Sem 2, Sem 3, Sem 4, Sem 5) baseado no dia
-4. Abaixo do gráfico, cards de resumo por semana mostrando: receita, despesa e saldo da semana
-5. O toggle Despesas/Receitas fica **escondido** nessa view (pois mostra ambos juntos)
+- Renomear tab "Barras" → "Acumulado"
+- Calcular receita e despesa acumuladas dia a dia usando `mergedTimelineData`
+- Renderizar um `AreaChart` com 2 áreas: receita acumulada (verde) e despesa acumulada (vermelha)
+- A distância visual entre as duas linhas mostra o saldo acumulado
+- Tooltip mostrando receita acumulada, despesa acumulada e saldo do dia
+- Cards abaixo com saldo final do mês
+- Esconder toggle nessa view também (mostra ambos)
 
-### Detalhes do gráfico
+Esse gráfico é mais informativo porque mostra **quando** o dinheiro entra e sai ao longo do mês, permitindo ver se em algum momento a despesa ultrapassou a receita.
 
-- Tipo: `BarChart` vertical com 2 barras por semana (receita + despesa)
-- Eixo X: Semanas (Sem 1, Sem 2, etc.)
-- Eixo Y: Valores
-- Cores: verde `#22c55e` para receita, vermelho `#ef4444` para despesa
-- Tooltip customizado mostrando receita e despesa da semana
-- Cards abaixo com saldo semanal (receita - despesa) e indicador visual positivo/negativo
-- Totais do mês no rodapé
-
-### Dados
-
-Usa `dailyExpenses` e `dailyIncome` já disponíveis como props, agrupando por semana (dias 1-7, 8-14, 15-21, 22-28, 29+).
+### Resumo das alterações
+- **1 arquivo**: `src/components/finance/FinanceCharts.tsx`
+- Toggle escondido em Linha e Acumulado
+- Seção "bars" substituída por gráfico acumulado
 
