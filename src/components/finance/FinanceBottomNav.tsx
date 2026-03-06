@@ -184,9 +184,9 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
             <div className="fab-cradle-ring">
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
-                className={cn(
-                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-300",
-                  menuOpen ? "rotate-45 scale-95 bg-primary fab-button-glow" : "fab-contextual-glow hover:scale-[1.08] active:scale-[0.92]"
+                 className={cn(
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-300 fab-contextual-glow",
+                  menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
                 )}
               >
                 <AppIcon name="Plus" size={20} className="relative z-10 text-white" />
