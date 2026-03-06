@@ -20,7 +20,7 @@ const nameSchema = z.string().min(2, 'Nome deve ter no mínimo 2 caracteres');
 // ── Brand Panel (left half on desktop) ─────────────────────────────
 function BrandPanel() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-[#000000]">
+    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-[hsl(220,20%,3%)]">
       {/* Subtle grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.05]"
