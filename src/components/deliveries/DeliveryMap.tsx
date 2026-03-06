@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { LocateFixed, Loader2, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -150,7 +150,6 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
   const [isGeocoding, setIsGeocoding] = useState(false);
-  const geocodedRef = useRef(false);
 
   useImperativeHandle(ref, () => ({
     focusDelivery(deliveryId: string) {
@@ -348,41 +347,23 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
     }
   }, [onRefresh, unitName]);
 
+  // Auto-geocode whenever there are addresses without coords
+  const withoutCoordsIds = useMemo(() => withoutCoords.map(d => d.id).join(','), [withoutCoords]);
   useEffect(() => {
-    if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
-      geocodedRef.current = true;
+    if (withoutCoords.length > 0 && !isGeocoding) {
       handleGeocode(withoutCoords);
     }
-  }, [withoutCoords.length, handleGeocode, isGeocoding]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withoutCoordsIds]);
 
   /* ── Render ── */
   return (
     <div className="space-y-2">
       {/* Geocode banner */}
-      {withoutCoords.length > 0 && (
-        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl border border-border/30 bg-card/50">
-          <div className="flex items-center gap-2 min-w-0">
-            {isGeocoding ? (
-              <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
-            ) : (
-              <LocateFixed className="w-4 h-4 text-primary shrink-0" />
-            )}
-            <p className="text-[11px] text-muted-foreground">
-              {isGeocoding
-                ? 'Localizando endereços no mapa…'
-                : `${withoutCoords.length} entrega(s) sem localização`}
-            </p>
-          </div>
-          {!isGeocoding && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-[10px] px-2.5 rounded-lg shrink-0"
-              onClick={() => handleGeocode(withoutCoords)}
-            >
-              Localizar
-            </Button>
-          )}
+      {isGeocoding && (
+        <div className="flex items-center gap-2 p-2.5 rounded-xl border border-border/30 bg-card/50">
+          <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
+          <p className="text-[11px] text-muted-foreground">Localizando endereços no mapa…</p>
         </div>
       )}
 
