@@ -44,8 +44,8 @@ export default function CashClosing() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
-        <div className="px-4 py-3 lg:px-6 space-y-4">
+      <div className="min-h-screen bg-background pb-24 lg:pb-12">
+        <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => (

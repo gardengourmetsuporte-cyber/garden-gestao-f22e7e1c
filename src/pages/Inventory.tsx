@@ -122,8 +122,8 @@ export default function InventoryPage() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-background pb-24">
-          <div className="px-4 py-3 lg:px-6 space-y-4">
+        <div className="min-h-screen bg-background pb-24 lg:pb-12">
+          <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
             </div>

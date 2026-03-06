@@ -149,7 +149,7 @@ export default function Customers() {
 
   return (
     <AppLayout>
-      <div className="px-4 py-3 lg:px-6 space-y-4 pb-24">
+      <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-24 lg:pb-12">
         {/* Compact stats row */}
         <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
           <span className="font-semibold text-foreground">{stats.total} clientes</span>
