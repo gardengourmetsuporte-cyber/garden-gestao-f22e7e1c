@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,9 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
+import { DeliveryMap } from '@/components/deliveries/DeliveryMap';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
-
-const DeliveryMap = lazy(() => import('@/components/deliveries/DeliveryMap').then(m => ({ default: m.DeliveryMap })));
 
 const STATUS_TABS: { key: DeliveryStatus | 'all'; label: string; icon: string }[] = [
   { key: 'all', label: 'Todas', icon: 'package_2' },
@@ -114,12 +113,10 @@ export default function Deliveries() {
 
         {/* Map or List view */}
         {viewMode === 'map' ? (
-          <Suspense fallback={<PageLoader />}>
-            <DeliveryMap
-              deliveries={deliveries}
-              onStatusChange={(id, status) => updateStatus({ id, status })}
-            />
-          </Suspense>
+          <DeliveryMap
+            deliveries={deliveries}
+            onStatusChange={(id, status) => updateStatus({ id, status })}
+          />
         ) : groupedByNeighborhood.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <AppIcon name="location_on" size={48} className="text-muted-foreground/30 mb-3" />
