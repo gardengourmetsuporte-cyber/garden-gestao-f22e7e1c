@@ -250,7 +250,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} loading="lazy" decoding="async" />
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">{activeUnit?.name || 'Garden'}</p>
+              <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
               <p className="text-[10px] text-emerald-400/50 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
           </div>

@@ -22,6 +22,7 @@ const NotificationSettings = lazy(() => import('@/components/settings/Notificati
 const AuditLogSettings = lazy(() => import('@/components/settings/AuditLogSettings').then(m => ({ default: m.AuditLogSettings })));
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const LoyaltySettings = lazy(() => import('@/components/settings/LoyaltySettings').then(m => ({ default: m.LoyaltySettings })));
+const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings').then(m => ({ default: m.AppearanceSettings })));
 interface MenuItem {
   value: string;
   icon: string;
@@ -35,6 +36,7 @@ interface MenuItem {
 const allMenuItems: MenuItem[] = [
   { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  { value: 'appearance', icon: 'Palette', label: 'Aparência', description: 'Tema claro ou escuro', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'team', icon: 'Users', label: 'Equipe', description: 'Membros, convites e níveis de acesso', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
@@ -91,7 +93,7 @@ export default function SettingsPage() {
     if (item.value === 'team') return isAdmin;
     if (item.value === 'audit-log') return isAdmin;
     if (item.value === 'medals') return isAdmin;
-    if (item.value === 'profile' || item.value === 'notifications') return true;
+    if (item.value === 'profile' || item.value === 'notifications' || item.value === 'appearance') return true;
     return isAdmin;
   });
 
@@ -123,6 +125,7 @@ export default function SettingsPage() {
   const settingsContent = activeSection ? (
     <Suspense fallback={<SettingsFallback />}>
       {activeSection === 'profile' && <ProfileSettings />}
+      {activeSection === 'appearance' && <AppearanceSettings />}
       {activeSection === 'categories' && <CategorySettings />}
       {activeSection === 'suppliers' && <SupplierSettings />}
       {activeSection === 'checklists' && <ChecklistSettingsManager />}

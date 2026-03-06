@@ -20,7 +20,7 @@ const nameSchema = z.string().min(2, 'Nome deve ter no mínimo 2 caracteres');
 // ── Brand Panel (left half on desktop) ─────────────────────────────
 function BrandPanel() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-[#000000]">
+    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-[hsl(220,20%,3%)]">
       {/* Subtle grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.05]"
@@ -112,7 +112,7 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-[#000000]"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-[hsl(220,20%,3%)]"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
       }}
@@ -364,7 +364,7 @@ export default function Auth() {
           : 'Preencha os dados para começar';
 
   return (
-    <div className="dark min-h-[100dvh] flex flex-row bg-[#000000] text-foreground">
+    <div className="min-h-[100dvh] flex flex-row bg-background text-foreground">
       {/* ── LEFT: Brand Panel (desktop) ── */}
       <BrandPanel />
 
@@ -372,7 +372,7 @@ export default function Auth() {
       <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0 bg-background">
         {/* Top bar - absolute on mobile to overlay the navy banner seamlessly */}
         <div className="flex items-center justify-between px-5 absolute top-0 left-0 right-0 z-20 lg:relative" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground -ml-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
