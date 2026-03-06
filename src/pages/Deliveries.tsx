@@ -122,7 +122,6 @@ export default function Deliveries() {
               onStatusChange={(id, status) => updateStatus({ id, status })}
               onRefresh={invalidate}
             />
-            />
           </div>
 
           {/* List */}

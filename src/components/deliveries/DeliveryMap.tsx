@@ -54,6 +54,7 @@ async function geocodeAddress(address: string, city: string): Promise<{ lat: num
 
 interface Props {
   deliveries: Delivery[];
+  unitName?: string;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onRefresh?: () => void;
 }
