@@ -231,15 +231,6 @@ function MoreButton({ moreOpen, slotWidth, onToggle }: { moreOpen: boolean; slot
         <div className="w-full h-full bg-background rounded-t-[14px]" />
       </div>
 
-      {/* Green dot */}
-      <div
-        className={cn(
-          "absolute left-1/2 -translate-x-1/2 transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-          moreOpen ? "-top-1 opacity-100 scale-100 duration-400" : "top-2 opacity-0 scale-0 duration-200"
-        )}
-      >
-        <div className="w-[5px] h-[5px] rounded-full bg-primary tab-dot-glow" />
-      </div>
 
       <div
         className="relative"

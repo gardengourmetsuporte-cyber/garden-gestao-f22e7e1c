@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ import { FinanceTab, TransactionType } from '@/types/finance';
 
 function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
   const [bouncing, setBouncing] = useState(false);
+  const handledByPointer = useRef(false);
 
   const handleTap = () => {
     navigator.vibrate?.(10);
@@ -15,28 +16,67 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
     setTimeout(() => {
       setBouncing(false);
       onTabChange(tab.id);
-    }, 120);
+    }, 150);
   };
 
   return (
     <button
-      onClick={handleTap}
+      onPointerDown={(e) => {
+        if (e.pointerType === 'mouse') return;
+        e.preventDefault();
+        handledByPointer.current = true;
+        handleTap();
+      }}
+      onClick={() => {
+        if (handledByPointer.current) {
+          handledByPointer.current = false;
+          return;
+        }
+        handleTap();
+      }}
       className={cn(
-        "flex flex-col items-center justify-center h-full gap-0.5 relative z-10",
+        "flex flex-col items-center justify-center h-full gap-0.5 relative",
         "text-muted-foreground"
       )}
       style={{ width: '20%' }}
     >
+      {/* Active bump */}
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 bottom-full pointer-events-none transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          active ? "w-14 h-3.5 opacity-100 duration-400" : "w-8 h-0 opacity-0 duration-200"
+        )}
+      >
+        <div className="w-full h-full bg-background rounded-t-[14px]" />
+      </div>
+
+      {/* Icon */}
       <div
         className="relative"
         style={{
-          transform: bouncing ? 'scale(0.85)' : (active ? 'scale(1.1)' : 'scale(1)'),
-          transition: bouncing ? 'transform 60ms ease-in' : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: bouncing
+            ? 'scale(0.82) translateY(1px)'
+            : active
+              ? 'scale(1.12) translateY(-2px)'
+              : 'scale(1)',
+          transition: bouncing
+            ? 'transform 100ms cubic-bezier(0.2, 0, 0, 1)'
+            : 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={active ? 'tab-icon-galaxy' : ''} />
+        {/* Ambient glow */}
+        <div
+          className={cn(
+            "absolute inset-0 rounded-full transition-all duration-500",
+            active ? "opacity-100 scale-[2.2]" : "opacity-0 scale-100"
+          )}
+          style={{
+            background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
+          }}
+        />
+        <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : '')} />
       </div>
-      <span className={cn("text-[10px]", active ? "font-semibold tab-icon-galaxy-text" : "font-normal")}>{tab.label}</span>
+      <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal")}>{tab.label}</span>
     </button>
   );
 }
@@ -66,7 +106,6 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
         navigate('/');
         return;
       }
-      // Already on this tab — scroll to top
       const scrollable = document.querySelector('[data-scroll-container]')
         || document.querySelector('.flex-1.overflow-y-auto')
         || document.querySelector('main');
@@ -129,47 +168,41 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
         </div>
       )}
 
-      <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50"
-      >
-        {/* Subtle top separator */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-border/15" />
+      <nav className="fixed bottom-0 left-0 right-0 lg:hidden z-50">
+        {/* Top separator with ambient glow */}
+        <div className="absolute top-0 left-0 right-0 h-px">
+          <div className="absolute inset-0 bg-border/8" />
+          <div className="absolute left-1/2 -translate-x-1/2 w-32 h-px bg-primary/20 blur-sm" />
+        </div>
 
-        {/* Bar background */}
         <div
           className="relative bg-background"
-          style={{
-            paddingBottom: 'env(safe-area-inset-bottom)',
-          }}
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
-          {/* FAB floating above the notch */}
-          <div className="absolute left-1/2 -translate-x-1/2 -top-[28px] z-20">
+          {/* FAB */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[22px] z-20">
             <div className="fab-cradle-ring">
               <button
                 onClick={() => { navigator.vibrate?.(10); setMenuOpen(!menuOpen); }}
                 className={cn(
-                  "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-200 fab-gradient",
+                  "w-[44px] h-[44px] rounded-full flex items-center justify-center fab-button-glow",
+                  "bg-primary",
                   menuOpen ? "rotate-45 scale-95" : "hover:scale-[1.08] active:scale-[0.92]"
                 )}
-                style={{
-                  boxShadow: '0 4px 20px rgba(16,185,129,0.35), 0 8px 32px rgba(0,0,0,0.2)',
-                }}
+                style={{ transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}
               >
                 <AppIcon name="Plus" size={20} className="relative z-10 text-white" />
               </button>
             </div>
           </div>
 
-          <div className="flex items-center h-[68px] max-w-lg mx-auto relative tabbar-notch-shell">
-            {/* Left tabs */}
+          <div className="flex items-center h-[64px] max-w-lg mx-auto relative z-10 tabbar-notch-shell overflow-visible">
             {tabs.slice(0, 2).map(tab => (
               <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
             ))}
 
-            {/* Center spacer for notch */}
             <div style={{ width: '20%' }} />
 
-            {/* Right tabs */}
             {tabs.slice(2, 4).map(tab => (
               <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
             ))}
