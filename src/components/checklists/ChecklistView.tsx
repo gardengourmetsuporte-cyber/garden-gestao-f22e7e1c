@@ -527,7 +527,7 @@ export function ChecklistView({
                                   isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                     : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
                                     : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
-                                )}
+                                 )}
                                 style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
                                   backgroundColor: getItemPointsColors(pointsAwarded).bg,
                                   color: getItemPointsColors(pointsAwarded).color,
@@ -536,7 +536,10 @@ export function ChecklistView({
                                   {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                     : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
                                     : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
-                                    : (<div className="flex items-center gap-0.5"><AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} /><span className="ml-0.5">+{pointsAwarded}</span></div>)}
+                                    : (<div className="flex items-center gap-1">
+                                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(pointsAwarded).color }} />
+                                        <span>+{pointsAwarded}</span>
+                                      </div>)}
                                 </div>
                               </div>
                               {isContested && contestedReason && (
@@ -802,13 +805,13 @@ export function ChecklistView({
                             )}
                             {configuredPoints > 0 && (
                               <div className="mt-1.5">
-                                <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
+                                <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
                                   style={{
                                     backgroundColor: getItemPointsColors(configuredPoints).bg,
                                     color: getItemPointsColors(configuredPoints).color,
                                     borderColor: getItemPointsColors(configuredPoints).border,
                                   }}>
-                                  <AppIcon name="Zap" className="w-3 h-3" />
+                                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
                                   +{configuredPoints} pts
                                 </span>
                               </div>
@@ -901,8 +904,8 @@ export function ChecklistView({
                                   <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
                                   <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
                                     {configuredPoints > 0 ? (
-                                      <div className="flex items-center gap-0.5 mt-0.5"><AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} />
-                                        <span className="text-xs font-bold ml-0.5" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span></div>
+                                      <div className="flex items-center gap-1 mt-0.5"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
+                                        <span className="text-xs font-bold" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span></div>
                                     ) : (<span className="text-xs text-muted-foreground">Tarefa sem pontos</span>)}
                                   </div>
                                 </button>
@@ -1059,13 +1062,9 @@ export function ChecklistView({
                                           {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                             : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
                                             : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
-                                            : (<div className="flex items-center gap-0.5">
-                                                {pointsAwarded > 0 && !isBonus && Array.from({ length: pointsAwarded }).map((_, i) => {
-                                                  const colors = getItemPointsColors(pointsAwarded);
-                                                  return <AppIcon name="Star" key={i} className="w-3 h-3" style={{ color: colors.color, fill: colors.color }} />;
-                                                })}
-                                                {isBonus && <AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(pointsAwarded).color }} />}
-                                                <span className="ml-0.5">+{pointsAwarded}</span>
+                                            : (<div className="flex items-center gap-1">
+                                                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(pointsAwarded).color }} />
+                                                <span>+{pointsAwarded}</span>
                                               </div>)}
                                         </div>
                                       </div>
@@ -1320,13 +1319,13 @@ export function ChecklistView({
                                     )}
                                     {configuredPoints > 0 && (
                                       <div className="mt-1.5">
-                                        <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
+                                        <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
                                           style={{
                                             backgroundColor: getItemPointsColors(configuredPoints).bg,
                                             color: getItemPointsColors(configuredPoints).color,
                                             borderColor: getItemPointsColors(configuredPoints).border,
                                           }}>
-                                          {isBonus ? <AppIcon name="Zap" className="w-3 h-3" /> : <AppIcon name="Star" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />}
+                                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
                                           +{configuredPoints} pts
                                         </span>
                                       </div>
