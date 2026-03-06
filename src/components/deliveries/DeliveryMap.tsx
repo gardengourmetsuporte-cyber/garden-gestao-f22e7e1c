@@ -179,12 +179,12 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
     };
   }, [withCoords, buildPopup]);
 
-  const handleGeocode = async () => {
-    if (withoutCoords.length === 0) return;
+  const handleGeocode = useCallback(async (toGeocode: Delivery[]) => {
+    if (toGeocode.length === 0) return;
     setIsGeocoding(true);
     let success = 0;
 
-    for (const delivery of withoutCoords) {
+    for (const delivery of toGeocode) {
       const addr = delivery.address;
       if (!addr) continue;
 
@@ -212,16 +212,15 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
     } else {
       toast.error('Não foi possível localizar os endereços');
     }
-  };
+  }, [onRefresh]);
 
   // Auto-geocode on first render when deliveries lack coords
   useEffect(() => {
     if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
       geocodedRef.current = true;
-      handleGeocode();
+      handleGeocode(withoutCoords);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withoutCoords.length]);
+  }, [withoutCoords.length, handleGeocode, isGeocoding]);
 
   return (
     <div className="space-y-2">
@@ -238,7 +237,7 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
             size="sm"
             variant="outline"
             className="h-7 text-xs shrink-0 px-2.5"
-            onClick={handleGeocode}
+            onClick={() => handleGeocode(withoutCoords)}
             disabled={isGeocoding}
           >
             {isGeocoding ? 'Aguarde' : 'Localizar'}
