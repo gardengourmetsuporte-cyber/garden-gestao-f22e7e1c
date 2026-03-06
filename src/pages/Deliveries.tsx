@@ -27,6 +27,7 @@ const STAT_CONFIG = [
 ];
 
 export default function Deliveries() {
+  const { activeUnit } = useUnit();
   const {
     deliveries,
     groupedByNeighborhood,
