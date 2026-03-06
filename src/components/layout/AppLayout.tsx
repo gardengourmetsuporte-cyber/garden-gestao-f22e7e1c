@@ -49,6 +49,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const isDashboard = location.pathname === '/';
   const moduleTitle = useMemo(() => getRouteTitle(location.pathname), [location.pathname]);
   const [isLgScreen, setIsLgScreen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');
     const onChange = () => setIsLgScreen(mql.matches);
