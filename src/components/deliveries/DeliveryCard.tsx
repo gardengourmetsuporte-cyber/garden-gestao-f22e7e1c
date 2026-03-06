@@ -32,7 +32,10 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick }: Props) {
     : null;
 
   return (
-    <div className="group rounded-xl bg-background/50 hover:bg-background/80 border border-border/20 hover:border-border/40 transition-all duration-200 p-3">
+    <div
+      className="group rounded-xl bg-background/50 hover:bg-background/80 border border-border/20 hover:border-border/40 transition-all duration-200 p-3 cursor-pointer active:scale-[0.98]"
+      onClick={() => onCardClick?.(delivery.id)}
+    >
       {/* Top row: avatar + info + status */}
       <div className="flex items-start gap-3">
         {/* Status indicator */}
