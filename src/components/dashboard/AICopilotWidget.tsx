@@ -38,62 +38,62 @@ export function AICopilotWidget() {
   const lastAssistantMsg = messages.filter(m => m.role === 'assistant').at(-1);
 
   return (
-    <div className="col-span-2 rounded-2xl bg-card overflow-hidden animate-slide-up stagger-2 relative">
-      {/* Subtle glow */}
-      <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-10 blur-2xl pointer-events-none bg-primary" />
-
-      {/* Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between text-left"
-      >
-        <div className="flex items-center gap-3">
-          <img src={mascotImg} alt="Garden Copiloto" className="w-9 h-9 rounded-xl object-cover" />
-          <div>
-            <span className="text-sm font-bold text-foreground leading-none">Copiloto IA</span>
-            <span className="text-[10px] text-muted-foreground block mt-0.5">Seu assistente de gestão</span>
+    <div className="col-span-2 rounded-2xl overflow-hidden animate-slide-up stagger-2 relative">
+      {/* Collapsed: Greeting card style */}
+      {!expanded && (
+        <div
+          onClick={() => setExpanded(true)}
+          className="card-stat-holo p-4 flex items-center gap-3 cursor-pointer group"
+        >
+          <img src={mascotImg} alt="Garden Copiloto" className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary/20 shrink-0" />
+          <div className="flex-1 min-w-0">
+            {lastAssistantMsg ? (
+              <>
+                <p className="text-xs font-semibold text-foreground leading-tight">Copiloto IA</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 mt-0.5">
+                  {lastAssistantMsg.content}
+                </p>
+              </>
+            ) : isLoading ? (
+              <>
+                <p className="text-xs font-semibold text-foreground leading-tight">Copiloto IA</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="text-[10px] text-muted-foreground ml-1">Analisando...</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-bold text-foreground leading-tight">Olá! Sou seu Copiloto 🌿</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Seu assistente de gestão</p>
+              </>
+            )}
           </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          {messages.length > 2 && (
-            <span className="text-[9px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">
-              {messages.length} msgs
-            </span>
-          )}
-          <AppIcon
-            name={expanded ? "ChevronUp" : "ChevronDown"}
-            size={16}
-            className="text-muted-foreground"
-          />
-        </div>
-      </button>
-
-      {/* Collapsed: show last message preview */}
-      {!expanded && lastAssistantMsg && (
-        <div className="px-4 pb-3">
-          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-            {lastAssistantMsg.content}
-          </p>
-        </div>
-      )}
-
-      {/* Loading state for initial greeting */}
-      {!expanded && !lastAssistantMsg && isLoading && (
-        <div className="px-4 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center group-hover:bg-primary/25 transition-colors">
+              <AppIcon name="MessageCircle" size={16} className="text-primary" />
             </div>
-            <span className="text-[10px] text-muted-foreground">Analisando seu dia...</span>
           </div>
         </div>
       )}
 
       {/* Expanded: full chat */}
       {expanded && (
-        <div className="px-4 pb-4 space-y-3">
+        <div className="card-stat-holo rounded-2xl overflow-hidden">
+          {/* Chat header */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border/30">
+            <img src={mascotImg} alt="Copiloto" className="w-8 h-8 rounded-xl object-cover" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-foreground">Copiloto IA</p>
+              <p className="text-[10px] text-muted-foreground">Online</p>
+            </div>
+            <button onClick={() => setExpanded(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors">
+              <AppIcon name="X" size={14} className="text-muted-foreground" />
+            </button>
+          </div>
+          <div className="px-4 pb-4 pt-3 space-y-3">
           {/* Messages */}
           <div ref={messagesContainerRef} className="max-h-64 overflow-y-auto space-y-2 scrollbar-thin">
             {messages.map((msg, i) => (
@@ -141,6 +141,7 @@ export function AICopilotWidget() {
               Limpar histórico
             </button>
           )}
+        </div>
         </div>
       )}
     </div>
