@@ -476,12 +476,12 @@ export function AccessLevelSettings() {
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
-            <Button onClick={handleSave}>{editingLevel ? 'Salvar' : 'Criar'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <div className="flex gap-2 pt-3 border-t border-border/30">
+            <Button variant="outline" onClick={() => setIsCreating(false)} className="flex-1">Cancelar</Button>
+            <Button onClick={handleSave} className="flex-1">{editingLevel ? 'Salvar' : 'Criar'}</Button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Access Level Picker */}
       <ListPicker
