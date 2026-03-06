@@ -294,7 +294,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
               className={cn(
                 "relative flex gap-3 px-3 py-3 rounded-xl border transition-all duration-300 min-h-[52px]",
                 "card-surface border-white/5",
-                isNow && "border-primary/50 shadow-[0_0_20px_hsl(68_100%_50%/0.15)] ring-1 ring-primary/20",
+                isNow && "border-primary/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-primary/20",
                 isPast && !hasTasks && "opacity-40",
                 hasTasks && "shadow-sm border-white/10",
               )}

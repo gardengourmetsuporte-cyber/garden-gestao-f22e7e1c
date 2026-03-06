@@ -54,7 +54,7 @@ export function QuotationList() {
               <div
                 key={q.id}
                 onClick={() => setSelectedQuotation(q)}
-                className="bg-secondary rounded-2xl border border-border/20 p-4 cursor-pointer transition-all hover:border-border/40 animate-fade-in"
+                className="bg-[#0a1a10] rounded-2xl border border-emerald-500/10 p-4 cursor-pointer transition-all hover:border-emerald-500/25 animate-fade-in"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="flex items-center justify-between">

@@ -12,7 +12,7 @@ export function CTASection() {
           className="relative rounded-[2.5rem] overflow-hidden p-10 sm:p-14 md:p-20 text-center border border-white/10"
           style={{
             background: 'linear-gradient(145deg, #050a05 0%, #0a150a 50%, #050a05 100%)',
-            boxShadow: '0 20px 80px -20px hsl(68 100% 50% / 0.15), inset 0 1px 1px rgba(255,255,255,0.05)'
+            boxShadow: '0 20px 80px -20px rgba(16,185,129,0.15), inset 0 1px 1px rgba(255,255,255,0.05)'
           }}
         >
           {/* Subtle Grid overlay */}

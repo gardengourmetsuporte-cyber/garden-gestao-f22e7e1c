@@ -69,11 +69,11 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
 
           {/* Quick info */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-border/20 bg-secondary/60 p-3 text-center">
+            <div className="rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60 p-3 text-center">
               <p className="text-lg font-bold text-amber-500">{customer.loyalty_points}</p>
               <p className="text-[10px] text-muted-foreground">Pontos Fidelidade</p>
             </div>
-            <div className="rounded-xl border border-border/20 bg-secondary/60 p-3 text-center">
+            <div className="rounded-xl border border-emerald-500/10 bg-[#0a1a10]/60 p-3 text-center">
               <p className="text-lg font-bold">{customer.visit_frequency_days ? `${Math.round(customer.visit_frequency_days)}d` : '-'}</p>
               <p className="text-[10px] text-muted-foreground">Freq. Visita</p>
             </div>

@@ -152,7 +152,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
       <div className="space-y-2">
         <p className="text-sm font-semibold text-foreground">Links dos Fornecedores</p>
         {suppliers.map(qs => (
-          <div key={qs.id} className="flex items-center gap-2 p-3 rounded-xl bg-secondary border border-border/20">
+          <div key={qs.id} className="flex items-center gap-2 p-3 rounded-xl bg-[#0a1a10] border border-emerald-500/10">
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm">{qs.supplier?.name}</p>
               <p className={cn(
@@ -170,7 +170,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
               <AppIcon name="Copy" className="w-3.5 h-3.5" />
             </Button>
             {qs.supplier?.phone && (
-              <Button size="sm" className="rounded-xl gap-1 bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => sendWhatsApp(qs)}>
+              <Button size="sm" className="rounded-xl gap-1 bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)]" onClick={() => sendWhatsApp(qs)}>
                 <AppIcon name="MessageCircle" className="w-3.5 h-3.5" />
               </Button>
             )}
@@ -185,7 +185,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
             <AppIcon name="Scale" className="w-4 h-4" />
             Comparação de Preços
           </p>
-           <div className="overflow-x-auto rounded-2xl border border-border/20 bg-secondary">
+           <div className="overflow-x-auto rounded-2xl border border-emerald-500/10 bg-[#0a1a10]">
              <table className="w-full text-sm">
                <thead>
                  <tr className="border-b border-emerald-500/10 bg-emerald-500/5">

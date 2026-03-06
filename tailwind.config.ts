@@ -24,20 +24,6 @@ export default {
         display: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
-        /* Emerald palette — restored */
-        emerald: {
-          50: 'hsl(152 81% 96%)',
-          100: 'hsl(149 80% 90%)',
-          200: 'hsl(152 76% 80%)',
-          300: 'hsl(156 72% 67%)',
-          400: 'hsl(158 64% 52%)',
-          500: 'hsl(160 84% 39%)',
-          600: 'hsl(161 94% 30%)',
-          700: 'hsl(163 94% 24%)',
-          800: 'hsl(163 88% 20%)',
-          900: 'hsl(164 86% 16%)',
-          950: 'hsl(166 91% 9%)',
-        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -129,8 +115,8 @@ export default {
           "50%": { opacity: "1" },
         },
         "glow-border": {
-          "0%, 100%": { borderColor: "hsl(68 100% 50% / 0.2)" },
-          "50%": { borderColor: "hsl(68 100% 50% / 0.45)" },
+          "0%, 100%": { borderColor: "hsl(156 72% 40% / 0.2)" },
+          "50%": { borderColor: "hsl(156 72% 40% / 0.45)" },
         },
         "task-complete": {
           "0%": { opacity: "1", transform: "translateX(0)" },

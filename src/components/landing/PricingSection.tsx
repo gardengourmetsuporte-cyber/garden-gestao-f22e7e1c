@@ -170,7 +170,7 @@ export function PricingSection() {
                 <button
                   onClick={() => setSelectedPlan(plan)}
                   className={`group/btn mt-auto flex items-center justify-center gap-2 w-full h-14 rounded-xl font-bold text-base transition-all duration-300 active:scale-[0.98] ${plan.highlight
-                    ? "bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_30px_hsl(68_100%_50%/0.3)] hover:shadow-[0_0_40px_hsl(68_100%_50%/0.5)]"
+                    ? "bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)]"
                     : "bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/10"
                     }`}
                 >
