@@ -107,6 +107,13 @@ async function geocodeAddress(
   return null;
 }
 
+interface Props {
+  deliveries: Delivery[];
+  unitName?: string;
+  onStatusChange: (id: string, status: DeliveryStatus) => void;
+  onRefresh?: () => void;
+}
+
 export interface DeliveryMapHandle {
   focusDelivery: (deliveryId: string) => void;
 }
