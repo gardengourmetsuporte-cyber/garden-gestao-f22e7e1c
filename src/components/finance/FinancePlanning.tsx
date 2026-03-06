@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { formatCurrency } from '@/lib/format';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
