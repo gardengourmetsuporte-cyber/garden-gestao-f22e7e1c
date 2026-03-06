@@ -33,6 +33,7 @@ export default function Deliveries() {
     uploadPhoto,
     createDelivery,
     updateStatus,
+    invalidate,
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -114,6 +115,7 @@ export default function Deliveries() {
           <DeliveryMap
             deliveries={deliveries}
             onStatusChange={(id, status) => updateStatus({ id, status })}
+            onRefresh={invalidate}
           />
         ) : groupedByNeighborhood.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
