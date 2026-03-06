@@ -83,26 +83,25 @@ export default function Deliveries() {
         </div>
 
         {/* ── Filters ── */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+        <div className="grid grid-cols-4 gap-2">
           {FILTERS.map(({ key, label, icon: Icon }) => {
             const active = statusFilter === key;
+            const count = key === 'all' ? stats.total : stats[key];
             return (
               <button
                 key={key}
                 onClick={() => setStatusFilter(key)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${
+                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-200 ${
                   active
                     ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
                     : 'bg-card/70 text-muted-foreground border border-border/40 hover:bg-card hover:text-foreground'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-                {key !== 'all' && (
-                  <span className={`text-[10px] tabular-nums ${active ? 'opacity-80' : 'opacity-50'}`}>
-                    {stats[key]}
-                  </span>
-                )}
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+                <span className={`text-[10px] tabular-nums leading-none ${active ? 'opacity-80' : 'opacity-40'}`}>
+                  {count}
+                </span>
               </button>
             );
           })}
