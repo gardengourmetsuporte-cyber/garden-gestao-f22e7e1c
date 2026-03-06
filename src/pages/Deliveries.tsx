@@ -118,8 +118,10 @@ export default function Deliveries() {
           <div className="lg:col-span-2 lg:sticky lg:top-4">
             <DeliveryMap
               deliveries={deliveries}
+              unitName={activeUnit?.name || ''}
               onStatusChange={(id, status) => updateStatus({ id, status })}
               onRefresh={invalidate}
+            />
             />
           </div>
 
