@@ -203,7 +203,7 @@ function MobileBrandHeader() {
       </div>
 
       {/* Bottom overlay blending mask into page content */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[hsl(220,20%,3%)] to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-6 bg-background rounded-t-3xl" />
     </div>
   );

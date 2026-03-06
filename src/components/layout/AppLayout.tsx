@@ -8,6 +8,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { PointsDisplay } from '@/components/rewards/PointsDisplay';
 import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimationContext';
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
+import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
@@ -67,6 +68,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const { leaderboard } = useLeaderboard();
   const myPosition = useMemo(() => leaderboard.find(e => e.user_id === user?.id)?.rank, [leaderboard, user?.id]);
   const [notifOpen, setNotifOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -181,8 +183,15 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </button>
             </div>
 
-            {/* Right: Notifications + Avatar */}
+            {/* Right: Theme toggle + Notifications + Avatar */}
             <div className="flex items-center gap-0.5">
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted/40 transition-colors active:scale-90"
+                aria-label="Alternar tema"
+              >
+                <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={19} className="text-foreground/60" />
+              </button>
               <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
                 <DrawerTrigger asChild>
                   <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted/40 transition-colors active:scale-90">
