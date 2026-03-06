@@ -76,6 +76,7 @@ export function LandingNavbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-5">
+          <Link
             to="/auth"
             className="text-sm font-semibold text-white/70 hover:text-white transition-colors"
           >
