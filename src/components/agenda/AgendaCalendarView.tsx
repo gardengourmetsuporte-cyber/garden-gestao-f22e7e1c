@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, isBefore, startOfDay, addMonths, subMonths } from 'date-fns';
+import { format, isToday, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
+import { UnifiedMonthGrid } from '@/components/ui/unified-month-grid';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import type { ManagerTask } from '@/types/agenda';
 
 interface AgendaCalendarViewProps {
@@ -17,22 +19,12 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const days = useMemo(() => {
-    const start = startOfMonth(currentMonth);
-    const end = endOfMonth(currentMonth);
-    return eachDayOfInterval({ start, end });
-  }, [currentMonth]);
-
-  // Group tasks by date — only pending tasks (for past days = overdue indicators)
+  // Group tasks by date — only pending tasks
   const tasksByDate = useMemo(() => {
     const today = startOfDay(new Date());
     const map = new Map<string, ManagerTask[]>();
     tasks.forEach(task => {
       if (!task.due_date) return;
-      const taskDate = new Date(task.due_date + 'T12:00:00');
-      const isPast = isBefore(taskDate, today) && !isToday(taskDate);
-      // Past days: only show pending (overdue). Today/future: show pending only.
-      if (task.is_completed && isPast) return;
       if (task.is_completed) return;
       const key = task.due_date;
       if (!map.has(key)) map.set(key, []);
@@ -41,102 +33,32 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
     return map;
   }, [tasks]);
 
-  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-  // Get the first day of the month to calculate padding
-  const firstDayOfMonth = startOfMonth(currentMonth).getDay();
+  const getDayIndicators = (dateKey: string) => {
+    const dayTasks = tasksByDate.get(dateKey) || [];
+    if (dayTasks.length === 0) return [];
+    const taskDate = new Date(dateKey + 'T12:00:00');
+    const today = startOfDay(new Date());
+    const isOverdue = isBefore(taskDate, today) && !isToday(taskDate);
+    return dayTasks.slice(0, 3).map((task) => ({
+      color: isOverdue ? 'hsl(348, 83%, 65%)' : (task.category?.color || 'hsl(var(--primary))'),
+    }));
+  };
 
   return (
     <div className="space-y-4">
       {/* Month Navigation */}
-      <div className="flex items-center justify-between px-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-xl"
-          onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-        >
-          <AppIcon name="ChevronLeft" size={20} />
-        </Button>
-        <h2 className="text-lg font-semibold capitalize">
-          {format(currentMonth, "MMMM 'de' yyyy", { locale: ptBR })}
-        </h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-xl"
-          onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-        >
-          <AppIcon name="ChevronRight" size={20} />
-        </Button>
-      </div>
-
-      {/* Week Headers */}
-      <div className="grid grid-cols-7 gap-1">
-        {weekDays.map(day => (
-          <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
-            {day}
-          </div>
-        ))}
-      </div>
+      <UnifiedMonthNav
+        currentMonth={currentMonth}
+        onMonthChange={setCurrentMonth}
+      />
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-1">
-        {/* Empty cells for days before the first of the month */}
-        {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-          <div key={`empty-${i}`} className="aspect-square" />
-        ))}
-
-        {/* Day cells */}
-        {days.map(day => {
-          const dateKey = format(day, 'yyyy-MM-dd');
-          const dayTasks = tasksByDate.get(dateKey) || [];
-          const today = startOfDay(new Date());
-          const dayDate = new Date(dateKey + 'T12:00:00');
-          const isOverdue = isBefore(dayDate, today) && !isToday(dayDate) && dayTasks.length > 0;
-
-          return (
-            <button
-              key={day.toISOString()}
-              className={cn(
-                'aspect-square flex flex-col items-center justify-start p-1 rounded-xl transition-all',
-                'hover:bg-primary/5 hover:border hover:border-primary/20',
-                isToday(day) && 'card-surface shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-primary/30',
-                isOverdue && 'bg-rose-500/10 border border-rose-500/20',
-                !isSameMonth(day, currentMonth) && 'opacity-40'
-              )}
-              onClick={() => {
-                setSelectedDate(dateKey);
-              }}
-            >
-              <span className={cn(
-                'text-sm font-medium',
-                isToday(day) && 'text-emerald-400 font-bold drop-shadow-md',
-                isOverdue && 'text-rose-400 font-bold drop-shadow-md',
-                !isToday(day) && !isOverdue && 'text-foreground'
-              )}>
-                {format(day, 'd')}
-              </span>
-
-              {/* Task indicators — only pending */}
-              {dayTasks.length > 0 && (
-                <div className="flex gap-0.5 flex-wrap justify-center mt-0.5">
-                  {dayTasks.slice(0, 3).map((task) => (
-                    <div
-                      key={task.id}
-                      className="w-1.5 h-1.5 rounded-full shadow-sm"
-                      style={{
-                        backgroundColor: isOverdue ? 'hsl(348, 83%, 65%)' : (task.category?.color || 'transparent'),
-                        boxShadow: `0 0 4px ${isOverdue ? 'rgba(251,113,133,0.8)' : task.category?.color ? task.category.color + '80' : 'rgba(16,185,129,0.6)'}`
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <UnifiedMonthGrid
+        currentMonth={currentMonth}
+        selectedDate={selectedDate}
+        onSelectDate={(key) => setSelectedDate(key || null)}
+        getDayIndicators={getDayIndicators}
+      />
 
       {/* Selected Date Tasks */}
       {selectedDate && (
@@ -213,7 +135,6 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
           )}
         </div>
       )}
-
     </div>
   );
 }

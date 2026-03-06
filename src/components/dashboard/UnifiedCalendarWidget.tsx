@@ -1,17 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isBefore, startOfDay, addMonths, subMonths } from 'date-fns';
+import { format, isToday, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useDashboardCalendar } from '@/hooks/useDashboardCalendar';
-
 import { calendarEventColors } from '@/types/calendar';
-import type { CalendarDayEvents, CalendarEvent } from '@/types/calendar';
+import type { CalendarEvent } from '@/types/calendar';
 import { cn } from '@/lib/utils';
-
-const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+import { UnifiedMonthGrid } from '@/components/ui/unified-month-grid';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 
 export function UnifiedCalendarWidget() {
   const navigate = useNavigate();
@@ -19,52 +16,33 @@ export function UnifiedCalendarWidget() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const { eventsMap, isLoading } = useDashboardCalendar(currentMonth);
 
-
-  const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
-    const days: Date[] = [];
-    let day = calStart;
-    while (day <= calEnd) {
-      days.push(day);
-      day = addDays(day, 1);
-    }
-    return days;
-  }, [currentMonth]);
-
   const selectedEvents = selectedDate ? eventsMap.get(selectedDate) : null;
-
-  const hasEvents = (dateKey: string) => {
-    const ev = eventsMap.get(dateKey);
-    if (!ev) return false;
-    return ev.tasks.length > 0 || ev.finance.length > 0 || ev.marketing.length > 0 || ev.schedules.length > 0;
-  };
-
   const todayStart = startOfDay(new Date());
 
-  const getChips = (dateKey: string) => {
+  const getDayIndicators = (dateKey: string) => {
     const ev = eventsMap.get(dateKey);
     if (!ev) return [];
-    const chips: { type: string; color: string }[] = [];
-    // Show tasks (pending)
+    const day = new Date(dateKey + 'T12:00:00');
+    const isPast = isBefore(day, todayStart) && !isToday(day);
+    if (isPast) return [];
+
+    const chips: { color: string; className?: string }[] = [];
     const hasPendingTasks = ev.tasks.some(t => t.type === 'task_pending');
-    if (hasPendingTasks) chips.push({ type: 'task', color: calendarEventColors.task_pending });
-    if (ev.marketing.length > 0) chips.push({ type: 'marketing', color: calendarEventColors.marketing });
-    if (ev.schedules.length > 0) chips.push({ type: 'schedule', color: calendarEventColors.schedule });
+    if (hasPendingTasks) chips.push({ color: '', className: calendarEventColors.task_pending });
+    if (ev.marketing.length > 0) chips.push({ color: '', className: calendarEventColors.marketing });
+    if (ev.schedules.length > 0) chips.push({ color: '', className: calendarEventColors.schedule });
     const hasPeak = ev.finance.some(f => f.type === 'finance_peak' && f.subtitle === 'Acima da média');
-    if (hasPeak) chips.push({ type: 'finance_peak', color: calendarEventColors.finance_peak });
+    if (hasPeak) chips.push({ color: '', className: calendarEventColors.finance_peak });
     return chips;
   };
 
   return (
     <div className="col-span-2 animate-slide-up stagger-4">
-      <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+      <div className="space-y-2">
         {/* Header */}
         <button
           onClick={() => navigate('/calendar')}
-          className="flex items-center justify-between px-4 py-3 border-b border-border/30 w-full hover:bg-secondary/30 transition-colors"
+          className="flex items-center justify-between px-1 w-full hover:opacity-80 transition-opacity"
         >
           <div className="flex items-center gap-2">
             <AppIcon name="CalendarDays" size={16} className="text-primary" />
@@ -75,84 +53,26 @@ export function UnifiedCalendarWidget() {
             <AppIcon name="ChevronRight" size={14} className="text-muted-foreground" />
           </div>
         </button>
+
         {/* Month nav */}
-        <div className="flex items-center justify-center gap-1 py-1.5 border-b border-border/20">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
-            <AppIcon name="ChevronLeft" size={14} />
-          </Button>
-          <button
-            className="text-xs font-medium text-foreground capitalize px-2 py-1 rounded-md hover:bg-secondary/50 transition-colors"
-            onClick={() => setCurrentMonth(new Date())}
-          >
-            {format(currentMonth, 'MMM yyyy', { locale: ptBR })}
-          </button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
-            <AppIcon name="ChevronRight" size={14} />
-          </Button>
-        </div>
+        <UnifiedMonthNav
+          currentMonth={currentMonth}
+          onMonthChange={setCurrentMonth}
+        />
 
-        {/* Week headers */}
-        <div className="grid grid-cols-7 border-b border-border/20">
-          {weekDays.map(d => (
-            <div key={d} className="text-center py-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-              {d}
-            </div>
-          ))}
-        </div>
-
-        {/* Day cells */}
-        <div className="grid grid-cols-7">
-          {isLoading ? (
-            Array.from({ length: 35 }).map((_, i) => (
-              <div key={i} className="min-h-[3.5rem] p-1 border-b border-r border-border/15">
-                <Skeleton className="h-3 w-4 mb-1" />
-                <div className="flex gap-[2px]">
-                  <Skeleton className="w-[6px] h-[6px] rounded-full" />
-                </div>
-              </div>
-            ))
-          ) : calendarDays.map((day, i) => {
-            const dateKey = format(day, 'yyyy-MM-dd');
-            const inMonth = isSameMonth(day, currentMonth);
-            const today = isToday(day);
-            const isPast = isBefore(day, todayStart) && !today;
-            const selected = selectedDate === dateKey;
-            const chips = (inMonth && !isPast) ? getChips(dateKey) : [];
-
-            return (
-              <button
-                key={i}
-                onClick={() => !isPast && inMonth && setSelectedDate(selected ? null : dateKey)}
-                disabled={isPast || !inMonth}
-                className={cn(
-                  'relative min-h-[3.5rem] p-1 border-b border-r border-border/15 text-left transition-colors',
-                  !inMonth && 'opacity-15 pointer-events-none',
-                  inMonth && isPast && 'opacity-30 pointer-events-none',
-                  inMonth && !isPast && 'hover:bg-secondary/40',
-                  today && 'bg-primary/5',
-                  selected && 'bg-primary/10 ring-1 ring-primary/30'
-                )}
-              >
-                <span className={cn(
-                  'text-[11px] font-medium leading-none block mb-0.5',
-                  today ? 'text-primary font-bold' : 'text-foreground'
-                )}>
-                  {format(day, 'd')}
-                </span>
-                {chips.length > 0 && (
-                  <div className="flex flex-wrap gap-[2px]">
-                    {chips.map((c, j) => (
-                      <div key={j} className={cn('w-[6px] h-[6px] rounded-full', c.color)} />
-                    ))}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {/* Calendar Grid */}
+        <UnifiedMonthGrid
+          currentMonth={currentMonth}
+          selectedDate={selectedDate}
+          onSelectDate={(key) => setSelectedDate(key || null)}
+          getDayIndicators={getDayIndicators}
+          disablePast
+          compact
+          isLoading={isLoading}
+        />
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-x-3 gap-y-1 justify-center px-3 py-2 border-t border-border/20">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 justify-center px-3 py-1">
           {[
             { label: 'Tarefas', color: calendarEventColors.task_pending },
             { label: 'Marketing', color: calendarEventColors.marketing },
@@ -168,7 +88,7 @@ export function UnifiedCalendarWidget() {
 
         {/* Inline detail panel */}
         {selectedDate && selectedEvents && (
-          <div className="border-t border-border/30 p-3 space-y-3 bg-secondary/20 animate-slide-up">
+          <div className="rounded-2xl border border-border/30 p-3 space-y-3 bg-card animate-slide-up">
             <p className="text-xs font-semibold text-foreground capitalize">
               {format(new Date(selectedDate + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </p>
