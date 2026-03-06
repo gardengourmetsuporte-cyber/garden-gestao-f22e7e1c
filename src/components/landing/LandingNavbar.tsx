@@ -76,14 +76,6 @@ export function LandingNavbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-5">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Alternar tema"
-          >
-            <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={17} />
-          </button>
-          <Link
             to="/auth"
             className="text-sm font-semibold text-white/70 hover:text-white transition-colors"
           >
