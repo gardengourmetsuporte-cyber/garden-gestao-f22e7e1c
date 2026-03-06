@@ -230,7 +230,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             background: 'linear-gradient(145deg, rgba(3,18,8,0.7) 0%, rgba(8,38,24,0.7) 50%, rgba(3,18,8,0.7) 100%)',
           }}
         >
-          <div className="flex items-center gap-3 px-4 h-16 relative z-10">
+          <div className="flex items-center gap-2.5 px-3 h-16 relative z-10">
             <button
               onClick={() => navigate('/')}
               className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
@@ -238,8 +238,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               <img alt="Garden Gestão" className="w-7 h-7 object-contain" src={gardenLogo} loading="lazy" decoding="async" />
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-foreground truncate">{activeUnit?.name || 'Garden'}</p>
-              <p className="text-[10px] text-emerald-400/50 font-medium tracking-wide">Gestão Inteligente</p>
+              <p className="text-[13px] font-bold text-foreground truncate leading-tight">{activeUnit?.name || 'Garden'}</p>
+              <p className="text-[10px] text-muted-foreground/50 font-medium tracking-wide">Gestão Inteligente</p>
             </div>
             {/* Desktop theme toggle + notification bell */}
             <ThemeToggle className="w-8 h-8 rounded-lg hover:bg-white/10 text-foreground/60" />
