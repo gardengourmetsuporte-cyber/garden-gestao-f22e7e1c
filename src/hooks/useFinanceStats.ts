@@ -21,19 +21,50 @@ export function useFinanceStats(
   transactions: FinanceTransaction[],
   categories: FinanceCategory[]
 ) {
+  const normalizeCategoryName = useCallback((value?: string | null) => {
+    return (value || '').trim().toLocaleLowerCase('pt-BR');
+  }, []);
+
   // Stats by category (for pie chart)
-  // Build a flat lookup map for finding parents (categories array only has parents with nested subs)
-  // Also index by subcategory parent_id from transactions to handle cross-unit category references
+  // Build lookups by id and by normalized name to keep parent grouping stable
+  // even when transactions reference legacy/duplicated category ids.
   const parentLookup = useMemo(() => {
-    const map: Record<string, FinanceCategory> = {};
+    const byId: Record<string, FinanceCategory> = {};
+    const parentByName: Record<string, FinanceCategory> = {};
+    const subcategoryNameToParent: Record<string, FinanceCategory> = {};
+
     categories.forEach(c => {
-      map[c.id] = c; // parent maps to itself
+      byId[c.id] = c; // parent maps to itself
+      parentByName[normalizeCategoryName(c.name)] = c;
+
       c.subcategories?.forEach(sub => {
-        map[sub.id] = c; // subcategory maps to its PARENT
+        byId[sub.id] = c; // subcategory maps to its PARENT
+        subcategoryNameToParent[normalizeCategoryName(sub.name)] = c;
       });
     });
-    return map;
-  }, [categories]);
+
+    return { byId, parentByName, subcategoryNameToParent };
+  }, [categories, normalizeCategoryName]);
+
+  const resolveParentCategory = useCallback((category?: FinanceCategory | null) => {
+    if (!category) return null;
+
+    const resolvedById = parentLookup.byId[category.id];
+    if (resolvedById) return resolvedById;
+
+    if (category.parent_id) {
+      const resolvedByParentId = parentLookup.byId[category.parent_id];
+      if (resolvedByParentId) return resolvedByParentId;
+    }
+
+    const resolvedBySubName = parentLookup.subcategoryNameToParent[normalizeCategoryName(category.name)];
+    if (resolvedBySubName) return resolvedBySubName;
+
+    const resolvedByParentName = parentLookup.parentByName[normalizeCategoryName(category.name)];
+    if (resolvedByParentName) return resolvedByParentName;
+
+    return category;
+  }, [parentLookup, normalizeCategoryName]);
 
   const expensesByCategory = useMemo((): CategoryStats[] => {
     const expenseTransactions = transactions.filter(
@@ -44,35 +75,24 @@ export function useFinanceStats(
       (sum, t) => sum + Number(t.amount), 0
     );
     
-    // Group by parent category
+    // Group by parent category (normalized name to collapse duplicated parent ids)
     const byCategory: Record<string, { amount: number; count: number; category: FinanceCategory }> = {};
-    
+
     expenseTransactions.forEach(t => {
-      let categoryData = t.category;
-      
-      // Resolve to parent category using lookup
+      const categoryData = resolveParentCategory(t.category);
+
       if (categoryData) {
-        const resolved = parentLookup[categoryData.id];
-        if (resolved) {
-          categoryData = resolved;
-        } else if (categoryData.parent_id) {
-          // Fallback: if not in lookup, try resolving via parent_id
-          const parentResolved = parentLookup[categoryData.parent_id];
-          if (parentResolved) {
-            categoryData = parentResolved;
-          }
+        const categoryKey = normalizeCategoryName(categoryData.name) || categoryData.id;
+
+        if (!byCategory[categoryKey]) {
+          byCategory[categoryKey] = { amount: 0, count: 0, category: categoryData };
         }
-      }
-      
-      if (categoryData) {
-        if (!byCategory[categoryData.id]) {
-          byCategory[categoryData.id] = { amount: 0, count: 0, category: categoryData };
-        }
-        byCategory[categoryData.id].amount += Number(t.amount);
-        byCategory[categoryData.id].count += 1;
+
+        byCategory[categoryKey].amount += Number(t.amount);
+        byCategory[categoryKey].count += 1;
       }
     });
-    
+
     return Object.values(byCategory)
       .map(item => ({
         category: item.category,
@@ -81,7 +101,7 @@ export function useFinanceStats(
         transactionCount: item.count
       }))
       .sort((a, b) => b.amount - a.amount);
-  }, [transactions, categories]);
+  }, [transactions, resolveParentCategory, normalizeCategoryName]);
 
   // Stats by subcategory (for drill-down)
   const getSubcategoryStats = useMemo(() => {
@@ -202,32 +222,22 @@ export function useFinanceStats(
     );
     
     const byCategory: Record<string, { amount: number; count: number; category: FinanceCategory }> = {};
-    
+
     incomeTransactions.forEach(t => {
-      let categoryData = t.category;
-      
-      // Resolve to parent category using lookup
+      const categoryData = resolveParentCategory(t.category);
+
       if (categoryData) {
-        const resolved = parentLookup[categoryData.id];
-        if (resolved) {
-          categoryData = resolved;
-        } else if (categoryData.parent_id) {
-          const parentResolved = parentLookup[categoryData.parent_id];
-          if (parentResolved) {
-            categoryData = parentResolved;
-          }
+        const categoryKey = normalizeCategoryName(categoryData.name) || categoryData.id;
+
+        if (!byCategory[categoryKey]) {
+          byCategory[categoryKey] = { amount: 0, count: 0, category: categoryData };
         }
-      }
-      
-      if (categoryData) {
-        if (!byCategory[categoryData.id]) {
-          byCategory[categoryData.id] = { amount: 0, count: 0, category: categoryData };
-        }
-        byCategory[categoryData.id].amount += Number(t.amount);
-        byCategory[categoryData.id].count += 1;
+
+        byCategory[categoryKey].amount += Number(t.amount);
+        byCategory[categoryKey].count += 1;
       }
     });
-    
+
     return Object.values(byCategory)
       .map(item => ({
         category: item.category,
@@ -236,7 +246,7 @@ export function useFinanceStats(
         transactionCount: item.count
       }))
       .sort((a, b) => b.amount - a.amount);
-  }, [transactions, categories]);
+  }, [transactions, resolveParentCategory, normalizeCategoryName]);
 
   // Daily expenses for timeline
   const dailyExpenses = useMemo(() => {
