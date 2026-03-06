@@ -11,10 +11,10 @@ import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardKPIGrid } from './DashboardKPIGrid';
 import { DashboardSection } from './DashboardSection';
-import { FinanceChartWidget } from './FinanceChartWidget';
-import { BillsDueWidget } from './BillsDueWidget';
-import { AIInsightsWidget } from './AIInsightsWidget';
-import { PendingOrdersWidget } from './PendingOrdersWidget';
+const FinanceChartWidget = lazy(() => import('./FinanceChartWidget').then(m => ({ default: m.FinanceChartWidget })));
+const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
+const AIInsightsWidget = lazy(() => import('./AIInsightsWidget').then(m => ({ default: m.AIInsightsWidget })));
+const PendingOrdersWidget = lazy(() => import('./PendingOrdersWidget').then(m => ({ default: m.PendingOrdersWidget })));
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,14 +105,16 @@ export function AdminDashboard() {
           case 'finance-chart':
             return hasAccess('finance') ? (
               <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
-                <FinanceChartWidget />
+                <LazyWidget><FinanceChartWidget /></LazyWidget>
               </DashboardSection>
             ) : null;
 
           case 'bills-due':
             return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
               <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
-                <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
+                <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
+                  <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
+                </Suspense>
               </div>
             ) : null;
 
