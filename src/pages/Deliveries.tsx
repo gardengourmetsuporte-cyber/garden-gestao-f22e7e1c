@@ -10,7 +10,7 @@ import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
-import { Truck, Clock, CheckCircle2, Package, MapPin, Filter } from 'lucide-react';
+import { Truck, Clock, CheckCircle2, Package, MapPin, Filter, ChevronDown } from 'lucide-react';
 
 const FILTERS: { key: DeliveryStatus | 'all'; label: string; icon: typeof Package }[] = [
   { key: 'all', label: 'Todas', icon: Package },
