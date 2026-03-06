@@ -24,8 +24,8 @@ export interface NavItem {
  * Plan locks are applied visually (gem icon + redirect to /plans) by each surface.
  */
 export const NAV_ITEMS: NavItem[] = [
-  // ── Principal ──
-  { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'principal', groupLabel: 'Principal' },
+  // ── Início ──
+  { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'principal', groupLabel: 'Início' },
 
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
