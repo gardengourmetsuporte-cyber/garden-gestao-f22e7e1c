@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
+
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
