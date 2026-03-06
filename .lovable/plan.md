@@ -1,46 +1,45 @@
 
 
-## Lançamento em Lote no Estoque
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Problema
-A equipe marca itens em uma lousa durante o dia e precisa lançar tudo de uma vez no final da noite. Hoje, precisa abrir item por item para registrar cada movimentação.
+### O que muda
 
-### Solução
-Criar um **sheet de "Lançamento em Lote"** acessível por um botão no estoque. O fluxo:
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-1. Abre sheet com lista de todos os itens do estoque agrupados por categoria
-2. Cada item tem um campo de quantidade ao lado (inicialmente vazio/zero)
-3. Usuário toca no item ou digita a quantidade — só os que tiver valor serão lançados
-4. Toggle no topo para escolher se é Entrada ou Saída (default: Entrada)
-5. Botão "Confirmar X lançamentos" no final
-6. Registra todas as movimentações de uma vez
+### Conceito visual
 
-### UI
-- Botão "Lançar em lote" na barra de busca ou como segundo FAB/botão fixo
-- Sheet fullscreen com busca no topo
-- Itens em lista compacta: `[nome do item] [estoque atual] [+/-] [input qty]`
-- Botões rápidos +1, +5 ao lado de cada item
-- Badge mostrando quantos itens foram preenchidos
-- Botão fixo no rodapé: "Confirmar 5 lançamentos"
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-### Mudanças
+### Implementação
 
-**Novo arquivo: `src/components/inventory/BatchMovementSheet.tsx`**
-- Sheet fullscreen com lista de itens agrupados por categoria
-- Campo de quantidade por item com botões +1/+5
-- Toggle entrada/saída no topo
-- Busca para filtrar itens
-- Botão de confirmação que chama `registerMovement` para cada item com qty > 0
-- Campo de observação geral (opcional)
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
 
-**Arquivo: `src/pages/Inventory.tsx`**
-- Adicionar botão "Lançar em lote" (ícone `ListChecks`) ao lado da busca ou nas tabs
-- State para controlar abertura do BatchMovementSheet
-- Passar `items`, `categories` e `registerMovement` para o sheet
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
 
-### Fluxo técnico
-- Mantém um `Map<string, number>` com itemId → quantidade
-- No confirmar, itera sobre as entradas com qty > 0 e chama `registerMovement` sequencialmente
-- Toast com resumo: "X movimentações registradas"
-- Limpa o estado e fecha o sheet
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+
+### Resultado
+
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 
