@@ -66,21 +66,21 @@ function DateStrip({ days, selectedDate, onSelectDate, trailing }: {
               >
                 <span className={cn(
                   "text-[10px] font-medium uppercase leading-none",
-                  isSelected ? "text-foreground" : isDayToday ? "text-primary" : "text-muted-foreground"
+                  isSelected ? "text-primary" : isDayToday ? "text-primary/70" : "text-muted-foreground"
                 )}>
                   {format(day, 'EEE', { locale: ptBR }).slice(0, 3)}
                 </span>
                 <div className={cn(
-                  "w-[38px] h-[38px] rounded-full flex items-center justify-center transition-colors",
+                  "w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-300",
                   isSelected
-                    ? "finance-hero-card checklist-gradient-slow shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-primary/30"
+                    ? "bg-primary text-primary-foreground shadow-md"
                     : isDayToday
-                      ? "bg-primary/8"
+                      ? "ring-1.5 ring-primary/30 bg-primary/8"
                       : "hover:bg-secondary/60"
                 )}>
                   <span className={cn(
                     "text-sm font-bold leading-none",
-                    isSelected ? "text-white drop-shadow-md" : isDayToday ? "text-primary dark:text-emerald-400" : "text-foreground"
+                    isSelected ? "text-primary-foreground" : isDayToday ? "text-primary" : "text-foreground"
                   )}>
                     {format(day, 'dd')}
                   </span>
