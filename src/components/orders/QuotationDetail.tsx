@@ -89,8 +89,9 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   }, [comparison]);
 
   const getPublicUrl = (token: string) => {
-    const base = window.location.origin;
-    return `${base}/cotacao/${token}`;
+    // Always use published URL so suppliers don't need Lovable auth
+    const publishedUrl = import.meta.env.VITE_PUBLISHED_URL || window.location.origin;
+    return `${publishedUrl}/cotacao/${token}`;
   };
 
   const copyLink = (token: string) => {
