@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
+
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -76,13 +76,6 @@ export function LandingNavbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-5">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Alternar tema"
-          >
-            <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={17} />
-          </button>
           <Link
             to="/auth"
             className="text-sm font-semibold text-white/70 hover:text-white transition-colors"
@@ -106,13 +99,6 @@ export function LandingNavbar() {
           >
             Entrar
           </Link>
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Alternar tema"
-          >
-            <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={16} />
-          </button>
           <button
             onClick={() => setOpen(!open)}
             className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10 bg-white/5 border border-white/10"
