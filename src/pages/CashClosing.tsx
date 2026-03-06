@@ -46,7 +46,7 @@ export default function CashClosing() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
-          {isLoading ? (
+          <DesktopActionBar label="Novo Fechamento" onClick={() => setIsFormOpen(true)} />
             <div className="space-y-3">
               {[1, 2, 3].map(i => (
                 <Skeleton key={i} className="h-20 w-full rounded-2xl" />
