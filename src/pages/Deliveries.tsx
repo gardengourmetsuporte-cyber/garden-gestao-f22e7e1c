@@ -37,6 +37,11 @@ export default function Deliveries() {
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const mapHandleRef = useRef<DeliveryMapHandle>(null);
+
+  const handleCardClick = useCallback((deliveryId: string) => {
+    mapHandleRef.current?.focusDelivery(deliveryId);
+  }, []);
 
   useFabAction(
     { icon: 'add', label: 'Nova Entrega', onClick: () => setSheetOpen(true) },
