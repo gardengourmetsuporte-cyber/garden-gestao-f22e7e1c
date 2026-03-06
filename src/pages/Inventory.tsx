@@ -155,6 +155,7 @@ export default function InventoryPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12 overflow-x-hidden">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 relative z-10">
+          <DesktopActionBar label="Novo Item" onClick={() => { setEditingItem(null); setItemFormOpen(true); }} />
           {/* Subtle background glow */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 

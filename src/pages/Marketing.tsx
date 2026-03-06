@@ -80,6 +80,7 @@ export default function Marketing() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
+          <DesktopActionBar label="Novo Post" onClick={() => { setEditingPost(null); setPrefillDate(null); setPrefillTitle(''); setSheetOpen(true); }} />
           <div className="flex items-center justify-between mb-1">
             <AnimatedTabs
               tabs={[
