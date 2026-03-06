@@ -63,6 +63,7 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const geocodedRef = useRef(false);
 
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
   const withoutCoords = deliveries.filter(d => d.address && (!d.address.lat || !d.address.lng));
@@ -212,6 +213,15 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
       toast.error('Não foi possível localizar os endereços');
     }
   };
+
+  // Auto-geocode on first render when deliveries lack coords
+  useEffect(() => {
+    if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
+      geocodedRef.current = true;
+      handleGeocode();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withoutCoords.length]);
 
   return (
     <div className="space-y-1.5">
