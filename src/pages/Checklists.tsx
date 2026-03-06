@@ -1,429 +1,35 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { format, subDays, isToday as isDateToday } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { subDays } from 'date-fns';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useChecklists } from '@/hooks/useChecklists';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUnit } from '@/contexts/UnitContext';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
-import { ChecklistType } from '@/types/database';
 import { AppIcon } from '@/components/ui/app-icon';
-import { useFabAction } from '@/contexts/FabActionContext';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { getDeadlineInfo, shouldAutoClose } from '@/lib/checklistTiming';
-import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
-import { DeadlineSettingPopover } from '@/components/checklists/DeadlineSettingPopover';
-import { useChecklistTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
+import { getDeadlineInfo } from '@/lib/checklistTiming';
 import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
-
-// DateStrip now uses the unified component
 import { UnifiedDateStrip } from '@/components/ui/unified-date-strip';
+import { ChecklistTypeCard, ChecklistBonusCard } from '@/components/checklists/ChecklistTypeCards';
+import { useChecklistPage } from '@/hooks/checklists/useChecklistPage';
 
 export default function ChecklistsPage() {
-  const { isAdmin, user } = useAuth();
   const {
-    sectors,
-    completions,
-    completionsFetched,
-    isLoading,
-    addSector, updateSector, deleteSector, reorderSectors,
-    addSubcategory, updateSubcategory, deleteSubcategory, reorderSubcategories,
-    addItem, updateItem, deleteItem, reorderItems,
-    toggleCompletion, contestCompletion, splitCompletion, isItemCompleted, getCompletionProgress,
-    fetchCompletions,
-  } = useChecklists();
-
-  const queryClient = useQueryClient();
-  const { activeUnitId } = useUnit();
-  const { settings: deadlineSettings, updateDeadline, removeDeadline, isSaving: isSavingDeadline } = useChecklistDeadlines();
-  const [settingsMode, setSettingsMode] = useState(false);
-  const [checklistType, setChecklistType] = useState<ChecklistType>('abertura');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  const currentDate = format(selectedDate, 'yyyy-MM-dd');
-
-  // Timer mode
-  const {
-    isTimerMode, timerSettings, activeTimers,
-    validatePin, startTimer, finishTimer, cancelTimer, getActiveTimer, getUserActiveTimer, getTimeStats,
-  } = useChecklistTimer(checklistType, currentDate);
-
-  const [timeStatsMap, setTimeStatsMap] = useState<Map<string, ItemTimeStats>>(new Map());
-
-  // Fetch time stats when timer mode is active
-  useEffect(() => {
-    if (!isTimerMode || sectors.length === 0) return;
-    const itemIds: string[] = [];
-    sectors.forEach((s: any) => {
-      s.subcategories?.forEach((sub: any) => {
-        sub.items?.forEach((item: any) => {
-          if (item.is_active && item.checklist_type === checklistType) itemIds.push(item.id);
-        });
-      });
-    });
-    if (itemIds.length === 0) return;
-    getTimeStats(itemIds).then(stats => {
-      const map = new Map<string, ItemTimeStats>();
-      stats.forEach(s => map.set(s.itemId, s));
-      setTimeStatsMap(map);
-    });
-  }, [isTimerMode, sectors, checklistType, getTimeStats]);
-
-  // The settings type follows the checklist type
-  const settingsType = checklistType;
-  const setSettingsType = setChecklistType;
-
-  useFabAction(isAdmin ? { icon: settingsMode ? 'X' : 'Settings', label: settingsMode ? 'Voltar' : 'Configurar', onClick: () => setSettingsMode(!settingsMode) } : null, [isAdmin, settingsMode]);
-
-  // Fetch completions for abertura & fechamento to show progress on cards
-  const { data: aberturaCompletions = [] } = useQuery({
-    queryKey: ['card-completions', currentDate, 'abertura', activeUnitId],
-    queryFn: async () => {
-      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', 'abertura');
-      if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
-      const { data } = await q;
-      return data || [];
-    },
-    enabled: !!user && !!activeUnitId,
-    staleTime: 30_000,
-  });
-
-  const { data: fechamentoCompletions = [] } = useQuery({
-    queryKey: ['card-completions', currentDate, 'fechamento', activeUnitId],
-    queryFn: async () => {
-      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', 'fechamento');
-      if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
-      const { data } = await q;
-      return data || [];
-    },
-    enabled: !!user && !!activeUnitId,
-    staleTime: 30_000,
-  });
-
-  // Compute progress per type from sectors
-  const getTypeProgress = useMemo(() => {
-    const calc = (type: ChecklistType, completionsList: { item_id: string }[]) => {
-      let total = 0;
-      const completedIds = new Set(completionsList.map(c => c.item_id));
-      const validIds: string[] = [];
-      sectors.forEach((s: any) => {
-        s.subcategories?.forEach((sub: any) => {
-          sub.items?.forEach((item: any) => {
-            if (item.is_active && item.checklist_type === type) {
-              total++;
-              if (completedIds.has(item.id)) validIds.push(item.id);
-            }
-          });
-        });
-      });
-      const completed = validIds.length;
-      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-      return { completed, total, percent };
-    };
-    return {
-      abertura: calc('abertura', aberturaCompletions),
-      fechamento: calc('fechamento', fechamentoCompletions),
-    };
-  }, [sectors, aberturaCompletions, fechamentoCompletions]);
-  // ── Deadline logic (centralized) ──
-  const [deadlineLabel, setDeadlineLabel] = useState<Record<string, string>>({});
-
-  // Update countdown every 30s
-  useEffect(() => {
-    const update = () => {
-      const ab = getDeadlineInfo(currentDate, 'abertura', deadlineSettings);
-      const fe = getDeadlineInfo(currentDate, 'fechamento', deadlineSettings);
-      const bo = getDeadlineInfo(currentDate, 'bonus', deadlineSettings);
-
-      const nextLabels = {
-        abertura: ab?.label || '',
-        fechamento: fe?.label || '',
-        bonus: bo?.label || '',
-      };
-
-      setDeadlineLabel((prev) => {
-        if (
-          prev.abertura === nextLabels.abertura &&
-          prev.fechamento === nextLabels.fechamento &&
-          prev.bonus === nextLabels.bonus
-        ) {
-          return prev;
-        }
-        return nextLabels;
-      });
-    };
-    update();
-    const iv = setInterval(update, 30_000);
-    return () => clearInterval(iv);
-  }, [currentDate, deadlineSettings]);
-
-  // deadlinePassed recalculated alongside the label timer (every 30s)
-  const [deadlinePassed, setDeadlinePassed] = useState(() => {
-    const info = getDeadlineInfo(currentDate, checklistType, deadlineSettings);
-    return info?.passed ?? false;
-  });
-
-  // Keep deadlinePassed in sync with the 30s timer
-  useEffect(() => {
-    const update = () => {
-      const info = getDeadlineInfo(currentDate, checklistType, deadlineSettings);
-      setDeadlinePassed(info?.passed ?? false);
-    };
-    update();
-    const iv = setInterval(update, 30_000);
-    return () => clearInterval(iv);
-  }, [currentDate, checklistType, deadlineSettings]);
-
-  // ── Auto-close: mark pending items as skipped after deadline ──
-  const autoClosedRef = useRef<string>('');
-
-  useEffect(() => {
-    fetchCompletions(currentDate, checklistType);
-  }, [currentDate, checklistType, fetchCompletions]);
-
-  useEffect(() => {
-    const key = `${currentDate}|${checklistType}`;
-    if (autoClosedRef.current === key) return;
-    if (!deadlinePassed || !user?.id || !activeUnitId) return;
-    if (sectors.length === 0) return;
-    if (!completionsFetched) return;
-    // Only admins run auto-close to avoid concurrent writes
-    if (!isAdmin) { autoClosedRef.current = key; return; }
-    // Only auto-close for valid operational windows (today/yesterday)
-    if (!shouldAutoClose(currentDate, checklistType, deadlineSettings)) { autoClosedRef.current = key; return; }
-
-    // Gather all active item IDs for this type
-    const activeItemIds: string[] = [];
-    sectors.forEach((s: any) => {
-      if (checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus') {
-        s.subcategories?.forEach((sub: any) => {
-          sub.items?.forEach((item: any) => {
-            if (item.is_active && item.checklist_type === checklistType) {
-              activeItemIds.push(item.id);
-            }
-          });
-        });
-      }
-    });
-
-    const completedIds = new Set(completions.map(c => c.item_id));
-    const pendingIds = activeItemIds.filter(id => !completedIds.has(id));
-
-    if (pendingIds.length === 0) {
-      autoClosedRef.current = key;
-      return;
-    }
-
-    autoClosedRef.current = key;
-
-    // Fetch fresh completions to avoid race condition with stale cache
-    (async () => {
-      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', checklistType);
-      if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
-      const { data: freshCompletions } = await q;
-      const freshIds = new Set((freshCompletions || []).map((c: any) => c.item_id));
-      const realPending = pendingIds.filter(id => !freshIds.has(id));
-      if (realPending.length === 0) return;
-
-      const rows = realPending.map(itemId => ({
-        item_id: itemId,
-        checklist_type: checklistType,
-        completed_by: user.id,
-        date: currentDate,
-        awarded_points: false,
-        points_awarded: 0,
-        is_skipped: true,
-        unit_id: activeUnitId,
-      }));
-
-      const { error } = await supabase
-        .from('checklist_completions')
-        .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' });
-      if (error) {
-        console.error('Auto-close error:', error);
-        return;
-      }
-      fetchCompletions(currentDate, checklistType);
-      queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
-    })();
-  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, isAdmin, activeUnitId, fetchCompletions, queryClient]);
-
-  // Realtime: invalidate progress queries when completions change
-  useEffect(() => {
-    const channel = supabase
-      .channel('checklist-completions-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'checklist_completions' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, 'abertura', activeUnitId] });
-          queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, 'fechamento', activeUnitId] });
-          fetchCompletions(currentDate, checklistType);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentDate, activeUnitId, checklistType, queryClient, fetchCompletions]);
-
-  const handleToggleItem = async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => {
-    try {
-      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace);
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao marcar item');
-    }
-  };
-
-  const handleAddSector = async (data: { name: string; color: string }) => {
-    const scope = settingsType === 'bonus' ? 'bonus' : 'standard';
-    try {
-      const newSector = await addSector({ ...data, scope });
-      // Auto-create a default subcategory for bonus sectors
-      if (scope === 'bonus' && newSector?.id) {
-        await addSubcategory({ sector_id: newSector.id, name: 'Geral' });
-      }
-    } catch { toast.error('Erro ao criar setor'); }
-  };
-  const handleUpdateSector = async (id: string, data: { name?: string; color?: string }) => {
-    try { await updateSector(id, data); } catch { toast.error('Erro ao atualizar setor'); }
-  };
-  const handleDeleteSector = async (id: string) => {
-    try { await deleteSector(id); } catch { toast.error('Erro ao excluir setor'); }
-  };
-  const handleAddSubcategory = async (data: { sector_id: string; name: string }) => {
-    try { await addSubcategory(data); } catch { toast.error('Erro ao criar subcategoria'); }
-  };
-  const handleUpdateSubcategory = async (id: string, data: { name?: string }) => {
-    try { await updateSubcategory(id, data); } catch { toast.error('Erro ao atualizar subcategoria'); }
-  };
-  const handleDeleteSubcategory = async (id: string) => {
-    try { await deleteSubcategory(id); } catch { toast.error('Erro ao excluir subcategoria'); }
-  };
-  const handleAddItem = async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
-    try { await addItem(data); } catch (err: any) { console.error('addItem error:', err); toast.error(err?.message || 'Erro ao criar item'); }
-  };
-  const handleUpdateItem = async (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
-    try { await updateItem(id, data); } catch { toast.error('Erro ao atualizar item'); }
-  };
-  const handleDeleteItem = async (id: string) => {
-    try { await deleteItem(id); } catch { toast.error('Erro ao excluir item'); }
-  };
-
-  const [closingType, setClosingType] = useState<ChecklistType | null>(null);
-  const [sendingReminder, setSendingReminder] = useState(false);
-
-  const handleSendReminder = async () => {
-    if (!user?.id || !activeUnitId) return;
-    setSendingReminder(true);
-    try {
-      // Get all users in this unit (except current admin)
-      const { data: unitUsers } = await supabase
-        .from('user_units')
-        .select('user_id')
-        .eq('unit_id', activeUnitId)
-        .neq('user_id', user.id);
-
-      if (!unitUsers || unitUsers.length === 0) {
-        toast.info('Nenhum funcionário encontrado na unidade');
-        return;
-      }
-
-      const typeLabel = checklistType === 'abertura' ? 'Abertura' : checklistType === 'fechamento' ? 'Fechamento' : 'Bônus';
-      const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
-      const pending = progress.total - progress.completed;
-
-      const rows = unitUsers.map((u: any) => ({
-        user_id: u.user_id,
-        type: 'alert' as const,
-        title: `⏰ Finalize o Checklist de ${typeLabel}!`,
-        description: `Faltam ${pending} tarefa(s) e o prazo está acabando. Corra para completar!`,
-        origin: 'checklist' as const,
-        read: false,
-      }));
-
-      const { error } = await supabase.from('notifications').insert(rows as any);
-      if (error) throw error;
-
-      toast.success(`Lembrete enviado para ${unitUsers.length} funcionário(s)!`);
-    } catch (err) {
-      console.error('Reminder error:', err);
-      toast.error('Erro ao enviar lembrete');
-    } finally {
-      setSendingReminder(false);
-    }
-  };
-
-  const handleManualClose = async (type: ChecklistType) => {
-    if (!user?.id || !activeUnitId) return;
-    setClosingType(type);
-    try {
-      const activeItemIds: string[] = [];
-      sectors.forEach((s: any) => {
-        if (type === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus') {
-          s.subcategories?.forEach((sub: any) => {
-            sub.items?.forEach((item: any) => {
-              if (item.is_active && item.checklist_type === type) activeItemIds.push(item.id);
-            });
-          });
-        }
-      });
-
-      // Fetch fresh completions
-      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', type);
-      if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
-      const { data: fresh } = await q;
-      const doneIds = new Set((fresh || []).map((c: any) => c.item_id));
-      const pending = activeItemIds.filter(id => !doneIds.has(id));
-
-      if (pending.length === 0) {
-        toast.info('Todas as tarefas já estão concluídas!');
-        return;
-      }
-
-      const rows = pending.map(itemId => ({
-        item_id: itemId,
-        checklist_type: type,
-        completed_by: user.id,
-        date: currentDate,
-        awarded_points: false,
-        points_awarded: 0,
-        is_skipped: true,
-        unit_id: activeUnitId,
-      }));
-
-      const { error } = await supabase
-        .from('checklist_completions')
-        .upsert(rows, { onConflict: 'item_id,completed_by,date,checklist_type' });
-      if (error) throw error;
-
-      fetchCompletions(currentDate, checklistType);
-      queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, type, activeUnitId] });
-      toast.success(`${type === 'abertura' ? 'Abertura' : 'Fechamento'} encerrado — ${pending.length} tarefa(s) marcada(s) como não concluída(s)`);
-    } catch (err: any) {
-      console.error('Manual close error:', err);
-      toast.error('Erro ao encerrar checklist');
-    } finally {
-      setClosingType(null);
-    }
-  };
+    isAdmin, user, sectors, completions, isLoading,
+    settingsMode, setSettingsMode, checklistType, setChecklistType,
+    selectedDate, setSelectedDate, currentDate,
+    settingsType, setSettingsType,
+    deadlineSettings, updateDeadline, removeDeadline, isSavingDeadline,
+    deadlineLabel, deadlinePassed,
+    closingType, sendingReminder,
+    getTypeProgress,
+    isTimerMode, timerSettings, timeStatsMap,
+    getActiveTimer, getUserActiveTimer, startTimer, finishTimer, cancelTimer, validatePin,
+    handleToggleItem, handleAddSector, handleUpdateSector, handleDeleteSector,
+    handleAddSubcategory, handleUpdateSubcategory, handleDeleteSubcategory,
+    handleAddItem, handleUpdateItem, handleDeleteItem,
+    handleSendReminder, handleManualClose,
+    reorderSectors, reorderSubcategories, reorderItems,
+    isItemCompleted, getCompletionProgress, contestCompletion, splitCompletion,
+  } = useChecklistPage();
 
   if (isLoading) {
     return (
@@ -441,47 +47,45 @@ export default function ChecklistsPage() {
     );
   }
 
+  const today = new Date();
+  const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
+
+  const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
+    const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+    if (progress.percent === 100 || progress.total === 0) return null;
+    return (
+      <button
+        onClick={handleSendReminder}
+        disabled={sendingReminder}
+        title="Lembrar equipe de completar o checklist"
+        className={cn(
+          "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
+          "hover:bg-amber-500/10 active:scale-95",
+          sendingReminder && "opacity-60 pointer-events-none"
+        )}
+      >
+        <AppIcon name="notifications" size={14} fill={0} className={cn("text-muted-foreground/60", sendingReminder && "animate-bounce text-amber-500")} />
+      </button>
+    );
+  })() : null;
+
+  const sharedCardProps = {
+    settingsMode, isAdmin, currentDate, deadlineSettings,
+    updateDeadline, removeDeadline, isSavingDeadline,
+    closingType, onManualClose: handleManualClose,
+  };
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
         <div className="px-4 py-3 lg:px-6 space-y-5 lg:max-w-4xl lg:mx-auto">
           <div className="animate-fade-in space-y-5" key={settingsMode ? 'settings' : 'view'}>
-            {/* Scrollable Date Strip — only in view mode */}
-            {!settingsMode && (() => {
-              const today = new Date();
-              const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
+            {/* Date Strip */}
+            {!settingsMode && (
+              <UnifiedDateStrip days={days} selectedDate={selectedDate} onSelectDate={setSelectedDate} trailing={reminderBtn} />
+            )}
 
-              const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
-                const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
-                if (progress.percent === 100 || progress.total === 0) return null;
-                return (
-                  <button
-                    onClick={handleSendReminder}
-                    disabled={sendingReminder}
-                    title="Lembrar equipe de completar o checklist"
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
-                      "hover:bg-amber-500/10 active:scale-95",
-                      sendingReminder && "opacity-60 pointer-events-none"
-                    )}
-                  >
-                    <AppIcon name="notifications" size={14} fill={0} className={cn("text-muted-foreground/60", sendingReminder && "animate-bounce text-amber-500")} />
-                  </button>
-                );
-              })() : null;
-
-              return (
-                <UnifiedDateStrip
-                  days={days}
-                  selectedDate={selectedDate}
-                  onSelectDate={setSelectedDate}
-                  trailing={reminderBtn}
-                />
-              );
-            })()}
-
-
-            {/* Settings mode header banner */}
+            {/* Settings mode header */}
             {settingsMode && (
               <div className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 border border-primary/20">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -491,293 +95,46 @@ export default function ChecklistsPage() {
                   <h2 className="font-semibold text-sm text-foreground">Modo Configuração</h2>
                   <p className="text-[11px] text-muted-foreground">Editando {checklistType === 'bonus' ? 'Bônus' : checklistType === 'abertura' ? 'Abertura' : 'Fechamento'}</p>
                 </div>
-                <button
-                  onClick={() => setSettingsMode(false)}
-                  className="p-2 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors"
-                >
+                <button onClick={() => setSettingsMode(false)} className="p-2 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors">
                   <AppIcon name="X" size={16} className="text-muted-foreground" />
                 </button>
               </div>
             )}
 
-            {/* Checklist Type Cards — always visible */}
+            {/* Type Cards */}
             <div className="grid grid-cols-2 gap-3">
-              {/* Abertura Card */}
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => setChecklistType('abertura')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setChecklistType('abertura');
-                  }
-                }}
-                className={cn(
-                  "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
-                  checklistType === 'abertura'
-                    ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
-                    : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
-                )}
-              >
-                {settingsMode && isAdmin && (
-                  <DeadlineSettingPopover
-                    type="abertura"
-                    currentSetting={deadlineSettings.find(s => s.checklist_type === 'abertura') || null}
-                    onSave={updateDeadline}
-                    onRemove={removeDeadline}
-                    isSaving={isSavingDeadline}
-                  />
-                )}
-                <div className="flex items-center gap-3 mb-3">
-                  <AppIcon
-                    name={getTypeProgress.abertura.percent === 100 ? 'check_circle' : 'Sun'}
-                    size={22}
-                    fill={getTypeProgress.abertura.percent === 100 ? 1 : 0}
-                    className={cn(
-                      "transition-colors",
-                      getTypeProgress.abertura.percent === 100 ? "text-success" : checklistType === 'abertura' ? "text-foreground" : "text-muted-foreground"
-                    )}
-                  />
-                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Abertura</h3>
-                </div>
-                {!settingsMode && (
-                  <div className="space-y-1.5">
-                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'abertura' ? "bg-white/15" : "bg-secondary/60")}>
-                      <div
-                        className="h-full rounded-full transition-all duration-700 ease-out"
-                        style={{
-                          width: `${getTypeProgress.abertura.percent}%`,
-                          background: getTypeProgress.abertura.percent === 100
-                            ? 'hsl(var(--success))'
-                            : 'linear-gradient(90deg, hsl(32 100% 50%), hsl(40 100% 55% / 0.7))',
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground">
-                        {getTypeProgress.abertura.completed}/{getTypeProgress.abertura.total}
-                        {deadlineLabel.abertura && (
-                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'abertura', deadlineSettings)?.passed ? "text-destructive/70" : "")}>
-                            · {getDeadlineInfo(currentDate, 'abertura', deadlineSettings)?.passed ? 'Encerrado' : deadlineLabel.abertura}
-                          </span>
-                        )}
-                      </span>
-                      <span className={cn(
-                        "text-sm font-black",
-                        getTypeProgress.abertura.percent === 100 ? "text-success" : "text-orange-500"
-                      )}>
-                        {getTypeProgress.abertura.percent}%
-                      </span>
-                    </div>
-                  </div>
-                )}
-                {checklistType === 'abertura' && getTypeProgress.abertura.percent < 100 && !settingsMode && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <div
-                        role="button"
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/15 hover:bg-destructive/25 flex items-center justify-center transition-colors cursor-pointer"
-                      >
-                        <AppIcon name="Power" size={14} className="text-destructive" />
-                      </div>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Encerrar Abertura?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {getTypeProgress.abertura.total - getTypeProgress.abertura.completed} tarefa(s) pendente(s) serão marcadas como <strong>não concluídas</strong>. Essa ação não pode ser desfeita.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleManualClose('abertura')}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {closingType === 'abertura' ? 'Encerrando...' : 'Encerrar'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-                {checklistType === 'abertura' && getTypeProgress.abertura.percent === 100 && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success animate-pulse" />
-                )}
-              </div>
-
-              {/* Fechamento Card */}
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => setChecklistType('fechamento')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setChecklistType('fechamento');
-                  }
-                }}
-                className={cn(
-                  "relative overflow-hidden rounded-2xl p-4 text-left transition-all duration-300",
-                  checklistType === 'fechamento'
-                    ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.02]"
-                    : "ring-1 ring-border/40 hover:ring-border bg-card/60 opacity-70 hover:opacity-90"
-                )}
-              >
-                {settingsMode && isAdmin && (
-                  <DeadlineSettingPopover
-                    type="fechamento"
-                    currentSetting={deadlineSettings.find(s => s.checklist_type === 'fechamento') || null}
-                    onSave={updateDeadline}
-                    onRemove={removeDeadline}
-                    isSaving={isSavingDeadline}
-                  />
-                )}
-                <div className="flex items-center gap-3 mb-3">
-                  <AppIcon
-                    name={getTypeProgress.fechamento.percent === 100 ? 'check_circle' : 'Moon'}
-                    size={22}
-                    fill={getTypeProgress.fechamento.percent === 100 ? 1 : 0}
-                    className={cn(
-                      "transition-colors",
-                      getTypeProgress.fechamento.percent === 100 ? "text-success" : checklistType === 'fechamento' ? "text-foreground" : "text-muted-foreground"
-                    )}
-                  />
-                  <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Fechamento</h3>
-                </div>
-                {!settingsMode && (
-                  <div className="space-y-1.5">
-                    <div className={cn("w-full h-1.5 rounded-full overflow-hidden", checklistType === 'fechamento' ? "bg-white/15" : "bg-secondary/60")}>
-                      <div
-                        className="h-full rounded-full transition-all duration-700 ease-out"
-                        style={{
-                          width: `${getTypeProgress.fechamento.percent}%`,
-                          background: getTypeProgress.fechamento.percent === 100
-                            ? 'hsl(var(--success))'
-                            : 'linear-gradient(90deg, hsl(234 89% 67%), hsl(234 70% 75% / 0.7))',
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground">
-                        {getTypeProgress.fechamento.completed}/{getTypeProgress.fechamento.total}
-                        {deadlineLabel.fechamento && (
-                          <span className={cn("ml-1", getDeadlineInfo(currentDate, 'fechamento', deadlineSettings)?.passed ? "text-destructive/70" : "")}>
-                            · {getDeadlineInfo(currentDate, 'fechamento', deadlineSettings)?.passed ? 'Encerrado' : deadlineLabel.fechamento}
-                          </span>
-                        )}
-                      </span>
-                      <span className={cn(
-                        "text-sm font-black",
-                        getTypeProgress.fechamento.percent === 100 ? "text-success" : "text-primary"
-                      )}>
-                        {getTypeProgress.fechamento.percent}%
-                      </span>
-            </div>
-                  </div>
-                )}
-                {checklistType === 'fechamento' && getTypeProgress.fechamento.percent < 100 && !settingsMode && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <div
-                        role="button"
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/15 hover:bg-destructive/25 flex items-center justify-center transition-colors cursor-pointer"
-                      >
-                        <AppIcon name="Power" size={14} className="text-destructive" />
-                      </div>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Encerrar Fechamento?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {getTypeProgress.fechamento.total - getTypeProgress.fechamento.completed} tarefa(s) pendente(s) serão marcadas como <strong>não concluídas</strong>. Essa ação não pode ser desfeita.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleManualClose('fechamento')}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {closingType === 'fechamento' ? 'Encerrando...' : 'Encerrar'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-                {checklistType === 'fechamento' && getTypeProgress.fechamento.percent === 100 && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-success animate-pulse" />
-                )}
-              </div>
-            </div>
-
-            {/* Bônus Card */}
-            <button
-              onClick={() => setChecklistType('bonus')}
-              className={cn(
-                "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
-                checklistType === 'bonus'
-                  ? "finance-hero-card checklist-gradient-slow ring-0 scale-[1.01] shadow-xl"
-                  : "bg-card hover:shadow-lg"
-              )}
-              style={checklistType !== 'bonus' ? {
-                border: '1px solid hsl(160 60% 45% / 0.15)',
-              } : undefined}
-            >
-              {settingsMode && isAdmin && (
-                <DeadlineSettingPopover
-                  type="bonus"
-                  currentSetting={deadlineSettings.find(s => s.checklist_type === 'bonus') || null}
-                  onSave={updateDeadline}
-                  onRemove={removeDeadline}
-                  isSaving={isSavingDeadline}
-                />
-              )}
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
-                  checklistType === 'bonus' ? "bg-emerald-500/15" : "bg-emerald-500/10"
-                )}>
-                  <AppIcon
-                    name="Zap"
-                    size={22}
-                    fill={checklistType === 'bonus' ? 1 : 0}
-                    className="transition-colors"
-                    style={{ color: 'hsl(160 70% 45%)' }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Bônus</h3>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{
-                      color: checklistType === 'bonus' ? 'hsl(160 84% 70%)' : 'hsl(160 84% 50%)',
-                      background: checklistType === 'bonus' ? 'hsl(160 84% 39% / 0.2)' : 'hsl(160 84% 39% / 0.12)',
-                    }}>
-                      Extra pts
-                    </span>
-                  </div>
-                  <p className="text-xs mt-0.5 text-muted-foreground">
-                    Tarefas exclusivas para mais pontos ⚡
-                  </p>
-                </div>
-                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
-              </div>
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  opacity: checklistType === 'bonus' ? 0.3 : 0.2,
-                  background: 'linear-gradient(105deg, transparent 40%, hsl(160 84% 39% / 0.15) 45%, hsl(var(--neon-cyan) / 0.1) 55%, transparent 60%)',
-                  backgroundSize: '200% 100%',
-                  animation: 'shimmer 120s ease-in-out infinite',
-                }}
+              <ChecklistTypeCard
+                type="abertura" icon="Sun" label="Abertura"
+                progress={getTypeProgress.abertura}
+                isSelected={checklistType === 'abertura'}
+                onSelect={() => setChecklistType('abertura')}
+                deadlineLabel={deadlineLabel.abertura || ''}
+                deadlinePassed={!!getDeadlineInfo(currentDate, 'abertura', deadlineSettings)?.passed}
+                gradientColors="linear-gradient(90deg, hsl(32 100% 50%), hsl(40 100% 55% / 0.7))"
+                {...sharedCardProps}
               />
-            </button>
+              <ChecklistTypeCard
+                type="fechamento" icon="Moon" label="Fechamento"
+                progress={getTypeProgress.fechamento}
+                isSelected={checklistType === 'fechamento'}
+                onSelect={() => setChecklistType('fechamento')}
+                deadlineLabel={deadlineLabel.fechamento || ''}
+                deadlinePassed={!!getDeadlineInfo(currentDate, 'fechamento', deadlineSettings)?.passed}
+                gradientColors="linear-gradient(90deg, hsl(234 89% 67%), hsl(234 70% 75% / 0.7))"
+                {...sharedCardProps}
+              />
+            </div>
 
-            {/* Content area — either checklist view or settings */}
+            {/* Bonus Card */}
+            <ChecklistBonusCard
+              isSelected={checklistType === 'bonus'}
+              onSelect={() => setChecklistType('bonus')}
+              settingsMode={settingsMode} isAdmin={isAdmin}
+              deadlineSettings={deadlineSettings}
+              updateDeadline={updateDeadline} removeDeadline={removeDeadline} isSavingDeadline={isSavingDeadline}
+            />
+
+            {/* Content */}
             <div className="pt-3">
               {settingsMode ? (
                 <div className="space-y-4">
@@ -798,7 +155,6 @@ export default function ChecklistsPage() {
                     onDeleteItem={handleDeleteItem}
                     onReorderItems={reorderItems}
                   />
-                  {/* Timer Settings */}
                   <TimerSettingsPanel checklistType={checklistType} />
                 </div>
               ) : (
@@ -818,9 +174,9 @@ export default function ChecklistsPage() {
                   isTimerMode={isTimerMode}
                   getActiveTimer={getActiveTimer}
                   getUserActiveTimer={getUserActiveTimer}
-                   onStartTimer={startTimer}
-                   onFinishTimer={finishTimer}
-                   onCancelTimer={cancelTimer}
+                  onStartTimer={startTimer}
+                  onFinishTimer={finishTimer}
+                  onCancelTimer={cancelTimer}
                   validatePin={validatePin}
                   timeStats={timeStatsMap}
                   timerMinExecutions={timerSettings?.minExecutionsForStats ?? 3}
