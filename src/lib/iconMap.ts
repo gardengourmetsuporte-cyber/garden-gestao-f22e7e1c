@@ -1,8 +1,8 @@
 // Custom SVG paths (inline for zero-flicker rendering)
 export const CUSTOM_SVG_PATHS: Record<string, string[]> = {
   ChartPie: [
-    'M12 2a10 10 0 1 0 10 10h-10V2z',
-    'M14 2.05A10 10 0 0 1 21.95 10H14V2.05z',
+    'M11 2.05V13h10.95A11 11 0 1 1 11 2.05z',
+    'M13 2.05A11 11 0 0 1 21.95 11H13V2.05z',
   ],
   Menu: [
     'M4,0h2c2.209,0,4,1.791,4,4v2c0,2.209-1.791,4-4,4h-2C1.791,10,0,8.209,0,6v-2C0,1.791,1.791,0,4,0Z',
