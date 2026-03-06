@@ -38,6 +38,16 @@ function loadLeaflet(): Promise<void> {
   });
 }
 
+// Strip apartment/unit/complement info that confuses geocoders
+function cleanAddress(addr: string): string {
+  return addr
+    .replace(/\b(apto?|apartamento|bloco?|sala|casa|unid(ade)?|lote|quadra|andar|fundos|frente)\b\s*\d*/gi, '')
+    .replace(/,\s*,/g, ',')
+    .replace(/,\s*$/, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 async function geocodeAddress(
   address: string,
   neighborhood: string,
@@ -45,11 +55,13 @@ async function geocodeAddress(
   unitName: string,
 ): Promise<{ lat: number; lng: number } | null> {
   const normalizedCity = city?.trim().length >= 4 ? city.trim() : unitName.trim();
+  const cleaned = cleanAddress(address);
+
   const queries = [
-    `${address}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
-    `${address}, ${normalizedCity}, SP, Brasil`,
-    `${address}, ${normalizedCity}, Brasil`,
-    `${address}, Brasil`,
+    `${cleaned}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
+    `${cleaned}, ${normalizedCity}, SP, Brasil`,
+    `${cleaned}, ${normalizedCity}, Brasil`,
+    `${cleaned}, Brasil`,
   ];
 
   let anchor: { lat: number; lng: number } | null = null;
@@ -76,20 +88,14 @@ async function geocodeAddress(
     }
   }
 
+  // First pass: bounded queries (prefer results near the city)
   for (const q of queries) {
     try {
-      const params = new URLSearchParams({
-        q,
-        format: 'json',
-        limit: '1',
-        countrycodes: 'br',
-      });
-
+      const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
       if (anchor) {
         params.set('viewbox', `${anchor.lng - 0.7},${anchor.lat + 0.7},${anchor.lng + 0.7},${anchor.lat - 0.7}`);
         params.set('bounded', '1');
       }
-
       const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
         headers: { 'User-Agent': 'GardenGestao/1.0' },
       });
@@ -100,8 +106,26 @@ async function geocodeAddress(
     } catch (error) {
       console.warn('Falha ao geocodificar endereço', error);
     }
-
     await new Promise((resolve) => setTimeout(resolve, 1100));
+  }
+
+  // Second pass: unbounded fallback (broader search)
+  if (anchor) {
+    for (const q of queries.slice(0, 2)) {
+      try {
+        const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br' });
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+          headers: { 'User-Agent': 'GardenGestao/1.0' },
+        });
+        const results = await res.json();
+        if (results?.[0]) {
+          return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+        }
+      } catch (error) {
+        console.warn('Falha ao geocodificar endereço (unbounded)', error);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+    }
   }
 
   return null;

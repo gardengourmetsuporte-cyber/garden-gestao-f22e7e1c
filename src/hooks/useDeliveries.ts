@@ -137,13 +137,24 @@ export function useDeliveries() {
     return urlData.publicUrl;
   }, [activeUnitId]);
 
+  // Strip apartment/unit/complement info that confuses geocoders
+  const cleanAddress = useCallback((addr: string): string => {
+    return addr
+      .replace(/\b(apto?|apartamento|bloco?|sala|casa|unid(ade)?|lote|quadra|andar|fundos|frente)\b\s*\d*/gi, '')
+      .replace(/,\s*,/g, ',')
+      .replace(/,\s*$/, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }, []);
+
   // Geocode address using Nominatim (free)
   const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
     const fallbackCity = city?.trim().length >= 4 ? city.trim() : (activeUnit?.name || '').trim();
+    const cleaned = cleanAddress(address);
     const queries = [
-      `${address}, ${fallbackCity}, SP, Brasil`,
-      `${address}, ${fallbackCity}, Brasil`,
-      `${address}, Brasil`,
+      `${cleaned}, ${fallbackCity}, SP, Brasil`,
+      `${cleaned}, ${fallbackCity}, Brasil`,
+      `${cleaned}, Brasil`,
     ];
 
     let anchor: { lat: number; lng: number } | null = null;
@@ -170,20 +181,14 @@ export function useDeliveries() {
       }
     }
 
+    // First pass: bounded
     for (const query of queries) {
       try {
-        const params = new URLSearchParams({
-          q: query,
-          format: 'json',
-          limit: '1',
-          countrycodes: 'br',
-        });
-
+        const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
         if (anchor) {
           params.set('viewbox', `${anchor.lng - 0.7},${anchor.lat + 0.7},${anchor.lng + 0.7},${anchor.lat - 0.7}`);
           params.set('bounded', '1');
         }
-
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
           headers: { 'User-Agent': 'GardenGestao/1.0' },
         });
@@ -196,8 +201,26 @@ export function useDeliveries() {
       }
     }
 
+    // Second pass: unbounded fallback
+    if (anchor) {
+      for (const query of queries.slice(0, 2)) {
+        try {
+          const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br' });
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+            headers: { 'User-Agent': 'GardenGestao/1.0' },
+          });
+          const results = await res.json();
+          if (results?.[0]) {
+            return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+          }
+        } catch (error) {
+          console.warn('Falha ao geocodificar endereço (unbounded)', error);
+        }
+      }
+    }
+
     return null;
-  }, [activeUnit?.name]);
+  }, [activeUnit?.name, cleanAddress]);
 
   // Create delivery
   const createDelivery = useMutation({
