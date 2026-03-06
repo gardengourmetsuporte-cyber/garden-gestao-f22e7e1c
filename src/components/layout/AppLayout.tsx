@@ -18,6 +18,7 @@ import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { getModuleKeyFromRoute } from '@/lib/modules';
 import { MODULE_REQUIRED_PLAN, planSatisfies } from '@/lib/plans';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import type { PlanTier } from '@/lib/plans';
 import { RankedAvatar } from '@/components/profile/RankedAvatar';
 import { usePoints } from '@/hooks/usePoints';
