@@ -76,8 +76,8 @@ export default function Deliveries() {
           </div>
         </div>
 
-        {/* Filter tabs + view toggle */}
-        <div className="flex items-center justify-between gap-2">
+        {/* Filter tabs */}
+        <div className="flex items-center gap-2">
           <div className="flex gap-1.5 overflow-x-auto no-scrollbar flex-1">
             {STATUS_TABS.map((tab) => (
               <Button
@@ -91,23 +91,21 @@ export default function Deliveries() {
               </Button>
             ))}
           </div>
-          <div className="flex gap-1 shrink-0">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="icon"
-              className="h-8 w-8 rounded-full"
+
+          {/* View toggle */}
+          <div className="flex shrink-0 rounded-lg border border-border/60 bg-card/60 overflow-hidden">
+            <button
+              className={`p-1.5 transition-colors ${viewMode === 'list' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setViewMode('list')}
             >
-              <AppIcon name="view_list" size={16} />
-            </Button>
-            <Button
-              variant={viewMode === 'map' ? 'default' : 'outline'}
-              size="icon"
-              className="h-8 w-8 rounded-full"
+              <AppIcon name="view_list" size={18} />
+            </button>
+            <button
+              className={`p-1.5 transition-colors ${viewMode === 'map' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setViewMode('map')}
             >
-              <AppIcon name="map" size={16} />
-            </Button>
+              <AppIcon name="map" size={18} />
+            </button>
           </div>
         </div>
 
