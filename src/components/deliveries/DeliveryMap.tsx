@@ -214,6 +214,15 @@ export function DeliveryMap({ deliveries, onStatusChange, onRefresh }: Props) {
     }
   };
 
+  // Auto-geocode on first render when deliveries lack coords
+  useEffect(() => {
+    if (withoutCoords.length > 0 && !geocodedRef.current && !isGeocoding) {
+      geocodedRef.current = true;
+      handleGeocode();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withoutCoords.length]);
+
   return (
     <div className="space-y-1.5">
       {/* Geocode banner */}
