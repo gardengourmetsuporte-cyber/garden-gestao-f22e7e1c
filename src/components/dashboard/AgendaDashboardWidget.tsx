@@ -108,7 +108,6 @@ export function AgendaDashboardWidget() {
             style={{
               maxHeight: '260px',
               overflowY: scrollUnlocked ? 'auto' : 'hidden',
-              touchAction: scrollUnlocked ? 'pan-y' : 'none',
             }}
             onClick={() => !scrollUnlocked && setScrollUnlocked(true)}
             onPointerLeave={handleBlur}
