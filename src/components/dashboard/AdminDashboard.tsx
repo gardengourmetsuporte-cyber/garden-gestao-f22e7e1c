@@ -66,10 +66,6 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6 px-4 py-3 lg:px-6">
-      {/* Context Bar */}
-      <div className={`animate-card-reveal ${nextStagger()}`}>
-        <DashboardContextBar firstName={firstName} stats={stats} />
-      </div>
 
       {/* Setup Onboarding */}
       <SetupChecklistWidget />
