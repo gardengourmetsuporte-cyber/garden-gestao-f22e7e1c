@@ -55,6 +55,31 @@ function normalizeText(value: string): string {
     .trim();
 }
 
+function getSignificantCityWords(city: string): string[] {
+  return normalizeText(city)
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !['de', 'da', 'do', 'das', 'dos'].includes(w));
+}
+
+function resolveGeocodeCity(city: string, unitName: string): string {
+  const cityTrimmed = city?.trim() || '';
+  const unitTrimmed = unitName?.trim() || '';
+  const cityWords = getSignificantCityWords(cityTrimmed);
+  const unitWords = getSignificantCityWords(unitTrimmed);
+
+  if (!cityTrimmed) return unitTrimmed;
+  if (!unitTrimmed) return cityTrimmed;
+
+  // If OCR gives ambiguous city like "SAO JOAO", prefer full unit city
+  if (cityWords.length < 3 && unitWords.length >= cityWords.length) return unitTrimmed;
+
+  const cityBase = normalizeText(cityTrimmed);
+  const unitBase = normalizeText(unitTrimmed);
+  if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) return unitTrimmed;
+
+  return cityTrimmed;
+}
+
 function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const earthRadiusKm = 6371;
