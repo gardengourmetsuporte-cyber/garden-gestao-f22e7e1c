@@ -121,15 +121,25 @@ export function FinanceCharts({
     color: entityView ? entry.color : entry.category?.color || '#6366f1',
   }));
 
-  // Prepare area chart data with cumulative
-  const timelineData = (dataType === 'expense' ? dailyExpenses : dailyIncome).map(d => ({
-    ...d,
-    day: new Date(d.date + 'T12:00:00').getDate(),
-    label: new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-  }));
-
-  const strokeColor = dataType === 'expense' ? '#ef4444' : '#22c55e';
-  const gradientId = dataType === 'expense' ? 'expenseGradient' : 'incomeGradient';
+  // Merged timeline data with both income and expense per day
+  const mergedTimelineData = (() => {
+    const map = new Map<number, { day: number; label: string; expense: number; income: number }>();
+    dailyExpenses.forEach(d => {
+      const day = new Date(d.date + 'T12:00:00').getDate();
+      const label = new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const existing = map.get(day) || { day, label, expense: 0, income: 0 };
+      existing.expense += d.amount;
+      map.set(day, existing);
+    });
+    dailyIncome.forEach(d => {
+      const day = new Date(d.date + 'T12:00:00').getDate();
+      const label = new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const existing = map.get(day) || { day, label, expense: 0, income: 0 };
+      existing.income += d.amount;
+      map.set(day, existing);
+    });
+    return Array.from(map.values()).sort((a, b) => a.day - b.day);
+  })();
 
   // Weekly data
   const weeklyData = (() => {
@@ -348,49 +358,39 @@ export function FinanceCharts({
         {/* ═══ AREA / LINE CHART ═══ */}
         {viewType === 'timeline' && (
           <div className="space-y-3">
-            {timelineData.length > 0 ? (
+            {mergedTimelineData.length > 0 ? (
               <div className="card-base p-3" style={{ height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <AreaChart data={mergedTimelineData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
-                      <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={strokeColor} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={strokeColor} stopOpacity={0.02} />
+                      <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#ef4444" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
+                      </linearGradient>
+                      <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#22c55e" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0.02} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="hsl(var(--border))"
-                      opacity={0.3}
-                      vertical={false}
-                    />
-                    <XAxis
-                      dataKey="day"
-                      fontSize={11}
-                      tickLine={false}
-                      axisLine={false}
-                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    />
-                    <YAxis
-                      tickFormatter={formatCompact}
-                      fontSize={11}
-                      tickLine={false}
-                      axisLine={false}
-                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                      width={45}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
+                    <XAxis dataKey="day" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                    <YAxis tickFormatter={formatCompact} fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }} width={45} />
                     <RechartsTooltip
-                      content={<CustomTooltip labelFormatter={(d: any) => `Dia ${d}`} />}
+                      content={({ active, payload, label }) => {
+                        if (!active || !payload?.length) return null;
+                        const inc = payload.find(p => p.dataKey === 'income')?.value as number || 0;
+                        const exp = payload.find(p => p.dataKey === 'expense')?.value as number || 0;
+                        return (
+                          <div className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 shadow-xl space-y-0.5">
+                            <p className="text-xs font-medium text-foreground">Dia {label}</p>
+                            <p className="text-xs" style={{ color: '#22c55e' }}>Receita: {formatCurrency(inc)}</p>
+                            <p className="text-xs" style={{ color: '#ef4444' }}>Despesa: {formatCurrency(exp)}</p>
+                          </div>
+                        );
+                      }}
                     />
-                    <Area
-                      type="monotone"
-                      dataKey="amount"
-                      stroke={strokeColor}
-                      strokeWidth={2.5}
-                      fill={`url(#${gradientId})`}
-                      dot={{ r: 3, fill: strokeColor, strokeWidth: 0 }}
-                      activeDot={{ r: 5, fill: strokeColor, stroke: 'hsl(var(--background))', strokeWidth: 2 }}
-                    />
+                    <Area type="monotone" dataKey="income" stroke="#22c55e" strokeWidth={2} fill="url(#incomeGradient)" dot={{ r: 2.5, fill: '#22c55e', strokeWidth: 0 }} activeDot={{ r: 4, fill: '#22c55e', stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
+                    <Area type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={2.5} fill="url(#expenseGradient)" dot={{ r: 2.5, fill: '#ef4444', strokeWidth: 0 }} activeDot={{ r: 4, fill: '#ef4444', stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -401,24 +401,18 @@ export function FinanceCharts({
             )}
 
             {/* Summary stats below chart */}
-            {timelineData.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
+            {mergedTimelineData.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
                 <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Total</p>
-                  <p className="text-sm font-bold tabular-nums">
-                    {formatCurrency(timelineData.reduce((s, d) => s + d.amount, 0))}
+                  <p className="text-xs text-muted-foreground mb-0.5">Receita total</p>
+                  <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
+                    {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.income, 0))}
                   </p>
                 </div>
                 <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Média/dia</p>
-                  <p className="text-sm font-bold tabular-nums">
-                    {formatCurrency(timelineData.reduce((s, d) => s + d.amount, 0) / (timelineData.length || 1))}
-                  </p>
-                </div>
-                <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Maior</p>
-                  <p className="text-sm font-bold tabular-nums">
-                    {formatCurrency(Math.max(...timelineData.map(d => d.amount)))}
+                  <p className="text-xs text-muted-foreground mb-0.5">Despesa total</p>
+                  <p className="text-sm font-bold tabular-nums" style={{ color: '#ef4444' }}>
+                    {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.expense, 0))}
                   </p>
                 </div>
               </div>
