@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
-import { MonthSelector } from './MonthSelector';
+import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { DREReport } from './DREReport';
 import { EntityStats } from '@/hooks/useFinanceStats';
