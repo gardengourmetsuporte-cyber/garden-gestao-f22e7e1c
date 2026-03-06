@@ -109,12 +109,14 @@ export function AgendaDashboardWidget() {
               maxHeight: '260px',
               overflowY: scrollUnlocked ? 'auto' : 'hidden',
             }}
-            onClick={() => !scrollUnlocked && setScrollUnlocked(true)}
             onPointerLeave={handleBlur}
           >
             {!scrollUnlocked && pendingTasks.length > 4 && (
-              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent z-10 pointer-events-none flex items-end justify-center pb-3">
-                <span className="text-[10px] font-medium text-muted-foreground bg-secondary/80 backdrop-blur-sm px-3 py-1 rounded-full pointer-events-auto">
+              <div
+                className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent z-10 flex items-end justify-center pb-3 cursor-pointer"
+                onClick={(e) => { e.stopPropagation(); setScrollUnlocked(true); }}
+              >
+                <span className="text-[10px] font-medium text-muted-foreground bg-secondary/80 backdrop-blur-sm px-3 py-1 rounded-full">
                   Toque para rolar a lista
                 </span>
               </div>
