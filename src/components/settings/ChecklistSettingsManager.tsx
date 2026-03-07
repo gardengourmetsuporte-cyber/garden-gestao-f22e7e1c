@@ -44,6 +44,15 @@ export function ChecklistSettingsManager() {
     );
   }
 
+  if (!hasItems && showTemplates) {
+    return (
+      <ChecklistTemplateSelector
+        onManual={() => setShowTemplates(false)}
+        onDone={() => setShowTemplates(false)}
+      />
+    );
+  }
+
   const handleAddSector = async (data: { name: string; color: string; icon?: string }) => {
     try {
       await addSector(data);
