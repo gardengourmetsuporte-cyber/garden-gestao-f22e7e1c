@@ -1,4 +1,4 @@
-import { subDays } from 'date-fns';
+import { DatePicker } from '@/components/ui/date-picker';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
