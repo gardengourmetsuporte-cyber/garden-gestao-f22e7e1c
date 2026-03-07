@@ -1406,18 +1406,6 @@ export function ChecklistView({
                                       +{configuredPoints} pts
                                     </span>
                                   )}
-                                        <AppIcon name="Timer" className="w-5 h-5 text-primary animate-pulse" />
-                                      </div>
-                                    ) : (
-                                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
-                                        <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
-                                      </div>
-                                    )
-                                  ) : (
-                                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
-                                      <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
-                                    </div>
-                                  )}
                                 </button>
                                 {openPopover === item.id && (
                                   <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
