@@ -9,7 +9,7 @@ import type { PrevMonthStats } from '@/hooks/usePreviousMonthStats';
 import { useBudgets } from '@/hooks/useBudgets';
 import { formatCurrency } from '@/lib/format';
 import { Progress } from '@/components/ui/progress';
-import financeHeroBg from '@/assets/finance-hero-bg.png';
+
 
 interface FinanceHomeProps {
   selectedMonth: Date;
@@ -76,8 +76,13 @@ export function FinanceHome({
         onClick={() => onNavigate?.('more')}
         className={cn("w-full text-left animate-slide-up stagger-1 rounded-2xl overflow-hidden relative", variant === 'personal' && "finance-hero-card--personal")}
       >
-        <img src={financeHeroBg} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden="true" loading="eager" fetchPriority="high" decoding="async" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(135deg, hsl(280 60% 25%), hsl(320 50% 35%), hsl(350 60% 40%), hsl(30 70% 45%), hsl(200 50% 30%))',
+        }} />
+        <div className="absolute inset-0 opacity-30" style={{
+          background: 'radial-gradient(ellipse at 70% 20%, hsl(40 80% 60% / 0.5), transparent 60%), radial-gradient(ellipse at 20% 80%, hsl(280 60% 50% / 0.4), transparent 50%)',
+        }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
         <div className="p-5 pb-4 relative z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
