@@ -51,6 +51,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'cardapio-digital', icon: 'BookOpen', label: 'Cardápio Digital', description: 'PDV, mesas, QR e roleta', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'loyalty', icon: 'Heart', label: 'Fidelidade', description: 'Regras de pontos e recompensas', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
+  { value: 'system-backup', icon: 'HardDrive', label: 'Backup Geral', description: 'Backup completo de todos os dados', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
 ];
 
 function SettingsFallback() {
