@@ -145,7 +145,7 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
       setDescription(ext.description || '');
       setDate(ext.date || format(new Date(), 'yyyy-MM-dd'));
       setType(ext.suggested_type || 'expense');
-      setAccountId(getDefaultAccount());
+      setAccountId(matchAccount(ext.bank_info));
 
       // Use AI categorization for exact ID matching
       const descToMatch = ext.description || ext.suggested_category_name || '';
