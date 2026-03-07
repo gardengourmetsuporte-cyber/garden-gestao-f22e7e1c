@@ -1,0 +1,1 @@
+ALTER TABLE public.invites ADD COLUMN IF NOT EXISTS access_level_id UUID REFERENCES public.access_levels(id) ON DELETE SET NULL;

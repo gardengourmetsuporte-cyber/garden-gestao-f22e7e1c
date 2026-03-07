@@ -406,9 +406,11 @@ function MembersTab() {
 function InvitesTab() {
   const { user } = useAuth();
   const { activeUnitId, activeUnit } = useUnit();
+  const { accessLevels } = useAccessLevels();
   const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('member');
+  const [selectedAccessLevelId, setSelectedAccessLevelId] = useState<string | null>(null);
   const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
   const [lastInviteEmail, setLastInviteEmail] = useState<string | null>(null);
 
@@ -426,7 +428,9 @@ function InvitesTab() {
   const sendInvite = useMutation({
     mutationFn: async () => {
       if (!user || !activeUnitId || !email.trim()) throw new Error('Dados inválidos');
-      const { data, error } = await supabase.from('invites').insert({ email: email.trim().toLowerCase(), unit_id: activeUnitId, role, invited_by: user.id }).select('token').single();
+      const insertData: any = { email: email.trim().toLowerCase(), unit_id: activeUnitId, role, invited_by: user.id };
+      if (selectedAccessLevelId) insertData.access_level_id = selectedAccessLevelId;
+      const { data, error } = await supabase.from('invites').insert(insertData).select('token').single();
       if (error) throw error;
       return data.token;
     },
@@ -468,18 +472,24 @@ function InvitesTab() {
             <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@exemplo.com" className="mt-1" />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">Cargo</Label>
-            <div className="flex gap-2 mt-1">
-              {[{ value: 'member', label: 'Funcionário' }, { value: 'admin', label: 'Gerente' }].map(r => (
-                <button key={r.value} onClick={() => setRole(r.value)}
+            <Label className="text-xs text-muted-foreground">Nível de Acesso</Label>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {accessLevels.map(level => (
+                <button key={level.id} onClick={() => {
+                  setSelectedAccessLevelId(level.id);
+                  setRole(level.is_default ? 'member' : 'admin');
+                }}
                   className={cn('px-4 py-2 rounded-lg text-sm font-medium border transition-all',
-                    role === r.value ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:bg-secondary')}>
-                  {r.label}
+                    selectedAccessLevelId === level.id ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:bg-secondary')}>
+                  {level.name}
                 </button>
               ))}
+              {accessLevels.length === 0 && (
+                <p className="text-xs text-muted-foreground">Crie níveis de acesso na aba "Níveis" primeiro.</p>
+              )}
             </div>
           </div>
-          <Button onClick={() => sendInvite.mutate()} disabled={!email.trim() || sendInvite.isPending} className="w-full">
+          <Button onClick={() => sendInvite.mutate()} disabled={!email.trim() || !selectedAccessLevelId || sendInvite.isPending} className="w-full">
             <AppIcon name="Link" size={16} className="mr-2" />
             {sendInvite.isPending ? 'Gerando...' : 'Gerar Link de Convite'}
           </Button>
