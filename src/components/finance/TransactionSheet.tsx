@@ -379,7 +379,7 @@ export function TransactionSheet({
         employee_id: employeeId || undefined,
       });
 
-      toast.success('Transação salva!');
+      toast.success('Lançamento salvo! Continue adicionando.');
 
       // Reset form for next entry
       clearDraft();
