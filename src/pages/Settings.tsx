@@ -79,7 +79,11 @@ export default function SettingsPage() {
   // Sync active section to URL so it persists across navigation
   useEffect(() => {
     if (activeSection) {
-      setSearchParams({ tab: activeSection }, { replace: true });
+      const newParams: Record<string, string> = { tab: activeSection };
+      // Preserve action param for sub-components (e.g., TeamHub reads action=invite)
+      const action = searchParams.get('action');
+      if (action) newParams.action = action;
+      setSearchParams(newParams, { replace: true });
     } else {
       if (searchParams.has('tab')) {
         setSearchParams({}, { replace: true });
