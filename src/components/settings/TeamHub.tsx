@@ -53,7 +53,16 @@ const UNIT_ROLE_LABELS: Record<string, string> = {
 };
 
 export function TeamHub() {
-  const [activeTab, setActiveTab] = useState('members');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    return searchParams.get('action') === 'invite' ? 'invites' : 'members';
+  });
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'invite') {
+      setSearchParams({ tab: 'team' }, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-4">
