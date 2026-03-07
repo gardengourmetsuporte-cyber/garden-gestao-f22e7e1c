@@ -37,14 +37,21 @@ serve(async (req) => {
 
 Sua tarefa: receber descrições de transações/despesas e mapear cada uma para a categoria, fornecedor e/ou funcionário correto do negócio.
 
-REGRAS:
-1. Se a descrição parece ser um NOME DE PESSOA, verifique se corresponde a algum funcionário. Se sim, use category de "Folha de Pagamento > Salários" e retorne o employee_id.
-2. Se a descrição corresponde a um FORNECEDOR conhecido, retorne o supplier_id e a categoria mais provável (ex: "Matéria-prima").
-3. "Moto", "motoboy", "uber", "99" → "Taxas Operacionais > App Delivery"
-4. "Gás", "botijão" → busque na lista de categorias por "Gás e Combustível" ou similar
-5. Se não tem certeza (confidence < 0.8), inclua uma "question" curta para o usuário confirmar.
-6. SEMPRE retorne IDs reais da lista fornecida. Nunca invente IDs.
-7. Se não encontrar correspondência, retorne category_id: null com confidence: 0.
+REGRAS OBRIGATÓRIAS:
+1. NOMES DE PESSOA são a prioridade máxima. Se a descrição contém um primeiro nome ou apelido que pode corresponder a um funcionário da lista, ASSUMA que é pagamento ao funcionário. Use a categoria "Folha de Pagamento > Salários" (ou subcategoria mais adequada) e retorne o employee_id. Confiança mínima 0.85 para correspondências parciais de nome.
+2. Descrições curtas de 1-2 palavras que parecem nomes de pessoas MAS NÃO estão na lista de funcionários → use "Despesas Administrativas" ou categoria genérica. confidence = 0.7 e inclua question.
+3. Se a descrição corresponde a um FORNECEDOR conhecido, retorne o supplier_id e a categoria mais provável.
+4. "Moto", "motoboy", "uber", "99" → "Taxas Operacionais > App Delivery"
+5. "Gás", "botijão" → "Gás e Combustível" ou similar
+6. "Taxa", "tarifa" → "Taxas Operacionais > Maquininha" ou "Despesas Administrativas" conforme contexto
+7. SEMPRE retorne IDs reais da lista fornecida. Nunca invente IDs.
+8. Se não encontrar correspondência, retorne category_id: null com confidence baixa e SEMPRE inclua uma question perguntando ao usuário o que é essa despesa.
+9. SEJA ASSERTIVO: prefira categorizar com confiança razoável (0.7+) do que deixar sem categoria. O usuário pode corrigir depois.
+
+EXEMPLOS DE MATCHING DE NOMES:
+- "Jessica" → buscar "Jessica" na lista de funcionários → se encontrar "Jessica Silva", confidence: 0.9
+- "Rafa" → buscar "Rafael" ou "Rafaela" na lista → se encontrar, confidence: 0.85
+- "Bruno" → buscar na lista → pode ser "Bruno Henrique", confidence: 0.85
 
 CATEGORIAS DISPONÍVEIS:
 ${categoryList || "(nenhuma)"}
@@ -88,8 +95,8 @@ ${employeeList || "(nenhum)"}`;
                         category_id: { type: "string", description: "ID da categoria mais adequada, ou null se incerto" },
                         employee_id: { type: "string", description: "ID do funcionário se a descrição é um nome de pessoa/funcionário, ou null" },
                         supplier_id: { type: "string", description: "ID do fornecedor se corresponde, ou null" },
-                        confidence: { type: "number", description: "Confiança de 0 a 1" },
-                        question: { type: "string", description: "Pergunta para o usuário quando confidence < 0.8" },
+                        confidence: { type: "number", description: "Confiança de 0 a 1. Use 0.85+ para matches de nomes de funcionários." },
+                        question: { type: "string", description: "Pergunta para o usuário quando confidence < 0.8, ex: 'Jessica é um pagamento à funcionária Jessica Silva?'" },
                       },
                       required: ["description", "confidence"],
                       additionalProperties: false,

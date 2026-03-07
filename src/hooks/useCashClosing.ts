@@ -487,16 +487,21 @@ export function useCashClosing() {
             for (let i = 0; i < validExpenses.length; i++) {
               const expense = validExpenses[i];
               const ai = aiResults[i];
-              const useCat = ai && ai.confidence >= 0.8 ? (ai.category_id || null) : null;
-              const useEmp = ai && ai.confidence >= 0.8 ? (ai.employee_id || null) : null;
+              // Lower threshold to 0.6 — prefer categorized over uncategorized
+              const useCat = ai && ai.confidence >= 0.6 ? (ai.category_id || null) : null;
+              const useEmp = ai && ai.confidence >= 0.6 ? (ai.employee_id || null) : null;
+              const useSup = ai && ai.confidence >= 0.6 ? (ai.supplier_id || null) : null;
               transactions.push({
                 user_id: user.id, unit_id: activeUnitId, type: 'expense',
                 amount: expense.amount, description: expense.description || 'Gasto do dia',
-                category_id: useCat, employee_id: useEmp, account_id: carteiraAccountId,
+                category_id: useCat, employee_id: useEmp, supplier_id: useSup,
+                account_id: carteiraAccountId,
                 date: closing.date, is_paid: true,
                 notes: ai && ai.confidence < 0.8 && ai.question
                   ? `⚠️ IA: ${ai.question}`
-                  : 'Lançamento automático do fechamento de caixa (categorizado por IA)',
+                  : ai && ai.confidence >= 0.6
+                    ? 'Categorizado por IA ✓'
+                    : 'Lançamento automático — categorize manualmente',
               });
             }
           } catch (err) {
