@@ -2,8 +2,8 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
 interface DashboardSectionProps {
-  title: string;
-  icon: string;
+  title?: string;
+  icon?: string;
   iconColor?: string;
   children: React.ReactNode;
   onNavigate?: () => void;
