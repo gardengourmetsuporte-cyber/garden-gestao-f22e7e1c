@@ -40,6 +40,7 @@ export default function Customers() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedForMessage, setSelectedForMessage] = useState<Set<string>>(new Set());
   const [selectMode, setSelectMode] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const { data: detailEvents = [], isLoading: eventsLoading } = useCustomerEvents(detailCustomer?.id || null);
 
@@ -140,12 +141,12 @@ export default function Customers() {
 
         {/* Select mode bar */}
         {selectMode && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20">
-            <AppIcon name="CheckSquare" size={16} className="text-primary" />
-            <span className="text-sm font-medium text-primary flex-1">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
+            <span className="text-sm font-bold text-primary whitespace-nowrap">
               {selectedForMessage.size} selecionado{selectedForMessage.size !== 1 ? 's' : ''}
             </span>
-            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={selectAll}>
+            <div className="flex-1" />
+            <Button size="sm" variant="ghost" className="text-xs h-7 whitespace-nowrap" onClick={selectAll}>
               Selecionar todos com telefone
             </Button>
             <Button size="sm" variant="ghost" className="text-xs h-7" onClick={exitSelectMode}>
@@ -162,22 +163,19 @@ export default function Customers() {
 
         {/* Search + Segment filter + Actions */}
         <div className="flex gap-2">
-          <div className="flex-1 relative">
-            <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: 18 }}>
-              search
-            </span>
-            <Input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar cliente..."
-              className="pl-10 h-11 border-border/50 bg-card"
-            />
-          </div>
+          <Button
+            size="icon"
+            variant={searchOpen ? "default" : "outline"}
+            className={cn("h-11 w-11 shrink-0", !searchOpen && "border-border/50 bg-card")}
+            onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearch(''); }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>{searchOpen ? 'close' : 'search'}</span>
+          </Button>
           <Select
             value={segmentFilter || 'all'}
             onValueChange={v => setSegmentFilter(v === 'all' ? null : v as CustomerSegment)}
           >
-            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold border-border/50 bg-card">
+            <SelectTrigger className="h-11 flex-1 rounded-xl text-xs font-semibold border-border/50 bg-card">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -192,11 +190,10 @@ export default function Customers() {
               })}
             </SelectContent>
           </Select>
-          {/* Message campaign button - always visible */}
           <Button
             size="icon"
             variant="outline"
-            className="h-11 w-11 shrink-0 border-border/50"
+            className="h-11 w-11 shrink-0 border-border/50 bg-card"
             onClick={() => {
               if (selectMode) {
                 setCampaignOpen(true);
@@ -211,13 +208,23 @@ export default function Customers() {
           <Button
             size="icon"
             variant="outline"
-            className="h-11 w-11 shrink-0 border-border/50"
+            className="h-11 w-11 shrink-0 border-border/50 bg-card"
             onClick={() => setCsvOpen(true)}
             title="Importar clientes"
           >
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
           </Button>
         </div>
+
+        {searchOpen && (
+          <Input
+            autoFocus
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar cliente..."
+            className="h-11 border-border/50 bg-card"
+          />
+        )}
 
         {/* List */}
         {isLoading ? (
@@ -237,23 +244,30 @@ export default function Customers() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {visibleCustomers.map(c => (
-                <div key={c.id} className="relative">
+                <div key={c.id} className="flex items-stretch gap-2">
                   {selectMode && (
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleSelect(c.id); }}
                       className={cn(
-                        "absolute top-3 left-3 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all",
+                        "w-7 shrink-0 flex items-center justify-center rounded-xl transition-all",
                         selectedForMessage.has(c.id)
-                          ? "bg-primary border-primary"
-                          : "border-muted-foreground/40 bg-background/80"
+                          ? "text-primary"
+                          : "text-muted-foreground/40"
                       )}
                     >
-                      {selectedForMessage.has(c.id) && (
-                        <AppIcon name="Check" size={14} className="text-primary-foreground" />
-                      )}
+                      <span className={cn(
+                        "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                        selectedForMessage.has(c.id)
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground/40"
+                      )}>
+                        {selectedForMessage.has(c.id) && (
+                          <AppIcon name="Check" size={14} className="text-primary-foreground" />
+                        )}
+                      </span>
                     </button>
                   )}
-                  <div className={cn(selectMode && "pl-8")}>
+                  <div className="flex-1 min-w-0">
                     <CustomerCard
                       customer={c}
                       onEdit={() => { if (!selectMode) setDetailCustomer(c); else toggleSelect(c.id); }}
