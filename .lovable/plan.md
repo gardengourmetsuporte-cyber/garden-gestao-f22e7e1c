@@ -1,45 +1,105 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Smart Scanner Widget — "Scanner Inteligente"
 
-### O que muda
+### Resumo
+Widget no topo do dashboard (acima do saldo financeiro) que funciona como um "portal de entrada universal": o usuário tira foto ou seleciona arquivo, a IA classifica o tipo de documento e direciona automaticamente para o módulo correto, criando os lançamentos necessários. Também identifica informações faltantes e sugere ações complementares.
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
+### Tipos de Documento Suportados
 
-### Conceito visual
+| Documento | Ações Automáticas |
+|-----------|-------------------|
+| Comprovante Pix/pagamento funcionário | Lança pagamento em Funcionários + despesa no Financeiro |
+| Nota Fiscal (DANFE) | Entrada de estoque + atualiza preços + provisão financeira |
+| Boleto | Cria provisão de despesa + vincula fornecedor |
+| Papel de saída de estoque | Lançamento em lote de saídas |
+| Holerite/Contracheque | Vincula como comprovante ao pagamento do funcionário |
+| Recibo genérico | Lança despesa no financeiro com categoria via IA |
+
+### Arquitetura
 
 ```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
+┌─────────────────────────────────┐
+│  SmartScannerWidget (Dashboard) │  ← Botão câmera/galeria
+└──────────┬──────────────────────┘
+           │ foto/arquivo
+           ▼
+┌─────────────────────────────────┐
+│  Edge Function: document-scanner│  ← Nova função
+│  (Gemini 2.5 Flash - visão)    │
+│  1. Classifica tipo documento   │
+│  2. Extrai dados estruturados   │
+│  3. Identifica lacunas          │
+└──────────┬──────────────────────┘
+           │ JSON classificado
+           ▼
+┌─────────────────────────────────┐
+│  SmartScannerSheet (Review)     │
+│  - Mostra dados extraídos       │
+│  - Perguntas sobre lacunas      │
+│  - Botão confirmar lançamento   │
+└──────────┬──────────────────────┘
+           │ confirmação
+           ▼
+┌─────────────────────────────────┐
+│  Hook: useSmartScanner          │
+│  - Roteamento por tipo          │
+│  - Criação de registros         │
+│  - Invalidação de queries       │
+└─────────────────────────────────┘
 ```
 
-### Implementação
+### Implementação — Arquivos
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+1. **`supabase/functions/document-scanner/index.ts`** — Nova edge function
+   - Recebe imagem base64
+   - Usa Gemini 2.5 Flash (multimodal, mais barato) para classificar e extrair
+   - Prompt unificado que identifica tipo + extrai dados + lista lacunas
+   - Retorna: `{ document_type, extracted_data, missing_info[], suggested_actions[] }`
 
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
+2. **`src/hooks/useSmartScanner.ts`** — Hook de orquestração
+   - `scanDocument(file)` → chama edge function
+   - `executeActions(scanResult, userInputs)` → roteamento por tipo:
+     - `pix_receipt` → insere em `employee_payments` + `finance_transactions`
+     - `invoice` → reutiliza lógica do `useSmartReceiving` existente
+     - `boleto` → insere em `finance_transactions` (despesa futura)
+     - `stock_exit` → insere `stock_movements` em lote
+     - `payslip` → vincula URL ao pagamento existente
+     - `generic_receipt` → insere em `finance_transactions` com categorização IA
 
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+3. **`src/components/dashboard/SmartScannerWidget.tsx`** — Widget visual
+   - Card compacto com ícone de câmera/scanner
+   - Texto: "Escanear documento"
+   - Input file hidden (câmera + galeria)
+   - Animação de processamento
 
-### Resultado
+4. **`src/components/dashboard/SmartScannerSheet.tsx`** — Sheet de revisão
+   - Mostra preview da imagem
+   - Badge com tipo detectado
+   - Dados extraídos editáveis
+   - Seção de "Informações faltantes" com perguntas
+   - Seção de "Sugestões" (ex: "Falta holerite do pagamento de Maria")
+   - Botão confirmar que executa as ações
 
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+5. **`src/components/dashboard/AdminDashboard.tsx`** — Integração
+   - Widget posicionado acima do grid de widgets (entre SetupChecklist e o grid)
+   - Full-width, sempre visível
+
+6. **`supabase/config.toml`** — Registro da nova função (verify_jwt = false)
+
+### Fluxo do Usuário
+
+1. Toca no widget "Escanear documento" no dashboard
+2. Escolhe câmera ou galeria
+3. Sistema processa com IA (loading com shimmer)
+4. Sheet abre mostrando: tipo detectado, dados extraídos, perguntas sobre lacunas
+5. Usuário revisa, responde perguntas e confirma
+6. Sistema cria todos os registros automaticamente e mostra resumo
+
+### Detalhes Técnicos
+
+- **Modelo IA**: `google/gemini-2.5-flash` (multimodal, custo-benefício)
+- **Contexto enviado à IA**: lista de funcionários, categorias financeiras, itens de estoque, fornecedores da unidade — para matching preciso
+- **Lacunas inteligentes**: A IA retorna `missing_info` com campos como "employee_id não identificado" ou "categoria financeira ambígua", que viram perguntas no Sheet
+- **Reutilização**: Aproveita lógica existente do `useSmartReceiving` para notas fiscais e do `useFinanceCategorize` para categorização
 
