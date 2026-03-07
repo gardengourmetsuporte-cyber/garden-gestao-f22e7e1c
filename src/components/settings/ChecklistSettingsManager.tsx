@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
