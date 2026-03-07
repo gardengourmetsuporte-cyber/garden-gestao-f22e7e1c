@@ -124,7 +124,7 @@ export function BottomTabBar() {
       {speedDialOpen && (
         <>
           <div
-            className="fixed inset-0 z-[60] bg-black/60 animate-fade-in"
+            className="fixed inset-0 bottom-[72px] z-[60] bg-black/60 animate-fade-in"
             onClick={() => setSpeedDialOpen(false)}
           />
           <div className="fixed bottom-28 left-0 right-0 z-[61] flex justify-center px-4 animate-fade-in"
