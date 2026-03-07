@@ -222,7 +222,12 @@ export default function InventoryPage() {
             {view === 'items' ? (
               <div className="space-y-4">
                 {filteredItems.length === 0 ? (
-                  items.length === 0 ? (
+                  items.length === 0 && showTemplates ? (
+                    <InventoryTemplateSelector
+                      onManual={() => { setShowTemplates(false); handleAddItem(); }}
+                      onDone={() => setShowTemplates(false)}
+                    />
+                  ) : items.length === 0 ? (
                     <EmptyState
                       icon="Package"
                       title="Seu estoque está vazio"
