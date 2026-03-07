@@ -13,6 +13,15 @@ declare global {
 function loadLeaflet(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.L) { resolve(); return; }
+    const existing = document.querySelector('script[src*="leaflet"]');
+    if (existing) {
+      const check = () => {
+        if (window.L) resolve();
+        else setTimeout(check, 50);
+      };
+      check();
+      return;
+    }
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
@@ -32,70 +41,81 @@ interface Props {
   onConfirm: (addressId: string, lat: number, lng: number) => Promise<void>;
 }
 
-// Default center: São João da Boa Vista
 const DEFAULT_CENTER: [number, number] = [-21.9687, -46.7969];
 
-function placeMarker(map: any, markerRef: React.MutableRefObject<any>, lat: number, lng: number) {
-  const L = window.L;
-  if (markerRef.current) {
-    markerRef.current.setLatLng([lat, lng]);
-  } else {
-    const icon = L.divIcon({
-      className: '',
-      html: `
-        <div style="position:relative;width:32px;height:42px;">
-          <svg width="32" height="42" viewBox="0 0 32 42" fill="none">
-            <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26C32 7.163 24.837 0 16 0z" fill="#f59e0b"/>
-            <circle cx="16" cy="16" r="8" fill="white"/>
-            <circle cx="16" cy="16" r="5" fill="#f59e0b"/>
-          </svg>
-        </div>`,
-      iconSize: [32, 42],
-      iconAnchor: [16, 42],
-    });
-    markerRef.current = L.marker([lat, lng], { icon }).addTo(map);
-  }
+function createMarkerIcon() {
+  return window.L.divIcon({
+    className: '',
+    html: `<div style="position:relative;width:32px;height:42px;">
+      <svg width="32" height="42" viewBox="0 0 32 42" fill="none">
+        <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26C32 7.163 24.837 0 16 0z" fill="#f59e0b"/>
+        <circle cx="16" cy="16" r="8" fill="white"/>
+        <circle cx="16" cy="16" r="5" fill="#f59e0b"/>
+      </svg>
+    </div>`,
+    iconSize: [32, 42],
+    iconAnchor: [16, 42],
+  });
 }
 
 export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm }: Props) {
-  const mapRef = useRef<HTMLDivElement>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const initAttemptRef = useRef<number>(0);
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
 
-  // Reset state when delivery changes
+  // Reset state when open changes
   useEffect(() => {
     if (open) {
       setSelectedCoords(null);
       setIsSaving(false);
       setSearchQuery(delivery?.address?.full_address || '');
       setIsSearching(false);
+      setMapReady(false);
+      initAttemptRef.current = 0;
+    } else {
+      // Cleanup on close
+      if (markerRef.current) { markerRef.current.remove(); markerRef.current = null; }
+      if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; }
+      setMapReady(false);
     }
   }, [open, delivery?.id]);
 
-  // Init map when sheet opens
+  // Init map with retry — waits for container to be visible
   useEffect(() => {
-    if (!open || !mapRef.current) return;
+    if (!open) return;
     let cancelled = false;
 
-    const timer = setTimeout(() => {
-      loadLeaflet().then(() => {
-        if (cancelled || !mapRef.current) return;
-        const L = window.L;
+    const tryInitMap = async () => {
+      await loadLeaflet();
+      if (cancelled) return;
 
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.remove();
-          mapInstanceRef.current = null;
+      const container = mapContainerRef.current;
+      if (!container || container.clientHeight === 0) {
+        // Container not ready yet, retry
+        if (initAttemptRef.current < 30) {
+          initAttemptRef.current++;
+          setTimeout(tryInitMap, 150);
         }
+        return;
+      }
 
-        const center = delivery?.address?.lat && delivery?.address?.lng
-          ? [delivery.address.lat, delivery.address.lng] as [number, number]
-          : DEFAULT_CENTER;
+      const L = window.L;
 
-        const map = L.map(mapRef.current, {
+      // Already initialized
+      if (mapInstanceRef.current) return;
+
+      const center = delivery?.address?.lat && delivery?.address?.lng
+        ? [delivery.address.lat, delivery.address.lng] as [number, number]
+        : DEFAULT_CENTER;
+
+      try {
+        const map = L.map(container, {
           zoomControl: true,
           attributionControl: false,
         }).setView(center, 15);
@@ -106,31 +126,38 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
           maxZoom: 19,
         }).addTo(map);
 
-        // Click to place marker
         map.on('click', (e: any) => {
           const { lat, lng } = e.latlng;
           setSelectedCoords({ lat, lng });
-          placeMarker(map, markerRef, lat, lng);
+          if (markerRef.current) {
+            markerRef.current.setLatLng([lat, lng]);
+          } else {
+            markerRef.current = L.marker([lat, lng], { icon: createMarkerIcon() }).addTo(map);
+          }
         });
 
-        // Multiple invalidateSize calls to handle sheet animation
-        setTimeout(() => map.invalidateSize(), 300);
-        setTimeout(() => map.invalidateSize(), 600);
-        setTimeout(() => map.invalidateSize(), 1000);
-      });
-    }, 200);
+        // Keep invalidating until tiles load
+        const intervals = [100, 300, 500, 800, 1200, 2000];
+        intervals.forEach(ms => {
+          setTimeout(() => {
+            if (!cancelled && mapInstanceRef.current) {
+              mapInstanceRef.current.invalidateSize();
+            }
+          }, ms);
+        });
+
+        setMapReady(true);
+      } catch (err) {
+        console.error('Map init error:', err);
+      }
+    };
+
+    // Start after a small delay to let drawer animate
+    const startTimer = setTimeout(tryInitMap, 300);
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
-      if (markerRef.current) {
-        markerRef.current.remove();
-        markerRef.current = null;
-      }
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
+      clearTimeout(startTimer);
     };
   }, [open, delivery?.id]);
 
@@ -141,7 +168,6 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
 
     setIsSearching(true);
     try {
-      // Append city context for better results
       const searchWithCity = query.toLowerCase().includes('são joão') || query.toLowerCase().includes('sao joao')
         ? query
         : `${query}, São João da Boa Vista, SP, Brasil`;
@@ -164,7 +190,11 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
         const map = mapInstanceRef.current;
 
         setSelectedCoords({ lat, lng });
-        placeMarker(map, markerRef, lat, lng);
+        if (markerRef.current) {
+          markerRef.current.setLatLng([lat, lng]);
+        } else {
+          markerRef.current = window.L.marker([lat, lng], { icon: createMarkerIcon() }).addTo(map);
+        }
         map.flyTo([lat, lng], 17, { duration: 0.8 });
       } else {
         toast.error('Endereço não encontrado. Tente ser mais específico.');
@@ -183,7 +213,7 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
       await onConfirm(delivery.address.id, selectedCoords.lat, selectedCoords.lng);
       onOpenChange(false);
     } catch {
-      // error handled by parent
+      toast.error('Erro ao salvar localização');
     } finally {
       setIsSaving(false);
     }
@@ -229,13 +259,21 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
           </form>
 
           <p className="text-[10px] text-muted-foreground/60">
-            Busque o endereço acima ou toque no mapa para marcar o local
+            Busque o endereço ou toque no mapa para marcar o local
           </p>
         </div>
 
-        {/* Map */}
-        <div className="relative isolate" style={{ height: 320 }}>
-          <div ref={mapRef} className="w-full h-full" />
+        {/* Map container — fixed height ensures Leaflet can render */}
+        <div
+          ref={mapContainerRef}
+          className="relative isolate w-full"
+          style={{ height: 300, minHeight: 300, background: 'hsl(var(--muted))' }}
+        >
+          {!mapReady && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+            </div>
+          )}
         </div>
 
         {/* Footer */}
