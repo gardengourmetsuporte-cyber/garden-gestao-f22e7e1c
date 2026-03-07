@@ -89,13 +89,6 @@ export function AdminDashboard() {
           </DashboardSection>
         ) : null;
 
-      case 'finance-chart':
-        return hasAccess('finance') ? (
-          <DashboardSection key={widget.key} onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><FinanceChartWidget /></LazyWidget>
-          </DashboardSection>
-        ) : null;
-
       case 'bills-due':
         return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
           <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
@@ -109,13 +102,6 @@ export function AdminDashboard() {
         return hasAccess('agenda') ? (
           <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyCalendar /></LazyWidget>
-          </DashboardSection>
-        ) : null;
-
-      case 'agenda':
-        return hasAccess('agenda') ? (
-          <DashboardSection key={widget.key} onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyAgenda /></LazyWidget>
           </DashboardSection>
         ) : null;
 
