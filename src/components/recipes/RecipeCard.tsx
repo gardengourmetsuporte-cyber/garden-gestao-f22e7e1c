@@ -13,6 +13,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 
 interface RecipeCardProps {
   recipe: Recipe;
+  totalCostPerPortion?: number;
   onEdit: (recipe: Recipe) => void;
   onDuplicate: (id: string) => void;
   onToggleActive: (id: string, is_active: boolean) => void;
