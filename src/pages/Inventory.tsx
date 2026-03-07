@@ -58,8 +58,10 @@ export default function InventoryPage() {
     if (action === 'move') {
       setMovementSheetOpen(true);
       setInvSearchParams({}, { replace: true });
+    } else if (action === 'templates') {
+      setShowTemplates(true);
+      setInvSearchParams({}, { replace: true });
     } else if (action === 'create') {
-      // If empty, show templates; otherwise open form
       if (items.length === 0) {
         setShowTemplates(true);
       } else {
