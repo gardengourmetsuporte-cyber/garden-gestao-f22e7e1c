@@ -174,14 +174,14 @@ export default function Finance() {
       await updateTransaction(editingTransaction.id, data);
       toast.success('Transação atualizada!', {
         action: { label: 'Ver transações', onClick: () => setActiveTab('transactions') },
-        cancel: canUndo ? { label: 'Desfazer', onClick: () => undo() } : undefined,
+        cancel: { label: 'Desfazer', onClick: () => undo() },
         duration: 6000,
       });
     } else {
       await addTransaction(data);
       toast.success('Transação criada!', {
         action: { label: 'Ver transações', onClick: () => setActiveTab('transactions') },
-        cancel: canUndo ? { label: 'Desfazer', onClick: () => undo() } : undefined,
+        cancel: { label: 'Desfazer', onClick: () => undo() },
         duration: 6000,
       });
     }
