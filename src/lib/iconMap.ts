@@ -279,6 +279,16 @@ export const ICON_MAP: Record<string, string> = {
   Beer: 'sports_bar',
   Pizza: 'local_pizza',
   Apple: 'nutrition',
+  Croissant: 'bakery_dining',
+  Beef: 'kebab_dining',
+  Drumstick: 'kebab_dining',
+  Sandwich: 'lunch_dining',
+  Salad: 'nutrition',
+  Milk: 'water_full',
+  Wheat: 'grain',
+  Candy: 'cake',
+  Egg: 'egg',
+  SprayCan: 'cleaning_services',
 
   // Tech
   Smartphone: 'smartphone',
