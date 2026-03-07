@@ -31,23 +31,23 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="flex items-center justify-between w-full py-1.5 px-2 rounded-lg hover:bg-muted/50 transition-colors group">
-        <div className="flex items-center gap-2 min-w-0">
+      <CollapsibleTrigger className="flex items-center w-full py-1.5 px-2 rounded-lg hover:bg-muted/50 transition-colors group">
+        <div className="flex items-center gap-2 w-[140px] shrink-0">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${color}20` }}
           >
             <AppIcon name={icon} size={16} style={{ color }} />
           </div>
-          <span className="text-xs font-semibold text-foreground truncate">{name}</span>
+          <span className="text-xs font-semibold text-foreground truncate" title={name}>{name}</span>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center justify-end gap-2 flex-1">
           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 shrink-0">
             {transactions.length}
           </Badge>
           <div className={cn("w-3 h-3 rounded-full shrink-0", allPaid ? "bg-success" : "bg-warning")} />
           <span className={cn(
-            "text-xs font-bold font-display tabular-nums",
+            "text-xs font-bold font-display tabular-nums w-[80px] text-right",
             subtotal >= 0 ? 'text-success' : 'text-destructive'
           )}>
             {formatCurrency(subtotal)}
