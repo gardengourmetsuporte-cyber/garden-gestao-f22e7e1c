@@ -484,39 +484,42 @@ export function ChecklistView({
             <button
               onClick={() => toggleSector(sector.id)}
               className={cn(
-                "w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300",
-                sectorComplete 
-                  ? "card-stat-holo !border-success/30" 
-                  : "card-stat-holo"
+                "w-full flex items-center gap-3.5 p-3.5 rounded-2xl transition-all duration-300 relative overflow-hidden",
+                "bg-card border border-border/40 hover:border-border/70",
+                sectorComplete && "border-success/30"
               )}
             >
-              <div className="flex items-center gap-3">
-                {/* Icon */}
-                <div className={cn(
-                  "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
-                  sectorComplete ? "bg-success/15" : "bg-muted/30"
+              {/* Left accent bar */}
+              <div
+                className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full transition-colors"
+                style={{ background: sectorComplete ? 'hsl(var(--success))' : sector.color }}
+              />
+
+              {/* Icon */}
+              <div className={cn(
+                "w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
+                sectorComplete ? "bg-success/15" : "bg-muted/40"
+              )}>
+                {sectorComplete ? (
+                  <AppIcon name="check_circle" size={22} fill={1} className="text-success animate-scale-in" />
+                ) : (
+                  <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-muted-foreground" />
                 )}
-                  style={!sectorComplete ? { borderLeft: `3px solid ${sector.color}` } : undefined}
-                >
-                  {sectorComplete ? (
-                    <AppIcon name="check_circle" size={22} fill={1} className="text-success animate-scale-in" />
-                  ) : (
-                    <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-muted-foreground" />
-                  )}
-                </div>
-                <div className="text-left">
-                  <p className={cn(
-                    "font-semibold transition-colors duration-300",
-                    sectorComplete ? "text-success" : "text-foreground"
-                  )}>
-                    {sector.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {progress.completed}/{progress.total} concluídos
-                  </p>
-                </div>
               </div>
-              <div className="flex items-center gap-3">
+
+              <div className="flex-1 min-w-0 text-left">
+                <p className={cn(
+                  "font-semibold text-sm transition-colors duration-300",
+                  sectorComplete ? "text-success" : "text-foreground"
+                )}>
+                  {sector.name}
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {progress.completed}/{progress.total} concluídos
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
                 <div className="w-14 h-1.5 bg-secondary rounded-full overflow-hidden">
                   <div
                     className={cn(
@@ -526,12 +529,10 @@ export function ChecklistView({
                     style={{ width: `${progress.total > 0 ? (progress.completed / progress.total) * 100 : 0}%` }}
                   />
                 </div>
-                <div className={cn(
-                  "transition-transform duration-300",
-                  isExpanded ? "rotate-0" : "-rotate-90"
-                )}>
-                  <AppIcon name="ChevronDown" className="w-5 h-5 text-muted-foreground" />
-                </div>
+                <AppIcon name="ChevronRight" size={16} className={cn(
+                  "text-muted-foreground/50 transition-transform duration-300",
+                  isExpanded && "rotate-90"
+                )} />
               </div>
             </button>
 
