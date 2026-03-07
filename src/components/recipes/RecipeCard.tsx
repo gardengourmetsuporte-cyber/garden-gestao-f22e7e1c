@@ -22,6 +22,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({
   recipe,
+  totalCostPerPortion,
   onEdit,
   onDuplicate,
   onToggleActive,
