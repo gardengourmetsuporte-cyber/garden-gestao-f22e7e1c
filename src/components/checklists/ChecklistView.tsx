@@ -895,15 +895,10 @@ export function ChecklistView({
                             )}
                           </div>
                           {configuredPoints > 0 && (
-                            <span className={cn("inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border shrink-0")}
-                              style={{
-                                backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                color: getItemPointsColors(configuredPoints).color,
-                                borderColor: getItemPointsColors(configuredPoints).border,
-                              }}>
-                              <AppIcon name="Star" size={13} />
-                              +{configuredPoints}
-                            </span>
+                            <div className="flex items-center gap-0.5 shrink-0 pr-1" style={{ color: getItemPointsColors(configuredPoints).color }}>
+                              <AppIcon name="Star" size={20} />
+                              <span className="text-sm font-bold">{configuredPoints}</span>
+                            </div>
                           )}
                         </button>
                         {openPopover === item.id && activeTimer && onCancelTimer && (
@@ -1396,15 +1391,10 @@ export function ChecklistView({
                                     )}
                                   </div>
                                   {configuredPoints > 0 && (
-                                    <span className={cn("inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border shrink-0")}
-                                      style={{
-                                        backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                        color: getItemPointsColors(configuredPoints).color,
-                                        borderColor: getItemPointsColors(configuredPoints).border,
-                                      }}>
-                                      <AppIcon name="Star" size={13} />
-                                      +{configuredPoints}
-                                    </span>
+                                    <div className="flex items-center gap-0.5 shrink-0 pr-1" style={{ color: getItemPointsColors(configuredPoints).color }}>
+                                      <AppIcon name="Star" size={20} />
+                                      <span className="text-sm font-bold">{configuredPoints}</span>
+                                    </div>
                                   )}
                                 </button>
                                 {openPopover === item.id && (
