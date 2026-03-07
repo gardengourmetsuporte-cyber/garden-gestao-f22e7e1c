@@ -80,7 +80,12 @@ export default function ChecklistsPage() {
           <div className="animate-fade-in space-y-5" key={settingsMode ? 'settings' : 'view'}>
             {/* Date Strip */}
             {!settingsMode && (
-              <UnifiedDateStrip days={days} selectedDate={selectedDate} onSelectDate={setSelectedDate} trailing={reminderBtn} />
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <DatePicker date={selectedDate} onSelect={setSelectedDate} />
+                </div>
+                {reminderBtn}
+              </div>
             )}
 
             {/* Settings mode header */}
