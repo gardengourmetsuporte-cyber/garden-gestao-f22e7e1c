@@ -32,12 +32,11 @@ export function useSetupProgress() {
         }
       }
 
-      const [suppliers, items, checklists, users, closings] = await Promise.all([
+      const [suppliers, items, checklists, users] = await Promise.all([
         supabase.from('suppliers').select('id', { count: 'exact', head: true }).eq('unit_id', unitId),
         supabase.from('inventory_items').select('id', { count: 'exact', head: true }).eq('unit_id', unitId),
         supabase.from('checklist_items').select('id', { count: 'exact', head: true }).eq('unit_id', unitId).is('deleted_at', null),
         supabase.from('user_units').select('id', { count: 'exact', head: true }).eq('unit_id', unitId),
-        supabase.from('cash_closings').select('id', { count: 'exact', head: true }).eq('unit_id', unitId),
       ]);
 
       const steps: SetupStep[] = [
