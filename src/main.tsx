@@ -60,85 +60,21 @@ if ('serviceWorker' in navigator) {
         }
       });
 
-      // Flag: only reload when user explicitly clicks Update
-      let userRequestedUpdate = false;
-
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (userRequestedUpdate) {
-          window.location.reload();
-        }
-        // If user didn't request, do NOT reload — prevents random screen jumps
-      });
-
-      const showUpdateBanner = (waitingSW: ServiceWorker) => {
-        // Remove any existing banner
-        document.getElementById('sw-update-banner')?.remove();
-
-        const banner = document.createElement('div');
-        banner.id = 'sw-update-banner';
-        banner.setAttribute('style', [
-          'position:fixed', 'bottom:calc(80px + env(safe-area-inset-bottom, 0px))', 'left:16px', 'right:16px',
-          'z-index:9999', 'display:flex', 'align-items:center', 'gap:12px',
-          'padding:14px 18px', 'border-radius:16px',
-          'background:hsl(var(--card))', 'border:1px solid hsl(var(--border))',
-          'box-shadow:0 8px 30px rgba(0,0,0,0.4)',
-          'color:hsl(var(--foreground))', 'font-family:system-ui,sans-serif', 'font-size:13px',
-          'animation:slideUp .3s ease-out',
-        ].join(';'));
-
-        banner.innerHTML = `
-          <span style="flex:1;line-height:1.4">Nova versão disponível ✨</span>
-          <button id="sw-update-btn" style="
-            padding:8px 16px;border-radius:10px;font-weight:600;font-size:13px;
-            background:hsl(var(--primary));color:hsl(var(--primary-foreground));border:none;cursor:pointer;
-            white-space:nowrap;
-          ">Atualizar</button>
-          <button id="sw-update-dismiss" style="
-            background:none;border:none;color:hsl(var(--muted-foreground));cursor:pointer;
-            font-size:18px;line-height:1;padding:0 4px;
-          ">×</button>
-        `;
-
-        // Add slide-up animation
-        const style = document.createElement('style');
-        style.textContent = '@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}';
-        banner.appendChild(style);
-
-        document.body.appendChild(banner);
-
-        document.getElementById('sw-update-btn')!.onclick = () => {
-          userRequestedUpdate = true;
-          banner.remove();
-          waitingSW.postMessage({ type: 'SKIP_WAITING' });
-          // Fallback: if controllerchange doesn't fire in 3s, force reload
-          setTimeout(() => {
-            if (userRequestedUpdate) window.location.reload();
-          }, 3000);
-        };
-
-        document.getElementById('sw-update-dismiss')!.onclick = () => {
-          banner.remove();
-        };
+      // Auto-activate new service workers silently
+      const activateWaiting = (sw: ServiceWorker) => {
+        sw.postMessage({ type: 'SKIP_WAITING' });
       };
 
-      // When a new SW is installed and waiting, show the banner
-      const handleWaiting = () => {
-        if (reg.waiting) {
-          showUpdateBanner(reg.waiting);
-        }
-      };
+      if (reg.waiting) activateWaiting(reg.waiting);
 
       reg.addEventListener('updatefound', () => {
         const newSW = reg.installing;
         newSW?.addEventListener('statechange', () => {
           if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            handleWaiting();
+            activateWaiting(newSW);
           }
         });
       });
-
-      // If there's already a waiting SW on load, show it
-      handleWaiting();
     })
     .catch(() => {});
 }
