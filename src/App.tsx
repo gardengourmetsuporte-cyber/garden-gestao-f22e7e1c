@@ -10,7 +10,7 @@ import { PageLoader } from "@/components/PageLoader";
 import { useUserModules } from "@/hooks/useAccessLevels";
 import { getModuleKeyFromRoute } from "@/lib/modules";
 import { MODULE_REQUIRED_PLAN, planSatisfies } from "@/lib/plans";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
 import { useRoutePersist, useRouteRestore } from "@/hooks/useRouteRestore";
@@ -230,11 +230,24 @@ function AppRoutes() {
   );
 }
 
+// Sync: when midnight theme is active, also add 'dark' class for CSS compatibility
+function MidnightThemeSync() {
+  const { theme } = useTheme();
+  useEffect(() => {
+    const html = document.documentElement;
+    if (theme === 'midnight') {
+      html.classList.add('dark');
+    }
+  }, [theme]);
+  return null;
+}
+
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="garden-theme">
+  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} storageKey="garden-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
+        <MidnightThemeSync />
         <BrowserRouter>
           <AuthProvider>
             <UnitProvider>

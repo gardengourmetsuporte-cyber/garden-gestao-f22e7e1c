@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 const themes = [
   { value: 'light', icon: 'Sun', label: 'Claro', description: 'Fundo branco com texto escuro' },
   { value: 'dark', icon: 'Moon', label: 'Escuro', description: 'Fundo escuro premium' },
-  { value: 'system', icon: 'Monitor', label: 'Sistema', description: 'Segue o tema do dispositivo' },
+  { value: 'midnight', icon: 'Sparkles', label: 'Midnight Neon', description: 'Escuro com acentos neon vibrantes' },
 ] as const;
 
 export function AppearanceSettings() {
