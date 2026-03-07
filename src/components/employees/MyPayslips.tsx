@@ -47,18 +47,19 @@ export function MyPayslips() {
 
   return (
     <div className="space-y-6">
-      <div className="card-unified p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <AppIcon name="User" size={24} className="text-primary" />
+      <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+        <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
+          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+            <AppIcon name="User" size={20} className="text-primary" />
           </div>
           <div className="flex-1">
-            <h2 className="font-semibold">{myEmployee.full_name}</h2>
-            <p className="text-sm text-muted-foreground">{myEmployee.role || 'Funcionário'}{myEmployee.department && ` • ${myEmployee.department}`}</p>
+            <h2 className="font-semibold text-foreground">{myEmployee.full_name}</h2>
+            <p className="text-[11px] text-muted-foreground">{myEmployee.role || 'Funcionário'}{myEmployee.department && ` • ${myEmployee.department}`}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Salário base</p>
-            <p className="font-semibold text-lg">{formatCurrency(myEmployee.base_salary)}</p>
+            <p className="text-[11px] text-muted-foreground">Salário base</p>
+            <p className="font-semibold text-lg text-foreground">{formatCurrency(myEmployee.base_salary)}</p>
           </div>
         </div>
       </div>
