@@ -140,12 +140,12 @@ export default function Customers() {
 
         {/* Select mode bar */}
         {selectMode && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20">
-            <AppIcon name="CheckSquare" size={16} className="text-primary" />
-            <span className="text-sm font-medium text-primary flex-1">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
+            <span className="text-sm font-bold text-primary whitespace-nowrap">
               {selectedForMessage.size} selecionado{selectedForMessage.size !== 1 ? 's' : ''}
             </span>
-            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={selectAll}>
+            <div className="flex-1" />
+            <Button size="sm" variant="ghost" className="text-xs h-7 whitespace-nowrap" onClick={selectAll}>
               Selecionar todos com telefone
             </Button>
             <Button size="sm" variant="ghost" className="text-xs h-7" onClick={exitSelectMode}>
