@@ -45,7 +45,7 @@ export function useSetupProgress() {
         { key: 'inventory', label: 'Adicione um item ao estoque', description: 'Registre seus produtos para controlar o estoque', icon: 'Package', route: '/inventory?action=create', completed: (items.count ?? 0) > 0 },
         { key: 'checklist', label: 'Configure um checklist', description: 'Crie tarefas para abertura e fechamento', icon: 'ClipboardCheck', route: '/settings?tab=checklists', completed: (checklists.count ?? 0) > 0 },
         { key: 'team', label: 'Convide um funcionário', description: 'Adicione membros da equipe', icon: 'Users', route: '/settings?tab=team&action=invite', completed: (users.count ?? 0) > 1 },
-        { key: 'closing', label: 'Faça seu primeiro fechamento', description: 'Registre o caixa do dia', icon: 'Receipt', route: '/cash-closing', completed: (closings.count ?? 0) > 0 },
+        
       ];
 
       return { steps, isNewUnit: true };
