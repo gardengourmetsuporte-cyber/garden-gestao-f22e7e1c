@@ -11,7 +11,7 @@ import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardKPIGrid } from './DashboardKPIGrid';
 import { DashboardSection } from './DashboardSection';
-const FinanceChartWidget = lazy(() => import('./FinanceChartWidget').then(m => ({ default: m.FinanceChartWidget })));
+
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
 const AIInsightsWidget = lazy(() => import('./AIInsightsWidget').then(m => ({ default: m.AIInsightsWidget })));
 const PendingOrdersWidget = lazy(() => import('./PendingOrdersWidget').then(m => ({ default: m.PendingOrdersWidget })));
@@ -24,7 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
 const LazyChecklist = lazy(() => import('./ChecklistDashboardWidget').then(m => ({ default: m.ChecklistDashboardWidget })));
-const LazyAgenda = lazy(() => import('./AgendaDashboardWidget').then(m => ({ default: m.AgendaDashboardWidget })));
+
 const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
 const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ default: m.AutoOrderWidget })));
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
@@ -89,13 +89,6 @@ export function AdminDashboard() {
           </DashboardSection>
         ) : null;
 
-      case 'finance-chart':
-        return hasAccess('finance') ? (
-          <DashboardSection key={widget.key} onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><FinanceChartWidget /></LazyWidget>
-          </DashboardSection>
-        ) : null;
-
       case 'bills-due':
         return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
           <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
@@ -109,13 +102,6 @@ export function AdminDashboard() {
         return hasAccess('agenda') ? (
           <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyCalendar /></LazyWidget>
-          </DashboardSection>
-        ) : null;
-
-      case 'agenda':
-        return hasAccess('agenda') ? (
-          <DashboardSection key={widget.key} onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyAgenda /></LazyWidget>
           </DashboardSection>
         ) : null;
 
