@@ -119,13 +119,20 @@ export default function Customers() {
       <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-24 lg:pb-12">
         <DesktopActionBar label="Novo Cliente" onClick={openNewSheet} />
 
-        {/* Compact stats row */}
-        <div className="flex items-center gap-4 lg:gap-6 text-xs text-muted-foreground flex-wrap">
-          <span className="font-semibold text-foreground">{stats.total} clientes</span>
-          <span>{stats.activeThisMonth} ativos</span>
-          <span>{stats.inactive} inativos</span>
-          <span>Ticket R${stats.avgTicket.toFixed(0)}</span>
-          <span>Retorno {stats.returnRate.toFixed(0)}%</span>
+        {/* Stats cards */}
+        <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+          <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
+            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+              <AppIcon name="Users" size={20} className="text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground">{stats.total} clientes</p>
+              <p className="text-[11px] text-muted-foreground">
+                {stats.activeThisMonth} ativos · {stats.inactive} inativos · Ticket R${stats.avgTicket.toFixed(0)} · Retorno {stats.returnRate.toFixed(0)}%
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Birthday alerts */}
