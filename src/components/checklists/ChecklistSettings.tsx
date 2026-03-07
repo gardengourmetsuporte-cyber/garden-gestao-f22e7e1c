@@ -842,63 +842,70 @@ export function ChecklistSettings({
       </Sheet>
 
       {/* Item Sheet */}
+      {renderItemSheet()}
+    </div>
+  );
+
+  function renderItemSheet() {
+    const isBonusItem = isBonusMode || itemChecklistType === 'bonus';
+    return (
       <Sheet open={itemSheetOpen} onOpenChange={setItemSheetOpen}>
         <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8">
           <SheetHeader className="pb-4">
-            <SheetTitle>{editingItem ? 'Editar Item' : 'Novo Item'}</SheetTitle>
+            <SheetTitle>{editingItem ? 'Editar Item' : isBonusMode ? 'Nova Tarefa Bônus' : 'Novo Item'}</SheetTitle>
           </SheetHeader>
 
           <div className="space-y-5 max-h-[70vh] overflow-y-auto">
-            {/* Sector picker */}
-            {editingItem && (
-              <div className="space-y-2">
-                <Label>Setor</Label>
-                <button
-                  type="button"
-                  onClick={() => setItemSectorPickerOpen(true)}
-                  className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
-                >
-                  <span>{sectors.find(s => s.id === itemSectorId)?.name || 'Selecione'}</span>
-                  <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
-                </button>
-                <ListPicker
-                  open={itemSectorPickerOpen}
-                  onOpenChange={setItemSectorPickerOpen}
-                  title="Setor"
-                  items={sectors.map(s => ({ id: s.id, label: s.name }))}
-                  selectedId={itemSectorId || ''}
-                  onSelect={(id) => {
-                    if (id) {
-                      setItemSectorId(id);
-                      const firstSub = sectors.find(s => s.id === id)?.subcategories?.[0];
-                      setSelectedSubcategoryId(firstSub?.id || null);
-                    }
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Subcategory picker */}
-            {editingItem && itemSectorId && (
-              <div className="space-y-2">
-                <Label>Subcategoria</Label>
-                <button
-                  type="button"
-                  onClick={() => setItemSubcategoryPickerOpen(true)}
-                  className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
-                >
-                  <span>{sectors.find(s => s.id === itemSectorId)?.subcategories?.find(sub => sub.id === selectedSubcategoryId)?.name || 'Selecione'}</span>
-                  <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
-                </button>
-                <ListPicker
-                  open={itemSubcategoryPickerOpen}
-                  onOpenChange={setItemSubcategoryPickerOpen}
-                  title="Subcategoria"
-                  items={(sectors.find(s => s.id === itemSectorId)?.subcategories || []).map(sub => ({ id: sub.id, label: sub.name }))}
-                  selectedId={selectedSubcategoryId || ''}
-                  onSelect={(id) => { if (id) setSelectedSubcategoryId(id); }}
-                />
-              </div>
+            {/* Sector/Subcategory pickers - only for non-bonus editing */}
+            {editingItem && !isBonusMode && (
+              <>
+                <div className="space-y-2">
+                  <Label>Setor</Label>
+                  <button
+                    type="button"
+                    onClick={() => setItemSectorPickerOpen(true)}
+                    className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                  >
+                    <span>{sectors.find(s => s.id === itemSectorId)?.name || 'Selecione'}</span>
+                    <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <ListPicker
+                    open={itemSectorPickerOpen}
+                    onOpenChange={setItemSectorPickerOpen}
+                    title="Setor"
+                    items={sectors.map(s => ({ id: s.id, label: s.name }))}
+                    selectedId={itemSectorId || ''}
+                    onSelect={(id) => {
+                      if (id) {
+                        setItemSectorId(id);
+                        const firstSub = sectors.find(s => s.id === id)?.subcategories?.[0];
+                        setSelectedSubcategoryId(firstSub?.id || null);
+                      }
+                    }}
+                  />
+                </div>
+                {itemSectorId && (
+                  <div className="space-y-2">
+                    <Label>Subcategoria</Label>
+                    <button
+                      type="button"
+                      onClick={() => setItemSubcategoryPickerOpen(true)}
+                      className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                    >
+                      <span>{sectors.find(s => s.id === itemSectorId)?.subcategories?.find(sub => sub.id === selectedSubcategoryId)?.name || 'Selecione'}</span>
+                      <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                    <ListPicker
+                      open={itemSubcategoryPickerOpen}
+                      onOpenChange={setItemSubcategoryPickerOpen}
+                      title="Subcategoria"
+                      items={(sectors.find(s => s.id === itemSectorId)?.subcategories || []).map(sub => ({ id: sub.id, label: sub.name }))}
+                      selectedId={selectedSubcategoryId || ''}
+                      onSelect={(id) => { if (id) setSelectedSubcategoryId(id); }}
+                    />
+                  </div>
+                )}
+              </>
             )}
 
             <div className="space-y-2">
@@ -943,7 +950,7 @@ export function ChecklistSettings({
               />
             </div>
 
-            {selectedType !== 'bonus' && (
+            {!isBonusMode && (
             <div className="space-y-2">
               <Label>Tipo de Checklist</Label>
               <button
@@ -970,9 +977,8 @@ export function ChecklistSettings({
             <div className="space-y-2">
               <Label>Pontos</Label>
               {(() => {
-                const isBonus = itemChecklistType === 'bonus';
-                const currentOptions = isBonus ? bonusPointsOptions : pointsOptions;
-                const style = isBonus 
+                const currentOptions = isBonusItem ? bonusPointsOptions : pointsOptions;
+                const style = isBonusItem
                   ? { color: getBonusPointsColors(itemPoints).color }
                   : getPointsToneStyle(itemPoints);
                 return (
@@ -1023,6 +1029,6 @@ export function ChecklistSettings({
           </div>
         </SheetContent>
       </Sheet>
-    </div>
-  );
+    );
+  }
 }
