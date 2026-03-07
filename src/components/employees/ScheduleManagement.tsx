@@ -17,6 +17,7 @@ export function ScheduleManagement() {
   const { schedules, isLoading, approveSchedule, deleteSchedule, getPendingSchedules } = useSchedule();
   const [selectedSchedule, setSelectedSchedule] = useState<WorkSchedule | null>(null);
   const [notes, setNotes] = useState('');
+  const [showPendingSheet, setShowPendingSheet] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const pendingSchedules = getPendingSchedules();
