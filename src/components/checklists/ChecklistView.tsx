@@ -996,24 +996,7 @@ export function ChecklistView({
                                   <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
                                   <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
-                                {configuredPoints > 0 && (
-                                  <>
-                                    <div className="border-t border-border" />
-                                    <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget)}
-                                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                      <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
-                                      <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
-                                    </button>
-                                  </>
-                                )}
                               </>
-                            )}
-                            {isAdmin && configuredPoints > 0 && (
-                              <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget)}
-                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
-                                <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos (eu marquei)</p></div>
-                              </button>
                             )}
                             {isAdmin && (
                               <>
@@ -1484,24 +1467,7 @@ export function ChecklistView({
                                           <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
                                           <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
-                                        {configuredPoints > 0 && (
-                                          <>
-                                            <div className="border-t border-border" />
-                                            <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget)}
-                                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                              <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
-                                              <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
-                                            </button>
-                                          </>
-                                        )}
                                       </>
-                                    )}
-                                    {isAdmin && configuredPoints > 0 && (
-                                      <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget)}
-                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]">
-                                        <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center"><AppIcon name="RefreshCw" className="w-5 h-5 text-muted-foreground" /></div>
-                                        <div><p className="font-semibold text-foreground">Já estava pronto</p><p className="text-xs text-muted-foreground">Sem pontos (eu marquei)</p></div>
-                                      </button>
                                     )}
                                     {isAdmin && (
                                       <>
