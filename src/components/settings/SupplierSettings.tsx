@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { Supplier } from '@/types/database';
 import { Button } from '@/components/ui/button';
@@ -23,12 +24,22 @@ const hasValidWhatsApp = (phone: string | null): boolean => {
 
 export function SupplierSettings() {
   const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [deliveryFrequency, setDeliveryFrequency] = useState('weekly');
+
+  // Auto-open create sheet from setup checklist
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      resetForm();
+      setSheetOpen(true);
+      setSearchParams({ tab: 'suppliers' }, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = async () => {
     if (!name.trim()) return;
