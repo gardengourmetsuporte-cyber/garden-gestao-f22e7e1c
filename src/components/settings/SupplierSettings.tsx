@@ -66,7 +66,6 @@ export function SupplierSettings() {
           <AppIcon name="Truck" size={20} className="text-primary" />
           <h3 className="font-semibold text-foreground">Fornecedores</h3>
         </div>
-        </Button>
       </div>
 
       <div className="space-y-2">
