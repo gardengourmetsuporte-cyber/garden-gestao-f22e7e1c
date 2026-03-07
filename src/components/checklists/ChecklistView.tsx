@@ -650,8 +650,8 @@ export function ChecklistView({
                           {/* Inline panel for completed items (admin or own completion) */}
                           {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                             <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
-                              {/* Continuar (desmarcar sem zerar timer) */}
-                              {canToggle && (
+                              {/* Continuar (desmarcar sem zerar timer) - only in timer mode */}
+                              {isTimerMode && canToggle && (
                                 <button
                                   onClick={async () => {
                                     setOpenPopover(null);
@@ -676,8 +676,8 @@ export function ChecklistView({
                                   </div>
                                 </button>
                               )}
-                              {/* Resetar tarefa (desmarcar + zerar timer) */}
-                              {canToggle && onCancelTimer && (
+                              {/* Resetar tarefa (desmarcar + zerar timer) - only in timer mode */}
+                              {isTimerMode && canToggle && onCancelTimer && (
                                 <>
                                   <div className="border-t border-border" />
                                   <button
@@ -1152,7 +1152,7 @@ export function ChecklistView({
                                   {/* Inline panel for completed items (admin or own completion) */}
                                   {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                                     <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
-                                      {canToggle && (
+                                      {isTimerMode && canToggle && (
                                         <button
                                           onClick={async () => {
                                             setOpenPopover(null);
@@ -1177,7 +1177,7 @@ export function ChecklistView({
                                           </div>
                                         </button>
                                       )}
-                                      {canToggle && onCancelTimer && (
+                                      {isTimerMode && canToggle && onCancelTimer && (
                                         <>
                                           <div className="border-t border-border" />
                                           <button
