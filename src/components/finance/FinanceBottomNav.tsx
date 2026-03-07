@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import scannerHero from '@/assets/scanner-hero.png';
 import { useNavigate } from 'react-router-dom';
 
 import { AppIcon } from '@/components/ui/app-icon';

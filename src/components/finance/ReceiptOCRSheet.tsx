@@ -210,7 +210,7 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
         {step === 'capture' && !loading && (
           <div className="flex flex-col items-center gap-4 py-8">
             <div className="w-20 h-20 rounded-full overflow-hidden relative flex items-center justify-center">
-              <img src="/assets/scanner-hero.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src={scannerHero} alt="" className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/30" />
               <AppIcon name="ScanLine" size={36} className="text-primary relative z-10" />
             </div>
