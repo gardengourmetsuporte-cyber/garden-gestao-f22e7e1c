@@ -46,9 +46,7 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
           {allPaid ? (
             <div className="w-3 h-3 rounded-full bg-success shrink-0" />
           ) : (
-            <div className="w-4 h-4 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
-              <AppIcon name="Clock" size={10} className="text-warning" />
-            </div>
+            <div className="w-3 h-3 rounded-full bg-warning shrink-0" />
           )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
