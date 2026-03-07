@@ -179,6 +179,7 @@ export function useEmployeePayments(employeeId?: string) {
         .insert({
           ...payment,
           created_by: user?.id,
+          unit_id: activeUnitId,
         });
       
       if (error) throw error;
