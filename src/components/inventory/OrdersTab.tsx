@@ -222,13 +222,16 @@ export function OrdersTab({
               const isNoSupplier = supplierId === 'no-supplier';
 
               return (
-                <div key={supplierId} className="bg-card rounded-xl border p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">
+                <div key={supplierId} className="bg-card rounded-xl border border-border/50 p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                      <AppIcon name={isNoSupplier ? 'HelpCircle' : 'Truck'} size={20} className="text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground truncate">
                         {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {supplierItems.length} item(ns) abaixo do mínimo
                       </p>
                     </div>
@@ -236,10 +239,10 @@ export function OrdersTab({
                       <Button
                         size="sm"
                         onClick={() => handleOpenOrder(supplier)}
-                        className="gap-2"
+                        className="gap-1.5 shrink-0"
                       >
                         <AppIcon name="Add" size={16} />
-                        Criar Pedido
+                        Pedir
                       </Button>
                     )}
                   </div>
