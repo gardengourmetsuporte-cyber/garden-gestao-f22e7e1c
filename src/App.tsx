@@ -235,7 +235,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
-        <MidnightThemeSync />
+        
         <BrowserRouter>
           <AuthProvider>
             <UnitProvider>
