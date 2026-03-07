@@ -2857,20 +2857,7 @@ select:focus {
 .dash-stagger-7 { animation-delay: 360ms; }
 .dash-stagger-8 { animation-delay: 420ms; }
 
-/* Finance hero decorative dots */
-.finance-hero-card::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle, hsl(160 80% 50% / 0.08) 1px, transparent 1px);
-  background-size: 12px 12px;
-  animation: dotPulse 4s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
+/* (finance-hero decorative dots removed — aurora mesh replaces them) */
 
 /* KPI card hover glow upgrade */
 @media (hover: hover) {
