@@ -55,7 +55,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'inventory', label: 'Estoque', icon: 'Package', route: '/inventory', routes: ['/inventory'], group: 'Gestão',
+    key: 'inventory', label: 'Estoque', icon: 'Package', route: '/inventory', routes: ['/inventory'], group: 'Operação',
     children: [
       { key: 'inventory.view', label: 'Ver itens', icon: 'Eye' },
       { key: 'inventory.create', label: 'Criar/editar itens', icon: 'PenSquare' },
