@@ -342,7 +342,6 @@ export function TransactionSheet({
       }
 
       clearDraft();
-      toast.success(editingTransaction ? 'Transação atualizada!' : 'Transação salva!');
       onOpenChange(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Não foi possível salvar a transação';
