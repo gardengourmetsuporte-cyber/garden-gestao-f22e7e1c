@@ -50,10 +50,14 @@ export default function InventoryPage() {
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
 
-  // Handle ?action=move from quick actions
+  // Handle ?action= from quick actions / setup checklist
   useEffect(() => {
-    if (invSearchParams.get('action') === 'move') {
+    const action = invSearchParams.get('action');
+    if (action === 'move') {
       setMovementSheetOpen(true);
+      setInvSearchParams({}, { replace: true });
+    } else if (action === 'create') {
+      setItemFormOpen(true);
       setInvSearchParams({}, { replace: true });
     }
   }, [invSearchParams, setInvSearchParams]);
