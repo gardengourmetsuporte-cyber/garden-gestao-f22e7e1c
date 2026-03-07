@@ -65,14 +65,15 @@ export function ScheduleManagement() {
       {pendingSchedules.length > 0 && (
         <button
           onClick={() => setShowPendingSheet(true)}
-          className="w-full card-unified-interactive p-4 flex items-center gap-3 text-left"
+          className="w-full bg-card border border-border/40 rounded-2xl overflow-hidden relative flex items-center gap-3 pl-5 pr-4 py-3.5 text-left"
         >
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-warning" />
           <div className="w-10 h-10 rounded-xl bg-warning/15 flex items-center justify-center shrink-0">
             <AppIcon name="Clock" size={20} className="text-warning" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm text-foreground">{pendingSchedules.length} solicitação(ões) pendente(s)</p>
-            <p className="text-xs text-muted-foreground">Toque para revisar</p>
+            <p className="text-[11px] text-muted-foreground">Toque para revisar</p>
           </div>
           <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
         </button>
