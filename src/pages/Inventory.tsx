@@ -106,7 +106,15 @@ export default function InventoryPage() {
   const handleEditItem = (item: InventoryItem) => { setEditingItem(item); setItemFormOpen(true); };
   const handleAddItem = () => { setEditingItem(null); setItemFormOpen(true); };
 
-  useFabAction(isAdmin ? { icon: 'Plus', label: 'Novo Item', onClick: () => { setEditingItem(null); setItemFormOpen(true); } } : null, [isAdmin]);
+  const handleFabAdd = () => {
+    if (items.length === 0 && showTemplates) {
+      // Scroll to top so user sees the template selector
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    handleAddItem();
+  };
+  useFabAction(isAdmin ? { icon: 'Plus', label: 'Novo Item', onClick: handleFabAdd } : null, [isAdmin, items.length, showTemplates]);
 
   const handleSaveItem = async (data: {
     name: string; category_id: string | null; supplier_id: string | null;
