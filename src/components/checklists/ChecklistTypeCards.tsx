@@ -191,7 +191,9 @@ export function ChecklistBonusCard({
               Extra pts
             </span>
           </div>
-          <p className="text-xs mt-0.5 text-muted-foreground">Tarefas exclusivas para mais pontos ⚡</p>
+          <p className="text-xs mt-0.5 text-muted-foreground">
+            {!hasActiveItems ? 'Nenhuma tarefa ativa — invisível para equipe' : 'Tarefas exclusivas para mais pontos ⚡'}
+          </p>
         </div>
         <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
       </div>
