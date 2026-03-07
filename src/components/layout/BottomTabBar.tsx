@@ -127,10 +127,10 @@ export function BottomTabBar() {
             className="fixed inset-0 z-[60] bg-black/60 animate-fade-in"
             onClick={() => setSpeedDialOpen(false)}
           />
-          <div className="fixed bottom-28 left-0 right-0 z-[61] flex justify-center animate-fade-in"
+          <div className="fixed bottom-28 left-0 right-0 z-[61] flex justify-center px-4 animate-fade-in"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
-            <div className="flex items-end gap-6">
+            <div className="flex flex-wrap items-end justify-center gap-x-5 gap-y-4 max-w-sm">
               {fabActions.map((action, i) => (
                 <button
                   key={i}
@@ -139,18 +139,18 @@ export function BottomTabBar() {
                     setSpeedDialOpen(false);
                     action.onClick();
                   }}
-                  className="flex flex-col items-center gap-2 animate-scale-in"
+                  className="flex flex-col items-center gap-1.5 animate-scale-in w-14"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg bg-primary/90 relative">
-                    <AppIcon name={action.icon} size={22} fill={1} className="text-white" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg bg-primary/90 relative">
+                    <AppIcon name={action.icon} size={20} fill={1} className="text-white" />
                     {action.badge && action.badge > 0 && (
                       <span className="absolute -top-1 -right-1 h-4 min-w-4 px-0.5 text-[9px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
                         {action.badge}
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] font-bold text-white whitespace-nowrap">{action.label}</span>
+                  <span className="text-[10px] font-bold text-white text-center leading-tight line-clamp-2 max-w-[56px]">{action.label}</span>
                 </button>
               ))}
             </div>
