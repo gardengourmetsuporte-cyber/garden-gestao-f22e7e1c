@@ -132,7 +132,7 @@ html {
   }
 
   /* ===== LIGHT THEME ===== */
-  :root:not(.dark):not(.midnight) {
+  :root:not(.dark) {
     --color-income: 156 72% 38%;
     --color-expense: 348 83% 45%;
     --color-transfer: 220 80% 50%;
@@ -203,87 +203,6 @@ html {
     --shadow-glow: none;
   }
 
-  /* ===== CYAN NEON THEME ===== */
-  .midnight {
-    --background: 220 35% 3%;
-    --foreground: 0 0% 98%;
-
-    --card: 220 30% 6%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 220 30% 6%;
-    --popover-foreground: 0 0% 98%;
-
-    /* Cyan neon primary — replaces all green */
-    --primary: 190 95% 48%;
-    --primary-foreground: 220 40% 4%;
-
-    --secondary: 215 25% 12%;
-    --secondary-foreground: 210 15% 85%;
-
-    --muted: 215 20% 11%;
-    --muted-foreground: 215 12% 55%;
-
-    --accent: 215 20% 16%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 348 83% 53%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Success also cyan to match the theme */
-    --success: 190 90% 45%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 43 96% 56%;
-    --warning-foreground: 0 0% 100%;
-
-    --border: 215 20% 14%;
-    --input: 215 18% 12%;
-    --ring: 190 95% 48%;
-
-    /* Brand green → cyan override */
-    --garden-green: 190 95% 48%;
-
-    /* Neon overrides — all cyan-based */
-    --neon-cyan: 190 95% 55%;
-    --neon-green: 190 90% 48%;
-    --neon-red: 348 83% 53%;
-    --neon-amber: 43 96% 56%;
-    --neon-purple: 260 80% 65%;
-
-    /* Vibrant cyan glows */
-    --glow-primary: 0 0 40px hsl(190 95% 48% / 0.3), 0 0 80px hsl(190 95% 48% / 0.12);
-    --glow-accent: 0 0 30px hsl(260 80% 65% / 0.15), 0 0 60px hsl(260 80% 65% / 0.06);
-    --glow-success: 0 0 40px hsl(190 90% 45% / 0.25), 0 0 20px hsl(190 90% 45% / 0.1);
-    --glow-destructive: 0 0 40px hsl(348 83% 53% / 0.2), 0 0 20px hsl(348 83% 53% / 0.1);
-    --glow-warning: 0 0 40px hsl(43 96% 56% / 0.2), 0 0 20px hsl(43 96% 56% / 0.1);
-    --glow-cyan: 0 0 40px hsl(190 95% 55% / 0.3), 0 0 80px hsl(190 95% 55% / 0.12);
-
-    /* Gradients — cyan-to-blue flow */
-    --gradient-brand: linear-gradient(135deg, hsl(190 95% 42%), hsl(210 90% 55%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(190 95% 48% / 0.15), hsl(210 90% 55% / 0.06));
-    --gradient-surface: linear-gradient(180deg, hsl(215 25% 9%), hsl(220 35% 3%));
-    --gradient-gold: linear-gradient(135deg, hsl(190 90% 42%), hsl(210 85% 55%), hsl(230 80% 60%));
-    --gradient-gold-subtle: linear-gradient(135deg, hsl(190 90% 42% / 0.15), hsl(210 85% 55% / 0.06));
-
-    /* Deep shadows with cyan tint */
-    --shadow-card: 0 2px 10px hsl(220 40% 0% / 0.5), 0 8px 30px hsl(220 40% 0% / 0.3), inset 0 1px 1px hsl(190 80% 70% / 0.04);
-    --shadow-card-hover: 0 4px 20px hsl(220 40% 0% / 0.6), 0 12px 40px hsl(220 40% 0% / 0.4), inset 0 1px 1px hsl(190 80% 70% / 0.06);
-    --shadow-elevated: 0 10px 40px hsl(220 40% 0% / 0.8), 0 20px 60px hsl(220 40% 0% / 0.5), inset 0 1px 1px hsl(190 80% 70% / 0.08);
-    --shadow-floating: 0 10px 40px hsl(220 40% 0% / 0.5), inset 0 1px 1px hsl(190 80% 70% / 0.06);
-    --shadow-glow: 0 0 30px hsl(190 95% 48% / 0.3), 0 0 60px hsl(190 95% 48% / 0.08), inset 0 1px 1px hsl(190 80% 70% / 0.08);
-
-    /* Finance tokens — income = cyan instead of green */
-    --color-income: 190 90% 45%;
-    --color-expense: 348 83% 53%;
-    --color-transfer: 220 80% 65%;
-    --color-pending: 43 96% 56%;
-    --color-credit-card: 260 70% 60%;
-
-    --surface-elevated: 215 20% 11%;
-    --surface-sunken: 220 35% 3%;
-  }
-
 }
 
 @layer base {
@@ -302,11 +221,11 @@ html {
     scroll-behavior: smooth;
   }
 
-  .dark, .midnight {
+  .dark {
     color-scheme: dark;
   }
 
-  :root:not(.dark):not(.midnight) {
+  :root:not(.dark) {
     color-scheme: light;
   }
 
