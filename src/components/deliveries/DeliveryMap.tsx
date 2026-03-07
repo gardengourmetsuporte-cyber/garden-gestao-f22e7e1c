@@ -304,8 +304,12 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
         .addAttribution('© <a href="https://openstreetmap.org">OSM</a>')
         .addTo(map);
 
-      // Clean, minimal map tiles (CartoDB Positron)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      // Use dark tiles when in dark mode, light otherwise
+      const isDark = document.documentElement.classList.contains('dark');
+      const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      L.tileLayer(tileUrl, {
         subdomains: 'abcd',
         maxZoom: 19,
       }).addTo(map);

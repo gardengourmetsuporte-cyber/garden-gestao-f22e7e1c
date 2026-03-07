@@ -129,7 +129,11 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
         }).setView(center, 15);
         mapInstanceRef.current = map;
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        const isDark = document.documentElement.classList.contains('dark');
+        const tileUrl = isDark
+          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+          : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+        L.tileLayer(tileUrl, {
           subdomains: 'abcd',
           maxZoom: 19,
         }).addTo(map);
