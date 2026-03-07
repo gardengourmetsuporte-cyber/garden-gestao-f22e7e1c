@@ -178,7 +178,9 @@ export function BottomTabBar() {
                 aria-label={fabAction?.label || 'Ação rápida'}
                 onClick={() => {
                   navigator.vibrate?.(10);
-                  if (fabAction) {
+                  if (hasMultiActions) {
+                    setSpeedDialOpen(!speedDialOpen);
+                  } else if (fabAction) {
                     fabAction.onClick();
                   } else {
                     setQuickOpen(true);
@@ -186,18 +188,19 @@ export function BottomTabBar() {
                 }}
                 className={cn(
                   "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-500",
-                  fabAction
+                  (fabAction || hasMultiActions)
                     ? "bg-accent-foreground fab-contextual-glow"
                     : "bg-primary fab-button-glow",
+                  speedDialOpen && "rotate-45",
                   "hover:scale-[1.08] active:scale-[0.92]"
                 )}
               >
                 <AppIcon
-                  name={fabAction?.icon || 'Plus'}
+                  name={hasMultiActions ? 'Plus' : (fabAction?.icon || 'Plus')}
                   size={20}
                   className={cn(
                     "relative z-10 text-white transition-transform duration-500",
-                    fabAction ? "animate-fab-morph" : ""
+                    (fabAction || hasMultiActions) ? "animate-fab-morph" : ""
                   )}
                 />
               </button>
