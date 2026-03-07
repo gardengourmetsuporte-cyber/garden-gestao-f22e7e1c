@@ -169,6 +169,11 @@ export function AppSidebar() {
                         >
                           <AppIcon name={item.icon} size={20} fill={isActive ? 1 : 0} />
                           <span className="truncate flex-1">{item.label}</span>
+                          {item.badge && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/20 text-primary shrink-0">
+                              {item.badge}
+                            </span>
+                          )}
                           {locked && <AppIcon name="Lock" size={14} className="text-sidebar-primary/60 shrink-0" />}
                         </Link>
                       </SidebarMenuButton>

@@ -29,7 +29,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Principal',
+    key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Em Desenvolvimento',
   },
   {
     key: 'finance', label: 'Financeiro', icon: 'DollarSign', route: '/finance', routes: ['/finance'], group: 'Gestão',
@@ -55,7 +55,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'inventory', label: 'Estoque', icon: 'Package', route: '/inventory', routes: ['/inventory'], group: 'Gestão',
+    key: 'inventory', label: 'Estoque', icon: 'Package', route: '/inventory', routes: ['/inventory'], group: 'Operação',
     children: [
       { key: 'inventory.view', label: 'Ver itens', icon: 'Eye' },
       { key: 'inventory.create', label: 'Criar/editar itens', icon: 'PenSquare' },
@@ -66,7 +66,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'orders', label: 'Pedidos', icon: 'ShoppingCart', route: '/orders', routes: ['/orders'], group: 'Gestão',
+    key: 'orders', label: 'Pedidos', icon: 'ShoppingCart', route: '/orders', routes: ['/orders'], group: 'Operação',
     children: [
       { key: 'orders.view', label: 'Ver pedidos', icon: 'Eye' },
       { key: 'orders.create', label: 'Criar/enviar pedidos', icon: 'PenSquare' },
@@ -101,7 +101,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Operação',
+    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Gestão',
     children: [
       { key: 'recipes.view', label: 'Ver fichas', icon: 'Eye' },
       { key: 'recipes.create', label: 'Criar/editar fichas', icon: 'PenSquare' },
@@ -135,7 +135,7 @@ export const ALL_MODULES: ModuleDef[] = [
     key: 'personal-finance', label: 'Finanças Pessoais', icon: 'Wallet', route: '/personal-finance', routes: ['/personal-finance'], group: 'Gestão',
   },
   {
-    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Premium',
+    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Em Desenvolvimento',
     children: [
       { key: 'marketing.calendar', label: 'Calendário de posts', icon: 'Calendar' },
       { key: 'marketing.create', label: 'Criar/editar posts', icon: 'PenSquare' },
@@ -144,7 +144,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'menu-admin', label: 'Cardápio Digital', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Premium',
+    key: 'menu-admin', label: 'Cardápio Digital', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Em Desenvolvimento',
     children: [
       { key: 'menu-admin.view', label: 'Ver cardápio', icon: 'Eye' },
       { key: 'menu-admin.products', label: 'Gerenciar produtos', icon: 'PenSquare' },
@@ -157,7 +157,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Premium',
+    key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Em Desenvolvimento',
     children: [
       { key: 'whatsapp.conversations', label: 'Conversas', icon: 'MessageCircle' },
       { key: 'whatsapp.settings', label: 'Configurações bot', icon: 'Settings' },
