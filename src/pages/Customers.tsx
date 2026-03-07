@@ -165,14 +165,11 @@ export default function Customers() {
         <div className="flex gap-2">
           <Button
             size="icon"
-            variant="outline"
-            className="h-11 w-11 shrink-0 border-border/50 bg-card"
-            onClick={() => {
-              const el = document.getElementById('customer-search-input');
-              if (el) el.focus();
-            }}
+            variant={searchOpen ? "default" : "outline"}
+            className={cn("h-11 w-11 shrink-0", !searchOpen && "border-border/50 bg-card")}
+            onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearch(''); }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>search</span>
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>{searchOpen ? 'close' : 'search'}</span>
           </Button>
           <Select
             value={segmentFilter || 'all'}
@@ -219,16 +216,13 @@ export default function Customers() {
           </Button>
         </div>
 
-        {/* Hidden search input for search button */}
-        {search !== undefined && (
+        {searchOpen && (
           <Input
-            id="customer-search-input"
+            autoFocus
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar cliente..."
             className="h-11 border-border/50 bg-card"
-            style={{ display: search ? 'block' : 'none' }}
-            onBlur={() => { if (!search) {} }}
           />
         )}
 
