@@ -192,6 +192,9 @@ export function ChecklistSettings({
   const [freqPickerOpen, setFreqPickerOpen] = useState(false);
   const [typePickerOpen, setTypePickerOpen] = useState(false);
   const [pointsPickerOpen, setPointsPickerOpen] = useState(false);
+  const [itemSectorPickerOpen, setItemSectorPickerOpen] = useState(false);
+  const [itemSubcategoryPickerOpen, setItemSubcategoryPickerOpen] = useState(false);
+  const [itemSectorId, setItemSectorId] = useState<string | null>(null);
   
   // Editing states
   const [editingSector, setEditingSector] = useState<ChecklistSector | null>(null);
