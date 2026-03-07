@@ -357,8 +357,8 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
               className: '',
               html: `
                 <div style="position:relative;width:48px;height:48px;">
-                  <div style="width:44px;height:44px;background:hsl(142 71% 45% / 0.12);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-                  <div style="width:36px;height:36px;background:hsl(var(--background));border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.15);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                  <div style="width:44px;height:44px;background:rgba(34,197,94,0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+                  <div style="width:36px;height:36px;background:#ffffff;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.2);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <img src="/icons/motocicleta.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;" />
                   </div>
                 </div>`,
