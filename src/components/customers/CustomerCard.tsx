@@ -25,7 +25,7 @@ export const CustomerCard = forwardRef<HTMLDivElement, Props>(function CustomerC
       className="bg-card border border-border/40 rounded-2xl overflow-hidden relative hover:border-primary/25 active:scale-[0.98] transition-all duration-200 cursor-pointer"
       onClick={onEdit}
     >
-      <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ backgroundColor: seg.rawColor || 'hsl(var(--primary))' }} />
+      <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
       
       <div className="pl-5 pr-4 py-3.5 space-y-2.5">
         {/* Header */}
