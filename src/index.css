@@ -1053,7 +1053,10 @@
 
   .tab-command-active,
   .tab-command-item-active {
-    @apply gradient-primary;
+    background: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+    font-weight: 600;
+    box-shadow: 0 1px 4px hsl(var(--primary) / 0.1);
   }
 
   .tab-command-inactive {
