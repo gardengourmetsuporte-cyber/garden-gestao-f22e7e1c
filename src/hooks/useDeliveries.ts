@@ -331,6 +331,7 @@ export function useDeliveries() {
           items_summary: ocrResult.items_summary || null,
           photo_url: photoUrl,
           total: ocrResult.total || 0,
+          order_number: ocrResult.order_number || '',
           created_by: user!.id,
         })
         .select('*, address:delivery_addresses(*)')
