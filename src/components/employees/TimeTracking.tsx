@@ -97,42 +97,6 @@ export function TimeTracking() {
         </Button>
       )}
 
-      {isAdmin && (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowManualSheet(true)}>
-              <AppIcon name="edit" size={16} className="mr-2" />
-              Lançamento Manual
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-xl h-11 w-11" onClick={() => setShowSettingsSheet(true)}>
-              <AppIcon name="settings" size={16} />
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowImportSheet(true)}>
-              <AppIcon name="upload" size={16} className="mr-2" />
-              Importar
-            </Button>
-            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => handleExportRecords()}>
-              <AppIcon name="download" size={16} className="mr-2" />
-              Exportar
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            className="w-full rounded-xl h-11 relative"
-            onClick={() => setShowCertificateList(true)}
-          >
-            <AppIcon name="clinical_notes" size={16} className="mr-2" />
-            Atestados
-            {pendingCerts.length > 0 && (
-              <Badge className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 text-[10px]" variant="destructive">
-                {pendingCerts.length}
-              </Badge>
-            )}
-          </Button>
-        </div>
-      )}
 
       <RecordsList records={records} isAdmin={isAdmin} onDelete={isAdmin ? deleteRecord : undefined} />
 
