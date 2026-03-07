@@ -251,7 +251,7 @@ function MidnightThemeSync() {
 }
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'dark midnight' }} storageKey="garden-theme">
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'midnight' }} storageKey="garden-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
