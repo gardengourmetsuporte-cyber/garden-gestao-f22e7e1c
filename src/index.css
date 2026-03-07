@@ -775,27 +775,27 @@ html {
   }
 
   .finance-hero-chip--success {
-    background: hsl(45 35% 15% / 0.65);
-    border: 1px solid hsl(45 50% 50% / 0.2);
+    background: hsl(42 40% 16% / 0.7);
+    border: 1px solid hsl(42 70% 55% / 0.25);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 
   .dark .finance-hero-chip--success {
-    background: hsl(45 25% 10% / 0.6);
-    border: 1px solid hsl(45 50% 45% / 0.18);
+    background: hsl(42 30% 11% / 0.65);
+    border: 1px solid hsl(42 65% 50% / 0.22);
   }
 
   .finance-hero-chip--neutral {
-    background: hsl(35 20% 15% / 0.65);
-    border: 1px solid hsl(35 30% 50% / 0.18);
+    background: hsl(35 30% 15% / 0.65);
+    border: 1px solid hsl(35 50% 50% / 0.22);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 
   .dark .finance-hero-chip--neutral {
-    background: hsl(35 15% 12% / 0.6);
-    border: 1px solid hsl(35 25% 45% / 0.15);
+    background: hsl(35 22% 12% / 0.6);
+    border: 1px solid hsl(35 45% 48% / 0.18);
   }
 
   /* ========== COMMAND CENTER CARDS ========== */
