@@ -53,7 +53,7 @@ export function RecipeCard({
       <div className="min-w-0 flex-1">
         <h3 className="font-medium text-sm text-foreground truncate">{recipe.name}</h3>
         <div className="flex items-center gap-1.5 mt-0.5 text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground">{formatCurrency(recipe.cost_per_portion)}</span>
+          <span className="font-semibold text-foreground">{formatCurrency(totalCostPerPortion ?? recipe.cost_per_portion)}</span>
           <span className="text-muted-foreground/40">·</span>
           <span>{recipe.ingredients?.length ?? 0} itens</span>
         </div>
