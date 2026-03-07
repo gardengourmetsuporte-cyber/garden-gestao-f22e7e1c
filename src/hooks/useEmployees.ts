@@ -267,6 +267,7 @@ export function useEmployeePayments(employeeId?: string) {
         .from('finance_transactions')
         .insert({
           user_id: user?.id,
+          unit_id: activeUnitId,
           type: payment.type === 'discount' ? 'income' : 'expense',
           description,
           amount: payment.amount,
