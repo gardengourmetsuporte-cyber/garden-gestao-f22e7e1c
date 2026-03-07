@@ -1177,7 +1177,7 @@ export function ChecklistView({
                                           </div>
                                         </button>
                                       )}
-                                      {canToggle && onCancelTimer && (
+                                      {isTimerMode && canToggle && onCancelTimer && (
                                         <>
                                           <div className="border-t border-border" />
                                           <button
