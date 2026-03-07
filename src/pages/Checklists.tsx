@@ -47,8 +47,6 @@ export default function ChecklistsPage() {
     );
   }
 
-  const today = new Date();
-  const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
 
   const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
     const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
