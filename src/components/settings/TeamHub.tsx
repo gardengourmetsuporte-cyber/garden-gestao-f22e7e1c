@@ -406,9 +406,11 @@ function MembersTab() {
 function InvitesTab() {
   const { user } = useAuth();
   const { activeUnitId, activeUnit } = useUnit();
+  const { accessLevels } = useAccessLevels();
   const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('member');
+  const [selectedAccessLevelId, setSelectedAccessLevelId] = useState<string | null>(null);
   const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
   const [lastInviteEmail, setLastInviteEmail] = useState<string | null>(null);
 
