@@ -5,7 +5,8 @@ import { useSmartScanner } from '@/hooks/useSmartScanner';
 import { cn } from '@/lib/utils';
 
 export function SmartScannerWidget() {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
   const scanner = useSmartScanner();
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -14,7 +15,6 @@ export function SmartScannerWidget() {
     if (!file) return;
     setSheetOpen(true);
     scanner.scanDocument(file);
-    // Reset input so the same file can be re-selected
     e.target.value = '';
   };
 
@@ -25,33 +25,53 @@ export function SmartScannerWidget() {
 
   return (
     <>
-      <button
-        onClick={() => inputRef.current?.click()}
-        className={cn(
-          'w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300',
-          'bg-gradient-to-r from-primary/15 via-primary/10 to-transparent',
-          'border border-primary/20 hover:border-primary/40',
-          'hover:shadow-lg hover:shadow-primary/10',
-          'active:scale-[0.98] group'
-        )}
-      >
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/20 group-hover:bg-primary/30 transition-colors shrink-0">
-          <AppIcon name="ScanLine" size={24} className="text-primary" />
+      <div className={cn(
+        'w-full flex items-center gap-3 p-4 rounded-2xl',
+        'bg-gradient-to-r from-primary/15 via-primary/10 to-transparent',
+        'border border-primary/20',
+      )}>
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/20 shrink-0">
+          <AppIcon name="ScanLine" size={22} className="text-primary" />
         </div>
-        <div className="flex-1 text-left">
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground">Scanner Inteligente</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-[11px] text-muted-foreground mt-0.5">
             Foto → lançamento automático
           </p>
         </div>
-        <AppIcon name="Camera" size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-      </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => cameraRef.current?.click()}
+            className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 hover:bg-primary/20 active:scale-95 transition-all"
+            title="Câmera"
+          >
+            <AppIcon name="Camera" size={18} className="text-primary" />
+          </button>
+          <button
+            onClick={() => galleryRef.current?.click()}
+            className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 hover:bg-primary/20 active:scale-95 transition-all"
+            title="Galeria / Arquivos"
+          >
+            <AppIcon name="Image" size={18} className="text-primary" />
+          </button>
+        </div>
+      </div>
 
+      {/* Camera input (with capture) */}
       <input
-        ref={inputRef}
+        ref={cameraRef}
         type="file"
         accept="image/*"
         capture="environment"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
+      {/* Gallery/file input (no capture = shows gallery + file picker) */}
+      <input
+        ref={galleryRef}
+        type="file"
+        accept="image/*"
         className="hidden"
         onChange={handleFileChange}
       />
