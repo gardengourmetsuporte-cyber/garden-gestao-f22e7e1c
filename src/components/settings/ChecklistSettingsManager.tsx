@@ -33,10 +33,23 @@ export function ChecklistSettingsManager() {
     refetch,
   } = useChecklists();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedType, setSelectedType] = useState<ChecklistType>('abertura');
   const [showTemplates, setShowTemplates] = useState(true);
 
   const hasItems = sectors.some(s => s.subcategories?.some((sub: any) => sub.items?.length > 0));
+
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'templates') {
+      setShowTemplates(true);
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.delete('action');
+        return next;
+      }, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
