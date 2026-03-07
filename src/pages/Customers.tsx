@@ -40,6 +40,7 @@ export default function Customers() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [selectedForMessage, setSelectedForMessage] = useState<Set<string>>(new Set());
   const [selectMode, setSelectMode] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const { data: detailEvents = [], isLoading: eventsLoading } = useCustomerEvents(detailCustomer?.id || null);
 
