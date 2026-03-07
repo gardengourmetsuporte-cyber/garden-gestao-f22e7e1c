@@ -534,11 +534,11 @@ html {
   /* Holographic card scoped tokens */
   .card-holographic {
     --foreground: 0 0% 98%;
-    --muted-foreground: 40 15% 60%;
-    --gp-label: hsl(40 15% 62%);
-    --gp-sublabel: hsl(40 12% 55%);
+    --muted-foreground: 42 20% 62%;
+    --gp-label: hsl(42 25% 65%);
+    --gp-sublabel: hsl(42 18% 58%);
     --gp-value: hsl(0 0% 98%);
-    --gp-icon: hsl(45 20% 70%);
+    --gp-icon: hsl(42 35% 72%);
     --gp-positive: hsl(142 60% 55%);
     --gp-negative: hsl(0 70% 60%);
   }
