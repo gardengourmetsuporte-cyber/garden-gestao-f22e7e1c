@@ -66,10 +66,6 @@ export function SupplierSettings() {
           <AppIcon name="Truck" size={20} className="text-primary" />
           <h3 className="font-semibold text-foreground">Fornecedores</h3>
         </div>
-        <Button variant="outline" size="sm" onClick={handleAdd} className="gap-2">
-          <AppIcon name="Plus" size={16} />
-          Novo
-        </Button>
       </div>
 
       <div className="space-y-2">
