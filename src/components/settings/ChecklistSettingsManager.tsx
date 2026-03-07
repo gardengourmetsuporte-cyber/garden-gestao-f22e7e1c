@@ -33,7 +33,9 @@ export function ChecklistSettingsManager() {
   } = useChecklists();
 
   const [selectedType, setSelectedType] = useState<ChecklistType>('abertura');
+  const [showTemplates, setShowTemplates] = useState(true);
 
+  const hasItems = sectors.some(s => s.subcategories?.some((sub: any) => sub.items?.length > 0));
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
