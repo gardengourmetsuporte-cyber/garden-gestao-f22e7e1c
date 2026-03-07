@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MapPin, Check, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { MapPin, Check, Loader2, Search } from 'lucide-react';
+import { toast } from 'sonner';
 import type { Delivery } from '@/hooks/useDeliveries';
 
 declare global {
@@ -33,18 +35,44 @@ interface Props {
 // Default center: São João da Boa Vista
 const DEFAULT_CENTER: [number, number] = [-21.9687, -46.7969];
 
+function placeMarker(map: any, markerRef: React.MutableRefObject<any>, lat: number, lng: number) {
+  const L = window.L;
+  if (markerRef.current) {
+    markerRef.current.setLatLng([lat, lng]);
+  } else {
+    const icon = L.divIcon({
+      className: '',
+      html: `
+        <div style="position:relative;width:32px;height:42px;">
+          <svg width="32" height="42" viewBox="0 0 32 42" fill="none">
+            <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26C32 7.163 24.837 0 16 0z" fill="#f59e0b"/>
+            <circle cx="16" cy="16" r="8" fill="white"/>
+            <circle cx="16" cy="16" r="5" fill="#f59e0b"/>
+          </svg>
+        </div>`,
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+    });
+    markerRef.current = L.marker([lat, lng], { icon }).addTo(map);
+  }
+}
+
 export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Reset state when delivery changes
   useEffect(() => {
     if (open) {
       setSelectedCoords(null);
       setIsSaving(false);
+      setSearchQuery(delivery?.address?.full_address || '');
+      setIsSearching(false);
     }
   }, [open, delivery?.id]);
 
@@ -82,31 +110,15 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
         map.on('click', (e: any) => {
           const { lat, lng } = e.latlng;
           setSelectedCoords({ lat, lng });
-
-          if (markerRef.current) {
-            markerRef.current.setLatLng([lat, lng]);
-          } else {
-            const icon = L.divIcon({
-              className: '',
-              html: `
-                <div style="position:relative;width:32px;height:42px;">
-                  <svg width="32" height="42" viewBox="0 0 32 42" fill="none">
-                    <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26C32 7.163 24.837 0 16 0z" fill="#f59e0b"/>
-                    <circle cx="16" cy="16" r="8" fill="white"/>
-                    <circle cx="16" cy="16" r="5" fill="#f59e0b"/>
-                  </svg>
-                </div>`,
-              iconSize: [32, 42],
-              iconAnchor: [16, 42],
-            });
-            markerRef.current = L.marker([lat, lng], { icon }).addTo(map);
-          }
+          placeMarker(map, markerRef, lat, lng);
         });
 
-        // Invalidate size after animation
-        setTimeout(() => map.invalidateSize(), 350);
+        // Multiple invalidateSize calls to handle sheet animation
+        setTimeout(() => map.invalidateSize(), 300);
+        setTimeout(() => map.invalidateSize(), 600);
+        setTimeout(() => map.invalidateSize(), 1000);
       });
-    }, 100);
+    }, 200);
 
     return () => {
       cancelled = true;
@@ -121,6 +133,48 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
       }
     };
   }, [open, delivery?.id]);
+
+  // Search address via Nominatim
+  const handleSearch = useCallback(async () => {
+    const query = searchQuery.trim();
+    if (!query || !mapInstanceRef.current) return;
+
+    setIsSearching(true);
+    try {
+      // Append city context for better results
+      const searchWithCity = query.toLowerCase().includes('são joão') || query.toLowerCase().includes('sao joao')
+        ? query
+        : `${query}, São João da Boa Vista, SP, Brasil`;
+
+      const params = new URLSearchParams({
+        q: searchWithCity,
+        format: 'json',
+        limit: '1',
+        countrycodes: 'br',
+      });
+
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+        headers: { 'User-Agent': 'GardenGestao/1.0' },
+      });
+      const results = await res.json();
+
+      if (results?.[0]) {
+        const lat = parseFloat(results[0].lat);
+        const lng = parseFloat(results[0].lon);
+        const map = mapInstanceRef.current;
+
+        setSelectedCoords({ lat, lng });
+        placeMarker(map, markerRef, lat, lng);
+        map.flyTo([lat, lng], 17, { duration: 0.8 });
+      } else {
+        toast.error('Endereço não encontrado. Tente ser mais específico.');
+      }
+    } catch {
+      toast.error('Erro ao buscar endereço');
+    } finally {
+      setIsSearching(false);
+    }
+  }, [searchQuery]);
 
   const handleConfirm = useCallback(async () => {
     if (!selectedCoords || !delivery?.address?.id) return;
@@ -138,9 +192,9 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
   const addr = delivery?.address;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="!max-h-[90vh] !h-auto !p-0 !rounded-t-3xl">
-        <div className="p-4 pb-2">
+    <Sheet open={open} onOpenChange={onOpenChange} mobileHandleOnly>
+      <SheetContent side="bottom" className="!max-h-[92vh] !h-auto !p-0 !rounded-t-3xl">
+        <div className="p-4 pb-2 space-y-2.5">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 text-base">
               <MapPin className="w-4 h-4 text-primary" />
@@ -152,13 +206,35 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
             </SheetDescription>
           </SheetHeader>
 
-          <p className="text-[11px] text-muted-foreground mt-2 bg-muted/30 rounded-lg px-3 py-2">
-            Toque no mapa para marcar onde fica o endereço de entrega
+          {/* Search bar */}
+          <form
+            onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
+            className="flex gap-2"
+          >
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar endereço..."
+              className="h-9 text-sm flex-1"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              variant="outline"
+              disabled={isSearching || !searchQuery.trim()}
+              className="h-9 px-3 shrink-0"
+            >
+              {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            </Button>
+          </form>
+
+          <p className="text-[10px] text-muted-foreground/60">
+            Busque o endereço acima ou toque no mapa para marcar o local
           </p>
         </div>
 
         {/* Map */}
-        <div className="relative isolate" style={{ height: 350 }}>
+        <div className="relative isolate" style={{ height: 320 }}>
           <div ref={mapRef} className="w-full h-full" />
         </div>
 
