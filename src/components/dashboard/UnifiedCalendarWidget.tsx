@@ -88,7 +88,7 @@ export function UnifiedCalendarWidget() {
 
         {/* Inline detail panel */}
         {selectedDate && selectedEvents && (
-          <div className="rounded-2xl border border-border/30 p-3 space-y-3 bg-card animate-slide-up">
+          <div className="calendar-card-brand p-3 space-y-3 animate-slide-up">
             <p className="text-xs font-semibold text-foreground capitalize">
               {format(new Date(selectedDate + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </p>

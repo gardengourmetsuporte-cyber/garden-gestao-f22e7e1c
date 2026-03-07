@@ -378,6 +378,35 @@ html {
     box-shadow: var(--shadow-card), 0 4px 20px -5px hsl(200 80% 60% / 0.06);
   }
 
+  /* Calendar card variant with stronger brand personality */
+  .calendar-card-brand {
+    @apply rounded-2xl relative overflow-hidden transition-all duration-300;
+    background: linear-gradient(145deg, hsl(var(--card) / 0.98), hsl(var(--card) / 0.92));
+    border: 1px solid hsl(var(--primary) / 0.28);
+    box-shadow: var(--shadow-card), inset 0 1px 0 hsl(var(--primary-foreground) / 0.08);
+  }
+
+  :is(.dark) .calendar-card-brand {
+    background: linear-gradient(145deg, hsl(var(--card) / 0.95), hsl(var(--primary) / 0.12));
+    border: 1px solid hsl(var(--primary) / 0.35);
+    box-shadow: var(--shadow-card), inset 0 1px 0 hsl(var(--primary-foreground) / 0.1), 0 10px 30px -20px hsl(var(--primary) / 0.45);
+  }
+
+  .calendar-card-brand::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(120% 85% at 0% 0%, hsl(var(--primary) / 0.16), transparent 60%);
+  }
+
+  @media (hover: hover) {
+    .calendar-card-brand:hover {
+      border-color: hsl(var(--primary) / 0.45);
+      box-shadow: var(--shadow-card-hover), 0 12px 30px -22px hsl(var(--primary) / 0.5);
+    }
+  }
+
   /* Sweep reflection for premium dark cards */
   :is(.dark) .card-base::after,
   :is(.dark) .card-surface::after,
