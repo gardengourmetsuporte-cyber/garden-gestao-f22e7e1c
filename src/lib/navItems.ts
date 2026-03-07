@@ -47,10 +47,10 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
 
   // ── Em Desenvolvimento ──
-  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'dev', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
-  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'dev', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
-  { icon: 'BookOpen', label: 'Cardápio Digital', href: '/cardapio', adminOnly: true, group: 'dev', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
-  { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'dev', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
+  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
+  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
+  { icon: 'BookOpen', label: 'Cardápio Digital', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
+  { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
 ];
 
 /**
@@ -86,7 +86,7 @@ export function filterNavItems(
 
     // Fallback: use adminOnly flag
     // Premium modules are admin-only by default
-    if (item.group === 'dev') return isAdmin;
+    if (item.group === 'premium') return isAdmin;
     if (item.adminOnly && !isAdmin) return false;
     return true;
   });
