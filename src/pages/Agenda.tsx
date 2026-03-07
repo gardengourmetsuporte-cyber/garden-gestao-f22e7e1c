@@ -359,13 +359,47 @@ export default function Agenda() {
               </DropdownMenu>
             </div>
           </div>
-          {/* Calendar view */}
+
+          {/* View mode tabs */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-secondary/30 border border-border/30">
+            {([
+              { key: 'list' as const, icon: 'FormatListBulleted', label: 'Lista' },
+              { key: 'calendar' as const, icon: 'CalendarMonth', label: 'Calendário' },
+              { key: 'blocks' as const, icon: 'ViewAgenda', label: 'Blocos' },
+            ]).map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setViewMode(tab.key)}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all",
+                  viewMode === tab.key
+                    ? "bg-primary/15 text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <AppIcon name={tab.icon} size={16} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Content */}
           <div className="animate-fade-in">
-            <AgendaCalendarView
-              tasks={displayTasks}
-              onTaskClick={handleEditTask}
-              onToggleTask={toggleTask}
-            />
+            {viewMode === 'calendar' && (
+              <AgendaCalendarView
+                tasks={displayTasks}
+                onTaskClick={handleEditTask}
+                onToggleTask={toggleTask}
+              />
+            )}
+            {viewMode === 'list' && <ListContent />}
+            {viewMode === 'blocks' && (
+              <TimeBlocksView
+                tasks={displayTasks}
+                onTaskClick={handleEditTask}
+                onToggleTask={toggleTask}
+              />
+            )}
           </div>
         </div>
 
