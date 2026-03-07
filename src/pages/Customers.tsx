@@ -1,8 +1,4 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useUnit } from '@/contexts/UnitContext';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Input } from '@/components/ui/input';
@@ -30,11 +26,8 @@ import {
 const SEGMENTS: CustomerSegment[] = ['vip', 'frequent', 'occasional', 'inactive', 'new'];
 const PAGE_SIZE = 30;
 
-
 export default function Customers() {
   const { customers, isLoading, createCustomer, updateCustomer, deleteCustomer, importCSV } = useCustomers();
-  const { activeUnit } = useUnit();
-  const qc = useQueryClient();
   const { stats, addEvent, loyaltyRules } = useCustomerCRM(customers);
   const [search, setSearch] = useState('');
   const [segmentFilter, setSegmentFilter] = useState<CustomerSegment | null>(null);
@@ -45,7 +38,8 @@ export default function Customers() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [campaignOpen, setCampaignOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const salesFileRef = useRef<HTMLInputElement>(null);
+  const [selectedForMessage, setSelectedForMessage] = useState<Set<string>>(new Set());
+  const [selectMode, setSelectMode] = useState(false);
 
   const { data: detailEvents = [], isLoading: eventsLoading } = useCustomerEvents(detailCustomer?.id || null);
 
@@ -55,43 +49,6 @@ export default function Customers() {
   }, []);
 
   useFabAction({ icon: 'Plus', label: 'Novo cliente', onClick: openNewSheet }, [openNewSheet]);
-
-  // One-time auto-import of Goomer customers CSV (scoped to unit)
-  useEffect(() => {
-    if (!activeUnit) return;
-    const IMPORT_KEY = `goomer_customers_imported_${activeUnit.id}`;
-    // Also check legacy key
-    if (localStorage.getItem(IMPORT_KEY) || localStorage.getItem('goomer_customers_imported_v1')) return;
-    
-    const doImport = async () => {
-      // Mark immediately to prevent concurrent retries
-      localStorage.setItem(IMPORT_KEY, 'pending');
-      try {
-        const res = await fetch('/data/goomer-customers.csv');
-        if (!res.ok) { localStorage.setItem(IMPORT_KEY, 'skip'); return; }
-        const csvText = await res.text();
-        if (!csvText.includes('"Nome"') || !csvText.includes(';')) { localStorage.setItem(IMPORT_KEY, 'skip'); return; }
-        
-        const { error, data } = await supabase.functions.invoke('import-customers-csv', {
-          body: { csvText, unitId: activeUnit.id },
-        });
-        if (error) throw error;
-        if (data?.error) throw new Error(data.error);
-        
-        localStorage.setItem(IMPORT_KEY, 'done');
-        if (data.inserted > 0) {
-          toast.success(`${data.inserted} clientes importados do Goomer!`);
-          qc.invalidateQueries({ queryKey: ['customers'] });
-        }
-      } catch (err: any) {
-        console.error('Auto-import failed:', err);
-        // Keep the key set to prevent infinite retries
-        localStorage.setItem(IMPORT_KEY, 'error');
-      }
-    };
-    
-    doImport();
-  }, [activeUnit, qc]);
 
   const filtered = useMemo(() => {
     let list = customers;
@@ -130,29 +87,39 @@ export default function Customers() {
     }
   };
 
-  const handleSalesImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !activeUnit) return;
-    try {
-      const csvText = await file.text();
-      const { data, error } = await supabase.functions.invoke('import-daily-sales', {
-        body: { csvText, unitId: activeUnit.id },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      toast.success(`${data.created} criados, ${data.updated} atualizados!`);
-      qc.invalidateQueries({ queryKey: ['customers'] });
-    } catch (err: any) {
-      toast.error(err.message || 'Erro na importação');
+  // Toggle selection for messaging
+  const toggleSelect = (id: string) => {
+    setSelectedForMessage(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    const withPhone = filtered.filter(c => c.phone?.trim());
+    setSelectedForMessage(new Set(withPhone.map(c => c.id)));
+  };
+
+  const campaignRecipients = useMemo(() => {
+    if (selectMode && selectedForMessage.size > 0) {
+      return customers.filter(c => selectedForMessage.has(c.id));
     }
-    e.target.value = '';
+    return filtered;
+  }, [selectMode, selectedForMessage, customers, filtered]);
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelectedForMessage(new Set());
   };
 
   return (
     <AppLayout>
-        <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-24 lg:pb-12">
-          <DesktopActionBar label="Novo Cliente" onClick={openNewSheet} />
-           {/* Compact stats row */}
+      <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-24 lg:pb-12">
+        <DesktopActionBar label="Novo Cliente" onClick={openNewSheet} />
+
+        {/* Compact stats row */}
         <div className="flex items-center gap-4 lg:gap-6 text-xs text-muted-foreground flex-wrap">
           <span className="font-semibold text-foreground">{stats.total} clientes</span>
           <span>{stats.activeThisMonth} ativos</span>
@@ -164,19 +131,46 @@ export default function Customers() {
         {/* Birthday alerts */}
         <BirthdayAlerts customers={customers} />
 
-        {/* Search + Segment filter inline */}
+        {/* Select mode bar */}
+        {selectMode && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/10 border border-primary/20">
+            <AppIcon name="CheckSquare" size={16} className="text-primary" />
+            <span className="text-sm font-medium text-primary flex-1">
+              {selectedForMessage.size} selecionado{selectedForMessage.size !== 1 ? 's' : ''}
+            </span>
+            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={selectAll}>
+              Selecionar todos com telefone
+            </Button>
+            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={exitSelectMode}>
+              Cancelar
+            </Button>
+            {selectedForMessage.size > 0 && (
+              <Button size="sm" className="text-xs h-7" onClick={() => setCampaignOpen(true)}>
+                <AppIcon name="Send" size={14} className="mr-1" />
+                Enviar
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Search + Segment filter + Actions */}
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: 18 }}>
               search
             </span>
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente..." className="pl-10 h-11 border-emerald-500/10 bg-[#0a1a10]/40 focus:border-emerald-500/30" />
+            <Input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar cliente..."
+              className="pl-10 h-11 border-border/50 bg-card"
+            />
           </div>
           <Select
             value={segmentFilter || 'all'}
             onValueChange={v => setSegmentFilter(v === 'all' ? null : v as CustomerSegment)}
           >
-            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold border-emerald-500/10 bg-[#0a1a10]/40">
+            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold border-border/50 bg-card">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -191,12 +185,29 @@ export default function Customers() {
               })}
             </SelectContent>
           </Select>
-          {segmentFilter && (
-            <Button size="icon" variant="outline" className="h-11 w-11 shrink-0 border-emerald-500/10 hover:border-emerald-500/25" onClick={() => setCampaignOpen(true)} title="Enviar mensagem em massa">
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
-            </Button>
-          )}
-           <Button size="icon" variant="outline" className="h-11 w-11 shrink-0 border-emerald-500/10 hover:border-emerald-500/25" onClick={() => setCsvOpen(true)} title="Importar clientes">
+          {/* Message campaign button - always visible */}
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-11 w-11 shrink-0 border-border/50"
+            onClick={() => {
+              if (selectMode) {
+                setCampaignOpen(true);
+              } else {
+                setSelectMode(true);
+              }
+            }}
+            title="Enviar mensagem"
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-11 w-11 shrink-0 border-border/50"
+            onClick={() => setCsvOpen(true)}
+            title="Importar clientes"
+          >
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
           </Button>
         </div>
@@ -211,23 +222,44 @@ export default function Customers() {
             icon="Users"
             title="Nenhum cliente"
             subtitle={search || segmentFilter ? 'Nenhum resultado para os filtros.' : 'Cadastre seu primeiro cliente ou importe um CSV.'}
+            actionLabel="Cadastrar cliente"
+            actionIcon="Plus"
+            onAction={openNewSheet}
           />
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {visibleCustomers.map(c => (
-                <CustomerCard
-                  key={c.id}
-                  customer={c}
-                  onEdit={() => setDetailCustomer(c)}
-                  onDelete={() => setDeletingId(c.id)}
-                />
+                <div key={c.id} className="relative">
+                  {selectMode && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(c.id); }}
+                      className={cn(
+                        "absolute top-3 left-3 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all",
+                        selectedForMessage.has(c.id)
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground/40 bg-background/80"
+                      )}
+                    >
+                      {selectedForMessage.has(c.id) && (
+                        <AppIcon name="Check" size={14} className="text-primary-foreground" />
+                      )}
+                    </button>
+                  )}
+                  <div className={cn(selectMode && "pl-8")}>
+                    <CustomerCard
+                      customer={c}
+                      onEdit={() => { if (!selectMode) setDetailCustomer(c); else toggleSelect(c.id); }}
+                      onDelete={() => setDeletingId(c.id)}
+                    />
+                  </div>
+                </div>
               ))}
             </div>
             {visibleCount < filtered.length && (
               <Button
                 variant="outline"
-                className="w-full mt-3 rounded-xl border-emerald-500/10"
+                className="w-full mt-3 rounded-xl border-border/50"
                 onClick={() => setVisibleCount(v => v + PAGE_SIZE)}
               >
                 Mostrar mais ({filtered.length - visibleCount} restantes)
@@ -264,8 +296,8 @@ export default function Customers() {
 
       <MessageCampaignSheet
         open={campaignOpen}
-        onOpenChange={setCampaignOpen}
-        customers={filtered}
+        onOpenChange={(v) => { setCampaignOpen(v); if (!v) exitSelectMode(); }}
+        customers={campaignRecipients}
         segment={segmentFilter}
       />
 
