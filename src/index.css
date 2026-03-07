@@ -770,23 +770,23 @@ html {
   }
 
   .finance-hero-chip--success {
-    background: hsl(140 40% 50% / 0.12);
-    border: 1px solid hsl(140 40% 50% / 0.2);
+    background: hsl(140 40% 12%);
+    border: 1px solid hsl(140 40% 25% / 0.4);
   }
 
   .dark .finance-hero-chip--success {
-    background: hsl(140 40% 40% / 0.08);
-    border: 1px solid hsl(140 40% 40% / 0.15);
+    background: hsl(140 30% 10%);
+    border: 1px solid hsl(140 40% 25% / 0.3);
   }
 
   .finance-hero-chip--neutral {
-    background: hsl(0 0% 100% / 0.08);
-    border: 1px solid hsl(0 0% 100% / 0.12);
+    background: hsl(220 20% 12%);
+    border: 1px solid hsl(220 20% 25% / 0.4);
   }
 
   .dark .finance-hero-chip--neutral {
-    background: hsl(240 10% 30% / 0.06);
-    border: 1px solid hsl(240 10% 30% / 0.1);
+    background: hsl(220 15% 10%);
+    border: 1px solid hsl(220 15% 25% / 0.3);
   }
 
   /* ========== COMMAND CENTER CARDS ========== */
