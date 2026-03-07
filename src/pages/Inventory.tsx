@@ -265,18 +265,33 @@ export default function InventoryPage() {
                     return (
                       <div
                         key={categoryName}
-                        className="space-y-2 animate-fade-in"
+                        className="bg-card border border-border/40 rounded-2xl overflow-hidden relative animate-fade-in"
                         style={{ animationDelay: `${catIndex * 40}ms` }}
                       >
+                        {/* Colored accent bar */}
+                        <div
+                          className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+                          style={{ background: categoryColor }}
+                        />
+
                         {/* Category Header */}
                         <button
                           onClick={() => toggleCategory(categoryName)}
-                          className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-secondary/50 transition-colors"
+                          className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors"
                         >
-                          <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: categoryColor }} />
-                            <span className="font-semibold text-foreground font-display">{categoryName}</span>
-                            <span className="text-sm text-muted-foreground">({categoryItems.length})</span>
+                          <div
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: `${categoryColor}15` }}
+                          >
+                            <AppIcon
+                              name={category?.icon || 'Package'}
+                              size={20}
+                              style={{ color: categoryColor }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-foreground truncate">{categoryName}</p>
+                            <p className="text-[11px] text-muted-foreground">{categoryItems.length} ite{categoryItems.length === 1 ? 'm' : 'ns'}</p>
                           </div>
                           <AppIcon
                             name="ChevronDown"
@@ -288,26 +303,28 @@ export default function InventoryPage() {
                           />
                         </button>
 
-                        {/* Category Items with collapse animation */}
+                        {/* Category Items */}
                         <div
                           className={cn(
-                            "space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 overflow-hidden transition-all duration-300 ease-out",
+                            "overflow-hidden transition-all duration-300 ease-out",
                             isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
                           )}
                         >
-                          {categoryItems.map((item, idx) => (
-                            <div
-                              key={item.id}
-                              className="animate-fade-in"
-                              style={{ animationDelay: `${idx * 30}ms` }}
-                            >
-                              <ItemCard
-                                item={item}
-                                onClick={() => handleItemClick(item)}
-                                onEdit={isAdmin ? () => handleEditItem(item) : undefined}
-                              />
-                            </div>
-                          ))}
+                          <div className="px-4 pb-3 space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
+                            {categoryItems.map((item, idx) => (
+                              <div
+                                key={item.id}
+                                className="animate-fade-in"
+                                style={{ animationDelay: `${idx * 30}ms` }}
+                              >
+                                <ItemCard
+                                  item={item}
+                                  onClick={() => handleItemClick(item)}
+                                  onEdit={isAdmin ? () => handleEditItem(item) : undefined}
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     );
