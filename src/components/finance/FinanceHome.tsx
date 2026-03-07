@@ -74,22 +74,20 @@ export function FinanceHome({
       {/* === HERO BALANCE CARD === */}
       <button
         onClick={() => onNavigate?.('more')}
-        className={cn("w-full text-left animate-slide-up stagger-1 rounded-2xl overflow-hidden relative", variant === 'personal' && "finance-hero-card--personal")}
+        className={cn(
+          "finance-hero-card w-full text-left animate-slide-up stagger-1",
+          variant === 'personal' && "finance-hero-card--personal"
+        )}
       >
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(135deg, hsl(280 60% 25%), hsl(320 50% 35%), hsl(350 60% 40%), hsl(30 70% 45%), hsl(200 50% 30%))',
-        }} />
-        <div className="absolute inset-0 opacity-30" style={{
-          background: 'radial-gradient(ellipse at 70% 20%, hsl(40 80% 60% / 0.5), transparent 60%), radial-gradient(ellipse at 20% 80%, hsl(280 60% 50% / 0.4), transparent 50%)',
-        }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
         <div className="p-5 pb-4 relative z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>
               {variant === 'personal' ? 'Meu saldo pessoal' : 'Saldo em contas'}
             </span>
-            <AppIcon name="ChevronRight" size={18} style={{ color: 'var(--gp-icon)' }} />
+            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
+              <AppIcon name="ChevronRight" size={14} style={{ color: 'var(--gp-icon)' }} />
+            </div>
           </div>
 
           {/* Balance */}
@@ -106,7 +104,7 @@ export function FinanceHome({
                   {fmtCurrency(Math.abs(profit))}
                 </span>
                 <span className={cn(
-                  "text-[10px] font-bold px-1 py-0.5 rounded",
+                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md",
                   profit >= 0 
                     ? "bg-green-500/15" 
                     : "bg-red-500/15"
