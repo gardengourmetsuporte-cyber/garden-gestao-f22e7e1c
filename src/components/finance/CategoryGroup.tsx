@@ -40,18 +40,14 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
             <AppIcon name={icon} size={16} style={{ color }} />
           </div>
           <span className="text-xs font-semibold text-foreground truncate">{name}</span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 shrink-0">
             {transactions.length}
           </Badge>
-          {allPaid ? (
-            <div className="w-3 h-3 rounded-full bg-success shrink-0" />
-          ) : (
-            <div className="w-3 h-3 rounded-full bg-warning shrink-0" />
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 shrink-0">
+          <div className={cn("w-3 h-3 rounded-full shrink-0", allPaid ? "bg-success" : "bg-warning")} />
           <span className={cn(
-            "text-xs font-bold font-display",
+            "text-xs font-bold font-display tabular-nums",
             subtotal >= 0 ? 'text-success' : 'text-destructive'
           )}>
             {formatCurrency(subtotal)}
