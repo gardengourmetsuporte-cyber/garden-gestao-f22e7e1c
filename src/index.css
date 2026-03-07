@@ -759,8 +759,8 @@ html {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(156 60% 40% / 0.1) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(156 50% 35% / 0.06) 0%, transparent 45%);
+    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(45 70% 45% / 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(40 60% 40% / 0.06) 0%, transparent 45%);
     pointer-events: none;
   }
 
