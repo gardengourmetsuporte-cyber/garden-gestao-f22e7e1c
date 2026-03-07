@@ -160,7 +160,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
             {onReceiptCapture && (
               <button onClick={handleReceipt} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '150ms' }}>
                 <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg overflow-hidden relative">
-                  <img src="/assets/scanner-hero.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={scannerHero} alt="" className="absolute inset-0 w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/40" />
                   <AppIcon name="ScanLine" size={24} fill={1} className="relative z-10" style={{ color: 'white' }} />
                 </div>
