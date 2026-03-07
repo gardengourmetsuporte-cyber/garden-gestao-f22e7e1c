@@ -144,7 +144,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'menu-admin', label: 'Cardápio Digital', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Premium',
+    key: 'menu-admin', label: 'Cardápio Digital', icon: 'BookOpen', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Em Desenvolvimento',
     children: [
       { key: 'menu-admin.view', label: 'Ver cardápio', icon: 'Eye' },
       { key: 'menu-admin.products', label: 'Gerenciar produtos', icon: 'PenSquare' },
