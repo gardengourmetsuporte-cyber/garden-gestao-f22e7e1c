@@ -1,4 +1,4 @@
-import { subDays } from 'date-fns';
+import { DatePicker } from '@/components/ui/date-picker';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getDeadlineInfo } from '@/lib/checklistTiming';
 import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
-import { UnifiedDateStrip } from '@/components/ui/unified-date-strip';
+
 import { ChecklistTypeCard, ChecklistBonusCard } from '@/components/checklists/ChecklistTypeCards';
 import { useChecklistPage } from '@/hooks/checklists/useChecklistPage';
 
@@ -47,8 +47,6 @@ export default function ChecklistsPage() {
     );
   }
 
-  const today = new Date();
-  const days = Array.from({ length: 30 }, (_, i) => subDays(today, 20 - i));
 
   const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
     const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
@@ -82,7 +80,12 @@ export default function ChecklistsPage() {
           <div className="animate-fade-in space-y-5" key={settingsMode ? 'settings' : 'view'}>
             {/* Date Strip */}
             {!settingsMode && (
-              <UnifiedDateStrip days={days} selectedDate={selectedDate} onSelectDate={setSelectedDate} trailing={reminderBtn} />
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <DatePicker date={selectedDate} onSelect={setSelectedDate} />
+                </div>
+                {reminderBtn}
+              </div>
             )}
 
             {/* Settings mode header */}
