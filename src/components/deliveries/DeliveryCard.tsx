@@ -18,7 +18,7 @@ interface Props {
   onSetLocation?: (delivery: Delivery) => void;
 }
 
-export function DeliveryCard({ delivery, onStatusChange, onCardClick }: Props) {
+export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocation }: Props) {
   const addr = delivery.address;
   const cfg = STATUS_CONFIG[delivery.status];
   const StatusIcon = cfg.icon;
