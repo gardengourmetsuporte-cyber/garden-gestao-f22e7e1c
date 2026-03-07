@@ -867,6 +867,15 @@ export function ChecklistView({
                           )}
                           style={{ animationDelay: `${itemIndex * 40}ms` }}
                         >
+                          {activeTimer ? (
+                            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-primary/15 border border-primary/30">
+                              <AppIcon name="Timer" className="w-5 h-5 text-primary animate-pulse" />
+                            </div>
+                          ) : (
+                            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
+                              <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
+                            </div>
+                          )}
                           <div className="flex-1 text-left min-w-0">
                             <div className="flex items-center gap-1.5">
                               <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
@@ -884,28 +893,17 @@ export function ChecklistView({
                                 <TimerStatsIndicator stats={itemStats} minExecutions={timerMinExecutions} />
                               </div>
                             )}
-                            {configuredPoints > 0 && (
-                              <div className="mt-1.5">
-                                <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border")}
-                                  style={{
-                                    backgroundColor: getItemPointsColors(configuredPoints).bg,
-                                    color: getItemPointsColors(configuredPoints).color,
-                                    borderColor: getItemPointsColors(configuredPoints).border,
-                                  }}>
-                                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
-                                  +{configuredPoints} pts
-                                </span>
-                              </div>
-                            )}
                           </div>
-                          {activeTimer ? (
-                            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-primary/15 border border-primary/30">
-                              <AppIcon name="Timer" className="w-5 h-5 text-primary animate-pulse" />
-                            </div>
-                          ) : (
-                            <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50 transition-all duration-300 hover:border-success/50 hover:bg-success/10">
-                              <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
-                            </div>
+                          {configuredPoints > 0 && (
+                            <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border shrink-0")}
+                              style={{
+                                backgroundColor: getItemPointsColors(configuredPoints).bg,
+                                color: getItemPointsColors(configuredPoints).color,
+                                borderColor: getItemPointsColors(configuredPoints).border,
+                              }}>
+                              <AppIcon name="Star" size={12} className="shrink-0" style={{ color: getItemPointsColors(configuredPoints).color }} />
+                              +{configuredPoints} pts
+                            </span>
                           )}
                         </button>
                         {openPopover === item.id && activeTimer && onCancelTimer && (
