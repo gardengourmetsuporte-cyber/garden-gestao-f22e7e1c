@@ -328,17 +328,22 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
         const color = STATUS_COLORS[delivery.status];
         bounds.push([lat, lng]);
 
+        const orderNum = delivery.order_number || '';
+        const displayNum = orderNum.length > 3 ? orderNum.slice(-3) : orderNum;
         const icon = L.divIcon({
           className: '',
           html: `
-            <div style="position:relative;width:32px;42px;">
-              <svg width="32" height="42" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+            <div style="position:relative;width:36px;height:46px;">
+              <svg width="36" height="46" viewBox="0 0 36 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 0C8.06 0 0 8.06 0 18c0 12 18 28 18 28s18-16 18-28C36 8.06 27.94 0 18 0z" fill="${color}"/>
               </svg>
+              <span style="position:absolute;top:6px;left:0;right:0;text-align:center;color:white;font-size:${displayNum.length > 2 ? '10' : '12'}px;font-weight:800;line-height:22px;text-shadow:0 1px 2px rgba(0,0,0,0.3);">
+                ${displayNum || '•'}
+              </span>
             </div>`,
-          iconSize: [32, 42],
-          iconAnchor: [16, 42],
-          popupAnchor: [0, -36],
+          iconSize: [36, 46],
+          iconAnchor: [18, 46],
+          popupAnchor: [0, -40],
         });
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
