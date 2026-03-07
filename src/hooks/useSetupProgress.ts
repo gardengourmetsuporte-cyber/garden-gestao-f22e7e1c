@@ -41,8 +41,8 @@ export function useSetupProgress() {
 
       const steps: SetupStep[] = [
         { key: 'supplier', label: 'Cadastre um fornecedor', description: 'Adicione seu primeiro fornecedor para fazer pedidos', icon: 'Truck', route: '/settings?tab=suppliers&action=create', completed: (suppliers.count ?? 0) > 0 },
-        { key: 'inventory', label: 'Adicione um item ao estoque', description: 'Registre seus produtos para controlar o estoque', icon: 'Package', route: '/inventory?action=create', completed: (items.count ?? 0) > 0 },
-        { key: 'checklist', label: 'Configure um checklist', description: 'Crie tarefas para abertura e fechamento', icon: 'ClipboardCheck', route: '/settings?tab=checklists', completed: (checklists.count ?? 0) > 0 },
+        { key: 'inventory', label: 'Adicione um item ao estoque', description: 'Registre seus produtos para controlar o estoque', icon: 'Package', route: '/inventory?action=templates', completed: (items.count ?? 0) > 0 },
+        { key: 'checklist', label: 'Configure um checklist', description: 'Crie tarefas para abertura e fechamento', icon: 'ClipboardCheck', route: '/settings?tab=checklists&action=templates', completed: (checklists.count ?? 0) > 0 },
         { key: 'team', label: 'Convide um funcionário', description: 'Adicione membros da equipe', icon: 'Users', route: '/settings?tab=team&action=invite', completed: (users.count ?? 0) > 1 },
         
       ];
