@@ -50,6 +50,7 @@ export default function InventoryPage() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(true);
 
   // Handle ?action= from quick actions / setup checklist
   useEffect(() => {
