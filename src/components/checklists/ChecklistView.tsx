@@ -650,8 +650,8 @@ export function ChecklistView({
                           {/* Inline panel for completed items (admin or own completion) */}
                           {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                             <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
-                              {/* Continuar (desmarcar sem zerar timer) */}
-                              {canToggle && (
+                              {/* Continuar (desmarcar sem zerar timer) - only in timer mode */}
+                              {isTimerMode && canToggle && (
                                 <button
                                   onClick={async () => {
                                     setOpenPopover(null);
