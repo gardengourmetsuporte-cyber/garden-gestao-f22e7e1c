@@ -132,7 +132,7 @@ html {
   }
 
   /* ===== LIGHT THEME ===== */
-  :root:not(.dark):not(.midnight) {
+  :root:not(.dark) {
     --color-income: 156 72% 38%;
     --color-expense: 348 83% 45%;
     --color-transfer: 220 80% 50%;
