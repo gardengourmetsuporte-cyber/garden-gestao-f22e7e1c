@@ -126,7 +126,7 @@ export function AdminDashboard() {
 
       case 'leaderboard':
         return hasAccess('ranking') ? (
-          <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
           </DashboardSection>
         ) : null;
