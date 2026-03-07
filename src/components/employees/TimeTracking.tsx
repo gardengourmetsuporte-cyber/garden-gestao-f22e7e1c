@@ -379,66 +379,67 @@ function RecordsList({ records, isAdmin, onDelete }: { records: TimeRecord[]; is
                 return (
                   <div
                     key={record.id}
-                    className="flex items-center gap-3 rounded-xl bg-card border border-border/40 px-3.5 py-3 transition-colors"
+                    className="bg-card border border-border/40 rounded-2xl overflow-hidden relative"
                   >
-                    <div className={cn(
-                      'w-2 h-2 rounded-full shrink-0',
-                      record.status === 'completed' ? 'bg-success' :
-                      record.status === 'checked_in' ? 'bg-primary' :
-                      record.status === 'absent' ? 'bg-destructive' :
-                      record.status === 'day_off' ? 'bg-amber-400' :
-                      'bg-muted-foreground/40'
-                    )} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        {isAdmin && record.profile && (
-                          <span className="text-sm font-medium truncate">{record.profile.full_name}</span>
-                        )}
-                        {record.manual_entry && (
-                          <span className="text-[10px] text-muted-foreground bg-muted/60 rounded px-1 py-px">manual</span>
-                        )}
-                        {label && (
-                          <span className={cn(
-                            "text-[10px] rounded px-1 py-px",
-                            record.status === 'day_off' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                            'bg-destructive/10 text-destructive'
-                          )}>{label}</span>
-                        )}
+                    <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{
+                      backgroundColor: record.status === 'completed' ? 'hsl(var(--success))' :
+                        record.status === 'checked_in' ? 'hsl(var(--primary))' :
+                        record.status === 'absent' ? 'hsl(var(--destructive))' :
+                        record.status === 'day_off' ? '#fbbf24' :
+                        'hsl(var(--muted-foreground) / 0.4)'
+                    }} />
+                    <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          {isAdmin && record.profile && (
+                            <span className="text-sm font-semibold text-foreground truncate">{record.profile.full_name}</span>
+                          )}
+                          {record.manual_entry && (
+                            <span className="text-[10px] text-muted-foreground bg-muted/60 rounded px-1 py-px">manual</span>
+                          )}
+                          {label && (
+                            <span className={cn(
+                              "text-[10px] rounded px-1 py-px",
+                              record.status === 'day_off' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                              'bg-destructive/10 text-destructive'
+                            )}>{label}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
+                          {record.check_in && <span>{record.check_in.substring(0, 5)}</span>}
+                          {record.check_out && <span>→ {record.check_out.substring(0, 5)}</span>}
+                          {!record.check_in && !record.check_out && record.notes && (
+                            <span>{record.notes}</span>
+                          )}
+                          {record.late_minutes > 0 && (
+                            <span className="text-destructive">{record.late_minutes}min atraso</span>
+                          )}
+                          {record.early_departure_minutes > 0 && (
+                            <span className="text-destructive">{record.early_departure_minutes}min antecipado</span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                        {record.check_in && <span>{record.check_in.substring(0, 5)}</span>}
-                        {record.check_out && <span>→ {record.check_out.substring(0, 5)}</span>}
-                        {!record.check_in && !record.check_out && record.notes && (
-                          <span>{record.notes}</span>
-                        )}
-                        {record.late_minutes > 0 && (
-                          <span className="text-destructive">{record.late_minutes}min atraso</span>
-                        )}
-                        {record.early_departure_minutes > 0 && (
-                          <span className="text-destructive">{record.early_departure_minutes}min antecipado</span>
-                        )}
-                      </div>
+                      {record.points_awarded !== 0 && (
+                        <span className={cn(
+                          'text-xs font-semibold tabular-nums shrink-0',
+                          record.points_awarded > 0 ? 'text-success' : 'text-destructive'
+                        )}>
+                          {record.points_awarded > 0 ? '+' : ''}{record.points_awarded}
+                        </span>
+                      )}
+                      {onDelete && (
+                        <button
+                          onClick={() => {
+                            if (confirm('Excluir este registro de ponto?')) {
+                              onDelete(record.id);
+                            }
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors shrink-0"
+                        >
+                          <AppIcon name="delete" size={14} className="text-destructive/60" />
+                        </button>
+                      )}
                     </div>
-                    {record.points_awarded !== 0 && (
-                      <span className={cn(
-                        'text-xs font-semibold tabular-nums shrink-0',
-                        record.points_awarded > 0 ? 'text-success' : 'text-destructive'
-                      )}>
-                        {record.points_awarded > 0 ? '+' : ''}{record.points_awarded}
-                      </span>
-                    )}
-                    {onDelete && (
-                      <button
-                        onClick={() => {
-                          if (confirm('Excluir este registro de ponto?')) {
-                            onDelete(record.id);
-                          }
-                        }}
-                        className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors shrink-0"
-                      >
-                        <AppIcon name="delete" size={14} className="text-destructive/60" />
-                      </button>
-                    )}
                   </div>
                 );
               })}

@@ -154,8 +154,13 @@ export function EmployeeWarnings() {
           {visibleWarnings.map(w => {
             const counts = getWarningCounts(w.employee_id);
             return (
-              <Card key={w.id} className="overflow-hidden">
-                <CardContent className="p-4 space-y-2">
+            <div key={w.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+                <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{
+                  backgroundColor: w.type === 'dismissal' ? 'hsl(var(--destructive))' :
+                    w.type === 'suspension' ? '#f59e0b' :
+                    'hsl(var(--primary))'
+                }} />
+                <div className="pl-5 pr-4 py-3.5 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -178,19 +183,19 @@ export function EmployeeWarnings() {
                       {isAdmin && w.employee && (
                         <p className="text-sm font-semibold mt-1.5">{w.employee.full_name}</p>
                       )}
-                      <p className="text-sm text-muted-foreground mt-1">{w.reason}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">{w.reason}</p>
                       {w.legal_basis && (
-                        <p className="text-xs text-muted-foreground/70 mt-0.5">{w.legal_basis}</p>
+                        <p className="text-[11px] text-muted-foreground/70 mt-0.5">{w.legal_basis}</p>
                       )}
                       {w.description && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{w.description}</p>
+                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{w.description}</p>
                       )}
                       {w.type === 'suspension' && w.suspension_days > 0 && (
-                        <p className="text-xs text-red-400 mt-1">Suspensão de {w.suspension_days} dia(s)</p>
+                        <p className="text-[11px] text-red-400 mt-1">Suspensão de {w.suspension_days} dia(s)</p>
                       )}
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-muted-foreground">{format(new Date(w.date), "dd/MM/yyyy")}</p>
+                      <p className="text-[11px] text-muted-foreground">{format(new Date(w.date), "dd/MM/yyyy")}</p>
                       {isAdmin && (
                         <p className="text-[10px] text-muted-foreground/60 mt-0.5">
                           {counts.total} advertência(s)
@@ -230,8 +235,8 @@ export function EmployeeWarnings() {
                       </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>

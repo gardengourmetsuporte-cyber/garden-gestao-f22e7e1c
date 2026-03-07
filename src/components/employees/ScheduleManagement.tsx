@@ -65,14 +65,15 @@ export function ScheduleManagement() {
       {pendingSchedules.length > 0 && (
         <button
           onClick={() => setShowPendingSheet(true)}
-          className="w-full card-unified-interactive p-4 flex items-center gap-3 text-left"
+          className="w-full bg-card border border-border/40 rounded-2xl overflow-hidden relative flex items-center gap-3 pl-5 pr-4 py-3.5 text-left"
         >
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-warning" />
           <div className="w-10 h-10 rounded-xl bg-warning/15 flex items-center justify-center shrink-0">
             <AppIcon name="Clock" size={20} className="text-warning" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm text-foreground">{pendingSchedules.length} solicitação(ões) pendente(s)</p>
-            <p className="text-xs text-muted-foreground">Toque para revisar</p>
+            <p className="text-[11px] text-muted-foreground">Toque para revisar</p>
           </div>
           <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
         </button>
@@ -100,17 +101,20 @@ export function ScheduleManagement() {
               <div key={key} className="space-y-2">
                 <h4 className="text-sm font-medium text-muted-foreground">{monthNames[month]} {year}</h4>
                 {monthSchedules.sort((a, b) => a.day_off - b.day_off).map((schedule) => (
-                  <div key={schedule.id} className="card-unified p-3 flex items-center justify-between cursor-pointer hover:bg-secondary/50" onClick={() => setSelectedSchedule(schedule)}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <span className="font-bold text-primary">{schedule.day_off}</span>
+                  <div key={schedule.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative cursor-pointer hover:bg-secondary/50" onClick={() => setSelectedSchedule(schedule)}>
+                    <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+                    <div className="flex items-center justify-between pl-5 pr-4 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+                          <span className="font-bold text-primary">{schedule.day_off}</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">{schedule.profile?.full_name || 'Usuário'}</p>
+                          {schedule.notes && <p className="text-[11px] text-muted-foreground">{schedule.notes}</p>}
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{schedule.profile?.full_name || 'Usuário'}</p>
-                        {schedule.notes && <p className="text-xs text-muted-foreground">{schedule.notes}</p>}
-                      </div>
+                      {getStatusBadge(schedule.status)}
                     </div>
-                    {getStatusBadge(schedule.status)}
                   </div>
                 ))}
               </div>
@@ -125,16 +129,17 @@ export function ScheduleManagement() {
           <SheetHeader><SheetTitle>Solicitações Pendentes</SheetTitle></SheetHeader>
           <div className="mt-4 space-y-3">
             {pendingSchedules.map((schedule) => (
-              <div key={schedule.id} className="card-unified-interactive p-4 cursor-pointer" onClick={() => { setShowPendingSheet(false); setSelectedSchedule(schedule); }}>
-                <div className="flex items-center justify-between">
+              <div key={schedule.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative cursor-pointer" onClick={() => { setShowPendingSheet(false); setSelectedSchedule(schedule); }}>
+                <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-warning" />
+                <div className="flex items-center justify-between pl-5 pr-4 py-3.5">
                   <div className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={schedule.profile?.avatar_url || ''} />
                       <AvatarFallback><AppIcon name="User" size={20} /></AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{schedule.profile?.full_name || 'Usuário'}</p>
-                      <p className="text-sm text-muted-foreground">{schedule.day_off} de {monthNames[schedule.month]} de {schedule.year}</p>
+                      <p className="font-semibold text-foreground">{schedule.profile?.full_name || 'Usuário'}</p>
+                      <p className="text-[11px] text-muted-foreground">{schedule.day_off} de {monthNames[schedule.month]} de {schedule.year}</p>
                     </div>
                   </div>
                   <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />

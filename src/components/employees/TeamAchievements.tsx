@@ -66,7 +66,8 @@ function TeamMemberCard({ member, isExpanded, onToggle }: { member: TeamMember; 
   return (
     <Collapsible open={isExpanded} onOpenChange={onToggle}>
       <CollapsibleTrigger asChild>
-        <button className="card-command p-3 w-full flex items-center gap-3 text-left">
+        <button className="bg-card border border-border/40 rounded-2xl overflow-hidden relative w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left">
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
           <RankedAvatar avatarUrl={member.avatar_url} earnedPoints={member.earnedPoints} size={36} />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-foreground truncate">{member.full_name}</p>
