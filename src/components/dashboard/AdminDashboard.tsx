@@ -16,6 +16,7 @@ const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ defaul
 const AIInsightsWidget = lazy(() => import('./AIInsightsWidget').then(m => ({ default: m.AIInsightsWidget })));
 const PendingOrdersWidget = lazy(() => import('./PendingOrdersWidget').then(m => ({ default: m.PendingOrdersWidget })));
 import { SmartScannerWidget } from './SmartScannerWidget';
+import { UpgradeBanner } from './UpgradeBanner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -139,6 +140,9 @@ export function AdminDashboard() {
 
   return (
     <div className="px-4 py-3 lg:px-8 lg:py-6 max-w-[1400px] mx-auto">
+
+      {/* Upgrade Banner for free users */}
+      <UpgradeBanner />
 
       {/* Setup Onboarding — full width */}
       <SetupChecklistWidget />
