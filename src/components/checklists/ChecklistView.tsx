@@ -1119,9 +1119,9 @@ export function ChecklistView({
                                           {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                             : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
                                             : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
-                                            : (<div className="flex items-center gap-1">
-                                                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(pointsAwarded).color }} />
-                                                <span>+{pointsAwarded}</span>
+                                            : (<div className="flex items-center gap-0.5" style={{ color: getItemPointsColors(pointsAwarded).color }}>
+                                                <AppIcon name="Star" size={14} />
+                                                <span className="font-bold">+{pointsAwarded}</span>
                                               </div>)}
                                         </div>
                                       </div>
