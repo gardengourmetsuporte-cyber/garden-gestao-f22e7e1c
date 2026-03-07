@@ -146,6 +146,7 @@ interface BonusCardProps {
   updateDeadline: any;
   removeDeadline: any;
   isSavingDeadline: boolean;
+  hasActiveItems?: boolean;
 }
 
 export function ChecklistBonusCard({

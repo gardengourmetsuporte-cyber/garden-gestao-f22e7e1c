@@ -360,6 +360,13 @@ export function ChecklistView({
     }
   };
 
+  // For bonus: collect all items flat across all sectors
+  const allBonusItems = isBonus ? sectors.flatMap(sector =>
+    sector.subcategories?.flatMap(sub =>
+      (sub.items || []).filter(i => i.is_active && (i as any).checklist_type === 'bonus')
+    ) || []
+  ) : [];
+
   const filteredSectors = sectors.filter(sector => {
     const hasActiveItems = sector.subcategories?.some(sub =>
       sub.items?.some(i => i.is_active && (i as any).checklist_type === checklistType)
