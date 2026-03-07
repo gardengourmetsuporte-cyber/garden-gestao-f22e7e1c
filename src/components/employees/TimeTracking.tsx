@@ -35,32 +35,7 @@ export function TimeTracking() {
 
   const pendingCerts = certificates.filter(c => c.status === 'pending');
 
-  // Register FAB actions for admin
-  useFabActions(
-    isAdmin
-      ? [
-          { icon: 'edit', label: 'Lançamento Manual', onClick: () => setShowManualSheet(true) },
-          { icon: 'upload', label: 'Importar', onClick: () => setShowImportSheet(true) },
-          { icon: 'download', label: 'Exportar', onClick: () => handleExportRecords() },
-          { icon: 'clinical_notes', label: 'Atestados', onClick: () => setShowCertificateList(true), badge: pendingCerts.length },
-          { icon: 'settings', label: 'Configurações', onClick: () => setShowSettingsSheet(true) },
-        ]
-      : [],
-    [isAdmin, pendingCerts.length]
-  );
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="h-16 w-full rounded-2xl" />
-        <Skeleton className="h-16 w-full rounded-2xl" />
-      </div>
-    );
-  }
-
-
-  const handleExportRecords = () => {
+  const handleExportRecords = useCallback(() => {
     if (records.length === 0) {
       toast.error('Nenhum registro para exportar');
       return;
@@ -84,7 +59,31 @@ export function TimeTracking() {
     XLSX.utils.book_append_sheet(wb, ws, 'Ponto');
     XLSX.writeFile(wb, `ponto-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
     toast.success('Relatório exportado!');
-  };
+  }, [records]);
+
+  // Register FAB actions for admin
+  useFabActions(
+    isAdmin
+      ? [
+          { icon: 'edit', label: 'Lançamento Manual', onClick: () => setShowManualSheet(true) },
+          { icon: 'upload', label: 'Importar', onClick: () => setShowImportSheet(true) },
+          { icon: 'download', label: 'Exportar', onClick: handleExportRecords },
+          { icon: 'clinical_notes', label: 'Atestados', onClick: () => setShowCertificateList(true), badge: pendingCerts.length },
+          { icon: 'settings', label: 'Configurações', onClick: () => setShowSettingsSheet(true) },
+        ]
+      : [],
+    [isAdmin, pendingCerts.length, handleExportRecords]
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-40 w-full rounded-2xl" />
+        <Skeleton className="h-16 w-full rounded-2xl" />
+        <Skeleton className="h-16 w-full rounded-2xl" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
