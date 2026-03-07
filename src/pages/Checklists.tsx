@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getDeadlineInfo } from '@/lib/checklistTiming';
 import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
-import { UnifiedDateStrip } from '@/components/ui/unified-date-strip';
+
 import { ChecklistTypeCard, ChecklistBonusCard } from '@/components/checklists/ChecklistTypeCards';
 import { useChecklistPage } from '@/hooks/checklists/useChecklistPage';
 
