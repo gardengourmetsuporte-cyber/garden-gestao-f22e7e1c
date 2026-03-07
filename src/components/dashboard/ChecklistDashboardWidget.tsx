@@ -152,7 +152,7 @@ export function ChecklistDashboardWidget() {
   const allDone = totalItems > 0 && totalCompleted === totalItems;
 
   const cards: { type: ChecklistType; label: string; iconName: string; progress: typeof abertura }[] = [
-    { type: 'abertura', label: 'Abertura', iconName: 'wb_sunny', progress: abertura },
+    { type: 'abertura', label: 'Abertura', iconName: 'light_mode', progress: abertura },
     { type: 'fechamento', label: 'Fechamento', iconName: 'dark_mode', progress: fechamento },
   ];
 
