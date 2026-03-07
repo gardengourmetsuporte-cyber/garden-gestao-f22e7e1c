@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import type { useSmartScanner, DocumentType } from '@/hooks/useSmartScanner';
@@ -23,9 +25,75 @@ const TYPE_COLORS: Record<DocumentType, string> = {
   unknown: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
+interface EditableField {
+  key: string;
+  label: string;
+  value: string;
+  type: 'text' | 'number' | 'date';
+  placeholder?: string;
+}
+
+function getEditableFields(docType: DocumentType, extractedData: Record<string, any>): EditableField[] {
+  const d = extractedData;
+  switch (docType) {
+    case 'pix_receipt':
+      return [
+        { key: 'amount', label: 'Valor (R$)', value: d.amount?.toString() || '', type: 'number', placeholder: '0.00' },
+        { key: 'date', label: 'Data', value: d.date || '', type: 'date' },
+        { key: 'receiver_name', label: 'Recebedor', value: d.receiver_name || '', type: 'text', placeholder: 'Nome do recebedor' },
+        { key: 'payer_name', label: 'Pagador', value: d.payer_name || '', type: 'text', placeholder: 'Nome do pagador' },
+        { key: 'description', label: 'Descrição', value: d.description || '', type: 'text', placeholder: 'Ex: Pagamento fornecedor' },
+      ];
+    case 'invoice':
+      return [
+        { key: 'supplier_name', label: 'Fornecedor', value: d.supplier_name || '', type: 'text', placeholder: 'Nome do fornecedor' },
+        { key: 'invoice_number', label: 'Nº NF', value: d.invoice_number || '', type: 'text', placeholder: '000000' },
+        { key: 'total_amount', label: 'Total (R$)', value: d.total_amount?.toString() || '', type: 'number', placeholder: '0.00' },
+      ];
+    case 'boleto':
+      return [
+        { key: 'amount', label: 'Valor (R$)', value: d.amount?.toString() || '', type: 'number', placeholder: '0.00' },
+        { key: 'due_date', label: 'Vencimento', value: d.due_date || '', type: 'date' },
+        { key: 'beneficiary_name', label: 'Beneficiário', value: d.beneficiary_name || '', type: 'text', placeholder: 'Nome do beneficiário' },
+      ];
+    case 'payslip':
+      return [
+        { key: 'employee_name', label: 'Funcionário', value: d.employee_name || '', type: 'text', placeholder: 'Nome do funcionário' },
+        { key: 'net_salary', label: 'Salário líquido (R$)', value: d.net_salary?.toString() || '', type: 'number', placeholder: '0.00' },
+        { key: 'reference_month', label: 'Mês referência', value: d.reference_month?.toString() || '', type: 'number', placeholder: '1-12' },
+        { key: 'reference_year', label: 'Ano referência', value: d.reference_year?.toString() || '', type: 'number', placeholder: '2026' },
+      ];
+    case 'generic_receipt':
+      return [
+        { key: 'vendor_name', label: 'Estabelecimento', value: d.vendor_name || '', type: 'text', placeholder: 'Nome do estabelecimento' },
+        { key: 'amount', label: 'Valor (R$)', value: d.amount?.toString() || '', type: 'number', placeholder: '0.00' },
+        { key: 'date', label: 'Data', value: d.date || '', type: 'date' },
+        { key: 'description', label: 'Descrição', value: d.description || '', type: 'text', placeholder: 'Descrição da despesa' },
+      ];
+    default:
+      return [];
+  }
+}
+
 export function SmartScannerSheet({ open, onOpenChange, scanner }: Props) {
   const { isScanning, scanResult, previewUrl, isExecuting, executeActions, DOCUMENT_TYPE_LABELS, DOCUMENT_TYPE_ICONS, reset } = scanner;
   const [userInputs, setUserInputs] = useState<Record<string, any>>({});
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Initialize userInputs from extracted data when scan completes
+  useEffect(() => {
+    if (scanResult) {
+      setUserInputs({});
+      setIsEditing(false);
+    }
+  }, [scanResult]);
+
+  const handleFieldChange = (key: string, value: string, type: string) => {
+    setUserInputs(prev => ({
+      ...prev,
+      [key]: type === 'number' ? (value ? parseFloat(value) : undefined) : value,
+    }));
+  };
 
   const handleConfirm = async () => {
     if (!scanResult) return;
@@ -36,6 +104,8 @@ export function SmartScannerSheet({ open, onOpenChange, scanner }: Props) {
   };
 
   const docType = scanResult?.document_type as DocumentType;
+  const editableFields = scanResult ? getEditableFields(docType, scanResult.extracted_data) : [];
+  const hasMissingFields = editableFields.some(f => !f.value);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -89,19 +159,93 @@ export function SmartScannerSheet({ open, onOpenChange, scanner }: Props) {
               </span>
             </div>
 
-            {/* Extracted data */}
-            <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dados extraídos</p>
-              {renderExtractedData(scanResult)}
+            {/* Extracted data - view/edit toggle */}
+            <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dados extraídos</p>
+                {editableFields.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(!isEditing)}
+                    className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <AppIcon name={isEditing ? 'Eye' : 'Pencil'} size={12} />
+                    {isEditing ? 'Visualizar' : 'Editar'}
+                  </button>
+                )}
+              </div>
+
+              {isEditing ? (
+                <div className="space-y-3">
+                  {editableFields.map((field) => {
+                    const currentValue = userInputs[field.key] !== undefined
+                      ? (field.type === 'number' ? userInputs[field.key]?.toString() : userInputs[field.key])
+                      : field.value;
+                    const isEmpty = !currentValue;
+
+                    return (
+                      <div key={field.key} className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">{field.label}</Label>
+                        <Input
+                          type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
+                          step={field.type === 'number' ? '0.01' : undefined}
+                          value={currentValue}
+                          placeholder={field.placeholder}
+                          onChange={(e) => handleFieldChange(field.key, e.target.value, field.type)}
+                          className={cn(
+                            'h-9 text-sm',
+                            isEmpty && 'border-warning/50 bg-warning/5'
+                          )}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {editableFields.map((field) => {
+                    const currentValue = userInputs[field.key] !== undefined
+                      ? (field.type === 'number' ? userInputs[field.key]?.toString() : userInputs[field.key])
+                      : field.value;
+                    const isEmpty = !currentValue;
+                    const displayValue = field.type === 'number' && currentValue
+                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(currentValue))
+                      : currentValue || '—';
+
+                    return (
+                      <div key={field.key} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{field.label}</span>
+                        <span className={cn(
+                          'font-medium text-right max-w-[60%] truncate',
+                          isEmpty ? 'text-warning italic' : 'text-foreground'
+                        )}>
+                          {isEmpty ? 'Não informado' : displayValue}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Missing info */}
+            {/* Missing info with quick-fill hint */}
             {scanResult.missing_info?.length > 0 && (
               <div className="rounded-xl border border-warning/30 bg-warning/5 p-4 space-y-2">
-                <p className="text-xs font-semibold text-warning uppercase tracking-wider flex items-center gap-1">
-                  <AppIcon name="AlertTriangle" size={14} />
-                  Informações faltantes
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-warning uppercase tracking-wider flex items-center gap-1">
+                    <AppIcon name="AlertTriangle" size={14} />
+                    Informações faltantes
+                  </p>
+                  {!isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                      className="text-xs text-warning hover:text-warning/80 underline underline-offset-2 transition-colors"
+                    >
+                      Preencher agora
+                    </button>
+                  )}
+                </div>
                 {scanResult.missing_info.map((info, i) => (
                   <p key={i} className="text-sm text-muted-foreground">
                     • {info.message}
@@ -159,63 +303,5 @@ export function SmartScannerSheet({ open, onOpenChange, scanner }: Props) {
         )}
       </SheetContent>
     </Sheet>
-  );
-}
-
-function renderExtractedData(result: ReturnType<typeof useSmartScanner>['scanResult']) {
-  if (!result) return null;
-  const { document_type, extracted_data: d } = result;
-
-  const formatCurrency = (v: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
-
-  const rows: { label: string; value: string }[] = [];
-
-  switch (document_type) {
-    case 'pix_receipt':
-      if (d.amount) rows.push({ label: 'Valor', value: formatCurrency(d.amount) });
-      if (d.date) rows.push({ label: 'Data', value: d.date });
-      if (d.receiver_name) rows.push({ label: 'Recebedor', value: d.receiver_name });
-      if (d.payer_name) rows.push({ label: 'Pagador', value: d.payer_name });
-      if (d.description) rows.push({ label: 'Descrição', value: d.description });
-      break;
-    case 'invoice':
-      if (d.supplier_name) rows.push({ label: 'Fornecedor', value: d.supplier_name });
-      if (d.invoice_number) rows.push({ label: 'Nº NF', value: d.invoice_number });
-      if (d.total_amount) rows.push({ label: 'Total', value: formatCurrency(d.total_amount) });
-      if (d.items?.length) rows.push({ label: 'Itens', value: `${d.items.length} produto(s)` });
-      break;
-    case 'boleto':
-      if (d.amount) rows.push({ label: 'Valor', value: formatCurrency(d.amount) });
-      if (d.due_date) rows.push({ label: 'Vencimento', value: d.due_date });
-      if (d.beneficiary_name) rows.push({ label: 'Beneficiário', value: d.beneficiary_name });
-      break;
-    case 'stock_exit':
-      if (d.items?.length) rows.push({ label: 'Itens', value: `${d.items.length} produto(s) para dar baixa` });
-      break;
-    case 'payslip':
-      if (d.employee_name) rows.push({ label: 'Funcionário', value: d.employee_name });
-      if (d.net_salary) rows.push({ label: 'Salário líquido', value: formatCurrency(d.net_salary) });
-      if (d.reference_month && d.reference_year) rows.push({ label: 'Referência', value: `${d.reference_month}/${d.reference_year}` });
-      break;
-    case 'generic_receipt':
-      if (d.vendor_name) rows.push({ label: 'Estabelecimento', value: d.vendor_name });
-      if (d.amount) rows.push({ label: 'Valor', value: formatCurrency(d.amount) });
-      if (d.date) rows.push({ label: 'Data', value: d.date });
-      if (d.description) rows.push({ label: 'Descrição', value: d.description });
-      break;
-    default:
-      rows.push({ label: 'Status', value: 'Documento não identificado' });
-  }
-
-  return (
-    <div className="space-y-1.5">
-      {rows.map((row, i) => (
-        <div key={i} className="flex justify-between text-sm">
-          <span className="text-muted-foreground">{row.label}</span>
-          <span className="font-medium text-foreground text-right max-w-[60%] truncate">{row.value}</span>
-        </div>
-      ))}
-    </div>
   );
 }
