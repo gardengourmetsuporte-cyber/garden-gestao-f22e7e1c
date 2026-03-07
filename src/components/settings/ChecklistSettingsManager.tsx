@@ -3,6 +3,7 @@ import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
 import { ChecklistClone } from '@/components/settings/ChecklistClone';
+import { ChecklistTemplateSelector } from '@/components/checklists/ChecklistTemplateSelector';
 import { toast } from 'sonner';
 import { ChecklistType } from '@/types/database';
 import { cn } from '@/lib/utils';
