@@ -31,6 +31,12 @@ export default function Recipes() {
     isAddingRecipe, isUpdatingRecipe, getAvailableSubRecipes,
     reorderCategories, updateItemPrice, updateItemUnit,
   } = useRecipes();
+  const { calculateOperationalCosts } = useRecipeCostSettings();
+
+  const getFullCostPerPortion = (recipe: Recipe) => {
+    const opCosts = calculateOperationalCosts(recipe.cost_per_portion);
+    return recipe.cost_per_portion + opCosts.totalOperational;
+  };
 
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
