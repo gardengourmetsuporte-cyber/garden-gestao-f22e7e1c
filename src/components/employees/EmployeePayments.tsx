@@ -6,6 +6,7 @@ import { useEmployeePayments } from '@/hooks/useEmployees';
 import { Employee, EmployeePayment, PAYMENT_TYPE_LABELS, PAYMENT_TYPE_COLORS, MONTHS } from '@/types/employee';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -67,6 +68,9 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
   const [payDialog, setPayDialog] = useState<{ open: boolean; paymentId: string | null }>({ open: false, paymentId: null });
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [isPaying, setIsPaying] = useState(false);
+
+  const openNewPayslip = () => { setEditingPayslip(null); setPayslipSheetOpen(true); };
+  useFabAction({ icon: 'Plus', label: 'Novo Lançamento', onClick: openNewPayslip }, [employee.id]);
 
   useEffect(() => {
     async function fetchAccounts() {
@@ -137,10 +141,8 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         </div>
       </div>
 
-      {/* Action Button */}
-      <Button className="w-full h-12" onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
-        <AppIcon name="Plus" size={18} className="mr-2" />Novo Lançamento
-      </Button>
+
+
 
       {sortedGroups.map((group) => (
         <div key={`${group.year}-${group.month}`} className="space-y-2">
@@ -205,9 +207,7 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         <div className="text-center py-12 text-muted-foreground">
           <AppIcon name="DollarSign" size={48} className="mx-auto mb-3 opacity-50" />
           <p>Nenhum pagamento registrado</p>
-          <Button variant="outline" className="mt-4" onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
-            <AppIcon name="Plus" size={16} className="mr-2" />Adicionar primeiro lançamento
-          </Button>
+          <p className="text-sm mt-2">Use o botão <strong>+</strong> para adicionar</p>
         </div>
       )}
 
