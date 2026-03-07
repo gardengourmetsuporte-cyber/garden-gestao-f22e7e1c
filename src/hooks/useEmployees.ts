@@ -270,22 +270,17 @@ export function useEmployeePayments(employeeId?: string) {
       const targetCategoryName = categoryMap[payment.type];
       let categoryId: string | null = null;
 
-      if (targetCategoryName) {
-        // Try to find the subcategory first, then fall back to parent
+      if (targetCategoryName && activeUnitId) {
         const { data: categories } = await supabase
           .from('finance_categories')
           .select('id, name, parent_id')
           .eq('user_id', user!.id)
+          .eq('unit_id', activeUnitId)
           .eq('type', 'expense')
-          .ilike('name', targetCategoryName);
+          .ilike('name', targetCategoryName)
+          .limit(1);
 
-        if (activeUnitId) {
-          const match = categories?.find(c => true); // pick first match
-          if (match) categoryId = match.id;
-        } else {
-          const match = categories?.[0];
-          if (match) categoryId = match.id;
-        }
+        if (categories?.[0]) categoryId = categories[0].id;
       }
       
       const description = `${typeLabels[payment.type]} - ${payment.employee.full_name}`;
