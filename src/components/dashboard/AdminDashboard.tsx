@@ -119,7 +119,7 @@ export function AdminDashboard() {
 
       case 'weekly-summary':
         return hasAccess('cash-closing') ? (
-          <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyWeeklySummary /></LazyWidget>
           </DashboardSection>
         ) : null;
