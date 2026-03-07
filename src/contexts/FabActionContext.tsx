@@ -1,26 +1,32 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-interface FabAction {
+export interface FabAction {
   icon: string;
   label: string;
   onClick: () => void;
+  badge?: number;
 }
 
 interface FabActionContextType {
   fabAction: FabAction | null;
+  fabActions: FabAction[];
   setFabAction: (action: FabAction | null) => void;
+  setFabActions: (actions: FabAction[]) => void;
 }
 
 const FabActionContext = createContext<FabActionContextType>({
   fabAction: null,
+  fabActions: [],
   setFabAction: () => {},
+  setFabActions: () => {},
 });
 
 export function FabActionProvider({ children }: { children: ReactNode }) {
   const [fabAction, setFabAction] = useState<FabAction | null>(null);
+  const [fabActions, setFabActions] = useState<FabAction[]>([]);
 
   return (
-    <FabActionContext.Provider value={{ fabAction, setFabAction }}>
+    <FabActionContext.Provider value={{ fabAction, fabActions, setFabAction, setFabActions }}>
       {children}
     </FabActionContext.Provider>
   );
@@ -31,11 +37,32 @@ export function FabActionProvider({ children }: { children: ReactNode }) {
  * The action is automatically cleared on unmount or route change.
  */
 export function useFabAction(action: FabAction | null, deps: any[] = []) {
-  const { setFabAction } = useContext(FabActionContext);
+  const { setFabAction, setFabActions } = useContext(FabActionContext);
 
   useEffect(() => {
     setFabAction(action);
-    return () => setFabAction(null);
+    setFabActions([]);
+    return () => { setFabAction(null); setFabActions([]); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}
+
+/**
+ * Hook for pages to register multiple actions on the FAB (speed dial).
+ * When tapped, the FAB opens a radial/list menu with all actions.
+ */
+export function useFabActions(actions: FabAction[], deps: any[] = []) {
+  const { setFabAction, setFabActions } = useContext(FabActionContext);
+
+  useEffect(() => {
+    if (actions.length === 1) {
+      setFabAction(actions[0]);
+      setFabActions([]);
+    } else if (actions.length > 1) {
+      setFabAction(null);
+      setFabActions(actions);
+    }
+    return () => { setFabAction(null); setFabActions([]); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
