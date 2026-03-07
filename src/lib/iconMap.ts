@@ -253,6 +253,7 @@ export const ICON_MAP: Record<string, string> = {
 
   // Home & Living
   House: 'home',
+  Armchair: 'weekend',
   Sofa: 'weekend',
   Droplets: 'water_drop',
   Zap: 'bolt',
@@ -323,6 +324,7 @@ export const ICON_MAP: Record<string, string> = {
   CalendarRange: 'date_range',
   CalendarIcon2: 'calendar_today',
   Bath: 'bathtub',
+  Snowflake: 'ac_unit',
   WifiOff: 'wifi_off',
   ToggleLeft: 'toggle_off',
   ToggleRight: 'toggle_on',
