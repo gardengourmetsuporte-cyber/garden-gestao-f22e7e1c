@@ -80,6 +80,13 @@ export function FinanceHome({
           variant === 'personal' && "finance-hero-card--personal"
         )}
       >
+        {/* Background image */}
+        <img
+          src={financeHeroBg}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ opacity: 0.6 }}
+        />
         <div className="p-5 pb-4 relative z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
