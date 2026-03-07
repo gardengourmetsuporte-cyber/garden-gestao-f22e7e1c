@@ -2,7 +2,6 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { FinanceAccount } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { matchBankBrand, WALLET_BRAND } from '@/lib/bankBrands';
-import { ICON_MAP } from '@/lib/iconMap';
 
 interface AccountCardProps {
   account: FinanceAccount;
@@ -15,7 +14,10 @@ function BankAvatar({ account }: { account: FinanceAccount }) {
 
   if (brand) {
     return (
-      <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 bg-white/20 backdrop-blur-sm text-white">
+      <div
+        className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-lg"
+        style={{ background: brand.bgColor, color: brand.textColor }}
+      >
         {brand.abbr}
       </div>
     );
@@ -25,7 +27,10 @@ function BankAvatar({ account }: { account: FinanceAccount }) {
   const iconName = typeIcons[account.type] || 'Wallet';
 
   return (
-    <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white/20 backdrop-blur-sm">
+    <div
+      className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-lg"
+      style={{ background: account.color }}
+    >
       <AppIcon name={iconName} size={20} className="text-white" />
     </div>
   );
@@ -37,29 +42,44 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
   const brand = isWallet ? WALLET_BRAND : matchBankBrand(account.name);
   const brandColor = brand?.bgColor || account.color;
 
+  const typeLabel = account.type === 'wallet' ? 'Carteira' : account.type === 'bank' ? 'Banco' : 'Cartão';
+
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] transition-all duration-200 w-full text-left relative overflow-hidden",
-        onClick && "hover:brightness-110 cursor-pointer active:scale-[0.98]"
+        "flex items-center gap-3.5 p-3.5 rounded-2xl w-full text-left relative overflow-hidden transition-all duration-200",
+        "bg-card border border-border/40 hover:border-border/70",
+        onClick && "hover:shadow-lg cursor-pointer active:scale-[0.98]"
       )}
-      style={{
-        background: brandColor,
-      }}
     >
+      {/* Subtle brand accent on left edge */}
+      <div
+        className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+        style={{ background: brandColor }}
+      />
+
       <BankAvatar account={account} />
-      <div className="flex-1 min-w-0 relative z-10">
-        <p className="font-semibold truncate font-display text-white" style={{ letterSpacing: '-0.01em' }}>{account.name}</p>
-        <p className="text-xs text-white/70 capitalize">{account.type === 'wallet' ? 'Carteira' : account.type === 'bank' ? 'Banco' : 'Cartão'}</p>
+
+      <div className="flex-1 min-w-0 pl-0.5">
+        <p className="font-semibold text-sm truncate text-foreground font-display" style={{ letterSpacing: '-0.01em' }}>
+          {account.name}
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-0.5">{typeLabel}</p>
       </div>
-      <p className={cn(
-        "font-semibold tabular-nums relative z-10",
-        isNegative ? "text-red-200" : "text-white"
-      )}>
-        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
-      </p>
-      {onClick && <AppIcon name="ChevronRight" size={16} className="text-white/70 shrink-0 relative z-10" />}
+
+      <div className="text-right shrink-0">
+        <p className={cn(
+          "font-bold text-sm tabular-nums",
+          isNegative ? "text-destructive" : "text-foreground"
+        )}>
+          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
+        </p>
+      </div>
+
+      {onClick && (
+        <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/50 shrink-0" />
+      )}
     </button>
   );
 }
