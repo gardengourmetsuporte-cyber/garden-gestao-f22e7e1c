@@ -352,6 +352,9 @@ export function ChecklistSettings({
   // Item handlers
   const handleOpenItemSheet = (subcategoryId: string, item?: ChecklistItem) => {
     setSelectedSubcategoryId(subcategoryId);
+    // Find which sector this subcategory belongs to
+    const parentSector = sectors.find(s => s.subcategories?.some(sub => sub.id === subcategoryId));
+    setItemSectorId(parentSector?.id || null);
     if (item) {
       setEditingItem(item);
       setItemName(item.name || '');
@@ -365,7 +368,6 @@ export function ChecklistSettings({
       setItemName('');
       setItemDescription('');
       setItemFrequency('daily');
-      // Use selected type as default for new items
       setItemChecklistType(selectedType);
       setItemPoints(selectedType === 'bonus' ? 5 : 1);
       setItemRequiresPhoto(false);
@@ -377,14 +379,19 @@ export function ChecklistSettings({
     if (!itemName.trim()) return;
 
     if (editingItem) {
-      await onUpdateItem(editingItem.id, {
+      const updates: any = {
         name: itemName.trim(),
         description: itemDescription.trim() || undefined,
         frequency: itemFrequency,
         checklist_type: itemChecklistType,
         points: itemPoints,
         requires_photo: itemRequiresPhoto,
-      });
+      };
+      // If subcategory changed, include it
+      if (selectedSubcategoryId && selectedSubcategoryId !== editingItem.subcategory_id) {
+        updates.subcategory_id = selectedSubcategoryId;
+      }
+      await onUpdateItem(editingItem.id, updates);
     } else if (selectedSubcategoryId) {
       await onAddItem({
         subcategory_id: selectedSubcategoryId,
