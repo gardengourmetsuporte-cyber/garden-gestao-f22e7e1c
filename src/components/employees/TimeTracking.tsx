@@ -19,6 +19,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useFabActions } from '@/contexts/FabActionContext';
 
 export function TimeTracking() {
   const { isAdmin, user } = useAuth();
