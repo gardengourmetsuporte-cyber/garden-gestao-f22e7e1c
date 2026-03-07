@@ -55,6 +55,7 @@ export function SupplierSettings() {
   };
   const handleDelete = async (id: string) => { try { await deleteSupplier(id); } catch (error) { toast.error('Erro ao excluir fornecedor'); } };
   const handleEdit = (supplier: Supplier) => { setEditingSupplier(supplier); setName(supplier.name); setPhone(supplier.phone || ''); setEmail(supplier.email || ''); setDeliveryFrequency((supplier as any).delivery_frequency || 'weekly'); setSheetOpen(true); };
+  const resetForm = () => { setEditingSupplier(null); setName(''); setPhone(''); setEmail(''); setDeliveryFrequency('weekly'); };
   const handleAdd = () => { resetForm(); setSheetOpen(true); };
   useFabAction({ icon: 'Plus', label: 'Novo Fornecedor', onClick: handleAdd }, []);
 
