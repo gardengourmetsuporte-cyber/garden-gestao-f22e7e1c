@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppIcon } from '@/components/ui/app-icon';
-import upgradeBannerImg from '@/assets/upgrade-banner.png';
+import upgradeBannerImg from '@/assets/upgrade-banner-clean.png';
 
 export function UpgradeBanner() {
   const { isFree } = useAuth();
@@ -20,13 +20,13 @@ export function UpgradeBanner() {
   };
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden animate-fade-in cursor-pointer group mb-4"
+    <div className="relative w-full rounded-2xl overflow-hidden animate-fade-in cursor-pointer group mb-4 bg-[#2a1548]"
       onClick={() => navigate('/plans')}
     >
       <img
         src={upgradeBannerImg}
         alt="Liberte o poder do Garden Gestão"
-        className="w-full h-auto object-cover rounded-2xl"
+        className="w-full h-auto object-cover rounded-2xl scale-[1.03]"
         loading="eager"
         fetchPriority="high"
         decoding="async"
