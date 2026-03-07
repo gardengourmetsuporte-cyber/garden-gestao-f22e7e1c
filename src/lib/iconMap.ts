@@ -286,7 +286,6 @@ export const ICON_MAP: Record<string, string> = {
   Salad: 'nutrition',
   Milk: 'water_full',
   Wheat: 'grain',
-  FlaskConical: 'science',
   Candy: 'cake',
   Egg: 'egg',
   SprayCan: 'cleaning_services',
