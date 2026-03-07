@@ -82,14 +82,14 @@ export function AdminDashboard() {
 
       case 'checklist':
         return hasAccess('checklists') ? (
-          <DashboardSection key={widget.key} title="Checklists" icon="CheckSquare" iconColor="text-green-400" onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyChecklist /></LazyWidget>
           </DashboardSection>
         ) : null;
 
       case 'finance-chart':
         return hasAccess('finance') ? (
-          <DashboardSection key={widget.key} title="Despesas do mês" icon="BarChart3" iconColor="text-emerald-400" onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/finance')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><FinanceChartWidget /></LazyWidget>
           </DashboardSection>
         ) : null;
@@ -105,28 +105,28 @@ export function AdminDashboard() {
 
       case 'calendar':
         return hasAccess('agenda') ? (
-          <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyCalendar /></LazyWidget>
           </DashboardSection>
         ) : null;
 
       case 'agenda':
         return hasAccess('agenda') ? (
-          <DashboardSection key={widget.key} title="Agenda" icon="ListTodo" iconColor="text-violet-400" onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/agenda')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyAgenda /></LazyWidget>
           </DashboardSection>
         ) : null;
 
       case 'weekly-summary':
         return hasAccess('cash-closing') ? (
-          <DashboardSection key={widget.key} title="Resumo semanal" icon="Calendar" iconColor="text-blue-400" onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyWeeklySummary /></LazyWidget>
           </DashboardSection>
         ) : null;
 
       case 'leaderboard':
         return hasAccess('ranking') ? (
-          <DashboardSection key={widget.key} title="Ranking" icon="Trophy" iconColor="text-yellow-400" onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
           </DashboardSection>
         ) : null;
