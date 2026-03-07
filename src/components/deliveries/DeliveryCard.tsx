@@ -15,6 +15,7 @@ interface Props {
   delivery: Delivery;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
+  onSetLocation?: (delivery: Delivery) => void;
 }
 
 export function DeliveryCard({ delivery, onStatusChange, onCardClick }: Props) {
