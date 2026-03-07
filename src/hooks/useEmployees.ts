@@ -259,10 +259,33 @@ export function useEmployeePayments(employeeId?: string) {
         discount: 'Desconto',
         other: 'Pagamento',
       };
+
+      // Auto-detect finance category based on payment type
+      const categoryMap: Record<string, string> = {
+        salary: 'Salários',
+        vale: 'Salários',
+        bonus: 'Folha de Pagamento',
+        other: 'Folha de Pagamento',
+      };
+      const targetCategoryName = categoryMap[payment.type];
+      let categoryId: string | null = null;
+
+      if (targetCategoryName && activeUnitId) {
+        const { data: categories } = await supabase
+          .from('finance_categories')
+          .select('id, name, parent_id')
+          .eq('user_id', user!.id)
+          .eq('unit_id', activeUnitId)
+          .eq('type', 'expense')
+          .ilike('name', targetCategoryName)
+          .limit(1);
+
+        if (categories?.[0]) categoryId = categories[0].id;
+      }
       
       const description = `${typeLabels[payment.type]} - ${payment.employee.full_name}`;
       
-      // Create finance transaction with employee_id linked
+      // Create finance transaction with employee_id linked and auto-category
       const { data: transaction, error: transError } = await supabase
         .from('finance_transactions')
         .insert({
@@ -273,6 +296,7 @@ export function useEmployeePayments(employeeId?: string) {
           amount: payment.amount,
           date: payment.payment_date,
           account_id: accountId,
+          category_id: categoryId,
           is_paid: true,
           is_fixed: false,
           employee_id: payment.employee_id,
