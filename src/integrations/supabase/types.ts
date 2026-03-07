@@ -4137,6 +4137,47 @@ export type Database = {
           },
         ]
       }
+      system_backups: {
+        Row: {
+          backup_data: Json
+          created_at: string
+          id: string
+          name: string
+          tables_included: string[]
+          total_records: number
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          backup_data?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          tables_included?: string[]
+          total_records?: number
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          backup_data?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          tables_included?: string[]
+          total_records?: number
+          unit_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_backups_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tablet_order_items: {
         Row: {
           created_at: string
