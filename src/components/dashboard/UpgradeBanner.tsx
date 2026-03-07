@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AppIcon } from '@/components/ui/app-icon';
-import upgradeBannerImg from '@/assets/upgrade-banner.png';
+import upgradeBannerImg from '@/assets/upgrade-banner-clean.png';
 
 export function UpgradeBanner() {
   const { isFree } = useAuth();
