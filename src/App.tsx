@@ -191,6 +191,7 @@ function AppRoutes() {
           <Route path="/landing" element={<Landing />} />
           <Route path="/invite" element={<Invite />} />
           <Route path="/share-receipt" element={<ShareReceiptHandler />} />
+          <Route path="/docs" element={<Documentation />} />
           <Route path="/" element={<ProtectedRoute><DashboardNew /></ProtectedRoute>} />
           <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
           <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
