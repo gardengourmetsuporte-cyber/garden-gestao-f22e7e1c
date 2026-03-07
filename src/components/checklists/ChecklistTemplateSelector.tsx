@@ -124,56 +124,102 @@ export function ChecklistTemplateSelector({ onManual, onDone }: Props) {
           const fechamento = totalItems - abertura;
 
           return (
-            <button
-              key={template.id}
-              onClick={() => setSelected(isSelected ? null : template.id)}
-              className={cn(
-                "relative w-full p-4 rounded-2xl border-2 text-left transition-all duration-200",
-                "hover:border-primary/40 hover:bg-primary/5",
-                isSelected
-                  ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
-                  : "border-border/50 bg-card"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                {isSelected && (
-                  <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                    <AppIcon name="Check" size={12} className="text-primary-foreground" />
-                  </div>
+            <div key={template.id} className="space-y-0">
+              <button
+                onClick={() => setSelected(isSelected ? null : template.id)}
+                className={cn(
+                  "relative w-full p-4 text-left transition-all duration-200",
+                  isSelected
+                    ? "rounded-t-2xl border-2 border-b-0 border-primary bg-primary/10 shadow-lg shadow-primary/10"
+                    : "rounded-2xl border-2 border-border/50 bg-card hover:border-primary/40 hover:bg-primary/5"
                 )}
-                <div className={cn(
-                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
-                  isSelected ? "bg-primary/20" : "bg-muted"
-                )}>
-                  <AppIcon name={template.icon} size={22} className={isSelected ? "text-primary" : "text-muted-foreground"} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground">{template.name}</h3>
-                    {template.badge && (
-                      <span className={cn(
-                        "text-[10px] px-2 py-0.5 rounded-full font-semibold",
-                        template.id === 'avancado' ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
-                      )}>
-                        {template.badge}
+              >
+                <div className="flex items-start gap-3">
+                  {isSelected && (
+                    <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <AppIcon name="Check" size={12} className="text-primary-foreground" />
+                    </div>
+                  )}
+                  <div className={cn(
+                    "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
+                    isSelected ? "bg-primary/20" : "bg-muted"
+                  )}>
+                    <AppIcon name={template.icon} size={22} className={isSelected ? "text-primary" : "text-muted-foreground"} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground">{template.name}</h3>
+                      {template.badge && (
+                        <span className={cn(
+                          "text-[10px] px-2 py-0.5 rounded-full font-semibold",
+                          template.id === 'avancado' ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+                        )}>
+                          {template.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{template.description}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                        {template.sectors.length} setores
                       </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{template.description}</p>
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-                      {template.sectors.length} setores
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-                      {abertura} abertura
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-                      {fechamento} fechamento
-                    </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                        {abertura} abertura
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                        {fechamento} fechamento
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </button>
+              </button>
+
+              {/* Preview expandido */}
+              {isSelected && (
+                <div className="border-2 border-t-0 border-primary rounded-b-2xl bg-card/80 backdrop-blur-sm overflow-hidden animate-in slide-in-from-top-2 duration-300">
+                  <div className="px-4 py-3 border-t border-border/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AppIcon name="Eye" size={14} className="text-primary" />
+                      <span className="text-[11px] font-semibold text-primary uppercase tracking-wider">Preview do modelo</span>
+                    </div>
+                    <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                      {template.sectors.map((sector, si) => (
+                        <div key={si}>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: sector.color }} />
+                            <span className="text-xs font-semibold text-foreground">{sector.name}</span>
+                          </div>
+                          <div className="ml-4 space-y-1">
+                            {sector.subcategories.map((sub, sci) => (
+                              <div key={sci}>
+                                <span className="text-[11px] font-medium text-muted-foreground">{sub.name}</span>
+                                <div className="ml-3 mt-0.5 space-y-0.5">
+                                  {sub.items.map((item, ii) => (
+                                    <div key={ii} className="flex items-center gap-2 text-[10px] text-muted-foreground/80">
+                                      <div className={cn(
+                                        "w-1.5 h-1.5 rounded-full shrink-0",
+                                        item.checklist_type === 'abertura' ? "bg-blue-400/60" : "bg-amber-400/60"
+                                      )} />
+                                      <span className="truncate">{item.name}</span>
+                                      {item.requires_photo && (
+                                        <AppIcon name="Camera" size={10} className="text-muted-foreground/50 shrink-0" />
+                                      )}
+                                      <span className="ml-auto text-[9px] text-muted-foreground/50 shrink-0 tabular-nums">
+                                        {item.points}pts
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
