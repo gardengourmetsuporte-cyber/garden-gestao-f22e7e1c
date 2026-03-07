@@ -78,7 +78,7 @@ export function useDeliveries() {
   });
 
   const filteredDeliveries = useMemo(() => {
-    if (statusFilter === 'all') return deliveries;
+    if (statusFilter === 'all') return deliveries.filter(d => d.status !== 'delivered');
     return deliveries.filter(d => d.status === statusFilter);
   }, [deliveries, statusFilter]);
 
