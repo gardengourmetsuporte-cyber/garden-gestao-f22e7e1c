@@ -47,22 +47,22 @@ export default function Employees() {
           ) : (
             <>
               {/* Navigation Cards */}
-              <div className={cn("grid gap-3", tabs.length <= 3 ? "grid-cols-3" : "grid-cols-4")}>
+              <div className={cn("grid gap-2", tabs.length <= 3 ? "grid-cols-3" : "grid-cols-4")}>
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
                     className={cn(
-                      "relative flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border transition-all duration-200 active:scale-[0.97]",
+                      "relative flex flex-col items-center justify-center gap-1.5 py-3 px-1.5 rounded-2xl border transition-all duration-200 active:scale-[0.97] min-w-0 overflow-hidden",
                       activeTab === tab.key
                         ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
                         : "bg-card border-border hover:border-primary/20"
                     )}
                   >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", activeTab === tab.key ? "bg-primary/20" : tab.bg)}>
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", activeTab === tab.key ? "bg-primary/20" : tab.bg)}>
                       <AppIcon name={tab.icon} size={20} fill={(tab as any).iconFill ?? 1} className={activeTab === tab.key ? "text-primary" : tab.color} />
                     </div>
-                    <span className={cn("text-xs font-semibold", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
+                    <span className={cn("text-[10px] font-semibold truncate w-full text-center", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
                   </button>
                 ))}
               </div>
