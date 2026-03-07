@@ -162,22 +162,22 @@ export default function Customers() {
 
         {/* Search + Segment filter + Actions */}
         <div className="flex gap-2">
-          <div className="flex-1 relative">
-            <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" style={{ fontSize: 18 }}>
-              search
-            </span>
-            <Input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar cliente..."
-              className="pl-10 h-11 border-border/50 bg-card"
-            />
-          </div>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-11 w-11 shrink-0 border-border/50 bg-card"
+            onClick={() => {
+              const el = document.getElementById('customer-search-input');
+              if (el) el.focus();
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>search</span>
+          </Button>
           <Select
             value={segmentFilter || 'all'}
             onValueChange={v => setSegmentFilter(v === 'all' ? null : v as CustomerSegment)}
           >
-            <SelectTrigger className="h-11 min-w-[130px] rounded-xl text-xs font-semibold border-border/50 bg-card">
+            <SelectTrigger className="h-11 flex-1 rounded-xl text-xs font-semibold border-border/50 bg-card">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -192,11 +192,10 @@ export default function Customers() {
               })}
             </SelectContent>
           </Select>
-          {/* Message campaign button - always visible */}
           <Button
             size="icon"
             variant="outline"
-            className="h-11 w-11 shrink-0 border-border/50"
+            className="h-11 w-11 shrink-0 border-border/50 bg-card"
             onClick={() => {
               if (selectMode) {
                 setCampaignOpen(true);
@@ -211,13 +210,26 @@ export default function Customers() {
           <Button
             size="icon"
             variant="outline"
-            className="h-11 w-11 shrink-0 border-border/50"
+            className="h-11 w-11 shrink-0 border-border/50 bg-card"
             onClick={() => setCsvOpen(true)}
             title="Importar clientes"
           >
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
           </Button>
         </div>
+
+        {/* Hidden search input for search button */}
+        {search !== undefined && (
+          <Input
+            id="customer-search-input"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar cliente..."
+            className="h-11 border-border/50 bg-card"
+            style={{ display: search ? 'block' : 'none' }}
+            onBlur={() => { if (!search) {} }}
+          />
+        )}
 
         {/* List */}
         {isLoading ? (
