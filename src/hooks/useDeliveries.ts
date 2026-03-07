@@ -35,10 +35,12 @@ export interface Delivery {
   created_by: string;
   created_at: string;
   updated_at: string;
+  order_number: string;
   address?: DeliveryAddress;
 }
 
 export interface OcrDeliveryResult {
+  order_number: string;
   customer_name: string;
   full_address: string;
   neighborhood: string;
