@@ -125,15 +125,15 @@ export function FinanceHome({
             </div>
             <div className="finance-hero-chip">
               <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center">
-                  <AppIcon name="TrendingDown" size={11} style={{ color: 'var(--gp-negative)' }} />
+                <div className="w-5 h-5 rounded-full bg-blue-500/15 flex items-center justify-center">
+                  <AppIcon name="Landmark" size={11} style={{ color: 'var(--gp-sublabel)' }} />
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
-                  Despesas
+                  Contas
                 </span>
               </div>
-              <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--gp-negative)' }}>
-                {fmtCurrency(monthStats.totalExpense)}
+              <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--gp-value)' }}>
+                {accounts.length}
               </span>
             </div>
           </div>
