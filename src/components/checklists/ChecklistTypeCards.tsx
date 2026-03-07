@@ -152,6 +152,7 @@ interface BonusCardProps {
 export function ChecklistBonusCard({
   isSelected, onSelect, settingsMode, isAdmin,
   deadlineSettings, updateDeadline, removeDeadline, isSavingDeadline,
+  hasActiveItems = true,
 }: BonusCardProps) {
   return (
     <button
