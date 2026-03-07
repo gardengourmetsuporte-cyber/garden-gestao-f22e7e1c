@@ -49,6 +49,7 @@ serve(async (req) => {
 Analise a imagem enviada e extraia os dados de entrega.
 
 EXTRAIA:
+- order_number: Número do pedido (ex: "123", "#456", "Pedido 789"). Procure por campos como "Pedido", "Nº", "#", "Comanda", "Número" etc.
 - customer_name: Nome do cliente (se visível)
 - full_address: Endereço completo de entrega
 - neighborhood: Bairro (OBRIGATÓRIO - se não visível, inferir da cidade/região)
@@ -58,11 +59,12 @@ EXTRAIA:
 - total: Valor total do pedido (número, 0 se não visível)
 
 REGRAS:
-1. Sempre tente extrair o bairro - é a chave de agrupamento das rotas
-2. Se o endereço não estiver claro, extraia o máximo possível
-3. Se houver múltiplos pedidos na imagem, extraia apenas o primeiro
-4. Valores monetários devem ser números (sem R$)
-5. Se não conseguir ler algo, use string vazia ao invés de inventar`;
+1. O número do pedido é MUITO IMPORTANTE - procure em todas as áreas da imagem
+2. Sempre tente extrair o bairro - é a chave de agrupamento das rotas
+3. Se o endereço não estiver claro, extraia o máximo possível
+4. Se houver múltiplos pedidos na imagem, extraia apenas o primeiro
+5. Valores monetários devem ser números (sem R$)
+6. Se não conseguir ler algo, use string vazia ao invés de inventar`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -85,7 +87,7 @@ REGRAS:
               },
               {
                 type: 'text',
-                text: 'Analise esta imagem de pedido/comanda e extraia os dados de entrega. Responda APENAS com JSON válido.',
+                text: 'Analise esta imagem de pedido/comanda e extraia os dados de entrega, incluindo o número do pedido. Responda APENAS com JSON válido.',
               },
             ],
           },
@@ -99,6 +101,7 @@ REGRAS:
               parameters: {
                 type: 'object',
                 properties: {
+                  order_number: { type: 'string', description: 'Número do pedido' },
                   customer_name: { type: 'string', description: 'Nome do cliente' },
                   full_address: { type: 'string', description: 'Endereço completo' },
                   neighborhood: { type: 'string', description: 'Bairro' },
@@ -107,7 +110,7 @@ REGRAS:
                   items_summary: { type: 'string', description: 'Resumo dos itens' },
                   total: { type: 'number', description: 'Valor total do pedido' },
                 },
-                required: ['customer_name', 'full_address', 'neighborhood'],
+                required: ['customer_name', 'full_address', 'neighborhood', 'order_number'],
                 additionalProperties: false,
               },
             },
@@ -161,6 +164,7 @@ REGRAS:
     return new Response(JSON.stringify({
       success: true,
       data: {
+        order_number: parsedData.order_number || '',
         customer_name: parsedData.customer_name || '',
         full_address: parsedData.full_address || '',
         neighborhood: parsedData.neighborhood || '',

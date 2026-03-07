@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Upload, Loader2, MapPin, User, Package, DollarSign } from 'lucide-react';
+import { Camera, Upload, Loader2, MapPin, User, Package, DollarSign, Hash } from 'lucide-react';
 import type { OcrDeliveryResult } from '@/hooks/useDeliveries';
 
 interface Props {
@@ -43,7 +43,7 @@ export function DeliveryOcrSheet({ open, onOpenChange, onConfirm, processImage, 
   };
 
   const handleConfirm = () => {
-    if (ocrData && file) {
+    if (ocrData && file && ocrData.order_number.trim()) {
       onConfirm(ocrData, file);
       reset();
       onOpenChange(false);
@@ -53,6 +53,8 @@ export function DeliveryOcrSheet({ open, onOpenChange, onConfirm, processImage, 
   const updateField = (key: keyof OcrDeliveryResult, value: string | number) => {
     if (ocrData) setOcrData({ ...ocrData, [key]: value });
   };
+
+  const orderNumberMissing = ocrData && !ocrData.order_number.trim();
 
   return (
     <Sheet open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
@@ -121,6 +123,27 @@ export function DeliveryOcrSheet({ open, onOpenChange, onConfirm, processImage, 
             {preview && (
               <img src={preview} alt="Pedido" className="w-full max-h-40 rounded-xl object-cover" />
             )}
+
+            {/* Order number - highlighted and required */}
+            <div className={`p-3 rounded-xl border-2 ${orderNumberMissing ? 'border-amber-500 bg-amber-500/5' : 'border-primary/30 bg-primary/5'}`}>
+              <Label className="flex items-center gap-1.5 mb-1.5">
+                <Hash className="w-3.5 h-3.5" />
+                Nº do Pedido
+                <span className="text-destructive ml-0.5">*</span>
+              </Label>
+              {orderNumberMissing && (
+                <p className="text-[11px] text-amber-500 mb-2 font-medium">
+                  ⚠️ Não foi possível identificar o número na foto. Digite manualmente:
+                </p>
+              )}
+              <Input
+                value={ocrData.order_number}
+                onChange={(e) => updateField('order_number', e.target.value)}
+                placeholder="Ex: 123, #456"
+                className={`font-bold text-lg ${orderNumberMissing ? 'border-amber-500/50' : ''}`}
+                autoFocus={!!orderNumberMissing}
+              />
+            </div>
 
             <div className="space-y-3">
               <div>
@@ -195,7 +218,11 @@ export function DeliveryOcrSheet({ open, onOpenChange, onConfirm, processImage, 
               <Button variant="outline" className="flex-1" onClick={reset}>
                 Refazer
               </Button>
-              <Button className="flex-1" onClick={handleConfirm}>
+              <Button
+                className="flex-1"
+                onClick={handleConfirm}
+                disabled={!ocrData.order_number.trim()}
+              >
                 Confirmar Entrega
               </Button>
             </div>

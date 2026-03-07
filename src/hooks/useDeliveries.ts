@@ -35,10 +35,12 @@ export interface Delivery {
   created_by: string;
   created_at: string;
   updated_at: string;
+  order_number: string;
   address?: DeliveryAddress;
 }
 
 export interface OcrDeliveryResult {
+  order_number: string;
   customer_name: string;
   full_address: string;
   neighborhood: string;
@@ -329,6 +331,7 @@ export function useDeliveries() {
           items_summary: ocrResult.items_summary || null,
           photo_url: photoUrl,
           total: ocrResult.total || 0,
+          order_number: ocrResult.order_number || '',
           created_by: user!.id,
         })
         .select('*, address:delivery_addresses(*)')

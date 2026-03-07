@@ -47,9 +47,16 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocat
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className="font-semibold text-sm leading-snug truncate">
-              {addr?.customer_name || 'Sem nome'}
-            </p>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {delivery.order_number && (
+                <span className="shrink-0 text-[11px] font-bold bg-primary/15 text-primary px-1.5 py-0.5 rounded-md tabular-nums">
+                  #{delivery.order_number}
+                </span>
+              )}
+              <p className="font-semibold text-sm leading-snug truncate">
+                {addr?.customer_name || 'Sem nome'}
+              </p>
+            </div>
             {delivery.total > 0 && (
               <span className="text-sm font-bold text-primary whitespace-nowrap tabular-nums shrink-0">
                 R$ {delivery.total.toFixed(2)}
