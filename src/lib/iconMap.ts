@@ -344,5 +344,8 @@ export const ICON_MAP: Record<string, string> = {
   Pause: 'pause',
   Power: 'power_settings_new',
   Loader2: 'progress_activity',
+  Progress_activity: 'progress_activity',
+  Database: 'database',
+  HardDrive: 'hard_drive',
   Delete: 'backspace',
 };
