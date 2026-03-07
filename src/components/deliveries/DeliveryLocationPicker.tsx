@@ -41,6 +41,13 @@ interface Props {
   onConfirm: (addressId: string, lat: number, lng: number) => Promise<void>;
 }
 
+interface NominatimResult {
+  place_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+}
+
 const DEFAULT_CENTER: [number, number] = [-21.9687, -46.7969];
 
 function createMarkerIcon() {
@@ -63,11 +70,14 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const initAttemptRef = useRef<number>(0);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+  const [suggestions, setSuggestions] = useState<NominatimResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Reset state when open changes
   useEffect(() => {
@@ -77,16 +87,17 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
       setSearchQuery(delivery?.address?.full_address || '');
       setIsSearching(false);
       setMapReady(false);
+      setSuggestions([]);
+      setShowSuggestions(false);
       initAttemptRef.current = 0;
     } else {
-      // Cleanup on close
       if (markerRef.current) { markerRef.current.remove(); markerRef.current = null; }
       if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; }
       setMapReady(false);
     }
   }, [open, delivery?.id]);
 
-  // Init map with retry — waits for container to be visible
+  // Init map with retry
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
@@ -97,7 +108,6 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
 
       const container = mapContainerRef.current;
       if (!container || container.clientHeight === 0) {
-        // Container not ready yet, retry
         if (initAttemptRef.current < 30) {
           initAttemptRef.current++;
           setTimeout(tryInitMap, 150);
@@ -106,8 +116,6 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
       }
 
       const L = window.L;
-
-      // Already initialized
       if (mapInstanceRef.current) return;
 
       const center = delivery?.address?.lat && delivery?.address?.lng
@@ -136,7 +144,6 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
           }
         });
 
-        // Keep invalidating until tiles load
         const intervals = [100, 300, 500, 800, 1200, 2000];
         intervals.forEach(ms => {
           setTimeout(() => {
@@ -152,19 +159,17 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
       }
     };
 
-    // Start after a small delay to let drawer animate
     const startTimer = setTimeout(tryInitMap, 300);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(startTimer);
-    };
+    return () => { cancelled = true; clearTimeout(startTimer); };
   }, [open, delivery?.id]);
 
-  // Search address via Nominatim
-  const handleSearch = useCallback(async () => {
-    const query = searchQuery.trim();
-    if (!query || !mapInstanceRef.current) return;
+  // Debounced autocomplete
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (query.trim().length < 3) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
 
     setIsSearching(true);
     try {
@@ -175,36 +180,49 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
       const params = new URLSearchParams({
         q: searchWithCity,
         format: 'json',
-        limit: '1',
+        limit: '5',
         countrycodes: 'br',
+        addressdetails: '1',
       });
 
       const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
         headers: { 'User-Agent': 'GardenGestao/1.0' },
       });
-      const results = await res.json();
-
-      if (results?.[0]) {
-        const lat = parseFloat(results[0].lat);
-        const lng = parseFloat(results[0].lon);
-        const map = mapInstanceRef.current;
-
-        setSelectedCoords({ lat, lng });
-        if (markerRef.current) {
-          markerRef.current.setLatLng([lat, lng]);
-        } else {
-          markerRef.current = window.L.marker([lat, lng], { icon: createMarkerIcon() }).addTo(map);
-        }
-        map.flyTo([lat, lng], 17, { duration: 0.8 });
-      } else {
-        toast.error('Endereço não encontrado. Tente ser mais específico.');
-      }
+      const results: NominatimResult[] = await res.json();
+      setSuggestions(results || []);
+      setShowSuggestions((results || []).length > 0);
     } catch {
-      toast.error('Erro ao buscar endereço');
+      setSuggestions([]);
     } finally {
       setIsSearching(false);
     }
-  }, [searchQuery]);
+  }, []);
+
+  const handleInputChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchSuggestions(value), 400);
+  }, [fetchSuggestions]);
+
+  const selectSuggestion = useCallback((result: NominatimResult) => {
+    const lat = parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
+    const map = mapInstanceRef.current;
+
+    setSearchQuery(result.display_name.split(',').slice(0, 3).join(','));
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setSelectedCoords({ lat, lng });
+
+    if (map) {
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lng]);
+      } else {
+        markerRef.current = window.L.marker([lat, lng], { icon: createMarkerIcon() }).addTo(map);
+      }
+      map.flyTo([lat, lng], 17, { duration: 0.8 });
+    }
+  }, []);
 
   const handleConfirm = useCallback(async () => {
     if (!selectedCoords || !delivery?.address?.id) return;
@@ -236,38 +254,54 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
             </SheetDescription>
           </SheetHeader>
 
-          {/* Search bar */}
-          <form
-            onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
-            className="flex gap-2"
-          >
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar endereço..."
-              className="h-9 text-sm flex-1"
-            />
-            <Button
-              type="submit"
-              size="sm"
-              variant="outline"
-              disabled={isSearching || !searchQuery.trim()}
-              className="h-9 px-3 shrink-0"
-            >
-              {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            </Button>
-          </form>
+          {/* Search bar with autocomplete */}
+          <div className="relative">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                  placeholder="Buscar endereço..."
+                  className="h-9 text-sm pr-8"
+                />
+                {isSearching && (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                )}
+              </div>
+            </div>
+
+            {/* Suggestions dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/40 bg-card shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+                {suggestions.map((s) => (
+                  <button
+                    key={s.place_id}
+                    type="button"
+                    onClick={() => selectSuggestion(s)}
+                    className="w-full text-left px-3 py-2.5 text-xs hover:bg-muted/50 transition-colors border-b border-border/10 last:border-0 flex items-start gap-2"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                    <span className="text-foreground/90 leading-tight line-clamp-2">
+                      {s.display_name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <p className="text-[10px] text-muted-foreground/60">
-            Busque o endereço ou toque no mapa para marcar o local
+            Digite o endereço para ver sugestões ou toque no mapa
           </p>
         </div>
 
-        {/* Map container — fixed height ensures Leaflet can render */}
+        {/* Map container */}
         <div
           ref={mapContainerRef}
           className="relative isolate w-full"
           style={{ height: 300, minHeight: 300, background: 'hsl(var(--muted))' }}
+          onClick={() => setShowSuggestions(false)}
         >
           {!mapReady && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
