@@ -30,12 +30,11 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
 
   
 
-  // Calculate spent per category (expense only, paid)
+  // Calculate spent per category (expense only, PAID)
   const spentByCategory = useMemo(() => {
     const map: Record<string, number> = {};
     const parentLookup: Record<string, string> = {};
 
-    // Build parent lookup from all categories
     categories.forEach(cat => {
       cat.subcategories?.forEach(sub => {
         parentLookup[sub.id] = cat.id;
@@ -44,6 +43,26 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
 
     transactions
       .filter(t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid && t.category_id)
+      .forEach(t => {
+        const parentId = parentLookup[t.category_id!] || t.category_id!;
+        map[parentId] = (map[parentId] || 0) + Number(t.amount);
+      });
+    return map;
+  }, [transactions, categories]);
+
+  // Calculate provisioned per category (expense only, paid + unpaid)
+  const provisionedByCategory = useMemo(() => {
+    const map: Record<string, number> = {};
+    const parentLookup: Record<string, string> = {};
+
+    categories.forEach(cat => {
+      cat.subcategories?.forEach(sub => {
+        parentLookup[sub.id] = cat.id;
+      });
+    });
+
+    transactions
+      .filter(t => (t.type === 'expense' || t.type === 'credit_card') && t.category_id)
       .forEach(t => {
         const parentId = parentLookup[t.category_id!] || t.category_id!;
         map[parentId] = (map[parentId] || 0) + Number(t.amount);
