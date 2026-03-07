@@ -254,8 +254,8 @@ export function SmartReceivingSheet({
                   className="w-full h-24 border-dashed flex flex-col gap-2"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <AppIcon name="PhotoCamera" size={24} className="text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Tirar foto da nota</span>
+                  <AppIcon name="ScanLine" size={24} className="text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Scanner Inteligente</span>
                 </Button>
               )}
               <input

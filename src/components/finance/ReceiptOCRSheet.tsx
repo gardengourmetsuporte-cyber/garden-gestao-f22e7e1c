@@ -227,7 +227,7 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
                   }
                 }}
               >
-                <AppIcon name="Camera" size={18} />
+                <AppIcon name="ScanLine" size={18} />
                 Câmera
               </Button>
               <Button
