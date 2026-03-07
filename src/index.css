@@ -319,7 +319,7 @@ html {
 
   :root:not(.dark):not(.midnight) input,
   :root:not(.dark):not(.midnight) textarea,
-  :root:not(.dark) select {
+  :root:not(.dark):not(.midnight) select {
     color-scheme: light;
   }
 
