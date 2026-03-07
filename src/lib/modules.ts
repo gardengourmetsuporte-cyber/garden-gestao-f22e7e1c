@@ -66,7 +66,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'orders', label: 'Pedidos', icon: 'ShoppingCart', route: '/orders', routes: ['/orders'], group: 'Gestão',
+    key: 'orders', label: 'Pedidos', icon: 'ShoppingCart', route: '/orders', routes: ['/orders'], group: 'Operação',
     children: [
       { key: 'orders.view', label: 'Ver pedidos', icon: 'Eye' },
       { key: 'orders.create', label: 'Criar/enviar pedidos', icon: 'PenSquare' },
