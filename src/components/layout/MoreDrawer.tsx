@@ -238,13 +238,13 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                       <div className={cn(
                         "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
                         active
-                          ? "bg-primary/15"
+                          ? "bg-primary/20"
                           : "bg-muted/50"
                       )}>
                         {item.customIcon ? (
                           <img src={item.customIcon} alt="" className={cn("w-6 h-6 transition-all", active ? "brightness-0 invert opacity-90" : "dark:invert dark:opacity-70 opacity-70")} />
                         ) : (
-                          <AppIcon name={item.icon} size={22} fill={active ? 1 : 0} className={active ? "text-primary" : "text-foreground"} />
+                          <AppIcon name={item.icon} size={22} fill={active ? 1 : 0} className={active ? "text-foreground" : "text-foreground"} />
                         )}
                       </div>
                       {locked && (
