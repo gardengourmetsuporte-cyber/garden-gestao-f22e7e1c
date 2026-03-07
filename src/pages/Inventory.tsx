@@ -18,6 +18,7 @@ import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { InventoryTemplateSelector } from '@/components/inventory/InventoryTemplateSelector';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
@@ -49,6 +50,7 @@ export default function InventoryPage() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'zero' | null>(null);
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(true);
 
   // Handle ?action= from quick actions / setup checklist
   useEffect(() => {
@@ -220,7 +222,12 @@ export default function InventoryPage() {
             {view === 'items' ? (
               <div className="space-y-4">
                 {filteredItems.length === 0 ? (
-                  items.length === 0 ? (
+                  items.length === 0 && showTemplates ? (
+                    <InventoryTemplateSelector
+                      onManual={() => { setShowTemplates(false); handleAddItem(); }}
+                      onDone={() => setShowTemplates(false)}
+                    />
+                  ) : items.length === 0 ? (
                     <EmptyState
                       icon="Package"
                       title="Seu estoque está vazio"
