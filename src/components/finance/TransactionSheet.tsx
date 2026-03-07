@@ -342,7 +342,6 @@ export function TransactionSheet({
       }
 
       clearDraft();
-      toast.success(editingTransaction ? 'Transação atualizada!' : 'Transação salva!');
       onOpenChange(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Não foi possível salvar a transação';
@@ -380,7 +379,7 @@ export function TransactionSheet({
         employee_id: employeeId || undefined,
       });
 
-      toast.success('Transação salva!');
+      toast.success('Lançamento salvo! Continue adicionando.');
 
       // Reset form for next entry
       clearDraft();

@@ -173,14 +173,16 @@ export default function Finance() {
     if (editingTransaction) {
       await updateTransaction(editingTransaction.id, data);
       toast.success('Transação atualizada!', {
-        action: { label: 'Ver', onClick: () => setActiveTab('transactions') },
-        duration: 5000,
+        action: { label: 'Ver transações', onClick: () => setActiveTab('transactions') },
+        cancel: { label: 'Desfazer', onClick: () => undo() },
+        duration: 6000,
       });
     } else {
       await addTransaction(data);
       toast.success('Transação criada!', {
-        action: { label: 'Ver', onClick: () => setActiveTab('transactions') },
-        duration: 5000,
+        action: { label: 'Ver transações', onClick: () => setActiveTab('transactions') },
+        cancel: { label: 'Desfazer', onClick: () => undo() },
+        duration: 6000,
       });
     }
   };

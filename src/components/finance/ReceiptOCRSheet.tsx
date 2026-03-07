@@ -183,7 +183,7 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
         is_fixed: false,
         is_recurring: false,
       });
-      toast.success('Transação lançada!');
+      // Toast handled by parent
       onOpenChange(false);
     } catch {
       toast.error('Erro ao salvar transação');
