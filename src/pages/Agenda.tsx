@@ -58,7 +58,7 @@ export default function Agenda() {
   const [agendaSearchParams, setAgendaSearchParams] = useSearchParams();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('calendar');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
@@ -359,66 +359,13 @@ export default function Agenda() {
               </DropdownMenu>
             </div>
           </div>
-          {/* View mode tabs with animated indicator */}
-          <div className="relative flex bg-card rounded-2xl p-1 border border-border/50 shadow-inner">
-            <div
-              className="absolute top-1 bottom-1 rounded-xl bg-primary/10 shadow-sm shadow-primary/10 border border-primary/20 transition-all duration-300 ease-out"
-              style={{
-                width: 'calc(33.333% - 4px)',
-                left: viewMode === 'list' ? '4px' : viewMode === 'calendar' ? 'calc(33.333% + 0px)' : 'calc(66.666% + 0px)',
-              }}
+          {/* Calendar view */}
+          <div className="animate-fade-in">
+            <AgendaCalendarView
+              tasks={displayTasks}
+              onTaskClick={handleEditTask}
+              onToggleTask={toggleTask}
             />
-            <button
-              onClick={() => setViewMode('list')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'list' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <AppIcon name="ListChecks" size={16} />
-              Lista
-            </button>
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'calendar' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <AppIcon name="Calendar" size={16} />
-              Calendário
-            </button>
-            <button
-              onClick={() => setViewMode('blocks')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-                viewMode === 'blocks' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <AppIcon name="LayoutGrid" size={16} />
-              Blocos
-            </button>
-          </div>
-
-          {/* Category filter removed — filtering via collapsible groups */}
-
-          {/* Content with fade transition */}
-          <div className="animate-fade-in" key={viewMode}>
-            {viewMode === 'list' && <ListContent />}
-            {viewMode === 'calendar' && (
-              <AgendaCalendarView
-                tasks={displayTasks}
-                onTaskClick={handleEditTask}
-                onToggleTask={toggleTask}
-              />
-            )}
-            {viewMode === 'blocks' && (
-              <TimeBlocksView
-                tasks={displayTasks}
-                onToggleTask={toggleTask}
-                onTaskClick={handleEditTask}
-              />
-            )}
           </div>
         </div>
 
