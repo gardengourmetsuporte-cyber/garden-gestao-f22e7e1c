@@ -244,23 +244,30 @@ export default function Customers() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {visibleCustomers.map(c => (
-                <div key={c.id} className="relative">
+                <div key={c.id} className="flex items-stretch gap-2">
                   {selectMode && (
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleSelect(c.id); }}
                       className={cn(
-                        "absolute top-3 left-3 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all",
+                        "w-7 shrink-0 flex items-center justify-center rounded-xl transition-all",
                         selectedForMessage.has(c.id)
-                          ? "bg-primary border-primary"
-                          : "border-muted-foreground/40 bg-background/80"
+                          ? "text-primary"
+                          : "text-muted-foreground/40"
                       )}
                     >
-                      {selectedForMessage.has(c.id) && (
-                        <AppIcon name="Check" size={14} className="text-primary-foreground" />
-                      )}
+                      <span className={cn(
+                        "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                        selectedForMessage.has(c.id)
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground/40"
+                      )}>
+                        {selectedForMessage.has(c.id) && (
+                          <AppIcon name="Check" size={14} className="text-primary-foreground" />
+                        )}
+                      </span>
                     </button>
                   )}
-                  <div className={cn(selectMode && "pl-8")}>
+                  <div className="flex-1 min-w-0">
                     <CustomerCard
                       customer={c}
                       onEdit={() => { if (!selectMode) setDetailCustomer(c); else toggleSelect(c.id); }}
