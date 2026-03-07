@@ -229,8 +229,13 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                       opacity: locked ? 0.55 : 1,
                     }}
                   >
+                    {item.badge && !isProd && (
+                      <span className="absolute top-1.5 right-1.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-400 leading-none">
+                        {item.badge}
+                      </span>
+                    )}
                     {isProd && (
-                      <span className="absolute top-1.5 right-1.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-warning/15 text-warning leading-none">
+                      <span className="absolute top-1.5 right-1.5 text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-400 leading-none">
                         Beta
                       </span>
                     )}
@@ -254,11 +259,6 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                     <span className={cn("text-[11px] font-semibold leading-tight text-center truncate max-w-full", active ? "text-primary" : locked ? "text-muted-foreground" : "text-foreground/80")}>
                       {item.label}
                     </span>
-                    {item.badge && !locked && (
-                      <span className="text-[8px] font-bold uppercase tracking-wider -mt-1 px-2 py-0.5 rounded-full bg-primary/15 text-primary">
-                        {item.badge}
-                      </span>
-                    )}
                     {locked && planLabel && (
                       <span className="text-[8px] font-bold uppercase tracking-wider -mt-1 px-2 py-0.5 rounded-full bg-warning/10" style={{ color: 'hsl(45 90% 55%)' }}>
                         {planLabel}
