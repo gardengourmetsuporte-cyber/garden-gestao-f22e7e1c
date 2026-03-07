@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { RecipeCard } from '@/components/recipes/RecipeCard';
 import { RecipeSheet } from '@/components/recipes/RecipeSheet';
 import { useRecipes } from '@/hooks/useRecipes';
+import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency, type Recipe } from '@/types/recipe';
 import { cn } from '@/lib/utils';
@@ -30,6 +31,12 @@ export default function Recipes() {
     isAddingRecipe, isUpdatingRecipe, getAvailableSubRecipes,
     reorderCategories, updateItemPrice, updateItemUnit,
   } = useRecipes();
+  const { calculateOperationalCosts } = useRecipeCostSettings();
+
+  const getFullCostPerPortion = (recipe: Recipe) => {
+    const opCosts = calculateOperationalCosts(recipe.cost_per_portion);
+    return recipe.cost_per_portion + opCosts.totalOperational;
+  };
 
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -65,9 +72,9 @@ export default function Recipes() {
   const stats = useMemo(() => {
     const active = recipes.filter(r => r.is_active);
     const inactive = recipes.filter(r => !r.is_active);
-    const avgCost = active.length > 0 ? active.reduce((sum, r) => sum + r.cost_per_portion, 0) / active.length : 0;
+    const avgCost = active.length > 0 ? active.reduce((sum, r) => sum + getFullCostPerPortion(r), 0) / active.length : 0;
     return { total: recipes.length, avgCost, inactive: inactive.length };
-  }, [recipes]);
+  }, [recipes, calculateOperationalCosts]);
 
   const toggleCategory = (catId: string) => {
     setExpandedCategories(prev => {
@@ -185,6 +192,7 @@ export default function Recipes() {
                         <div key={recipe.id} className="animate-fade-in" style={{ animationDelay: `${idx * 30}ms` }}>
                           <RecipeCard
                             recipe={recipe}
+                            totalCostPerPortion={getFullCostPerPortion(recipe)}
                             onEdit={handleEdit}
                             onDuplicate={duplicateRecipe}
                             onToggleActive={(id, active) => toggleActive({ id, is_active: active })}
