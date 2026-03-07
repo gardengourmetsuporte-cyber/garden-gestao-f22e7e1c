@@ -76,10 +76,12 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
   const budgetItems = useMemo(() => {
     return budgets.map(b => {
       const spent = b.category_id ? (spentByCategory[b.category_id] || 0) : 0;
+      const provisioned = b.category_id ? (provisionedByCategory[b.category_id] || 0) : 0;
       const percent = b.planned_amount > 0 ? (spent / b.planned_amount) * 100 : 0;
-      return { ...b, spent, percent };
-    }).sort((a, b) => (b.percent) - (a.percent));
-  }, [budgets, spentByCategory]);
+      const provPercent = b.planned_amount > 0 ? (provisioned / b.planned_amount) * 100 : 0;
+      return { ...b, spent, provisioned, percent, provPercent };
+    }).sort((a, b) => (b.provPercent) - (a.provPercent));
+  }, [budgets, spentByCategory, provisionedByCategory]);
 
   const totalBudget = budgetItems.reduce((s, b) => s + b.planned_amount, 0);
   const totalSpent = budgetItems.reduce((s, b) => s + b.spent, 0);
