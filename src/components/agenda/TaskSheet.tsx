@@ -101,7 +101,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl flex flex-col overflow-hidden">
+        <SheetContent side="bottom" className="h-auto max-h-[90vh] rounded-t-3xl flex flex-col overflow-hidden" onOpenAutoFocus={(e) => e.preventDefault()}>
           <SheetHeader className="text-left pb-2">
             <SheetTitle>{editingTask ? 'Editar Lembrete' : 'Novo Lembrete'}</SheetTitle>
             <SheetDescription className="text-muted-foreground">
@@ -121,18 +121,8 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                 <Textarea
                   placeholder="Notas"
                   value={notes}
-                  onChange={(e) => {
-                    setNotes(e.target.value);
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                  }}
-                  ref={(el) => {
-                    if (el && notes) {
-                      el.style.height = 'auto';
-                      el.style.height = el.scrollHeight + 'px';
-                    }
-                  }}
-                  className="min-h-[60px] border-0 bg-transparent px-0 resize-none focus-visible:ring-0 placeholder:text-muted-foreground/60 overflow-hidden"
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="min-h-[60px] max-h-[120px] border-0 bg-transparent px-0 resize-none focus-visible:ring-0 placeholder:text-muted-foreground/60"
                   data-vaul-no-drag
                 />
               </div>
