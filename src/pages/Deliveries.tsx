@@ -165,6 +165,7 @@ export default function Deliveries() {
                     deliveries={group.deliveries}
                     onStatusChange={(id, status) => updateStatus({ id, status })}
                     onCardClick={handleCardClick}
+                    onSetLocation={setLocationPickerDelivery}
                   />
                 ))}
               </div>
