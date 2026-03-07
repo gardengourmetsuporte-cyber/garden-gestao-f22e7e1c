@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { WorkSchedule } from '@/types/database';
 
@@ -17,6 +16,7 @@ export function ScheduleManagement() {
   const { schedules, isLoading, approveSchedule, deleteSchedule, getPendingSchedules } = useSchedule();
   const [selectedSchedule, setSelectedSchedule] = useState<WorkSchedule | null>(null);
   const [notes, setNotes] = useState('');
+  const [showPendingSheet, setShowPendingSheet] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const pendingSchedules = getPendingSchedules();
@@ -61,81 +61,89 @@ export function ScheduleManagement() {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="pending" className="relative">
-            Pendentes
-            {pendingSchedules.length > 0 && (
-              <span className="ml-2 bg-primary text-primary-foreground text-xs rounded-full px-2 py-0.5">{pendingSchedules.length}</span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="calendar">Calendário</TabsTrigger>
-        </TabsList>
+      {/* Pending banner — only if there are pending requests */}
+      {pendingSchedules.length > 0 && (
+        <button
+          onClick={() => setShowPendingSheet(true)}
+          className="w-full card-unified-interactive p-4 flex items-center gap-3 text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-warning/15 flex items-center justify-center shrink-0">
+            <AppIcon name="Clock" size={20} className="text-warning" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-foreground">{pendingSchedules.length} solicitação(ões) pendente(s)</p>
+            <p className="text-xs text-muted-foreground">Toque para revisar</p>
+          </div>
+          <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+        </button>
+      )}
 
-        <TabsContent value="pending" className="mt-4">
-          {pendingSchedules.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <AppIcon name="Check" size={48} className="mx-auto mb-3 opacity-50" />
-              <p>Nenhuma solicitação pendente</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {pendingSchedules.map((schedule) => (
-                <div key={schedule.id} className="card-unified-interactive p-4 cursor-pointer" onClick={() => setSelectedSchedule(schedule)}>
-                  <div className="flex items-center justify-between">
+      {/* Calendar — always visible */}
+      <div className="card-unified p-4">
+        <ScheduleCalendar schedules={schedules} onDayClick={(day, month, year) => {
+          const schedule = schedules.find(s => s.day_off === day && s.month === month && s.year === year);
+          if (schedule) setSelectedSchedule(schedule);
+        }} />
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="font-semibold">Folgas Programadas</h3>
+        {Object.entries(groupedSchedules).length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <AppIcon name="CalendarOff" size={40} className="mx-auto mb-2 opacity-40" />
+            <p className="text-sm">Nenhuma folga programada</p>
+          </div>
+        ) : (
+          Object.entries(groupedSchedules).sort(([a], [b]) => b.localeCompare(a)).map(([key, monthSchedules]) => {
+            const [year, month] = key.split('-').map(Number);
+            return (
+              <div key={key} className="space-y-2">
+                <h4 className="text-sm font-medium text-muted-foreground">{monthNames[month]} {year}</h4>
+                {monthSchedules.sort((a, b) => a.day_off - b.day_off).map((schedule) => (
+                  <div key={schedule.id} className="card-unified p-3 flex items-center justify-between cursor-pointer hover:bg-secondary/50" onClick={() => setSelectedSchedule(schedule)}>
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={schedule.profile?.avatar_url || ''} />
-                        <AvatarFallback><AppIcon name="User" size={20} /></AvatarFallback>
-                      </Avatar>
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <span className="font-bold text-primary">{schedule.day_off}</span>
+                      </div>
                       <div>
                         <p className="font-medium">{schedule.profile?.full_name || 'Usuário'}</p>
-                        <p className="text-sm text-muted-foreground">{schedule.day_off} de {monthNames[schedule.month]} de {schedule.year}</p>
+                        {schedule.notes && <p className="text-xs text-muted-foreground">{schedule.notes}</p>}
                       </div>
                     </div>
-                    <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />
+                    {getStatusBadge(schedule.status)}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
+                ))}
+              </div>
+            );
+          })
+        )}
+      </div>
 
-        <TabsContent value="calendar" className="mt-4">
-          <div className="card-unified p-4">
-            <ScheduleCalendar schedules={schedules} onDayClick={(day, month, year) => {
-              const schedule = schedules.find(s => s.day_off === day && s.month === month && s.year === year);
-              if (schedule) setSelectedSchedule(schedule);
-            }} />
-          </div>
-
-          <div className="mt-6 space-y-4">
-            <h3 className="font-semibold">Folgas Programadas</h3>
-            {Object.entries(groupedSchedules).sort(([a], [b]) => b.localeCompare(a)).map(([key, monthSchedules]) => {
-              const [year, month] = key.split('-').map(Number);
-              return (
-                <div key={key} className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">{monthNames[month]} {year}</h4>
-                  {monthSchedules.sort((a, b) => a.day_off - b.day_off).map((schedule) => (
-                    <div key={schedule.id} className="card-unified p-3 flex items-center justify-between cursor-pointer hover:bg-secondary/50" onClick={() => setSelectedSchedule(schedule)}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <span className="font-bold text-primary">{schedule.day_off}</span>
-                        </div>
-                        <div>
-                          <p className="font-medium">{schedule.profile?.full_name || 'Usuário'}</p>
-                          {schedule.notes && <p className="text-xs text-muted-foreground">{schedule.notes}</p>}
-                        </div>
-                      </div>
-                      {getStatusBadge(schedule.status)}
+      {/* Pending requests sheet */}
+      <Sheet open={showPendingSheet} onOpenChange={setShowPendingSheet}>
+        <SheetContent side="bottom" className="max-h-[80vh] rounded-t-2xl">
+          <SheetHeader><SheetTitle>Solicitações Pendentes</SheetTitle></SheetHeader>
+          <div className="mt-4 space-y-3">
+            {pendingSchedules.map((schedule) => (
+              <div key={schedule.id} className="card-unified-interactive p-4 cursor-pointer" onClick={() => { setShowPendingSheet(false); setSelectedSchedule(schedule); }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={schedule.profile?.avatar_url || ''} />
+                      <AvatarFallback><AppIcon name="User" size={20} /></AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{schedule.profile?.full_name || 'Usuário'}</p>
+                      <p className="text-sm text-muted-foreground">{schedule.day_off} de {monthNames[schedule.month]} de {schedule.year}</p>
                     </div>
-                  ))}
+                  </div>
+                  <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-        </TabsContent>
-      </Tabs>
+        </SheetContent>
+      </Sheet>
 
       <Sheet open={!!selectedSchedule} onOpenChange={() => setSelectedSchedule(null)}>
         <SheetContent>
