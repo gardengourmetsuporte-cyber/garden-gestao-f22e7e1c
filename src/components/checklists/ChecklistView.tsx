@@ -1103,25 +1103,23 @@ export function ChecklistView({
                                     <div className="flex-1 min-w-0 text-left">
                                       <div className="flex items-start justify-between gap-2">
                                         <p className={cn("font-medium line-through text-sm leading-tight", isContested ? "text-amber-600 dark:text-amber-400" : wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
+                                        {wasAwardedPoints && pointsAwarded > 0 && !isContested && !wasSkipped ? (
+                                          <div className="flex items-center gap-0.5 shrink-0" style={{ color: getItemPointsColors(pointsAwarded).color }}>
+                                            <AppIcon name="Star" size={18} />
+                                            <span className="text-sm font-bold">{pointsAwarded}</span>
+                                          </div>
+                                        ) : (
                                         <div className={cn(
                                           "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
                                           isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                             : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
-                                            : !wasAwardedPoints ? "bg-primary/10 text-primary border-primary/20" : "border-border"
-                                        )}
-                                        style={!isContested && !wasSkipped && wasAwardedPoints && pointsAwarded > 0 ? {
-                                          backgroundColor: getItemPointsColors(pointsAwarded).bg,
-                                          color: getItemPointsColors(pointsAwarded).color,
-                                          borderColor: getItemPointsColors(pointsAwarded).border,
-                                        } : undefined}>
+                                            : "bg-primary/10 text-primary border-primary/20"
+                                        )}>
                                           {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                             : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
-                                            : !wasAwardedPoints ? (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>) 
-                                            : (<div className="flex items-center gap-0.5" style={{ color: getItemPointsColors(pointsAwarded).color }}>
-                                                <AppIcon name="Star" size={14} />
-                                                <span className="font-bold">+{pointsAwarded}</span>
-                                              </div>)}
+                                            : (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>)}
                                         </div>
+                                        )}
                                       </div>
                                       {isContested && contestedReason && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Contestado: {contestedReason}</p>
