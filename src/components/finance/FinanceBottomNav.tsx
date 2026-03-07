@@ -146,13 +146,13 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
               </div>
               <span className="text-[11px] font-bold text-white">Receita</span>
             </button>
-            <button onClick={() => handleAction('expense')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '50ms' }}>
+            <button onClick={() => handleAction('expense')} className="flex flex-col items-center gap-2 mb-6 animate-scale-in" style={{ animationDelay: '50ms' }}>
               <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg" style={{ background: 'hsl(var(--color-expense))' }}>
                 <AppIcon name="ArrowDownCircle" size={26} fill={1} style={{ color: 'white' }} />
               </div>
               <span className="text-[11px] font-bold text-white">Despesa</span>
             </button>
-            <button onClick={() => handleAction('transfer')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '100ms' }}>
+            <button onClick={() => handleAction('transfer')} className="flex flex-col items-center gap-2 mb-6 animate-scale-in" style={{ animationDelay: '100ms' }}>
               <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg" style={{ background: 'hsl(var(--color-transfer))' }}>
                 <AppIcon name="ArrowLeftRight" size={24} fill={1} style={{ color: 'white' }} />
               </div>
