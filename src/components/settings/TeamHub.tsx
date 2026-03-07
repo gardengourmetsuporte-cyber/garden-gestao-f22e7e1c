@@ -488,6 +488,8 @@ function InvitesTab() {
                 <p className="text-xs text-muted-foreground">Crie níveis de acesso na aba "Níveis" primeiro.</p>
               )}
             </div>
+          </div>
+          <Button onClick={() => sendInvite.mutate()} disabled={!email.trim() || !selectedAccessLevelId || sendInvite.isPending} className="w-full">
             <AppIcon name="Link" size={16} className="mr-2" />
             {sendInvite.isPending ? 'Gerando...' : 'Gerar Link de Convite'}
           </Button>
