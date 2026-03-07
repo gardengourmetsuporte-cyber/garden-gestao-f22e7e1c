@@ -74,9 +74,11 @@ export function FinanceHome({
       {/* === HERO BALANCE CARD === */}
       <button
         onClick={() => onNavigate?.('more')}
-        className={cn("finance-hero-card w-full text-left animate-slide-up stagger-1", variant === 'personal' && "finance-hero-card--personal")}
+        className={cn("w-full text-left animate-slide-up stagger-1 rounded-2xl overflow-hidden relative", variant === 'personal' && "finance-hero-card--personal")}
       >
-        <div className="finance-hero-inner p-5 pb-4">
+        <img src={financeHeroBg} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+        <div className="p-5 pb-4 relative z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>
