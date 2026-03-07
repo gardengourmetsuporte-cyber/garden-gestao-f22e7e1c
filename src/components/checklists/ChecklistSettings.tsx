@@ -115,7 +115,7 @@ interface ChecklistSettingsProps {
   onDeleteSubcategory: (id: string) => Promise<void>;
   onReorderSubcategories?: (sectorId: string, orderedIds: string[]) => Promise<void>;
   onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean; subcategory_id?: string }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
