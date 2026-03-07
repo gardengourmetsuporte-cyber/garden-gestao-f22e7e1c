@@ -232,18 +232,26 @@ function AppRoutes() {
 
 // Sync: when midnight theme is active, also add 'dark' class for CSS compatibility
 function MidnightThemeSync() {
-  const { resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   useEffect(() => {
     const html = document.documentElement;
-    if (resolvedTheme === 'midnight') {
-      html.classList.add('dark');
+    if (theme === 'midnight') {
+      // next-themes sets the value class, but we need 'dark' too for all .dark CSS selectors
+      if (!html.classList.contains('dark')) {
+        html.classList.add('dark');
+      }
+      if (!html.classList.contains('midnight')) {
+        html.classList.add('midnight');
+      }
+    } else {
+      html.classList.remove('midnight');
     }
-  });
+  }, [theme]);
   return null;
 }
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'midnight' }} storageKey="garden-theme">
+  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'dark midnight' }} storageKey="garden-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
