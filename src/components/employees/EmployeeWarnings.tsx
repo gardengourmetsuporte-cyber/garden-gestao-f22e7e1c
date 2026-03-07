@@ -109,31 +109,26 @@ export function EmployeeWarnings() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">Advertências</h2>
-      </div>
-
       {/* Filters (admin only) */}
       {isAdmin && (
         <div className="flex gap-2">
           <Select value={filterEmployee} onValueChange={setFilterEmployee}>
-            <SelectTrigger className="flex-1 h-10">
+            <SelectTrigger className="flex-1 rounded-xl h-10 bg-card/70 border-border/40">
               <SelectValue placeholder="Funcionário" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="all">Todos os funcionários</SelectItem>
               {employees.map(e => (
                 <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-40 h-10">
+            <SelectTrigger className="w-36 rounded-xl h-10 bg-card/70 border-border/40">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="all">Todos os tipos</SelectItem>
               <SelectItem value="verbal">Verbal</SelectItem>
               <SelectItem value="written">Escrita</SelectItem>
               <SelectItem value="suspension">Suspensão</SelectItem>
@@ -145,9 +140,14 @@ export function EmployeeWarnings() {
 
       {/* Warnings list */}
       {visibleWarnings.length === 0 ? (
-      <div className="text-center py-12 text-muted-foreground">
-          <AppIcon name="verified_user" size={40} className="mx-auto mb-3 opacity-40" />
-          <p className="text-sm">Nenhuma advertência registrada</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-border/30 bg-card/20">
+          <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mb-4">
+            <AppIcon name="verified_user" size={32} className="text-muted-foreground/20" />
+          </div>
+          <p className="text-sm font-semibold text-muted-foreground">Nenhuma advertência</p>
+          <p className="text-xs text-muted-foreground/50 mt-1.5 max-w-[220px] leading-relaxed">
+            Registros de advertências aparecerão aqui
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
