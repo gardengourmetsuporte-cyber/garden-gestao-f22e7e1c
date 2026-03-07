@@ -57,13 +57,12 @@ const colorOptions = [
 ];
 
 const sectorIconOptions = [
-  'Folder', 'Utensils', 'ChefHat', 'Coffee', 'Armchair',
-  'Bath', 'Package', 'ClipboardCheck', 'Wrench', 'Droplets',
-  'Star', 'Zap', 'Sparkles', 'Store', 'ShoppingCart',
-  'Briefcase', 'Heart', 'Shield', 'Settings', 'Leaf',
-  'Flame', 'Wine', 'Truck', 'Monitor', 'DollarSign',
-  'Printer', 'Trash2', 'Warehouse', 'CookingPot', 'Beef',
-  'Salad', 'Sandwich', 'Cherry', 'Apple', 'Egg',
+  'Folder', 'ChefHat', 'Coffee', 'Armchair', 'Bath',
+  'Package', 'ClipboardCheck', 'Wrench', 'Droplets', 'Star',
+  'Zap', 'Sparkles', 'Store', 'ShoppingCart', 'Briefcase',
+  'Heart', 'Shield', 'Settings', 'Leaf', 'Flame',
+  'Wine', 'Truck', 'Monitor', 'DollarSign', 'Warehouse',
+  'CookingPot', 'Beef', 'Salad', 'Sandwich', 'Egg',
 ];
 
 const frequencyOptions: { value: ItemFrequency; label: string; iconName: string }[] = [
