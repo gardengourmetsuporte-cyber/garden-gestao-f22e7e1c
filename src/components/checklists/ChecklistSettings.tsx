@@ -545,25 +545,30 @@ export function ChecklistSettings({
             const isExpanded = expandedSectors.has(sector.id);
 
             return (
-              <SortableItem key={sector.id} id={sector.id} className="bg-card rounded-xl border overflow-hidden mb-4">
+              <SortableItem key={sector.id} id={sector.id} className="rounded-2xl overflow-hidden mb-3">
                 <div className="flex-1">
                   {/* Sector Header */}
-                  <div className="flex items-center gap-2 p-3 bg-secondary/30">
+                  <div className="flex items-center gap-3.5 p-3.5 bg-card border border-border/40 rounded-2xl relative overflow-hidden">
+                    {/* Left accent */}
+                    <div
+                      className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+                      style={{ backgroundColor: sector.color }}
+                    />
                     <button
                       onClick={() => toggleSector(sector.id)}
                       className="flex-1 flex items-center gap-3"
                     >
-                      <div
-                        className="w-[3px] self-stretch rounded-full shrink-0"
-                        style={{ backgroundColor: sector.color }}
-                      />
-                      <AppIcon name={getSectorIcon(sector)} size={18} fill={0} className="text-muted-foreground" />
-                      <span className="font-semibold text-foreground">{sector.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({sector.subcategories?.length || 0} subcategorias)
-                      </span>
+                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-muted/40">
+                        <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="font-semibold text-sm text-foreground">{sector.name}</span>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          {sector.subcategories?.length || 0} subcategorias
+                        </p>
+                      </div>
                     </button>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => handleOpenSubcategorySheet(sector.id)}
                         className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-primary"
@@ -583,11 +588,10 @@ export function ChecklistSettings({
                       >
                         <AppIcon name="delete" size={16} />
                       </button>
-                      {isExpanded ? (
-                        <AppIcon name="expand_more" size={16} className="text-muted-foreground" />
-                      ) : (
-                        <AppIcon name="chevron_right" size={16} className="text-muted-foreground" />
-                      )}
+                      <AppIcon name="ChevronRight" size={16} className={cn(
+                        "text-muted-foreground/50 transition-transform duration-300",
+                        isExpanded && "rotate-90"
+                      )} />
                     </div>
                   </div>
 
