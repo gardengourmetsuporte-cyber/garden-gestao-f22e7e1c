@@ -236,14 +236,22 @@ function MidnightThemeSync() {
   useEffect(() => {
     const html = document.documentElement;
     if (theme === 'midnight') {
-      html.classList.add('dark');
+      // next-themes sets the value class, but we need 'dark' too for all .dark CSS selectors
+      if (!html.classList.contains('dark')) {
+        html.classList.add('dark');
+      }
+      if (!html.classList.contains('midnight')) {
+        html.classList.add('midnight');
+      }
+    } else {
+      html.classList.remove('midnight');
     }
   }, [theme]);
   return null;
 }
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} storageKey="garden-theme">
+  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'dark midnight' }} storageKey="garden-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
