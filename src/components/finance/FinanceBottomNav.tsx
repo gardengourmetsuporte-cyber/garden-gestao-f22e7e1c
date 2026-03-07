@@ -139,6 +139,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
       {menuOpen && (
         <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="flex items-end gap-8">
+            {/* Outer items at base level, inner items raised */}
             <button onClick={() => handleAction('income')} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '0ms' }}>
               <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg" style={{ background: 'hsl(var(--color-income))' }}>
                 <AppIcon name="ArrowUpCircle" size={26} fill={1} style={{ color: 'white' }} />
