@@ -231,7 +231,7 @@ function AppRoutes() {
 }
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="garden-theme">
+  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} storageKey="garden-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
