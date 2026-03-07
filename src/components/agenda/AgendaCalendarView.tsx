@@ -87,7 +87,7 @@ export function AgendaCalendarView({ tasks, onTaskClick, onToggleTask }: AgendaC
                 <div
                   key={task.id}
                   className={cn(
-                    'p-3 rounded-xl card-surface hover:shadow-card-hover border-white/5 transition-all',
+                    'p-3 rounded-xl calendar-card-brand hover:shadow-card-hover transition-all',
                     task.is_completed && 'opacity-60'
                   )}
                 >
