@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify user via getClaims (faster than getUser)
+    // Verify user via getClaims
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
     if (claimsError || !claimsData?.claims?.sub) {
@@ -60,6 +60,31 @@ Deno.serve(async (req) => {
     const { csvText, unitId } = await req.json();
     if (!csvText || !unitId) {
       return new Response(JSON.stringify({ error: "Missing csvText or unitId" }), { status: 400, headers: corsHeaders });
+    }
+
+    // =============================================
+    // CRITICAL: Validate user has access to this unit (IDOR protection)
+    // =============================================
+    const { data: unitAccess } = await supabase
+      .from('user_units')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('unit_id', unitId)
+      .single();
+
+    if (!unitAccess) {
+      // Fallback: check global admin role
+      const { data: globalRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .in('role', ['admin', 'super_admin'])
+        .limit(1);
+
+      if (!globalRole || globalRole.length === 0) {
+        console.error(`SECURITY: User ${userId} attempted to import customers into unit ${unitId} without access`);
+        return new Response(JSON.stringify({ error: "Access denied" }), { status: 403, headers: corsHeaders });
+      }
     }
 
     // Parse CSV (semicolon-delimited, quoted fields)
@@ -120,7 +145,6 @@ Deno.serve(async (req) => {
 
       // Skip duplicates by phone
       if (phone && existingPhones.has(phone)) continue;
-      // Track within batch too
       if (phone) existingPhones.add(phone);
 
       records.push({
@@ -138,19 +162,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Batch insert in chunks of 100, fallback to individual on conflict
+    // Batch insert in chunks of 100
     let inserted = 0;
     for (let i = 0; i < records.length; i += 100) {
       const chunk = records.slice(i, i + 100);
       const { error } = await supabase.from('customers').insert(chunk);
       if (error) {
         if (error.code === '23505') {
-          // Duplicate in chunk — insert one by one, skipping conflicts
-          console.warn(`Chunk ${i} had duplicates, inserting individually`);
           for (const record of chunk) {
             const { error: singleErr } = await supabase.from('customers').insert(record);
             if (singleErr) {
-              if (singleErr.code === '23505') continue; // skip duplicate
+              if (singleErr.code === '23505') continue;
               console.error('Single insert error:', singleErr);
             } else {
               inserted++;
@@ -165,7 +187,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Recalculate scores for all imported customers
+    // Recalculate scores
     if (inserted > 0) {
       await supabase.rpc('recalculate_all_customer_scores', { p_unit_id: unitId });
     }
