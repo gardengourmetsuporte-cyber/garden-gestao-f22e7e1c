@@ -1321,30 +1321,30 @@ export function ChecklistView({
                                         <>
                                           <div className="border-t border-border" />
                                           {contestingItemId === item.id ? (
-                                            <div className="space-y-2 animate-fade-in">
+                                            <div className="space-y-3 animate-fade-in">
                                               <div className="flex items-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400">
                                                 <AppIcon name="AlertTriangle" className="w-4 h-4" />
                                                 <span>Motivo da contestação</span>
                                               </div>
+                                              <input
+                                                type="text"
+                                                value={contestReason}
+                                                onChange={(e) => setContestReason(e.target.value)}
+                                                placeholder="Descreva o motivo..."
+                                                className="w-full bg-transparent border border-amber-500/30 rounded-xl px-3 py-2.5 outline-none text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-amber-500/30"
+                                                onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
+                                              />
                                               <div className="flex items-center gap-2">
-                                                <input
-                                                  type="text"
-                                                  value={contestReason}
-                                                  onChange={(e) => setContestReason(e.target.value)}
-                                                  placeholder="Descreva o motivo..."
-                                                  className="flex-1 bg-transparent border border-amber-500/30 rounded-lg px-3 py-2 outline-none text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-amber-500/30"
-                                                  autoFocus
-                                                  onKeyDown={(e) => { if (e.key === 'Enter' && contestReason.trim()) handleContest(completion.id); if (e.key === 'Escape') { setContestingItemId(null); setContestReason(''); } }}
-                                                />
                                                 <button
                                                   onClick={() => handleContest(completion.id)}
                                                   disabled={!contestReason.trim() || contestLoading}
-                                                  className="p-2 rounded-lg bg-amber-500 text-white disabled:opacity-50 hover:bg-amber-600 transition-colors"
+                                                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-semibold disabled:opacity-50 hover:bg-amber-600 transition-colors"
                                                 >
                                                   <AppIcon name="Send" className="w-4 h-4" />
+                                                  Contestar
                                                 </button>
-                                                <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-2 rounded-lg hover:bg-secondary transition-colors">
-                                                  <AppIcon name="X" className="w-4 h-4 text-muted-foreground" />
+                                                <button onClick={() => { setContestingItemId(null); setContestReason(''); }} className="p-2.5 rounded-xl hover:bg-secondary transition-colors">
+                                                  <AppIcon name="X" className="w-5 h-5 text-muted-foreground" />
                                                 </button>
                                               </div>
                                             </div>
