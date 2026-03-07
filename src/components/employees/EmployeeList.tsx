@@ -119,46 +119,43 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
           return (
             <div
               key={employee.id}
-              className="card-unified-interactive p-4 cursor-pointer"
+              className="bg-card border border-border/40 rounded-2xl overflow-hidden relative cursor-pointer"
               onClick={() => onSelectEmployee(employee)}
             >
-              <div className="flex items-center gap-3">
+              {/* Accent bar */}
+              <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+
+              <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
                 {/* Avatar */}
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
                     alt={employee.full_name}
-                    className="w-11 h-11 rounded-full object-cover flex-shrink-0"
+                    className="w-10 h-10 rounded-xl object-cover flex-shrink-0"
                   />
                 ) : (
                   <div className="flex-shrink-0">
-                    <DefaultAvatar name={employee.full_name} size={44} userId={employee.user_id || undefined} />
+                    <DefaultAvatar name={employee.full_name} size={40} userId={employee.user_id || undefined} />
                   </div>
                 )}
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-semibold font-display truncate">{employee.full_name}</span>
+                    <span className="font-semibold text-foreground truncate">{employee.full_name}</span>
                     {!employee.is_active && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Inativo</Badge>
                     )}
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
                     {employee.user_id && (
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                         <AppIcon name="UserCheck" size={10} className="mr-0.5" />
                         Vinculado
                       </Badge>
                     )}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                     {employee.role && (
-                      <span className="truncate">{employee.role}</span>
-                    )}
-                    {employee.department && (
-                      <>
-                        <span className="text-border">•</span>
-                        <span className="truncate">{employee.department}</span>
-                      </>
+                      <span className="text-[11px] text-muted-foreground truncate">{employee.role}</span>
                     )}
                   </div>
                 </div>
