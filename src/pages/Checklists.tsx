@@ -128,14 +128,25 @@ export default function ChecklistsPage() {
               />
             </div>
 
-            {/* Bonus Card */}
-            <ChecklistBonusCard
-              isSelected={checklistType === 'bonus'}
-              onSelect={() => setChecklistType('bonus')}
-              settingsMode={settingsMode} isAdmin={isAdmin}
-              deadlineSettings={deadlineSettings}
-              updateDeadline={updateDeadline} removeDeadline={removeDeadline} isSavingDeadline={isSavingDeadline}
-            />
+            {/* Bonus Card - hidden for non-admins when no active bonus items */}
+            {(() => {
+              const hasActiveBonusItems = sectors.some((s: any) =>
+                s.scope === 'bonus' && s.subcategories?.some((sub: any) =>
+                  sub.items?.some((i: any) => i.is_active && i.checklist_type === 'bonus')
+                )
+              );
+              if (!isAdmin && !hasActiveBonusItems) return null;
+              return (
+                <ChecklistBonusCard
+                  isSelected={checklistType === 'bonus'}
+                  onSelect={() => setChecklistType('bonus')}
+                  settingsMode={settingsMode} isAdmin={isAdmin}
+                  deadlineSettings={deadlineSettings}
+                  updateDeadline={updateDeadline} removeDeadline={removeDeadline} isSavingDeadline={isSavingDeadline}
+                  hasActiveItems={hasActiveBonusItems}
+                />
+              );
+            })()}
 
             {/* Content */}
             <div className="pt-3">
