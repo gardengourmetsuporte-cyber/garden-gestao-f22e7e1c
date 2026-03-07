@@ -105,7 +105,7 @@ export function AdminDashboard() {
 
       case 'calendar':
         return hasAccess('agenda') ? (
-          <DashboardSection key={widget.key} title="Calendário" icon="CalendarDays" iconColor="text-indigo-400" onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyCalendar /></LazyWidget>
           </DashboardSection>
         ) : null;
