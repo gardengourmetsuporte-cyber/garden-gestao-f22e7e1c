@@ -69,6 +69,9 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [isPaying, setIsPaying] = useState(false);
 
+  const openNewPayslip = () => { setEditingPayslip(null); setPayslipSheetOpen(true); };
+  useFabAction({ icon: 'Plus', label: 'Novo Lançamento', onClick: openNewPayslip }, [employee.id]);
+
   useEffect(() => {
     async function fetchAccounts() {
       if (!user) return;
