@@ -1172,6 +1172,29 @@ export function ChecklistView({
                                   {/* Inline panel for completed items (admin or own completion) */}
                                   {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && !isContested && completion && (
                                     <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
+                                      {!isTimerMode && canToggle && (
+                                        <button
+                                          onClick={async () => {
+                                            setOpenPopover(null);
+                                            setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                                            try {
+                                              await onToggleItem(item.id, 0, undefined, undefined, undefined, false, true);
+                                            } catch (error: any) {
+                                              setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
+                                              toast.error(error.message || 'Erro ao desfazer');
+                                            }
+                                          }}
+                                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
+                                        >
+                                          <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                                            <AppIcon name="Undo2" className="w-5 h-5 text-muted-foreground" />
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-foreground">Desfazer</p>
+                                            <p className="text-xs text-muted-foreground">Desmarcar conclusão</p>
+                                          </div>
+                                        </button>
+                                      )}
                                       {isTimerMode && canToggle && (
                                         <button
                                           onClick={async () => {
