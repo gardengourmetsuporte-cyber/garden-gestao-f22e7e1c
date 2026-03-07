@@ -163,6 +163,7 @@ export const ICON_MAP: Record<string, string> = {
   Package: 'inventory_2',
   PackageX: 'inventory',
   PackageCheck: 'inventory',
+  Clipboard: 'content_paste',
   ClipboardCheck: 'task_alt',
   ClipboardList: 'checklist',
   Folder: 'folder',
