@@ -6,6 +6,7 @@ import { useEmployeePayments } from '@/hooks/useEmployees';
 import { Employee, EmployeePayment, PAYMENT_TYPE_LABELS, PAYMENT_TYPE_COLORS, MONTHS } from '@/types/employee';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
