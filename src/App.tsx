@@ -70,6 +70,7 @@ const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
 const BrandCore = lazy(() => lazyRetry(() => import("./pages/BrandCore")));
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const Deliveries = lazy(() => lazyRetry(() => import("./pages/Deliveries")));
+const DeliveryHub = lazy(() => lazyRetry(() => import("./pages/DeliveryHub")));
 
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
