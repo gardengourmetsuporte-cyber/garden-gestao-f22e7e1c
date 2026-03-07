@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { RecipeCard } from '@/components/recipes/RecipeCard';
 import { RecipeSheet } from '@/components/recipes/RecipeSheet';
 import { useRecipes } from '@/hooks/useRecipes';
+import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency, type Recipe } from '@/types/recipe';
 import { cn } from '@/lib/utils';
