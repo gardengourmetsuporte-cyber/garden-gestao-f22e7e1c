@@ -594,7 +594,7 @@ export function RecipeSheet({
                 />
               </div>
             </div>
-          </ScrollArea>
+          </div>
 
           {/* Sticky Footer */}
           {ingredients.length > 0 && (
