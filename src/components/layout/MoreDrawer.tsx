@@ -194,7 +194,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
           <div className="px-4 pt-5 pb-8 space-y-3 relative z-10 more-drawer-modules">
             {groupedNav.map(group => {
               const count = group.items.length;
-              const useCols3 = count >= 3 && count !== 4;
+              const useCols3 = group.label !== 'Gestão' && count >= 3 && count !== 4;
               const cols = useCols3 ? 3 : 2;
               const remainder = count % cols;
               const fullRowItems = remainder > 0 ? group.items.slice(0, count - remainder) : group.items;

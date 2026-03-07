@@ -86,7 +86,7 @@ export function filterNavItems(
 
     // Fallback: use adminOnly flag
     // Premium modules are admin-only by default
-    if (item.group === 'dev') return isAdmin;
+    if (item.group === 'premium') return isAdmin;
     if (item.adminOnly && !isAdmin) return false;
     return true;
   });
