@@ -198,11 +198,13 @@ function NeighborhoodGroup({
   deliveries,
   onStatusChange,
   onCardClick,
+  onSetLocation,
 }: {
   neighborhood: string;
   deliveries: import('@/hooks/useDeliveries').Delivery[];
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
+  onSetLocation?: (delivery: import('@/hooks/useDeliveries').Delivery) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -230,6 +232,7 @@ function NeighborhoodGroup({
               delivery={delivery}
               onStatusChange={onStatusChange}
               onCardClick={onCardClick}
+              onSetLocation={onSetLocation}
             />
           ))}
         </div>
