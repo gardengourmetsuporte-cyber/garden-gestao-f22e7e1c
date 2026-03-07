@@ -1,4 +1,4 @@
-import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, Phone } from 'lucide-react';
+import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
