@@ -79,39 +79,62 @@ export function FinanceHome({
           variant === 'personal' && "finance-hero-card--personal"
         )}
       >
-        <div className="p-5 pb-4 relative z-10">
+        <div className="finance-hero-inner p-5 pb-4">
           {/* Header */}
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gp-label)' }}>
-              {variant === 'personal' ? 'Meu saldo pessoal' : 'Saldo em contas'}
-            </span>
-            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
-              <AppIcon name="ChevronRight" size={14} style={{ color: 'var(--gp-icon)' }} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-white/[0.08] flex items-center justify-center border border-white/[0.06]">
+                <AppIcon name="Landmark" size={16} style={{ color: 'var(--gp-icon)' }} />
+              </div>
+              <span className="text-[11px] font-semibold tracking-[0.08em] uppercase" style={{ color: 'var(--gp-label)' }}>
+                {variant === 'personal' ? 'Saldo pessoal' : 'Saldo em contas'}
+              </span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-white/[0.08] flex items-center justify-center border border-white/[0.06]">
+              <AppIcon name="ArrowRight" size={14} style={{ color: 'var(--gp-icon)' }} />
             </div>
           </div>
 
           {/* Balance */}
-          <p className="text-[2rem] font-extrabold tracking-tight leading-tight" style={{ color: totalBalance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
+          <p className="text-[2.25rem] font-black tracking-[-0.03em] leading-none" style={{ color: totalBalance >= 0 ? 'var(--gp-value)' : 'var(--gp-negative)' }}>
             {fmtCurrency(totalBalance)}
           </p>
 
-          {/* Sub-stats row */}
-          <div className="flex gap-2 mt-3">
-            <div className="finance-hero-chip finance-hero-chip--success">
-              <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>Lucro líquido</span>
+          {/* Stat chips */}
+          <div className="flex gap-2.5 mt-5">
+            <div className="finance-hero-chip">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold" style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
+                <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center">
+                  <AppIcon name="TrendingUp" size={11} style={{ color: 'var(--gp-positive)' }} />
+                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
+                  Lucro
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[15px] font-bold tabular-nums" style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
                   {fmtCurrency(Math.abs(profit))}
                 </span>
                 <span className={cn(
-                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md",
-                  profit >= 0 
-                    ? "bg-green-500/15" 
-                    : "bg-red-500/15"
+                  "text-[9px] font-bold px-1.5 py-0.5 rounded-full",
+                  profit >= 0 ? "bg-emerald-500/15" : "bg-red-500/15"
                 )} style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
-                  {profit >= 0 ? '+' : '-'}{Math.abs(Number(profitPercent))}%
+                  {profit >= 0 ? '+' : ''}{profitPercent}%
                 </span>
               </div>
+            </div>
+            <div className="finance-hero-chip">
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center">
+                  <AppIcon name="TrendingDown" size={11} style={{ color: 'var(--gp-negative)' }} />
+                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
+                  Despesas
+                </span>
+              </div>
+              <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--gp-negative)' }}>
+                {fmtCurrency(monthStats.totalExpense)}
+              </span>
             </div>
           </div>
         </div>

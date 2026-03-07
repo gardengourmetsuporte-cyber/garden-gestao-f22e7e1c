@@ -669,162 +669,147 @@ html {
     color: hsl(348 80% 45%);
   }
 
-  /* ========== FINANCE HERO CARD ========== */
+  /* ========== FINANCE HERO CARD — Modern Mesh ========== */
 
   .finance-hero-card {
-    @apply relative overflow-hidden rounded-[24px] border transition-all duration-300 active:scale-[0.98];
-    background: linear-gradient(145deg, hsl(220 20% 5%) 0%, hsl(40 22% 9%) 50%, hsl(220 20% 5%) 100%);
-    border-color: hsl(42 90% 55% / 0.22);
+    @apply relative overflow-hidden rounded-[28px] transition-all duration-500 active:scale-[0.97];
+    background: hsl(228 22% 7%);
+    border: 1px solid hsl(0 0% 100% / 0.07);
     box-shadow:
-      0 8px 32px hsl(0 0% 0% / 0.5),
-      0 2px 8px hsl(0 0% 0% / 0.3),
-      inset 0 1px 0 hsl(42 95% 60% / 0.12),
-      0 0 50px hsl(42 90% 50% / 0.1);
+      0 1px 2px hsl(0 0% 0% / 0.4),
+      0 8px 40px hsl(0 0% 0% / 0.35);
     color: hsl(0 0% 98%) !important;
+    isolation: isolate;
   }
 
-  /* Holographic shimmer on finance hero */
+  /* Aurora mesh gradient — animated */
   .finance-hero-card::before {
     content: '';
     position: absolute;
-    inset: 0;
+    inset: -40%;
     border-radius: inherit;
     background:
-      radial-gradient(ellipse 70% 50% at 15% 15%, hsl(42 95% 55% / 0.14) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 85% 85%, hsl(30 90% 48% / 0.1) 0%, transparent 50%),
-      linear-gradient(125deg,
-        transparent 15%,
-        hsl(48 95% 58% / 0.12) 28%,
-        hsl(42 100% 52% / 0.16) 40%,
-        hsl(36 90% 50% / 0.12) 52%,
-        hsl(50 85% 55% / 0.1) 65%,
-        transparent 80%);
-    background-size: 250% 250%;
-    animation: holoShimmer 8s ease-in-out infinite;
+      radial-gradient(ellipse 55% 55% at 15% 25%, hsl(var(--primary) / 0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 85% 75%, hsl(270 65% 55% / 0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 10%, hsl(200 80% 50% / 0.15) 0%, transparent 50%);
+    animation: auroraDrift 12s ease-in-out infinite alternate;
     pointer-events: none;
-    z-index: 1;
+    z-index: 0;
+    filter: blur(50px);
   }
 
-  /* Sweep reflection */
+  /* Noise grain texture overlay */
   .finance-hero-card::after {
     content: '';
     position: absolute;
     inset: 0;
-    pointer-events: none;
     border-radius: inherit;
-    background: linear-gradient(105deg, transparent 35%, hsl(0 0% 100% / 0.04) 45%, hsl(0 0% 100% / 0.08) 50%, hsl(0 0% 100% / 0.04) 55%, transparent 65%);
-    background-size: 250% 100%;
-    animation: cardShineSwipe 6s ease-in-out infinite;
-    z-index: 2;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    z-index: 3;
+  }
+
+  @keyframes auroraDrift {
+    0% { transform: rotate(0deg) scale(1); }
+    33% { transform: rotate(3deg) scale(1.05); }
+    66% { transform: rotate(-2deg) scale(1.02); }
+    100% { transform: rotate(1deg) scale(1); }
+  }
+
+  /* Token overrides inside card */
+  .finance-hero-card {
+    --foreground: 0 0% 98%;
+    --muted-foreground: 220 10% 58%;
+    --gp-label: hsl(220 15% 60%);
+    --gp-sublabel: hsl(220 10% 55%);
+    --gp-value: hsl(0 0% 100%);
+    --gp-icon: hsl(220 15% 68%);
+    --gp-positive: hsl(152 62% 55%);
+    --gp-negative: hsl(0 72% 62%);
   }
 
   @media (hover: hover) {
     .finance-hero-card:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
       box-shadow:
-        0 12px 40px hsl(0 0% 0% / 0.6),
-        0 4px 12px hsl(0 0% 0% / 0.3),
-        inset 0 1px 0 hsl(42 95% 60% / 0.15),
-        0 0 60px hsl(42 90% 50% / 0.12);
-      border-color: hsl(42 90% 55% / 0.3);
+        0 2px 4px hsl(0 0% 0% / 0.3),
+        0 16px 56px hsl(0 0% 0% / 0.45),
+        0 0 80px hsl(var(--primary) / 0.08);
+      border-color: hsl(0 0% 100% / 0.12);
     }
-  }
-
-  /* Override Tailwind theme tokens inside these dark cards */
-  .finance-hero-card {
-    --foreground: 0 0% 98%;
-    --muted-foreground: 42 20% 62%;
-    --gp-label: hsl(42 25% 65%);
-    --gp-sublabel: hsl(42 18% 58%);
-    --gp-value: hsl(0 0% 98%);
-    --gp-icon: hsl(42 35% 72%);
-    --gp-positive: hsl(142 60% 55%);
-    --gp-negative: hsl(0 70% 60%);
   }
 
   .finance-hero-card:active {
-    transform: scale(0.98);
-  }
-
-  @keyframes navyCardFlow {
-    0% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-
-    100% {
-      background-position: 0% 50%;
-    }
+    transform: scale(0.97);
   }
 
   .finance-hero-card--personal {
-    background: linear-gradient(145deg, hsl(220 20% 5%) 0%, hsl(40 18% 8%) 50%, hsl(220 20% 5%) 100%);
-    box-shadow:
-      0 4px 24px hsl(0 0% 0% / 0.4),
-      0 8px 48px hsl(0 0% 0% / 0.2),
-      inset 0 1px 0 hsl(42 80% 55% / 0.08),
-      0 0 40px hsl(42 80% 50% / 0.06);
-    border-color: hsl(42 80% 55% / 0.15);
+    /* Slightly cooler aurora for personal variant */
   }
-
-  @media (hover: hover) {
-    .finance-hero-card--personal:hover {
-      border-color: hsl(45 60% 50% / 0.15);
-      box-shadow:
-        0 6px 32px hsl(0 0% 0% / 0.5),
-        0 12px 56px hsl(0 0% 0% / 0.25),
-        inset 0 1px 0 hsl(45 60% 50% / 0.08);
-    }
-  }
-
-  .checklist-gradient-slow {
-    animation: none;
-    background-position: 30% 50%;
+  .finance-hero-card--personal::before {
+    background:
+      radial-gradient(ellipse 55% 55% at 20% 30%, hsl(200 70% 55% / 0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 70%, hsl(var(--primary) / 0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 55% 15%, hsl(280 60% 55% / 0.15) 0%, transparent 50%);
   }
 
   .finance-hero-inner {
     position: relative;
+    z-index: 1;
   }
 
-  .finance-hero-inner::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 85% -20%, hsl(42 90% 50% / 0.14) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 5% 110%, hsl(38 80% 45% / 0.08) 0%, transparent 45%);
-    pointer-events: none;
-  }
-
+  /* Glass stat chips */
   .finance-hero-chip {
-    @apply flex-1 rounded-xl px-3 py-2 flex flex-col gap-0.5;
-    position: relative;
+    @apply flex-1 rounded-2xl px-3.5 py-2.5 flex flex-col gap-1;
+    background: hsl(0 0% 100% / 0.06);
+    border: 1px solid hsl(0 0% 100% / 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background 0.3s ease, border-color 0.3s ease;
   }
 
-  .finance-hero-chip--success {
-    background: hsl(42 40% 16% / 0.7);
-    border: 1px solid hsl(42 70% 55% / 0.25);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+  .finance-hero-chip:hover {
+    background: hsl(0 0% 100% / 0.1);
+    border-color: hsl(0 0% 100% / 0.14);
   }
 
-  .dark .finance-hero-chip--success {
-    background: hsl(42 30% 11% / 0.65);
-    border: 1px solid hsl(42 65% 50% / 0.22);
+  /* Light mode adaptation */
+  :root:not(.dark) .finance-hero-card {
+    background: hsl(0 0% 100%);
+    border-color: hsl(220 15% 90%);
+    box-shadow: 0 1px 3px hsl(220 20% 50% / 0.06), 0 8px 32px hsl(220 20% 50% / 0.08);
+    color: hsl(220 20% 10%) !important;
+    --foreground: 220 20% 10%;
+    --muted-foreground: 220 10% 48%;
+    --gp-label: hsl(220 12% 48%);
+    --gp-sublabel: hsl(220 10% 52%);
+    --gp-value: hsl(220 20% 10%);
+    --gp-icon: hsl(220 10% 52%);
+    --gp-positive: hsl(156 55% 38%);
+    --gp-negative: hsl(0 68% 48%);
   }
 
-  .finance-hero-chip--neutral {
-    background: hsl(35 30% 15% / 0.65);
-    border: 1px solid hsl(35 50% 50% / 0.22);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+  :root:not(.dark) .finance-hero-card::before {
+    background:
+      radial-gradient(ellipse 55% 55% at 10% 20%, hsl(var(--primary) / 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 90% 80%, hsl(270 60% 60% / 0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 5%, hsl(200 70% 55% / 0.06) 0%, transparent 50%);
+    filter: blur(40px);
   }
 
-  .dark .finance-hero-chip--neutral {
-    background: hsl(35 22% 12% / 0.6);
-    border: 1px solid hsl(35 45% 48% / 0.18);
+  :root:not(.dark) .finance-hero-card::after {
+    opacity: 0.08;
+  }
+
+  :root:not(.dark) .finance-hero-chip {
+    background: hsl(220 20% 50% / 0.05);
+    border-color: hsl(220 15% 85%);
+  }
+
+  :root:not(.dark) .finance-hero-chip:hover {
+    background: hsl(220 20% 50% / 0.08);
   }
 
   /* ========== COMMAND CENTER CARDS ========== */
@@ -2872,20 +2857,7 @@ select:focus {
 .dash-stagger-7 { animation-delay: 360ms; }
 .dash-stagger-8 { animation-delay: 420ms; }
 
-/* Finance hero decorative dots */
-.finance-hero-card::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle, hsl(160 80% 50% / 0.08) 1px, transparent 1px);
-  background-size: 12px 12px;
-  animation: dotPulse 4s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
+/* (finance-hero decorative dots removed — aurora mesh replaces them) */
 
 /* KPI card hover glow upgrade */
 @media (hover: hover) {
