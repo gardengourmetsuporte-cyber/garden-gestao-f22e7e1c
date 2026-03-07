@@ -661,11 +661,11 @@ html {
     background:
       linear-gradient(125deg,
         transparent 20%,
-        hsl(280 80% 65% / 0.08) 30%,
-        hsl(200 90% 60% / 0.1) 40%,
-        hsl(160 80% 50% / 0.08) 50%,
-        hsl(40 90% 60% / 0.06) 60%,
-        hsl(320 80% 60% / 0.08) 70%,
+        hsl(45 80% 55% / 0.06) 30%,
+        hsl(38 90% 50% / 0.08) 40%,
+        hsl(50 80% 55% / 0.06) 50%,
+        hsl(30 85% 50% / 0.05) 60%,
+        hsl(55 70% 50% / 0.06) 70%,
         transparent 80%);
     background-size: 250% 250%;
     animation: holoShimmer 8s ease-in-out infinite;
