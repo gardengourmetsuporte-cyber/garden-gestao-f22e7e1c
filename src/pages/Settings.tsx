@@ -145,6 +145,7 @@ export default function SettingsPage() {
       {activeSection === 'audit-log' && <AuditLogSettings />}
       {activeSection === 'cardapio-digital' && <CardapioSettings />}
       {activeSection === 'loyalty' && <LoyaltySettings />}
+      {activeSection === 'system-backup' && <SystemBackupSettings />}
     </Suspense>
   ) : null;
 
