@@ -488,7 +488,7 @@ export function FinanceTransactions({
                       {sorted.map(transaction => (
                         <div key={transaction.id} className="relative">
                           {transaction.is_recurring && transaction.installment_group_id && (
-                            <Badge variant="outline" className="absolute -top-2 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                            <Badge variant="outline" className="absolute top-1.5 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
                               <AppIcon name="Repeat" size={10} className="mr-0.5" />
                               {transaction.installment_number}/{transaction.total_installments}
                             </Badge>
