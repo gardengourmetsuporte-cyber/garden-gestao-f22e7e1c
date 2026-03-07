@@ -156,17 +156,22 @@ function NeighborhoodGroup({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-border/20 bg-card/40 overflow-hidden">
+    <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+      {/* Accent bar */}
+      <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 px-3.5 py-2.5 w-full hover:bg-card/60 transition-colors"
+        className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors"
       >
-        <AppIcon name="location_on" size={16} className="text-primary shrink-0" />
-        <span className="font-semibold text-[13px] flex-1 truncate text-left">{neighborhood}</span>
-        <span className="text-[10px] font-bold tabular-nums text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-          {deliveries.length}
-        </span>
+        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+          <AppIcon name="location_on" size={20} className="text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-foreground truncate">{neighborhood}</p>
+          <p className="text-[11px] text-muted-foreground">{deliveries.length} entrega{deliveries.length !== 1 ? 's' : ''}</p>
+        </div>
         <AppIcon
           name="expand_more"
           size={18}
@@ -174,7 +179,7 @@ function NeighborhoodGroup({
         />
       </button>
       {open && (
-        <div className="p-2 pt-0 space-y-1.5">
+        <div className="px-4 pb-3 space-y-1.5">
           {deliveries.map((delivery) => (
             <DeliveryCard
               key={delivery.id}
