@@ -216,7 +216,7 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-[11px]">
                 <span className="text-muted-foreground">
                   {formatCurrency(item.spent)} / {formatCurrency(item.planned_amount)}
@@ -231,10 +231,29 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
                   <span className="text-warning font-semibold">Atenção</span>
                 )}
               </div>
-              <Progress
-                value={Math.min(item.percent, 100)}
-                className="h-1.5"
-              />
+              {/* Dual progress bar */}
+              <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                {/* Orange bar: provisioned */}
+                <div
+                  className="absolute inset-0 h-full rounded-full transition-all"
+                  style={{
+                    width: `${Math.min(item.provPercent, 100)}%`,
+                    background: 'hsl(var(--neon-amber))',
+                    opacity: 0.5,
+                  }}
+                />
+                {/* Green bar: paid */}
+                <div
+                  className="absolute inset-0 h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${Math.min(item.percent, 100)}%` }}
+                />
+              </div>
+              {item.provisioned > item.spent && (
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'hsl(var(--neon-amber))', opacity: 0.7 }} />
+                  <span>Provisionado: {formatCurrency(item.provisioned)}</span>
+                </div>
+              )}
             </div>
           </button>
         ))}
