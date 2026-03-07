@@ -1402,7 +1402,7 @@ export function ChecklistView({
                                         color: getItemPointsColors(configuredPoints).color,
                                         borderColor: getItemPointsColors(configuredPoints).border,
                                       }}>
-                                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
+                                      <AppIcon name="Star" size={12} className="shrink-0" style={{ color: getItemPointsColors(configuredPoints).color, fill: getItemPointsColors(configuredPoints).color }} />
                                       +{configuredPoints} pts
                                     </span>
                                   )}
