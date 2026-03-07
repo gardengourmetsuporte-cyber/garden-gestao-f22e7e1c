@@ -141,10 +141,8 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         </div>
       </div>
 
-      {/* Action Button */}
-      <Button className="w-full h-12" onClick={() => { setEditingPayslip(null); setPayslipSheetOpen(true); }}>
-        <AppIcon name="Plus" size={18} className="mr-2" />Novo Lançamento
-      </Button>
+
+
 
       {sortedGroups.map((group) => (
         <div key={`${group.year}-${group.month}`} className="space-y-2">
