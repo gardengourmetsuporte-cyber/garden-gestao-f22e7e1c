@@ -15,6 +15,7 @@ const FinanceChartWidget = lazy(() => import('./FinanceChartWidget').then(m => (
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
 const AIInsightsWidget = lazy(() => import('./AIInsightsWidget').then(m => ({ default: m.AIInsightsWidget })));
 const PendingOrdersWidget = lazy(() => import('./PendingOrdersWidget').then(m => ({ default: m.PendingOrdersWidget })));
+import { SmartScannerWidget } from './SmartScannerWidget';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -141,6 +142,11 @@ export function AdminDashboard() {
 
       {/* Setup Onboarding — full width */}
       <SetupChecklistWidget />
+
+      {/* Smart Scanner — full width */}
+      <div className="mt-4">
+        <SmartScannerWidget />
+      </div>
 
       {/* Widgets Grid — 2 columns on desktop */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
