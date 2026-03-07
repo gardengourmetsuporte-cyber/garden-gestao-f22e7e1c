@@ -268,8 +268,13 @@ export function RecipeSheet({
       })),
     };
 
-    await onSave(data);
-    onOpenChange(false);
+    try {
+      await onSave(data);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('[RecipeSheet] Save failed:', error);
+      // Toast is already shown by the mutation's onError handler
+    }
   };
 
   return (
