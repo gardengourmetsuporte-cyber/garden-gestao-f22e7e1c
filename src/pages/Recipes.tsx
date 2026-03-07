@@ -192,6 +192,7 @@ export default function Recipes() {
                         <div key={recipe.id} className="animate-fade-in" style={{ animationDelay: `${idx * 30}ms` }}>
                           <RecipeCard
                             recipe={recipe}
+                            totalCostPerPortion={getFullCostPerPortion(recipe)}
                             onEdit={handleEdit}
                             onDuplicate={duplicateRecipe}
                             onToggleActive={(id, active) => toggleActive({ id, is_active: active })}
