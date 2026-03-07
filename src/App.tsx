@@ -236,13 +236,9 @@ function MidnightThemeSync() {
   useEffect(() => {
     const html = document.documentElement;
     if (theme === 'midnight') {
-      // next-themes sets the value class, but we need 'dark' too for all .dark CSS selectors
-      if (!html.classList.contains('dark')) {
-        html.classList.add('dark');
-      }
-      if (!html.classList.contains('midnight')) {
-        html.classList.add('midnight');
-      }
+      // Ensure both 'dark' and 'midnight' classes are present for CSS compatibility
+      if (!html.classList.contains('dark')) html.classList.add('dark');
+      if (!html.classList.contains('midnight')) html.classList.add('midnight');
     } else {
       html.classList.remove('midnight');
     }
@@ -251,7 +247,7 @@ function MidnightThemeSync() {
 }
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="dark" themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'dark midnight' }} storageKey="garden-theme">
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange themes={['light', 'dark', 'midnight']} value={{ light: 'light', dark: 'dark', midnight: 'midnight' }} storageKey="garden-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
