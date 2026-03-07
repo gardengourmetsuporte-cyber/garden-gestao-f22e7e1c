@@ -101,7 +101,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Operação',
+    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Gestão',
     children: [
       { key: 'recipes.view', label: 'Ver fichas', icon: 'Eye' },
       { key: 'recipes.create', label: 'Criar/editar fichas', icon: 'PenSquare' },
