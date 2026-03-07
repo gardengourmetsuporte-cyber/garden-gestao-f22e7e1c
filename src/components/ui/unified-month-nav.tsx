@@ -45,13 +45,13 @@ export function UnifiedMonthNav({
 
   const chevronSize = compact ? 14 : 16;
   const chevronBtn = cn(
-    "flex items-center justify-center rounded-full transition-all active:scale-90",
-    compact ? "w-7 h-7" : "w-8 h-8",
-    "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+    "flex items-center justify-center rounded-xl transition-all active:scale-90",
+    compact ? "w-7 h-7" : "w-9 h-9",
+    "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
   );
 
   return (
-    <div className={cn('flex items-center justify-center gap-0.5', className)}>
+    <div className={cn('flex items-center justify-between', className)}>
       <button className={chevronBtn} onClick={() => onMonthChange(subMonths(currentMonth, 1))}>
         <AppIcon name="ChevronLeft" size={chevronSize} />
       </button>
@@ -60,11 +60,11 @@ export function UnifiedMonthNav({
         <PopoverTrigger asChild>
           <button
             className={cn(
-              "relative capitalize font-semibold tracking-tight transition-all rounded-xl",
-              "hover:bg-secondary/50 active:scale-[0.97]",
+              "relative capitalize font-bold tracking-tight transition-all rounded-xl",
+              "hover:bg-secondary/40 active:scale-[0.97]",
               compact
-                ? "text-xs px-3 py-1 min-w-[90px]"
-                : "text-[13px] px-4 py-1.5 min-w-[140px]"
+                ? "text-xs px-3 py-1.5 min-w-[90px]"
+                : "text-sm px-5 py-2 min-w-[160px]"
             )}
           >
             {format(currentMonth, compact ? 'MMM yyyy' : 'MMMM yyyy', { locale: ptBR })}
