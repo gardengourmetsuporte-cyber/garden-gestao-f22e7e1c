@@ -3,6 +3,7 @@ import { formatCurrency } from '@/lib/format';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
+import financeHeroBg from '@/assets/finance-hero-bg.png';
 
 interface DashboardHeroFinanceProps {
   balance: number;
@@ -17,8 +18,11 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
   const masked = '•••••••';
 
   return (
-    <div className="card-holographic w-full text-left animate-spring-in spring-stagger-2">
-      <div className="finance-hero-inner p-5 pb-4 relative z-10">
+    <div className="w-full text-left animate-spring-in spring-stagger-2 rounded-2xl overflow-hidden relative">
+      {/* Full-bleed background image */}
+      <img src={financeHeroBg} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+      <div className="p-5 pb-4 relative z-10">
         {/* Header row */}
         <div className="flex items-center justify-between mb-1">
           <span className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--gp-label)' }}>
