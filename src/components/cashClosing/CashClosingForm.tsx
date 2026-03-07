@@ -619,8 +619,8 @@ export function CashClosingForm({ onSuccess }: Props) {
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <AppIcon name="Camera" className="w-4 h-4 mr-1" />
-                  Câmera
+                   <AppIcon name="ScanLine" className="w-4 h-4 mr-1" />
+                  Scanner
                 </Button>
                 <Button
                   variant="secondary"
@@ -639,8 +639,8 @@ export function CashClosingForm({ onSuccess }: Props) {
                 className="flex-1 h-32 border-dashed flex flex-col gap-2"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <AppIcon name="Camera" className="w-7 h-7 text-muted-foreground" />
-                <span className="text-muted-foreground text-sm">Câmera</span>
+                <AppIcon name="ScanLine" className="w-7 h-7 text-muted-foreground" />
+                <span className="text-muted-foreground text-sm">Scanner</span>
               </Button>
               <Button
                 variant="outline"

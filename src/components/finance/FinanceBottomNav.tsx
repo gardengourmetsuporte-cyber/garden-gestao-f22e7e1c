@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import scannerHero from '@/assets/scanner-hero.png';
 import { useNavigate } from 'react-router-dom';
 
 import { AppIcon } from '@/components/ui/app-icon';
@@ -158,10 +159,12 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
             </button>
             {onReceiptCapture && (
               <button onClick={handleReceipt} className="flex flex-col items-center gap-2 animate-scale-in" style={{ animationDelay: '150ms' }}>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg bg-muted-foreground">
-                  <AppIcon name="Camera" size={24} fill={1} style={{ color: 'white' }} />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg overflow-hidden relative">
+                  <img src={scannerHero} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40" />
+                  <AppIcon name="ScanLine" size={24} fill={1} className="relative z-10" style={{ color: 'white' }} />
                 </div>
-                <span className="text-[11px] font-bold text-white">Comprov.</span>
+                <span className="text-[11px] font-bold text-white">Scanner</span>
               </button>
             )}
           </div>

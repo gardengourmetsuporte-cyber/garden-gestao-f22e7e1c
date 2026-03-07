@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import scannerHero from '@/assets/scanner-hero.png';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -201,15 +202,17 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
       <SheetContent side="bottom" className="rounded-t-3xl max-h-[92vh] overflow-y-auto">
         <SheetHeader className="pb-2">
           <SheetTitle className="flex items-center gap-2 text-base">
-            <AppIcon name="Camera" size={20} className="text-primary" />
-            Lançar por comprovante
+            <AppIcon name="ScanLine" size={20} className="text-primary" />
+            Scanner Inteligente
           </SheetTitle>
         </SheetHeader>
 
         {step === 'capture' && !loading && (
           <div className="flex flex-col items-center gap-4 py-8">
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <AppIcon name="Receipt" size={36} className="text-primary" />
+            <div className="w-20 h-20 rounded-full overflow-hidden relative flex items-center justify-center">
+              <img src={scannerHero} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/30" />
+              <AppIcon name="ScanLine" size={36} className="text-primary relative z-10" />
             </div>
             <p className="text-sm text-muted-foreground text-center max-w-[260px]">
               Tire uma foto ou escolha da galeria um comprovante de pagamento (Pix, boleto, transferência)
@@ -225,7 +228,7 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
                   }
                 }}
               >
-                <AppIcon name="Camera" size={18} />
+                <AppIcon name="ScanLine" size={18} />
                 Câmera
               </Button>
               <Button
