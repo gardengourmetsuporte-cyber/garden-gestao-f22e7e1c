@@ -732,12 +732,13 @@ html {
   }
 
   .finance-hero-card--personal {
-    background: linear-gradient(145deg, hsl(220 25% 5%) 0%, hsl(40 12% 7%) 50%, hsl(220 25% 5%) 100%);
+    background: linear-gradient(145deg, hsl(220 20% 5%) 0%, hsl(40 18% 8%) 50%, hsl(220 20% 5%) 100%);
     box-shadow:
       0 4px 24px hsl(0 0% 0% / 0.4),
       0 8px 48px hsl(0 0% 0% / 0.2),
-      inset 0 1px 0 hsl(45 60% 50% / 0.06);
-    border-color: hsl(45 60% 50% / 0.1);
+      inset 0 1px 0 hsl(42 80% 55% / 0.08),
+      0 0 40px hsl(42 80% 50% / 0.06);
+    border-color: hsl(42 80% 55% / 0.15);
   }
 
   @media (hover: hover) {
