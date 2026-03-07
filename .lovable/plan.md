@@ -1,49 +1,45 @@
 
 
-## Plano: Localização manual para entregas sem coordenadas
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Problema
-Quando o geocoding falha (como no caso da Juliana Bonfante), a entrega fica sem pin no mapa e sem botão de navegação. O usuário quer poder definir a localização manualmente.
+### O que muda
 
-### Solução
-Adicionar uma funcionalidade de "marcar no mapa" para entregas sem coordenadas (ou para corrigir coordenadas erradas).
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-### Mudanças
+### Conceito visual
 
-**1. DeliveryCard.tsx** -- Indicador visual + ação
-- Quando `!hasCoords`, mostrar um badge/botão "Sem localização" com ícone de alerta
-- Ao clicar nesse botão (ou no card quando sem coords), abrir um dialog/sheet para marcar manualmente
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-**2. Novo componente: `DeliveryLocationPicker.tsx`**
-- Sheet/Dialog com um mapa Leaflet interativo
-- Centralizado na cidade da unidade (âncora padrão)
-- O usuário toca/clica no mapa para colocar um pin
-- Botão "Confirmar localização" salva as coordenadas
-- Inclui campo de busca de endereço opcional (pesquisa Nominatim inline)
+### Implementação
 
-**3. useDeliveries.ts** -- Nova mutation `updateAddress`
-- Mutation para atualizar `lat` e `lng` na tabela `delivery_addresses`
-- `supabase.from('delivery_addresses').update({ lat, lng }).eq('id', addressId)`
-- Invalida o cache após sucesso
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
 
-**4. DeliveryCard.tsx** -- Passar callback `onSetLocation`
-- Nova prop `onSetLocation?: (delivery: Delivery) => void`
-- Exibida como botão quando `!hasCoords`
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
 
-**5. Deliveries.tsx** -- Orquestração
-- State para controlar qual entrega está sendo editada
-- Renderizar `DeliveryLocationPicker` com a entrega selecionada
-- Passar `onSetLocation` para `DeliveryCard` via `NeighborhoodGroup`
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
 
-### Fluxo do usuário
-1. Vê o card com indicador "Sem localização" (ícone amarelo de alerta)
-2. Clica no botão/card
-3. Abre sheet com mapa interativo centralizado em São João da Boa Vista
-4. Toca no mapa para posicionar o pin
-5. Confirma -> salva lat/lng -> pin aparece no mapa principal
+### Resultado
 
-### Detalhes técnicos
-- Reutilizar a mesma lógica de carregamento do Leaflet já existente em `DeliveryMap.tsx`
-- O mapa do picker será uma instância separada, mais simples, sem markers de outras entregas
-- A âncora da cidade será obtida via Nominatim (mesma lógica existente) ou usando coords da unidade se disponíveis
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 

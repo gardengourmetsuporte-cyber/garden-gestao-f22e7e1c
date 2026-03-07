@@ -1,4 +1,4 @@
-import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, Phone } from 'lucide-react';
+import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -15,9 +15,10 @@ interface Props {
   delivery: Delivery;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
+  onSetLocation?: (delivery: Delivery) => void;
 }
 
-export function DeliveryCard({ delivery, onStatusChange, onCardClick }: Props) {
+export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocation }: Props) {
   const addr = delivery.address;
   const cfg = STATUS_CONFIG[delivery.status];
   const StatusIcon = cfg.icon;
@@ -75,6 +76,18 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick }: Props) {
           )}
         </div>
       </div>
+
+      {/* No location warning */}
+      {!hasCoords && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onSetLocation?.(delivery); }}
+          className="flex items-center gap-2 mt-2 w-full px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/15 transition-colors"
+        >
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+          <span className="text-[11px] font-medium">Sem localização — toque para marcar</span>
+        </button>
+      )}
 
       {/* Bottom row: time + actions */}
       <div className="flex items-center justify-between gap-2 mt-2.5 pt-2 border-t border-border/10">

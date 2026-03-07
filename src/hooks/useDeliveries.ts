@@ -364,6 +364,24 @@ export function useDeliveries() {
     },
   });
 
+  // Update address coordinates
+  const updateAddress = useMutation({
+    mutationFn: async ({ id, lat, lng }: { id: string; lat: number; lng: number }) => {
+      const { error } = await supabase
+        .from('delivery_addresses')
+        .update({ lat, lng })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      invalidate();
+      toast.success('Localização salva!');
+    },
+    onError: () => {
+      toast.error('Erro ao salvar localização');
+    },
+  });
+
   // Delete delivery
   const deleteDelivery = useMutation({
     mutationFn: async (id: string) => {
@@ -398,6 +416,7 @@ export function useDeliveries() {
     createDelivery: createDelivery.mutateAsync,
     isCreating: createDelivery.isPending,
     updateStatus: updateStatus.mutateAsync,
+    updateAddress: updateAddress.mutateAsync,
     deleteDelivery: deleteDelivery.mutateAsync,
     invalidate,
   };

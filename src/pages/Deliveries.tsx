@@ -3,11 +3,12 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useDeliveries, type DeliveryStatus } from '@/hooks/useDeliveries';
+import { useDeliveries, type DeliveryStatus, type Delivery } from '@/hooks/useDeliveries';
 import { useUnit } from '@/contexts/UnitContext';
 import { DeliveryCard } from '@/components/deliveries/DeliveryCard';
 import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
+import { DeliveryLocationPicker } from '@/components/deliveries/DeliveryLocationPicker';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Truck, Clock, CheckCircle2, Package, MapPin, Filter, ChevronDown } from 'lucide-react';
@@ -33,10 +34,12 @@ export default function Deliveries() {
     uploadPhoto,
     createDelivery,
     updateStatus,
+    updateAddress,
     invalidate,
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [locationPickerDelivery, setLocationPickerDelivery] = useState<Delivery | null>(null);
   const mapHandleRef = useRef<DeliveryMapHandle>(null);
 
   const handleCardClick = useCallback((deliveryId: string) => {
@@ -162,6 +165,7 @@ export default function Deliveries() {
                     deliveries={group.deliveries}
                     onStatusChange={(id, status) => updateStatus({ id, status })}
                     onCardClick={handleCardClick}
+                    onSetLocation={setLocationPickerDelivery}
                   />
                 ))}
               </div>
@@ -177,6 +181,13 @@ export default function Deliveries() {
         processImage={processImage}
         isProcessing={isProcessing}
       />
+
+      <DeliveryLocationPicker
+        open={!!locationPickerDelivery}
+        onOpenChange={(open) => { if (!open) setLocationPickerDelivery(null); }}
+        delivery={locationPickerDelivery}
+        onConfirm={(id, lat, lng) => updateAddress({ id, lat, lng })}
+      />
     </AppLayout>
   );
 }
@@ -187,11 +198,13 @@ function NeighborhoodGroup({
   deliveries,
   onStatusChange,
   onCardClick,
+  onSetLocation,
 }: {
   neighborhood: string;
   deliveries: import('@/hooks/useDeliveries').Delivery[];
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
+  onSetLocation?: (delivery: import('@/hooks/useDeliveries').Delivery) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -219,6 +232,7 @@ function NeighborhoodGroup({
               delivery={delivery}
               onStatusChange={onStatusChange}
               onCardClick={onCardClick}
+              onSetLocation={onSetLocation}
             />
           ))}
         </div>
