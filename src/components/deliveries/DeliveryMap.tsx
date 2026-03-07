@@ -251,7 +251,10 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
     return `
       <div style="font-family:system-ui,-apple-system,sans-serif;min-width:170px;max-width:230px;">
-        <p style="font-weight:700;font-size:13px;margin:0 0 2px;">${addr.customer_name || 'Sem nome'}</p>
+        <div style="display:flex;align-items:center;gap:6px;margin:0 0 4px;">
+          ${delivery.order_number ? `<span style="font-size:11px;font-weight:800;padding:2px 6px;border-radius:6px;background:#22c55e20;color:#22c55e;">#${delivery.order_number}</span>` : ''}
+          <span style="font-weight:700;font-size:13px;">${addr.customer_name || 'Sem nome'}</span>
+        </div>
         <p style="font-size:10px;color:#888;margin:0 0 4px;">${addr.full_address || '—'}</p>
         <div style="display:flex;align-items:center;gap:6px;margin:4px 0;">
           <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:99px;background:${color}20;color:${color};">${label}</span>
