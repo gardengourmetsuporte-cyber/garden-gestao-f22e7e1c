@@ -253,6 +253,7 @@ export const ICON_MAP: Record<string, string> = {
 
   // Home & Living
   House: 'home',
+  Armchair: 'weekend',
   Sofa: 'weekend',
   Droplets: 'water_drop',
   Zap: 'bolt',
