@@ -11,31 +11,22 @@ interface AccountCardProps {
 
 function BankAvatar({ account }: { account: FinanceAccount }) {
   const isWallet = account.type === 'wallet';
-  const brand = isWallet
-    ? WALLET_BRAND
-    : matchBankBrand(account.name);
+  const brand = isWallet ? WALLET_BRAND : matchBankBrand(account.name);
 
   if (brand) {
     return (
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm"
-        style={{ backgroundColor: brand.bgColor, color: brand.textColor }}
-      >
+      <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 bg-white/20 backdrop-blur-sm text-white">
         {brand.abbr}
       </div>
     );
   }
 
-  // Fallback: use account type to pick a safe icon, ignore potentially invalid DB icon values
   const typeIcons: Record<string, string> = { bank: 'Landmark', credit_card: 'CreditCard', wallet: 'Wallet' };
   const iconName = typeIcons[account.type] || 'Wallet';
 
   return (
-    <div
-      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-      style={{ backgroundColor: account.color + '20' }}
-    >
-      <AppIcon name={iconName} size={20} style={{ color: account.color }} />
+    <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white/20 backdrop-blur-sm">
+      <AppIcon name={iconName} size={20} className="text-white" />
     </div>
   );
 }
