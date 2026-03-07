@@ -138,43 +138,66 @@ export default function Recipes() {
         />
       ) : (
         <div className="space-y-3">
-          {groupedRecipes.map(([catId, group], index) => (
-            <Collapsible
-              key={catId}
-              open={expandedCategories.has(catId) || search.length > 0}
-              onOpenChange={() => toggleCategory(catId)}
-            >
-              <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
-                <AppIcon
-                  name="ChevronDown"
-                  size={16}
-                  className={cn(
-                    "text-muted-foreground transition-transform duration-200",
-                    (expandedCategories.has(catId) || search.length > 0) && "rotate-180"
-                  )}
-                />
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: group.category?.color || '#6b7280' }} />
-                <span className="font-semibold font-display">{group.category?.name || 'Sem categoria'}</span>
-                <span className="text-sm text-muted-foreground ml-auto">({group.recipes.length})</span>
-              </CollapsibleTrigger>
+          {groupedRecipes.map(([catId, group], index) => {
+            const catColor = group.category?.color || '#6b7280';
+            const isOpen = expandedCategories.has(catId) || search.length > 0;
 
-              <CollapsibleContent>
-                <div className="space-y-2 mt-2 ml-2">
-                  {group.recipes.map((recipe, idx) => (
-                    <div key={recipe.id} className="animate-fade-in" style={{ animationDelay: `${idx * 30}ms` }}>
-                      <RecipeCard
-                        recipe={recipe}
-                        onEdit={handleEdit}
-                        onDuplicate={duplicateRecipe}
-                        onToggleActive={(id, active) => toggleActive({ id, is_active: active })}
-                        onDelete={(id) => { setRecipeToDelete(id); setDeleteDialogOpen(true); }}
+            return (
+              <div
+                key={catId}
+                className="bg-card border border-border/40 rounded-2xl overflow-hidden relative animate-fade-in"
+                style={{ animationDelay: `${index * 40}ms` }}
+              >
+                <div
+                  className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+                  style={{ background: catColor }}
+                />
+
+                <Collapsible open={isOpen} onOpenChange={() => toggleCategory(catId)}>
+                  <CollapsibleTrigger className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: `${catColor}15` }}
+                    >
+                      <AppIcon
+                        name={group.category?.icon || 'ChefHat'}
+                        size={20}
+                        style={{ color: catColor }}
                       />
                     </div>
-                  ))}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground truncate">{group.category?.name || 'Sem categoria'}</p>
+                      <p className="text-[11px] text-muted-foreground">{group.recipes.length} receita{group.recipes.length !== 1 ? 's' : ''}</p>
+                    </div>
+                    <AppIcon
+                      name="ChevronDown"
+                      size={16}
+                      className={cn(
+                        "text-muted-foreground transition-transform duration-200",
+                        isOpen && "rotate-180"
+                      )}
+                    />
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent>
+                    <div className="px-4 pb-3 space-y-2">
+                      {group.recipes.map((recipe, idx) => (
+                        <div key={recipe.id} className="animate-fade-in" style={{ animationDelay: `${idx * 30}ms` }}>
+                          <RecipeCard
+                            recipe={recipe}
+                            onEdit={handleEdit}
+                            onDuplicate={duplicateRecipe}
+                            onToggleActive={(id, active) => toggleActive({ id, is_active: active })}
+                            onDelete={(id) => { setRecipeToDelete(id); setDeleteDialogOpen(true); }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            );
+          })}
         </div>
       )}
     </>
