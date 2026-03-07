@@ -597,10 +597,12 @@ export function FinanceCharts({
           </div>
         )}
 
-        {/* DRE Report */}
-        <div className="mt-8">
-          <DREReport transactions={transactions} categories={categoriesProp} monthLabel={`${selectedMonth.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`} />
-        </div>
+        {/* DRE Report - only on pie/categories view */}
+        {viewType === 'categories' && (
+          <div className="mt-8">
+            <DREReport transactions={transactions} categories={categoriesProp} monthLabel={`${selectedMonth.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}`} />
+          </div>
+        )}
       </div>
     </div>
   );
