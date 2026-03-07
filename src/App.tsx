@@ -84,6 +84,7 @@ const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
 const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
+const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -190,6 +191,7 @@ function AppRoutes() {
           <Route path="/landing" element={<Landing />} />
           <Route path="/invite" element={<Invite />} />
           <Route path="/share-receipt" element={<ShareReceiptHandler />} />
+          <Route path="/docs" element={<Documentation />} />
           <Route path="/" element={<ProtectedRoute><DashboardNew /></ProtectedRoute>} />
           <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
           <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
