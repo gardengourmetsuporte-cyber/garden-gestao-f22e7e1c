@@ -428,7 +428,9 @@ function InvitesTab() {
   const sendInvite = useMutation({
     mutationFn: async () => {
       if (!user || !activeUnitId || !email.trim()) throw new Error('Dados inválidos');
-      const { data, error } = await supabase.from('invites').insert({ email: email.trim().toLowerCase(), unit_id: activeUnitId, role, invited_by: user.id }).select('token').single();
+      const insertData: any = { email: email.trim().toLowerCase(), unit_id: activeUnitId, role, invited_by: user.id };
+      if (selectedAccessLevelId) insertData.access_level_id = selectedAccessLevelId;
+      const { data, error } = await supabase.from('invites').insert(insertData).select('token').single();
       if (error) throw error;
       return data.token;
     },
