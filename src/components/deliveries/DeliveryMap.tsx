@@ -453,29 +453,26 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
 
   /* ── Render ── */
   return (
-    <div className="space-y-2">
+    <div className="relative z-0 isolate h-full w-full">
       {/* Geocode banner */}
       {isGeocoding && (
-        <div className="flex items-center gap-2 p-2.5 rounded-xl border border-border/30 bg-card/50">
+        <div className="absolute top-2 left-2 right-2 z-[500] flex items-center gap-2 p-2.5 rounded-xl border border-border/30 bg-card/80 backdrop-blur-sm shadow-sm">
           <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
           <p className="text-[11px] text-muted-foreground">Localizando endereços no mapa…</p>
         </div>
       )}
 
-      {/* Map container */}
-      <div className="relative z-0 isolate rounded-2xl overflow-hidden border border-border/30 shadow-sm">
-        <div
-          ref={mapRef}
-          style={{ height: 260 }}
-          className="w-full relative z-0"
-        />
-        {withCoords.length === 0 && !isGeocoding && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/60 backdrop-blur-sm">
-            <Map className="w-8 h-8 text-muted-foreground/20 mb-2" />
-            <p className="text-xs text-muted-foreground/40 font-medium">Aguardando localização</p>
-          </div>
-        )}
-      </div>
+      {/* Map fills parent */}
+      <div
+        ref={mapRef}
+        className="w-full h-full relative z-0"
+      />
+      {withCoords.length === 0 && !isGeocoding && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/60 backdrop-blur-sm">
+          <Map className="w-8 h-8 text-muted-foreground/20 mb-2" />
+          <p className="text-xs text-muted-foreground/40 font-medium">Aguardando localização</p>
+        </div>
+      )}
     </div>
   );
 });
