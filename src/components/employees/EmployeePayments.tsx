@@ -227,9 +227,9 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={payDialog.open} onOpenChange={(open) => setPayDialog({ open, paymentId: open ? payDialog.paymentId : null })}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Confirmar Pagamento</DialogTitle></DialogHeader>
+      <Sheet open={payDialog.open} onOpenChange={(open) => setPayDialog({ open, paymentId: open ? payDialog.paymentId : null })}>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetHeader><SheetTitle>Confirmar Pagamento</SheetTitle></SheetHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Conta para débito</Label>
@@ -244,14 +244,14 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
               <p className="text-xs text-muted-foreground">O valor será lançado como despesa nesta conta</p>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPayDialog({ open: false, paymentId: null })}>Cancelar</Button>
-            <Button onClick={handlePay} disabled={!selectedAccountId || isPaying}>
+          <SheetFooter className="flex flex-col gap-2 pt-2">
+            <Button onClick={handlePay} disabled={!selectedAccountId || isPaying} className="w-full">
               {isPaying ? (<><AppIcon name="progress_activity" size={16} className="mr-2 animate-spin" />Processando...</>) : ('Confirmar pagamento')}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <Button variant="outline" className="w-full" onClick={() => setPayDialog({ open: false, paymentId: null })}>Cancelar</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
