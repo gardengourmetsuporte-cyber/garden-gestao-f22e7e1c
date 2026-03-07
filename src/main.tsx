@@ -32,7 +32,8 @@ import "./index.css";
   if ('fonts' in document) {
     document.fonts.ready.then(tryMarkReady).catch(() => {});
     document.fonts.load(fontQuery).then(tryMarkReady).catch(() => {});
-    setTimeout(tryMarkReady, 3500);
+    // Fail-safe: nunca deixar ícones invisíveis mesmo se a checagem da fonte falhar
+    setTimeout(markReady, 1200);
     return;
   }
 
