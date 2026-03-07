@@ -132,7 +132,7 @@ html {
   }
 
   /* ===== LIGHT THEME ===== */
-  :root:not(.dark) {
+  :root:not(.dark):not(.midnight) {
     --color-income: 156 72% 38%;
     --color-expense: 348 83% 45%;
     --color-transfer: 220 80% 50%;
@@ -317,9 +317,9 @@ html {
     color-scheme: dark;
   }
 
-  :root:not(.dark) input,
-  :root:not(.dark) textarea,
-  :root:not(.dark) select {
+  :root:not(.dark):not(.midnight) input,
+  :root:not(.dark):not(.midnight) textarea,
+  :root:not(.dark):not(.midnight) select {
     color-scheme: light;
   }
 
