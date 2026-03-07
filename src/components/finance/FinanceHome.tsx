@@ -76,7 +76,7 @@ export function FinanceHome({
         onClick={() => onNavigate?.('more')}
         className={cn("w-full text-left animate-slide-up stagger-1 rounded-2xl overflow-hidden relative", variant === 'personal' && "finance-hero-card--personal")}
       >
-        <img src={financeHeroBg} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden="true" />
+        <img src={financeHeroBg} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden="true" loading="eager" fetchPriority="high" decoding="async" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
         <div className="p-5 pb-4 relative z-10">
           {/* Header */}
