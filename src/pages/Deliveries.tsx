@@ -34,10 +34,12 @@ export default function Deliveries() {
     uploadPhoto,
     createDelivery,
     updateStatus,
+    updateAddress,
     invalidate,
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [locationPickerDelivery, setLocationPickerDelivery] = useState<Delivery | null>(null);
   const mapHandleRef = useRef<DeliveryMapHandle>(null);
 
   const handleCardClick = useCallback((deliveryId: string) => {
