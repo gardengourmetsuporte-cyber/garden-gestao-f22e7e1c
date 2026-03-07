@@ -236,13 +236,9 @@ function MidnightThemeSync() {
   useEffect(() => {
     const html = document.documentElement;
     if (theme === 'midnight') {
-      // next-themes sets the value class, but we need 'dark' too for all .dark CSS selectors
-      if (!html.classList.contains('dark')) {
-        html.classList.add('dark');
-      }
-      if (!html.classList.contains('midnight')) {
-        html.classList.add('midnight');
-      }
+      // Ensure both 'dark' and 'midnight' classes are present for CSS compatibility
+      if (!html.classList.contains('dark')) html.classList.add('dark');
+      if (!html.classList.contains('midnight')) html.classList.add('midnight');
     } else {
       html.classList.remove('midnight');
     }
