@@ -257,9 +257,10 @@ export function FinanceTransactions({
   const tomorrowStr = format(tomorrowDate, 'yyyy-MM-dd');
 
   const getDateLabel = useCallback((dateStr: string) => {
-    if (dateStr === todayStr) return 'Hoje';
-    if (dateStr === yesterdayStr) return 'Ontem';
-    if (dateStr === tomorrowStr) return 'Amanhã';
+    const formatted = format(parseISO(dateStr), "dd 'de' MMMM", { locale: ptBR });
+    if (dateStr === todayStr) return `Hoje, ${formatted}`;
+    if (dateStr === yesterdayStr) return `Ontem, ${formatted}`;
+    if (dateStr === tomorrowStr) return `Amanhã, ${formatted}`;
     return format(parseISO(dateStr), "EEEE, dd 'de' MMMM", { locale: ptBR });
   }, [todayStr, yesterdayStr, tomorrowStr]);
 
