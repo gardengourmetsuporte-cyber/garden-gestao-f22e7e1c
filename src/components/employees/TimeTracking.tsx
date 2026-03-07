@@ -33,6 +33,22 @@ export function TimeTracking() {
   const [showCertificateSheet, setShowCertificateSheet] = useState(false);
   const [showCertificateList, setShowCertificateList] = useState(false);
 
+  const pendingCerts = certificates.filter(c => c.status === 'pending');
+
+  // Register FAB actions for admin
+  useFabActions(
+    isAdmin
+      ? [
+          { icon: 'edit', label: 'Lançamento Manual', onClick: () => setShowManualSheet(true) },
+          { icon: 'upload', label: 'Importar', onClick: () => setShowImportSheet(true) },
+          { icon: 'download', label: 'Exportar', onClick: () => handleExportRecords() },
+          { icon: 'clinical_notes', label: 'Atestados', onClick: () => setShowCertificateList(true), badge: pendingCerts.length },
+          { icon: 'settings', label: 'Configurações', onClick: () => setShowSettingsSheet(true) },
+        ]
+      : [],
+    [isAdmin, pendingCerts.length]
+  );
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -43,7 +59,6 @@ export function TimeTracking() {
     );
   }
 
-  const pendingCerts = certificates.filter(c => c.status === 'pending');
 
   const handleExportRecords = () => {
     if (records.length === 0) {
