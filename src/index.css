@@ -298,11 +298,11 @@ html {
     scroll-behavior: smooth;
   }
 
-  .dark {
+  .dark, .midnight {
     color-scheme: dark;
   }
 
-  :root:not(.dark) {
+  :root:not(.dark):not(.midnight) {
     color-scheme: light;
   }
 
