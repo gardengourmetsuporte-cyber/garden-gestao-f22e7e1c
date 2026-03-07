@@ -10,7 +10,7 @@ import { PageLoader } from "@/components/PageLoader";
 import { useUserModules } from "@/hooks/useAccessLevels";
 import { getModuleKeyFromRoute } from "@/lib/modules";
 import { MODULE_REQUIRED_PLAN, planSatisfies } from "@/lib/plans";
-import { ThemeProvider, useTheme } from "next-themes";
+import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { toast } from "sonner";
 import { useRoutePersist, useRouteRestore } from "@/hooks/useRouteRestore";
