@@ -96,9 +96,35 @@ export function ReceiptOCRSheet({ open, onOpenChange, categories, accounts, onSa
     return null;
   }, [categories]);
 
-  const getDefaultAccount = useCallback((): string | null => {
-    const nonCard = accounts.filter(a => a.type !== 'credit_card' && a.is_active);
-    return nonCard.length > 0 ? nonCard[0].id : (accounts[0]?.id ?? null);
+  const matchAccount = useCallback((bankInfo?: string): string | null => {
+    const active = accounts.filter(a => a.type !== 'credit_card' && a.is_active);
+    if (!bankInfo || active.length === 0) return active[0]?.id ?? (accounts[0]?.id ?? null);
+
+    const normalized = bankInfo.toLowerCase();
+    // Try to match by account name containing bank info or vice versa
+    const matched = active.find(a => {
+      const name = a.name.toLowerCase();
+      return normalized.includes(name) || name.includes(normalized) ||
+        // Common bank name fragments
+        (normalized.includes('nubank') && name.includes('nubank')) ||
+        (normalized.includes('inter') && name.includes('inter')) ||
+        (normalized.includes('itaú') && name.includes('itaú')) ||
+        (normalized.includes('itau') && name.includes('itau')) ||
+        (normalized.includes('bradesco') && name.includes('bradesco')) ||
+        (normalized.includes('santander') && name.includes('santander')) ||
+        (normalized.includes('caixa') && name.includes('caixa')) ||
+        (normalized.includes('bb') && name.includes('brasil')) ||
+        (normalized.includes('banco do brasil') && name.includes('brasil')) ||
+        (normalized.includes('sicoob') && name.includes('sicoob')) ||
+        (normalized.includes('sicredi') && name.includes('sicredi')) ||
+        (normalized.includes('safra') && name.includes('safra')) ||
+        (normalized.includes('c6') && name.includes('c6')) ||
+        (normalized.includes('mercado pago') && name.includes('mercado')) ||
+        (normalized.includes('picpay') && name.includes('picpay')) ||
+        (normalized.includes('pagbank') && name.includes('pagbank'));
+    });
+
+    return matched?.id ?? active[0]?.id ?? (accounts[0]?.id ?? null);
   }, [accounts]);
 
   const processImage = async (base64: string) => {
