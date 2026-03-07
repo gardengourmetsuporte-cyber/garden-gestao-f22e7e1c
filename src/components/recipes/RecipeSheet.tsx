@@ -275,7 +275,7 @@ export function RecipeSheet({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col [&>button]:hidden">
+        <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col h-full max-h-[100dvh] [&>button]:hidden">
           {/* Fixed Header */}
           <SheetHeader className="p-4 border-b shrink-0">
             <div className="flex items-center justify-between gap-2">
@@ -298,8 +298,8 @@ export function RecipeSheet({
           </SheetHeader>
 
           {/* Scrollable Content */}
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-6 pb-6">
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="p-4 space-y-6 pb-24">
               {/* Basic Info */}
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -594,7 +594,7 @@ export function RecipeSheet({
                 />
               </div>
             </div>
-          </ScrollArea>
+          </div>
 
           {/* Sticky Footer */}
           {ingredients.length > 0 && (
