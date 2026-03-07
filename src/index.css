@@ -317,7 +317,7 @@ html {
     color-scheme: dark;
   }
 
-  :root:not(.dark) input,
+  :root:not(.dark):not(.midnight) input,
   :root:not(.dark) textarea,
   :root:not(.dark) select {
     color-scheme: light;
