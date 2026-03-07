@@ -194,7 +194,7 @@ export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onR
             </div>
           </div>
 
-          <div className="flex items-center h-[64px] max-w-lg mx-auto relative z-10 tabbar-notch-shell overflow-visible">
+          <div className="flex items-center h-[64px] max-w-sm mx-auto relative z-10 tabbar-notch-shell overflow-visible">
             {tabs.slice(0, 2).map(tab => (
               <FinanceTabButton key={tab.id} tab={tab} active={activeTab === tab.id} onTabChange={handleTabChange} />
             ))}
