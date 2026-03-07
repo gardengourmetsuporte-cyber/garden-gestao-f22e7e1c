@@ -115,7 +115,7 @@ interface ChecklistSettingsProps {
   onDeleteSubcategory: (id: string) => Promise<void>;
   onReorderSubcategories?: (sectorId: string, orderedIds: string[]) => Promise<void>;
   onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean; subcategory_id?: string }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
@@ -192,6 +192,9 @@ export function ChecklistSettings({
   const [freqPickerOpen, setFreqPickerOpen] = useState(false);
   const [typePickerOpen, setTypePickerOpen] = useState(false);
   const [pointsPickerOpen, setPointsPickerOpen] = useState(false);
+  const [itemSectorPickerOpen, setItemSectorPickerOpen] = useState(false);
+  const [itemSubcategoryPickerOpen, setItemSubcategoryPickerOpen] = useState(false);
+  const [itemSectorId, setItemSectorId] = useState<string | null>(null);
   
   // Editing states
   const [editingSector, setEditingSector] = useState<ChecklistSector | null>(null);
@@ -349,6 +352,9 @@ export function ChecklistSettings({
   // Item handlers
   const handleOpenItemSheet = (subcategoryId: string, item?: ChecklistItem) => {
     setSelectedSubcategoryId(subcategoryId);
+    // Find which sector this subcategory belongs to
+    const parentSector = sectors.find(s => s.subcategories?.some(sub => sub.id === subcategoryId));
+    setItemSectorId(parentSector?.id || null);
     if (item) {
       setEditingItem(item);
       setItemName(item.name || '');
@@ -362,7 +368,6 @@ export function ChecklistSettings({
       setItemName('');
       setItemDescription('');
       setItemFrequency('daily');
-      // Use selected type as default for new items
       setItemChecklistType(selectedType);
       setItemPoints(selectedType === 'bonus' ? 5 : 1);
       setItemRequiresPhoto(false);
@@ -374,14 +379,19 @@ export function ChecklistSettings({
     if (!itemName.trim()) return;
 
     if (editingItem) {
-      await onUpdateItem(editingItem.id, {
+      const updates: any = {
         name: itemName.trim(),
         description: itemDescription.trim() || undefined,
         frequency: itemFrequency,
         checklist_type: itemChecklistType,
         points: itemPoints,
         requires_photo: itemRequiresPhoto,
-      });
+      };
+      // If subcategory changed, include it
+      if (selectedSubcategoryId && selectedSubcategoryId !== editingItem.subcategory_id) {
+        updates.subcategory_id = selectedSubcategoryId;
+      }
+      await onUpdateItem(editingItem.id, updates);
     } else if (selectedSubcategoryId) {
       await onAddItem({
         subcategory_id: selectedSubcategoryId,
@@ -841,7 +851,59 @@ export function ChecklistSettings({
             <SheetTitle>{editingItem ? 'Editar Item' : 'Novo Item'}</SheetTitle>
           </SheetHeader>
 
-          <div className="space-y-5">
+          <div className="space-y-5 max-h-[70vh] overflow-y-auto">
+            {/* Sector picker */}
+            {editingItem && (
+              <div className="space-y-2">
+                <Label>Setor</Label>
+                <button
+                  type="button"
+                  onClick={() => setItemSectorPickerOpen(true)}
+                  className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                >
+                  <span>{sectors.find(s => s.id === itemSectorId)?.name || 'Selecione'}</span>
+                  <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <ListPicker
+                  open={itemSectorPickerOpen}
+                  onOpenChange={setItemSectorPickerOpen}
+                  title="Setor"
+                  items={sectors.map(s => ({ id: s.id, label: s.name }))}
+                  selectedId={itemSectorId || ''}
+                  onSelect={(id) => {
+                    if (id) {
+                      setItemSectorId(id);
+                      const firstSub = sectors.find(s => s.id === id)?.subcategories?.[0];
+                      setSelectedSubcategoryId(firstSub?.id || null);
+                    }
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Subcategory picker */}
+            {editingItem && itemSectorId && (
+              <div className="space-y-2">
+                <Label>Subcategoria</Label>
+                <button
+                  type="button"
+                  onClick={() => setItemSubcategoryPickerOpen(true)}
+                  className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                >
+                  <span>{sectors.find(s => s.id === itemSectorId)?.subcategories?.find(sub => sub.id === selectedSubcategoryId)?.name || 'Selecione'}</span>
+                  <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <ListPicker
+                  open={itemSubcategoryPickerOpen}
+                  onOpenChange={setItemSubcategoryPickerOpen}
+                  title="Subcategoria"
+                  items={(sectors.find(s => s.id === itemSectorId)?.subcategories || []).map(sub => ({ id: sub.id, label: sub.name }))}
+                  selectedId={selectedSubcategoryId || ''}
+                  onSelect={(id) => { if (id) setSelectedSubcategoryId(id); }}
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label>Nome do Item</Label>
               <Input
