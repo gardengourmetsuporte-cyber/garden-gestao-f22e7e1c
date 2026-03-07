@@ -128,6 +128,7 @@ export function useChecklistCompletions({
     }
 
     queryClient.invalidateQueries({ queryKey: ['checklist-completions', date, checklistType, activeUnitId] });
+    queryClient.invalidateQueries({ queryKey: ['card-completions', date, checklistType, activeUnitId] });
     queryClient.invalidateQueries({ queryKey: ['checklist-active-timers', activeUnitId, checklistType, date] });
     invalidateGamificationCaches(queryClient);
   }, [completions, userId, queryClient, activeUnitId]);
