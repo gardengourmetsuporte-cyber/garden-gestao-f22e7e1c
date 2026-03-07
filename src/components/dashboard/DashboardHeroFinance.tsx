@@ -3,7 +3,7 @@ import { formatCurrency } from '@/lib/format';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
-import financeHeroBg from '@/assets/finance-hero-bg.png';
+
 
 interface DashboardHeroFinanceProps {
   balance: number;
