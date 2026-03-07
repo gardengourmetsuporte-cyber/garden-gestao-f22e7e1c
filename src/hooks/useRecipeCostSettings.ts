@@ -1,6 +1,7 @@
  import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
  import { supabase } from '@/integrations/supabase/client';
  import { useAuth } from '@/contexts/AuthContext';
+ import { useUnit } from '@/contexts/UnitContext';
  import { toast } from 'sonner';
  
  export interface RecipeCostSettings {
@@ -40,7 +41,8 @@
  };
  
  export function useRecipeCostSettings() {
-   const { user } = useAuth();
+  const { user } = useAuth();
+   const { activeUnitId } = useUnit();
    const queryClient = useQueryClient();
  
    // Buscar configurações do usuário
@@ -57,7 +59,6 @@
        
        if (error) throw error;
        
-       // Retornar configuração existente ou valores padrão
        if (data) {
          return {
            ...data,
@@ -70,19 +71,25 @@
      enabled: !!user?.id,
    });
  
-   // Buscar categorias de despesa do financeiro
+   // Buscar categorias de despesa do financeiro (filtradas pela unidade ativa)
    const { data: expenseCategories = [] } = useQuery({
-     queryKey: ['finance-expense-categories', user?.id],
+     queryKey: ['finance-expense-categories', user?.id, activeUnitId],
      queryFn: async () => {
        if (!user?.id) return [];
        
-       const { data, error } = await supabase
+       let query = supabase
          .from('finance_categories')
          .select('id, name, type, parent_id')
          .eq('user_id', user.id)
          .eq('type', 'expense')
          .is('parent_id', null)
          .order('sort_order');
+
+       if (activeUnitId) {
+         query = query.eq('unit_id', activeUnitId);
+       }
+       
+       const { data, error } = await query;
        
        if (error) throw error;
        return data as FinanceCategory[];
