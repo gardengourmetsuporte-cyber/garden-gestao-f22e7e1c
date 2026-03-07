@@ -1245,6 +1245,7 @@ export type Database = {
           id: string
           items_summary: string | null
           notes: string | null
+          order_number: string | null
           photo_url: string | null
           status: Database["public"]["Enums"]["delivery_status"]
           total: number
@@ -1260,6 +1261,7 @@ export type Database = {
           id?: string
           items_summary?: string | null
           notes?: string | null
+          order_number?: string | null
           photo_url?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           total?: number
@@ -1275,6 +1277,7 @@ export type Database = {
           id?: string
           items_summary?: string | null
           notes?: string | null
+          order_number?: string | null
           photo_url?: string | null
           status?: Database["public"]["Enums"]["delivery_status"]
           total?: number

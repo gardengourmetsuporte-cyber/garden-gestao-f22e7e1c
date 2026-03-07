@@ -1,0 +1,1 @@
+ALTER TABLE public.deliveries ADD COLUMN order_number TEXT DEFAULT '';
