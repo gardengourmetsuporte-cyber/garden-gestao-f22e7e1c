@@ -76,48 +76,50 @@ import { AppIcon } from '@/components/ui/app-icon';
                {dateClosings.map(closing => {
                  const status = getStatusConfig(closing.status);
                  
-                 return (
-                   <Card 
-                     key={closing.id}
-                     className="card-unified-interactive cursor-pointer"
-                     onClick={() => setSelectedClosing(closing)}
-                   >
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <AppIcon name="User" className="w-4 h-4 text-muted-foreground" />
-                              <span className="font-medium truncate">
-                                {closing.profile?.full_name || 'Usuário'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                              <span>{closing.unit_name}</span>
-                              {/* Valores só aparecem para admin */}
-                              {isAdmin && (
-                                <>
-                                  <span>•</span>
-                                  <span className="font-semibold text-foreground">
-                                    R$ {closing.total_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <Badge 
-                            variant="outline" 
-                            className={`${status.color} shrink-0`}
-                          >
-                            <AppIcon name={status.icon} className="w-3 h-3 mr-1" />
-                            {status.label}
-                          </Badge>
-                          
-                          <AppIcon name="ChevronRight" className="w-5 h-5 text-muted-foreground" />
+                  return (
+                    <div 
+                      key={closing.id}
+                      className="bg-card border border-border/40 rounded-2xl overflow-hidden relative cursor-pointer hover:bg-secondary/30 transition-colors"
+                      onClick={() => setSelectedClosing(closing)}
+                    >
+                      <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{
+                        backgroundColor: closing.status === 'approved' ? 'hsl(var(--success))' :
+                          closing.status === 'divergent' ? 'hsl(var(--destructive))' :
+                          '#f59e0b'
+                      }} />
+                      <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                          <AppIcon name="User" className="w-5 h-5 text-primary" />
                         </div>
-                      </CardContent>
-                   </Card>
-                 );
+                        <div className="flex-1 min-w-0">
+                          <span className="font-semibold text-foreground truncate block">
+                            {closing.profile?.full_name || 'Usuário'}
+                          </span>
+                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                            <span>{closing.unit_name}</span>
+                            {isAdmin && (
+                              <>
+                                <span>•</span>
+                                <span className="font-semibold text-foreground">
+                                  R$ {closing.total_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <Badge 
+                          variant="outline" 
+                          className={`${status.color} shrink-0`}
+                        >
+                          <AppIcon name={status.icon} className="w-3 h-3 mr-1" />
+                          {status.label}
+                        </Badge>
+                        
+                        <AppIcon name="ChevronRight" className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </div>
+                  );
                })}
              </div>
            </div>
