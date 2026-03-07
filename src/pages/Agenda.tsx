@@ -58,7 +58,7 @@ export default function Agenda() {
   const [agendaSearchParams, setAgendaSearchParams] = useSearchParams();
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('calendar');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
