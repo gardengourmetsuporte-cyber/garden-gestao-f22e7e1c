@@ -2259,6 +2259,7 @@ export type Database = {
       invites: {
         Row: {
           accepted_at: string | null
+          access_level_id: string | null
           created_at: string | null
           email: string
           expires_at: string | null
@@ -2270,6 +2271,7 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          access_level_id?: string | null
           created_at?: string | null
           email: string
           expires_at?: string | null
@@ -2281,6 +2283,7 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          access_level_id?: string | null
           created_at?: string | null
           email?: string
           expires_at?: string | null
@@ -2291,6 +2294,13 @@ export type Database = {
           unit_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invites_access_level_id_fkey"
+            columns: ["access_level_id"]
+            isOneToOne: false
+            referencedRelation: "access_levels"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invites_unit_id_fkey"
             columns: ["unit_id"]
