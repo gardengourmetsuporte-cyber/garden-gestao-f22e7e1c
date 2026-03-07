@@ -14,7 +14,7 @@ import {
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
-const WEEK_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const WEEK_DAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export interface DayIndicator {
   color: string;
@@ -70,22 +70,20 @@ export function UnifiedMonthGrid({
     return days;
   }, [currentMonth]);
 
-  const cellHeight = compact ? 'min-h-[2.75rem]' : 'min-h-[3.5rem]';
-  const fontSize = compact ? 'text-[10px]' : 'text-[11px]';
-  const dotSize = compact ? 'w-[5px] h-[5px]' : 'w-[6px] h-[6px]';
-  const headerFontSize = compact ? 'text-[9px]' : 'text-[10px]';
+  const cellSize = compact ? 'h-10' : 'h-12';
+  const fontSize = compact ? 'text-[12px]' : 'text-[13px]';
+  const dotSize = compact ? 'w-[4px] h-[4px]' : 'w-[5px] h-[5px]';
 
   return (
-    <div className={cn('rounded-2xl border border-border/40 bg-card overflow-hidden', className)}>
+    <div className={cn('', className)}>
       {/* Week headers */}
-      <div className="grid grid-cols-7 border-b border-border/20">
-        {WEEK_DAYS.map(d => (
+      <div className="grid grid-cols-7 mb-1">
+        {WEEK_DAYS.map((d, i) => (
           <div
-            key={d}
+            key={i}
             className={cn(
-              'text-center font-semibold text-muted-foreground/70 uppercase tracking-wider',
-              headerFontSize,
-              compact ? 'py-1.5' : 'py-2'
+              'text-center font-semibold text-muted-foreground/50 uppercase tracking-wider',
+              compact ? 'text-[10px] py-1' : 'text-[11px] py-1.5'
             )}
           >
             {d}
@@ -94,17 +92,14 @@ export function UnifiedMonthGrid({
       </div>
 
       {/* Day cells */}
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7 gap-[2px]">
         {isLoading
           ? Array.from({ length: 35 }).map((_, i) => (
               <div
                 key={i}
-                className={cn(
-                  cellHeight,
-                  'p-1.5 border-b border-r border-border/10 animate-pulse'
-                )}
+                className={cn(cellSize, 'rounded-xl animate-pulse flex items-center justify-center')}
               >
-                <div className="h-3 w-4 rounded bg-secondary/40 mb-1" />
+                <div className="h-3 w-3 rounded-full bg-secondary/30" />
               </div>
             ))
           : calendarDays.map((day, i) => {
@@ -116,6 +111,7 @@ export function UnifiedMonthGrid({
               const disabled =
                 (!inMonth && disableOutsideMonth) || (isPast && disablePast);
               const indicators = getDayIndicators?.(dateKey) || [];
+              const hasContent = !!renderDayContent;
 
               return (
                 <button
@@ -123,36 +119,47 @@ export function UnifiedMonthGrid({
                   onClick={() => !disabled && onSelectDate?.(selected ? '' : dateKey)}
                   disabled={disabled}
                   className={cn(
-                    'relative text-left transition-all duration-200',
-                    cellHeight,
-                    compact ? 'p-1' : 'p-1.5',
-                    'border-b border-r border-border/10',
+                    'relative flex flex-col items-center justify-center transition-all duration-200 rounded-xl',
+                    hasContent ? 'min-h-[3.5rem] items-start justify-start p-1' : cellSize,
                     // States
                     disabled && 'opacity-20 pointer-events-none',
-                    !disabled && inMonth && isPast && !disablePast && 'opacity-50',
-                    !disabled && 'hover:bg-secondary/40',
-                    today && 'bg-primary/5',
-                    selected && 'bg-primary/10 ring-1 ring-primary/30'
+                    !disabled && inMonth && isPast && !disablePast && 'opacity-40',
+                    !disabled && !selected && !today && 'hover:bg-secondary/30 active:scale-95',
+                    today && !selected && 'bg-primary/8',
+                    selected && 'bg-primary/12'
                   )}
                 >
                   {/* Day number */}
-                  <span
+                  <div
                     className={cn(
-                      fontSize,
-                      'font-semibold leading-none block mb-0.5',
-                      today && 'text-primary font-bold',
-                      selected && !today && 'text-primary font-bold',
-                      !today && !selected && 'text-foreground'
+                      'flex items-center justify-center transition-all duration-200',
+                      hasContent ? '' : 'mx-auto',
+                      today && !selected && cn(
+                        'w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold',
+                        fontSize
+                      ),
+                      selected && !today && cn(
+                        'w-7 h-7 rounded-full ring-2 ring-primary/50 bg-primary/15 text-primary font-bold',
+                        fontSize
+                      ),
+                      selected && today && cn(
+                        'w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold ring-2 ring-primary/30 shadow-[0_0_12px_hsl(var(--primary)/0.4)]',
+                        fontSize
+                      ),
+                      !today && !selected && cn(
+                        fontSize,
+                        'font-medium text-foreground/80'
+                      )
                     )}
                   >
                     {format(day, 'd')}
-                  </span>
+                  </div>
 
                   {/* Custom content or indicators */}
                   {renderDayContent ? (
                     renderDayContent(day, dateKey)
                   ) : indicators.length > 0 ? (
-                    <div className="flex flex-wrap gap-[2px]">
+                    <div className="flex gap-[3px] mt-0.5">
                       {indicators.map((ind, j) => (
                         <div
                           key={j}
