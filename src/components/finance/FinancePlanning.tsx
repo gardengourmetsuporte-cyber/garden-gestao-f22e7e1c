@@ -85,6 +85,8 @@ export function FinancePlanning({ selectedMonth, onMonthChange, totalBalance = 0
 
   const totalBudget = budgetItems.reduce((s, b) => s + b.planned_amount, 0);
   const totalSpent = budgetItems.reduce((s, b) => s + b.spent, 0);
+  const totalProvisioned = budgetItems.reduce((s, b) => s + b.provisioned, 0);
+  const totalProvPercent = totalBudget > 0 ? (totalProvisioned / totalBudget) * 100 : 0;
   const totalPercent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   // Categories not yet budgeted
