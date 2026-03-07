@@ -966,7 +966,7 @@ export function ChecklistView({
                                     ))}
                                   </div>
                                 </div>
-                                <div className="border-t border-border" />
+                                {expandedPeopleFor === item.id && <div className="border-t border-border" />}
                               </>
                             )}
                             {!isAdmin && (
