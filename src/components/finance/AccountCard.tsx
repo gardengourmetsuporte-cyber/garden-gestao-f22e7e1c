@@ -54,27 +54,21 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
         onClick && "hover:brightness-110 cursor-pointer active:scale-[0.98]"
       )}
       style={{
-        background: `linear-gradient(135deg, ${brandColor}18 0%, ${brandColor}08 100%)`,
-        borderColor: `${brandColor}30`,
+        background: brandColor,
       }}
     >
-      {/* Subtle accent glow */}
-      <div
-        className="absolute -left-4 -top-4 w-20 h-20 rounded-full blur-2xl opacity-30 pointer-events-none"
-        style={{ backgroundColor: brandColor }}
-      />
       <BankAvatar account={account} />
       <div className="flex-1 min-w-0 relative z-10">
-        <p className="font-semibold truncate font-display" style={{ letterSpacing: '-0.01em' }}>{account.name}</p>
-        <p className="text-xs text-muted-foreground capitalize">{account.type === 'wallet' ? 'Carteira' : account.type === 'bank' ? 'Banco' : 'Cartão'}</p>
+        <p className="font-semibold truncate font-display text-white" style={{ letterSpacing: '-0.01em' }}>{account.name}</p>
+        <p className="text-xs text-white/70 capitalize">{account.type === 'wallet' ? 'Carteira' : account.type === 'bank' ? 'Banco' : 'Cartão'}</p>
       </div>
       <p className={cn(
         "font-semibold tabular-nums relative z-10",
-        isNegative ? "text-destructive" : "text-foreground"
+        isNegative ? "text-red-200" : "text-white"
       )}>
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
       </p>
-      {onClick && <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0 relative z-10" />}
+      {onClick && <AppIcon name="ChevronRight" size={16} className="text-white/70 shrink-0 relative z-10" />}
     </button>
   );
 }
