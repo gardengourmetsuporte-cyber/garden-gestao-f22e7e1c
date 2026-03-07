@@ -2880,7 +2880,19 @@ select:focus {
 .finance-hero-chip:nth-child(1) { animation-delay: 400ms; }
 .finance-hero-chip:nth-child(2) { animation-delay: 500ms; }
 
-/* ========== MORE DRAWER ANIMATIONS ========== */
+/* Finance hero background slow drift */
+@keyframes heroBgDrift {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  25%  { transform: translate(-5%, -3%) scale(1.05); }
+  50%  { transform: translate(3%, -5%) scale(1.02); }
+  75%  { transform: translate(-3%, 2%) scale(1.06); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+.finance-hero-bg-drift {
+  animation: heroBgDrift 20s ease-in-out infinite;
+}
+
 
 @keyframes moreDrawerIn {
   0% { opacity: 0; transform: scale(0.97); }
