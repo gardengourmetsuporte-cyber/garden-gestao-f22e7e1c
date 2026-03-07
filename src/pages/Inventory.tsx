@@ -18,6 +18,7 @@ import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { InventoryTemplateSelector } from '@/components/inventory/InventoryTemplateSelector';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
