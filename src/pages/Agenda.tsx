@@ -363,9 +363,9 @@ export default function Agenda() {
           {/* View mode tabs */}
           <div className="flex items-center gap-1 p-1 rounded-xl bg-secondary/30 border border-border/30">
             {([
-              { key: 'list' as const, icon: 'FormatListBulleted', label: 'Lista' },
-              { key: 'calendar' as const, icon: 'CalendarMonth', label: 'Calendário' },
-              { key: 'blocks' as const, icon: 'ViewAgenda', label: 'Blocos' },
+              { key: 'list' as const, icon: 'List', label: 'Lista' },
+              { key: 'calendar' as const, icon: 'CalendarDays', label: 'Calendário' },
+              { key: 'blocks' as const, icon: 'LayoutGrid', label: 'Blocos' },
             ]).map(tab => (
               <button
                 key={tab.key}
