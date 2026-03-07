@@ -10,6 +10,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 17px;
+}
+
 /* Prevent Material Symbols from flashing as raw text before font loads */
 .material-symbols-rounded {
   overflow: hidden;
