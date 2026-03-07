@@ -84,8 +84,8 @@ export function FinanceHome({
         <img
           src={financeHeroBg}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none finance-hero-bg-drift"
-          style={{ opacity: 0.6, width: '140%', height: '140%', top: '-20%', left: '-20%' }}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ opacity: 0.6 }}
         />
         <div className="p-5 pb-4 relative z-10">
           {/* Header */}
