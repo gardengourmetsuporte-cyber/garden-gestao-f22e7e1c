@@ -1351,6 +1351,136 @@ export type Database = {
           },
         ]
       }
+      delivery_hub_order_items: {
+        Row: {
+          id: string
+          name: string
+          notes: string | null
+          options: Json | null
+          order_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          name: string
+          notes?: string | null
+          options?: Json | null
+          order_id: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          notes?: string | null
+          options?: Json | null
+          order_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_hub_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_hub_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_hub_orders: {
+        Row: {
+          accepted_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          customer_address: string | null
+          customer_name: string
+          customer_phone: string | null
+          delivered_at: string | null
+          delivery_fee: number
+          discount: number
+          id: string
+          notes: string | null
+          payment_method: string | null
+          platform: Database["public"]["Enums"]["delivery_hub_platform"]
+          platform_data: Json | null
+          platform_display_id: string | null
+          platform_order_id: string | null
+          ready_at: string | null
+          received_at: string
+          status: Database["public"]["Enums"]["delivery_hub_order_status"]
+          subtotal: number
+          total: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          customer_address?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          delivered_at?: string | null
+          delivery_fee?: number
+          discount?: number
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          platform?: Database["public"]["Enums"]["delivery_hub_platform"]
+          platform_data?: Json | null
+          platform_display_id?: string | null
+          platform_order_id?: string | null
+          ready_at?: string | null
+          received_at?: string
+          status?: Database["public"]["Enums"]["delivery_hub_order_status"]
+          subtotal?: number
+          total?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          customer_address?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          delivered_at?: string | null
+          delivery_fee?: number
+          discount?: number
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          platform?: Database["public"]["Enums"]["delivery_hub_platform"]
+          platform_data?: Json | null
+          platform_display_id?: string | null
+          platform_order_id?: string | null
+          ready_at?: string | null
+          received_at?: string
+          status?: Database["public"]["Enums"]["delivery_hub_order_status"]
+          subtotal?: number
+          total?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_hub_orders_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_payments: {
         Row: {
           advance_deduction: number | null
@@ -5310,6 +5440,20 @@ export type Database = {
       chat_conversation_type: "direct" | "group" | "announcement"
       checklist_type: "abertura" | "fechamento" | "limpeza" | "bonus"
       day_period: "morning" | "afternoon" | "evening"
+      delivery_hub_order_status:
+        | "new"
+        | "accepted"
+        | "preparing"
+        | "ready"
+        | "dispatched"
+        | "delivered"
+        | "cancelled"
+      delivery_hub_platform:
+        | "ifood"
+        | "rappi"
+        | "uber_eats"
+        | "aiqfome"
+        | "manual"
       delivery_status: "pending" | "out" | "delivered" | "cancelled"
       movement_type: "entrada" | "saida"
       order_status: "draft" | "sent" | "received" | "cancelled"
@@ -5473,6 +5617,22 @@ export const Constants = {
       chat_conversation_type: ["direct", "group", "announcement"],
       checklist_type: ["abertura", "fechamento", "limpeza", "bonus"],
       day_period: ["morning", "afternoon", "evening"],
+      delivery_hub_order_status: [
+        "new",
+        "accepted",
+        "preparing",
+        "ready",
+        "dispatched",
+        "delivered",
+        "cancelled",
+      ],
+      delivery_hub_platform: [
+        "ifood",
+        "rappi",
+        "uber_eats",
+        "aiqfome",
+        "manual",
+      ],
       delivery_status: ["pending", "out", "delivered", "cancelled"],
       movement_type: ["entrada", "saida"],
       order_status: ["draft", "sent", "received", "cancelled"],
