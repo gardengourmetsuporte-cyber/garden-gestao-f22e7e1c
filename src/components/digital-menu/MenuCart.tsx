@@ -26,10 +26,10 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
   if (orderSent) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center gap-5">
-        <div className="w-20 h-20 rounded-full bg-[hsl(var(--neon-green)/0.12)] flex items-center justify-center">
-          <AppIcon name="CheckCircle2" size={40} className="text-[hsl(var(--neon-green))]" />
+        <div className="w-20 h-20 rounded-full bg-emerald-500/12 flex items-center justify-center animate-in zoom-in-50 duration-300">
+          <AppIcon name="CheckCircle2" size={40} className="text-emerald-500" />
         </div>
-        <div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <h2 className="text-2xl font-bold text-foreground">Pedido enviado!</h2>
           <p className="text-muted-foreground text-sm mt-2">
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
@@ -37,6 +37,17 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
           <p className="text-muted-foreground text-xs mt-1">
             Mesa {tableNumber || 'Balcão'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </p>
+        </div>
+        <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="flex items-center gap-3 text-sm">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/12 flex items-center justify-center shrink-0">
+              <AppIcon name="Schedule" size={20} className="text-amber-500" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-foreground">Aguardando preparo</p>
+              <p className="text-xs text-muted-foreground">Seu pedido está sendo preparado</p>
+            </div>
+          </div>
         </div>
         <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); }}>
           <AppIcon name="Plus" size={18} className="mr-2" />
