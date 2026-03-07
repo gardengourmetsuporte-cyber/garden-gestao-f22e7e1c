@@ -65,13 +65,19 @@ export function MyPayslips() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="card-unified p-4">
-          <div className="flex items-center gap-2 text-emerald-500 mb-1"><AppIcon name="Wallet" size={16} /><span className="text-sm">Recebido</span></div>
-          <p className="text-xl font-semibold">{formatCurrency(totalPaid)}</p>
+        <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-success" />
+          <div className="pl-5 pr-4 py-3.5">
+            <div className="flex items-center gap-2 text-success mb-1"><AppIcon name="Wallet" size={16} /><span className="text-[11px]">Recebido</span></div>
+            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalPaid)}</p>
+          </div>
         </div>
-        <div className="card-unified p-4">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1"><AppIcon name="TrendingUp" size={16} /><span className="text-sm">A receber</span></div>
-          <p className="text-xl font-semibold">{formatCurrency(totalPending)}</p>
+        <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-muted-foreground" />
+          <div className="pl-5 pr-4 py-3.5">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1"><AppIcon name="TrendingUp" size={16} /><span className="text-[11px]">A receber</span></div>
+            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalPending)}</p>
+          </div>
         </div>
       </div>
 

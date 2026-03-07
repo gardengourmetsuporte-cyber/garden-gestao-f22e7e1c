@@ -129,16 +129,17 @@ export function ScheduleManagement() {
           <SheetHeader><SheetTitle>Solicitações Pendentes</SheetTitle></SheetHeader>
           <div className="mt-4 space-y-3">
             {pendingSchedules.map((schedule) => (
-              <div key={schedule.id} className="card-unified-interactive p-4 cursor-pointer" onClick={() => { setShowPendingSheet(false); setSelectedSchedule(schedule); }}>
-                <div className="flex items-center justify-between">
+              <div key={schedule.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative cursor-pointer" onClick={() => { setShowPendingSheet(false); setSelectedSchedule(schedule); }}>
+                <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-warning" />
+                <div className="flex items-center justify-between pl-5 pr-4 py-3.5">
                   <div className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={schedule.profile?.avatar_url || ''} />
                       <AvatarFallback><AppIcon name="User" size={20} /></AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{schedule.profile?.full_name || 'Usuário'}</p>
-                      <p className="text-sm text-muted-foreground">{schedule.day_off} de {monthNames[schedule.month]} de {schedule.year}</p>
+                      <p className="font-semibold text-foreground">{schedule.profile?.full_name || 'Usuário'}</p>
+                      <p className="text-[11px] text-muted-foreground">{schedule.day_off} de {monthNames[schedule.month]} de {schedule.year}</p>
                     </div>
                   </div>
                   <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />

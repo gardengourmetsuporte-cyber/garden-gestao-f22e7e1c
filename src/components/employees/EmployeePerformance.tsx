@@ -135,8 +135,9 @@ export function EmployeePerformance() {
       </div>
 
       {entries.map((entry, idx) => (
-        <div key={entry.employee_id} className="card-command p-4 space-y-3">
-          <div className="flex items-center gap-3">
+        <div key={entry.employee_id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative space-y-3">
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+          <div className="pl-5 pr-4 pt-3.5 flex items-center gap-3">
             <span className="text-xs font-bold text-muted-foreground w-5 text-center">{idx + 1}º</span>
             <RankedAvatar avatarUrl={entry.avatar_url} earnedPoints={entry.earnedPoints} size={36} />
             <div className="flex-1 min-w-0">
@@ -156,9 +157,11 @@ export function EmployeePerformance() {
             )}
           </div>
 
-          <Progress value={(entry.score / maxScore) * 100} className="h-1.5" />
+          <div className="px-5">
+            <Progress value={(entry.score / maxScore) * 100} className="h-1.5" />
+          </div>
 
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 px-5 pb-3.5">
             <MetricChip icon="CheckSquare" label="Checklists" value={entry.checklistsCompleted} />
             <MetricChip icon="Star" label="Pontos" value={entry.earnedPoints} />
             <MetricChip icon="Receipt" label="Caixas" value={entry.cashClosings} />

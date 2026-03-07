@@ -148,15 +148,16 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
         <div key={`${group.year}-${group.month}`} className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground px-1">{MONTHS[group.month - 1]} {group.year}</h3>
           {group.payments.map((payment) => (
-            <div key={payment.id} className="card-unified p-4">
-              <div className="flex items-center justify-between">
+            <div key={payment.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+              <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ backgroundColor: PAYMENT_TYPE_COLORS[payment.type] }} />
+              <div className="flex items-center justify-between pl-5 pr-4 py-3.5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${PAYMENT_TYPE_COLORS[payment.type]}20` }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${PAYMENT_TYPE_COLORS[payment.type]}20` }}>
                     <AppIcon name="DollarSign" size={20} style={{ color: PAYMENT_TYPE_COLORS[payment.type] }} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">{PAYMENT_TYPE_LABELS[payment.type]}</span>
+                      <span className="font-semibold text-foreground">{PAYMENT_TYPE_LABELS[payment.type]}</span>
                       {payment.is_paid ? (
                         <Badge variant="default" className="bg-success/20 text-success hover:bg-success/30">
                           <AppIcon name="Check" size={12} className="mr-1" />Pago
@@ -167,10 +168,10 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                       <AppIcon name="Calendar" size={12} />
                       {format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ptBR })}
-                      {payment.notes && <span className="text-xs">• {payment.notes}</span>}
+                      {payment.notes && <span>• {payment.notes}</span>}
                     </div>
                   </div>
                 </div>
