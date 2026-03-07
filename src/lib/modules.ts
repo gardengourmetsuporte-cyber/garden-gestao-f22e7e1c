@@ -135,7 +135,7 @@ export const ALL_MODULES: ModuleDef[] = [
     key: 'personal-finance', label: 'Finanças Pessoais', icon: 'Wallet', route: '/personal-finance', routes: ['/personal-finance'], group: 'Gestão',
   },
   {
-    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Premium',
+    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Em Desenvolvimento',
     children: [
       { key: 'marketing.calendar', label: 'Calendário de posts', icon: 'Calendar' },
       { key: 'marketing.create', label: 'Criar/editar posts', icon: 'PenSquare' },
