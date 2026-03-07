@@ -98,24 +98,31 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocat
         <div className="flex items-center gap-1">
           {mapsUrl && (
             <Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-lg" asChild>
-              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Abrir rota">
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Abrir rota" onClick={(e) => e.stopPropagation()}>
                 <Navigation className="w-3.5 h-3.5 text-emerald-400" />
               </a>
             </Button>
           )}
 
-          {nextStatus && (
+          {nextStatus === 'out' && (
             <Button
               size="sm"
-              variant={nextStatus === 'delivered' ? 'default' : 'outline'}
+              variant="outline"
               className="h-7 text-[11px] px-3 gap-1.5 rounded-lg font-semibold"
-              onClick={() => onStatusChange(delivery.id, nextStatus)}
+              onClick={(e) => { e.stopPropagation(); onStatusChange(delivery.id, 'out'); }}
             >
-              {nextStatus === 'out' ? (
-                <><Truck className="w-3.5 h-3.5" /> Saiu</>
-              ) : (
-                <><CheckCircle2 className="w-3.5 h-3.5" /> Entregue</>
-              )}
+              <Truck className="w-3.5 h-3.5" /> Saiu
+            </Button>
+          )}
+
+          {delivery.status !== 'delivered' && delivery.status !== 'cancelled' && (
+            <Button
+              size="sm"
+              variant="default"
+              className="h-7 text-[11px] px-3 gap-1.5 rounded-lg font-semibold"
+              onClick={(e) => { e.stopPropagation(); onStatusChange(delivery.id, 'delivered'); }}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" /> Entregue
             </Button>
           )}
         </div>
