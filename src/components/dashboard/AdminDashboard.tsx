@@ -24,7 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
 const LazyChecklist = lazy(() => import('./ChecklistDashboardWidget').then(m => ({ default: m.ChecklistDashboardWidget })));
-const LazyAgenda = lazy(() => import('./AgendaDashboardWidget').then(m => ({ default: m.AgendaDashboardWidget })));
+
 const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
 const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ default: m.AutoOrderWidget })));
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
