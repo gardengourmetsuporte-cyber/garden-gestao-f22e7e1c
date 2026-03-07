@@ -42,10 +42,12 @@ export function BottomTabBar() {
   const { activeUnit } = useUnit();
   const { hasAccess } = useUserModules();
   const { pinnedTabs } = useBottomBarTabs();
-  const { fabAction } = useFabContext();
+  const { fabAction, fabActions } = useFabContext();
   const { plan } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
+  const [speedDialOpen, setSpeedDialOpen] = useState(false);
+  const hasMultiActions = fabActions.length > 1;
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isHidden = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r)) || location.pathname.startsWith('/tablet');
