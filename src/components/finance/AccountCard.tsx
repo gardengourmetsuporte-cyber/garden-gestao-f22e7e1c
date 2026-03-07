@@ -42,27 +42,39 @@ function BankAvatar({ account }: { account: FinanceAccount }) {
 
 export function AccountCard({ account, onClick }: AccountCardProps) {
   const isNegative = account.balance < 0;
+  const isWallet = account.type === 'wallet';
+  const brand = isWallet ? WALLET_BRAND : matchBankBrand(account.name);
+  const brandColor = brand?.bgColor || account.color;
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl bg-card border border-border/40 transition-all duration-200 w-full text-left",
-        onClick && "hover:bg-secondary/50 cursor-pointer active:scale-[0.98]"
+        "flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] transition-all duration-200 w-full text-left relative overflow-hidden",
+        onClick && "hover:brightness-110 cursor-pointer active:scale-[0.98]"
       )}
+      style={{
+        background: `linear-gradient(135deg, ${brandColor}18 0%, ${brandColor}08 100%)`,
+        borderColor: `${brandColor}30`,
+      }}
     >
+      {/* Subtle accent glow */}
+      <div
+        className="absolute -left-4 -top-4 w-20 h-20 rounded-full blur-2xl opacity-30 pointer-events-none"
+        style={{ backgroundColor: brandColor }}
+      />
       <BankAvatar account={account} />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative z-10">
         <p className="font-semibold truncate font-display" style={{ letterSpacing: '-0.01em' }}>{account.name}</p>
         <p className="text-xs text-muted-foreground capitalize">{account.type === 'wallet' ? 'Carteira' : account.type === 'bank' ? 'Banco' : 'Cartão'}</p>
       </div>
       <p className={cn(
-        "font-semibold tabular-nums",
+        "font-semibold tabular-nums relative z-10",
         isNegative ? "text-destructive" : "text-foreground"
       )}>
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(account.balance)}
       </p>
-      {onClick && <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />}
+      {onClick && <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0 relative z-10" />}
     </button>
   );
 }
