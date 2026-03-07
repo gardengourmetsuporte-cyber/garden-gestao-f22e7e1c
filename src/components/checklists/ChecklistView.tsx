@@ -676,8 +676,8 @@ export function ChecklistView({
                                   </div>
                                 </button>
                               )}
-                              {/* Resetar tarefa (desmarcar + zerar timer) */}
-                              {canToggle && onCancelTimer && (
+                              {/* Resetar tarefa (desmarcar + zerar timer) - only in timer mode */}
+                              {isTimerMode && canToggle && onCancelTimer && (
                                 <>
                                   <div className="border-t border-border" />
                                   <button
