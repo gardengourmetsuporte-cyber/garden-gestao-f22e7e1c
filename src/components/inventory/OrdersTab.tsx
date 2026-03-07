@@ -222,8 +222,11 @@ export function OrdersTab({
               const isNoSupplier = supplierId === 'no-supplier';
 
               return (
-                <div key={supplierId} className="bg-card rounded-xl border border-border/50 p-4 space-y-3">
-                  <div className="flex items-center gap-3">
+                <div key={supplierId} className="bg-card rounded-2xl border border-border/40 overflow-hidden relative">
+                  {/* Accent bar */}
+                  <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
+
+                  <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
                     <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
                       <AppIcon name={isNoSupplier ? 'HelpCircle' : 'Truck'} size={20} className="text-primary" />
                     </div>
@@ -231,7 +234,7 @@ export function OrdersTab({
                       <p className="font-semibold text-foreground truncate">
                         {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[11px] text-muted-foreground">
                         {supplierItems.length} item(ns) abaixo do mínimo
                       </p>
                     </div>
@@ -247,15 +250,15 @@ export function OrdersTab({
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="px-4 pb-3 space-y-1">
                     {supplierItems.slice(0, 3).map(item => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between py-2 border-t border-border/50 first:border-t-0"
+                        className="flex items-center justify-between py-2 border-t border-border/30 first:border-t-0"
                       >
                         <span className="text-sm">{item.name}</span>
                         <span className={cn(
-                          "text-sm font-medium",
+                          "text-sm font-medium tabular-nums",
                           item.current_stock === 0 ? "text-destructive" : "text-warning"
                         )}>
                           {item.current_stock} / {item.min_stock} {item.unit_type}
@@ -263,7 +266,7 @@ export function OrdersTab({
                       </div>
                     ))}
                     {supplierItems.length > 3 && (
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground pt-1">
                         +{supplierItems.length - 3} mais item(ns)
                       </p>
                     )}
