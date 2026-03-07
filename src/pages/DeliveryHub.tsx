@@ -75,7 +75,7 @@ export default function DeliveryHub() {
   return (
     <AppLayout>
       <div className="pb-28 lg:pb-12 px-4 pt-2 lg:px-8 lg:max-w-7xl lg:mx-auto space-y-4">
-        <DesktopActionBar label="Hub de Delivery" />
+        <DesktopActionBar label="Hub de Delivery" onClick={() => {}} />
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2">
