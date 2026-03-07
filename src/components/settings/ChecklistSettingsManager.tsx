@@ -3,6 +3,7 @@ import { useChecklists } from '@/hooks/useChecklists';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
 import { ChecklistTrash } from '@/components/checklists/ChecklistTrash';
 import { ChecklistClone } from '@/components/settings/ChecklistClone';
+import { ChecklistTemplateSelector } from '@/components/checklists/ChecklistTemplateSelector';
 import { toast } from 'sonner';
 import { ChecklistType } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -32,12 +33,23 @@ export function ChecklistSettingsManager() {
   } = useChecklists();
 
   const [selectedType, setSelectedType] = useState<ChecklistType>('abertura');
+  const [showTemplates, setShowTemplates] = useState(true);
 
+  const hasItems = sectors.some(s => s.subcategories?.some((sub: any) => sub.items?.length > 0));
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <AppIcon name="Loader2" className="w-6 h-6 animate-spin text-primary" />
       </div>
+    );
+  }
+
+  if (!hasItems && showTemplates) {
+    return (
+      <ChecklistTemplateSelector
+        onManual={() => setShowTemplates(false)}
+        onDone={() => setShowTemplates(false)}
+      />
     );
   }
 
