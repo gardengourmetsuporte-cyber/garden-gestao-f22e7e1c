@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { format, parseISO, startOfMonth, subMonths, addMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -19,6 +19,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useFabActions } from '@/contexts/FabActionContext';
 
 export function TimeTracking() {
   const { isAdmin, user } = useAuth();
@@ -32,19 +33,9 @@ export function TimeTracking() {
   const [showCertificateSheet, setShowCertificateSheet] = useState(false);
   const [showCertificateList, setShowCertificateList] = useState(false);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="h-16 w-full rounded-2xl" />
-        <Skeleton className="h-16 w-full rounded-2xl" />
-      </div>
-    );
-  }
-
   const pendingCerts = certificates.filter(c => c.status === 'pending');
 
-  const handleExportRecords = () => {
+  const handleExportRecords = useCallback(() => {
     if (records.length === 0) {
       toast.error('Nenhum registro para exportar');
       return;
@@ -68,7 +59,31 @@ export function TimeTracking() {
     XLSX.utils.book_append_sheet(wb, ws, 'Ponto');
     XLSX.writeFile(wb, `ponto-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
     toast.success('Relatório exportado!');
-  };
+  }, [records]);
+
+  // Register FAB actions for admin
+  useFabActions(
+    isAdmin
+      ? [
+          { icon: 'edit', label: 'Lançamento Manual', onClick: () => setShowManualSheet(true) },
+          { icon: 'upload', label: 'Importar', onClick: () => setShowImportSheet(true) },
+          { icon: 'download', label: 'Exportar', onClick: handleExportRecords },
+          { icon: 'clinical_notes', label: 'Atestados', onClick: () => setShowCertificateList(true), badge: pendingCerts.length },
+          { icon: 'settings', label: 'Configurações', onClick: () => setShowSettingsSheet(true) },
+        ]
+      : [],
+    [isAdmin, pendingCerts.length, handleExportRecords]
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-40 w-full rounded-2xl" />
+        <Skeleton className="h-16 w-full rounded-2xl" />
+        <Skeleton className="h-16 w-full rounded-2xl" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -82,42 +97,6 @@ export function TimeTracking() {
         </Button>
       )}
 
-      {isAdmin && (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowManualSheet(true)}>
-              <AppIcon name="edit" size={16} className="mr-2" />
-              Lançamento Manual
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-xl h-11 w-11" onClick={() => setShowSettingsSheet(true)}>
-              <AppIcon name="settings" size={16} />
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setShowImportSheet(true)}>
-              <AppIcon name="upload" size={16} className="mr-2" />
-              Importar
-            </Button>
-            <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => handleExportRecords()}>
-              <AppIcon name="download" size={16} className="mr-2" />
-              Exportar
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            className="w-full rounded-xl h-11 relative"
-            onClick={() => setShowCertificateList(true)}
-          >
-            <AppIcon name="clinical_notes" size={16} className="mr-2" />
-            Atestados
-            {pendingCerts.length > 0 && (
-              <Badge className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 text-[10px]" variant="destructive">
-                {pendingCerts.length}
-              </Badge>
-            )}
-          </Button>
-        </div>
-      )}
 
       <RecordsList records={records} isAdmin={isAdmin} onDelete={isAdmin ? deleteRecord : undefined} />
 

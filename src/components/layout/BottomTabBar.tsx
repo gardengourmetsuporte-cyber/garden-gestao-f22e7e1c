@@ -42,10 +42,12 @@ export function BottomTabBar() {
   const { activeUnit } = useUnit();
   const { hasAccess } = useUserModules();
   const { pinnedTabs } = useBottomBarTabs();
-  const { fabAction } = useFabContext();
+  const { fabAction, fabActions } = useFabContext();
   const { plan } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
+  const [speedDialOpen, setSpeedDialOpen] = useState(false);
+  const hasMultiActions = fabActions.length > 1;
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isHidden = HIDDEN_ROUTES.some(r => location.pathname.startsWith(r)) || location.pathname.startsWith('/tablet');
@@ -118,6 +120,42 @@ export function BottomTabBar() {
 
   return createPortal(
     <>
+      {/* Speed Dial Overlay */}
+      {speedDialOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => setSpeedDialOpen(false)}
+          />
+          <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 z-[61] flex flex-col-reverse items-center gap-2.5 animate-fade-in"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          >
+            {fabActions.map((action, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  navigator.vibrate?.(10);
+                  setSpeedDialOpen(false);
+                  action.onClick();
+                }}
+                className="flex items-center gap-2.5 bg-card border border-border/40 rounded-full pl-3 pr-4 py-2 shadow-lg hover:bg-muted/50 transition-all"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center relative">
+                  <AppIcon name={action.icon} size={16} className="text-primary" />
+                  {action.badge && action.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 h-4 min-w-4 px-0.5 text-[9px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
+                      {action.badge}
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm font-medium text-foreground whitespace-nowrap">{action.label}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
       <MoreDrawer open={moreOpen} onOpenChange={setMoreOpen} />
       <QuickActionSheet open={quickOpen} onOpenChange={setQuickOpen} />
 
@@ -140,7 +178,9 @@ export function BottomTabBar() {
                 aria-label={fabAction?.label || 'Ação rápida'}
                 onClick={() => {
                   navigator.vibrate?.(10);
-                  if (fabAction) {
+                  if (hasMultiActions) {
+                    setSpeedDialOpen(!speedDialOpen);
+                  } else if (fabAction) {
                     fabAction.onClick();
                   } else {
                     setQuickOpen(true);
@@ -148,18 +188,19 @@ export function BottomTabBar() {
                 }}
                 className={cn(
                   "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-500",
-                  fabAction
+                  (fabAction || hasMultiActions)
                     ? "bg-accent-foreground fab-contextual-glow"
                     : "bg-primary fab-button-glow",
+                  speedDialOpen && "rotate-45",
                   "hover:scale-[1.08] active:scale-[0.92]"
                 )}
               >
                 <AppIcon
-                  name={fabAction?.icon || 'Plus'}
+                  name={hasMultiActions ? 'Plus' : (fabAction?.icon || 'Plus')}
                   size={20}
                   className={cn(
                     "relative z-10 text-white transition-transform duration-500",
-                    fabAction ? "animate-fab-morph" : ""
+                    (fabAction || hasMultiActions) ? "animate-fab-morph" : ""
                   )}
                 />
               </button>
