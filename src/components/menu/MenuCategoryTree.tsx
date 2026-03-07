@@ -156,33 +156,47 @@ export function MenuCategoryTree({
       {categories.map(cat => {
         const expanded = expandedCats.has(cat.id);
         const catGroups = groups.filter(g => g.category_id === cat.id);
+        const totalProducts = catGroups.reduce((sum, g) => sum + getProductCount(g.id), 0);
 
         return (
-          <div key={cat.id} className="card-base overflow-hidden">
+          <div key={cat.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+            {/* Vertical accent bar */}
+            <div
+              className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
+              style={{ background: cat.color || 'hsl(var(--primary))' }}
+            />
+
             {/* Category header */}
             <div className="flex items-center gap-1">
               <button
                 onClick={() => toggleCat(cat.id)}
-                className="flex-1 flex items-center gap-2.5 px-3.5 py-3 text-sm font-semibold transition-all"
+                className="flex-1 flex items-center gap-3 pl-5 pr-3 py-3.5 text-sm transition-all"
               >
-                <div className="icon-glow icon-glow-sm icon-glow-primary">
-                  <AppIcon name={cat.icon || 'Package'} size={16} />
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: `${cat.color || 'hsl(var(--primary))'}15` }}
+                >
+                  <AppIcon name={cat.icon || 'Package'} size={20} style={{ color: cat.color || 'hsl(var(--primary))' }} />
                 </div>
-                <span className="flex-1 text-left text-foreground">{cat.name}</span>
-                <span className="text-[10px] text-muted-foreground mr-1">{catGroups.length} grupos</span>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="font-semibold text-foreground truncate">{cat.name}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {catGroups.length} grupo{catGroups.length !== 1 ? 's' : ''} · {totalProducts} produto{totalProducts !== 1 ? 's' : ''}
+                  </p>
+                </div>
                 <AppIcon
                   name="ChevronDown"
-                  size={14}
+                  size={16}
                   className={cn(
-                    "text-muted-foreground transition-transform duration-200",
+                    "text-muted-foreground/50 transition-transform duration-200",
                     !expanded && "-rotate-90"
                   )}
                 />
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-2 rounded-lg hover:bg-secondary/60 mr-1">
-                    <AppIcon name="MoreVertical" size={14} className="text-muted-foreground" />
+                  <button className="p-2 rounded-lg hover:bg-secondary/60 mr-2">
+                    <AppIcon name="MoreVertical" size={14} className="text-muted-foreground/50" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -200,7 +214,7 @@ export function MenuCategoryTree({
             </div>
 
             {expanded && (
-              <div className="px-3 pb-3 space-y-1">
+              <div className="px-4 pl-5 pb-3 space-y-1.5">
                 <div className="h-px bg-border/30 mb-2" />
                 {catGroups.map(grp => {
                   const count = getProductCount(grp.id);
@@ -215,7 +229,7 @@ export function MenuCategoryTree({
                           className={cn(
                             "flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 active:scale-[0.98]",
                             isSelected
-                              ? "finance-hero-card text-foreground font-medium"
+                              ? "bg-primary/10 text-foreground font-medium border border-primary/20"
                               : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent"
                           )}
                         >
