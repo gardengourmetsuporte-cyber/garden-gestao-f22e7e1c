@@ -52,42 +52,31 @@ export default function Deliveries() {
       <div className="pb-28 lg:pb-12 px-4 pt-2 lg:px-8 lg:max-w-7xl lg:mx-auto space-y-4">
         <DesktopActionBar label="Nova Entrega" onClick={() => setSheetOpen(true)} />
 
-        {/* ── Compact Stats Row ── */}
-        <div className="flex items-center gap-3">
-          {[
-            { value: stats.pending, label: 'Pendentes', color: 'text-amber-500' },
-            { value: stats.out, label: 'Em rota', color: 'text-primary' },
-            { value: stats.delivered, label: 'Entregues', color: 'text-success' },
-          ].map(({ value, label, color }) => (
-            <div key={label} className="flex items-center gap-1.5">
-              <span className={cn("text-lg font-black tabular-nums", color)}>{value}</span>
-              <span className="text-[11px] text-muted-foreground">{label}</span>
-            </div>
-          ))}
-          <span className="ml-auto text-xs text-muted-foreground font-medium tabular-nums">
-            {stats.total} total
-          </span>
-        </div>
-
-        {/* ── Filters ── */}
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+        {/* ── Stats + Filters as Cards ── */}
+        <div className="grid grid-cols-4 gap-2">
           {FILTERS.map(({ key, label, icon }) => {
             const active = statusFilter === key;
             const count = key === 'all' ? stats.total : stats[key];
+            const colors: Record<string, string> = {
+              all: 'text-foreground',
+              pending: 'text-amber-500',
+              out: 'text-primary',
+              delivered: 'text-success',
+            };
             return (
               <button
                 key={key}
                 onClick={() => setStatusFilter(key)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0",
+                  "flex flex-col items-center gap-1 p-3 rounded-2xl transition-all",
                   active
-                    ? "bg-primary/15 text-primary"
-                    : "bg-card/60 text-muted-foreground border border-border/30 hover:text-foreground"
+                    ? "bg-primary/15 ring-1 ring-primary/30"
+                    : "bg-card/60 border border-border/20 hover:bg-card/80"
                 )}
               >
-                <AppIcon name={icon} size={15} fill={active ? 1 : 0} />
-                {label}
-                <span className={cn("tabular-nums text-[10px]", active ? "opacity-70" : "opacity-40")}>{count}</span>
+                <AppIcon name={icon} size={20} fill={active ? 1 : 0} className={colors[key]} />
+                <span className={cn("text-2xl font-black tabular-nums leading-none", colors[key])}>{count}</span>
+                <span className="text-[10px] text-muted-foreground font-medium truncate w-full text-center">{label}</span>
               </button>
             );
           })}
