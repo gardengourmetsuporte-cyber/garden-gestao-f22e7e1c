@@ -32,7 +32,7 @@ export function InviteShareDialog({ open, onOpenChange }: InviteShareDialogProps
         .from('invites')
         .select('token')
         .eq('unit_id', activeUnit.id)
-        .eq('created_by', user.id)
+        .eq('invited_by', user.id)
         .is('accepted_at', null)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -48,7 +48,7 @@ export function InviteShareDialog({ open, onOpenChange }: InviteShareDialogProps
           email: 'open-invite@garden.app',
           role: 'member',
           token,
-          created_by: user.id,
+          invited_by: user.id,
         });
         if (error) throw error;
         setInviteLink(`${window.location.origin}/invite?token=${token}`);
