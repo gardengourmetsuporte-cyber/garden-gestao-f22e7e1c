@@ -11,6 +11,8 @@ export interface NavItem {
   adminOnly?: boolean;
   group: string;
   groupLabel: string;
+  /** Show a badge next to the label */
+  badge?: string;
 }
 
 /**
