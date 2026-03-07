@@ -25,65 +25,57 @@ export function SmartScannerWidget() {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[hsl(225_25%_6%)] scanner-card-glow">
-        {/* Animated glow orbs */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl animate-pulse pointer-events-none" />
-        <div className="absolute -bottom-8 -left-8 w-28 h-28 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ background: 'hsl(var(--neon-amber) / 0.15)' }} />
-        <div className="absolute top-1/2 right-1/4 w-16 h-16 rounded-full blur-2xl animate-pulse pointer-events-none" style={{ background: 'hsl(var(--neon-purple) / 0.12)', animationDelay: '1s' }} />
+      <div className="relative overflow-hidden rounded-2xl scanner-card-glow" style={{ minHeight: 140 }}>
+        {/* Full background image */}
+        <img
+          src={scannerHero}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+        />
 
-        <div className="relative flex items-center gap-3 p-3">
-          {/* Hero image */}
-          <div className="relative w-24 h-20 shrink-0 rounded-xl overflow-hidden">
-            <img
-              src={scannerHero}
-              alt="Scanner IA"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-            {/* Subtle shimmer overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent scanner-shimmer" />
-          </div>
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
 
-          {/* Content */}
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent scanner-shimmer pointer-events-none" />
+
+        {/* Content */}
+        <div className="relative flex items-end justify-between p-4 h-full" style={{ minHeight: 140 }}>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80">IA Scanner</span>
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary drop-shadow-sm">IA Scanner</span>
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             </div>
-            <p className="text-sm font-bold text-foreground leading-tight">
+            <p className="text-base font-bold text-white leading-tight drop-shadow-md">
               Scanner Inteligente
             </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+            <p className="text-xs text-white/70 mt-0.5">
               Foto → lançamento automático
             </p>
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col gap-1.5 shrink-0">
+          <div className="flex gap-2 shrink-0">
             <button
               onClick={() => cameraRef.current?.click()}
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 hover:bg-primary/15 hover:border-primary/30 active:scale-90 transition-all backdrop-blur-sm"
+              className="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 active:scale-90 transition-all backdrop-blur-md"
               title="Câmera"
             >
-              <AppIcon name="Camera" size={17} className="text-primary" />
+              <AppIcon name="Camera" size={18} className="text-white" />
             </button>
             <button
               onClick={() => galleryRef.current?.click()}
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 hover:bg-primary/15 hover:border-primary/30 active:scale-90 transition-all backdrop-blur-sm"
+              className="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 active:scale-90 transition-all backdrop-blur-md"
               title="Galeria"
             >
-              <AppIcon name="Image" size={17} className="text-primary" />
+              <AppIcon name="Image" size={18} className="text-white" />
             </button>
           </div>
         </div>
-
-        {/* Bottom accent line */}
-        <div className="h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       </div>
 
-      {/* Camera input */}
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
-      {/* Gallery input */}
       <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
       <SmartScannerSheet
