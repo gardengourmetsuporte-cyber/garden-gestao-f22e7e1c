@@ -9,7 +9,6 @@ import type { PrevMonthStats } from '@/hooks/usePreviousMonthStats';
 import { useBudgets } from '@/hooks/useBudgets';
 import { formatCurrency } from '@/lib/format';
 import { Progress } from '@/components/ui/progress';
-import financeHeroBg from '@/assets/finance-hero-bg.png';
 
 
 interface FinanceHomeProps {
