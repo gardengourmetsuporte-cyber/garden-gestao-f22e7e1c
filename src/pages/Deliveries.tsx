@@ -180,6 +180,13 @@ export default function Deliveries() {
         processImage={processImage}
         isProcessing={isProcessing}
       />
+
+      <DeliveryLocationPicker
+        open={!!locationPickerDelivery}
+        onOpenChange={(open) => { if (!open) setLocationPickerDelivery(null); }}
+        delivery={locationPickerDelivery}
+        onConfirm={(id, lat, lng) => updateAddress({ id, lat, lng })}
+      />
     </AppLayout>
   );
 }

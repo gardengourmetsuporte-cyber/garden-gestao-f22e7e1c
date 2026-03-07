@@ -416,6 +416,7 @@ export function useDeliveries() {
     createDelivery: createDelivery.mutateAsync,
     isCreating: createDelivery.isPending,
     updateStatus: updateStatus.mutateAsync,
+    updateAddress: updateAddress.mutateAsync,
     deleteDelivery: deleteDelivery.mutateAsync,
     invalidate,
   };
