@@ -83,13 +83,17 @@ export default function CardapioHub() {
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 
+  const [defaultRecipeName, setDefaultRecipeName] = useState('');
+
   const handleEditRecipe = useCallback((product: MenuProduct) => {
     const recipeId = (product as any).recipe_id;
     if (recipeId) {
       const recipe = recipes.find(r => r.id === recipeId) || null;
       setEditingRecipe(recipe);
+      setDefaultRecipeName('');
     } else {
       setEditingRecipe(null);
+      setDefaultRecipeName(product.name);
     }
     setRecipeSheetOpen(true);
   }, [recipes]);
