@@ -98,14 +98,15 @@ serve(async (req) => {
     let fee: number | null = null;
     let zoneName: string | null = null;
     let outOfRange = false;
+    let deliveryTimeMinutes: number | null = null;
 
     if (zones && zones.length > 0) {
       const matchedZone = zones.find(z => distanceKm >= z.min_distance_km && distanceKm <= z.max_distance_km);
       if (matchedZone) {
         fee = matchedZone.fee;
         zoneName = matchedZone.name;
+        deliveryTimeMinutes = matchedZone.delivery_time_minutes;
       } else {
-        // Check if beyond max range
         const maxZone = zones.reduce((max, z) => z.max_distance_km > max.max_distance_km ? z : max, zones[0]);
         if (distanceKm > maxZone.max_distance_km) {
           outOfRange = true;
@@ -119,6 +120,7 @@ serve(async (req) => {
       duration: durationText,
       fee,
       zone_name: zoneName,
+      delivery_time_minutes: deliveryTimeMinutes,
       out_of_range: outOfRange,
       formatted_address: destinationFormatted,
     }), {

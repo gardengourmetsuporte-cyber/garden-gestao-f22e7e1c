@@ -1,0 +1,1 @@
+ALTER TABLE public.delivery_zones ADD COLUMN delivery_time_minutes integer NOT NULL DEFAULT 60;

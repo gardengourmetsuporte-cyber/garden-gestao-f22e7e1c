@@ -11,6 +11,7 @@ export interface DeliveryZone {
   min_distance_km: number;
   max_distance_km: number;
   fee: number;
+  delivery_time_minutes: number;
   is_active: boolean;
   sort_order: number;
 }
@@ -45,6 +46,7 @@ export function useDeliveryZones() {
             min_distance_km: zone.min_distance_km,
             max_distance_km: zone.max_distance_km,
             fee: zone.fee,
+            delivery_time_minutes: zone.delivery_time_minutes,
             is_active: zone.is_active,
             updated_at: new Date().toISOString(),
           })
@@ -59,6 +61,7 @@ export function useDeliveryZones() {
             min_distance_km: zone.min_distance_km || 0,
             max_distance_km: zone.max_distance_km || 5,
             fee: zone.fee || 0,
+            delivery_time_minutes: zone.delivery_time_minutes || 60,
             is_active: zone.is_active ?? true,
             sort_order: zones.length,
           });
@@ -83,7 +86,25 @@ export function useDeliveryZones() {
     },
   });
 
-  return { zones, isLoading, upsertZone, deleteZone };
+  const bulkAdjustTime = useMutation({
+    mutationFn: async (deltaMinutes: number) => {
+      if (!activeUnitId || zones.length === 0) return;
+      for (const zone of zones) {
+        const newTime = Math.max(10, (zone.delivery_time_minutes || 60) + deltaMinutes);
+        await supabase
+          .from('delivery_zones')
+          .update({ delivery_time_minutes: newTime, updated_at: new Date().toISOString() })
+          .eq('id', zone.id);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+      toast.success('Tempos atualizados!');
+    },
+    onError: () => toast.error('Erro ao atualizar tempos'),
+  });
+
+  return { zones, isLoading, upsertZone, deleteZone, bulkAdjustTime };
 }
 
 // Hook for customer-facing fee calculation
