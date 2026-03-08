@@ -279,63 +279,17 @@ export default function DigitalMenu() {
         ]);
 
       try {
-        const email = customerUser.email || '';
-        
-        // Try to find existing customer by email or phone
-        let existing: { id: string } | null = null;
-        
-        if (email) {
-          const { data: byEmail } = await withTimeout(() =>
-            supabase
-              .from('customers')
-              .select('id')
-              .eq('unit_id', unitId)
-              .eq('email', email)
-              .maybeSingle()
-          );
-          existing = byEmail;
-        }
-        
-        if (!existing && data.phone) {
-          const { data: byPhone } = await withTimeout(() =>
-            supabase
-              .from('customers')
-              .select('id')
-              .eq('unit_id', unitId)
-              .eq('phone', data.phone)
-              .maybeSingle()
-          );
-          existing = byPhone;
-        }
-
-        if (existing) {
-          const { error } = await withTimeout(() =>
-            supabase.from('customers').update({
-              name: data.name,
-              phone: data.phone,
-              birthday: data.birthday,
-              email: email || undefined,
-            }).eq('id', existing!.id)
-          );
-          if (error) throw error;
-        } else {
-          const { error } = await withTimeout(() =>
-            supabase.from('customers').insert({
-              unit_id: unitId,
-              name: data.name,
-              email: email || null,
-              phone: data.phone,
-              birthday: data.birthday,
-              origin: 'digital_menu' as any,
-              score: 0,
-              segment: 'new',
-              loyalty_points: 0,
-              total_spent: 0,
-              total_orders: 0,
-            })
-          );
-          if (error) throw error;
-        }
+        // Use security definer function to bypass RLS for menu customers
+        const { error } = await withTimeout(() =>
+          supabase.rpc('upsert_menu_customer', {
+            p_unit_id: unitId,
+            p_name: data.name,
+            p_email: customerUser.email || null,
+            p_phone: data.phone || null,
+            p_birthday: data.birthday,
+          })
+        );
+        if (error) throw error;
 
         setShowProfile(false);
         if (pendingTabAfterAuth) {
