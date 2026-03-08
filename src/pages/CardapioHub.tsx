@@ -264,6 +264,13 @@ export default function CardapioHub() {
           {/* ==================== PRODUTOS ==================== */}
           {cardapioTab === 'produtos' && (
             <div className="space-y-4">
+              {viewMode === 'ficha' && (
+                <FichaTecnicaHeader
+                  products={products}
+                  syncing={recipeSync.syncing}
+                  onRefreshCosts={recipeSync.refreshCosts}
+                />
+              )}
               <MenuCategoryTree
                 categories={categories}
                 groups={groups}
@@ -291,6 +298,7 @@ export default function CardapioHub() {
                         const avail = (prod.availability as any) || { tablet: true, delivery: true };
                         saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
                       }}
+                      viewMode={viewMode}
                     />
                   );
                 }}
