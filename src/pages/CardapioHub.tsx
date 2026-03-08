@@ -18,6 +18,7 @@ import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
+import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
 import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
