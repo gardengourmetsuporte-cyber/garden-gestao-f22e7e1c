@@ -188,7 +188,7 @@ export default function SupplierPortal() {
         <Sonner />
         <div className="w-full max-w-sm space-y-6 text-center">
           <div className="flex flex-col items-center gap-2">
-            <AppIcon size={40} />
+            <AppIcon name="Store" size={40} />
             <h1 className="text-xl font-bold text-foreground">Portal do Fornecedor</h1>
             {supplierName && <p className="text-muted-foreground text-sm">{supplierName}</p>}
           </div>
