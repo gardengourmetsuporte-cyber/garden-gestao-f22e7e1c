@@ -305,7 +305,7 @@ export default function TabletAdmin() {
                 {/* Generic QR */}
                 <div className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30 border border-border/30">
                   <QRCodeSVG
-                    value={`${window.location.origin}/m/${activeUnit.id}`}
+                    value={`${basePublicUrl}/m/${activeUnit.id}`}
                     size={80}
                     bgColor="transparent"
                     fgColor="currentColor"
