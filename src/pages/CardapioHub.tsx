@@ -62,6 +62,11 @@ export default function CardapioHub() {
   // Rodízio settings
   const { settings: rodizioSettings, loading: rodizioLoading } = useRodizioSettings();
 
+  // Recipe sync
+  const recipeSync = useRecipeMenuSync(products, groups, () => {
+    menuAdmin.fetchProducts();
+  });
+
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
