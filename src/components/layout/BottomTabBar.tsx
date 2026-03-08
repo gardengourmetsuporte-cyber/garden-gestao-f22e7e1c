@@ -106,7 +106,10 @@ export function BottomTabBar() {
       return false;
     }
     if (isCardapioRoute && path === '/cardapio') {
-      return location.pathname.startsWith('/cardapio') && !new URLSearchParams(location.search).get('tab') && !new URLSearchParams(location.search).get('section');
+      // "Início" tab: active when no tab/section params
+      const currentTab = new URLSearchParams(location.search).get('tab');
+      const currentSection = new URLSearchParams(location.search).get('section');
+      return location.pathname === '/cardapio' && !currentTab && !currentSection;
     }
     return location.pathname.startsWith(path);
   };
