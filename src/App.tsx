@@ -207,7 +207,7 @@ function PublicRoutes() {
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
         <Route path="/fornecedor/:token" element={<SupplierPortal />} />
         <Route path="/landing" element={<Landing />} />
-        <Route path="/invite" element={<PublicWithAuth><Invite /></PublicWithAuth>} />
+        <Route path="/invite" element={<PublicWithAuth><RouteErrorBoundary><Invite /></RouteErrorBoundary></PublicWithAuth>} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="*" element={<AuthenticatedApp />} />
