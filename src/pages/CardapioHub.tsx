@@ -22,6 +22,11 @@ import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
 import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
+// Recipe integration
+import { RecipeSheet } from '@/components/recipes/RecipeSheet';
+import { useRecipes } from '@/hooks/useRecipes';
+import type { Recipe } from '@/types/recipe';
+
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
