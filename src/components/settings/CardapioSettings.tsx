@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useGamificationAdmin } from '@/hooks/useGamificationAdmin';
 import { useUnit } from '@/contexts/UnitContext';
