@@ -109,32 +109,37 @@ export default function DigitalMenu() {
     try {
       const email = user.email;
       const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email?.split('@')[0] || 'Cliente';
-      const phone = user.phone || null;
+
+      if (!email) return;
 
       // Check if customer already exists by email
       const { data: existing } = await supabase
         .from('customers')
         .select('id')
         .eq('unit_id', unitId)
-        .eq('email', email || '')
+        .eq('email', email)
         .maybeSingle();
 
       if (!existing) {
-        await supabase.from('customers').insert({
+        const { error } = await supabase.from('customers').insert({
           unit_id: unitId,
           name: fullName,
-          email: email || null,
-          phone,
-          origin: 'whatsapp' as any, // closest to "online/social"
+          email,
+          phone: user.phone || null,
+          origin: 'whatsapp' as any,
           score: 0,
           segment: 'new',
           loyalty_points: 0,
           total_spent: 0,
           total_orders: 0,
         });
+        // Ignore unique constraint violations (phone already exists)
+        if (error && !error.message?.includes('duplicate')) {
+          console.error('[DigitalMenu] Failed to create customer:', error);
+        }
       }
     } catch (err) {
-      console.error('[DigitalMenu] Failed to create customer record:', err);
+      console.error('[DigitalMenu] Failed to ensure customer record:', err);
     }
   };
 
