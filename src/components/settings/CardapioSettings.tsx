@@ -87,6 +87,7 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
   const TABS: { id: SettingsTab; label: string; icon: string; description: string }[] = [
     { id: 'pdv', label: 'Integração PDV', icon: 'Zap', description: 'Conexão com Colibri e envio automático' },
     { id: 'mesas', label: 'Mesas & QR Codes', icon: 'QrCode', description: 'Cadastrar mesas e gerar QR codes' },
+    { id: 'rodizio', label: 'Rodízio', icon: 'AllInclusive', description: 'Preço fixo, regras e categorias do rodízio' },
     { id: 'roleta', label: 'Roleta / Gamificação', icon: 'Dices', description: 'Prêmios, probabilidades e métricas' },
     { id: 'config', label: 'Geral', icon: 'Cog', description: 'Delivery, retirada e horários' },
   ];
