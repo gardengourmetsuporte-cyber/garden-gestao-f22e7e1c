@@ -289,3 +289,126 @@ export default function CardapioHub() {
     </AppLayout>
   );
 }
+
+// ==================== MENU LINKS BAR ====================
+function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: string }) {
+  const [qrOpen, setQrOpen] = useState<'public' | 'tablet' | null>(null);
+
+  const copyLink = (url: string, label: string) => {
+    navigator.clipboard.writeText(url);
+    toast.success(`Link "${label}" copiado!`);
+  };
+
+  return (
+    <>
+      <div className="px-4 pt-3 lg:px-6">
+        <div className="flex gap-2">
+          {/* Cardápio Digital */}
+          <div className="flex-1 rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <AppIcon name="Globe" size={20} className="text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-foreground truncate">Cardápio Digital</p>
+              <p className="text-[10px] text-muted-foreground truncate">Link para clientes</p>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={() => setQrOpen('public')}
+                className="w-8 h-8 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="QrCode" size={15} className="text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => copyLink(publicUrl, 'Cardápio Digital')}
+                className="w-8 h-8 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="Copy" size={15} className="text-muted-foreground" />
+              </button>
+              <a
+                href={publicUrl}
+                target="_blank"
+                rel="noopener"
+                className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="ExternalLink" size={15} className="text-primary" />
+              </a>
+            </div>
+          </div>
+
+          {/* Cardápio Tablet */}
+          <div className="flex-1 rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/50 flex items-center justify-center shrink-0">
+              <AppIcon name="Tablet" size={20} className="text-foreground" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-foreground truncate">Cardápio Tablet</p>
+              <p className="text-[10px] text-muted-foreground truncate">Link para mesas</p>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={() => setQrOpen('tablet')}
+                className="w-8 h-8 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="QrCode" size={15} className="text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => copyLink(tabletUrl, 'Cardápio Tablet')}
+                className="w-8 h-8 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="Copy" size={15} className="text-muted-foreground" />
+              </button>
+              <a
+                href={tabletUrl}
+                target="_blank"
+                rel="noopener"
+                className="w-8 h-8 rounded-lg bg-accent/50 hover:bg-accent flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="ExternalLink" size={15} className="text-foreground" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* QR Code Modal */}
+      {qrOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setQrOpen(null)}>
+          <div
+            className="bg-card rounded-3xl p-8 shadow-2xl border border-border/30 flex flex-col items-center gap-5 max-w-xs w-full mx-4 animate-in zoom-in-95 fade-in duration-200"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-foreground">
+                {qrOpen === 'public' ? 'Cardápio Digital' : 'Cardápio Tablet'}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">Escaneie para acessar</p>
+            </div>
+            <div className="bg-white rounded-2xl p-5">
+              <QRCodeSVG
+                value={qrOpen === 'public' ? publicUrl : tabletUrl}
+                size={200}
+                level="H"
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </div>
+            <button
+              onClick={() => copyLink(qrOpen === 'public' ? publicUrl : tabletUrl, qrOpen === 'public' ? 'Cardápio Digital' : 'Cardápio Tablet')}
+              className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              <AppIcon name="Copy" size={16} />
+              Copiar link
+            </button>
+            <button
+              onClick={() => setQrOpen(null)}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
