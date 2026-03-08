@@ -185,8 +185,9 @@ function PublicRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/m/:unitId" element={<DigitalMenu />} />
-        <Route path="/tablet/:unitId" element={<TabletDigitalMenu />} />
+        <Route path="/tablet/:unitId" element={<TabletHome />} />
         <Route path="/tablet/:unitId/menu" element={<TabletDigitalMenu />} />
+        <Route path="/tablet/:unitId/rodizio" element={<TabletRodizio />} />
         <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
         <Route path="/gamification/:unitId" element={<DigitalMenu />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
