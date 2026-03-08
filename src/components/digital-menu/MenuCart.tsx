@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,24 +7,35 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
+import type { User } from '@supabase/supabase-js';
 
 interface Props {
   cart: CartItem[];
   cartTotal: number;
   unitId: string;
+  customerUser?: User | null;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, onClear }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
 
-  // Delivery fields
+  // Delivery fields — pre-fill from logged-in user
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+
+  useEffect(() => {
+    if (customerUser) {
+      const name = customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || '';
+      const phone = customerUser.phone || '';
+      setCustomerName(prev => prev || name);
+      setCustomerPhone(prev => prev || phone);
+    }
+  }, [customerUser]);
 
   const formatPhone = (val: string) => {
     const digits = val.replace(/\D/g, '').slice(0, 11);
@@ -151,6 +162,22 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
           <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
         </div>
       </div>
+
+      {/* Logged-in user indicator */}
+      {customerUser && (
+        <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <AppIcon name="Person" size={18} className="text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
+            </p>
+            <p className="text-[11px] text-muted-foreground truncate">{customerUser.email}</p>
+          </div>
+          <AppIcon name="Check" size={16} className="text-primary shrink-0" />
+        </div>
+      )}
 
       {/* Delivery fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
