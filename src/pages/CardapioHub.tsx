@@ -470,7 +470,11 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
               />
             </div>
             <button
-              onClick={() => copyLink(qrOpen === 'public' ? publicUrl : tabletUrl, qrOpen === 'public' ? 'Cardápio Digital' : 'Cardápio Tablet')}
+              onClick={() => {
+                const url = qrOpen === 'public' ? publicUrl : qrOpen === 'tablet' ? tabletUrl : kdsUrl;
+                const label = qrOpen === 'public' ? 'Cardápio Digital' : qrOpen === 'tablet' ? 'Cardápio Tablet' : 'KDS - Cozinha';
+                copyLink(url, label);
+              }}
               className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
             >
               <AppIcon name="Copy" size={16} />
