@@ -146,6 +146,18 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
+      // Save address to customer record for next time
+      if (saveAddress && customerUser?.email && customerAddress.trim()) {
+        await supabase
+          .from('customers')
+          .update({
+            notes: customerAddress.trim(),
+            phone: customerPhone.replace(/\D/g, ''),
+          })
+          .eq('unit_id', unitId)
+          .eq('email', customerUser.email);
+      }
+
       toast.success('Pedido enviado com sucesso!');
       setOrderSent((order as any).id.slice(0, 8));
     } catch (err: any) {
