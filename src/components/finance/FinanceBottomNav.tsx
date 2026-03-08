@@ -94,7 +94,7 @@ const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Início' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
   { id: 'charts', icon: 'ChartPie', label: 'Gráficos' },
-  { id: 'more', icon: 'MoreHorizontal', label: 'Mais' },
+  { id: 'more', icon: 'Menu', label: 'Mais' },
 ];
 
 export function FinanceBottomNav({ activeTab, onTabChange, onAddTransaction, onReceiptCapture, variant = 'business' }: FinanceBottomNavProps) {
