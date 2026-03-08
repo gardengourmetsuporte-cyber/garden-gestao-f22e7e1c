@@ -101,22 +101,29 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
         supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability, updated_at').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
       ]);
 
-      setUnit((unitRes.data as any) || null);
+      const unitData = (unitRes.data as any) || null;
+      setUnit(unitData);
       setCategories((catRes.data as DMCategory[]) || []);
+
+      const menuPublishedAt = unitData?.menu_published_at ? new Date(unitData.menu_published_at).getTime() : null;
 
       const allGroups = (grpRes.data as any[]) || [];
       const filteredGroups = allGroups.filter(g => {
         const avail = g.availability || { tablet: true, delivery: true };
-        return avail[channel] !== false;
+        if (avail[channel] === false) return false;
+        if (menuPublishedAt && g.updated_at && new Date(g.updated_at).getTime() > menuPublishedAt) return false;
+        return true;
       });
       setGroups(filteredGroups as DMGroup[]);
 
-      const allProducts = (prodRes.data as DMProduct[]) || [];
+      const allProducts = (prodRes.data as any[]) || [];
       const filteredProducts = allProducts.filter(p => {
         const avail = p.availability || { tablet: true, delivery: true };
-        return avail[channel] !== false;
+        if (avail[channel] === false) return false;
+        if (menuPublishedAt && p.updated_at && new Date(p.updated_at).getTime() > menuPublishedAt) return false;
+        return true;
       });
-      setProducts(filteredProducts);
+      setProducts(filteredProducts as DMProduct[]);
 
       const productIds = filteredProducts.map(p => p.id);
 
