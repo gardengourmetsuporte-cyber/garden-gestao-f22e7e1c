@@ -123,9 +123,7 @@ export function AdminDashboard() {
       case 'quick-stats':
         return (
           <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
-              <LazyQuickStats />
-            </Suspense>
+            <LazyWidget><LazyQuickStats /></LazyWidget>
           </div>
         );
 
