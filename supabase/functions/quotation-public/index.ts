@@ -159,8 +159,8 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Check if supplier has a phone (needs login)
       const hasPhone = !!(qs as any).supplier?.phone;
+      const portalToken = (qs as any).supplier?.portal_token || null;
 
       return new Response(
         JSON.stringify({
