@@ -4,21 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { useUnit } from '@/contexts/UnitContext';
-import { useMenuAdmin } from '@/hooks/useMenuAdmin';
-import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
+import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
 
 interface Props {
   onNavigate: (tab: string) => void;
+  unitId?: string;
+  menuLoading: boolean;
+  products: MenuProduct[];
+  groups: MenuGroup[];
+  orders: TabletOrderAdmin[];
 }
 
-export function CardapioDashboard({ onNavigate }: Props) {
-  const { activeUnit } = useUnit();
-  const { products, groups, loading: menuLoading } = useMenuAdmin();
-  const { orders } = useTabletAdmin();
+export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, groups, orders }: Props) {
 
   // Delivery time from store_info
   const queryClient = useQueryClient();
