@@ -120,6 +120,7 @@ serve(async (req) => {
       duration: durationText,
       fee,
       zone_name: zoneName,
+      delivery_time_minutes: deliveryTimeMinutes,
       out_of_range: outOfRange,
       formatted_address: destinationFormatted,
     }), {
