@@ -7,6 +7,8 @@ import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { useRodizioSettings } from '@/hooks/useRodizioSettings';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 // Menu components
 import { MenuCategoryTree } from '@/components/menu/MenuCategoryTree';
