@@ -9,7 +9,7 @@ interface Props {
   logoUrl?: string;
   defaultName?: string;
   defaultEmail?: string;
-  onComplete: (data: { name: string; phone: string; birthday: string | null }) => void;
+  onComplete: (data: { name: string; phone: string; birthday: string | null }) => Promise<void> | void;
   onBack?: () => void;
 }
 
@@ -33,7 +33,7 @@ export function MenuCustomerProfile({ unitName, logoUrl, defaultName, defaultEma
     return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) { toast.error('Informe seu nome'); return; }
     const phoneDigits = phone.replace(/\D/g, '');
     if (phoneDigits.length < 10) { toast.error('Informe um celular válido'); return; }
@@ -47,7 +47,13 @@ export function MenuCustomerProfile({ unitName, logoUrl, defaultName, defaultEma
     }
 
     setSaving(true);
-    onComplete({ name: name.trim(), phone: phoneDigits, birthday: birthdayISO });
+    try {
+      await onComplete({ name: name.trim(), phone: phoneDigits, birthday: birthdayISO });
+    } catch {
+      // error handled by parent
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
