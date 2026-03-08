@@ -29,6 +29,7 @@ export interface DMProduct {
   price_type: string;
   custom_prices: any[] | null;
   sort_order: number;
+  availability: { tablet: boolean; delivery: boolean } | null;
 }
 
 export interface DMOptionGroup {
@@ -70,7 +71,7 @@ export interface CartItem {
   selectedOptions: { groupId: string; optionId: string; name: string; price: number }[];
 }
 
-export function useDigitalMenu(unitId: string | undefined) {
+export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | 'delivery' = 'delivery') {
   const [unit, setUnit] = useState<DMUnit | null>(null);
   const [categories, setCategories] = useState<DMCategory[]>([]);
   const [groups, setGroups] = useState<DMGroup[]>([]);
@@ -87,8 +88,8 @@ export function useDigitalMenu(unitId: string | undefined) {
       const [unitRes, catRes, grpRes, prodRes, ogRes, optRes, linkRes] = await Promise.all([
         supabase.from('units').select('id, name, store_info').eq('id', unitId).single(),
         supabase.from('menu_categories').select('id, name, icon, color, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('menu_groups').select('id, category_id, name, description, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+        supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+        supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
         supabase.from('menu_option_groups').select('id, title, min_selections, max_selections, allow_repeat').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
         supabase.from('menu_options').select('id, option_group_id, name, price, image_url, sort_order').eq('is_active', true).order('sort_order'),
         supabase.from('menu_product_option_groups').select('product_id, option_group_id'),
@@ -96,8 +97,22 @@ export function useDigitalMenu(unitId: string | undefined) {
 
       setUnit((unitRes.data as any) || null);
       setCategories((catRes.data as DMCategory[]) || []);
-      setGroups((grpRes.data as DMGroup[]) || []);
-      setProducts((prodRes.data as DMProduct[]) || []);
+
+      // Filter groups by channel availability
+      const allGroups = (grpRes.data as any[]) || [];
+      const filteredGroups = allGroups.filter(g => {
+        const avail = g.availability || { tablet: true, delivery: true };
+        return avail[channel] !== false;
+      });
+      setGroups(filteredGroups as DMGroup[]);
+
+      // Filter products by channel availability
+      const allProducts = (prodRes.data as DMProduct[]) || [];
+      const filteredProducts = allProducts.filter(p => {
+        const avail = p.availability || { tablet: true, delivery: true };
+        return avail[channel] !== false;
+      });
+      setProducts(filteredProducts);
 
       const ogs = (ogRes.data as any[]) || [];
       const opts = (optRes.data as DMOption[]) || [];
@@ -111,7 +126,7 @@ export function useDigitalMenu(unitId: string | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [unitId]);
+  }, [unitId, channel]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
