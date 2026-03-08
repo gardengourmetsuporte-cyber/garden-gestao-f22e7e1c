@@ -1,64 +1,45 @@
 
 
-## KDS - Kitchen Display System
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Overview
-Create a dedicated public kitchen display page (`/kds/:unitId`) that shows active orders in real-time, optimized for a kitchen screen (TV/tablet). The kitchen staff can see incoming orders and mark items/orders as done.
+### O que muda
 
-### How It Works
-- **Public route** (no auth required, like the tablet pages) at `/kds/:unitId`
-- Shows orders from `tablet_orders` with statuses: `confirmed`, `preparing`, `ready`
-- Real-time updates via Supabase Realtime (already configured for `tablet_orders`)
-- Kitchen staff can advance order status: **Confirmed → Preparing → Ready**
-- Auto-removes delivered/cancelled orders from view
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-### UI Design
-- Full-screen grid layout (3-4 columns on large screens, 2 on tablets)
-- Each order is a card showing: order number, source (mesa/delivery), time elapsed, items list
-- Color-coded by status: yellow (confirmed/waiting), orange (preparing), green (ready)
-- Large touch-friendly buttons to advance status
-- Audio alert on new orders (optional browser notification)
-- Auto-refresh every 10s + realtime websocket
-- Dark theme by default for kitchen visibility
+### Conceito visual
 
 ```text
-┌──────────────────────────────────────────────────┐
-│  🍳 KDS - Cozinha           [Unit Name]   12:45  │
-├──────────┬──────────┬──────────┬─────────────────┤
-│ #A1B2    │ #C3D4    │ #E5F6    │ #G7H8           │
-│ Mesa 3   │ Delivery │ Mesa 7   │ Delivery        │
-│ 5 min    │ 2 min    │ 8 min    │ 1 min           │
-│──────────│──────────│──────────│─────────────────│
-│ 2x Burger│ 1x Pizza │ 3x Açaí │ 1x Combo        │
-│ 1x Fries │ 2x Refri │          │ 2x Suco         │
-│          │          │          │                 │
-│[PREPARAR]│[PRONTO ✓]│[PREPARAR]│[ACEITAR]        │
-└──────────┴──────────┴──────────┴─────────────────┘
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
 ```
 
-### Technical Plan
+### Implementação
 
-1. **Create `/src/pages/KDS.tsx`**
-   - Fetches `tablet_orders` with items for the given `unitId`
-   - Filters to active statuses only (`awaiting_confirmation`, `confirmed`, `preparing`, `ready`)
-   - Subscribes to realtime changes
-   - Plays audio beep on new order arrival
-   - Sorts by creation time (oldest first)
-   - Each card shows items, elapsed time (auto-updating), and action button
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
 
-2. **Add route in `App.tsx`**
-   - Add `/kds/:unitId` as a public route alongside existing tablet routes
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
 
-3. **Reuse existing infrastructure**
-   - Same `tablet_orders` table and status flow from `UnifiedOrdersPanel`
-   - Same status update logic (direct Supabase update)
-   - No new database changes needed
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
 
-4. **KDS-specific features**
-   - Timer on each card showing elapsed time since order creation
-   - Cards sorted oldest-first (urgency)
-   - "Bump" button to advance status
-   - Visual alert when order exceeds time threshold (e.g., >10 min turns red)
-   - Full-screen mode support
-   - No scrolling needed — pagination by columns
+### Resultado
+
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 
