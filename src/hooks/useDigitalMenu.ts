@@ -71,7 +71,7 @@ export interface CartItem {
   selectedOptions: { groupId: string; optionId: string; name: string; price: number }[];
 }
 
-export function useDigitalMenu(unitId: string | undefined) {
+export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | 'delivery' = 'delivery') {
   const [unit, setUnit] = useState<DMUnit | null>(null);
   const [categories, setCategories] = useState<DMCategory[]>([]);
   const [groups, setGroups] = useState<DMGroup[]>([]);
