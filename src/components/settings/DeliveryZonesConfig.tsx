@@ -11,7 +11,7 @@ import { formatCurrency } from '@/lib/format';
 
 export function DeliveryZonesConfig() {
   const { activeUnitId } = useUnit();
-  const { zones, isLoading, upsertZone, deleteZone } = useDeliveryZones();
+  const { zones, isLoading, upsertZone, deleteZone, bulkAdjustTime } = useDeliveryZones();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<DeliveryZone> | null>(null);
 
@@ -22,6 +22,7 @@ export function DeliveryZonesConfig() {
       min_distance_km: lastMax,
       max_distance_km: lastMax + 5,
       fee: 5,
+      delivery_time_minutes: 60,
       is_active: true,
     });
     setSheetOpen(true);
@@ -47,12 +48,41 @@ export function DeliveryZonesConfig() {
             <AppIcon name="MapPin" size={14} className="text-primary" />
             Zonas de Entrega
           </h4>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Configure raios e taxas por distância</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Configure raios, taxas e tempos por distância</p>
         </div>
         <Button size="sm" onClick={openNew}>
           <AppIcon name="Plus" size={14} className="mr-1" /> Nova Zona
         </Button>
       </div>
+
+      {/* Global time adjuster */}
+      {zones.length > 0 && (
+        <div className="flex items-center gap-2 p-2.5 rounded-xl border border-border/20 bg-card/50">
+          <AppIcon name="Clock" size={14} className="text-muted-foreground shrink-0" />
+          <span className="text-xs text-muted-foreground flex-1">Ajustar tempo geral</span>
+          <div className="flex items-center gap-1">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-7 w-7"
+              disabled={bulkAdjustTime.isPending}
+              onClick={() => bulkAdjustTime.mutate(-10)}
+            >
+              <AppIcon name="Minus" size={14} />
+            </Button>
+            <span className="text-xs font-medium w-12 text-center text-muted-foreground">±10 min</span>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-7 w-7"
+              disabled={bulkAdjustTime.isPending}
+              onClick={() => bulkAdjustTime.mutate(10)}
+            >
+              <AppIcon name="Plus" size={14} />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <p className="text-sm text-muted-foreground py-4 text-center">Carregando...</p>
@@ -77,6 +107,7 @@ export function DeliveryZonesConfig() {
                 <p className="text-sm font-medium truncate">{zone.name || `${zone.min_distance_km}–${zone.max_distance_km} km`}</p>
                 <p className="text-xs text-muted-foreground">
                   {zone.min_distance_km}–{zone.max_distance_km} km → <span className="font-semibold text-foreground">{formatCurrency(Number(zone.fee))}</span>
+                  <span className="ml-2 text-muted-foreground">• {zone.delivery_time_minutes} min</span>
                 </p>
               </div>
               <div className="flex gap-1">
@@ -130,16 +161,29 @@ export function DeliveryZonesConfig() {
                 />
               </div>
             </div>
-            <div>
-              <Label>Taxa (R$)</Label>
-              <Input
-                type="number"
-                step="0.50"
-                min="0"
-                value={editing?.fee ?? 0}
-                onChange={e => setEditing(prev => prev ? { ...prev, fee: parseFloat(e.target.value) || 0 } : prev)}
-                placeholder="0.00"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Taxa (R$)</Label>
+                <Input
+                  type="number"
+                  step="0.50"
+                  min="0"
+                  value={editing?.fee ?? 0}
+                  onChange={e => setEditing(prev => prev ? { ...prev, fee: parseFloat(e.target.value) || 0 } : prev)}
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <Label>Tempo (min)</Label>
+                <Input
+                  type="number"
+                  step="5"
+                  min="10"
+                  value={editing?.delivery_time_minutes ?? 60}
+                  onChange={e => setEditing(prev => prev ? { ...prev, delivery_time_minutes: parseInt(e.target.value) || 60 } : prev)}
+                  placeholder="60"
+                />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Switch
