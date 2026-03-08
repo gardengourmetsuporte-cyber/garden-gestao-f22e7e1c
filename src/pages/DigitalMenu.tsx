@@ -10,6 +10,7 @@ import { MenuCart } from '@/components/digital-menu/MenuCart';
 import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
 import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
+import { MenuAccount } from '@/components/digital-menu/MenuAccount';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
 import { PrizeResult } from '@/components/gamification/PrizeResult';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -136,8 +137,8 @@ export default function DigitalMenu() {
 
   // Intercept tab changes — require auth for cart
   const handleTabChange = (tab: MenuTab) => {
-    if (tab === 'cart' && !customerUser && authChecked) {
-      setPendingTabAfterAuth('cart');
+    if ((tab === 'cart' || tab === 'account') && !customerUser && authChecked) {
+      setPendingTabAfterAuth(tab);
       setShowAuth(true);
       return;
     }
@@ -430,6 +431,26 @@ export default function DigitalMenu() {
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}
+          />
+        </div>
+      )}
+
+      {/* Account tab */}
+      {activeTab === 'account' && unitId && (
+        <div className="pt-4">
+          <MenuAccount
+            customerUser={customerUser}
+            unitId={unitId}
+            unitName={unit?.name}
+            logoUrl={unit?.store_info?.logo_url}
+            onLogin={() => {
+              setPendingTabAfterAuth('account');
+              setShowAuth(true);
+            }}
+            onLogout={() => {
+              setCustomerUser(null);
+              setActiveTab('home');
+            }}
           />
         </div>
       )}
