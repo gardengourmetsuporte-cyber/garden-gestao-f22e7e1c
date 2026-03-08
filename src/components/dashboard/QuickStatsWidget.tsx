@@ -32,7 +32,7 @@ export function QuickStatsWidget() {
       icon: 'Gift',
       variant: stats.pendingRedemptions > 0 ? 'success' : 'default',
     },
-  ] as any[];
+  ];
 
   return (
     <DashboardSection
