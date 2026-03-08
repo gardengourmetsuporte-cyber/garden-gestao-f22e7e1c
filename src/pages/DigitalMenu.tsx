@@ -435,6 +435,26 @@ export default function DigitalMenu() {
         </div>
       )}
 
+      {/* Account tab */}
+      {activeTab === 'account' && unitId && (
+        <div className="pt-4">
+          <MenuAccount
+            customerUser={customerUser}
+            unitId={unitId}
+            unitName={unit?.name}
+            logoUrl={unit?.store_info?.logo_url}
+            onLogin={() => {
+              setPendingTabAfterAuth('account');
+              setShowAuth(true);
+            }}
+            onLogout={() => {
+              setCustomerUser(null);
+              setActiveTab('home');
+            }}
+          />
+        </div>
+      )}
+
       {/* Game tab */}
       {activeTab === 'game' && (
         <div className="px-5 pt-6 pb-28 flex flex-col items-center gap-6">
