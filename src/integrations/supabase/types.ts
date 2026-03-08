@@ -1481,6 +1481,53 @@ export type Database = {
           },
         ]
       }
+      delivery_zones: {
+        Row: {
+          created_at: string
+          fee: number
+          id: string
+          is_active: boolean
+          max_distance_km: number
+          min_distance_km: number
+          name: string
+          sort_order: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fee?: number
+          id?: string
+          is_active?: boolean
+          max_distance_km?: number
+          min_distance_km?: number
+          name?: string
+          sort_order?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fee?: number
+          id?: string
+          is_active?: boolean
+          max_distance_km?: number
+          min_distance_km?: number
+          name?: string
+          sort_order?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_zones_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_payments: {
         Row: {
           advance_deduction: number | null
