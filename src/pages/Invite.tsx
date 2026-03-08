@@ -86,28 +86,44 @@ export default function Invite() {
       const hasExistingUnits = (count ?? 0) > 0;
 
       // Use access level from invite, or fall back to default
-      let accessLevelId = (invite as any).access_level_id || null;
+      let accessLevelId = invite.access_level_id || null;
       if (!accessLevelId) {
-        const { data: defaultLevel } = await supabase
+        const { data: defaultLevel, error: defaultLevelError } = await supabase
           .from('access_levels')
           .select('id')
           .eq('unit_id', invite!.unit_id)
           .eq('is_default', true)
           .maybeSingle();
+
+        if (defaultLevelError) {
+          throw defaultLevelError;
+        }
+
         accessLevelId = defaultLevel?.id || null;
       }
 
-      // Create user_units association with access level
-      await supabase.from('user_units').insert({
+      // Create/update user_units association with access level
+      const { error: upsertUserUnitError } = await supabase.from('user_units').upsert({
         user_id: userId,
         unit_id: invite!.unit_id,
         role: invite!.role || 'member',
         is_default: !hasExistingUnits,
         access_level_id: accessLevelId,
-      });
+      }, { onConflict: 'user_id,unit_id' });
+
+      if (upsertUserUnitError) {
+        throw upsertUserUnitError;
+      }
 
       // Mark invite as accepted
-      await supabase.from('invites').update({ accepted_at: new Date().toISOString() }).eq('id', invite!.id);
+      const { error: acceptInviteError } = await supabase
+        .from('invites')
+        .update({ accepted_at: new Date().toISOString() })
+        .eq('id', invite!.id);
+
+      if (acceptInviteError) {
+        throw acceptInviteError;
+      }
 
       // Refresh units so ProtectedRoute won't redirect to onboarding
       await refetchUnits();
