@@ -50,6 +50,9 @@ export interface MenuProduct {
   custom_prices: any[] | null;
   created_at: string;
   option_group_count?: number;
+  recipe_id?: string | null;
+  profit_margin?: number | null;
+  cost_per_portion?: number;
 }
 
 export interface MenuOptionGroup {

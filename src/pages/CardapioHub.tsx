@@ -17,7 +17,9 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
+import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
 import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
+import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,7 +33,7 @@ const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettin
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
 
-type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
+type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio' | 'receitas';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
@@ -59,6 +61,11 @@ export default function CardapioHub() {
 
   // Rodízio settings
   const { settings: rodizioSettings, loading: rodizioLoading } = useRodizioSettings();
+
+  // Recipe sync
+  const recipeSync = useRecipeMenuSync(products, groups, () => {
+    menuAdmin.fetchProducts();
+  });
 
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
@@ -92,7 +99,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config') {
+    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config' || cardapioTab === 'receitas') {
       return null;
     }
     if (cardapioTab === 'opcionais') {
@@ -225,6 +232,7 @@ export default function CardapioHub() {
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-full">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
+                { id: 'receitas' as CardapioTab, label: 'Receitas', icon: 'ChefHat', count: recipeSync.syncableRecipes.length },
                 { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
                 { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
               ]).map(tab => (
@@ -289,7 +297,18 @@ export default function CardapioHub() {
             </div>
           )}
 
-          {/* ==================== RODÍZIO ==================== */}
+          {/* ==================== RECEITAS (SYNC) ==================== */}
+          {cardapioTab === 'receitas' && (
+            <RecipeSyncPanel
+              recipes={recipeSync.syncableRecipes}
+              groups={groups}
+              syncing={recipeSync.syncing}
+              alreadySyncedCount={recipeSync.alreadySyncedCount}
+              onSync={(ids, groupId, margin, override) => recipeSync.syncRecipes({ recipeIds: ids, groupId, margin, overrideExisting: override })}
+              onRefreshCosts={recipeSync.refreshCosts}
+            />
+          )}
+
           {cardapioTab === 'rodizio' && (
             <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /></div>}>
               <RodizioSettingsLazy />
