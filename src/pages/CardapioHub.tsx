@@ -409,6 +409,7 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
               >
                 <AppIcon name="ExternalLink" size={13} className="text-primary" />
               </a>
+            </div>
           </div>
 
           {/* KDS - Cozinha */}
