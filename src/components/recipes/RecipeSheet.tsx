@@ -60,6 +60,7 @@ interface RecipeSheetProps {
   onSave: (data: any) => Promise<void>;
   isSaving: boolean;
   defaultCategoryId?: string | null;
+  defaultName?: string;
   onUpdateItemPrice?: (itemId: string, newPrice: number) => Promise<void>;
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
 }
