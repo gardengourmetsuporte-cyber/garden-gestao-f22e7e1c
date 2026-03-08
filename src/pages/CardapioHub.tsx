@@ -380,8 +380,8 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
 
           {/* Cardápio Tablet */}
           <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-accent/50 flex items-center justify-center shrink-0">
-              <AppIcon name="Tablet" size={18} className="text-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <AppIcon name="Tablet" size={18} className="text-primary" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-foreground truncate">Cardápio Tablet</p>
@@ -404,9 +404,9 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
                 href={tabletUrl}
                 target="_blank"
                 rel="noopener"
-                className="w-7 h-7 rounded-lg bg-accent/50 hover:bg-accent flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
               >
-                <AppIcon name="ExternalLink" size={13} className="text-foreground" />
+                <AppIcon name="ExternalLink" size={13} className="text-primary" />
               </a>
             </div>
           </div>
