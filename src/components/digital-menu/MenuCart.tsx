@@ -23,10 +23,11 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
 
-  // Delivery fields — pre-fill from logged-in user
+  // Delivery fields — pre-fill from logged-in user + saved customer data
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [saveAddress, setSaveAddress] = useState(true);
 
   useEffect(() => {
     if (customerUser) {
@@ -34,8 +35,26 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
       const phone = customerUser.phone || '';
       setCustomerName(prev => prev || name);
       setCustomerPhone(prev => prev || phone);
+
+      // Load saved address from customer record
+      const email = customerUser.email;
+      if (email) {
+        supabase
+          .from('customers')
+          .select('phone, notes')
+          .eq('unit_id', unitId)
+          .eq('email', email)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data) {
+              if (data.phone) setCustomerPhone(prev => prev || formatPhone(data.phone!));
+              // Use notes field to store saved address
+              if (data.notes) setCustomerAddress(prev => prev || data.notes!);
+            }
+          });
+      }
     }
-  }, [customerUser]);
+  }, [customerUser, unitId]);
 
   const formatPhone = (val: string) => {
     const digits = val.replace(/\D/g, '').slice(0, 11);
@@ -127,6 +146,18 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
+      // Save address to customer record for next time
+      if (saveAddress && customerUser?.email && customerAddress.trim()) {
+        await supabase
+          .from('customers')
+          .update({
+            notes: customerAddress.trim(),
+            phone: customerPhone.replace(/\D/g, ''),
+          })
+          .eq('unit_id', unitId)
+          .eq('email', customerUser.email);
+      }
+
       toast.success('Pedido enviado com sucesso!');
       setOrderSent((order as any).id.slice(0, 8));
     } catch (err: any) {
@@ -205,6 +236,17 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
           className="rounded-xl resize-none"
           rows={2}
         />
+        {customerUser && (
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={saveAddress}
+              onChange={e => setSaveAddress(e.target.checked)}
+              className="w-4 h-4 rounded border-border accent-primary"
+            />
+            <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
+          </label>
+        )}
       </div>
 
       <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
