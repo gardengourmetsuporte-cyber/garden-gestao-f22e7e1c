@@ -71,6 +71,7 @@ const BrandCore = lazy(() => lazyRetry(() => import("./pages/BrandCore")));
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const Deliveries = lazy(() => lazyRetry(() => import("./pages/Deliveries")));
 const DeliveryHub = lazy(() => lazyRetry(() => import("./pages/DeliveryHub")));
+const PDV = lazy(() => lazyRetry(() => import("./pages/PDV")));
 
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
@@ -250,6 +251,7 @@ function AuthenticatedRoutes() {
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
           <Route path="/delivery-hub" element={<ProtectedRoute><DeliveryHub /></ProtectedRoute>} />
+          <Route path="/pdv" element={<ProtectedRoute><PDV /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
           <Route path="/gamification" element={<Navigate to="/cardapio" replace />} />
