@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { normalizePhone } from '@/lib/normalizePhone';
+import gardenLogo from '@/assets/logo.png';
 import type { GamificationPrize } from '@/hooks/useGamification';
 
 export default function DigitalMenu() {
@@ -57,7 +58,6 @@ export default function DigitalMenu() {
       if (!isEnabled) { toast.error('Jogo desativado no momento'); return; }
       if (await checkAlreadyPlayed(gameOrderId.trim())) { toast.error('Este pedido já participou!'); return; }
       if (await checkDailyCostExceeded()) { toast.error('Limite diário atingido!'); return; }
-      // Upsert customer
       if (unitId) {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data: existing } = await supabase
@@ -101,11 +101,11 @@ export default function DigitalMenu() {
 
   if (loading) {
     return (
-      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-card border border-border/40 shadow-lg flex items-center justify-center animate-pulse">
-          <AppIcon name="MenuBook" size={28} className="text-primary" />
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
+        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
+          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
         </div>
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1.5">
           <p className="text-sm font-semibold text-foreground">Carregando cardápio...</p>
           <div className="flex gap-1 mt-2">
             <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -117,7 +117,6 @@ export default function DigitalMenu() {
     );
   }
 
-  // Derive logo initials for fallback
   const unitInitials = unit?.name
     ?.split(' ')
     .slice(0, 2)
@@ -127,16 +126,16 @@ export default function DigitalMenu() {
 
   return (
     <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative">
-      {/* Home tab: Landing + search + featured */}
+      {/* Home tab */}
       {activeTab === 'home' && (
         <div>
           <MenuLanding unit={unit} unitInitials={unitInitials} />
 
           {/* Quick search bar */}
-          <div className="px-4 md:px-8 mt-5">
+          <div className="px-5 md:px-8 mt-5">
             <button
               onClick={() => { setSearchOpen(true); setActiveTab('menu'); }}
-              className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl bg-card border border-border/40 text-muted-foreground text-sm"
+              className="w-full flex items-center gap-2.5 px-4 py-3.5 rounded-2xl bg-card border border-border/40 text-muted-foreground text-sm active:scale-[0.98] transition-transform"
             >
               <AppIcon name="Search" size={16} />
               Buscar no cardápio...
@@ -145,17 +144,17 @@ export default function DigitalMenu() {
 
           {/* Featured products */}
           {products.filter(p => p.is_highlighted).length > 0 && (
-            <div className="mt-6 px-4 md:px-8">
+            <div className="mt-6 px-5 md:px-8">
               <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
                 <AppIcon name="Whatshot" size={14} className="text-primary" />
                 Destaques
               </h3>
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
                 {products.filter(p => p.is_highlighted).slice(0, 8).map(product => (
                   <button
                     key={product.id}
                     onClick={() => handleProductSelect(product)}
-                    className="shrink-0 w-36 rounded-2xl bg-card border border-border/30 overflow-hidden active:scale-[0.97] transition-transform text-left"
+                    className="shrink-0 w-[140px] rounded-2xl bg-card border border-border/30 overflow-hidden active:scale-[0.97] transition-transform text-left"
                   >
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-24 object-cover" loading="lazy" />
@@ -178,14 +177,14 @@ export default function DigitalMenu() {
 
           {/* Quick category access */}
           {categories.length > 0 && (
-            <div className="mt-6 px-4 md:px-8 pb-28">
+            <div className="mt-6 px-5 md:px-8 pb-28">
               <h3 className="text-sm font-bold text-foreground mb-3">Categorias</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
                 {categories.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => { setSelectedCategory(cat.id); setActiveTab('menu'); }}
-                    className="flex items-center gap-2.5 p-3.5 rounded-xl bg-card border border-border/30 active:scale-[0.97] transition-transform text-left"
+                    className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-card border border-border/30 active:scale-[0.97] transition-transform text-left"
                   >
                     {cat.icon && <AppIcon name={cat.icon} size={20} className="text-muted-foreground" />}
                     <span className="text-sm font-semibold text-foreground truncate">{cat.name}</span>
@@ -206,7 +205,7 @@ export default function DigitalMenu() {
             </div>
           ) : (
             <>
-              <div className="px-4 md:px-8 mb-3 flex items-center justify-between">
+              <div className="px-5 md:px-8 mb-3 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground">Cardápio</h2>
                 <button
                   onClick={() => setSearchOpen(true)}
@@ -246,13 +245,15 @@ export default function DigitalMenu() {
 
       {/* Game tab */}
       {activeTab === 'game' && (
-        <div className="px-4 pt-6 pb-28 flex flex-col items-center gap-6">
+        <div className="px-5 pt-6 pb-28 flex flex-col items-center gap-6">
           {/* Unit logo */}
-          {unit?.store_info?.logo_url && (
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/30 shadow-lg">
-              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover" />
-            </div>
-          )}
+          <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/30 shadow-lg bg-white flex items-center justify-center p-2">
+            {unit?.store_info?.logo_url ? (
+              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover rounded-xl" />
+            ) : (
+              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+            )}
+          </div>
           <div className="text-center">
             <h2 className="text-xl font-bold text-foreground">🎰 Roleta da Sorte</h2>
             <p className="text-sm text-muted-foreground mt-1">
