@@ -229,6 +229,7 @@ export function useMenuAdmin() {
           name: grp.name, category_id: grp.category_id, description: grp.description,
           availability: grp.availability || { tablet: true, delivery: true },
           schedule: grp.schedule, sort_order: grp.sort_order ?? 0, is_active: grp.is_active ?? true,
+          updated_at: new Date().toISOString(),
         }).eq('id', grp.id);
         if (error) throw error;
       } else {
@@ -272,7 +273,7 @@ export function useMenuAdmin() {
       };
 
       if (prod.id) {
-        const { error } = await supabase.from('tablet_products').update(payload).eq('id', prod.id);
+        const { error } = await supabase.from('tablet_products').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', prod.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('tablet_products').insert({ ...payload, unit_id: activeUnitId });

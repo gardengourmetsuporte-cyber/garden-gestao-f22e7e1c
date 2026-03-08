@@ -473,12 +473,19 @@ function MenuPublishBar({ unitId, products, groups }: { unitId: string; products
     },
   });
 
+  // Build a fingerprint of all relevant data to detect ANY change
+  const dataFingerprint = useMemo(() => {
+    const prodParts = products.map(p => `${p.id}:${p.updated_at}:${p.is_active}:${JSON.stringify(p.availability)}`).join('|');
+    const grpParts = groups.map(g => `${g.id}:${g.updated_at}:${g.is_active}:${JSON.stringify(g.availability)}`).join('|');
+    return `${prodParts}__${grpParts}`;
+  }, [products, groups]);
+
   const hasUnpublished = useMemo(() => {
     if (!publishedAt) return products.length > 0 || groups.length > 0;
     const pubDate = new Date(publishedAt).getTime();
     return products.some(p => new Date(p.updated_at).getTime() > pubDate) ||
            groups.some(g => new Date(g.updated_at).getTime() > pubDate);
-  }, [publishedAt, products, groups]);
+  }, [publishedAt, products, groups, dataFingerprint]);
 
   const publish = useMutation({
     mutationFn: async () => {
@@ -498,18 +505,16 @@ function MenuPublishBar({ unitId, products, groups }: { unitId: string; products
   if (!hasUnpublished) return null;
 
   return (
-    <div className="px-4 pt-2 lg:px-6">
-      <button
-        onClick={() => publish.mutate()}
-        disabled={publish.isPending}
-        className="w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm active:scale-[0.97] transition-all disabled:opacity-60"
-      >
-        <AppIcon name="Upload" size={16} />
-        {publish.isPending ? 'Publicando...' : 'Publicar Cardápio'}
-        <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground text-[10px] ml-1">
-          Alterações pendentes
-        </Badge>
-      </button>
-    </div>
+    <button
+      onClick={() => publish.mutate()}
+      disabled={publish.isPending}
+      className="w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm active:scale-[0.97] transition-all disabled:opacity-60"
+    >
+      <AppIcon name="Upload" size={16} />
+      {publish.isPending ? 'Publicando...' : 'Publicar Cardápio'}
+      <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground text-[10px] ml-1">
+        Alterações pendentes
+      </Badge>
+    </button>
   );
 }
