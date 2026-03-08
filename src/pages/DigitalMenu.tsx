@@ -45,11 +45,13 @@ export default function DigitalMenu() {
   const [showAuth, setShowAuth] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
+  const [menuEntered, setMenuEntered] = useState(false);
 
   // Check auth state on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setCustomerUser(session?.user ?? null);
+      if (session?.user) setMenuEntered(true);
       setAuthChecked(true);
     });
 
@@ -61,6 +63,7 @@ export default function DigitalMenu() {
       // After OAuth login, check if customer profile is complete
       if (user && unitId && _event === 'SIGNED_IN') {
         setShowAuth(false);
+        setMenuEntered(true);
         const needsProfile = await checkNeedsProfile(user, unitId);
         if (needsProfile) {
           setShowProfile(true);
@@ -209,12 +212,38 @@ export default function DigitalMenu() {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
-  // Show auth screen
+  // Compute open/closed status for welcome screen
+  const isOpen = (() => {
+    const hours = unit?.store_info?.opening_hours;
+    if (!hours?.length) return true;
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    return hours.some(h => currentTime >= h.open && currentTime <= h.close);
+  })();
+
+  // Welcome gate: show auth/entry screen before entering the menu
+  if (!menuEntered && !showProfile && authChecked && !customerUser) {
+    return (
+      <MenuCustomerAuth
+        unitName={unit?.name}
+        logoUrl={unit?.store_info?.logo_url}
+        cuisineType={unit?.store_info?.cuisine_type}
+        city={unit?.store_info?.city}
+        isOpen={isOpen}
+        onSkip={() => setMenuEntered(true)}
+      />
+    );
+  }
+
+  // Show auth screen (from cart/account requiring login)
   if (showAuth) {
     return (
       <MenuCustomerAuth
         unitName={unit?.name}
         logoUrl={unit?.store_info?.logo_url}
+        cuisineType={unit?.store_info?.cuisine_type}
+        city={unit?.store_info?.city}
+        isOpen={isOpen}
         onSkip={() => {
           setShowAuth(false);
           if (pendingTabAfterAuth) {
