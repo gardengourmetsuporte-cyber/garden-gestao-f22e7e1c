@@ -173,61 +173,8 @@ export default function CardapioHub() {
             </div>
           </header>
 
-          <div className="px-4 py-3 lg:px-6 space-y-4">
-            {/* Stats row */}
-            {pdvConfig?.is_active && (
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { icon: 'Send', value: todayStats.sent, label: 'Enviados', color: 'text-success' },
-                  { icon: 'AlertCircle', value: todayStats.errors, label: 'Erros', color: 'text-destructive' },
-                  { icon: 'Clock', value: todayStats.pending, label: 'Pendentes', color: 'text-warning' },
-                ].map(s => (
-                  <div key={s.label} className="card-base p-3 text-center">
-                    <AppIcon name={s.icon as any} size={16} className={`mx-auto ${s.color} mb-1`} />
-                    <p className="text-lg font-bold text-foreground">{s.value}</p>
-                    <p className="text-[10px] text-muted-foreground">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {orders.length === 0 ? (
-              <EmptyState icon="QrCode" title="Nenhum pedido ainda" subtitle="Os pedidos feitos no cardápio digital aparecerão aqui" />
-            ) : (
-              orders.map(order => (
-                <div key={order.id} className="card-base p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">Mesa {order.table_number}</span>
-                      <Badge className={statusColor[order.status] || 'bg-secondary'}>
-                        {statusLabel[order.status] || order.status}
-                      </Badge>
-                    </div>
-                    <span className="font-bold text-primary">{formatPrice(order.total)}</span>
-                  </div>
-                  {order.tablet_order_items && (
-                    <div className="text-xs text-muted-foreground space-y-0.5">
-                      {order.tablet_order_items.map((item: any) => (
-                        <p key={item.id}>{item.quantity}x {item.tablet_products?.name || '?'}</p>
-                      ))}
-                    </div>
-                  )}
-                  {order.error_message && (
-                    <p className="text-xs text-destructive flex items-center gap-1">
-                      <AppIcon name="AlertCircle" size={12} /> {order.error_message}
-                    </p>
-                  )}
-                  {order.status === 'error' && (
-                    <Button size="sm" variant="outline" onClick={() => retryPDV(order.id)}>
-                      <AppIcon name="RefreshCw" size={14} className="mr-1" /> Reenviar
-                    </Button>
-                  )}
-                  <p className="text-[10px] text-muted-foreground">
-                    {new Date(order.created_at).toLocaleString('pt-BR')}
-                  </p>
-                </div>
-              ))
-            )}
+          <div className="px-4 py-3 lg:px-6">
+            <UnifiedOrdersPanel unitId={activeUnit?.id} onRetryPDV={retryPDV} />
           </div>
         </div>
       </AppLayout>
