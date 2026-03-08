@@ -137,8 +137,8 @@ export default function DigitalMenu() {
 
   // Intercept tab changes — require auth for cart
   const handleTabChange = (tab: MenuTab) => {
-    if (tab === 'cart' && !customerUser && authChecked) {
-      setPendingTabAfterAuth('cart');
+    if ((tab === 'cart' || tab === 'account') && !customerUser && authChecked) {
+      setPendingTabAfterAuth(tab);
       setShowAuth(true);
       return;
     }
