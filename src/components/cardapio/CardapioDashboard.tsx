@@ -38,21 +38,6 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
     enabled: !!unitId,
   });
 
-  const [editingDeliveryTime, setEditingDeliveryTime] = useState(false);
-  const [deliveryTimeValue, setDeliveryTimeValue] = useState('');
-
-  const saveDeliveryTime = useMutation({
-    mutationFn: async (value: string) => {
-      if (!unitId) throw new Error('No unit');
-      const updated = { ...(storeInfo || {}), delivery_time: value };
-      await supabase.from('units').update({ store_info: updated }).eq('id', unitId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['store-info', unitId] });
-      setEditingDeliveryTime(false);
-      toast.success('Tempo de entrega atualizado');
-    },
-  });
 
   // Order stats
   const todayStats = useMemo(() => {
