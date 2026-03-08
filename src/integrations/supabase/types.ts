@@ -5818,6 +5818,16 @@ export type Database = {
         }
         Returns: number
       }
+      upsert_menu_customer: {
+        Args: {
+          p_birthday?: string
+          p_email?: string
+          p_name: string
+          p_phone?: string
+          p_unit_id: string
+        }
+        Returns: string
+      }
       user_has_unit_access: {
         Args: { _unit_id: string; _user_id: string }
         Returns: boolean
