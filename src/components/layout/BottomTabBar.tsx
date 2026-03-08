@@ -269,7 +269,7 @@ function ConfigButton({ slotWidth, active, onClick }: { slotWidth: string; activ
   return (
     <button
       onClick={onClick}
-      aria-label="Configurações"
+      aria-label="Mais"
       className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative"
       style={{ width: slotWidth }}
     >
@@ -297,9 +297,9 @@ function ConfigButton({ slotWidth, active, onClick }: { slotWidth: string; activ
             background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
           }}
         />
-        <AppIcon name="Settings" size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : 'text-muted-foreground')} />
+        <AppIcon name="Menu" size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : 'text-muted-foreground')} />
       </div>
-      <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal text-muted-foreground")}>Config</span>
+      <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal text-muted-foreground")}>Mais</span>
     </button>
   );
 }
