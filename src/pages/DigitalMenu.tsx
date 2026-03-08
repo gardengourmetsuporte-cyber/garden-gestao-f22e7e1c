@@ -52,21 +52,30 @@ export default function DigitalMenu() {
       setAuthChecked(true);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const user = session?.user ?? null;
       setCustomerUser(user);
       setAuthChecked(true);
 
-      // If user just logged in and we had a pending tab, go there
-      if (user && pendingTabAfterAuth) {
+      // After OAuth login, check if customer profile is complete
+      if (user && unitId && _event === 'SIGNED_IN') {
         setShowAuth(false);
-        setActiveTab(pendingTabAfterAuth);
-        setPendingTabAfterAuth(null);
+        const needsProfile = await checkNeedsProfile(user, unitId);
+        if (needsProfile) {
+          setShowProfile(true);
+        } else {
+          if (pendingTabAfterAuth) {
+            setActiveTab(pendingTabAfterAuth);
+            setPendingTabAfterAuth(null);
+          }
+        }
+        await ensureCustomerRecord(user, unitId);
       }
 
-      // Auto-create customer record after OAuth login
-      if (user && unitId && _event === 'SIGNED_IN') {
-        ensureCustomerRecord(user, unitId);
+      // If user already logged in (page refresh), just proceed
+      if (user && !showAuth && pendingTabAfterAuth && _event !== 'SIGNED_IN') {
+        setActiveTab(pendingTabAfterAuth);
+        setPendingTabAfterAuth(null);
       }
     });
 
