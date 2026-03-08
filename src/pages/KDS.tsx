@@ -157,7 +157,7 @@ function OrderCard({
   );
 }
 
-// ─── Order Detail Overlay ─────────────────────────────────────────
+// ─── Order Detail (Full-screen for better KDS visibility) ─────────
 function OrderDetail({
   order, onClose, onBump,
 }: {
@@ -170,89 +170,113 @@ function OrderDetail({
   const source = order.source || 'mesa';
   const items = order.tablet_order_items || [];
   const shortId = order.id.slice(0, 4).toUpperCase();
+  const mins = Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60_000);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
-      <div
-        className={cn(
-          'w-full max-w-lg rounded-3xl border overflow-hidden shadow-2xl',
-          a.border, 'bg-[hsl(240,10%,7%)]',
-        )}
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className={cn('flex items-center justify-between px-5 py-4 border-b border-white/5', a.bg)}>
-          <div className="flex items-center gap-3">
-            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', a.bg, 'ring-1', a.ring)}>
-              <Hash className={cn('w-5 h-5', a.text)} />
-            </div>
-            <div>
-              <h2 className="text-xl font-black text-white">#{shortId}</h2>
-              <span className={cn('text-xs font-bold uppercase tracking-wider', a.text)}>{cfg.label}</span>
-            </div>
+    <div className="fixed inset-0 z-50 flex flex-col bg-[hsl(240,10%,4%)] animate-in fade-in slide-in-from-bottom-4 duration-200">
+      {/* ── Header ── */}
+      <header className={cn('flex items-center justify-between px-5 py-4 border-b border-white/[0.06] shrink-0', a.bg)}>
+        <div className="flex items-center gap-4">
+          <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center', a.bg, 'ring-2', a.ring)}>
+            <span className={cn('text-2xl font-black', a.text)}>#{shortId}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <ElapsedBadge createdAt={order.created_at} />
-            <button onClick={onClose} className="p-2 rounded-xl hover:bg-white/10 transition-colors">
-              <X className="w-5 h-5 text-white/60" />
-            </button>
-          </div>
-        </div>
-
-        {/* Info row */}
-        <div className="flex items-center gap-4 px-5 py-3 border-b border-white/5 text-sm">
-          <div className="flex items-center gap-1.5 text-white/70">
-            {source === 'delivery' ? <Truck className="w-4 h-4 text-blue-400" /> : <UtensilsCrossed className="w-4 h-4 text-emerald-400" />}
-            <span className="font-semibold">{source === 'delivery' ? 'Delivery' : `Mesa ${order.table_number}`}</span>
-          </div>
-          {order.customer_name && (
-            <div className="flex items-center gap-1.5 text-white/50">
-              <User className="w-3.5 h-3.5" />
-              <span>{order.customer_name}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1.5 text-white/40 ml-auto">
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
-          </div>
-        </div>
-
-        {/* Items list */}
-        <div className="px-5 py-4 space-y-3 max-h-[50vh] overflow-y-auto">
-          {items.map(item => (
-            <div key={item.id} className="flex items-start gap-3 rounded-xl bg-white/[0.03] p-3">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className={cn('text-sm font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg', a.bg, a.text, 'ring-1', a.ring)}>
+                {cfg.label}
+              </span>
               <span className={cn(
-                'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black shrink-0',
-                a.bg, a.text,
+                'inline-flex items-center gap-1.5 text-sm font-mono font-bold px-2.5 py-1 rounded-lg',
+                mins >= 15 ? 'bg-red-500/20 text-red-400 animate-pulse' :
+                mins >= 10 ? 'bg-orange-500/15 text-orange-400' :
+                'bg-white/5 text-white/50',
               )}>
-                {item.quantity}
+                <Clock className="w-4 h-4" />
+                {mins} min
+              </span>
+            </div>
+            <p className="text-xs text-white/40 mt-1">
+              Criado {format(new Date(order.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
+            </p>
+          </div>
+        </div>
+        <button onClick={onClose} className="p-3 rounded-2xl hover:bg-white/10 transition-colors active:scale-95">
+          <X className="w-7 h-7 text-white/60" />
+        </button>
+      </header>
+
+      {/* ── Info bar ── */}
+      <div className="flex items-center gap-6 px-5 py-3 border-b border-white/[0.06] bg-white/[0.02] shrink-0">
+        <div className="flex items-center gap-2">
+          {source === 'delivery' ? <Truck className="w-5 h-5 text-blue-400" /> : <UtensilsCrossed className="w-5 h-5 text-emerald-400" />}
+          <span className="text-base font-bold text-white/80">
+            {source === 'delivery' ? 'Delivery' : `Mesa ${order.table_number}`}
+          </span>
+        </div>
+        {order.customer_name && (
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-white/40" />
+            <span className="text-base text-white/60 font-medium">{order.customer_name}</span>
+          </div>
+        )}
+        <div className="flex items-center gap-2 ml-auto">
+          <ShoppingBag className="w-4 h-4 text-white/40" />
+          <span className="text-sm text-white/50 font-semibold">{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
+        </div>
+      </div>
+
+      {/* ── Items list (scrollable, large) ── */}
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="grid gap-3 max-w-3xl mx-auto">
+          {items.map((item, idx) => (
+            <div key={item.id} className={cn(
+              'flex items-start gap-4 rounded-2xl p-4 border transition-colors',
+              'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.05]',
+            )}>
+              <span className={cn(
+                'w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black shrink-0',
+                a.bg, a.text, 'ring-1', a.ring,
+              )}>
+                {item.quantity}x
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white/90">{item.tablet_products?.name || 'Item'}</p>
+                <p className="text-lg font-bold text-white/90 leading-snug">{item.tablet_products?.name || 'Item'}</p>
                 {item.tablet_products?.codigo_pdv && (
-                  <p className="text-[10px] text-white/30 font-mono">COD: {item.tablet_products.codigo_pdv}</p>
+                  <p className="text-xs text-white/30 font-mono mt-0.5">COD PDV: {item.tablet_products.codigo_pdv}</p>
                 )}
                 {item.notes && (
-                  <p className="text-xs text-amber-400/80 mt-1">⚠ {item.notes}</p>
+                  <div className="mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <p className="text-sm text-amber-400/90 font-medium">⚠ {item.notes}</p>
+                  </div>
                 )}
               </div>
+              {/* Future: ficha técnica button per item */}
             </div>
           ))}
           {items.length === 0 && (
-            <p className="text-sm text-white/20 text-center py-6">Nenhum item neste pedido</p>
+            <div className="flex flex-col items-center justify-center py-12 text-white/20">
+              <ShoppingBag className="w-10 h-10 mb-2" />
+              <p className="text-sm font-medium">Nenhum item neste pedido</p>
+            </div>
           )}
         </div>
+      </div>
 
-        {/* Footer */}
-        <div className="px-5 pb-5 pt-2 flex items-center gap-3">
-          <p className="text-[10px] text-white/30 flex-1">
-            Criado {format(new Date(order.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
-          </p>
+      {/* ── Footer with actions ── */}
+      <div className="shrink-0 border-t border-white/[0.06] bg-[hsl(240,10%,5%)] px-5 py-4">
+        <div className="max-w-3xl mx-auto flex items-center gap-3">
+          <button
+            onClick={onClose}
+            className="px-6 py-3.5 rounded-xl text-sm font-bold text-white/60 bg-white/5 hover:bg-white/10 transition-colors active:scale-[0.97]"
+          >
+            Voltar
+          </button>
+          <div className="flex-1" />
           {cfg.next && (
             <button
               onClick={() => { onBump(order.id, cfg.next!); onClose(); }}
               className={cn(
-                'px-8 py-3 rounded-xl text-sm font-black text-black tracking-wide transition-all active:scale-[0.97]',
+                'px-10 py-3.5 rounded-xl text-base font-black text-black tracking-wide transition-all active:scale-[0.97] shadow-lg',
                 a.btn,
               )}
             >
