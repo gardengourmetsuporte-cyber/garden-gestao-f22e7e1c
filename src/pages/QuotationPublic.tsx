@@ -29,6 +29,7 @@ interface QuotationData {
   existing_prices: { quotation_item_id: string; unit_price: number; brand: string | null; round: number }[];
   contested_item_ids: string[];
   last_prices: LastPrice[];
+  portal_token: string | null;
 }
 
 const SESSION_KEY = 'supplier_session';
