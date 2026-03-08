@@ -33,7 +33,8 @@ export default function CardapioHub() {
   const { activeUnit } = useUnit();
   const [searchParams, setSearchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
-  const isDashboard = searchParams.get('tab') === 'dashboard';
+  const isProdutos = searchParams.get('tab') === 'produtos';
+  const isDashboard = !searchParams.get('tab') && !searchParams.get('section');
   const isConfigFromUrl = searchParams.get('section') === 'config';
 
   // Menu admin hook
