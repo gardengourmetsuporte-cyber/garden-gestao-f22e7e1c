@@ -234,7 +234,6 @@ export default function DigitalMenu() {
             cart={cart}
             cartTotal={cartTotal}
             unitId={unitId}
-            mesa={mesa}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}

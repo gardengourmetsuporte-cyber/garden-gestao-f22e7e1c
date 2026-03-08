@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { AppIcon } from '@/components/ui/app-icon';
+import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
@@ -15,23 +15,14 @@ interface Props {
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
+  onClose: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, onClear }: Props) {
+export function TabletMenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, onClear, onClose }: Props) {
+  const [tableNumber, setTableNumber] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
-
-  // Delivery fields
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [customerAddress, setCustomerAddress] = useState('');
-
-  const formatPhone = (val: string) => {
-    const digits = val.replace(/\D/g, '').slice(0, 11);
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-  };
 
   if (orderSent) {
     return (
@@ -45,7 +36,7 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
           </p>
           <p className="text-muted-foreground text-xs mt-1">
-            {customerName || 'Delivery'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            Mesa {tableNumber} • {customerName} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -54,12 +45,12 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
               <AppIcon name="Schedule" size={20} className="text-amber-500" />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-foreground">Aguardando confirmação</p>
-              <p className="text-xs text-muted-foreground">O estabelecimento confirmará seu pedido em breve</p>
+              <p className="font-semibold text-foreground">Aguardando preparo</p>
+              <p className="text-xs text-muted-foreground">Seu pedido está sendo preparado</p>
             </div>
           </div>
         </div>
-        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); }}>
+        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); onClose(); }}>
           <AppIcon name="Plus" size={18} className="mr-2" />
           Fazer novo pedido
         </Button>
@@ -82,9 +73,8 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
   }
 
   const handleSend = async () => {
+    if (!tableNumber.trim()) { toast.error('Informe o número da mesa'); return; }
     if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
-    if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
-    if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
 
     setSending(true);
     try {
@@ -92,13 +82,11 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
         .from('tablet_orders')
         .insert({
           unit_id: unitId,
-          table_number: 0,
+          table_number: parseInt(tableNumber) || 0,
           status: 'awaiting_confirmation',
           total: cartTotal,
-          source: 'delivery',
+          source: 'mesa',
           customer_name: customerName.trim(),
-          customer_phone: customerPhone.replace(/\D/g, ''),
-          customer_address: customerAddress.trim(),
         })
         .select('id')
         .single();
@@ -126,7 +114,7 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
   };
 
   return (
-    <div className="px-4 pb-28 space-y-4">
+    <div className="px-4 pb-8 space-y-4 max-h-[80vh] overflow-y-auto">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-foreground">
           Seu Pedido
@@ -152,32 +140,32 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
         </div>
       </div>
 
-      {/* Delivery fields */}
+      {/* Mesa + Name fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="Bike" size={16} className="text-primary" />
-          Dados para entrega
+          <AppIcon name="TableRestaurant" size={16} className="text-primary" />
+          Identificação
         </h3>
-        <Input
-          placeholder="Seu nome *"
-          value={customerName}
-          onChange={e => setCustomerName(e.target.value)}
-          className="h-12 rounded-xl"
-        />
-        <Input
-          placeholder="Telefone *"
-          value={customerPhone}
-          onChange={e => setCustomerPhone(formatPhone(e.target.value))}
-          className="h-12 rounded-xl"
-          inputMode="tel"
-        />
-        <Textarea
-          placeholder="Endereço completo *"
-          value={customerAddress}
-          onChange={e => setCustomerAddress(e.target.value)}
-          className="rounded-xl resize-none"
-          rows={2}
-        />
+        <div>
+          <label className="text-xs font-semibold text-muted-foreground mb-1 block">Número da mesa</label>
+          <Input
+            placeholder="Ex: 5"
+            value={tableNumber}
+            onChange={e => setTableNumber(e.target.value)}
+            className="text-center h-14 text-xl font-bold rounded-xl"
+            type="number"
+            inputMode="numeric"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-semibold text-muted-foreground mb-1 block">Seu nome</label>
+          <Input
+            placeholder="Como deseja ser chamado?"
+            value={customerName}
+            onChange={e => setCustomerName(e.target.value)}
+            className="h-12 rounded-xl"
+          />
+        </div>
       </div>
 
       <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
@@ -186,57 +174,8 @@ export function MenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, 
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Finalizar Pedido • {formatPrice(cartTotal)}
+        Enviar Pedido • {formatPrice(cartTotal)}
       </Button>
-    </div>
-  );
-}
-
-// Extracted cart items list (shared visual)
-export function CartItemsList({ cart, onUpdateQuantity }: { cart: CartItem[]; onUpdateQuantity: (i: number, qty: number) => void }) {
-  return (
-    <div className="space-y-2">
-      {cart.map((item, i) => {
-        const unitPrice = item.product.price + item.selectedOptions.reduce((s, o) => s + o.price, 0);
-        return (
-          <div key={i} className="flex items-start gap-3 p-3 rounded-2xl bg-card border border-border/30">
-            {item.product.image_url ? (
-              <img src={item.product.image_url} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
-            ) : (
-              <div className="w-14 h-14 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0">
-                <AppIcon name="Package" size={18} className="text-muted-foreground/30" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">{item.product.name}</p>
-              {item.selectedOptions.length > 0 && (
-                <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                  {item.selectedOptions.map(o => o.name).join(', ')}
-                </p>
-              )}
-              {item.notes && <p className="text-[11px] text-muted-foreground/70 italic truncate">{item.notes}</p>}
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => onUpdateQuantity(i, item.quantity - 1)}
-                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform"
-                  >
-                    <AppIcon name={item.quantity === 1 ? 'Trash2' : 'Minus'} size={13} className={item.quantity === 1 ? 'text-destructive' : ''} />
-                  </button>
-                  <span className="w-7 text-center text-sm font-bold text-foreground">{item.quantity}</span>
-                  <button
-                    onClick={() => onUpdateQuantity(i, item.quantity + 1)}
-                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform"
-                  >
-                    <AppIcon name="Plus" size={13} />
-                  </button>
-                </div>
-                <p className="text-sm font-bold text-foreground">{formatPrice(unitPrice * item.quantity)}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }
