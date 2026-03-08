@@ -41,7 +41,7 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   const [address, setAddress] = useState('');
 
   useEffect(() => {
-    if (!customerUser?.email) {
+    if (!customerUser) {
       setLoading(false);
       return;
     }
@@ -49,14 +49,35 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   }, [customerUser, unitId]);
 
   const fetchCustomer = async () => {
+    if (!customerUser) return;
     setLoading(true);
     try {
-      const { data } = await supabase
+      const email = customerUser.email;
+      const phone = customerUser.phone;
+      
+      // Try by email first, then by phone
+      let query = supabase
         .from('customers')
         .select('id, name, phone, email, birthday, loyalty_points, total_orders, total_spent, segment, notes')
-        .eq('unit_id', unitId)
-        .eq('email', customerUser!.email!)
-        .maybeSingle();
+        .eq('unit_id', unitId);
+      
+      if (email) {
+        query = query.eq('email', email);
+      } else if (phone) {
+        query = query.eq('phone', phone);
+      } else {
+        // No email or phone — can't find customer
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await query.maybeSingle();
+      
+      if (error) {
+        console.error('Failed to fetch customer:', error);
+        setLoading(false);
+        return;
+      }
 
       if (data) {
         setCustomer(data as CustomerData);

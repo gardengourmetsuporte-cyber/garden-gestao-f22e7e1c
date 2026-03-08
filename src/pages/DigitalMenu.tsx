@@ -109,32 +109,37 @@ export default function DigitalMenu() {
     try {
       const email = user.email;
       const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email?.split('@')[0] || 'Cliente';
-      const phone = user.phone || null;
+
+      if (!email) return;
 
       // Check if customer already exists by email
       const { data: existing } = await supabase
         .from('customers')
         .select('id')
         .eq('unit_id', unitId)
-        .eq('email', email || '')
+        .eq('email', email)
         .maybeSingle();
 
       if (!existing) {
-        await supabase.from('customers').insert({
+        const { error } = await supabase.from('customers').insert({
           unit_id: unitId,
           name: fullName,
-          email: email || null,
-          phone,
-          origin: 'whatsapp' as any, // closest to "online/social"
+          email,
+          phone: user.phone || null,
+          origin: 'whatsapp' as any,
           score: 0,
           segment: 'new',
           loyalty_points: 0,
           total_spent: 0,
           total_orders: 0,
         });
+        // Ignore unique constraint violations (phone already exists)
+        if (error && !error.message?.includes('duplicate')) {
+          console.error('[DigitalMenu] Failed to create customer:', error);
+        }
       }
     } catch (err) {
-      console.error('[DigitalMenu] Failed to create customer record:', err);
+      console.error('[DigitalMenu] Failed to ensure customer record:', err);
     }
   };
 
@@ -260,25 +265,43 @@ export default function DigitalMenu() {
       if (!unitId) return;
       try {
         const email = customerUser.email || '';
-        // Update or insert customer record with complete data
-        const { data: existing } = await supabase
-          .from('customers')
-          .select('id')
-          .eq('unit_id', unitId)
-          .eq('email', email)
-          .maybeSingle();
+        
+        // Try to find existing customer by email or phone
+        let existing: { id: string } | null = null;
+        
+        if (email) {
+          const { data: byEmail } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('unit_id', unitId)
+            .eq('email', email)
+            .maybeSingle();
+          existing = byEmail;
+        }
+        
+        if (!existing && data.phone) {
+          const { data: byPhone } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('unit_id', unitId)
+            .eq('phone', data.phone)
+            .maybeSingle();
+          existing = byPhone;
+        }
 
         if (existing) {
-          await supabase.from('customers').update({
+          const { error } = await supabase.from('customers').update({
             name: data.name,
             phone: data.phone,
             birthday: data.birthday,
+            email: email || undefined,
           }).eq('id', existing.id);
+          if (error) throw error;
         } else {
-          await supabase.from('customers').insert({
+          const { error } = await supabase.from('customers').insert({
             unit_id: unitId,
             name: data.name,
-            email,
+            email: email || null,
             phone: data.phone,
             birthday: data.birthday,
             origin: 'whatsapp' as any,
@@ -288,6 +311,7 @@ export default function DigitalMenu() {
             total_spent: 0,
             total_orders: 0,
           });
+          if (error) throw error;
         }
 
         setShowProfile(false);
@@ -297,7 +321,8 @@ export default function DigitalMenu() {
         }
         toast.success('Cadastro completo!');
       } catch (err) {
-        toast.error('Erro ao salvar dados');
+        console.error('[DigitalMenu] Profile save error:', err);
+        toast.error('Erro ao salvar dados. Tente novamente.');
         throw err;
       }
     };
