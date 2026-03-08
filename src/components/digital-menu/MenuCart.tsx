@@ -236,6 +236,17 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
           className="rounded-xl resize-none"
           rows={2}
         />
+        {customerUser && (
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={saveAddress}
+              onChange={e => setSaveAddress(e.target.checked)}
+              className="w-4 h-4 rounded border-border accent-primary"
+            />
+            <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
+          </label>
+        )}
       </div>
 
       <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
