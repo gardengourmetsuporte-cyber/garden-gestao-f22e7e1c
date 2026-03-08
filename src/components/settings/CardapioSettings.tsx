@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useGamificationAdmin } from '@/hooks/useGamificationAdmin';
 import { useUnit } from '@/contexts/UnitContext';
@@ -15,8 +15,9 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import type { GamificationPrize } from '@/hooks/useGamification';
+import { RodizioSettings as RodizioSettingsPanel } from '@/components/settings/RodizioSettings';
 
-type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'config';
+type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
 interface CardapioSettingsProps {
   initialTab?: SettingsTab | null;
@@ -87,6 +88,7 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
   const TABS: { id: SettingsTab; label: string; icon: string; description: string }[] = [
     { id: 'pdv', label: 'Integração PDV', icon: 'Zap', description: 'Conexão com Colibri e envio automático' },
     { id: 'mesas', label: 'Mesas & QR Codes', icon: 'QrCode', description: 'Cadastrar mesas e gerar QR codes' },
+    { id: 'rodizio', label: 'Rodízio', icon: 'AllInclusive', description: 'Preço fixo, regras e categorias do rodízio' },
     { id: 'roleta', label: 'Roleta / Gamificação', icon: 'Dices', description: 'Prêmios, probabilidades e métricas' },
     { id: 'config', label: 'Geral', icon: 'Cog', description: 'Delivery, retirada e horários' },
   ];
@@ -235,6 +237,9 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
           </div>
         </div>
       )}
+
+      {/* ==================== RODÍZIO ==================== */}
+      {activeTab === 'rodizio' && <RodizioSettingsPanel />}
 
       {/* ==================== ROLETA ==================== */}
       {activeTab === 'roleta' && (

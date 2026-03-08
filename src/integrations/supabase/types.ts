@@ -3835,6 +3835,103 @@ export type Database = {
           },
         ]
       }
+      rodizio_sessions: {
+        Row: {
+          created_at: string
+          customer_name: string | null
+          expires_at: string
+          id: string
+          started_at: string
+          status: string
+          table_number: string
+          total_items_ordered: number
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_name?: string | null
+          expires_at: string
+          id?: string
+          started_at?: string
+          status?: string
+          table_number?: string
+          total_items_ordered?: number
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string | null
+          expires_at?: string
+          id?: string
+          started_at?: string
+          status?: string
+          table_number?: string
+          total_items_ordered?: number
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rodizio_sessions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rodizio_settings: {
+        Row: {
+          allowed_category_ids: string[] | null
+          allowed_group_ids: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_item_quantity: number
+          price: number
+          rules: Json | null
+          time_limit_minutes: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          allowed_category_ids?: string[] | null
+          allowed_group_ids?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_item_quantity?: number
+          price?: number
+          rules?: Json | null
+          time_limit_minutes?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          allowed_category_ids?: string[] | null
+          allowed_group_ids?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_item_quantity?: number
+          price?: number
+          rules?: Json | null
+          time_limit_minutes?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rodizio_settings_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopping_list_items: {
         Row: {
           added_by: string | null
