@@ -43,9 +43,13 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   useEffect(() => {
     if (!customerUser) {
       setLoading(false);
+      setCustomer(null);
       return;
     }
     fetchCustomer();
+    // Safety timeout to prevent infinite skeleton
+    const timeout = setTimeout(() => setLoading(false), 5000);
+    return () => clearTimeout(timeout);
   }, [customerUser, unitId]);
 
   const fetchCustomer = async () => {
@@ -196,6 +200,38 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
           <div className="h-20 rounded-2xl bg-muted animate-pulse" />
           <div className="h-20 rounded-2xl bg-muted animate-pulse" />
         </div>
+      </div>
+    );
+  }
+
+  // Logged in but no customer record found - show basic profile from auth data
+  if (!customer) {
+    const displayName = customerUser.user_metadata?.full_name || customerUser.email || 'Cliente';
+    const displayInitials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
+    return (
+      <div className="px-5 pt-6 pb-28">
+        <div className="flex flex-col items-center gap-3 mb-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+            <span className="text-2xl font-bold text-primary">{displayInitials}</span>
+          </div>
+          <div className="text-center">
+            <h2 className="text-lg font-bold text-foreground">{displayName}</h2>
+            <p className="text-sm text-muted-foreground">{customerUser.email}</p>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-card border border-border/30 p-5 text-center mb-4">
+          <AppIcon name="UserCheck" size={32} className="text-primary mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">
+            Você está logado. Faça seu primeiro pedido para ativar seu perfil de cliente.
+          </p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-destructive/10 text-destructive font-semibold text-sm active:scale-[0.98] transition-transform"
+        >
+          <AppIcon name="LogOut" size={16} />
+          Sair da conta
+        </button>
       </div>
     );
   }

@@ -326,8 +326,8 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
 
   return (
     <Sheet open={!!order} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <SheetContent side="bottom" className="max-h-[90dvh] rounded-t-3xl overflow-auto pb-safe">
-        <div className="space-y-4 pb-6">
+      <SheetContent side="bottom" className="max-h-[85dvh] rounded-t-3xl overflow-auto">
+        <div className="space-y-4 pb-10">
           {/* Header */}
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between">
