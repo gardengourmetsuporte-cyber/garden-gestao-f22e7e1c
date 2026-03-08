@@ -183,19 +183,6 @@ export default function CardapioHub() {
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
-          <header className="page-header-bar">
-            <div className="page-header-content flex items-center justify-between">
-              <h1 className="text-lg font-bold flex items-center gap-2">
-                <AppIcon name="Storefront" size={20} className="text-primary" />
-                Cardápio Digital
-              </h1>
-              {activeUnit && (
-                <a href={`/m/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1 text-xs text-primary font-medium">
-                  <AppIcon name="ExternalLink" size={14} /> Abrir
-                </a>
-              )}
-            </div>
-          </header>
           <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-28 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
             <CardapioDashboardLazy
               onNavigate={handleDashboardNavigate}
