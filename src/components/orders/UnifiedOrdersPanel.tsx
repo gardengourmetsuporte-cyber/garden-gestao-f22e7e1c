@@ -152,7 +152,7 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
       )}
 
       {activeTab === 'delivery' && (
-        <TabletOrderList orders={deliveryOrders} emptyIcon="Bike" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={deliveryOrders} emptyIcon="Truck" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'ifood' && (
