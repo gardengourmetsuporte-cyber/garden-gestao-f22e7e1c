@@ -9,7 +9,7 @@ interface Props {
   logoUrl?: string;
   defaultName?: string;
   defaultEmail?: string;
-  onComplete: (data: { name: string; phone: string; birthday: string | null }) => void;
+  onComplete: (data: { name: string; phone: string; birthday: string | null }) => Promise<void> | void;
   onBack?: () => void;
 }
 
