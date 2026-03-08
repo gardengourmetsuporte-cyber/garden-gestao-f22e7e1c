@@ -43,9 +43,13 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   useEffect(() => {
     if (!customerUser) {
       setLoading(false);
+      setCustomer(null);
       return;
     }
     fetchCustomer();
+    // Safety timeout to prevent infinite skeleton
+    const timeout = setTimeout(() => setLoading(false), 5000);
+    return () => clearTimeout(timeout);
   }, [customerUser, unitId]);
 
   const fetchCustomer = async () => {
