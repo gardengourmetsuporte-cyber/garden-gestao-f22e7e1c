@@ -107,7 +107,7 @@ export default function CardapioHub() {
       });
       setProductSheetOpen(true);
     }};
-  }, [isPedidos, isDashboard, cardapioTab, selectedGroupId]);
+  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, selectedGroupId]);
 
   useFabAction(fabAction, [fabAction]);
 
