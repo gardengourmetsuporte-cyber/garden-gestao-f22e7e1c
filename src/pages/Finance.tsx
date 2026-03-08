@@ -224,7 +224,7 @@ export default function Finance() {
     { id: 'transactions' as FinanceTab, icon: 'FileText', label: 'Transações' },
     { id: 'charts' as FinanceTab, icon: 'PieChart', label: 'Gráficos' },
     { id: 'planning' as FinanceTab, icon: 'Target', label: 'Planejar' },
-    { id: 'more' as FinanceTab, icon: 'MoreHorizontal', label: 'Mais' },
+    { id: 'more' as FinanceTab, icon: 'Menu', label: 'Mais' },
   ];
 
   return (
