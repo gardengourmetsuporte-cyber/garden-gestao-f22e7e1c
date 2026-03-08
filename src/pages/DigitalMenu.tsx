@@ -42,6 +42,7 @@ export default function DigitalMenu() {
   const [customerUser, setCustomerUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
 
   // Check auth state on mount
