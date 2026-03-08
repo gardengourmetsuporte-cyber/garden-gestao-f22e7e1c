@@ -118,7 +118,7 @@ export function RecipeSheet({
         }))
       );
     } else {
-      setName('');
+      setName(defaultName || '');
       setCategoryId('');
       setYieldQuantity('1');
       setYieldUnit('unidade');
