@@ -15,6 +15,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import type { GamificationPrize } from '@/hooks/useGamification';
+import { RodizioSettings as RodizioSettingsPanel } from '@/components/settings/RodizioSettings';
 
 type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
