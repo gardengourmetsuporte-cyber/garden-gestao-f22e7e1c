@@ -346,7 +346,7 @@ export default function TabletAdmin() {
                       {tables.map(t => (
                         <div key={t.id} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/20 border border-border/20">
                           <QRCodeSVG
-                            value={`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`}
+                            value={`${basePublicUrl}/m/${activeUnit.id}?mesa=${t.number}`}
                             size={48}
                             bgColor="transparent"
                             fgColor="currentColor"
