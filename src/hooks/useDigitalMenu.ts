@@ -82,7 +82,16 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const fetchAll = useCallback(async () => {
-    if (!unitId) return;
+    if (!unitId) {
+      setUnit(null);
+      setCategories([]);
+      setGroups([]);
+      setProducts([]);
+      setOptionGroups([]);
+      setProductOptionLinks([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [unitRes, catRes, grpRes, prodRes, ogRes, optRes, linkRes] = await Promise.all([
