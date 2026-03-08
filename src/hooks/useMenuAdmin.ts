@@ -273,7 +273,7 @@ export function useMenuAdmin() {
       };
 
       if (prod.id) {
-        const { error } = await supabase.from('tablet_products').update(payload).eq('id', prod.id);
+        const { error } = await supabase.from('tablet_products').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', prod.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('tablet_products').insert({ ...payload, unit_id: activeUnitId });
