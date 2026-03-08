@@ -13,6 +13,7 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
+import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
