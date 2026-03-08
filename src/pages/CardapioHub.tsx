@@ -57,7 +57,11 @@ export default function CardapioHub() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isConfigFromUrl) setCardapioTab('config');
+    if (isConfigFromUrl) {
+      setCardapioTab('config');
+    } else if (cardapioTab === 'config') {
+      setCardapioTab('produtos');
+    }
   }, [isConfigFromUrl]);
   const handleSelectGroup = useCallback((groupId: string) => {
     setSelectedGroupId(prev => prev === groupId ? null : groupId);
