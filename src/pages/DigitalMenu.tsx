@@ -269,6 +269,14 @@ export default function DigitalMenu() {
   if (showProfile && customerUser) {
     const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
       if (!unitId) return;
+      
+      // Timeout wrapper to prevent hanging
+      const withTimeout = <T,>(promise: Promise<T>, ms = 8000): Promise<T> =>
+        Promise.race([
+          promise,
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+        ]);
+
       try {
         const email = customerUser.email || '';
         
@@ -276,47 +284,55 @@ export default function DigitalMenu() {
         let existing: { id: string } | null = null;
         
         if (email) {
-          const { data: byEmail } = await supabase
-            .from('customers')
-            .select('id')
-            .eq('unit_id', unitId)
-            .eq('email', email)
-            .maybeSingle();
+          const { data: byEmail } = await withTimeout(
+            supabase
+              .from('customers')
+              .select('id')
+              .eq('unit_id', unitId)
+              .eq('email', email)
+              .maybeSingle()
+          );
           existing = byEmail;
         }
         
         if (!existing && data.phone) {
-          const { data: byPhone } = await supabase
-            .from('customers')
-            .select('id')
-            .eq('unit_id', unitId)
-            .eq('phone', data.phone)
-            .maybeSingle();
+          const { data: byPhone } = await withTimeout(
+            supabase
+              .from('customers')
+              .select('id')
+              .eq('unit_id', unitId)
+              .eq('phone', data.phone)
+              .maybeSingle()
+          );
           existing = byPhone;
         }
 
         if (existing) {
-          const { error } = await supabase.from('customers').update({
-            name: data.name,
-            phone: data.phone,
-            birthday: data.birthday,
-            email: email || undefined,
-          }).eq('id', existing.id);
+          const { error } = await withTimeout(
+            supabase.from('customers').update({
+              name: data.name,
+              phone: data.phone,
+              birthday: data.birthday,
+              email: email || undefined,
+            }).eq('id', existing.id)
+          );
           if (error) throw error;
         } else {
-          const { error } = await supabase.from('customers').insert({
-            unit_id: unitId,
-            name: data.name,
-            email: email || null,
-            phone: data.phone,
-            birthday: data.birthday,
-            origin: 'whatsapp' as any,
-            score: 0,
-            segment: 'new',
-            loyalty_points: 0,
-            total_spent: 0,
-            total_orders: 0,
-          });
+          const { error } = await withTimeout(
+            supabase.from('customers').insert({
+              unit_id: unitId,
+              name: data.name,
+              email: email || null,
+              phone: data.phone,
+              birthday: data.birthday,
+              origin: 'digital_menu' as any,
+              score: 0,
+              segment: 'new',
+              loyalty_points: 0,
+              total_spent: 0,
+              total_orders: 0,
+            })
+          );
           if (error) throw error;
         }
 
@@ -326,10 +342,14 @@ export default function DigitalMenu() {
           setPendingTabAfterAuth(null);
         }
         toast.success('Cadastro completo!');
-      } catch (err) {
+      } catch (err: any) {
         console.error('[DigitalMenu] Profile save error:', err);
-        toast.error('Erro ao salvar dados. Tente novamente.');
-        throw err;
+        if (err?.message === 'timeout') {
+          toast.error('Conexão lenta. Tente novamente.');
+        } else {
+          toast.error('Erro ao salvar dados. Tente novamente.');
+        }
+        // Don't re-throw — let the child reset saving state gracefully
       }
     };
 
