@@ -6,6 +6,7 @@ import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
 import { useFabAction } from '@/contexts/FabActionContext';
+import { useRodizioSettings } from '@/hooks/useRodizioSettings';
 
 // Menu components
 import { MenuCategoryTree } from '@/components/menu/MenuCategoryTree';
