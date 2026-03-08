@@ -217,12 +217,15 @@ export default function CardapioHub() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Quick Access Links */}
+        {/* Quick Access Links + Publish */}
         {activeUnit && (
-          <MenuLinksBar
-            publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
-            tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
-          />
+          <>
+            <MenuLinksBar
+              publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
+              tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
+            />
+            <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />
+          </>
         )}
 
         {cardapioTab !== 'config' && (
