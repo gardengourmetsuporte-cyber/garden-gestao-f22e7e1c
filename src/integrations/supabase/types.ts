@@ -3313,6 +3313,180 @@ export type Database = {
           },
         ]
       }
+      pos_sale_items: {
+        Row: {
+          created_at: string
+          discount: number
+          id: string
+          notes: string | null
+          product_code: string | null
+          product_id: string | null
+          product_name: string
+          quantity: number
+          sale_id: string
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          discount?: number
+          id?: string
+          notes?: string | null
+          product_code?: string | null
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          sale_id: string
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          discount?: number
+          id?: string
+          notes?: string | null
+          product_code?: string | null
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          sale_id?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sale_payments: {
+        Row: {
+          amount: number
+          change_amount: number
+          created_at: string
+          id: string
+          method: string
+          sale_id: string
+        }
+        Insert: {
+          amount?: number
+          change_amount?: number
+          created_at?: string
+          id?: string
+          method: string
+          sale_id: string
+        }
+        Update: {
+          amount?: number
+          change_amount?: number
+          created_at?: string
+          id?: string
+          method?: string
+          sale_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sale_payments_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sales: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          customer_document: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          discount: number
+          fiscal_error: string | null
+          fiscal_key: string | null
+          fiscal_number: string | null
+          fiscal_status: string | null
+          fiscal_xml: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          sale_number: number
+          source: string
+          source_order_id: string | null
+          status: string
+          subtotal: number
+          table_number: number | null
+          total: number
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          customer_document?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          fiscal_error?: string | null
+          fiscal_key?: string | null
+          fiscal_number?: string | null
+          fiscal_status?: string | null
+          fiscal_xml?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          sale_number?: number
+          source?: string
+          source_order_id?: string | null
+          status?: string
+          subtotal?: number
+          table_number?: number | null
+          total?: number
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          customer_document?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          fiscal_error?: string | null
+          fiscal_key?: string | null
+          fiscal_number?: string | null
+          fiscal_status?: string | null
+          fiscal_xml?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          sale_number?: number
+          source?: string
+          source_order_id?: string | null
+          status?: string
+          subtotal?: number
+          table_number?: number | null
+          total?: number
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sales_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
