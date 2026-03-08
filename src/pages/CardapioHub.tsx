@@ -102,7 +102,7 @@ export default function CardapioHub() {
       });
       setProductSheetOpen(true);
     }};
-  }, [isPedidos, cardapioTab, selectedGroupId]);
+  }, [isPedidos, isDashboard, cardapioTab, selectedGroupId]);
 
   useFabAction(fabAction, [fabAction]);
 
