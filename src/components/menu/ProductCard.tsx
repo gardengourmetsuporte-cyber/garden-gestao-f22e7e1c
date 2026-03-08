@@ -12,6 +12,7 @@ interface Props {
   onLinkOptions: () => void;
   onImageUpload?: (productId: string, file: File) => void;
   onToggleAvailability?: (product: MenuProduct, channel: 'tablet' | 'delivery') => void;
+  viewMode?: 'menu' | 'ficha';
 }
 
 const formatPrice = (v: number) =>
