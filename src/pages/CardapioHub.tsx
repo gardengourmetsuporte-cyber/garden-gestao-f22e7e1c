@@ -314,6 +314,13 @@ export default function CardapioHub() {
             </div>
           )}
 
+          {/* ==================== RODÍZIO ==================== */}
+          {cardapioTab === 'rodizio' && (
+            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /></div>}>
+              <RodizioSettingsLazy />
+            </Suspense>
+          )}
+
           {/* ==================== OPCIONAIS ==================== */}
           {cardapioTab === 'opcionais' && (
             <OptionGroupList
