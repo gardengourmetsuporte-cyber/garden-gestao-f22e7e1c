@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import type { GamificationPrize } from '@/hooks/useGamification';
 import { RodizioSettings as RodizioSettingsPanel } from '@/components/settings/RodizioSettings';
+import { DeliveryZonesConfig } from '@/components/settings/DeliveryZonesConfig';
+import { StoreAddressConfig } from '@/components/settings/StoreAddressConfig';
 
 type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
@@ -351,6 +353,14 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
               </div>
               <Switch defaultChecked />
             </div>
+          </div>
+
+          {/* Endereço da loja (origin para cálculo de distância) */}
+          <StoreAddressConfig />
+
+          {/* Zonas de entrega */}
+          <div className="card-base p-4">
+            <DeliveryZonesConfig />
           </div>
 
           <div className="card-base p-4 space-y-3">
