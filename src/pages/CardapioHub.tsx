@@ -462,7 +462,7 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
             </div>
             <div className="bg-white rounded-2xl p-5">
               <QRCodeSVG
-                value={qrOpen === 'public' ? publicUrl : tabletUrl}
+                value={qrOpen === 'public' ? publicUrl : qrOpen === 'tablet' ? tabletUrl : kdsUrl}
                 size={200}
                 level="H"
                 bgColor="#ffffff"
