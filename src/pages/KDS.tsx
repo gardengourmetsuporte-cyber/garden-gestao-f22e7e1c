@@ -351,10 +351,13 @@ export default function KDS() {
   }, []);
 
   const handleBump = useCallback(async (orderId: string, nextStatus: string) => {
-    const updateData: any = { status: nextStatus };
-    if (nextStatus === 'delivered') updateData.delivered_at = new Date().toISOString();
-    if (nextStatus === 'ready') updateData.ready_at = new Date().toISOString();
-    await supabase.from('tablet_orders').update(updateData).eq('id', orderId);
+    const { error } = await supabase
+      .from('tablet_orders')
+      .update({ status: nextStatus })
+      .eq('id', orderId);
+    if (error) {
+      console.error('[KDS] Bump failed:', error);
+    }
     queryClient.invalidateQueries({ queryKey: ['kds-orders', unitId] });
   }, [unitId, queryClient]);
 
