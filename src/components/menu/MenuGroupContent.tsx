@@ -85,6 +85,7 @@ export function MenuGroupContent({
               onLinkOptions={() => onLinkOptions(p.id)}
               onImageUpload={onImageUpload}
               onToggleAvailability={onToggleProductAvailability}
+              viewMode={viewMode}
             />
           ))}
         </div>

@@ -117,7 +117,11 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
 
       {/* Price + Actions */}
       <div className="text-right shrink-0 flex items-center gap-1">
-        <span className="font-bold text-sm text-primary">{formatPrice(product.price)}</span>
+        {viewMode === 'ficha' ? (
+          <FichaTecnicaOverlay product={product} />
+        ) : (
+          <span className="font-bold text-sm text-primary">{formatPrice(product.price)}</span>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="p-1.5 rounded-lg hover:bg-secondary/60 transition-opacity">
@@ -137,6 +141,41 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+    </div>
+  );
+}
+
+function FichaTecnicaOverlay({ product }: { product: MenuProduct }) {
+  const cost = (product as any).cost_per_portion || 0;
+  const hasRecipe = !!(product as any).recipe_id;
+  const margin = cost > 0 ? ((product.price - cost) / cost) * 100 : 0;
+
+  const marginColor = margin >= 200
+    ? 'bg-success/15 text-success'
+    : margin >= 100
+      ? 'bg-warning/15 text-warning'
+      : 'bg-destructive/15 text-destructive';
+
+  if (!hasRecipe) {
+    return (
+      <div className="flex flex-col items-end gap-0.5">
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-semibold">Sem ficha</span>
+        <span className="text-[10px] text-muted-foreground">{formatPrice(product.price)}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-end gap-0.5">
+      <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold", marginColor)}>
+        {margin.toFixed(0)}%
+      </span>
+      <span className="text-[10px] text-muted-foreground">
+        C: {formatPrice(cost)}
+      </span>
+      <span className="text-[10px] font-semibold text-foreground">
+        V: {formatPrice(product.price)}
+      </span>
     </div>
   );
 }
