@@ -238,7 +238,7 @@ function AuthenticatedRoutes() {
           <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/cash-closing" element={<ProtectedRoute><CashClosing /></ProtectedRoute>} />
-          <Route path="/recipes" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
+          <Route path="/recipes" element={<Navigate to="/cardapio" replace />} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
           <Route path="/cardapio" element={<ProtectedRoute><CardapioHub /></ProtectedRoute>} />
