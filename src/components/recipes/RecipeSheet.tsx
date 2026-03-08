@@ -60,6 +60,7 @@ interface RecipeSheetProps {
   onSave: (data: any) => Promise<void>;
   isSaving: boolean;
   defaultCategoryId?: string | null;
+  defaultName?: string;
   onUpdateItemPrice?: (itemId: string, newPrice: number) => Promise<void>;
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
 }
@@ -74,6 +75,7 @@ export function RecipeSheet({
   onSave,
   isSaving,
   defaultCategoryId,
+  defaultName,
   onUpdateItemPrice,
   onUpdateItemUnit,
 }: RecipeSheetProps) {
@@ -116,7 +118,7 @@ export function RecipeSheet({
         }))
       );
     } else {
-      setName('');
+      setName(defaultName || '');
       setCategoryId('');
       setYieldQuantity('1');
       setYieldUnit('unidade');
