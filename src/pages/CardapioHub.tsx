@@ -80,8 +80,8 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || cardapioTab === 'config') {
-      return null; // No primary action on orders or config
+    if (isPedidos || isDashboard || cardapioTab === 'config') {
+      return null;
     }
     if (cardapioTab === 'opcionais') {
       return { icon: 'Plus', label: 'Novo Opcional', onClick: () => {
