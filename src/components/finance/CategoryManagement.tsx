@@ -226,7 +226,7 @@ export function CategoryManagement({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
+      <Sheet nested open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
         <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl overflow-y-auto">
           <SheetHeader className="pb-4">
             <SheetTitle className="flex items-center gap-2">

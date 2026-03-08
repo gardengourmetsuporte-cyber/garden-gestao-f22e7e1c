@@ -18,17 +18,20 @@ interface SheetProps {
   modal?: boolean;
   /** When true, mobile drawer can only be closed via handle bar (not by dragging content) */
   mobileHandleOnly?: boolean;
+  /** When true, uses Vaul's NestedRoot to allow stacking drawers without closing the parent */
+  nested?: boolean;
 }
 
-const Sheet = React.forwardRef<HTMLDivElement, SheetProps>(({ children, mobileHandleOnly, ...props }, _ref) => {
+const Sheet = React.forwardRef<HTMLDivElement, SheetProps>(({ children, mobileHandleOnly, nested, ...props }, _ref) => {
   const isMobile = useIsMobile();
 
   if (isMobile) {
+    const DrawerRoot = nested ? DrawerPrimitive.NestedRoot : DrawerPrimitive.Root;
     return (
       <SheetMobileContext.Provider value={true}>
-        <DrawerPrimitive.Root handleOnly={mobileHandleOnly} {...props}>
+        <DrawerRoot handleOnly={mobileHandleOnly} {...props}>
           {children}
-        </DrawerPrimitive.Root>
+        </DrawerRoot>
       </SheetMobileContext.Provider>
     );
   }
