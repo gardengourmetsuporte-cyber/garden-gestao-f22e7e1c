@@ -320,7 +320,7 @@ export default function TabletAdmin() {
                         variant="outline"
                         className="h-7 text-xs"
                         onClick={() => {
-                          navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`);
+                          navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}`);
                           toast({ title: 'Link copiado!' });
                         }}
                       >
