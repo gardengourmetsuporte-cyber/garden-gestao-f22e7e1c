@@ -251,19 +251,7 @@ export function BottomTabBar() {
             ))}
 
             {/* "Mais" tab — always far right */}
-            {isCardapioRoute ? (
-              <button
-                onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }}
-                aria-label="Configurações"
-                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative"
-                style={{ width: slotWidth }}
-              >
-                <span className="material-symbols-rounded text-muted-foreground transition-colors" style={{ fontSize: 22 }}>settings</span>
-                <span className="text-[10px] font-normal text-muted-foreground">Config</span>
-              </button>
-            ) : (
-              <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
-            )}
+            <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
           </div>
         </div>
       </nav>
