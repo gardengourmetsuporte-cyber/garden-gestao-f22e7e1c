@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDeliveryZones } from '@/hooks/useDeliveryZones';
+import { formatCurrency } from '@/lib/format';
 import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
 
@@ -36,21 +38,6 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
     enabled: !!unitId,
   });
 
-  const [editingDeliveryTime, setEditingDeliveryTime] = useState(false);
-  const [deliveryTimeValue, setDeliveryTimeValue] = useState('');
-
-  const saveDeliveryTime = useMutation({
-    mutationFn: async (value: string) => {
-      if (!unitId) throw new Error('No unit');
-      const updated = { ...(storeInfo || {}), delivery_time: value };
-      await supabase.from('units').update({ store_info: updated }).eq('id', unitId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['store-info', unitId] });
-      setEditingDeliveryTime(false);
-      toast.success('Tempo de entrega atualizado');
-    },
-  });
 
   // Order stats
   const todayStats = useMemo(() => {
@@ -139,61 +126,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
         ))}
       </div>
 
-      {/* Quick delivery time config */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center">
-              <AppIcon name="DeliveryDining" size={18} className="text-foreground" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-foreground">Tempo de Entrega</p>
-              {!editingDeliveryTime && (
-                <p className="text-sm text-muted-foreground">
-                  {storeInfo?.delivery_time || 'Não configurado'}
-                </p>
-              )}
-            </div>
-          </div>
-          {!editingDeliveryTime ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setDeliveryTimeValue(storeInfo?.delivery_time || '');
-                setEditingDeliveryTime(true);
-              }}
-            >
-              <AppIcon name="Edit" size={14} className="mr-1" /> Editar
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Input
-                value={deliveryTimeValue}
-                onChange={e => setDeliveryTimeValue(e.target.value)}
-                placeholder="Ex: 30-50 min"
-                className="h-8 text-sm w-32"
-              />
-              <Button
-                size="sm"
-                className="h-8"
-                onClick={() => saveDeliveryTime.mutate(deliveryTimeValue)}
-                disabled={saveDeliveryTime.isPending}
-              >
-                Salvar
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8"
-                onClick={() => setEditingDeliveryTime(false)}
-              >
-                <AppIcon name="X" size={14} />
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Delivery Time Widget */}
+      <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
 
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (
@@ -273,6 +207,96 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DeliveryTimeWidget({ unitId, onNavigate }: { unitId?: string; onNavigate: (tab: string) => void }) {
+  const { zones, isLoading, bulkAdjustTime } = useDeliveryZones();
+
+  const activeZones = zones.filter(z => z.is_active);
+  const minTime = activeZones.length > 0 ? Math.min(...activeZones.map(z => z.delivery_time_minutes)) : 0;
+  const maxTime = activeZones.length > 0 ? Math.max(...activeZones.map(z => z.delivery_time_minutes)) : 0;
+  const timeRange = minTime === maxTime ? `${minTime} min` : `${minTime}–${maxTime} min`;
+
+  if (isLoading) {
+    return <Skeleton className="h-32 rounded-2xl" />;
+  }
+
+  if (activeZones.length === 0) {
+    return (
+      <button
+        onClick={() => onNavigate('configuracoes')}
+        className="w-full rounded-2xl bg-card border border-border/30 p-4 text-left active:scale-[0.97] transition-transform"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-warning/15 flex items-center justify-center">
+            <AppIcon name="Clock" size={18} className="text-warning" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-foreground">Tempo de Entrega</p>
+            <p className="text-sm text-muted-foreground">Nenhuma zona configurada</p>
+          </div>
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
+            <AppIcon name="Clock" size={18} className="text-primary" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-foreground">Tempo de Entrega</p>
+            <p className="text-lg font-black text-foreground leading-tight">{timeRange}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-8 w-8 rounded-xl"
+            disabled={bulkAdjustTime.isPending || minTime <= 10}
+            onClick={() => bulkAdjustTime.mutate(-10)}
+          >
+            <AppIcon name="Minus" size={14} />
+          </Button>
+          <span className="text-[10px] text-muted-foreground w-10 text-center font-medium">10 min</span>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-8 w-8 rounded-xl"
+            disabled={bulkAdjustTime.isPending}
+            onClick={() => bulkAdjustTime.mutate(10)}
+          >
+            <AppIcon name="Plus" size={14} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Zone time summary */}
+      <div className="grid grid-cols-2 gap-1.5">
+        {activeZones.slice(0, 4).map(zone => (
+          <div key={zone.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-secondary/50">
+            <span className="text-[10px] text-muted-foreground truncate">
+              Até {zone.max_distance_km} km
+            </span>
+            <span className="text-[10px] font-bold text-foreground ml-1">{zone.delivery_time_minutes} min</span>
+          </div>
+        ))}
+      </div>
+
+      {activeZones.length > 4 && (
+        <button
+          onClick={() => onNavigate('configuracoes')}
+          className="text-[10px] text-primary font-medium w-full text-center"
+        >
+          +{activeZones.length - 4} zonas • Ver todas
+        </button>
+      )}
     </div>
   );
 }
