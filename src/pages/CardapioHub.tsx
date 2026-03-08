@@ -74,6 +74,31 @@ export default function CardapioHub() {
     menuAdmin.fetchProducts();
   });
 
+  // Recipe editing (integrated from /recipes)
+  const {
+    recipes, categories: recipeCategories, inventoryItems: recipeInventoryItems,
+    addRecipe, updateRecipe, isAddingRecipe, isUpdatingRecipe, getAvailableSubRecipes,
+    updateItemPrice, updateItemUnit,
+  } = useRecipes();
+  const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+
+  const handleEditRecipe = useCallback((product: MenuProduct) => {
+    const recipeId = (product as any).recipe_id;
+    if (recipeId) {
+      const recipe = recipes.find(r => r.id === recipeId) || null;
+      setEditingRecipe(recipe);
+    } else {
+      setEditingRecipe(null);
+    }
+    setRecipeSheetOpen(true);
+  }, [recipes]);
+
+  const handleRecipeSave = async (data: any) => {
+    if (data.id) await updateRecipe(data);
+    else await addRecipe(data);
+  };
+
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
