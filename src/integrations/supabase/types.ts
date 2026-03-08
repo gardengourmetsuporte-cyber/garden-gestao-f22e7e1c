@@ -5751,6 +5751,7 @@ export type Database = {
         Args: { p_token: string }
         Returns: {
           accepted_at: string
+          access_level_id: string
           email: string
           expires_at: string
           id: string
