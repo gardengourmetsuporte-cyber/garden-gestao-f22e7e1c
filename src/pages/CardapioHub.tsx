@@ -223,6 +223,7 @@ export default function CardapioHub() {
             <MenuLinksBar
               publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
               tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
+              kdsUrl={`${window.location.origin}/kds/${activeUnit.id}`}
             />
           </>
         )}
