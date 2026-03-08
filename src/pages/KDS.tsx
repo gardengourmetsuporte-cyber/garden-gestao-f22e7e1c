@@ -240,7 +240,13 @@ export default function KDS() {
     if (nextStatus === 'delivered') {
       updateData.delivered_at = new Date().toISOString();
     }
-    await supabase.from('tablet_orders').update(updateData).eq('id', orderId);
+    if (nextStatus === 'ready') {
+      updateData.ready_at = new Date().toISOString();
+    }
+    const { error } = await supabase.from('tablet_orders').update(updateData).eq('id', orderId);
+    if (error) {
+      console.error('[KDS] Bump error:', error);
+    }
     queryClient.invalidateQueries({ queryKey: ['kds-orders', unitId] });
   }, [unitId, queryClient]);
 
