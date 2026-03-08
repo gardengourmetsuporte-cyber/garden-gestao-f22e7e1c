@@ -174,16 +174,19 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      // Save address to customer record for next time
+      // Save address to customer record (fire-and-forget, don't block order)
       if (saveAddress && customerUser?.email && customerAddress.trim()) {
-        await supabase
+        supabase
           .from('customers')
           .update({
             notes: customerAddress.trim(),
             phone: customerPhone.replace(/\D/g, ''),
           })
           .eq('unit_id', unitId)
-          .eq('email', customerUser.email);
+          .eq('email', customerUser.email)
+          .then(({ error: saveErr }) => {
+            if (saveErr) console.warn('Failed to save address:', saveErr);
+          });
       }
 
       toast.success('Pedido enviado com sucesso!');
