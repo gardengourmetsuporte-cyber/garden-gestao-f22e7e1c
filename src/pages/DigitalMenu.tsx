@@ -230,7 +230,6 @@ export default function DigitalMenu() {
         cuisineType={unit?.store_info?.cuisine_type}
         city={unit?.store_info?.city}
         isOpen={isOpen}
-        onSkip={() => setMenuEntered(true)}
       />
     );
   }
