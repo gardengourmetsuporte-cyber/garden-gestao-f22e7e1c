@@ -25,13 +25,15 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
+const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 
 type CardapioTab = 'produtos' | 'opcionais' | 'config';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
+  const isDashboard = searchParams.get('tab') === 'dashboard';
   const isConfigFromUrl = searchParams.get('section') === 'config';
 
   // Menu admin hook
@@ -78,8 +80,8 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || cardapioTab === 'config') {
-      return null; // No primary action on orders or config
+    if (isPedidos || isDashboard || cardapioTab === 'config') {
+      return null;
     }
     if (cardapioTab === 'opcionais') {
       return { icon: 'Plus', label: 'Novo Opcional', onClick: () => {
@@ -154,6 +156,43 @@ export default function CardapioHub() {
   };
   const openEditOG = (og: MenuOptionGroup) => { setEditingOG(og); setOgSheetOpen(true); };
   const openLinkProducts = (og: MenuOptionGroup) => { setLinkingOG(og); setLinkDialogOpen(true); };
+
+  // ==================== DASHBOARD VIEW ====================
+  if (isDashboard) {
+    const handleDashboardNavigate = (tab: string) => {
+      if (tab === 'pedidos') {
+        setSearchParams({ tab: 'pedidos' });
+      } else if (tab === 'produtos') {
+        setSearchParams({});
+        setCardapioTab('produtos');
+      } else {
+        setSearchParams({});
+      }
+    };
+
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background pb-24">
+          <header className="page-header-bar">
+            <div className="page-header-content flex items-center justify-between">
+              <h1 className="text-lg font-bold flex items-center gap-2">
+                <AppIcon name="Storefront" size={20} className="text-primary" />
+                Cardápio Digital
+              </h1>
+              {activeUnit && (
+                <a href={`/m/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1 text-xs text-primary font-medium">
+                  <AppIcon name="ExternalLink" size={14} /> Abrir
+                </a>
+              )}
+            </div>
+          </header>
+          <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-28 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
+            <CardapioDashboardLazy onNavigate={handleDashboardNavigate} />
+          </Suspense>
+        </div>
+      </AppLayout>
+    );
+  }
 
   // ==================== PEDIDOS VIEW ====================
   if (isPedidos) {

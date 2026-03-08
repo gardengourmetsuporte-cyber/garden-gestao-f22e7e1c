@@ -26,9 +26,10 @@ const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/
 
 // Custom tabs when inside CardapioHub
 const CARDAPIO_TABS: TabDef[] = [
-  HOME_TAB,
+  { key: 'cardapio-home', icon: 'Storefront', label: 'Início', path: '/cardapio?tab=dashboard', moduleKey: 'cardapio' },
   { key: 'cardapio', icon: 'BookOpen', label: 'Cardápio', path: '/cardapio', moduleKey: 'cardapio' },
   { key: 'pedidos', icon: 'ShoppingBag', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
+  { key: 'config', icon: 'Settings', label: 'Config', path: '/cardapio?section=config', moduleKey: 'cardapio' },
 ];
 
 const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
@@ -95,10 +96,18 @@ export function BottomTabBar() {
       const [basePath, query] = path.split('?');
       const params = new URLSearchParams(query);
       const tabParam = params.get('tab');
-      return location.pathname.startsWith(basePath) && new URLSearchParams(location.search).get('tab') === tabParam;
+      const sectionParam = params.get('section');
+      const currentSearch = new URLSearchParams(location.search);
+      if (tabParam) {
+        return location.pathname.startsWith(basePath) && currentSearch.get('tab') === tabParam;
+      }
+      if (sectionParam) {
+        return location.pathname.startsWith(basePath) && currentSearch.get('section') === sectionParam;
+      }
+      return false;
     }
     if (isCardapioRoute && path === '/cardapio') {
-      return location.pathname.startsWith('/cardapio') && !new URLSearchParams(location.search).get('tab');
+      return location.pathname.startsWith('/cardapio') && !new URLSearchParams(location.search).get('tab') && !new URLSearchParams(location.search).get('section');
     }
     return location.pathname.startsWith(path);
   };
