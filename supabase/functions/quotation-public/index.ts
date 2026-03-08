@@ -177,6 +177,7 @@ Deno.serve(async (req) => {
           existing_prices: prices || [],
           contested_item_ids: contestedItemIds,
           last_prices: lastPrices,
+          portal_token: portalToken,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
