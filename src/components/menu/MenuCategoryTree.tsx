@@ -264,7 +264,7 @@ export function MenuCategoryTree({
                         </button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="p-1.5 rounded-lg hover:bg-secondary/60">
+                            <button className="p-2.5 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
                               <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
                             </button>
                           </DropdownMenuTrigger>
