@@ -84,6 +84,7 @@ export default function CardapioHub() {
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 
   const [defaultRecipeName, setDefaultRecipeName] = useState('');
+  const [defaultRecipeCategoryId, setDefaultRecipeCategoryId] = useState<string | null>(null);
 
   const handleEditRecipe = useCallback((product: MenuProduct) => {
     const recipeId = (product as any).recipe_id;
@@ -91,12 +92,16 @@ export default function CardapioHub() {
       const recipe = recipes.find(r => r.id === recipeId) || null;
       setEditingRecipe(recipe);
       setDefaultRecipeName('');
+      setDefaultRecipeCategoryId(null);
     } else {
       setEditingRecipe(null);
       setDefaultRecipeName(product.name);
+      // Match menu product category name to recipe category id
+      const matchedCat = recipeCategories.find(c => c.name.toLowerCase() === product.category?.toLowerCase());
+      setDefaultRecipeCategoryId(matchedCat?.id || null);
     }
     setRecipeSheetOpen(true);
-  }, [recipes]);
+  }, [recipes, recipeCategories]);
 
   const handleRecipeSave = async (data: any) => {
     if (data.id) await updateRecipe(data);
