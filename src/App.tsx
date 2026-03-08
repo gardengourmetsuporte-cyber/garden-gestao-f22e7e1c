@@ -207,8 +207,8 @@ function AppRoutes() {
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
           <Route path="/cotacao/:token" element={<QuotationPublic />} />
           <Route path="/m/:unitId" element={<DigitalMenu />} />
-          <Route path="/tablet/:unitId" element={<DigitalMenu />} />
-          <Route path="/tablet/:unitId/menu" element={<DigitalMenu />} />
+          <Route path="/tablet/:unitId" element={<TabletDigitalMenu />} />
+          <Route path="/tablet/:unitId/menu" element={<TabletDigitalMenu />} />
           <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
           <Route path="/gamification/:unitId" element={<DigitalMenu />} />
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
