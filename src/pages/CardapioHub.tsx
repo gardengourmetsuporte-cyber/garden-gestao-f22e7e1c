@@ -454,3 +454,60 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
     </>
   );
 }
+
+// ==================== MENU PUBLISH BAR ====================
+function MenuPublishBar({ unitId, products, groups }: { unitId: string; products: any[]; groups: any[] }) {
+  const queryClient = useQueryClient();
+
+  const { data: publishedAt } = useQuery({
+    queryKey: ['menu-published-at', unitId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('units')
+        .select('menu_published_at')
+        .eq('id', unitId)
+        .single();
+      return (data as any)?.menu_published_at as string | null;
+    },
+  });
+
+  const hasUnpublished = useMemo(() => {
+    if (!publishedAt) return products.length > 0 || groups.length > 0;
+    const pubDate = new Date(publishedAt).getTime();
+    return products.some(p => new Date(p.updated_at).getTime() > pubDate) ||
+           groups.some(g => new Date(g.updated_at).getTime() > pubDate);
+  }, [publishedAt, products, groups]);
+
+  const publish = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('units')
+        .update({ menu_published_at: new Date().toISOString() })
+        .eq('id', unitId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['menu-published-at', unitId] });
+      toast.success('Cardápio publicado com sucesso!');
+    },
+    onError: () => toast.error('Erro ao publicar'),
+  });
+
+  if (!hasUnpublished) return null;
+
+  return (
+    <div className="px-4 pt-2 lg:px-6">
+      <button
+        onClick={() => publish.mutate()}
+        disabled={publish.isPending}
+        className="w-full flex items-center justify-center gap-2 p-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm active:scale-[0.97] transition-all disabled:opacity-60"
+      >
+        <AppIcon name="Upload" size={16} />
+        {publish.isPending ? 'Publicando...' : 'Publicar Cardápio'}
+        <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground text-[10px] ml-1">
+          Alterações pendentes
+        </Badge>
+      </button>
+    </div>
+  );
+}
