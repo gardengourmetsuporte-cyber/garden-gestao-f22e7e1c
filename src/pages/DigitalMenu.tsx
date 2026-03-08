@@ -21,7 +21,6 @@ import type { GamificationPrize } from '@/hooks/useGamification';
 export default function DigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
   const [searchParams] = useSearchParams();
-  const mesa = searchParams.get('mesa');
   const initialTab = (searchParams.get('tab') as MenuTab) || 'home';
 
   const {
@@ -235,7 +234,6 @@ export default function DigitalMenu() {
             cart={cart}
             cartTotal={cartTotal}
             unitId={unitId}
-            mesa={mesa}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}
