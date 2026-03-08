@@ -17,7 +17,7 @@ interface Props {
 
 import { formatCurrency as formatPrice } from '@/lib/format';
 
-export function MenuProductDetail({ product, optionGroups, open, onClose, onAddToCart }: Props) {
+export function MenuProductDetail({ product, optionGroups, open, onClose, onAddToCart, hidePrice }: Props) {
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
