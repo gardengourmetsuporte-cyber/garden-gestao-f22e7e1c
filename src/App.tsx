@@ -194,6 +194,7 @@ function PublicRoutes() {
         <Route path="/kds/:unitId" element={<KDS />} />
         <Route path="/gamification/:unitId" element={<DigitalMenu />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
+        <Route path="/fornecedor/:token" element={<SupplierPortal />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/invite" element={<Invite />} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
