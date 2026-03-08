@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDeliveryZones } from '@/hooks/useDeliveryZones';
+import { formatCurrency } from '@/lib/format';
 import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
 
