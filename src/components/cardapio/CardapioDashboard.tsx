@@ -225,3 +225,93 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
     </div>
   );
 }
+
+function DeliveryTimeWidget({ unitId, onNavigate }: { unitId?: string; onNavigate: (tab: string) => void }) {
+  const { zones, isLoading, bulkAdjustTime } = useDeliveryZones();
+
+  const activeZones = zones.filter(z => z.is_active);
+  const minTime = activeZones.length > 0 ? Math.min(...activeZones.map(z => z.delivery_time_minutes)) : 0;
+  const maxTime = activeZones.length > 0 ? Math.max(...activeZones.map(z => z.delivery_time_minutes)) : 0;
+  const timeRange = minTime === maxTime ? `${minTime} min` : `${minTime}–${maxTime} min`;
+
+  if (isLoading) {
+    return <Skeleton className="h-32 rounded-2xl" />;
+  }
+
+  if (activeZones.length === 0) {
+    return (
+      <button
+        onClick={() => onNavigate('configuracoes')}
+        className="w-full rounded-2xl bg-card border border-border/30 p-4 text-left active:scale-[0.97] transition-transform"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-warning/15 flex items-center justify-center">
+            <AppIcon name="Clock" size={18} className="text-warning" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-foreground">Tempo de Entrega</p>
+            <p className="text-sm text-muted-foreground">Nenhuma zona configurada</p>
+          </div>
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
+            <AppIcon name="Clock" size={18} className="text-primary" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-foreground">Tempo de Entrega</p>
+            <p className="text-lg font-black text-foreground leading-tight">{timeRange}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-8 w-8 rounded-xl"
+            disabled={bulkAdjustTime.isPending || minTime <= 10}
+            onClick={() => bulkAdjustTime.mutate(-10)}
+          >
+            <AppIcon name="Minus" size={14} />
+          </Button>
+          <span className="text-[10px] text-muted-foreground w-10 text-center font-medium">10 min</span>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-8 w-8 rounded-xl"
+            disabled={bulkAdjustTime.isPending}
+            onClick={() => bulkAdjustTime.mutate(10)}
+          >
+            <AppIcon name="Plus" size={14} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Zone time summary */}
+      <div className="grid grid-cols-2 gap-1.5">
+        {activeZones.slice(0, 4).map(zone => (
+          <div key={zone.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-secondary/50">
+            <span className="text-[10px] text-muted-foreground truncate">
+              Até {zone.max_distance_km} km
+            </span>
+            <span className="text-[10px] font-bold text-foreground ml-1">{zone.delivery_time_minutes} min</span>
+          </div>
+        ))}
+      </div>
+
+      {activeZones.length > 4 && (
+        <button
+          onClick={() => onNavigate('configuracoes')}
+          className="text-[10px] text-primary font-medium w-full text-center"
+        >
+          +{activeZones.length - 4} zonas • Ver todas
+        </button>
+      )}
+    </div>
+  );
+}
