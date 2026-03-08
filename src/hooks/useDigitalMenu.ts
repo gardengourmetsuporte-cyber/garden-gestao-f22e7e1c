@@ -94,20 +94,16 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
     }
     setLoading(true);
     try {
-      const [unitRes, catRes, grpRes, prodRes, ogRes, optRes, linkRes] = await Promise.all([
-        supabase.from('units').select('id, name, store_info').eq('id', unitId).single(),
+      const [unitRes, catRes, grpRes, prodRes] = await Promise.all([
+        supabase.from('units').select('id, name, store_info').eq('id', unitId).maybeSingle(),
         supabase.from('menu_categories').select('id, name, icon, color, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
         supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
         supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('menu_option_groups').select('id, title, min_selections, max_selections, allow_repeat').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('menu_options').select('id, option_group_id, name, price, image_url, sort_order').eq('is_active', true).order('sort_order'),
-        supabase.from('menu_product_option_groups').select('product_id, option_group_id'),
       ]);
 
       setUnit((unitRes.data as any) || null);
       setCategories((catRes.data as DMCategory[]) || []);
 
-      // Filter groups by channel availability
       const allGroups = (grpRes.data as any[]) || [];
       const filteredGroups = allGroups.filter(g => {
         const avail = g.availability || { tablet: true, delivery: true };
@@ -115,7 +111,6 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
       });
       setGroups(filteredGroups as DMGroup[]);
 
-      // Filter products by channel availability
       const allProducts = (prodRes.data as DMProduct[]) || [];
       const filteredProducts = allProducts.filter(p => {
         const avail = p.availability || { tablet: true, delivery: true };
@@ -123,13 +118,38 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
       });
       setProducts(filteredProducts);
 
-      const ogs = (ogRes.data as any[]) || [];
-      const opts = (optRes.data as DMOption[]) || [];
+      const productIds = filteredProducts.map(p => p.id);
+
+      const { data: ogData, error: ogError } = await supabase
+        .from('menu_option_groups')
+        .select('id, title, min_selections, max_selections, allow_repeat')
+        .eq('unit_id', unitId)
+        .eq('is_active', true)
+        .order('sort_order');
+      if (ogError) throw ogError;
+
+      const ogs = (ogData as any[]) || [];
+      const optionGroupIds = ogs.map(og => og.id);
+
+      const [{ data: optData, error: optError }, { data: linkData, error: linkError }] = await Promise.all([
+        optionGroupIds.length
+          ? supabase.from('menu_options').select('id, option_group_id, name, price, image_url, sort_order').in('option_group_id', optionGroupIds).eq('is_active', true).order('sort_order')
+          : Promise.resolve({ data: [] as DMOption[], error: null } as any),
+        productIds.length
+          ? supabase.from('menu_product_option_groups').select('product_id, option_group_id').in('product_id', productIds)
+          : Promise.resolve({ data: [] as { product_id: string; option_group_id: string }[], error: null } as any),
+      ]);
+
+      if (optError) throw optError;
+      if (linkError) throw linkError;
+
+      const opts = (optData as DMOption[]) || [];
       ogs.forEach((og: any) => {
         og.options = opts.filter(o => o.option_group_id === og.id);
       });
+
       setOptionGroups(ogs);
-      setProductOptionLinks((linkRes.data as any[]) || []);
+      setProductOptionLinks((linkData as any[]) || []);
     } catch (err) {
       console.error('[useDigitalMenu] Error fetching:', err);
     } finally {
