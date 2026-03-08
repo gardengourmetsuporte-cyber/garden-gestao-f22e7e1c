@@ -377,14 +377,8 @@ const TabButton = forwardRef<
     if (moreOpen) {
       onClick();
     } else if (active) {
-      const scrollable = document.querySelector('[data-scroll-container]')
-        || document.querySelector('.flex-1.overflow-y-auto')
-        || document.querySelector('main');
-      if (scrollable && scrollable.scrollTop > 0) {
-        scrollable.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      // If already active, delegate to onClick (handles double-tap navigation like cardápio→dashboard)
+      onClick();
     } else {
       onClick();
     }
