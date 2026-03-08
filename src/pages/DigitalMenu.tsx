@@ -285,7 +285,7 @@ export default function DigitalMenu() {
         let existing: { id: string } | null = null;
         
         if (email) {
-          const { data: byEmail } = await withTimeout(
+          const { data: byEmail } = await withTimeout(() =>
             supabase
               .from('customers')
               .select('id')
@@ -297,7 +297,7 @@ export default function DigitalMenu() {
         }
         
         if (!existing && data.phone) {
-          const { data: byPhone } = await withTimeout(
+          const { data: byPhone } = await withTimeout(() =>
             supabase
               .from('customers')
               .select('id')
@@ -309,17 +309,17 @@ export default function DigitalMenu() {
         }
 
         if (existing) {
-          const { error } = await withTimeout(
+          const { error } = await withTimeout(() =>
             supabase.from('customers').update({
               name: data.name,
               phone: data.phone,
               birthday: data.birthday,
               email: email || undefined,
-            }).eq('id', existing.id)
+            }).eq('id', existing!.id)
           );
           if (error) throw error;
         } else {
-          const { error } = await withTimeout(
+          const { error } = await withTimeout(() =>
             supabase.from('customers').insert({
               unit_id: unitId,
               name: data.name,
