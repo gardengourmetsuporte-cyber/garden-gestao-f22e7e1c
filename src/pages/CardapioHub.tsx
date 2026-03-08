@@ -186,25 +186,13 @@ export default function CardapioHub() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Header */}
-        <header className="page-header-bar">
-          <div className="page-header-content flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <AppIcon name="BookOpen" size={20} className="text-primary" />
-              Cardápio Digital
-            </h1>
-            {activeUnit && (
-              <div className="flex items-center gap-4">
-                <a href={`/m/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors font-medium">
-                  <AppIcon name="ExternalLink" size={14} /> Ver público
-                </a>
-                <a href={`/tablet/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors font-medium">
-                  <AppIcon name="Tablet" size={14} /> Ver tablet
-                </a>
-              </div>
-            )}
-          </div>
-        </header>
+        {/* Quick Access Links */}
+        {activeUnit && (
+          <MenuLinksBar
+            publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
+            tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
+          />
+        )}
 
         {cardapioTab !== 'config' && (
           <div className="px-4 pt-3 lg:px-6">
