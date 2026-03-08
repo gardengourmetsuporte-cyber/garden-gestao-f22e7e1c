@@ -183,6 +183,16 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PublicWithAuth({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <UnitProvider>
+        {children}
+      </UnitProvider>
+    </AuthProvider>
+  );
+}
+
 function PublicRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -197,7 +207,7 @@ function PublicRoutes() {
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
         <Route path="/fornecedor/:token" element={<SupplierPortal />} />
         <Route path="/landing" element={<Landing />} />
-        <Route path="/invite" element={<Invite />} />
+        <Route path="/invite" element={<PublicWithAuth><Invite /></PublicWithAuth>} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="*" element={<AuthenticatedApp />} />
