@@ -18,7 +18,7 @@ interface Props {
 const formatPrice = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload, onToggleAvailability }: Props) {
+export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload, onToggleAvailability, viewMode = 'menu' }: Props) {
   const avail = product.availability as any;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
