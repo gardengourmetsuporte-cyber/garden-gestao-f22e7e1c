@@ -1,7 +1,7 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
-export type MenuTab = 'home' | 'menu' | 'cart' | 'game';
+export type MenuTab = 'home' | 'menu' | 'cart' | 'account' | 'game';
 
 interface Props {
   active: MenuTab;
@@ -13,6 +13,7 @@ const tabs: { key: MenuTab; icon: string; iconFilled: string; label: string }[] 
   { key: 'home', icon: 'Storefront', iconFilled: 'Storefront', label: 'Início' },
   { key: 'menu', icon: 'RestaurantMenu', iconFilled: 'RestaurantMenu', label: 'Cardápio' },
   { key: 'cart', icon: 'ShoppingBag', iconFilled: 'ShoppingBag', label: 'Pedido' },
+  { key: 'account', icon: 'Person', iconFilled: 'Person', label: 'Conta' },
   { key: 'game', icon: 'Casino', iconFilled: 'Casino', label: 'Roleta' },
 ];
 
