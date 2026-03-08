@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
 import { useGamification } from '@/hooks/useGamification';
@@ -8,6 +8,7 @@ import { MenuProductList } from '@/components/digital-menu/MenuProductList';
 import { MenuProductDetail } from '@/components/digital-menu/MenuProductDetail';
 import { MenuCart } from '@/components/digital-menu/MenuCart';
 import { MenuSearch } from '@/components/digital-menu/MenuSearch';
+import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
 import { PrizeResult } from '@/components/gamification/PrizeResult';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -15,8 +16,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { normalizePhone } from '@/lib/normalizePhone';
+import { supabase } from '@/integrations/supabase/client';
 import gardenLogo from '@/assets/logo.png';
 import type { GamificationPrize } from '@/hooks/useGamification';
+import type { User } from '@supabase/supabase-js';
 
 export default function DigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -33,6 +36,85 @@ export default function DigitalMenu() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<DMProduct | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Auth state for customer login
+  const [customerUser, setCustomerUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
+
+  // Check auth state on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCustomerUser(session?.user ?? null);
+      setAuthChecked(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user ?? null;
+      setCustomerUser(user);
+      setAuthChecked(true);
+
+      // If user just logged in and we had a pending tab, go there
+      if (user && pendingTabAfterAuth) {
+        setShowAuth(false);
+        setActiveTab(pendingTabAfterAuth);
+        setPendingTabAfterAuth(null);
+      }
+
+      // Auto-create customer record after OAuth login
+      if (user && unitId && _event === 'SIGNED_IN') {
+        ensureCustomerRecord(user, unitId);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [unitId, pendingTabAfterAuth]);
+
+  // Create/update customer record from OAuth user data
+  const ensureCustomerRecord = async (user: User, unitId: string) => {
+    try {
+      const email = user.email;
+      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email?.split('@')[0] || 'Cliente';
+      const phone = user.phone || null;
+
+      // Check if customer already exists by email
+      const { data: existing } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('unit_id', unitId)
+        .eq('email', email || '')
+        .maybeSingle();
+
+      if (!existing) {
+        await supabase.from('customers').insert({
+          unit_id: unitId,
+          name: fullName,
+          email: email || null,
+          phone,
+          origin: 'whatsapp' as any, // closest to "online/social"
+          score: 0,
+          segment: 'new',
+          loyalty_points: 0,
+          total_spent: 0,
+          total_orders: 0,
+        });
+      }
+    } catch (err) {
+      console.error('[DigitalMenu] Failed to create customer record:', err);
+    }
+  };
+
+  // Intercept tab changes — require auth for cart
+  const handleTabChange = (tab: MenuTab) => {
+    if (tab === 'cart' && !customerUser && authChecked) {
+      setPendingTabAfterAuth('cart');
+      setShowAuth(true);
+      return;
+    }
+    setActiveTab(tab);
+    setSearchOpen(false);
+  };
 
   // Gamification
   const { prizes, prizesLoading, isEnabled, checkAlreadyPlayed, checkDailyCostExceeded, recordPlay } = useGamification(unitId);
@@ -58,7 +140,6 @@ export default function DigitalMenu() {
       if (await checkAlreadyPlayed(gameOrderId.trim())) { toast.error('Este pedido já participou!'); return; }
       if (await checkDailyCostExceeded()) { toast.error('Limite diário atingido!'); return; }
       if (unitId) {
-        const { supabase } = await import('@/integrations/supabase/client');
         const { data: existing } = await supabase
           .from('customers')
           .select('id')
@@ -97,6 +178,23 @@ export default function DigitalMenu() {
     if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
+
+  // Show auth screen
+  if (showAuth) {
+    return (
+      <MenuCustomerAuth
+        unitName={unit?.name}
+        logoUrl={unit?.store_info?.logo_url}
+        onSkip={() => {
+          setShowAuth(false);
+          if (pendingTabAfterAuth) {
+            setActiveTab(pendingTabAfterAuth);
+            setPendingTabAfterAuth(null);
+          }
+        }}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -234,6 +332,7 @@ export default function DigitalMenu() {
             cart={cart}
             cartTotal={cartTotal}
             unitId={unitId}
+            customerUser={customerUser}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}
@@ -312,7 +411,7 @@ export default function DigitalMenu() {
       />
 
       {/* Bottom nav */}
-      <MenuBottomNav active={activeTab} onTabChange={(tab) => { setActiveTab(tab); setSearchOpen(false); }} cartCount={cartCount} />
+      <MenuBottomNav active={activeTab} onTabChange={handleTabChange} cartCount={cartCount} />
     </div>
   );
 }
