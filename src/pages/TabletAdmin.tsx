@@ -38,6 +38,9 @@ export default function TabletAdmin() {
   const [pdvActive, setPdvActive] = useState(true);
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const basePublicUrl = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app')
+    ? 'https://garden-gestao.lovable.app'
+    : window.location.origin;
 
   // Sync pdvConfig state
   useEffect(() => {
@@ -305,7 +308,7 @@ export default function TabletAdmin() {
                 {/* Generic QR */}
                 <div className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30 border border-border/30">
                   <QRCodeSVG
-                    value={`${window.location.origin}/m/${activeUnit.id}`}
+                    value={`${basePublicUrl}/m/${activeUnit.id}`}
                     size={80}
                     bgColor="transparent"
                     fgColor="currentColor"
@@ -320,7 +323,7 @@ export default function TabletAdmin() {
                         variant="outline"
                         className="h-7 text-xs"
                         onClick={() => {
-                          navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`);
+                          navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}`);
                           toast({ title: 'Link copiado!' });
                         }}
                       >
@@ -346,7 +349,7 @@ export default function TabletAdmin() {
                       {tables.map(t => (
                         <div key={t.id} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/20 border border-border/20">
                           <QRCodeSVG
-                            value={`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`}
+                            value={`${basePublicUrl}/m/${activeUnit.id}?mesa=${t.number}`}
                             size={48}
                             bgColor="transparent"
                             fgColor="currentColor"
@@ -356,7 +359,7 @@ export default function TabletAdmin() {
                             <p className="text-xs font-bold text-foreground">Mesa {t.number}</p>
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`);
+                                navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}?mesa=${t.number}`);
                                 toast({ title: `Link mesa ${t.number} copiado!` });
                               }}
                               className="text-[10px] text-primary font-medium mt-0.5"
