@@ -47,7 +47,6 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
       return;
     }
     fetchCustomer();
-    // Safety timeout to prevent infinite skeleton
     const timeout = setTimeout(() => setLoading(false), 5000);
     return () => clearTimeout(timeout);
   }, [customerUser, unitId]);
@@ -57,9 +56,8 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
     setLoading(true);
     try {
       const email = customerUser.email;
-      const phone = customerUser.phone;
+      const userPhone = customerUser.phone;
       
-      // Try by email first, then by phone
       let query = supabase
         .from('customers')
         .select('id, name, phone, email, birthday, loyalty_points, total_orders, total_spent, segment, notes')
@@ -67,10 +65,9 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
       
       if (email) {
         query = query.eq('email', email);
-      } else if (phone) {
-        query = query.eq('phone', phone);
+      } else if (userPhone) {
+        query = query.eq('phone', userPhone);
       } else {
-        // No email or phone — can't find customer
         setLoading(false);
         return;
       }
@@ -106,7 +103,6 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
 
   const formatBirthdayDisplay = (val: string) => {
     if (!val) return '';
-    // ISO date to dd/mm/yyyy
     if (val.includes('-')) {
       const [y, m, d] = val.split('-');
       return `${d}/${m}/${y}`;
@@ -141,15 +137,16 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
         }
       }
 
-      await supabase
-        .from('customers')
-        .update({
-          name: name.trim(),
-          phone: phoneDigits || null,
-          birthday: birthdayISO,
-          notes: address.trim() || null,
-        })
-        .eq('id', customer.id);
+      // Use RPC to bypass RLS
+      const { error } = await supabase.rpc('upsert_menu_customer', {
+        p_unit_id: unitId,
+        p_name: name.trim(),
+        p_email: customerUser?.email || null,
+        p_phone: phoneDigits || null,
+        p_birthday: birthdayISO,
+      });
+
+      if (error) throw error;
 
       toast.success('Dados atualizados!');
       setEditing(false);
@@ -170,7 +167,7 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   if (!customerUser) {
     return (
       <div className="px-5 pt-8 pb-28 flex flex-col items-center gap-6">
-        <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/30 shadow-lg bg-white flex items-center justify-center p-2">
+        <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/30 shadow-lg bg-card flex items-center justify-center p-2">
           {logoUrl ? (
             <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-cover rounded-xl" />
           ) : (
@@ -204,7 +201,6 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
     );
   }
 
-  // Logged in but no customer record found - show basic profile from auth data
   if (!customer) {
     const displayName = customerUser.user_metadata?.full_name || customerUser.email || 'Cliente';
     const displayInitials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
@@ -278,6 +274,30 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
             </p>
             <p className="text-[11px] text-muted-foreground">Total gasto</p>
           </div>
+        </div>
+      </div>
+
+      {/* Cashback section */}
+      <div className="rounded-2xl bg-card border border-border/30 p-5 mb-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+            <AppIcon name="Payments" size={20} className="text-emerald-500" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">Cashback</p>
+            <p className="text-xs text-muted-foreground">Troque pontos por descontos</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30">
+          <div>
+            <p className="text-xs text-muted-foreground">Saldo disponível</p>
+            <p className="text-lg font-bold text-foreground">
+              {((customer?.loyalty_points || 0) * 0.01).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </p>
+          </div>
+          <Button size="sm" variant="secondary" disabled className="rounded-lg text-xs opacity-60">
+            Em breve
+          </Button>
         </div>
       </div>
 
