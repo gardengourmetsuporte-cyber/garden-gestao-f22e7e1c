@@ -101,7 +101,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config' || cardapioTab === 'receitas') {
+    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config') {
       return null;
     }
     if (cardapioTab === 'opcionais') {
@@ -114,16 +114,16 @@ export default function CardapioHub() {
         setOgSheetOpen(true);
       }};
     }
-    // Default: add product
-    return { icon: 'Plus', label: 'Novo Produto', onClick: () => {
-      setEditingProduct({
-        name: '', price: 0, category: 'Geral', group_id: selectedGroupId,
-        is_active: true, availability: { tablet: true, delivery: true },
-        price_type: 'fixed', is_highlighted: false, is_18_plus: false,
-      });
-      setProductSheetOpen(true);
-    }};
-  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, selectedGroupId]);
+    // Toggle between menu and ficha tecnica
+    if (cardapioTab === 'produtos') {
+      return {
+        icon: viewMode === 'menu' ? 'ChefHat' : 'Eye',
+        label: viewMode === 'menu' ? 'Ficha Técnica' : 'Ver Cardápio',
+        onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu'),
+      };
+    }
+    return null;
+  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
 
   useFabAction(fabAction, [fabAction]);
 
