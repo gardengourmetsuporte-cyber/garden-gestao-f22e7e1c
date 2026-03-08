@@ -217,16 +217,7 @@ export default function CardapioHub() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Quick Access Links + Publish */}
-        {activeUnit && (
-          <>
-            <MenuLinksBar
-              publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
-              tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
-              kdsUrl={`${window.location.origin}/kds/${activeUnit.id}`}
-            />
-          </>
-        )}
+        {/* Quick Access Links only in config */}
 
         {cardapioTab !== 'config' && (
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
