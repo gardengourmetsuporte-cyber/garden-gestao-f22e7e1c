@@ -23,10 +23,11 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
 
-  // Delivery fields — pre-fill from logged-in user
+  // Delivery fields — pre-fill from logged-in user + saved customer data
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [saveAddress, setSaveAddress] = useState(true);
 
   useEffect(() => {
     if (customerUser) {
@@ -34,8 +35,26 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
       const phone = customerUser.phone || '';
       setCustomerName(prev => prev || name);
       setCustomerPhone(prev => prev || phone);
+
+      // Load saved address from customer record
+      const email = customerUser.email;
+      if (email) {
+        supabase
+          .from('customers')
+          .select('phone, notes')
+          .eq('unit_id', unitId)
+          .eq('email', email)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data) {
+              if (data.phone) setCustomerPhone(prev => prev || formatPhone(data.phone!));
+              // Use notes field to store saved address
+              if (data.notes) setCustomerAddress(prev => prev || data.notes!);
+            }
+          });
+      }
     }
-  }, [customerUser]);
+  }, [customerUser, unitId]);
 
   const formatPhone = (val: string) => {
     const digits = val.replace(/\D/g, '').slice(0, 11);
