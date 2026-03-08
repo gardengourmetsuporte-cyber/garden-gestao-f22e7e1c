@@ -1,45 +1,80 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Portal do Fornecedor — Dashboard de Vendas
 
-### O que muda
+### Visão Geral
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
+Expandir a página pública de cotação (`/cotacao/:token`) para um **Portal do Fornecedor** completo, acessível via token permanente por fornecedor. O portal funcionará como um dashboard onde o fornecedor acompanha pedidos, boletos/faturas e pagamentos em tempo real.
 
-### Conceito visual
+### Arquitetura
 
 ```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
+┌─────────────────────────────────────┐
+│  /fornecedor/:token                 │
+│  (Nova rota pública)                │
+│                                     │
+│  ┌──────────┬──────────┬──────────┐ │
+│  │ Resumo   │ Pedidos  │ Boletos  │ │
+│  │ (cards)  │ (lista)  │ (lista)  │ │
+│  └──────────┴──────────┴──────────┘ │
+│                                     │
+│  Auth: telefone do fornecedor       │
+│  Realtime: supplier_invoices        │
+└─────────────────────────────────────┘
 ```
 
-### Implementação
+### Mudanças no Banco de Dados
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+1. **Adicionar coluna `portal_token` na tabela `suppliers`** (uuid, unique, default `gen_random_uuid()`):
+   - Token permanente por fornecedor para acesso ao portal
+   - Diferente do token de cotação (que é por cotação)
 
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
+2. **Habilitar realtime na tabela `supplier_invoices`**:
+   - `ALTER PUBLICATION supabase_realtime ADD TABLE public.supplier_invoices;`
+   - Permite que o fornecedor veja pagamentos atualizados instantaneamente
 
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+### Nova Edge Function: `supplier-portal`
 
-### Resultado
+Endpoint público (sem JWT) que valida pelo `portal_token` do fornecedor.
 
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+**Ações:**
+- `GET ?token=xxx` — Retorna dados do fornecedor + resumo
+- `GET ?token=xxx&action=orders` — Lista pedidos do fornecedor com status
+- `GET ?token=xxx&action=invoices` — Lista boletos/faturas com status de pagamento
+- `GET ?token=xxx&action=verify-phone&phone=xxx` — Autenticação por telefone (mesmo padrão da cotação)
+
+**Dados retornados no resumo:**
+- Total vendido (mês atual)
+- Boletos pendentes (quantidade + valor)
+- Boletos vencidos
+- Próximo vencimento
+
+### Nova Página: `SupplierPortal.tsx`
+
+**Rota:** `/fornecedor/:token` (pública, sem auth do app)
+
+**Abas:**
+1. **Resumo** — Cards com totais: vendas do mês, pendências, vencidos
+2. **Pedidos** — Lista de pedidos (orders) com status (Rascunho → Enviado → Recebido), data, itens
+3. **Faturas** — Lista de boletos (supplier_invoices) com badge pago/pendente/vencido, valor, vencimento. Atualização em tempo real via Supabase Realtime
+
+**Autenticação:** Mesmo fluxo de verificação por telefone já usado na cotação pública. Sessão salva no localStorage por 90 dias.
+
+### Integração com Cotações
+
+Na página de cotação existente (`/cotacao/:token`), adicionar um link/botão "Ver meu Portal" que redireciona para `/fornecedor/:portalToken` (o `portal_token` será retornado pela edge function de cotação quando o fornecedor estiver autenticado).
+
+### Compartilhamento do Link
+
+No painel admin (lista de fornecedores ou detalhe do pedido), adicionar botão para copiar/enviar o link do portal do fornecedor via WhatsApp.
+
+### Arquivos Envolvidos
+
+| Arquivo | Ação |
+|---|---|
+| `supabase/functions/supplier-portal/index.ts` | Criar — Edge function do portal |
+| `src/pages/SupplierPortal.tsx` | Criar — Página pública do portal |
+| `src/App.tsx` | Editar — Adicionar rota `/fornecedor/:token` |
+| `supabase/functions/quotation-public/index.ts` | Editar — Retornar `portal_token` no GET |
+| Migration SQL | Criar — Adicionar `portal_token` em `suppliers`, habilitar realtime |
 
