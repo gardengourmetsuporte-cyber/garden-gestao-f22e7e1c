@@ -223,6 +223,7 @@ export default function CardapioHub() {
             <MenuLinksBar
               publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
               tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
+              kdsUrl={`${window.location.origin}/kds/${activeUnit.id}`}
             />
           </>
         )}
@@ -333,8 +334,8 @@ export default function CardapioHub() {
 }
 
 // ==================== MENU LINKS BAR ====================
-function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: string }) {
-  const [qrOpen, setQrOpen] = useState<'public' | 'tablet' | null>(null);
+function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tabletUrl: string; kdsUrl: string }) {
+  const [qrOpen, setQrOpen] = useState<'public' | 'tablet' | 'kds' | null>(null);
 
   const copyLink = (url: string, label: string) => {
     navigator.clipboard.writeText(url);
@@ -408,9 +409,42 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
               >
                 <AppIcon name="ExternalLink" size={13} className="text-primary" />
               </a>
+          </div>
+
+          {/* KDS - Cozinha */}
+          <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+              <AppIcon name="ChefHat" size={18} className="text-orange-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-foreground truncate">KDS - Cozinha</p>
+              <p className="text-[10px] text-muted-foreground truncate">{kdsUrl.replace(/^https?:\/\//, '')}</p>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={() => setQrOpen('kds')}
+                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="QrCode" size={13} className="text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => copyLink(kdsUrl, 'KDS - Cozinha')}
+                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="Copy" size={13} className="text-muted-foreground" />
+              </button>
+              <a
+                href={kdsUrl}
+                target="_blank"
+                rel="noopener"
+                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="ExternalLink" size={13} className="text-primary" />
+              </a>
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {/* QR Code Modal */}
@@ -422,13 +456,13 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
           >
             <div className="text-center">
               <h3 className="text-lg font-bold text-foreground">
-                {qrOpen === 'public' ? 'Cardápio Digital' : 'Cardápio Tablet'}
+                {qrOpen === 'public' ? 'Cardápio Digital' : qrOpen === 'tablet' ? 'Cardápio Tablet' : 'KDS - Cozinha'}
               </h3>
               <p className="text-xs text-muted-foreground mt-1">Escaneie para acessar</p>
             </div>
             <div className="bg-white rounded-2xl p-5">
               <QRCodeSVG
-                value={qrOpen === 'public' ? publicUrl : tabletUrl}
+                value={qrOpen === 'public' ? publicUrl : qrOpen === 'tablet' ? tabletUrl : kdsUrl}
                 size={200}
                 level="H"
                 bgColor="#ffffff"
@@ -436,7 +470,11 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
               />
             </div>
             <button
-              onClick={() => copyLink(qrOpen === 'public' ? publicUrl : tabletUrl, qrOpen === 'public' ? 'Cardápio Digital' : 'Cardápio Tablet')}
+              onClick={() => {
+                const url = qrOpen === 'public' ? publicUrl : qrOpen === 'tablet' ? tabletUrl : kdsUrl;
+                const label = qrOpen === 'public' ? 'Cardápio Digital' : qrOpen === 'tablet' ? 'Cardápio Tablet' : 'KDS - Cozinha';
+                copyLink(url, label);
+              }}
               className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
             >
               <AppIcon name="Copy" size={16} />
