@@ -46,6 +46,7 @@ export function useDeliveryZones() {
             min_distance_km: zone.min_distance_km,
             max_distance_km: zone.max_distance_km,
             fee: zone.fee,
+            delivery_time_minutes: zone.delivery_time_minutes,
             is_active: zone.is_active,
             updated_at: new Date().toISOString(),
           })
@@ -60,6 +61,7 @@ export function useDeliveryZones() {
             min_distance_km: zone.min_distance_km || 0,
             max_distance_km: zone.max_distance_km || 5,
             fee: zone.fee || 0,
+            delivery_time_minutes: zone.delivery_time_minutes || 60,
             is_active: zone.is_active ?? true,
             sort_order: zones.length,
           });
