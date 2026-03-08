@@ -17,7 +17,9 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
+import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
 import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
+import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
