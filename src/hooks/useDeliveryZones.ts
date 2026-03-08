@@ -105,6 +105,7 @@ export function useDeliveryZones() {
   });
 
   return { zones, isLoading, upsertZone, deleteZone, bulkAdjustTime };
+}
 
 // Hook for customer-facing fee calculation
 export function useDeliveryFeeCalculator() {
