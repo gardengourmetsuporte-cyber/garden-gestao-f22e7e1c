@@ -77,40 +77,57 @@ export function TabletMenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRe
     if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
 
     setSending(true);
-    try {
-      const { data: order, error: orderError } = await supabase
-        .from('tablet_orders')
-        .insert({
-          unit_id: unitId,
-          table_number: parseInt(tableNumber) || 0,
-          status: 'awaiting_confirmation',
-          total: cartTotal,
-          source: 'mesa',
-          customer_name: customerName.trim(),
-        })
-        .select('id')
-        .single();
 
-      if (orderError || !order) throw new Error(orderError?.message || 'Erro');
+    const maxRetries = 3;
+    let lastError: any = null;
 
-      const items = cart.map(c => ({
-        order_id: (order as any).id,
-        product_id: c.product.id,
-        quantity: c.quantity,
-        notes: [c.notes, c.selectedOptions.map(o => o.name).join(', ')].filter(Boolean).join(' | ') || null,
-        unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
-      }));
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const { data: order, error: orderError } = await supabase
+          .from('tablet_orders')
+          .insert({
+            unit_id: unitId,
+            table_number: parseInt(tableNumber) || 0,
+            status: 'awaiting_confirmation',
+            total: cartTotal,
+            source: 'mesa',
+            customer_name: customerName.trim(),
+          })
+          .select('id')
+          .single();
 
-      const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
-      if (itemsError) throw new Error(itemsError.message);
+        if (orderError || !order) throw new Error(orderError?.message || 'Erro ao criar pedido');
 
-      toast.success('Pedido enviado com sucesso!');
-      setOrderSent((order as any).id.slice(0, 8));
-    } catch (err: any) {
-      toast.error(err.message || 'Erro ao enviar pedido');
-    } finally {
-      setSending(false);
+        const items = cart.map(c => ({
+          order_id: (order as any).id,
+          product_id: c.product.id,
+          quantity: c.quantity,
+          notes: [c.notes, c.selectedOptions.map(o => o.name).join(', ')].filter(Boolean).join(' | ') || null,
+          unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
+        }));
+
+        const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
+        if (itemsError) throw new Error(itemsError.message);
+
+        toast.success('Pedido enviado com sucesso!');
+        setOrderSent((order as any).id.slice(0, 8));
+        setSending(false);
+        return; // Success — exit
+      } catch (err: any) {
+        lastError = err;
+        const isAbort = err?.name === 'AbortError' || err?.message?.includes('abort');
+        const isNetwork = err?.message?.includes('fetch') || err?.message?.includes('network');
+        if ((isAbort || isNetwork) && attempt < maxRetries - 1) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue; // Retry
+        }
+        break; // Non-retryable error
+      }
     }
+
+    toast.error('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+    console.error('[TabletMenuCart] Order send failed:', lastError);
+    setSending(false);
   };
 
   return (
