@@ -20,6 +20,7 @@ interface Props {
 export function MenuGroupContent({
   group, products, getOptionCount,
   onNewProduct, onEditProduct, onDeleteProduct, onLinkOptions, onImageUpload, onToggleProductAvailability,
+  viewMode = 'menu',
 }: Props) {
   if (!group) {
     return (
