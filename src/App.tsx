@@ -59,7 +59,7 @@ const Rewards = lazy(() => lazyRetry(() => import("./pages/Rewards")));
 const Settings = lazy(() => lazyRetry(() => import("./pages/Settings")));
 const NotFound = lazy(() => lazyRetry(() => import("./pages/NotFound")));
 const CashClosing = lazy(() => lazyRetry(() => import("./pages/CashClosing")));
-const Recipes = lazy(() => lazyRetry(() => import("./pages/Recipes")));
+
 const Employees = lazy(() => lazyRetry(() => import("./pages/Employees")));
 const TabletConfirm = lazy(() => lazyRetry(() => import("./pages/TabletConfirm")));
 const CardapioHub = lazy(() => lazyRetry(() => import("./pages/CardapioHub")));
