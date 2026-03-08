@@ -353,6 +353,14 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
             </div>
           </div>
 
+          {/* Endereço da loja (origin para cálculo de distância) */}
+          <StoreAddressConfig />
+
+          {/* Zonas de entrega */}
+          <div className="card-base p-4">
+            <DeliveryZonesConfig />
+          </div>
+
           <div className="card-base p-4 space-y-3">
             <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
               <AppIcon name="Clock" size={16} className="text-primary" /> Horários de Funcionamento
