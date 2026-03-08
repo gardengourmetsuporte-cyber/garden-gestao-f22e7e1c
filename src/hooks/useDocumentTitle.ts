@@ -27,6 +27,7 @@ export const ROUTE_TITLES: Record<string, string> = {
   '/deliveries': 'Entregas',
   '/brand': 'Marca',
   '/notifications': 'Notificações',
+  '/cardapio': 'Cardápio Digital',
   
 };
 
