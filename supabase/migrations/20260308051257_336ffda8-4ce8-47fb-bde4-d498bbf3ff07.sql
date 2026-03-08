@@ -1,0 +1,1 @@
+ALTER TABLE public.units ADD COLUMN menu_published_at timestamptz DEFAULT now();

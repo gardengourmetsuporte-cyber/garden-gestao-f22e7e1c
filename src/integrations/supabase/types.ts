@@ -4968,6 +4968,7 @@ export type Database = {
           created_by: string
           id: string
           is_active: boolean
+          menu_published_at: string | null
           name: string
           slug: string
           store_info: Json | null
@@ -4978,6 +4979,7 @@ export type Database = {
           created_by: string
           id?: string
           is_active?: boolean
+          menu_published_at?: string | null
           name: string
           slug: string
           store_info?: Json | null
@@ -4988,6 +4990,7 @@ export type Database = {
           created_by?: string
           id?: string
           is_active?: boolean
+          menu_published_at?: string | null
           name?: string
           slug?: string
           store_info?: Json | null
