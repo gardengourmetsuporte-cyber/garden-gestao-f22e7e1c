@@ -21,6 +21,7 @@ interface InviteData {
   accepted_at: string | null;
   expires_at: string;
   unit_name: string;
+  access_level_id: string | null;
 }
 
 export default function Invite() {
