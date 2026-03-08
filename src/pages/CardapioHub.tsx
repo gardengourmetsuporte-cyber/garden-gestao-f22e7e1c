@@ -229,7 +229,7 @@ export default function CardapioHub() {
         )}
 
         {cardapioTab !== 'config' && (
-          <div className="px-4 pt-3 lg:px-6 overflow-x-auto scrollbar-none">
+          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-1 lg:px-6 overflow-x-auto scrollbar-none">
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit mx-auto">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
