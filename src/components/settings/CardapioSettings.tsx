@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import type { GamificationPrize } from '@/hooks/useGamification';
 import { RodizioSettings as RodizioSettingsPanel } from '@/components/settings/RodizioSettings';
+import { DeliveryZonesConfig } from '@/components/settings/DeliveryZonesConfig';
+import { StoreAddressConfig } from '@/components/settings/StoreAddressConfig';
 
 type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
