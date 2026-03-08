@@ -29,7 +29,6 @@ const CARDAPIO_TABS: TabDef[] = [
   { key: 'cardapio-home', icon: 'Storefront', label: 'Início', path: '/cardapio?tab=dashboard', moduleKey: 'cardapio' },
   { key: 'cardapio', icon: 'BookOpen', label: 'Cardápio', path: '/cardapio', moduleKey: 'cardapio' },
   { key: 'pedidos', icon: 'ShoppingBag', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
-  { key: 'config', icon: 'Settings', label: 'Config', path: '/cardapio?section=config', moduleKey: 'cardapio' },
 ];
 
 const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
