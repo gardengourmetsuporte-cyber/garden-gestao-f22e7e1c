@@ -4359,10 +4359,14 @@ export type Database = {
       tablet_orders: {
         Row: {
           created_at: string
+          customer_address: string | null
+          customer_name: string | null
+          customer_phone: string | null
           error_message: string | null
           id: string
           pdv_response: Json | null
           retry_count: number | null
+          source: string
           status: string
           table_number: number
           total: number
@@ -4371,10 +4375,14 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_address?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
           error_message?: string | null
           id?: string
           pdv_response?: Json | null
           retry_count?: number | null
+          source?: string
           status?: string
           table_number: number
           total?: number
@@ -4383,10 +4391,14 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_address?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
           error_message?: string | null
           id?: string
           pdv_response?: Json | null
           retry_count?: number | null
+          source?: string
           status?: string
           table_number?: number
           total?: number

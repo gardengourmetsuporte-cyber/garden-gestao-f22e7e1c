@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,6 +24,19 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
 
+  // Delivery fields (when no mesa param)
+  const isDelivery = !mesa;
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+
+  const formatPhone = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
   if (orderSent) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center gap-5">
@@ -35,7 +49,7 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
           </p>
           <p className="text-muted-foreground text-xs mt-1">
-            Mesa {tableNumber || 'Balcão'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            {isDelivery ? (customerName || 'Delivery') : `Mesa ${tableNumber || 'Balcão'}`} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -44,8 +58,12 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
               <AppIcon name="Schedule" size={20} className="text-amber-500" />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-foreground">Aguardando preparo</p>
-              <p className="text-xs text-muted-foreground">Seu pedido está sendo preparado</p>
+              <p className="font-semibold text-foreground">
+                {isDelivery ? 'Aguardando confirmação' : 'Aguardando preparo'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isDelivery ? 'O estabelecimento confirmará seu pedido em breve' : 'Seu pedido está sendo preparado'}
+              </p>
             </div>
           </div>
         </div>
@@ -72,20 +90,33 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
   }
 
   const handleSend = async () => {
-    if (!tableNumber.trim()) {
-      toast.error('Informe o número da mesa');
-      return;
+    if (isDelivery) {
+      if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
+      if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
+      if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
+    } else {
+      if (!tableNumber.trim()) { toast.error('Informe o número da mesa'); return; }
     }
+
     setSending(true);
     try {
+      const orderData: any = {
+        unit_id: unitId,
+        table_number: isDelivery ? 0 : (parseInt(tableNumber) || 0),
+        status: 'awaiting_confirmation',
+        total: cartTotal,
+        source: isDelivery ? 'delivery' : 'mesa',
+      };
+
+      if (isDelivery) {
+        orderData.customer_name = customerName.trim();
+        orderData.customer_phone = customerPhone.replace(/\D/g, '');
+        orderData.customer_address = customerAddress.trim();
+      }
+
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
-        .insert({
-          unit_id: unitId,
-          table_number: parseInt(tableNumber) || 0,
-          status: 'awaiting_confirmation',
-          total: cartTotal,
-        })
+        .insert(orderData)
         .select('id')
         .single();
 
@@ -182,19 +213,48 @@ export function MenuCart({ cart, cartTotal, unitId, mesa, onUpdateQuantity, onRe
         </div>
       </div>
 
-      {/* Table input */}
-      {!mesa && (
-        <div className="rounded-2xl bg-card border border-border/30 p-4">
-          <label className="text-sm font-semibold text-foreground mb-2 block">Número da mesa</label>
+      {/* Delivery fields */}
+      {isDelivery ? (
+        <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+          <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+            <AppIcon name="Bike" size={16} className="text-primary" />
+            Dados para entrega
+          </h3>
           <Input
-            placeholder="Ex: 5"
-            value={tableNumber}
-            onChange={e => setTableNumber(e.target.value)}
-            className="text-center h-14 text-xl font-bold rounded-xl"
-            type="number"
-            inputMode="numeric"
+            placeholder="Seu nome *"
+            value={customerName}
+            onChange={e => setCustomerName(e.target.value)}
+            className="h-12 rounded-xl"
+          />
+          <Input
+            placeholder="Telefone *"
+            value={customerPhone}
+            onChange={e => setCustomerPhone(formatPhone(e.target.value))}
+            className="h-12 rounded-xl"
+            inputMode="tel"
+          />
+          <Textarea
+            placeholder="Endereço completo *"
+            value={customerAddress}
+            onChange={e => setCustomerAddress(e.target.value)}
+            className="rounded-xl resize-none"
+            rows={2}
           />
         </div>
+      ) : (
+        !mesa && (
+          <div className="rounded-2xl bg-card border border-border/30 p-4">
+            <label className="text-sm font-semibold text-foreground mb-2 block">Número da mesa</label>
+            <Input
+              placeholder="Ex: 5"
+              value={tableNumber}
+              onChange={e => setTableNumber(e.target.value)}
+              className="text-center h-14 text-xl font-bold rounded-xl"
+              type="number"
+              inputMode="numeric"
+            />
+          </div>
+        )
       )}
 
       <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
