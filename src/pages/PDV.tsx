@@ -99,7 +99,7 @@ export default function PDV() {
   };
 
   return (
-    <AppLayout title="PDV" showBack>
+    <AppLayout>
       <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
         {/* Top bar */}
         <div className="px-4 pt-3 pb-2 flex items-center gap-2">
