@@ -251,6 +251,7 @@ function AuthenticatedRoutes() {
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
           <Route path="/delivery-hub" element={<ProtectedRoute><DeliveryHub /></ProtectedRoute>} />
+          <Route path="/pdv" element={<ProtectedRoute><PDV /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
           <Route path="/gamification" element={<Navigate to="/cardapio" replace />} />
