@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
+import { useDeliveryFeeCalculator } from '@/hooks/useDeliveryZones';
 import type { User } from '@supabase/supabase-js';
 
 interface Props {
@@ -29,6 +30,10 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
   const [customerAddress, setCustomerAddress] = useState('');
   const [saveAddress, setSaveAddress] = useState(true);
 
+  // Fee calculation
+  const { calculateFee, calculating, result: feeResult, reset: resetFee } = useDeliveryFeeCalculator();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
   useEffect(() => {
     if (customerUser) {
       const name = customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || '';
@@ -48,13 +53,35 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
           .then(({ data }) => {
             if (data) {
               if (data.phone) setCustomerPhone(prev => prev || formatPhone(data.phone!));
-              // Use notes field to store saved address
               if (data.notes) setCustomerAddress(prev => prev || data.notes!);
             }
           });
       }
     }
   }, [customerUser, unitId]);
+
+  // Debounced fee calculation when address changes
+  const handleAddressChange = useCallback((value: string) => {
+    setCustomerAddress(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (value.trim().length >= 10) {
+      debounceRef.current = setTimeout(() => {
+        calculateFee(unitId, value);
+      }, 1200);
+    } else {
+      resetFee();
+    }
+  }, [unitId, calculateFee, resetFee]);
+
+  // Calculate fee when pre-filled address loads
+  useEffect(() => {
+    if (customerAddress.length >= 10 && !feeResult && !calculating) {
+      calculateFee(unitId, customerAddress);
+    }
+  }, [customerAddress]);
+
+  const deliveryFee = feeResult?.fee ?? 0;
+  const grandTotal = cartTotal + deliveryFee;
 
   const formatPhone = (val: string) => {
     const digits = val.replace(/\D/g, '').slice(0, 11);
@@ -89,7 +116,7 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
             </div>
           </div>
         </div>
-        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); }}>
+        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); resetFee(); }}>
           <AppIcon name="Plus" size={18} className="mr-2" />
           Fazer novo pedido
         </Button>
@@ -115,6 +142,7 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
     if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
     if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
     if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
+    if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
 
     setSending(true);
     try {
@@ -124,7 +152,7 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
           unit_id: unitId,
           table_number: 0,
           status: 'awaiting_confirmation',
-          total: cartTotal,
+          total: grandTotal,
           source: 'delivery',
           customer_name: customerName.trim(),
           customer_phone: customerPhone.replace(/\D/g, ''),
@@ -187,12 +215,49 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
           <span className="text-sm text-muted-foreground">Subtotal</span>
           <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
         </div>
+
+        {/* Delivery fee line */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground flex items-center gap-1">
+            Taxa de entrega
+            {calculating && <AppIcon name="Loader2" size={12} className="animate-spin text-muted-foreground" />}
+          </span>
+          {feeResult?.out_of_range ? (
+            <span className="text-xs font-medium text-destructive">Fora da área</span>
+          ) : feeResult && feeResult.fee !== null ? (
+            <span className="text-sm font-semibold text-foreground">
+              {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee)}
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground">—</span>
+          )}
+        </div>
+
+        {/* Distance info */}
+        {feeResult && !feeResult.out_of_range && (
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <AppIcon name="MapPin" size={10} />
+            <span>{feeResult.distance_km} km · {feeResult.duration}</span>
+            {feeResult.zone_name && <span>· {feeResult.zone_name}</span>}
+          </div>
+        )}
+
         <div className="border-t border-border/30" />
         <div className="flex items-center justify-between">
           <span className="font-bold text-foreground">Total</span>
-          <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+          <span className="text-xl font-bold text-primary">{formatPrice(grandTotal)}</span>
         </div>
       </div>
+
+      {/* Out of range warning */}
+      {feeResult?.out_of_range && (
+        <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 flex items-center gap-2">
+          <AppIcon name="AlertTriangle" size={16} className="text-destructive shrink-0" />
+          <p className="text-xs text-destructive">
+            Infelizmente não entregamos neste endereço ({feeResult.distance_km} km). Tente um endereço mais próximo.
+          </p>
+        </div>
+      )}
 
       {/* Logged-in user indicator */}
       {customerUser && (
@@ -230,9 +295,9 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
           inputMode="tel"
         />
         <Textarea
-          placeholder="Endereço completo *"
+          placeholder="Endereço completo * (rua, número, bairro, cidade)"
           value={customerAddress}
-          onChange={e => setCustomerAddress(e.target.value)}
+          onChange={e => handleAddressChange(e.target.value)}
           className="rounded-xl resize-none"
           rows={2}
         />
@@ -249,13 +314,17 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
         )}
       </div>
 
-      <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
+      <Button
+        className="w-full h-14 text-base font-bold rounded-xl"
+        onClick={handleSend}
+        disabled={sending || feeResult?.out_of_range}
+      >
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Finalizar Pedido • {formatPrice(cartTotal)}
+        Finalizar Pedido • {formatPrice(grandTotal)}
       </Button>
     </div>
   );
