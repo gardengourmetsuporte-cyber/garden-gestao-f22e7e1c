@@ -105,7 +105,7 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
 
   const tabs: { id: UnifiedTab; label: string; icon: string; count: number; badge?: number }[] = [
     { id: 'comandas', label: 'Comandas', icon: 'Receipt', count: stats.comandas, badge: stats.comandasPending },
-    { id: 'delivery', label: 'Delivery', icon: 'Bike', count: stats.delivery, badge: stats.deliveryPending },
+    { id: 'delivery', label: 'Delivery', icon: 'Truck', count: stats.delivery, badge: stats.deliveryPending },
     { id: 'ifood', label: 'iFood/Rappi', icon: 'Store', count: stats.ifood, badge: stats.ifoodNew },
   ];
 
@@ -152,7 +152,7 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
       )}
 
       {activeTab === 'delivery' && (
-        <TabletOrderList orders={deliveryOrders} emptyIcon="Bike" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={deliveryOrders} emptyIcon="Truck" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'ifood' && (

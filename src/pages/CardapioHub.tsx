@@ -217,16 +217,7 @@ export default function CardapioHub() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24">
-        {/* Quick Access Links + Publish */}
-        {activeUnit && (
-          <>
-            <MenuLinksBar
-              publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
-              tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
-              kdsUrl={`${window.location.origin}/kds/${activeUnit.id}`}
-            />
-          </>
-        )}
+        {/* Quick Access Links only in config */}
 
         {cardapioTab !== 'config' && (
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
@@ -318,9 +309,18 @@ export default function CardapioHub() {
 
           {/* ==================== CONFIGURAÇÕES ==================== */}
           {cardapioTab === 'config' && (
-            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
-              <CardapioSettings />
-            </Suspense>
+            <>
+              {activeUnit && (
+                <MenuLinksBar
+                  publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
+                  tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
+                  kdsUrl={`${window.location.origin}/kds/${activeUnit.id}`}
+                />
+              )}
+              <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
+                <CardapioSettings />
+              </Suspense>
+            </>
           )}
         </div>
       </div>
@@ -409,6 +409,7 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
               >
                 <AppIcon name="ExternalLink" size={13} className="text-primary" />
               </a>
+            </div>
           </div>
 
           {/* KDS - Cozinha */}
@@ -444,7 +445,6 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       {/* QR Code Modal */}
