@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,19 @@ import { toast } from 'sonner';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { AppIcon } from '@/components/ui/app-icon';
 
+interface LastPrice {
+  supplier_id: string;
+  item_id: string;
+  unit_price: number;
+  brand: string | null;
+  last_quoted_at: string;
+}
+
 interface QuotationData {
   quotation_supplier_id: string;
+  supplier_id: string;
   supplier_name: string;
+  supplier_has_phone: boolean;
   quotation_title: string;
   quotation_status: string;
   deadline: string | null;
@@ -18,6 +28,30 @@ interface QuotationData {
   items: { id: string; quantity: number; item: { id: string; name: string; unit_type: string } }[];
   existing_prices: { quotation_item_id: string; unit_price: number; brand: string | null; round: number }[];
   contested_item_ids: string[];
+  last_prices: LastPrice[];
+}
+
+const SESSION_KEY = 'supplier_session';
+
+function getSession(): { supplierId: string; supplierName: string; expiresAt: number } | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (s.expiresAt < Date.now()) {
+      localStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return s;
+  } catch { return null; }
+}
+
+function saveSession(supplierId: string, supplierName: string) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    supplierId,
+    supplierName,
+    expiresAt: Date.now() + 90 * 24 * 60 * 60 * 1000, // 90 days
+  }));
 }
 
 export default function QuotationPublic() {
@@ -28,8 +62,13 @@ export default function QuotationPublic() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [generalNotes, setGeneralNotes] = useState('');
-
   const [priceInputs, setPriceInputs] = useState<Record<string, { unit_price: string; brand: string; notes: string }>>({});
+
+  // Auth state
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -39,6 +78,20 @@ export default function QuotationPublic() {
       .then(d => {
         if (d.error) { setError(d.error); return; }
         setData(d);
+
+        // Check if login needed
+        const session = getSession();
+        if (d.supplier_has_phone) {
+          if (session && session.supplierId === d.supplier_id) {
+            setAuthenticated(true);
+          } else {
+            setNeedsLogin(true);
+          }
+        } else {
+          // No phone on file, skip login
+          setAuthenticated(true);
+        }
+
         // Pre-fill existing prices
         const inputs: Record<string, { unit_price: string; brand: string; notes: string }> = {};
         d.items.forEach((item: any) => {
@@ -54,6 +107,57 @@ export default function QuotationPublic() {
       .catch(() => setError('Erro ao carregar cotação'))
       .finally(() => setLoading(false));
   }, [token]);
+
+  // Map inventory item_id -> last price
+  const lastPriceMap = useMemo(() => {
+    if (!data?.last_prices) return {};
+    const map: Record<string, LastPrice> = {};
+    data.last_prices.forEach(lp => { map[lp.item_id] = lp; });
+    return map;
+  }, [data?.last_prices]);
+
+  const handleVerifyPhone = async () => {
+    if (!token || !phoneInput.trim()) return;
+    setVerifying(true);
+    try {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(
+        `${baseUrl}/functions/v1/quotation-public?token=${token}&action=verify-phone&phone=${encodeURIComponent(phoneInput.trim())}`
+      );
+      const result = await res.json();
+      if (result.valid) {
+        saveSession(result.supplier_id, result.supplier_name);
+        setAuthenticated(true);
+        setNeedsLogin(false);
+        toast.success(`Bem-vindo, ${result.supplier_name}!`);
+      } else {
+        toast.error('Telefone não corresponde ao cadastro deste fornecedor.');
+      }
+    } catch {
+      toast.error('Erro ao verificar telefone.');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleRepeatLastPrices = () => {
+    if (!data) return;
+    let filled = 0;
+    const newInputs = { ...priceInputs };
+    data.items.forEach(item => {
+      const lp = lastPriceMap[item.item.id];
+      if (lp) {
+        newInputs[item.id] = {
+          ...newInputs[item.id],
+          unit_price: String(lp.unit_price),
+          brand: lp.brand || newInputs[item.id]?.brand || '',
+        };
+        filled++;
+      }
+    });
+    setPriceInputs(newInputs);
+    toast.success(`${filled} ${filled === 1 ? 'item preenchido' : 'itens preenchidos'} com últimos preços`);
+  };
 
   const handleSubmit = async () => {
     if (!data) return;
@@ -109,6 +213,51 @@ export default function QuotationPublic() {
     );
   }
 
+  // Login screen
+  if (needsLogin && !authenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Sonner />
+        <div className="w-full max-w-sm space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
+              <AppIcon name="Store" className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="text-xl font-bold text-foreground">{data.quotation_title || 'Cotação de Preços'}</h1>
+            <p className="text-sm text-muted-foreground">
+              Para acessar, informe o telefone cadastrado do fornecedor.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Telefone</label>
+              <Input
+                type="tel"
+                placeholder="(11) 99999-9999"
+                value={phoneInput}
+                onChange={e => setPhoneInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleVerifyPhone()}
+                className="rounded-xl text-center text-lg tracking-wider"
+              />
+            </div>
+            <Button
+              onClick={handleVerifyPhone}
+              disabled={verifying || phoneInput.trim().length < 10}
+              className="w-full h-12 rounded-xl"
+            >
+              {verifying ? (
+                <AppIcon name="Loader2" className="w-5 h-5 animate-spin" />
+              ) : (
+                'Entrar'
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (submitted || (data.supplier_status === 'responded' && data.existing_prices.length > 0 && data.quotation_status !== 'contested')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -128,6 +277,7 @@ export default function QuotationPublic() {
 
   const isContested = data.supplier_status === 'contested';
   const filledCount = Object.values(priceInputs).filter(v => v.unit_price && Number(v.unit_price) > 0).length;
+  const hasLastPrices = Object.keys(lastPriceMap).length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,11 +308,26 @@ export default function QuotationPublic() {
         )}
       </header>
 
+      {/* Repeat last prices button */}
+      {hasLastPrices && (
+        <div className="p-4 pb-0">
+          <Button
+            variant="outline"
+            onClick={handleRepeatLastPrices}
+            className="w-full rounded-xl border-dashed gap-2"
+          >
+            <AppIcon name="RotateCcw" className="w-4 h-4" />
+            Usar últimos preços ({Object.keys(lastPriceMap).length} itens)
+          </Button>
+        </div>
+      )}
+
       {/* Items */}
       <div className="p-4 space-y-3 pb-32">
         {data.items.map(item => {
           const isContestedItem = data.contested_item_ids.includes(item.id);
           const input = priceInputs[item.id] || { unit_price: '', brand: '', notes: '' };
+          const lastPrice = lastPriceMap[item.item.id];
 
           return (
             <div
@@ -180,11 +345,18 @@ export default function QuotationPublic() {
                     ×{item.quantity} {item.item.unit_type}
                   </p>
                 </div>
-                {isContestedItem && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 font-medium">
-                    Revisar
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5">
+                  {lastPrice && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                      Último: R$ {Number(lastPrice.unit_price).toFixed(2)}
+                    </span>
+                  )}
+                  {isContestedItem && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500 font-medium">
+                      Revisar
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
