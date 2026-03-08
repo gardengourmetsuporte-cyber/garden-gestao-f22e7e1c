@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
         .from("quotation_suppliers")
         .select(`
           id, status, notes, quotation_id,
-          supplier:suppliers(id, name, phone),
+          supplier:suppliers(id, name, phone, portal_token),
           quotation:quotations(id, title, status, deadline, notes, unit_id,
             unit:units(name)
           )
