@@ -232,6 +232,7 @@ export default function CardapioHub() {
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-full">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
+                { id: 'receitas' as CardapioTab, label: 'Receitas', icon: 'ChefHat', count: recipeSync.syncableRecipes.length },
                 { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
                 { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
               ]).map(tab => (
