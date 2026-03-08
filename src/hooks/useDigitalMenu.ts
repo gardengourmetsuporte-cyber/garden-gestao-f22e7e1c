@@ -95,10 +95,10 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
     setLoading(true);
     try {
       const [unitRes, catRes, grpRes, prodRes] = await Promise.all([
-        supabase.from('units').select('id, name, store_info').eq('id', unitId).maybeSingle(),
+        supabase.from('units').select('id, name, store_info, menu_published_at').eq('id', unitId).maybeSingle(),
         supabase.from('menu_categories').select('id, name, icon, color, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+        supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability, updated_at').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+        supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability, updated_at').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
       ]);
 
       setUnit((unitRes.data as any) || null);
