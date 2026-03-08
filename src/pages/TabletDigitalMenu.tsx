@@ -16,7 +16,7 @@ export default function TabletDigitalMenu() {
     unit, categories, groups, products, loading,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
-  } = useDigitalMenu(unitId);
+  } = useDigitalMenu(unitId, 'tablet');
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<DMProduct | null>(null);
