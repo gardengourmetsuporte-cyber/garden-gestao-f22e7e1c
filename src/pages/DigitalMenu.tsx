@@ -296,9 +296,9 @@ export default function DigitalMenu() {
           setPendingTabAfterAuth(null);
         }
         toast.success('Cadastro completo!');
-      } catch {
+      } catch (err) {
         toast.error('Erro ao salvar dados');
-      }
+        throw err;
     };
 
     return (
