@@ -237,6 +237,9 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
         </div>
       )}
 
+      {/* ==================== RODÍZIO ==================== */}
+      {activeTab === 'rodizio' && <RodizioSettingsPanel />}
+
       {/* ==================== ROLETA ==================== */}
       {activeTab === 'roleta' && (
         <div className="space-y-4">
