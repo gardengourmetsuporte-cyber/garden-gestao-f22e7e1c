@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,7 +73,7 @@ export function useSmartReceiving() {
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const queryKey = ['smart-receivings', activeUnitId];
+  const queryKey = useMemo(() => ['smart-receivings', activeUnitId], [activeUnitId]);
 
   const { data: receivings = [], isLoading } = useQuery({
     queryKey,

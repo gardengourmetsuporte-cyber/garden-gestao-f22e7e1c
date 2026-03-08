@@ -62,7 +62,7 @@ export function useDeliveries() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<DeliveryStatus | 'all'>('all');
 
-  const queryKey = ['deliveries', activeUnitId];
+  const queryKey = useMemo(() => ['deliveries', activeUnitId], [activeUnitId]);
 
   const { data: deliveries = [], isLoading } = useQuery({
     queryKey,

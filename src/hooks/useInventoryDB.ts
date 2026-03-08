@@ -61,8 +61,8 @@ export function useInventoryDB() {
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
 
-  const itemsKey = ['inventory-items', activeUnitId];
-  const movementsKey = ['inventory-movements', activeUnitId];
+  const itemsKey = useMemo(() => ['inventory-items', activeUnitId], [activeUnitId]);
+  const movementsKey = useMemo(() => ['inventory-movements', activeUnitId], [activeUnitId]);
 
   const { data: items = [], isLoading: isLoadingItems } = useQuery({
     queryKey: itemsKey,

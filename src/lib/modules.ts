@@ -75,6 +75,16 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Operação',
+    children: [
+      { key: 'recipes.view', label: 'Ver fichas técnicas', icon: 'Eye' },
+      { key: 'recipes.create', label: 'Criar/editar fichas', icon: 'PenSquare' },
+      { key: 'recipes.delete', label: 'Excluir fichas', icon: 'Trash2' },
+      { key: 'recipes.ingredients', label: 'Gerenciar ingredientes', icon: 'List' },
+      { key: 'recipes.sync_menu', label: 'Sincronizar cardápio', icon: 'RefreshCcw' },
+    ],
+  },
+  {
     key: 'checklists', label: 'Checklists', icon: 'ClipboardCheck', route: '/checklists', routes: ['/checklists'], group: 'Operação',
     children: [
       { key: 'checklists.complete', label: 'Completar itens', icon: 'CheckSquare' },
@@ -98,14 +108,6 @@ export const ALL_MODULES: ModuleDef[] = [
       { key: 'deliveries.view', label: 'Ver entregas', icon: 'Eye' },
       { key: 'deliveries.create', label: 'Cadastrar entregas', icon: 'Camera' },
       { key: 'deliveries.manage', label: 'Gerenciar status', icon: 'ArrowLeftRight' },
-    ],
-  },
-  {
-    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Gestão',
-    children: [
-      { key: 'recipes.view', label: 'Ver fichas', icon: 'Eye' },
-      { key: 'recipes.create', label: 'Criar/editar fichas', icon: 'PenSquare' },
-      { key: 'recipes.costs', label: 'Custos e precificação', icon: 'Calculator' },
     ],
   },
   {

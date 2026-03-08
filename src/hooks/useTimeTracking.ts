@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -54,8 +54,8 @@ export function useTimeTracking() {
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
 
-  const queryKey = ['time-records', activeUnitId];
-  const settingsKey = ['time-tracking-settings', activeUnitId];
+  const queryKey = useMemo(() => ['time-records', activeUnitId], [activeUnitId]);
+  const settingsKey = useMemo(() => ['time-tracking-settings', activeUnitId], [activeUnitId]);
 
   // Fetch all time records for the unit (admin) or user
   const { data: records = [], isLoading } = useQuery({

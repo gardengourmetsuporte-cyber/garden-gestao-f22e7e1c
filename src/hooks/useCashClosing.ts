@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFinanceCategorize } from './useFinanceCategorize';
 import { useAuth } from '@/contexts/AuthContext';
@@ -63,7 +63,7 @@ export function useCashClosing() {
   const queryClient = useQueryClient();
   const { categorize } = useFinanceCategorize();
 
-  const queryKey = ['cash-closings', activeUnitId];
+  const queryKey = useMemo(() => ['cash-closings', activeUnitId], [activeUnitId]);
 
   const { data: closings = [], isLoading } = useQuery({
     queryKey,
