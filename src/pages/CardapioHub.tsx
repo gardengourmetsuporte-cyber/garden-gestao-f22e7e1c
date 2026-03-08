@@ -54,6 +54,9 @@ export default function CardapioHub() {
   const tabletAdmin = useTabletAdmin();
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
 
+  // Rodízio settings
+  const { settings: rodizioSettings, loading: rodizioLoading } = useRodizioSettings();
+
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
