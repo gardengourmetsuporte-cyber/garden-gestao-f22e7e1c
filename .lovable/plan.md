@@ -1,45 +1,62 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Problema Identificado
 
-### O que muda
+A página `/invite` está definida em `PublicRoutes` **fora** do `AuthenticatedApp`:
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
-
-### Conceito visual
-
-```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
+```
+App
+└── PublicRoutes
+    ├── /invite → Invite ❌ (usa useAuth e useUnit, mas não tem os providers)
+    └── /* → AuthenticatedApp
+              └── AuthProvider
+                  └── UnitProvider
+                      └── Routes protegidas
 ```
 
-### Implementação
+O componente `Invite.tsx` faz:
+```tsx
+const { user } = useAuth();       // ❌ Sem AuthProvider
+const { refetchUnits } = useUnit(); // ❌ Sem UnitProvider
+```
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+Quando o hook é chamado sem o provider correspondente, o contexto retorna `undefined` e a aplicação crasha silenciosamente → tela preta.
 
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
+## Solução
 
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+Envolver a rota `/invite` com os providers necessários:
 
-### Resultado
+### Arquivo: `src/App.tsx`
 
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+Criar um wrapper para rotas públicas que precisam de contexto de autenticação:
+
+```tsx
+function PublicWithAuth({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <UnitProvider>
+        {children}
+      </UnitProvider>
+    </AuthProvider>
+  );
+}
+```
+
+E alterar a rota `/invite`:
+
+```tsx
+<Route path="/invite" element={
+  <PublicWithAuth>
+    <Invite />
+  </PublicWithAuth>
+} />
+```
+
+Isso mantém a rota pública (sem ProtectedRoute), mas fornece os contextos que o componente precisa para funcionar.
+
+## Arquivos a modificar
+
+| Arquivo | Mudança |
+|---|---|
+| `src/App.tsx` | Criar wrapper `PublicWithAuth` e aplicar na rota `/invite` |
 
