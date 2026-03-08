@@ -193,9 +193,14 @@ export default function CardapioHub() {
               Cardápio Digital
             </h1>
             {activeUnit && (
-              <a href={`/m/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1 text-xs text-primary font-medium">
-                <AppIcon name="ExternalLink" size={14} /> Ver público
-              </a>
+              <div className="flex items-center gap-3">
+                <a href={`/m/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1 text-xs text-primary font-medium">
+                  <AppIcon name="ExternalLink" size={14} /> Ver público
+                </a>
+                <a href={`/tablet/${activeUnit.id}`} target="_blank" rel="noopener" className="flex items-center gap-1 text-xs text-primary font-medium">
+                  <AppIcon name="Tablet" size={14} /> Ver tablet
+                </a>
+              </div>
             )}
           </div>
         </header>
