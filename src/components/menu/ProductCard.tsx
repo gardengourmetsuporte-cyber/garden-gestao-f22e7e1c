@@ -119,7 +119,7 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
         <span className="font-bold text-sm text-primary">{formatPrice(product.price)}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-1.5 rounded-lg hover:bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button className="p-1.5 rounded-lg hover:bg-secondary/60 transition-opacity">
               <AppIcon name="MoreVertical" size={16} className="text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
