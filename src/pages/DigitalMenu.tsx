@@ -9,6 +9,7 @@ import { MenuProductDetail } from '@/components/digital-menu/MenuProductDetail';
 import { MenuCart } from '@/components/digital-menu/MenuCart';
 import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
+import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
 import { PrizeResult } from '@/components/gamification/PrizeResult';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -41,6 +42,7 @@ export default function DigitalMenu() {
   const [customerUser, setCustomerUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
 
   // Check auth state on mount
@@ -50,26 +52,53 @@ export default function DigitalMenu() {
       setAuthChecked(true);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const user = session?.user ?? null;
       setCustomerUser(user);
       setAuthChecked(true);
 
-      // If user just logged in and we had a pending tab, go there
-      if (user && pendingTabAfterAuth) {
+      // After OAuth login, check if customer profile is complete
+      if (user && unitId && _event === 'SIGNED_IN') {
         setShowAuth(false);
-        setActiveTab(pendingTabAfterAuth);
-        setPendingTabAfterAuth(null);
+        const needsProfile = await checkNeedsProfile(user, unitId);
+        if (needsProfile) {
+          setShowProfile(true);
+        } else {
+          if (pendingTabAfterAuth) {
+            setActiveTab(pendingTabAfterAuth);
+            setPendingTabAfterAuth(null);
+          }
+        }
+        await ensureCustomerRecord(user, unitId);
       }
 
-      // Auto-create customer record after OAuth login
-      if (user && unitId && _event === 'SIGNED_IN') {
-        ensureCustomerRecord(user, unitId);
+      // If user already logged in (page refresh), just proceed
+      if (user && !showAuth && pendingTabAfterAuth && _event !== 'SIGNED_IN') {
+        setActiveTab(pendingTabAfterAuth);
+        setPendingTabAfterAuth(null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [unitId, pendingTabAfterAuth]);
+  }, [unitId, pendingTabAfterAuth, showAuth]);
+
+  // Check if customer needs to complete their profile (no phone)
+  const checkNeedsProfile = async (user: User, unitId: string): Promise<boolean> => {
+    try {
+      const email = user.email;
+      if (!email) return true;
+      const { data } = await supabase
+        .from('customers')
+        .select('phone')
+        .eq('unit_id', unitId)
+        .eq('email', email)
+        .maybeSingle();
+      // If no customer record or no phone, needs profile
+      return !data || !data.phone;
+    } catch {
+      return true;
+    }
+  };
 
   // Create/update customer record from OAuth user data
   const ensureCustomerRecord = async (user: User, unitId: string) => {
@@ -187,6 +216,71 @@ export default function DigitalMenu() {
         logoUrl={unit?.store_info?.logo_url}
         onSkip={() => {
           setShowAuth(false);
+          if (pendingTabAfterAuth) {
+            setActiveTab(pendingTabAfterAuth);
+            setPendingTabAfterAuth(null);
+          }
+        }}
+      />
+    );
+  }
+
+  // Show profile completion screen
+  if (showProfile && customerUser) {
+    const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
+      if (!unitId) return;
+      try {
+        const email = customerUser.email || '';
+        // Update or insert customer record with complete data
+        const { data: existing } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('unit_id', unitId)
+          .eq('email', email)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase.from('customers').update({
+            name: data.name,
+            phone: data.phone,
+            birthday: data.birthday,
+          }).eq('id', existing.id);
+        } else {
+          await supabase.from('customers').insert({
+            unit_id: unitId,
+            name: data.name,
+            email,
+            phone: data.phone,
+            birthday: data.birthday,
+            origin: 'whatsapp' as any,
+            score: 0,
+            segment: 'new',
+            loyalty_points: 0,
+            total_spent: 0,
+            total_orders: 0,
+          });
+        }
+
+        setShowProfile(false);
+        if (pendingTabAfterAuth) {
+          setActiveTab(pendingTabAfterAuth);
+          setPendingTabAfterAuth(null);
+        }
+        toast.success('Cadastro completo!');
+      } catch {
+        toast.error('Erro ao salvar dados');
+      }
+    };
+
+    return (
+      <MenuCustomerProfile
+        unitName={unit?.name}
+        logoUrl={unit?.store_info?.logo_url}
+        defaultName={customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || ''}
+        defaultEmail={customerUser.email}
+        onComplete={handleProfileComplete}
+        onBack={() => {
+          setShowProfile(false);
           if (pendingTabAfterAuth) {
             setActiveTab(pendingTabAfterAuth);
             setPendingTabAfterAuth(null);
