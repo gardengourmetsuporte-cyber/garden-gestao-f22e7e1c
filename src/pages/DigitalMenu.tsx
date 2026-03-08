@@ -271,9 +271,10 @@ export default function DigitalMenu() {
       if (!unitId) return;
       
       // Timeout wrapper to prevent hanging
-      const withTimeout = <T,>(promise: Promise<T>, ms = 8000): Promise<T> =>
+      // Timeout wrapper to prevent hanging queries
+      const withTimeout = async <T,>(fn: () => PromiseLike<T>, ms = 8000): Promise<T> =>
         Promise.race([
-          promise,
+          Promise.resolve(fn()),
           new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
         ]);
 
