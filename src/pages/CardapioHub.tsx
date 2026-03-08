@@ -6,6 +6,7 @@ import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
 import { useFabAction } from '@/contexts/FabActionContext';
+import { useRodizioSettings } from '@/hooks/useRodizioSettings';
 
 // Menu components
 import { MenuCategoryTree } from '@/components/menu/MenuCategoryTree';
@@ -26,8 +27,9 @@ import { cn } from '@/lib/utils';
 
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
+const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
 
-type CardapioTab = 'produtos' | 'opcionais' | 'config';
+type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
@@ -52,6 +54,9 @@ export default function CardapioHub() {
   // Tablet admin hook (for orders)
   const tabletAdmin = useTabletAdmin();
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
+
+  // Rodízio settings
+  const { settings: rodizioSettings, loading: rodizioLoading } = useRodizioSettings();
 
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
@@ -245,6 +250,7 @@ export default function CardapioHub() {
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
+                { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'AllInclusive', count: undefined },
                 { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
               ]).map(tab => (
                 <button
@@ -306,6 +312,13 @@ export default function CardapioHub() {
                 }}
               />
             </div>
+          )}
+
+          {/* ==================== RODÍZIO ==================== */}
+          {cardapioTab === 'rodizio' && (
+            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /></div>}>
+              <RodizioSettingsLazy />
+            </Suspense>
           )}
 
           {/* ==================== OPCIONAIS ==================== */}
