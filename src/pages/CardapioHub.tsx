@@ -25,13 +25,15 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
+const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 
 type CardapioTab = 'produtos' | 'opcionais' | 'config';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
+  const isDashboard = searchParams.get('tab') === 'dashboard';
   const isConfigFromUrl = searchParams.get('section') === 'config';
 
   // Menu admin hook
