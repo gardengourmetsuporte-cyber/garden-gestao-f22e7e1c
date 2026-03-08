@@ -4608,6 +4608,7 @@ export type Database = {
           availability: Json
           category: string
           codigo_pdv: string | null
+          cost_per_portion: number | null
           created_at: string
           custom_prices: Json | null
           description: string | null
@@ -4620,6 +4621,8 @@ export type Database = {
           name: string
           price: number
           price_type: string
+          profit_margin: number | null
+          recipe_id: string | null
           schedule: Json | null
           sort_order: number
           unit_id: string
@@ -4629,6 +4632,7 @@ export type Database = {
           availability?: Json
           category?: string
           codigo_pdv?: string | null
+          cost_per_portion?: number | null
           created_at?: string
           custom_prices?: Json | null
           description?: string | null
@@ -4641,6 +4645,8 @@ export type Database = {
           name: string
           price?: number
           price_type?: string
+          profit_margin?: number | null
+          recipe_id?: string | null
           schedule?: Json | null
           sort_order?: number
           unit_id: string
@@ -4650,6 +4656,7 @@ export type Database = {
           availability?: Json
           category?: string
           codigo_pdv?: string | null
+          cost_per_portion?: number | null
           created_at?: string
           custom_prices?: Json | null
           description?: string | null
@@ -4662,6 +4669,8 @@ export type Database = {
           name?: string
           price?: number
           price_type?: string
+          profit_margin?: number | null
+          recipe_id?: string | null
           schedule?: Json | null
           sort_order?: number
           unit_id?: string
@@ -4673,6 +4682,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "menu_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tablet_products_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
             referencedColumns: ["id"]
           },
           {
