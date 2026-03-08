@@ -83,6 +83,7 @@ const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")))
 const Customers = lazy(() => lazyRetry(() => import("./pages/Customers")));
 const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
 const TabletDigitalMenu = lazy(() => lazyRetry(() => import("./pages/TabletDigitalMenu")));
+const SupplierPortal = lazy(() => lazyRetry(() => import("./pages/SupplierPortal")));
 const TabletHome = lazy(() => lazyRetry(() => import("./pages/TabletHome")));
 const TabletRodizio = lazy(() => lazyRetry(() => import("./pages/TabletRodizio")));
 const KDS = lazy(() => lazyRetry(() => import("./pages/KDS")));
