@@ -28,6 +28,7 @@ const LazyChecklist = lazy(() => import('./ChecklistDashboardWidget').then(m => 
 const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
 const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ default: m.AutoOrderWidget })));
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
+const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 
 function LazyWidget({ children }: { children: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
@@ -118,6 +119,15 @@ export function AdminDashboard() {
             <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
           </DashboardSection>
         ) : null;
+
+      case 'quick-stats':
+        return (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
+              <LazyQuickStats />
+            </Suspense>
+          </div>
+        );
 
       default:
         return null;

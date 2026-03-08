@@ -9,6 +9,7 @@ export interface DashboardWidget {
 }
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
+  { key: 'quick-stats', label: 'Visão geral', icon: 'LayoutDashboard', visible: true },
   { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
   { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
