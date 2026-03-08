@@ -356,7 +356,7 @@ export default function TabletAdmin() {
                             <p className="text-xs font-bold text-foreground">Mesa {t.number}</p>
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`);
+                                navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}?mesa=${t.number}`);
                                 toast({ title: `Link mesa ${t.number} copiado!` });
                               }}
                               className="text-[10px] text-primary font-medium mt-0.5"
