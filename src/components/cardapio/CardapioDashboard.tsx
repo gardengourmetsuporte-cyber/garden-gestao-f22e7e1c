@@ -141,61 +141,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
         ))}
       </div>
 
-      {/* Quick delivery time config */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center">
-              <AppIcon name="DeliveryDining" size={18} className="text-foreground" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-foreground">Tempo de Entrega</p>
-              {!editingDeliveryTime && (
-                <p className="text-sm text-muted-foreground">
-                  {storeInfo?.delivery_time || 'Não configurado'}
-                </p>
-              )}
-            </div>
-          </div>
-          {!editingDeliveryTime ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setDeliveryTimeValue(storeInfo?.delivery_time || '');
-                setEditingDeliveryTime(true);
-              }}
-            >
-              <AppIcon name="Edit" size={14} className="mr-1" /> Editar
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Input
-                value={deliveryTimeValue}
-                onChange={e => setDeliveryTimeValue(e.target.value)}
-                placeholder="Ex: 30-50 min"
-                className="h-8 text-sm w-32"
-              />
-              <Button
-                size="sm"
-                className="h-8"
-                onClick={() => saveDeliveryTime.mutate(deliveryTimeValue)}
-                disabled={saveDeliveryTime.isPending}
-              >
-                Salvar
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8"
-                onClick={() => setEditingDeliveryTime(false)}
-              >
-                <AppIcon name="X" size={14} />
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Delivery Time Widget */}
+      <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
 
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (
