@@ -391,6 +391,7 @@ export default function CardapioHub() {
         onOpenChange={setRecipeSheetOpen}
         recipe={editingRecipe}
         defaultName={defaultRecipeName}
+        defaultCategoryId={defaultRecipeCategoryId}
         categories={recipeCategories}
         inventoryItems={recipeInventoryItems}
         subRecipes={getAvailableSubRecipes(editingRecipe?.id).map(r => ({
