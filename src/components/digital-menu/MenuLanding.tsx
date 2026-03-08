@@ -1,5 +1,6 @@
 import { DMUnit } from '@/hooks/useDigitalMenu';
 import { AppIcon } from '@/components/ui/app-icon';
+import gardenLogo from '@/assets/logo.png';
 
 interface Props {
   unit: DMUnit | null;
@@ -31,34 +32,34 @@ export function MenuLanding({ unit, unitInitials = '?' }: Props) {
   return (
     <div className="relative">
       {/* Banner */}
-      <div className="h-48 md:h-64 w-full overflow-hidden relative">
+      <div className="h-44 md:h-56 w-full overflow-hidden relative">
         {bannerUrl ? (
           <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full" style={{
-            background: 'linear-gradient(180deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--primary) / 0.08) 40%, hsl(var(--background)) 100%)',
+            background: 'linear-gradient(180deg, hsl(var(--primary) / 0.18) 0%, hsl(var(--primary) / 0.06) 50%, hsl(var(--background)) 100%)',
           }} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
       </div>
 
       {/* Logo + Info */}
-      <div className="px-4 md:px-8 -mt-16 relative z-10">
+      <div className="px-5 md:px-8 -mt-14 relative z-10">
         <div className="flex items-end gap-4">
           {/* Logo container */}
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
+          <div className="w-[88px] h-[88px] md:w-24 md:h-24 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-card flex items-center justify-center">
-                <span className="text-2xl md:text-3xl font-bold text-primary/60">{unitInitials}</span>
+              <div className="w-full h-full bg-white flex items-center justify-center p-2.5">
+                <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
               </div>
             )}
           </div>
-          <div className="pb-2 min-w-0">
-            <h1 className="text-xl md:text-2xl font-bold text-foreground leading-tight">{unit.name}</h1>
+          <div className="pb-1.5 min-w-0">
+            <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight">{unit.name}</h1>
             {cuisineType && (
-              <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{cuisineType}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{cuisineType}</p>
             )}
           </div>
         </div>
@@ -91,7 +92,7 @@ export function MenuLanding({ unit, unitInitials = '?' }: Props) {
 
         {/* Address */}
         {(city || address) && (
-          <p className="text-xs md:text-sm text-muted-foreground mt-2 flex items-center gap-1">
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
             <AppIcon name="LocationOn" size={13} className="shrink-0" />
             {[address, city].filter(Boolean).join(' • ')}
           </p>
