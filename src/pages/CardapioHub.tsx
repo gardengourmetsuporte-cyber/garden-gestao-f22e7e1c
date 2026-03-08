@@ -377,6 +377,21 @@ export default function CardapioHub() {
       <ProductSheet open={productSheetOpen} onOpenChange={setProductSheetOpen} product={editingProduct} groups={groups} onSave={saveProduct} onDelete={deleteProduct} onImageUpload={(productId, file) => uploadProductImage(productId, file)} />
       <OptionGroupSheet open={ogSheetOpen} onOpenChange={setOgSheetOpen} optionGroup={editingOG} onSave={saveOptionGroup} onDelete={deleteOptionGroup} />
       <LinkOptionsDialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen} optionGroup={linkingOG} categories={categories} groups={groups} products={products} linkedProductIds={linkingOG ? getLinkedProductIds(linkingOG.id) : []} onSave={(ogId, pids) => setProductOptionLinks(ogId, pids)} />
+      <RecipeSheet
+        open={recipeSheetOpen}
+        onOpenChange={setRecipeSheetOpen}
+        recipe={editingRecipe}
+        categories={recipeCategories}
+        inventoryItems={recipeInventoryItems}
+        subRecipes={getAvailableSubRecipes(editingRecipe?.id).map(r => ({
+          id: r.id, name: r.name, yield_unit: r.yield_unit, cost_per_portion: r.cost_per_portion,
+          category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
+        }))}
+        onSave={handleRecipeSave}
+        isSaving={isAddingRecipe || isUpdatingRecipe}
+        onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
+        onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
+      />
     </AppLayout>
   );
 }
