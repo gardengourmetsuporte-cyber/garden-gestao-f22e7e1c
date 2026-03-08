@@ -11,6 +11,7 @@ export interface DeliveryZone {
   min_distance_km: number;
   max_distance_km: number;
   fee: number;
+  delivery_time_minutes: number;
   is_active: boolean;
   sort_order: number;
 }
