@@ -14,11 +14,13 @@ interface Props {
   onLinkOptions: (productId: string) => void;
   onImageUpload?: (productId: string, file: File) => void;
   onToggleProductAvailability?: (product: MenuProduct, channel: 'tablet' | 'delivery') => void;
+  viewMode?: 'menu' | 'ficha';
 }
 
 export function MenuGroupContent({
   group, products, getOptionCount,
   onNewProduct, onEditProduct, onDeleteProduct, onLinkOptions, onImageUpload, onToggleProductAvailability,
+  viewMode = 'menu',
 }: Props) {
   if (!group) {
     return (
@@ -83,6 +85,7 @@ export function MenuGroupContent({
               onLinkOptions={() => onLinkOptions(p.id)}
               onImageUpload={onImageUpload}
               onToggleAvailability={onToggleProductAvailability}
+              viewMode={viewMode}
             />
           ))}
         </div>

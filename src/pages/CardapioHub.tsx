@@ -18,6 +18,7 @@ import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
+import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
 import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
@@ -33,7 +34,7 @@ const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettin
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
 
-type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio' | 'receitas';
+type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
@@ -70,6 +71,7 @@ export default function CardapioHub() {
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'menu' | 'ficha'>('menu');
 
   useEffect(() => {
     if (isConfigFromUrl) {
@@ -99,7 +101,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config' || cardapioTab === 'receitas') {
+    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config') {
       return null;
     }
     if (cardapioTab === 'opcionais') {
@@ -112,16 +114,16 @@ export default function CardapioHub() {
         setOgSheetOpen(true);
       }};
     }
-    // Default: add product
-    return { icon: 'Plus', label: 'Novo Produto', onClick: () => {
-      setEditingProduct({
-        name: '', price: 0, category: 'Geral', group_id: selectedGroupId,
-        is_active: true, availability: { tablet: true, delivery: true },
-        price_type: 'fixed', is_highlighted: false, is_18_plus: false,
-      });
-      setProductSheetOpen(true);
-    }};
-  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, selectedGroupId]);
+    // Toggle between menu and ficha tecnica
+    if (cardapioTab === 'produtos') {
+      return {
+        icon: viewMode === 'menu' ? 'ChefHat' : 'Eye',
+        label: viewMode === 'menu' ? 'Ficha Técnica' : 'Ver Cardápio',
+        onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu'),
+      };
+    }
+    return null;
+  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
 
   useFabAction(fabAction, [fabAction]);
 
@@ -232,7 +234,6 @@ export default function CardapioHub() {
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-full">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-                { id: 'receitas' as CardapioTab, label: 'Receitas', icon: 'ChefHat', count: recipeSync.syncableRecipes.length },
                 { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
                 { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
               ]).map(tab => (
@@ -263,6 +264,13 @@ export default function CardapioHub() {
           {/* ==================== PRODUTOS ==================== */}
           {cardapioTab === 'produtos' && (
             <div className="space-y-4">
+              {viewMode === 'ficha' && (
+                <FichaTecnicaHeader
+                  products={products}
+                  syncing={recipeSync.syncing}
+                  onRefreshCosts={recipeSync.refreshCosts}
+                />
+              )}
               <MenuCategoryTree
                 categories={categories}
                 groups={groups}
@@ -290,23 +298,12 @@ export default function CardapioHub() {
                         const avail = (prod.availability as any) || { tablet: true, delivery: true };
                         saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
                       }}
+                      viewMode={viewMode}
                     />
                   );
                 }}
               />
             </div>
-          )}
-
-          {/* ==================== RECEITAS (SYNC) ==================== */}
-          {cardapioTab === 'receitas' && (
-            <RecipeSyncPanel
-              recipes={recipeSync.syncableRecipes}
-              groups={groups}
-              syncing={recipeSync.syncing}
-              alreadySyncedCount={recipeSync.alreadySyncedCount}
-              onSync={(ids, groupId, margin, override) => recipeSync.syncRecipes({ recipeIds: ids, groupId, margin, overrideExisting: override })}
-              onRefreshCosts={recipeSync.refreshCosts}
-            />
           )}
 
           {cardapioTab === 'rodizio' && (
