@@ -299,6 +299,7 @@ export default function CardapioHub() {
                         const avail = (prod.availability as any) || { tablet: true, delivery: true };
                         saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
                       }}
+                      onEditRecipe={(product) => navigate('/recipes')}
                       viewMode={viewMode}
                     />
                   );
