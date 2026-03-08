@@ -101,14 +101,6 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'recipes', label: 'Fichas Técnicas', icon: 'ChefHat', route: '/recipes', routes: ['/recipes'], group: 'Gestão',
-    children: [
-      { key: 'recipes.view', label: 'Ver fichas', icon: 'Eye' },
-      { key: 'recipes.create', label: 'Criar/editar fichas', icon: 'PenSquare' },
-      { key: 'recipes.costs', label: 'Custos e precificação', icon: 'Calculator' },
-    ],
-  },
-  {
     key: 'employees', label: 'Funcionários', icon: 'Users', route: '/employees', routes: ['/employees'], group: 'Pessoas',
     children: [
       { key: 'employees.view', label: 'Ver funcionários', icon: 'Eye' },
