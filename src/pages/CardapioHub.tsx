@@ -224,37 +224,39 @@ export default function CardapioHub() {
               publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
               tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
             />
-            <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />
           </>
         )}
 
         {cardapioTab !== 'config' && (
-          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-1 lg:px-6 overflow-x-auto scrollbar-none">
-            <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit mx-auto">
-              {([
-                { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-                { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
-                { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
-              ]).map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setCardapioTab(tab.id)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
-                    cardapioTab === tab.id
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <AppIcon name={tab.icon} size={15} fill={cardapioTab === tab.id ? 1 : 0} />
-                  {tab.label}
-                  {tab.count !== undefined && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
+          <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
+            {activeUnit && <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />}
+            <div className="overflow-x-auto scrollbar-none">
+              <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit mx-auto">
+                {([
+                  { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
+                  { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
+                  { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
+                ]).map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setCardapioTab(tab.id)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+                      cardapioTab === tab.id
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <AppIcon name={tab.icon} size={15} fill={cardapioTab === tab.id ? 1 : 0} />
+                    {tab.label}
+                    {tab.count !== undefined && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -380,8 +382,8 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
 
           {/* Cardápio Tablet */}
           <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-accent/50 flex items-center justify-center shrink-0">
-              <AppIcon name="Tablet" size={18} className="text-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <AppIcon name="Tablet" size={18} className="text-primary" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-foreground truncate">Cardápio Tablet</p>
@@ -404,9 +406,9 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
                 href={tabletUrl}
                 target="_blank"
                 rel="noopener"
-                className="w-7 h-7 rounded-lg bg-accent/50 hover:bg-accent flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
               >
-                <AppIcon name="ExternalLink" size={13} className="text-foreground" />
+                <AppIcon name="ExternalLink" size={13} className="text-primary" />
               </a>
             </div>
           </div>
