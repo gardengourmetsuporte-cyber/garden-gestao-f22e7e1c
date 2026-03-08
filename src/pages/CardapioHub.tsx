@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
@@ -38,6 +38,7 @@ type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
   const isProdutos = searchParams.get('tab') === 'produtos';
@@ -298,6 +299,7 @@ export default function CardapioHub() {
                         const avail = (prod.availability as any) || { tablet: true, delivery: true };
                         saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
                       }}
+                      onEditRecipe={(product) => navigate('/recipes')}
                       viewMode={viewMode}
                     />
                   );
