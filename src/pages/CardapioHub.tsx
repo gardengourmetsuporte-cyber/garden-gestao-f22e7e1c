@@ -334,8 +334,8 @@ export default function CardapioHub() {
 }
 
 // ==================== MENU LINKS BAR ====================
-function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: string }) {
-  const [qrOpen, setQrOpen] = useState<'public' | 'tablet' | null>(null);
+function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tabletUrl: string; kdsUrl: string }) {
+  const [qrOpen, setQrOpen] = useState<'public' | 'tablet' | 'kds' | null>(null);
 
   const copyLink = (url: string, label: string) => {
     navigator.clipboard.writeText(url);
