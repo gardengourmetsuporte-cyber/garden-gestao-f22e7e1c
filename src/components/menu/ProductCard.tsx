@@ -87,23 +87,23 @@ export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOpti
             <button
               onClick={(e) => { e.stopPropagation(); onToggleAvailability(product, 'tablet'); }}
               className={cn(
-                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                "text-[10px] px-2.5 py-1 rounded-full font-semibold transition-colors active:scale-95 min-h-[28px]",
                 avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
               )}
             >Mesa</button>
           ) : avail?.tablet ? (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-success/15 text-success">Mesa</span>
+            <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-success/15 text-success">Mesa</span>
           ) : null}
           {onToggleAvailability ? (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleAvailability(product, 'delivery'); }}
               className={cn(
-                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                "text-[10px] px-2.5 py-1 rounded-full font-semibold transition-colors active:scale-95 min-h-[28px]",
                 avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
               )}
             >Delivery</button>
           ) : avail?.delivery ? (
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-success/15 text-success">Delivery</span>
+            <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-success/15 text-success">Delivery</span>
           ) : null}
           {optionCount > 0 && (
             <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">{optionCount} {optionCount === 1 ? 'opcional' : 'opcionais'}</span>
