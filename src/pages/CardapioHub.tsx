@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
