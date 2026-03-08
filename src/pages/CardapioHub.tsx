@@ -297,7 +297,18 @@ export default function CardapioHub() {
             </div>
           )}
 
-          {/* ==================== RODÍZIO ==================== */}
+          {/* ==================== RECEITAS (SYNC) ==================== */}
+          {cardapioTab === 'receitas' && (
+            <RecipeSyncPanel
+              recipes={recipeSync.syncableRecipes}
+              groups={groups}
+              syncing={recipeSync.syncing}
+              alreadySyncedCount={recipeSync.alreadySyncedCount}
+              onSync={(ids, groupId, margin, override) => recipeSync.syncRecipes({ recipeIds: ids, groupId, margin, overrideExisting: override })}
+              onRefreshCosts={recipeSync.refreshCosts}
+            />
+          )}
+
           {cardapioTab === 'rodizio' && (
             <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /></div>}>
               <RodizioSettingsLazy />
