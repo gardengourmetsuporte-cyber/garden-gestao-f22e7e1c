@@ -12,6 +12,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onAddToCart: (item: CartItem) => void;
+  hidePrice?: boolean;
 }
 
 import { formatCurrency as formatPrice } from '@/lib/format';
