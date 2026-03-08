@@ -57,100 +57,106 @@ export function MenuCustomerProfile({ unitName, logoUrl, defaultName, defaultEma
   };
 
   return (
-    <div className="min-h-[100dvh] bg-white flex flex-col">
-      {/* Header */}
-      <div className="flex items-center h-14 border-b border-gray-200 shrink-0 px-4">
-        {onBack && (
-          <button onClick={onBack} className="w-9 h-9 flex items-center justify-center -ml-2">
-            <AppIcon name="ArrowLeft" size={22} className="text-gray-700" />
-          </button>
-        )}
-        <div className="flex-1 flex justify-center pr-9">
-          <div className="w-14 h-14 -mb-4 rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center p-1.5 shadow-sm">
-            {logoUrl ? (
-              <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-contain" />
-            ) : (
-              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
-            )}
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center animate-in fade-in duration-200">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onBack} />
+
+      {/* Sheet */}
+      <div className="relative w-full max-w-md bg-background rounded-t-3xl sm:rounded-3xl shadow-2xl border border-border/40 animate-in slide-in-from-bottom-8 duration-300 max-h-[90dvh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center h-14 border-b border-border/20 shrink-0 px-4">
+          {onBack && (
+            <button onClick={onBack} className="w-9 h-9 flex items-center justify-center -ml-2">
+              <AppIcon name="ArrowLeft" size={22} className="text-foreground" />
+            </button>
+          )}
+          <div className="flex-1 flex justify-center pr-9">
+            <div className="w-12 h-12 -mb-3 rounded-xl overflow-hidden border border-border/30 bg-card flex items-center justify-center p-1.5 shadow-sm">
+              {logoUrl ? (
+                <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-contain" />
+              ) : (
+                <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="flex-1 px-6 pt-12 pb-8">
-        <div className="w-full max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            Complete seu cadastro
-          </h2>
-          <p className="text-sm text-gray-500 text-center mb-8 leading-relaxed">
-            Estes dados nos ajudam a adaptar o aplicativo às suas necessidades e preferências.
-          </p>
+        {/* Content */}
+        <div className="px-6 pt-8 pb-8">
+          <div className="w-full max-w-md mx-auto">
+            <h2 className="text-xl font-bold text-foreground text-center mb-2">
+              Complete seu cadastro
+            </h2>
+            <p className="text-sm text-muted-foreground text-center mb-6 leading-relaxed">
+              Estes dados nos ajudam a personalizar sua experiência.
+            </p>
 
-          <div className="space-y-6">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">
-                Nome e sobrenome
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Seu nome completo"
-                className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors"
-              />
+            <div className="space-y-5">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Nome e sobrenome
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Seu nome completo"
+                  className="w-full h-12 px-4 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+              </div>
+
+              {/* Birthday */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Data de nascimento <span className="font-normal text-muted-foreground">(Opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={birthday}
+                  onChange={e => setBirthday(formatBirthday(e.target.value))}
+                  placeholder="__/__/____"
+                  inputMode="numeric"
+                  className="w-full h-12 px-4 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Número do seu celular
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(formatPhone(e.target.value))}
+                  placeholder="(00) 00000-0000"
+                  inputMode="tel"
+                  className="w-full h-12 px-4 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  Usaremos para te atualizar sobre o status do seu pedido.
+                </p>
+              </div>
             </div>
 
-            {/* Birthday */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">
-                Data de nascimento <span className="font-normal text-gray-400">(Opcional)</span>
-              </label>
-              <input
-                type="text"
-                value={birthday}
-                onChange={e => setBirthday(formatBirthday(e.target.value))}
-                placeholder="__/__/____"
-                inputMode="numeric"
-                className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors"
-              />
-            </div>
+            {/* Terms */}
+            <p className="text-xs text-muted-foreground mt-5 leading-relaxed">
+              Ao prosseguir, você concorda com os Termos de Serviço e Política de Uso de Dados.
+            </p>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-2">
-                Número do seu celular
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(formatPhone(e.target.value))}
-                placeholder="(00) 00000-0000"
-                inputMode="tel"
-                className="w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors"
-              />
-              <p className="text-xs text-gray-400 mt-1.5">
-                O número do celular será utilizado para te atualizar sobre o status do seu pedido.
-              </p>
-            </div>
+            {/* Submit */}
+            <Button
+              className="w-full h-14 mt-4 rounded-xl text-base font-semibold"
+              onClick={handleSubmit}
+              disabled={saving}
+            >
+              {saving ? (
+                <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
+              ) : null}
+              Continuar
+            </Button>
           </div>
-
-          {/* Terms */}
-          <p className="text-xs text-gray-400 mt-6 leading-relaxed">
-            Ao prosseguir com o cadastro, você concorda com os Termos de Serviço e Política de Uso de Dados.
-          </p>
-
-          {/* Submit */}
-          <Button
-            className="w-full h-14 mt-4 rounded-xl text-base font-semibold"
-            onClick={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? (
-              <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
-            ) : null}
-            Continuar
-          </Button>
         </div>
       </div>
     </div>
