@@ -51,6 +51,7 @@ export default function DigitalMenu() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setCustomerUser(session?.user ?? null);
+      if (session?.user) setMenuEntered(true);
       setAuthChecked(true);
     });
 
