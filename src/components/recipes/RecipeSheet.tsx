@@ -75,6 +75,7 @@ export function RecipeSheet({
   onSave,
   isSaving,
   defaultCategoryId,
+  defaultName,
   onUpdateItemPrice,
   onUpdateItemUnit,
 }: RecipeSheetProps) {
