@@ -38,6 +38,7 @@ type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
   const isProdutos = searchParams.get('tab') === 'produtos';
