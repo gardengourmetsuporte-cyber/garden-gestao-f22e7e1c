@@ -309,9 +309,18 @@ export default function CardapioHub() {
 
           {/* ==================== CONFIGURAÇÕES ==================== */}
           {cardapioTab === 'config' && (
-            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
-              <CardapioSettings />
-            </Suspense>
+            <>
+              {activeUnit && (
+                <MenuLinksBar
+                  publicUrl={`${window.location.origin}/m/${activeUnit.id}`}
+                  tabletUrl={`${window.location.origin}/tablet/${activeUnit.id}`}
+                  kdsUrl={`${window.location.origin}/kds/${activeUnit.id}`}
+                />
+              )}
+              <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
+                <CardapioSettings />
+              </Suspense>
+            </>
           )}
         </div>
       </div>
