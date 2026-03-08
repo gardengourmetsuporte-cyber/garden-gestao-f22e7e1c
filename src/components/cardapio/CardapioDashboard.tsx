@@ -4,36 +4,36 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { useUnit } from '@/contexts/UnitContext';
-import { useMenuAdmin } from '@/hooks/useMenuAdmin';
-import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
+import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
 
 interface Props {
   onNavigate: (tab: string) => void;
+  unitId?: string;
+  menuLoading: boolean;
+  products: MenuProduct[];
+  groups: MenuGroup[];
+  orders: TabletOrderAdmin[];
 }
 
-export function CardapioDashboard({ onNavigate }: Props) {
-  const { activeUnit } = useUnit();
-  const { products, groups, loading: menuLoading } = useMenuAdmin();
-  const { orders } = useTabletAdmin();
+export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, groups, orders }: Props) {
 
-  // Delivery time from store_info
   const queryClient = useQueryClient();
   const { data: storeInfo, isLoading: storeLoading } = useQuery({
-    queryKey: ['store-info', activeUnit?.id],
+    queryKey: ['store-info', unitId],
     queryFn: async () => {
-      if (!activeUnit?.id) return null;
+      if (!unitId) return null;
       const { data } = await supabase
         .from('units')
         .select('store_info')
-        .eq('id', activeUnit.id)
-        .single();
+        .eq('id', unitId)
+        .maybeSingle();
       return (data?.store_info as any) || {};
     },
-    enabled: !!activeUnit?.id,
+    enabled: !!unitId,
   });
 
   const [editingDeliveryTime, setEditingDeliveryTime] = useState(false);
@@ -41,12 +41,12 @@ export function CardapioDashboard({ onNavigate }: Props) {
 
   const saveDeliveryTime = useMutation({
     mutationFn: async (value: string) => {
-      if (!activeUnit?.id) throw new Error('No unit');
+      if (!unitId) throw new Error('No unit');
       const updated = { ...(storeInfo || {}), delivery_time: value };
-      await supabase.from('units').update({ store_info: updated }).eq('id', activeUnit.id);
+      await supabase.from('units').update({ store_info: updated }).eq('id', unitId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['store-info', activeUnit?.id] });
+      queryClient.invalidateQueries({ queryKey: ['store-info', unitId] });
       setEditingDeliveryTime(false);
       toast.success('Tempo de entrega atualizado');
     },

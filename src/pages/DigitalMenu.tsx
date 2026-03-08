@@ -147,7 +147,7 @@ export default function DigitalMenu() {
   };
 
   // Gamification
-  const { prizes, prizesLoading, isEnabled, checkAlreadyPlayed, checkDailyCostExceeded, recordPlay } = useGamification(unitId);
+  const { prizes, prizesLoading, isEnabled, checkAlreadyPlayed, checkDailyCostExceeded, recordPlay } = useGamification(activeTab === 'game' ? unitId : undefined);
   const [gamePhase, setGamePhase] = useState<'input' | 'wheel' | 'result'>('input');
   const [gameOrderId, setGameOrderId] = useState('');
   const [gameName, setGameName] = useState('');

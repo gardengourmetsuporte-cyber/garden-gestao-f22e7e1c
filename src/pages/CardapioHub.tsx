@@ -102,7 +102,7 @@ export default function CardapioHub() {
       });
       setProductSheetOpen(true);
     }};
-  }, [isPedidos, cardapioTab, selectedGroupId]);
+  }, [isPedidos, isDashboard, cardapioTab, selectedGroupId]);
 
   useFabAction(fabAction, [fabAction]);
 
@@ -187,7 +187,14 @@ export default function CardapioHub() {
             </div>
           </header>
           <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-28 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
-            <CardapioDashboardLazy onNavigate={handleDashboardNavigate} />
+            <CardapioDashboardLazy
+              onNavigate={handleDashboardNavigate}
+              unitId={activeUnit?.id}
+              menuLoading={menuLoading}
+              products={products}
+              groups={groups}
+              orders={orders}
+            />
           </Suspense>
         </div>
       </AppLayout>
