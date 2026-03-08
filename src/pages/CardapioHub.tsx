@@ -341,34 +341,34 @@ function MenuLinksBar({ publicUrl, tabletUrl }: { publicUrl: string; tabletUrl: 
       <div className="px-4 pt-3 lg:px-6">
         <div className="flex flex-col gap-2">
           {/* Cardápio Digital */}
-          <div className="flex-1 rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <AppIcon name="Globe" size={20} className="text-primary" />
+          <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <AppIcon name="Globe" size={18} className="text-primary" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-foreground truncate">Cardápio Digital</p>
-              <p className="text-[10px] text-muted-foreground truncate">Link para clientes</p>
+              <p className="text-[10px] text-muted-foreground truncate">{publicUrl.replace(/^https?:\/\//, '')}</p>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => setQrOpen('public')}
-                className="w-8 h-8 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
               >
-                <AppIcon name="QrCode" size={15} className="text-muted-foreground" />
+                <AppIcon name="QrCode" size={13} className="text-muted-foreground" />
               </button>
               <button
                 onClick={() => copyLink(publicUrl, 'Cardápio Digital')}
-                className="w-8 h-8 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
               >
-                <AppIcon name="Copy" size={15} className="text-muted-foreground" />
+                <AppIcon name="Copy" size={13} className="text-muted-foreground" />
               </button>
               <a
                 href={publicUrl}
                 target="_blank"
                 rel="noopener"
-                className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
               >
-                <AppIcon name="ExternalLink" size={15} className="text-primary" />
+                <AppIcon name="ExternalLink" size={13} className="text-primary" />
               </a>
             </div>
           </div>
