@@ -22,6 +22,11 @@ import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
 import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
+// Recipe integration
+import { RecipeSheet } from '@/components/recipes/RecipeSheet';
+import { useRecipes } from '@/hooks/useRecipes';
+import type { Recipe } from '@/types/recipe';
+
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -68,6 +73,31 @@ export default function CardapioHub() {
   const recipeSync = useRecipeMenuSync(products, groups, () => {
     menuAdmin.fetchProducts();
   });
+
+  // Recipe editing (integrated from /recipes)
+  const {
+    recipes, categories: recipeCategories, inventoryItems: recipeInventoryItems,
+    addRecipe, updateRecipe, isAddingRecipe, isUpdatingRecipe, getAvailableSubRecipes,
+    updateItemPrice, updateItemUnit,
+  } = useRecipes();
+  const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+
+  const handleEditRecipe = useCallback((product: MenuProduct) => {
+    const recipeId = (product as any).recipe_id;
+    if (recipeId) {
+      const recipe = recipes.find(r => r.id === recipeId) || null;
+      setEditingRecipe(recipe);
+    } else {
+      setEditingRecipe(null);
+    }
+    setRecipeSheetOpen(true);
+  }, [recipes]);
+
+  const handleRecipeSave = async (data: any) => {
+    if (data.id) await updateRecipe(data);
+    else await addRecipe(data);
+  };
 
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
@@ -299,7 +329,7 @@ export default function CardapioHub() {
                         const avail = (prod.availability as any) || { tablet: true, delivery: true };
                         saveProduct({ ...prod, availability: { ...avail, [channel]: !avail[channel] } } as any);
                       }}
-                      onEditRecipe={(product) => navigate('/recipes')}
+                      onEditRecipe={handleEditRecipe}
                       viewMode={viewMode}
                     />
                   );
@@ -347,6 +377,21 @@ export default function CardapioHub() {
       <ProductSheet open={productSheetOpen} onOpenChange={setProductSheetOpen} product={editingProduct} groups={groups} onSave={saveProduct} onDelete={deleteProduct} onImageUpload={(productId, file) => uploadProductImage(productId, file)} />
       <OptionGroupSheet open={ogSheetOpen} onOpenChange={setOgSheetOpen} optionGroup={editingOG} onSave={saveOptionGroup} onDelete={deleteOptionGroup} />
       <LinkOptionsDialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen} optionGroup={linkingOG} categories={categories} groups={groups} products={products} linkedProductIds={linkingOG ? getLinkedProductIds(linkingOG.id) : []} onSave={(ogId, pids) => setProductOptionLinks(ogId, pids)} />
+      <RecipeSheet
+        open={recipeSheetOpen}
+        onOpenChange={setRecipeSheetOpen}
+        recipe={editingRecipe}
+        categories={recipeCategories}
+        inventoryItems={recipeInventoryItems}
+        subRecipes={getAvailableSubRecipes(editingRecipe?.id).map(r => ({
+          id: r.id, name: r.name, yield_unit: r.yield_unit, cost_per_portion: r.cost_per_portion,
+          category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
+        }))}
+        onSave={handleRecipeSave}
+        isSaving={isAddingRecipe || isUpdatingRecipe}
+        onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
+        onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
+      />
     </AppLayout>
   );
 }
