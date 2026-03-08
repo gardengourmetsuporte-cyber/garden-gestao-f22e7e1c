@@ -38,6 +38,9 @@ export default function TabletAdmin() {
   const [pdvActive, setPdvActive] = useState(true);
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const basePublicUrl = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app')
+    ? 'https://garden-gestao.lovable.app'
+    : window.location.origin;
 
   // Sync pdvConfig state
   useEffect(() => {
