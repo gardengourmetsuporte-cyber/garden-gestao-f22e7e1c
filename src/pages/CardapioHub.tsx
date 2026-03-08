@@ -446,7 +446,6 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
           </div>
         </div>
       </div>
-      </div>
 
       {/* QR Code Modal */}
       {qrOpen && (
