@@ -456,7 +456,7 @@ function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tab
           >
             <div className="text-center">
               <h3 className="text-lg font-bold text-foreground">
-                {qrOpen === 'public' ? 'Cardápio Digital' : 'Cardápio Tablet'}
+                {qrOpen === 'public' ? 'Cardápio Digital' : qrOpen === 'tablet' ? 'Cardápio Tablet' : 'KDS - Cozinha'}
               </h3>
               <p className="text-xs text-muted-foreground mt-1">Escaneie para acessar</p>
             </div>
