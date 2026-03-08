@@ -21,20 +21,19 @@ interface Props {
 
 export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, groups, orders }: Props) {
 
-  // Delivery time from store_info
   const queryClient = useQueryClient();
   const { data: storeInfo, isLoading: storeLoading } = useQuery({
-    queryKey: ['store-info', activeUnit?.id],
+    queryKey: ['store-info', unitId],
     queryFn: async () => {
-      if (!activeUnit?.id) return null;
+      if (!unitId) return null;
       const { data } = await supabase
         .from('units')
         .select('store_info')
-        .eq('id', activeUnit.id)
-        .single();
+        .eq('id', unitId)
+        .maybeSingle();
       return (data?.store_info as any) || {};
     },
-    enabled: !!activeUnit?.id,
+    enabled: !!unitId,
   });
 
   const [editingDeliveryTime, setEditingDeliveryTime] = useState(false);
