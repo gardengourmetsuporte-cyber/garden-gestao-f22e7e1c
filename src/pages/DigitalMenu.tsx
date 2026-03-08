@@ -80,7 +80,25 @@ export default function DigitalMenu() {
     });
 
     return () => subscription.unsubscribe();
-  }, [unitId, pendingTabAfterAuth]);
+  }, [unitId, pendingTabAfterAuth, showAuth]);
+
+  // Check if customer needs to complete their profile (no phone)
+  const checkNeedsProfile = async (user: User, unitId: string): Promise<boolean> => {
+    try {
+      const email = user.email;
+      if (!email) return true;
+      const { data } = await supabase
+        .from('customers')
+        .select('phone')
+        .eq('unit_id', unitId)
+        .eq('email', email)
+        .maybeSingle();
+      // If no customer record or no phone, needs profile
+      return !data || !data.phone;
+    } catch {
+      return true;
+    }
+  };
 
   // Create/update customer record from OAuth user data
   const ensureCustomerRecord = async (user: User, unitId: string) => {
