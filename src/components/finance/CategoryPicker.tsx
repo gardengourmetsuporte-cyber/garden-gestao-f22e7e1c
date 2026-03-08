@@ -65,7 +65,7 @@ export function CategoryPicker({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={handleClose}>
+      <Sheet nested open={open} onOpenChange={handleClose}>
         <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl">
           <SheetHeader className="pb-4 border-b">
             <div className="flex items-center gap-2">
