@@ -178,7 +178,41 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function AppRoutes() {
+function PublicRoutes() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/m/:unitId" element={<DigitalMenu />} />
+        <Route path="/tablet/:unitId" element={<TabletDigitalMenu />} />
+        <Route path="/tablet/:unitId/menu" element={<TabletDigitalMenu />} />
+        <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
+        <Route path="/gamification/:unitId" element={<DigitalMenu />} />
+        <Route path="/cotacao/:token" element={<QuotationPublic />} />
+        <Route path="/landing" element={<Landing />} />
+        <Route path="/invite" element={<Invite />} />
+        <Route path="/share-receipt" element={<ShareReceiptHandler />} />
+        <Route path="/docs" element={<Documentation />} />
+        <Route path="*" element={<AuthenticatedApp />} />
+      </Routes>
+    </Suspense>
+  );
+}
+
+function AuthenticatedApp() {
+  return (
+    <AuthProvider>
+      <UnitProvider>
+        <FabActionProvider>
+          <UnhandledRejectionGuard>
+            <AuthenticatedRoutes />
+          </UnhandledRejectionGuard>
+        </FabActionProvider>
+      </UnitProvider>
+    </AuthProvider>
+  );
+}
+
+function AuthenticatedRoutes() {
   useRoutePersist();
   useRouteRestore();
   useDocumentTitle();
@@ -190,10 +224,6 @@ function AppRoutes() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/invite" element={<Invite />} />
-          <Route path="/share-receipt" element={<ShareReceiptHandler />} />
-          <Route path="/docs" element={<Documentation />} />
           <Route path="/" element={<ProtectedRoute><DashboardNew /></ProtectedRoute>} />
           <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
           <Route path="/finance" element={<ProtectedRoute><Finance /></ProtectedRoute>} />
@@ -205,12 +235,6 @@ function AppRoutes() {
           <Route path="/cash-closing" element={<ProtectedRoute><CashClosing /></ProtectedRoute>} />
           <Route path="/recipes" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-          <Route path="/cotacao/:token" element={<QuotationPublic />} />
-          <Route path="/m/:unitId" element={<DigitalMenu />} />
-          <Route path="/tablet/:unitId" element={<TabletDigitalMenu />} />
-          <Route path="/tablet/:unitId/menu" element={<TabletDigitalMenu />} />
-          <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
-          <Route path="/gamification/:unitId" element={<DigitalMenu />} />
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
           <Route path="/cardapio" element={<ProtectedRoute><CardapioHub /></ProtectedRoute>} />
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
@@ -219,7 +243,6 @@ function AppRoutes() {
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
           <Route path="/delivery-hub" element={<ProtectedRoute><DeliveryHub /></ProtectedRoute>} />
-
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
           <Route path="/gamification" element={<Navigate to="/cardapio" replace />} />
@@ -240,17 +263,8 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
-        
         <BrowserRouter>
-          <AuthProvider>
-            <UnitProvider>
-              <FabActionProvider>
-                <UnhandledRejectionGuard>
-                  <AppRoutes />
-                </UnhandledRejectionGuard>
-              </FabActionProvider>
-            </UnitProvider>
-          </AuthProvider>
+          <PublicRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
