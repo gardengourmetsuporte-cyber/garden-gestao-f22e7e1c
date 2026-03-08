@@ -299,6 +299,7 @@ export default function DigitalMenu() {
       } catch (err) {
         toast.error('Erro ao salvar dados');
         throw err;
+      }
     };
 
     return (
