@@ -71,6 +71,7 @@ export default function CardapioHub() {
   // Internal tab for cardápio content
   const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'menu' | 'ficha'>('menu');
 
   useEffect(() => {
     if (isConfigFromUrl) {
