@@ -12,6 +12,7 @@ import gardenLogo from '@/assets/logo.png';
 
 export default function TabletDigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
+  const navigate = useNavigate();
   const {
     unit, categories, groups, products, loading,
     getProductOptionGroups, getGroupProducts,
