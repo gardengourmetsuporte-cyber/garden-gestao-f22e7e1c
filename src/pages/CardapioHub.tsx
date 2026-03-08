@@ -33,7 +33,7 @@ const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettin
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
 
-type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
+type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio' | 'receitas';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
