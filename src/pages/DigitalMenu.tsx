@@ -290,6 +290,7 @@ export default function DigitalMenu() {
     );
   }
 
+  if (loading) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
         <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
