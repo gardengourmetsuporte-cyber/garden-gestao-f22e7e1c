@@ -229,6 +229,7 @@ export function useMenuAdmin() {
           name: grp.name, category_id: grp.category_id, description: grp.description,
           availability: grp.availability || { tablet: true, delivery: true },
           schedule: grp.schedule, sort_order: grp.sort_order ?? 0, is_active: grp.is_active ?? true,
+          updated_at: new Date().toISOString(),
         }).eq('id', grp.id);
         if (error) throw error;
       } else {
