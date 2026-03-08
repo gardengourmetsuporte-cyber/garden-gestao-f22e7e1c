@@ -225,7 +225,71 @@ export default function DigitalMenu() {
     );
   }
 
-  if (loading) {
+  // Show profile completion screen
+  if (showProfile && customerUser) {
+    const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
+      if (!unitId) return;
+      try {
+        const email = customerUser.email || '';
+        // Update or insert customer record with complete data
+        const { data: existing } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('unit_id', unitId)
+          .eq('email', email)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase.from('customers').update({
+            name: data.name,
+            phone: data.phone,
+            birthday: data.birthday,
+          }).eq('id', existing.id);
+        } else {
+          await supabase.from('customers').insert({
+            unit_id: unitId,
+            name: data.name,
+            email,
+            phone: data.phone,
+            birthday: data.birthday,
+            origin: 'whatsapp' as any,
+            score: 0,
+            segment: 'new',
+            loyalty_points: 0,
+            total_spent: 0,
+            total_orders: 0,
+          });
+        }
+
+        setShowProfile(false);
+        if (pendingTabAfterAuth) {
+          setActiveTab(pendingTabAfterAuth);
+          setPendingTabAfterAuth(null);
+        }
+        toast.success('Cadastro completo!');
+      } catch {
+        toast.error('Erro ao salvar dados');
+      }
+    };
+
+    return (
+      <MenuCustomerProfile
+        unitName={unit?.name}
+        logoUrl={unit?.store_info?.logo_url}
+        defaultName={customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || ''}
+        defaultEmail={customerUser.email}
+        onComplete={handleProfileComplete}
+        onBack={() => {
+          setShowProfile(false);
+          if (pendingTabAfterAuth) {
+            setActiveTab(pendingTabAfterAuth);
+            setPendingTabAfterAuth(null);
+          }
+        }}
+      />
+    );
+  }
+
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
         <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
