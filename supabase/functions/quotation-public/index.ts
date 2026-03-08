@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
         .from("quotation_suppliers")
         .select(`
           id, status, notes, quotation_id,
-          supplier:suppliers(id, name, phone),
+          supplier:suppliers(id, name, phone, portal_token),
           quotation:quotations(id, title, status, deadline, notes, unit_id,
             unit:units(name)
           )
@@ -159,8 +159,8 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Check if supplier has a phone (needs login)
       const hasPhone = !!(qs as any).supplier?.phone;
+      const portalToken = (qs as any).supplier?.portal_token || null;
 
       return new Response(
         JSON.stringify({
@@ -177,6 +177,7 @@ Deno.serve(async (req) => {
           existing_prices: prices || [],
           contested_item_ids: contestedItemIds,
           last_prices: lastPrices,
+          portal_token: portalToken,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

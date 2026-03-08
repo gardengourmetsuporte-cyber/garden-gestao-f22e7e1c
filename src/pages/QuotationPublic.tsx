@@ -29,6 +29,7 @@ interface QuotationData {
   existing_prices: { quotation_item_id: string; unit_price: number; brand: string | null; round: number }[];
   contested_item_ids: string[];
   last_prices: LastPrice[];
+  portal_token: string | null;
 }
 
 const SESSION_KEY = 'supplier_session';
@@ -405,6 +406,18 @@ export default function QuotationPublic() {
           />
         </div>
       </div>
+
+      {/* Portal link */}
+      {data.portal_token && (
+        <div className="px-4 py-2">
+          <a
+            href={`${window.location.origin}/fornecedor/${data.portal_token}`}
+            className="block text-center text-sm text-primary underline"
+          >
+            📊 Ver meu Portal de Vendas
+          </a>
+        </div>
+      )}
 
       {/* Submit button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-lg border-t border-border">
