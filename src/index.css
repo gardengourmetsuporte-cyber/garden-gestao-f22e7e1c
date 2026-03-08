@@ -700,6 +700,8 @@ html {
       0 8px 40px hsl(0 0% 0% / 0.35);
     color: hsl(0 0% 98%) !important;
     isolation: isolate;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
   }
 
   /* Aurora mesh gradient — animated */
