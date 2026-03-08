@@ -246,24 +246,24 @@ export default function CardapioHub() {
         )}
 
         {cardapioTab !== 'config' && (
-          <div className="px-4 pt-3 lg:px-6">
-            <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit">
+          <div className="px-4 pt-3 lg:px-6 overflow-x-auto scrollbar-none">
+            <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-fit mx-auto">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-                { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'AllInclusive', count: undefined },
+                { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
                 { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
               ]).map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setCardapioTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                    "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
                     cardapioTab === tab.id
                       ? "bg-background text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <AppIcon name={tab.icon} size={15} />
+                  <AppIcon name={tab.icon} size={15} fill={cardapioTab === tab.id ? 1 : 0} />
                   {tab.label}
                   {tab.count !== undefined && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">
