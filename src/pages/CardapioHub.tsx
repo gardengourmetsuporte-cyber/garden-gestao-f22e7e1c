@@ -216,15 +216,6 @@ export default function CardapioHub() {
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
-          <header className="page-header-bar">
-            <div className="page-header-content">
-              <h1 className="text-lg font-bold flex items-center gap-2">
-                <AppIcon name="ShoppingBag" size={20} className="text-primary" />
-                Pedidos
-              </h1>
-            </div>
-          </header>
-
           <div className="px-4 py-3 lg:px-6">
             <UnifiedOrdersPanel unitId={activeUnit?.id} onRetryPDV={retryPDV} />
           </div>
