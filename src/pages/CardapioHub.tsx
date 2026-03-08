@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
+const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
 
 type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
 
