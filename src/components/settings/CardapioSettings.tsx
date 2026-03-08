@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import type { GamificationPrize } from '@/hooks/useGamification';
 
-type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'config';
+type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
 interface CardapioSettingsProps {
   initialTab?: SettingsTab | null;
