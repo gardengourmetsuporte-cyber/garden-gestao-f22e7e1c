@@ -52,6 +52,14 @@ export default function TabletDigitalMenu() {
     <div className="min-h-[100dvh] bg-background flex flex-col">
       {/* Header */}
       <header className="flex items-center gap-4 px-6 py-3 border-b border-border/30 bg-card/80 backdrop-blur-sm shrink-0">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(`/tablet/${unitId}`)}
+          className="w-10 h-10 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0"
+        >
+          <AppIcon name="ArrowLeft" size={20} className="text-muted-foreground" />
+        </button>
+
         {/* Logo */}
         <div className="w-12 h-12 rounded-xl overflow-hidden border border-border/30 bg-white flex items-center justify-center shrink-0">
           {logoUrl ? (
