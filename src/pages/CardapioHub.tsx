@@ -33,7 +33,8 @@ export default function CardapioHub() {
   const { activeUnit } = useUnit();
   const [searchParams, setSearchParams] = useSearchParams();
   const isPedidos = searchParams.get('tab') === 'pedidos';
-  const isDashboard = searchParams.get('tab') === 'dashboard';
+  const isProdutos = searchParams.get('tab') === 'produtos';
+  const isDashboard = !searchParams.get('tab') && !searchParams.get('section');
   const isConfigFromUrl = searchParams.get('section') === 'config';
 
   // Menu admin hook
@@ -84,7 +85,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || isDashboard || cardapioTab === 'config') {
+    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config') {
       return null;
     }
     if (cardapioTab === 'opcionais') {
@@ -106,7 +107,7 @@ export default function CardapioHub() {
       });
       setProductSheetOpen(true);
     }};
-  }, [isPedidos, isDashboard, cardapioTab, selectedGroupId]);
+  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, selectedGroupId]);
 
   useFabAction(fabAction, [fabAction]);
 

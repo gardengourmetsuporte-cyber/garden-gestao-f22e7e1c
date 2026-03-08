@@ -26,8 +26,8 @@ const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/
 
 // Custom tabs when inside CardapioHub
 const CARDAPIO_TABS: TabDef[] = [
-  { key: 'cardapio-home', icon: 'Storefront', label: 'Início', path: '/cardapio?tab=dashboard', moduleKey: 'cardapio' },
-  { key: 'cardapio', icon: 'BookOpen', label: 'Cardápio', path: '/cardapio', moduleKey: 'cardapio' },
+  { key: 'cardapio-home', icon: 'Storefront', label: 'Início', path: '/cardapio', moduleKey: 'cardapio' },
+  { key: 'cardapio', icon: 'BookOpen', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
   { key: 'pedidos', icon: 'ShoppingBag', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
 ];
 
@@ -106,7 +106,10 @@ export function BottomTabBar() {
       return false;
     }
     if (isCardapioRoute && path === '/cardapio') {
-      return location.pathname.startsWith('/cardapio') && !new URLSearchParams(location.search).get('tab') && !new URLSearchParams(location.search).get('section');
+      // "Início" tab: active when no tab/section params
+      const currentTab = new URLSearchParams(location.search).get('tab');
+      const currentSection = new URLSearchParams(location.search).get('section');
+      return location.pathname === '/cardapio' && !currentTab && !currentSection;
     }
     return location.pathname.startsWith(path);
   };
@@ -248,19 +251,7 @@ export function BottomTabBar() {
             ))}
 
             {/* "Mais" tab — always far right */}
-            {isCardapioRoute ? (
-              <button
-                onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }}
-                aria-label="Configurações"
-                className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative"
-                style={{ width: slotWidth }}
-              >
-                <span className="material-symbols-rounded text-muted-foreground transition-colors" style={{ fontSize: 22 }}>settings</span>
-                <span className="text-[10px] font-normal text-muted-foreground">Config</span>
-              </button>
-            ) : (
-              <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
-            )}
+            <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
           </div>
         </div>
       </nav>
