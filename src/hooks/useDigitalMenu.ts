@@ -29,6 +29,7 @@ export interface DMProduct {
   price_type: string;
   custom_prices: any[] | null;
   sort_order: number;
+  availability: { tablet: boolean; delivery: boolean } | null;
 }
 
 export interface DMOptionGroup {
