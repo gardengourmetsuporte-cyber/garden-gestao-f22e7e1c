@@ -288,11 +288,11 @@ export default function OrdersPage() {
 
             return (
               <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
-                {/* Fornecedores — spans full width on mobile */}
-                <div className="col-span-2 lg:col-span-1">
+                {/* Fornecedores — spans left column, 2 rows tall on mobile */}
+                <div className="row-span-2 lg:col-span-1 lg:row-span-2">
                   {renderCard(supplierTab, true)}
                 </div>
-                {/* 2x2 smaller cards */}
+                {/* 2x2 smaller cards beside it */}
                 {smallTabs.map(tab => renderCard(tab))}
               </div>
             );
