@@ -159,6 +159,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     try {
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
+          const orderNotes = payWithCoins ? `[PAGO_COM_MOEDAS:${coinTotal}]` : null;
           const { data: order, error: orderError } = await withTimeout(
             supabase
               .from('tablet_orders')
@@ -166,9 +167,10 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 unit_id: unitId,
                 table_number: parseInt(tableNumber) || 0,
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
-                total: cartTotal,
+                total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
+                notes: orderNotes,
               })
               .select('id')
               .single(),
