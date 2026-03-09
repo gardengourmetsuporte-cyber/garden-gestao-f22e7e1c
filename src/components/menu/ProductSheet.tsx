@@ -168,6 +168,23 @@ export function ProductSheet({ open, onOpenChange, product, groups, onSave, onDe
             )}
           </div>
 
+          {/* Coin price */}
+          <div>
+            <Label className="flex items-center gap-1.5">
+              <AppIcon name="Coins" className="w-4 h-4 text-amber-500" />
+              Preço em Moedas Garden
+            </Label>
+            <Input
+              type="number"
+              step="1"
+              min="0"
+              placeholder="Deixe vazio para desabilitar"
+              value={form.coin_price ?? ''}
+              onChange={e => setForm({ ...form, coin_price: e.target.value ? parseInt(e.target.value) : null })}
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">Se preenchido, o cliente poderá pagar com moedas</p>
+          </div>
+
           {/* Availability */}
           <div className="space-y-2">
             <Label>Disponibilidade</Label>
