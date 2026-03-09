@@ -29,6 +29,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerName, setCustomerName] = useState('');
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
+  const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
 
   if (orderSent) {
     return (
