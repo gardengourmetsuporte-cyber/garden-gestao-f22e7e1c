@@ -45,7 +45,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
-  { value: 'costs', icon: 'Calculator', label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
+  { value: 'costs', icon: 'Calculator', label: 'Custos de Produção', description: 'Percentuais e markups', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
   { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
   { value: 'cardapio-digital', icon: 'UtensilsCrossed', label: 'Cardápio Digital', description: 'PDV, mesas, QR e roleta', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   // Sistema
