@@ -354,12 +354,14 @@ export function MenuCategoryTree({
                     </div>
                   );
                 })}
-                <button
-                  onClick={() => openNewGroup(cat.id)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs text-primary hover:bg-primary/5 rounded-xl transition-all w-full active:scale-[0.98]"
-                >
-                  <AppIcon name="Plus" size={12} /> Adicionar grupo
-                </button>
+                {viewMode !== 'ficha' && (
+                  <button
+                    onClick={() => openNewGroup(cat.id)}
+                    className="flex items-center gap-2 px-3 py-2 text-xs text-primary hover:bg-primary/5 rounded-xl transition-all w-full active:scale-[0.98]"
+                  >
+                    <AppIcon name="Plus" size={12} /> Adicionar grupo
+                  </button>
+                )}
               </div>
             )}
           </div>
