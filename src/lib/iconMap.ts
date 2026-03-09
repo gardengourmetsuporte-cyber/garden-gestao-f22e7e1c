@@ -283,9 +283,9 @@ export const ICON_MAP: Record<string, string> = {
 
   // Health & Body
   Heart: 'favorite',
-  HeartPulse: 'monitor_heart',
+  HeartPulse: 'ecg_heart',
   Pill: 'medication',
-  Stethoscope: 'stethoscope',
+  Stethoscope: 'medical_services',
   Dumbbell: 'fitness_center',
 
   // Entertainment
@@ -370,8 +370,8 @@ export const ICON_MAP: Record<string, string> = {
   Delete: 'backspace',
 
   // Compliance / Safety
-  FireExtinguisher: 'fire_extinguisher',
-  KeyRound: 'key',
+  FireExtinguisher: 'fire_hydrant_alt',
+  KeyRound: 'vpn_key',
   ShieldAlert: 'gpp_maybe',
   Recycle: 'recycling',
   Bug: 'pest_control',
