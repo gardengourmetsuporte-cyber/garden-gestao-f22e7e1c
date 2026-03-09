@@ -115,7 +115,15 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
   const totalSales = sales.filter(s => s.status === 'paid').length;
   const totalRevenue = sales.filter(s => s.status === 'paid').reduce((sum, s) => sum + s.total, 0);
 
-  const paymentSummary = sales.filter(s => s.status === 'paid').reduce((acc, sale) => {
+  const handleResendWhatsApp = useCallback((sale: Sale) => {
+    const cleanPhone = (sale.customer_phone || '').replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) return;
+    const itemsList = sale.items.map(i => `• ${i.quantity}x ${i.product_name} - ${formatCurrency(i.quantity * i.unit_price)}`).join('\n');
+    const paymentsList = sale.payments.map(p => `${PAYMENT_LABELS[p.method] || p.method}: ${formatCurrency(p.amount)}`).join(', ');
+    const msg = `🧾 *Nota Fiscal*\n\n${itemsList}\n\n💰 *Total: ${formatCurrency(sale.total)}*\nPagamento: ${paymentsList}\n\nObrigado pela preferência! 🙏`;
+    const phoneFormatted = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
+    window.open(`https://wa.me/${phoneFormatted}?text=${encodeURIComponent(msg)}`, '_blank');
+  }, []);
     sale.payments.forEach(p => {
       acc[p.method] = (acc[p.method] || 0) + p.amount;
     });
