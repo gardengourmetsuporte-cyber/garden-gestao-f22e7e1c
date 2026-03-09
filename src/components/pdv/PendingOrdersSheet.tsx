@@ -251,15 +251,22 @@ function OrderDetailSheet({
         </div>
 
         {/* Footer actions */}
-        <div className="shrink-0 border-t border-border/20 bg-background/80 backdrop-blur-sm px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex gap-3">
-          <Button size="sm" variant="outline" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { onLoadOrder(order); onClose(); setShowItems(false); }}>
-            <AppIcon name="Banknote" size={16} className="mr-1.5" />
-            Cobrar
-          </Button>
+        <div className="shrink-0 border-t border-border/20 bg-background/80 backdrop-blur-sm px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2">
+          <div className="flex gap-3">
+            <Button size="sm" variant="outline" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { onLoadOrder(order); onClose(); setShowItems(false); }}>
+              <AppIcon name="Plus" size={16} className="mr-1.5" />
+              Adicionar itens
+            </Button>
+            <Button size="sm" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { onLoadOrder(order); onClose(); setShowItems(false); }}>
+              <AppIcon name="Banknote" size={16} className="mr-1.5" />
+              Cobrar
+            </Button>
+          </div>
           {canDispatch && (
             <Button
               size="sm"
-              className="flex-1 h-11 rounded-xl text-sm"
+              variant="outline"
+              className="w-full h-11 rounded-xl text-sm"
               onClick={() => onDispatch(order)}
               disabled={dispatching === order.id}
             >
