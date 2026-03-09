@@ -478,6 +478,20 @@ export default function DigitalMenu() {
         </div>
       )}
 
+      {/* Ranking tab */}
+      {activeTab === 'ranking' && unitId && (
+        <div className="pt-6 px-5 md:px-8 pb-28">
+          <div className="flex items-center gap-2 mb-4">
+            <AppIcon name="EmojiEvents" size={22} style={{ color: 'hsl(45 100% 50%)' }} />
+            <h2 className="text-lg font-bold text-foreground">Ranking de Clientes</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Os clientes que mais acumularam moedas Garden 🪙
+          </p>
+          <CustomerLeaderboard unitId={unitId} />
+        </div>
+      )}
+
       {/* Game tab */}
       {activeTab === 'game' && (
         <div className="px-5 pt-6 pb-28 flex flex-col items-center gap-6">
