@@ -112,6 +112,8 @@ export const ICON_MAP: Record<string, string> = {
   MoreVertical: 'more_vert',
   LayoutList: 'view_agenda',
   LayoutGrid: 'grid_view',
+  MenuBook: 'menu_book',
+  RestaurantMenu: 'restaurant_menu',
 
   // Actions
   Plus: 'add',
