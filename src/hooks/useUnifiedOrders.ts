@@ -3,8 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useDeliveryHub, HubOrder } from './useDeliveryHub';
 
-export type OrderSource = 'mesa' | 'delivery';
-export type UnifiedTab = 'comandas' | 'delivery' | 'ifood';
+export type OrderSource = 'mesa' | 'delivery' | 'balcao';
+export type UnifiedTab = 'balcao' | 'comandas' | 'delivery' | 'ifood';
 
 export interface TabletOrder {
   id: string;
