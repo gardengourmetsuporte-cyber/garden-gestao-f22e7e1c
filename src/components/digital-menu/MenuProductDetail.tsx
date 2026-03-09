@@ -107,7 +107,15 @@ export function MenuProductDetail({ product, optionGroups, open, onClose, onAddT
               {product.description && (
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{product.description}</p>
               )}
-              <p className="text-lg font-bold text-primary mt-3">{formatPrice(product.price)}</p>
+              <div className="flex items-center gap-2.5 mt-3">
+                <p className="text-lg font-bold text-primary">{formatPrice(product.price)}</p>
+                {product.coin_price != null && product.coin_price > 0 && (
+                  <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/10 text-amber-600 text-sm font-bold">
+                    <AppIcon name="Coins" size={14} />
+                    {product.coin_price} moedas
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Option groups */}

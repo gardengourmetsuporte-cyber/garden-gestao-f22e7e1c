@@ -4940,6 +4940,7 @@ export type Database = {
           availability: Json
           category: string
           codigo_pdv: string | null
+          coin_price: number | null
           cost_per_portion: number | null
           created_at: string
           custom_prices: Json | null
@@ -4964,6 +4965,7 @@ export type Database = {
           availability?: Json
           category?: string
           codigo_pdv?: string | null
+          coin_price?: number | null
           cost_per_portion?: number | null
           created_at?: string
           custom_prices?: Json | null
@@ -4988,6 +4990,7 @@ export type Database = {
           availability?: Json
           category?: string
           codigo_pdv?: string | null
+          coin_price?: number | null
           cost_per_portion?: number | null
           created_at?: string
           custom_prices?: Json | null

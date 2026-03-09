@@ -36,6 +36,7 @@ export interface MenuProduct {
   name: string;
   codigo_pdv: string | null;
   price: number;
+  coin_price: number | null;
   category: string;
   image_url: string | null;
   description: string | null;
@@ -264,7 +265,8 @@ export function useMenuAdmin() {
     setLoading(true);
     try {
       const payload = {
-        name: prod.name, price: prod.price, codigo_pdv: prod.codigo_pdv,
+        name: prod.name, price: prod.price, coin_price: prod.coin_price ?? null,
+        codigo_pdv: prod.codigo_pdv,
         category: prod.category || 'Geral', description: prod.description,
         image_url: prod.image_url ?? null,
         is_active: prod.is_active ?? true, sort_order: prod.sort_order ?? 0,

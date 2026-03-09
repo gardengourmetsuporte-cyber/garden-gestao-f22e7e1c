@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,33 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
+  const [payWithCoins, setPayWithCoins] = useState(false);
+  const [customerCoins, setCustomerCoins] = useState<number | null>(null);
+
+  // Check customer coin balance
+  const coinTotal = cart.reduce((sum, item) => {
+    const cp = item.product.coin_price;
+    if (cp == null || cp <= 0) return sum + 999999; // product not available for coins
+    return sum + cp * item.quantity;
+  }, 0);
+  const allProductsHaveCoinPrice = cart.every(i => i.product.coin_price != null && i.product.coin_price > 0);
+  const canPayWithCoins = allProductsHaveCoinPrice && customerCoins !== null && customerCoins >= coinTotal;
+
+  // Fetch customer coins when logged in
+  useEffect(() => {
+    if (!customerUser) return;
+    const email = customerUser.email;
+    if (!email) return;
+    supabase
+      .from('customers')
+      .select('loyalty_points')
+      .eq('unit_id', unitId)
+      .eq('email', email)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setCustomerCoins(data.loyalty_points ?? 0);
+      });
+  }, [customerUser, unitId]);
 
   if (orderSent) {
     return (
@@ -132,6 +159,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     try {
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
+          const orderNotes = payWithCoins ? `[PAGO_COM_MOEDAS:${coinTotal}]` : null;
           const { data: order, error: orderError } = await withTimeout(
             supabase
               .from('tablet_orders')
@@ -139,9 +167,10 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 unit_id: unitId,
                 table_number: parseInt(tableNumber) || 0,
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
-                total: cartTotal,
+                total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
+                notes: orderNotes,
               })
               .select('id')
               .single(),
@@ -184,7 +213,36 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
              }
            }
 
-           toast.success('Pedido enviado com sucesso!');
+           // Deduct coins if paying with coins
+           if (payWithCoins && customerUser?.email) {
+             try {
+               const { data: cust } = await supabase
+                 .from('customers')
+                 .select('id, loyalty_points')
+                 .eq('unit_id', unitId)
+                 .eq('email', customerUser.email)
+                 .maybeSingle();
+               if (cust) {
+                 await supabase
+                   .from('customers')
+                   .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
+                   .eq('id', cust.id);
+                 // Log redemption event
+                 await supabase.from('loyalty_events').insert({
+                   customer_id: cust.id,
+                   unit_id: unitId,
+                   type: 'redeemed',
+                   points: -coinTotal,
+                   description: 'Pedido #' + (order as any).id.slice(0, 8) + ' pago com moedas',
+                 });
+                 setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
+               }
+             } catch (e) {
+               console.warn('[TabletMenuCart] coin deduction failed:', e);
+             }
+           }
+
+           toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
            setOrderSent((order as any).id.slice(0, 8));
            return; // Success — exit
         } catch (err: any) {
@@ -234,9 +292,47 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         <div className="border-t border-border/30" />
         <div className="flex items-center justify-between">
           <span className="font-bold text-foreground">Total</span>
-          <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+          {payWithCoins ? (
+            <div className="flex items-center gap-1.5">
+              <AppIcon name="Coins" size={18} className="text-amber-500" />
+              <span className="text-xl font-bold text-amber-500 tabular-nums">{coinTotal} moedas</span>
+            </div>
+          ) : (
+            <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+          )}
         </div>
       </div>
+
+      {/* Coin payment option */}
+      {customerUser && allProductsHaveCoinPrice && customerCoins !== null && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center">
+                <AppIcon name="Coins" size={18} className="text-amber-500" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-foreground">Pagar com Moedas</p>
+                <p className="text-[11px] text-muted-foreground">Saldo: <span className="font-bold text-amber-600">{customerCoins}</span> moedas</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setPayWithCoins(!payWithCoins)}
+              className={`w-12 h-7 rounded-full transition-all relative ${payWithCoins ? 'bg-amber-500' : 'bg-secondary'}`}
+              disabled={!canPayWithCoins && !payWithCoins}
+            >
+              <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-all ${payWithCoins ? 'left-[22px]' : 'left-0.5'}`} />
+            </button>
+          </div>
+          {!canPayWithCoins && (
+            <p className="text-[11px] text-destructive font-medium">
+              {customerCoins < coinTotal
+                ? `Saldo insuficiente (faltam ${coinTotal - customerCoins} moedas)`
+                : 'Alguns produtos não possuem preço em moedas'}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Auth banner or logged-in indicator */}
       {!customerUser ? (
@@ -322,13 +418,19 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         )}
       </div>
 
-      <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
+      <Button
+        className={`w-full h-14 text-base font-bold rounded-xl ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+        onClick={handleSend}
+        disabled={sending || (payWithCoins && !canPayWithCoins)}
+      >
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
+        ) : payWithCoins ? (
+          <AppIcon name="Coins" size={20} className="mr-2" />
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Enviar Pedido • {formatPrice(cartTotal)}
+        {payWithCoins ? `Pagar com ${coinTotal} moedas` : `Enviar Pedido • ${formatPrice(cartTotal)}`}
       </Button>
     </div>
   );
