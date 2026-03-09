@@ -266,45 +266,59 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
         </div>
 
-        {/* Delivery fee line */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground flex items-center gap-1">
-            Taxa de entrega
-            {calculating && <AppIcon name="Loader2" size={12} className="animate-spin text-muted-foreground" />}
-          </span>
-          {feeResult?.out_of_range ? (
-            <span className="text-xs font-medium text-destructive">Fora da área</span>
-          ) : feeResult && feeResult.fee !== null ? (
-            <span className="text-sm font-semibold text-foreground">
-              {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee)}
-            </span>
-          ) : (
-            <span className="text-xs text-muted-foreground">—</span>
-          )}
-        </div>
+        {/* Delivery fee line — hide for QR Code */}
+        {!isQrCode && (
+          <>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                Taxa de entrega
+                {calculating && <AppIcon name="Loader2" size={12} className="animate-spin text-muted-foreground" />}
+              </span>
+              {feeResult?.out_of_range ? (
+                <span className="text-xs font-medium text-destructive">Fora da área</span>
+              ) : feeResult && feeResult.fee !== null ? (
+                <span className="text-sm font-semibold text-foreground">
+                  {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee)}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </div>
 
-        {/* Distance info */}
-        {feeResult && !feeResult.out_of_range && (
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-            <AppIcon name="MapPin" size={10} />
-            <span>{feeResult.distance_km} km · {feeResult.duration}</span>
-            {feeResult.zone_name && <span>· {feeResult.zone_name}</span>}
-          </div>
+            {/* Distance info */}
+            {feeResult && !feeResult.out_of_range && (
+              <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                <AppIcon name="MapPin" size={10} />
+                <span>{feeResult.distance_km} km · {feeResult.duration}</span>
+                {feeResult.zone_name && <span>· {feeResult.zone_name}</span>}
+              </div>
+            )}
+          </>
         )}
 
         <div className="border-t border-border/30" />
         <div className="flex items-center justify-between">
           <span className="font-bold text-foreground">Total</span>
-          <span className="text-xl font-bold text-primary">{formatPrice(grandTotal)}</span>
+          <span className="text-xl font-bold text-primary">{formatPrice(isQrCode ? cartTotal : grandTotal)}</span>
         </div>
       </div>
 
       {/* Out of range warning */}
-      {feeResult?.out_of_range && (
+      {!isQrCode && feeResult?.out_of_range && (
         <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 flex items-center gap-2">
           <AppIcon name="AlertTriangle" size={16} className="text-destructive shrink-0" />
           <p className="text-xs text-destructive">
             Infelizmente não entregamos neste endereço ({feeResult.distance_km} km). Tente um endereço mais próximo.
+          </p>
+        </div>
+      )}
+
+      {/* QR Code dine-in info */}
+      {isQrCode && (
+        <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-2">
+          <AppIcon name="RestaurantMenu" size={16} className="text-primary shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            Pedido para <span className="font-semibold text-foreground">comer no restaurante</span>. Será confirmado pelo atendente.
           </p>
         </div>
       )}

@@ -70,7 +70,7 @@ export function useUnifiedOrders(unitId: string | undefined) {
   );
 
   const comandas = useMemo(() =>
-    tabletOrders.filter(o => (o.source || 'mesa') === 'mesa'),
+    tabletOrders.filter(o => ['mesa', 'mesa_levar', 'qrcode'].includes(o.source || 'mesa')),
     [tabletOrders]
   );
 
