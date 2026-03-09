@@ -257,6 +257,7 @@ export default function OrdersPage() {
               { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, color: 'text-blue-400', bg: 'bg-blue-500/10' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, color: 'text-amber-400', bg: 'bg-amber-500/10' },
               { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, color: 'text-orange-400', bg: 'bg-orange-500/10' },
             ];
 
             const renderCard = (tab: { key: string; label: string; icon: string; badge: number | undefined; color: string; bg: string }, large = false) => (
