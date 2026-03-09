@@ -344,6 +344,16 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
         <OrdersTab orders={orders} />
       )}
 
+      {activeTab === 'addresses' && customer && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <AppIcon name="MapPin" size={16} className="text-primary" />
+            Meus endereços
+          </h3>
+          <CustomerAddressManager customerId={customer.id} unitId={unitId} />
+        </div>
+      )}
+
       {activeTab === 'history' && (
         <HistoryTab events={loyaltyEvents} loading={loadingExtra} />
       )}
