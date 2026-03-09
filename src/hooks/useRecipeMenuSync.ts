@@ -38,9 +38,11 @@ export function useRecipeMenuSync(
   const [syncing, setSyncing] = useState(false);
 
   const getFullCost = useCallback((recipe: Recipe) => {
-    const opCosts = calculateOperationalCosts(recipe.cost_per_portion);
+    const linked = menuProducts.find(p => (p as any).recipe_id === recipe.id);
+    const sellingPrice = linked?.price;
+    const opCosts = calculateOperationalCosts(recipe.cost_per_portion, sellingPrice);
     return recipe.cost_per_portion + opCosts.totalOperational;
-  }, [calculateOperationalCosts]);
+  }, [calculateOperationalCosts, menuProducts]);
 
   /** All active recipes enriched with sync status */
   const syncableRecipes: SyncableRecipe[] = recipes
