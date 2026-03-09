@@ -4,22 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
+import { CustomerAuthBanner } from '@/components/digital-menu/CustomerAuthBanner';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
+import type { User } from '@supabase/supabase-js';
 
 interface Props {
   cart: CartItem[];
   cartTotal: number;
   unitId: string;
   autoConfirm?: boolean;
+  customerUser?: User | null;
+  signupBonusPoints?: number;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
   onClose: () => void;
+  onLoginClick?: () => void;
 }
 
-export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, onUpdateQuantity, onRemove, onClear, onClose }: Props) {
+export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, signupBonusPoints = 0, onUpdateQuantity, onRemove, onClear, onClose, onLoginClick }: Props) {
   const [tableNumber, setTableNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [sending, setSending] = useState(false);
