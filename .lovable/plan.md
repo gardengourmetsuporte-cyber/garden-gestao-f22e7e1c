@@ -1,17 +1,45 @@
 
 
-## Correção: "null value in column product_id" ao enviar pedido
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Problema
-A coluna `product_id` na tabela `tablet_order_items` tem constraint `NOT NULL`, mas quando um pedido é carregado (via `loadOrderIntoCart`), os itens recebem `product.id = ''` (string vazia). Na hora de enviar, `c.product.id || null` resulta em `null`, violando a constraint.
+### O que muda
 
-### Solução
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-1. **Migração**: Alterar a coluna `product_id` em `tablet_order_items` para aceitar `NULL` (`ALTER TABLE tablet_order_items ALTER COLUMN product_id DROP NOT NULL`). Isso é necessário porque itens carregados de pedidos existentes podem não ter o `product_id` original mapeado.
+### Conceito visual
 
-2. **Código (`usePOS.ts`)**: Manter o `c.product.id || null` como está — com a coluna nullable, funcionará corretamente.
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-### Arquivo afetado
-- Migração SQL (1 linha)
-- Nenhuma mudança de código necessária
+### Implementação
+
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
+
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+
+### Resultado
+
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 
