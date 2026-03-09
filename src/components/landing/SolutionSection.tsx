@@ -33,7 +33,7 @@ const modules = [
   { icon: "Users", title: "Gestão de Equipe", desc: "Escala, ponto, folha de pagamento e ranking de desempenho." },
   { icon: "UtensilsCrossed", title: "Fichas Técnicas", desc: "Monte receitas com custo automático baseado no estoque." },
   { icon: "Calendar", title: "Agenda & Marketing", desc: "Calendário de tarefas, campanhas e datas comemorativas." },
-  { icon: "Bot", title: "IA Copiloto", desc: "Assistente inteligente que analisa dados e sugere ações." },
+  { icon: "Bot", title: "Copilot IA", desc: "Assistente inteligente que analisa dados e sugere ações." },
   { icon: "ShoppingCart", title: "Pedidos Online", desc: "Cardápio digital com pedidos via tablet e WhatsApp." },
   { icon: "Gamepad2", title: "Gamificação", desc: "Roleta de prêmios e ranking para engajar clientes e equipe." },
 ];

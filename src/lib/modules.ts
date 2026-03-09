@@ -18,10 +18,10 @@ export interface ModuleDef {
 
 export const ALL_MODULES: ModuleDef[] = [
   {
-    key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', route: '/', routes: ['/'], group: 'Principal',
+    key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', route: '/', routes: ['/'], group: 'Início',
   },
   {
-    key: 'agenda', label: 'Agenda', icon: 'CalendarDays', route: '/agenda', routes: ['/agenda'], group: 'Principal',
+    key: 'agenda', label: 'Agenda', icon: 'CalendarDays', route: '/agenda', routes: ['/agenda'], group: 'Início',
     children: [
       { key: 'agenda.view', label: 'Visualizar tarefas', icon: 'Eye' },
       { key: 'agenda.create', label: 'Criar/editar tarefas', icon: 'PenSquare' },

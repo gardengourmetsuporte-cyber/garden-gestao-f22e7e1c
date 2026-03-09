@@ -37,7 +37,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   // ── Operação ──
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'Receipt', label: 'Fechamento de Caixa', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
@@ -51,7 +51,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   // ── Gestão ──
   { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
-  { icon: 'ShieldCheck', label: 'Obrigações', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'ShieldCheck', label: 'Obrigações Legais', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   
 ];
 

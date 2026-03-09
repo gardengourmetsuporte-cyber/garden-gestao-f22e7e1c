@@ -113,7 +113,7 @@ export default function Agenda() {
     if (!canAccessAgenda) navigate('/');
   }, [canAccessAgenda, navigate]);
 
-  useFabAction({ icon: 'Plus', label: 'Novo Lembrete', onClick: () => { setEditingTask(null); setTaskSheetOpen(true); } }, []);
+  useFabAction({ icon: 'Plus', label: 'Nova Tarefa', onClick: () => { setEditingTask(null); setTaskSheetOpen(true); } }, []);
 
   // Stats
   const pendingCount = useCountUp(displayTasks.filter(t => !t.is_completed).length);
@@ -209,7 +209,7 @@ export default function Agenda() {
           </div>
           <p className="text-foreground text-base font-semibold">Tudo em dia! 🎉</p>
           <Button variant="link" className="mt-2 text-primary font-medium hover:text-primary/80" onClick={() => setTaskSheetOpen(true)}>
-            Criar novo lembrete
+            Criar nova tarefa
           </Button>
         </div>
       ) : (
@@ -229,7 +229,7 @@ export default function Agenda() {
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
-                      <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'lembrete' : 'lembretes'}</span>
+                      <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -298,7 +298,7 @@ export default function Agenda() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
-          <DesktopActionBar label="Novo Lembrete" onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }} />
+          <DesktopActionBar label="Nova Tarefa" onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }} />
           {/* Stats + actions row */}
           <div className="flex items-center justify-between">
             {!isLoading && (

@@ -40,8 +40,8 @@ export const PLANS: PlanDef[] = [
     highlight: false,
     features: [
       'Tudo do Pro',
-      'IA Copiloto',
-      'WhatsApp Bot',
+      'Copilot IA',
+      'WhatsApp IA',
       'Marketing',
       'Pedidos online (tablet)',
       'Cardápio digital',
