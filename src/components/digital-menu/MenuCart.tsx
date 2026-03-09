@@ -178,22 +178,21 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      if (shouldAutoConfirm) {
-        try {
-          await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              },
-              body: JSON.stringify({ order_id: (order as any).id }),
-            }
-          );
-        } catch (e) {
-          console.warn('[MenuCart] send-to-pdv failed:', e);
-        }
+      // Auto send to PDV
+      try {
+        await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ order_id: (order as any).id }),
+          }
+        );
+      } catch (e) {
+        console.warn('[MenuCart] send-to-pdv failed:', e);
       }
 
       // Save address to customer record (fire-and-forget, don't block order)
