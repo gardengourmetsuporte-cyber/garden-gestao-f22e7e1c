@@ -95,31 +95,31 @@ import { AppIcon } from '@/components/ui/app-icon';
               </CardDescription>
            </CardHeader>
            <CardContent className="space-y-4">
-             <div className="space-y-2">
-               <Label htmlFor="monthly-products" className="flex items-center gap-2">
-                 Média de produtos vendidos por mês
-                 <Tooltip>
-                   <TooltipTrigger>
-                     <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
-                   </TooltipTrigger>
-                   <TooltipContent className="max-w-xs">
-                     Informe quantos produtos você vende em média por mês.
-                     Esse número será usado para dividir os custos fixos.
-                   </TooltipContent>
-                 </Tooltip>
-               </Label>
-               <div className="flex items-center gap-2">
-                 <Input
-                   id="monthly-products"
-                   type="number"
-                   value={monthlyProductsSold}
-                   onChange={(e) => setMonthlyProductsSold(e.target.value)}
-                   min="1"
-                   className="max-w-[200px]"
-                 />
-                 <span className="text-sm text-muted-foreground">produtos</span>
-               </div>
-             </div>
+              <div className="space-y-2">
+                <Label htmlFor="monthly-revenue" className="flex items-center gap-2">
+                  Faturamento mensal estimado
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      Informe sua receita bruta mensal estimada.
+                      O custo fixo de cada produto será calculado proporcionalmente ao seu preço de venda em relação a esse faturamento.
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">R$</span>
+                  <Input
+                    id="monthly-revenue"
+                    type="number"
+                    value={monthlyRevenue}
+                    onChange={(e) => setMonthlyRevenue(e.target.value)}
+                    min="1"
+                    className="max-w-[200px]"
+                  />
+                </div>
+              </div>
  
              {/* Categorias de Custo Fixo */}
              <div className="space-y-3">
