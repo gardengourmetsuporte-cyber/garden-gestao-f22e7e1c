@@ -325,11 +325,11 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         </div>
       )}
 
-      {/* Delivery fields */}
+      {/* Customer fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="Bike" size={16} className="text-primary" />
-          Dados para entrega
+          <AppIcon name={isQrCode ? 'RestaurantMenu' : 'Bike'} size={16} className="text-primary" />
+          {isQrCode ? 'Dados para o pedido' : 'Dados para entrega'}
         </h3>
         <Input
           placeholder="Seu nome *"
@@ -337,30 +337,44 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           onChange={e => setCustomerName(e.target.value)}
           className="h-12 rounded-xl"
         />
-        <Input
-          placeholder="Telefone *"
-          value={customerPhone}
-          onChange={e => setCustomerPhone(formatPhone(e.target.value))}
-          className="h-12 rounded-xl"
-          inputMode="tel"
-        />
-        <Textarea
-          placeholder="Endereço completo * (rua, número, bairro, cidade)"
-          value={customerAddress}
-          onChange={e => handleAddressChange(e.target.value)}
-          className="rounded-xl resize-none"
-          rows={2}
-        />
-        {customerUser && (
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={saveAddress}
-              onChange={e => setSaveAddress(e.target.checked)}
-              className="w-4 h-4 rounded border-border accent-primary"
+        {isQrCode ? (
+          <Input
+            placeholder="Número da mesa *"
+            value={tableNumber}
+            onChange={e => setTableNumber(e.target.value.replace(/\D/g, ''))}
+            className="h-12 rounded-xl"
+            inputMode="numeric"
+            type="number"
+            min={1}
+          />
+        ) : (
+          <>
+            <Input
+              placeholder="Telefone *"
+              value={customerPhone}
+              onChange={e => setCustomerPhone(formatPhone(e.target.value))}
+              className="h-12 rounded-xl"
+              inputMode="tel"
             />
-            <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
-          </label>
+            <Textarea
+              placeholder="Endereço completo * (rua, número, bairro, cidade)"
+              value={customerAddress}
+              onChange={e => handleAddressChange(e.target.value)}
+              className="rounded-xl resize-none"
+              rows={2}
+            />
+            {customerUser && (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={saveAddress}
+                  onChange={e => setSaveAddress(e.target.checked)}
+                  className="w-4 h-4 rounded border-border accent-primary"
+                />
+                <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
+              </label>
+            )}
+          </>
         )}
       </div>
 
