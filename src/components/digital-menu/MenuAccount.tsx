@@ -47,7 +47,7 @@ interface Props {
   onLogout: () => void;
 }
 
-type AccountTab = 'overview' | 'orders' | 'history' | 'data';
+type AccountTab = 'overview' | 'orders' | 'history' | 'data' | 'addresses';
 
 export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, onLogout }: Props) {
   const [customer, setCustomer] = useState<CustomerData | null>(null);
