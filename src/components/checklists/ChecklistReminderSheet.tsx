@@ -10,6 +10,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+// employees table has user_id and we can cross-reference for phone
 interface TeamMember {
   user_id: string;
   full_name: string;
