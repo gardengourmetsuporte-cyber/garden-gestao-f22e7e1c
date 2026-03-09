@@ -17,6 +17,28 @@ serve(async (req) => {
     const { prompt, unit_id } = await req.json();
     if (!prompt || !unit_id) throw new Error("prompt and unit_id required");
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch brand context for visual consistency
+    const { data: brand } = await supabase
+      .from("brand_identity")
+      .select("colors, tone_of_voice, tagline")
+      .eq("unit_id", unit_id)
+      .maybeSingle();
+
+    const brandColors = brand?.colors ? JSON.stringify(brand.colors) : "";
+    const brandStyle = brand?.tone_of_voice || "";
+
+    const imagePrompt = `Generate a professional Instagram post image for a restaurant/food business. 
+The image should be vibrant, appetizing, and ready to post. 
+Style: modern food photography, clean composition, warm lighting.
+${brandColors ? `Brand color palette for accents/props: ${brandColors}.` : ""}
+${brandStyle ? `Brand personality: ${brandStyle}.` : ""}
+DO NOT include any text overlay on the image.
+Subject: ${prompt}`;
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -25,12 +47,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-3.1-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: `Generate a professional Instagram post image for a restaurant/food business. The image should be vibrant, appetizing, and ready to post. Style: modern food photography, clean composition, warm lighting. DO NOT include any text overlay on the image. Prompt: ${prompt}`,
-          },
-        ],
+        messages: [{ role: "user", content: imagePrompt }],
         modalities: ["image", "text"],
       }),
     });
@@ -50,17 +67,11 @@ serve(async (req) => {
     const data = await response.json();
     const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    if (!imageUrl) {
-      throw new Error("No image generated");
-    }
+    if (!imageUrl) throw new Error("No image generated");
 
     // Extract base64 data and upload to storage
     const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, "");
     const imageBytes = decode(base64Data);
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const fileName = `${unit_id}/ai-${Date.now()}.png`;
     const { error: uploadError } = await supabase.storage
@@ -69,7 +80,6 @@ serve(async (req) => {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      // Return base64 as fallback
       return new Response(JSON.stringify({ image_url: imageUrl, storage: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
