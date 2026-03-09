@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import type { Delivery } from '@/hooks/useDeliveries';
 
 interface Props {
@@ -13,6 +14,17 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   delivery: Delivery | null;
   onSaved: () => void;
+}
+
+interface AddressSuggestion {
+  display_name: string;
+  address: {
+    road?: string;
+    house_number?: string;
+    suburb?: string;
+    city?: string;
+    town?: string;
+  };
 }
 
 export function DeliveryEditSheet({ open, onOpenChange, delivery, onSaved }: Props) {
@@ -25,6 +37,11 @@ export function DeliveryEditSheet({ open, onOpenChange, delivery, onSaved }: Pro
   const [total, setTotal] = useState('');
   const [itemsSummary, setItemsSummary] = useState('');
   const [notes, setNotes] = useState('');
+  
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (delivery && open) {
@@ -36,14 +53,69 @@ export function DeliveryEditSheet({ open, onOpenChange, delivery, onSaved }: Pro
       setTotal(delivery.total > 0 ? delivery.total.toFixed(2) : '');
       setItemsSummary(delivery.items_summary || '');
       setNotes(delivery.notes || '');
+      setSuggestions([]);
+      setShowSuggestions(false);
     }
   }, [delivery, open]);
+
+  const searchAddresses = useCallback(async (query: string) => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const params = new URLSearchParams({
+        q: `${query}, Brasil`,
+        format: 'json',
+        limit: '5',
+        countrycodes: 'br',
+        addressdetails: '1',
+      });
+      
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+        headers: { 'User-Agent': 'GardenGestao/1.0' },
+      });
+      
+      const results = await res.json();
+      setSuggestions(results || []);
+      setShowSuggestions(results.length > 0);
+    } catch (error) {
+      console.warn('Erro ao buscar endereços', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  const handleAddressChange = (value: string) => {
+    setFullAddress(value);
+    
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    
+    debounceRef.current = setTimeout(() => {
+      searchAddresses(value);
+    }, 400);
+  };
+
+  const handleSelectSuggestion = (suggestion: AddressSuggestion) => {
+    const addr = suggestion.address;
+    const road = addr.road || '';
+    const number = addr.house_number || '';
+    const formatted = number ? `${road}, ${number}` : road;
+    
+    setFullAddress(formatted || suggestion.display_name.split(',')[0]);
+    setNeighborhood(addr.suburb || neighborhood);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
 
   const handleSave = async () => {
     if (!delivery) return;
     setSaving(true);
     try {
-      // Update delivery
       const { error: delError } = await supabase
         .from('deliveries')
         .update({
@@ -56,7 +128,6 @@ export function DeliveryEditSheet({ open, onOpenChange, delivery, onSaved }: Pro
 
       if (delError) throw delError;
 
-      // Update address
       if (delivery.address) {
         const { error: addrError } = await supabase
           .from('delivery_addresses')
@@ -125,14 +196,42 @@ export function DeliveryEditSheet({ open, onOpenChange, delivery, onSaved }: Pro
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Endereço</label>
-            <Input
-              value={fullAddress}
-              onChange={e => setFullAddress(e.target.value)}
-              placeholder="Rua, número"
-              className="rounded-xl"
-            />
+            <div className="relative">
+              <Input
+                value={fullAddress}
+                onChange={e => handleAddressChange(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Rua, número"
+                className="rounded-xl pr-10"
+              />
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <AppIcon name="Loader2" size={16} className="animate-spin text-muted-foreground" />
+                </div>
+              )}
+            </div>
+            
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(suggestion)}
+                    className={cn(
+                      "w-full px-3 py-2.5 text-left text-sm hover:bg-secondary/80 transition-colors",
+                      "flex items-start gap-2 border-b border-border/50 last:border-0"
+                    )}
+                  >
+                    <AppIcon name="MapPin" size={14} className="text-primary mt-0.5 shrink-0" />
+                    <span className="line-clamp-2">{suggestion.display_name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
