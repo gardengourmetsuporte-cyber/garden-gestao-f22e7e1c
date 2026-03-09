@@ -163,7 +163,7 @@ export default function PDV() {
                     </button>
                   </div>
                   <span className="flex-1 truncate text-xs">{item.product.name}</span>
-                  <span className="text-xs font-medium shrink-0">{formatPrice(item.quantity * item.unit_price)}</span>
+                  <span className="text-xs font-medium shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
                 </div>
               ))}
             </div>
