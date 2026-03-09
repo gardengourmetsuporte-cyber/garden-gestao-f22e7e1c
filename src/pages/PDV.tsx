@@ -335,44 +335,52 @@ export default function PDV() {
                 )}
 
                 {/* Footer: total + actions */}
-                <div className="flex items-center justify-between pt-0.5">
-                  <div>
-                    <p className="text-[10px] text-muted-foreground">{itemCount} {itemCount === 1 ? 'item' : 'itens'}</p>
-                    <p className="text-xl font-black text-foreground leading-tight">{formatCurrency(pos.total)}</p>
+                <div className="space-y-2 pt-0.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground">{itemCount} {itemCount === 1 ? 'item' : 'itens'}</p>
+                      <p className="text-xl font-black text-foreground leading-tight">{formatCurrency(pos.total)}</p>
+                    </div>
+                    {/* Finalize / Cobrar */}
+                    <button
+                      onClick={() => setPaymentOpen(true)}
+                      className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5 active:scale-95 shadow-sm shrink-0"
+                    >
+                      <AppIcon name="Banknote" size={16} />
+                      Cobrar
+                    </button>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {/* Close loaded order (unload without cancelling) */}
+                    {/* Close loaded order */}
                     {activeOrderId && (
                       <button
                         onClick={() => { pos.clearCart(); setActiveOrderId(null); }}
-                        className="h-9 px-3 rounded-xl bg-secondary/60 text-muted-foreground text-xs font-semibold flex items-center gap-1 active:scale-95"
+                        className="h-8 px-3 rounded-xl bg-secondary/60 text-muted-foreground text-[11px] font-semibold flex items-center gap-1 active:scale-95"
                       >
-                        <AppIcon name="X" size={13} />
+                        <AppIcon name="X" size={12} />
                         Fechar
                       </button>
                     )}
-                    {/* Cancel existing order (requires PIN) — only for orders already sent */}
+                    {/* Cancel existing order */}
                     {activeOrderId && (
-                      <button onClick={handleCancelClick} className="h-9 px-3 rounded-xl bg-destructive/10 text-destructive text-xs font-semibold flex items-center gap-1 active:scale-95">
-                        <AppIcon name="Ban" size={13} />
+                      <button onClick={handleCancelClick} className="h-8 px-3 rounded-xl bg-destructive/10 text-destructive text-[11px] font-semibold flex items-center gap-1 active:scale-95">
+                        <AppIcon name="Ban" size={12} />
                         Cancelar
                       </button>
                     )}
-                    {/* Clear cart when no active order */}
+                    {/* Clear cart */}
                     {!activeOrderId && (
-                      <button onClick={() => pos.clearCart()} className="h-9 px-3 rounded-xl bg-secondary/60 text-muted-foreground text-xs font-semibold flex items-center gap-1 active:scale-95">
-                        <AppIcon name="X" size={13} />
+                      <button onClick={() => pos.clearCart()} className="h-8 px-3 rounded-xl bg-secondary/60 text-muted-foreground text-[11px] font-semibold flex items-center gap-1 active:scale-95">
+                        <AppIcon name="X" size={12} />
                         Limpar
                       </button>
                     )}
-
-                    {/* Send order — for delivery opens payment sheet first */}
+                    {/* Send order */}
                     <button
                       onClick={() => {
                         if (pos.saleSource === 'delivery') {
-                          // Validate delivery fields first
-                          if (!pos.customerName.trim()) { pos.sendOrder(); return; } // triggers validation toast
+                          if (!pos.customerName.trim()) { pos.sendOrder(); return; }
                           if (!pos.deliveryPhone.trim()) { pos.sendOrder(); return; }
                           if (!pos.deliveryAddress.trim()) { pos.sendOrder(); return; }
                           setDeliveryPaymentOpen(true);
@@ -381,19 +389,10 @@ export default function PDV() {
                         }
                       }}
                       disabled={pos.savingSale || pos.cart.length === 0 || (!!activeOrderId && pos.cart.length <= originalCartSize)}
-                      className="h-9 px-3 rounded-xl bg-secondary/60 border border-border/30 text-foreground text-xs font-semibold flex items-center gap-1 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
+                      className="h-8 px-3 rounded-xl bg-secondary/60 border border-border/30 text-foreground text-[11px] font-semibold flex items-center gap-1 active:scale-95 disabled:opacity-30 disabled:pointer-events-none ml-auto"
                     >
-                      <AppIcon name="Send" size={13} />
+                      <AppIcon name="Send" size={12} />
                       Enviar
-                    </button>
-
-                    {/* Finalize / Cobrar */}
-                    <button
-                      onClick={() => setPaymentOpen(true)}
-                      className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 active:scale-95 shadow-sm"
-                    >
-                      <AppIcon name="Banknote" size={14} />
-                      Cobrar
                     </button>
                   </div>
                 </div>
