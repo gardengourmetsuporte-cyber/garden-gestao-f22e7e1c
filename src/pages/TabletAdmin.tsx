@@ -147,6 +147,9 @@ export default function TabletAdmin() {
               <AppIcon name="ExternalLink" className="w-3.5 h-3.5" />
               Ver Cardápio
             </a>
+          </div>
+        )}
+
 
         {/* Integration Status Banner */}
         {pdvConfig?.is_active && (
