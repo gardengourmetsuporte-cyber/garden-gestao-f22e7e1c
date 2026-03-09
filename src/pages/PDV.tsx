@@ -492,6 +492,39 @@ export default function PDV() {
           fetchSummary={cashRegister.fetchSalesSummary}
         />
       )}
+
+      <SaleSourceSheet
+        open={saleSourceOpen}
+        onOpenChange={setSaleSourceOpen}
+        initialSource={pos.saleSource}
+        initialCustomerName={pos.customerName}
+        initialTableNumber={pos.tableNumber}
+        onConfirm={(data) => {
+          // Apply selections to POS state
+          pos.setSaleSource(data.source);
+          pos.setCustomerName(data.customerName);
+          pos.setCustomerDocument(data.customerDocument);
+          pos.setTableNumber(data.tableNumber);
+          pos.setDeliveryPhone(data.deliveryPhone);
+          pos.setDeliveryAddress(data.deliveryAddress);
+          setSaleSourceOpen(false);
+
+          if (saleSourceAction === 'charge') {
+            setPaymentOpen(true);
+          } else {
+            // Send order
+            if (data.source === 'delivery') {
+              if (!data.customerName.trim() || !data.deliveryPhone.trim() || !data.deliveryAddress.trim()) {
+                pos.sendOrder();
+              } else {
+                setDeliveryPaymentOpen(true);
+              }
+            } else {
+              pos.sendOrder();
+            }
+          }
+        }}
+      />
     </AppLayout>
   );
 }
