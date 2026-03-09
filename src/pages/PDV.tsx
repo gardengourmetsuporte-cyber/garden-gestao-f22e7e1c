@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
+import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 
