@@ -55,66 +55,83 @@ export function WhatsAppKnowledge() {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="px-4 py-4 space-y-4 max-w-3xl mx-auto">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <AppIcon name="BookOpen" className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold">Base de Conhecimento</h2>
-          <span className="text-xs text-muted-foreground">({articles.length} artigos)</span>
+          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+            <AppIcon name="BookOpen" className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-foreground">Base de Conhecimento</h2>
+            <p className="text-[11px] text-muted-foreground">{articles.length} artigo{articles.length !== 1 ? 's' : ''}</p>
+          </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => setShowSuggestions(!showSuggestions)}>
-            <AppIcon name="Lightbulb" className="w-3.5 h-3.5 mr-1" />
+          <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowSuggestions(!showSuggestions)}>
+            <AppIcon name="Lightbulb" className="w-3.5 h-3.5" />
             Sugestões
           </Button>
-          <Button size="sm" onClick={openNew}>
-            <AppIcon name="Plus" className="w-3.5 h-3.5 mr-1" />
+          <Button size="sm" className="rounded-xl gap-1.5" onClick={openNew}>
+            <AppIcon name="Plus" className="w-3.5 h-3.5" />
             Novo
           </Button>
         </div>
       </div>
 
+      {/* Suggestions */}
       {showSuggestions && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg border border-border/30 bg-muted/30">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-2xl border border-border/30 bg-card">
           <p className="col-span-full text-xs text-muted-foreground mb-1">Clique para usar como base:</p>
           {SUGGESTIONS.filter(s => !articles.some(a => a.title === s.title)).map(s => (
             <button
               key={s.title}
               onClick={() => useSuggestion(s)}
-              className="text-left text-xs p-2 rounded-md border border-border/20 hover:bg-accent/50 transition-colors"
+              className="text-left text-xs p-3 rounded-xl border border-border/20 hover:bg-accent/50 transition-colors"
             >
-              <span className="font-medium">{s.title}</span>
+              <span className="font-medium text-foreground">{s.title}</span>
               <span className="block text-muted-foreground mt-0.5">{s.category}</span>
             </button>
           ))}
         </div>
       )}
 
+      {/* Content */}
       {isLoading ? (
-        <p className="text-sm text-muted-foreground text-center py-8">Carregando...</p>
+        <div className="space-y-2">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-16 rounded-2xl bg-card animate-pulse" />
+          ))}
+        </div>
       ) : articles.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <AppIcon name="BookOpen" className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">Nenhum artigo cadastrado</p>
+        <div className="text-center py-16 text-muted-foreground">
+          <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
+            <AppIcon name="BookOpen" className="w-7 h-7 opacity-40" />
+          </div>
+          <p className="text-sm font-medium">Nenhum artigo cadastrado</p>
           <p className="text-xs mt-1">Use as sugestões ou crie um novo artigo</p>
         </div>
       ) : (
         <div className="space-y-2">
-          {articles.map(article => (
-            <div key={article.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/20 bg-card/50">
+          {articles.map((article, i) => (
+            <div
+              key={article.id}
+              className="flex items-center gap-3 p-3 rounded-2xl border border-border/20 bg-card animate-fade-in"
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
               <Switch
                 checked={article.is_active}
                 onCheckedChange={(v) => toggleActive.mutate({ id: article.id, is_active: v })}
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{article.title}</p>
+                <p className="text-sm font-medium text-foreground truncate">{article.title}</p>
                 <p className="text-xs text-muted-foreground">{article.category}</p>
               </div>
               <div className="flex gap-1">
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(article)}>
+                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-xl" onClick={() => openEdit(article)}>
                   <AppIcon name="Pencil" className="w-3.5 h-3.5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteArticle.mutate(article.id)}>
+                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-xl text-destructive" onClick={() => deleteArticle.mutate(article.id)}>
                   <AppIcon name="Trash2" className="w-3.5 h-3.5" />
                 </Button>
               </div>
@@ -123,6 +140,7 @@ export function WhatsAppKnowledge() {
         </div>
       )}
 
+      {/* Edit/Create Sheet */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="overflow-y-auto">
           <SheetHeader>
