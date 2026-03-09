@@ -55,6 +55,9 @@ export function usePOS() {
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [discount, setDiscount] = useState(0);
   const [saleNotes, setSaleNotes] = useState('');
+  const [saleSource, setSaleSource] = useState<'balcao' | 'mesa' | 'delivery'>('balcao');
+  const [deliveryPhone, setDeliveryPhone] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
@@ -180,6 +183,9 @@ export function usePOS() {
     setTableNumber(null);
     setDiscount(0);
     setSaleNotes('');
+    setSaleSource('balcao');
+    setDeliveryPhone('');
+    setDeliveryAddress('');
   }, []);
 
   // Load order into cart
@@ -217,7 +223,7 @@ export function usePOS() {
         .insert({
           unit_id: activeUnitId,
           user_id: user.id,
-          source: sourceOrderId ? 'pedido' : 'balcao',
+          source: sourceOrderId ? 'pedido' : saleSource,
           source_order_id: sourceOrderId || null,
           customer_name: customerName || null,
           customer_document: customerDocument || null,
@@ -288,6 +294,9 @@ export function usePOS() {
     tableNumber, setTableNumber,
     discount, setDiscount,
     saleNotes, setSaleNotes,
+    saleSource, setSaleSource,
+    deliveryPhone, setDeliveryPhone,
+    deliveryAddress, setDeliveryAddress,
     subtotal, total,
     addToCart, updateCartItem, removeFromCart, clearCart,
     loadOrderIntoCart, finalizeSale, fetchPendingOrders,

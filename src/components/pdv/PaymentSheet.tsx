@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,10 +33,14 @@ interface PaymentSheetProps {
   itemCount: number;
   savingSale: boolean;
   onFinalize: (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => void;
+  saleSource?: 'balcao' | 'mesa' | 'delivery';
+  customerName?: string;
+  tableNumber?: number | null;
 }
 
 export function PaymentSheet({
   open, onOpenChange, total, subtotal, discount, itemCount, savingSale, onFinalize,
+  saleSource = 'balcao', customerName, tableNumber,
 }: PaymentSheetProps) {
   const [payments, setPayments] = useState<PaymentLine[]>([]);
   const [payMethod, setPayMethod] = useState('pix');
@@ -115,7 +120,13 @@ export function PaymentSheet({
       <SheetContent side="bottom" className="max-h-[92vh] rounded-t-2xl flex flex-col p-0">
         {/* Header with total */}
         <div className="px-5 pt-5 pb-3 border-b border-border">
-          <SheetTitle className="text-base font-bold text-foreground">Recebimento</SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle className="text-base font-bold text-foreground">Recebimento</SheetTitle>
+            <Badge variant="secondary" className="text-[10px] font-medium gap-1">
+              <AppIcon name={saleSource === 'mesa' ? 'UtensilsCrossed' : saleSource === 'delivery' ? 'Bike' : 'Store'} size={10} />
+              {saleSource === 'mesa' ? `Mesa ${tableNumber || '?'}` : saleSource === 'delivery' ? `Delivery${customerName ? ` — ${customerName}` : ''}` : 'Balcão'}
+            </Badge>
+          </div>
           <div className="flex items-baseline justify-between mt-2">
             <div>
               <p className="text-xs text-muted-foreground">{itemCount} itens</p>

@@ -157,21 +157,88 @@ export default function PDV() {
               ))}
             </div>
 
-            {/* Customer / discount row */}
-            <div className="flex gap-2">
-              <Input
-                placeholder="Nome do cliente"
-                value={pos.customerName}
-                onChange={e => pos.setCustomerName(e.target.value)}
-                className="h-8 text-xs flex-1"
-              />
-              <Input
-                placeholder="CPF"
-                value={pos.customerDocument}
-                onChange={e => pos.setCustomerDocument(e.target.value)}
-                className="h-8 text-xs w-32"
-              />
+            {/* Source selector */}
+            <div className="flex gap-1.5">
+              {([
+                { key: 'balcao', label: 'Balcão', icon: 'Store' },
+                { key: 'mesa', label: 'Mesa', icon: 'UtensilsCrossed' },
+                { key: 'delivery', label: 'Delivery', icon: 'Bike' },
+              ] as const).map(s => (
+                <button
+                  key={s.key}
+                  onClick={() => pos.setSaleSource(s.key)}
+                  className={cn(
+                    'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                    pos.saleSource === s.key
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-muted-foreground'
+                  )}
+                >
+                  <AppIcon name={s.icon} size={12} />
+                  {s.label}
+                </button>
+              ))}
             </div>
+
+            {/* Conditional fields based on source */}
+            {pos.saleSource === 'balcao' && (
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Nome do cliente"
+                  value={pos.customerName}
+                  onChange={e => pos.setCustomerName(e.target.value)}
+                  className="h-8 text-xs flex-1"
+                />
+                <Input
+                  placeholder="CPF"
+                  value={pos.customerDocument}
+                  onChange={e => pos.setCustomerDocument(e.target.value)}
+                  className="h-8 text-xs w-32"
+                />
+              </div>
+            )}
+            {pos.saleSource === 'mesa' && (
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Nº da mesa"
+                  value={pos.tableNumber ?? ''}
+                  onChange={e => pos.setTableNumber(e.target.value ? Number(e.target.value) : null)}
+                  className="h-8 text-xs w-24"
+                  inputMode="numeric"
+                />
+                <Input
+                  placeholder="Nome do cliente (opcional)"
+                  value={pos.customerName}
+                  onChange={e => pos.setCustomerName(e.target.value)}
+                  className="h-8 text-xs flex-1"
+                />
+              </div>
+            )}
+            {pos.saleSource === 'delivery' && (
+              <div className="space-y-1.5">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Nome do cliente"
+                    value={pos.customerName}
+                    onChange={e => pos.setCustomerName(e.target.value)}
+                    className="h-8 text-xs flex-1"
+                  />
+                  <Input
+                    placeholder="Telefone"
+                    value={pos.deliveryPhone}
+                    onChange={e => pos.setDeliveryPhone(e.target.value)}
+                    className="h-8 text-xs w-32"
+                  />
+                </div>
+                <Input
+                  placeholder="Endereço de entrega"
+                  value={pos.deliveryAddress}
+                  onChange={e => pos.setDeliveryAddress(e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+            )}
 
             {/* Totals and actions */}
             <div className="flex items-center justify-between">
@@ -204,6 +271,9 @@ export default function PDV() {
         itemCount={pos.cart.reduce((s, i) => s + i.quantity, 0)}
         savingSale={pos.savingSale}
         onFinalize={handleFinalize}
+        saleSource={pos.saleSource}
+        customerName={pos.customerName}
+        tableNumber={pos.tableNumber}
       />
 
       {/* Pending Orders Sheet */}
