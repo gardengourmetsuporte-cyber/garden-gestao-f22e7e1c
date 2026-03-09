@@ -32,6 +32,9 @@ interface PaymentSheetProps {
   itemCount: number;
   savingSale: boolean;
   onFinalize: (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => void;
+  saleSource?: 'balcao' | 'mesa' | 'delivery';
+  customerName?: string;
+  tableNumber?: number | null;
 }
 
 export function PaymentSheet({
