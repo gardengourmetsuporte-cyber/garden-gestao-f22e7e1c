@@ -23,8 +23,7 @@ const SECTIONS = [
   { id: 'kds-stations', icon: 'ChefHat', label: 'Pistas da Cozinha (KDS)', description: 'Setores configuráveis para agrupar ingredientes no KDS', settingsTab: null },
   { id: 'delivery', icon: 'Truck', label: 'Solução Delivery', description: 'Sobre, delivery & retirada, áreas, pagamento, horários', settingsTab: 'config' as const },
   { id: 'tablet', icon: 'Tablet', label: 'Solução Tablet', description: 'Integração PDV, mesas, QR codes e chave Pix', settingsTab: 'pdv' as const },
-  { id: 'qrcode', icon: 'QrCode', label: 'QR Code Balcão', description: 'Link externo para pedidos via celular do cliente', settingsTab: null },
-  { id: 'gamificacao', icon: 'Dices', label: 'Gamificação', description: 'Roleta de prêmios e probabilidades', settingsTab: 'roleta' as const },
+  { id: 'qrcode', icon: 'QrCode', label: 'Solução QR Code', description: 'Link externo para pedidos via celular do cliente', settingsTab: null },
   { id: 'rodizio', icon: 'all_inclusive', label: 'Rodízio', description: 'Preço fixo, regras e categorias', settingsTab: 'rodizio' as const },
 ];
 
@@ -172,7 +171,7 @@ function QRCodeBalcaoSection({ url }: { url: string }) {
       <div className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30 border border-border/30">
         <QRCodeSVG value={url} size={96} bgColor="transparent" fgColor="currentColor" className="text-foreground shrink-0" />
         <div className="flex-1 min-w-0 space-y-2">
-          <p className="text-sm font-semibold text-foreground">QR Code Balcão</p>
+          <p className="text-sm font-semibold text-foreground">Solução QR Code</p>
           <p className="text-[10px] text-muted-foreground truncate">{url.replace(/^https?:\/\//, '')}</p>
           <div className="flex gap-2">
             <Button
