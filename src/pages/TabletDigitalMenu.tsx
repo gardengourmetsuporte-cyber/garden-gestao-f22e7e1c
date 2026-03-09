@@ -14,7 +14,7 @@ export default function TabletDigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
   const {
-    unit, categories, groups, products, loading,
+    unit, categories, groups, products, loading, hasVisibleProducts,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId, 'tablet');
