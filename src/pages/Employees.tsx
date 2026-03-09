@@ -10,6 +10,7 @@ import { EmployeeScheduleRequest } from '@/components/employees/EmployeeSchedule
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
 import { TimeTracking } from '@/components/employees/TimeTracking';
 import { EmployeeWarnings } from '@/components/employees/EmployeeWarnings';
+import { MaterialDeliveries } from '@/components/employees/MaterialDeliveries';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +24,7 @@ export default function Employees() {
     { key: 'employees', label: 'Funcionários', icon: 'Users', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
     { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+    { key: 'deliveries', label: 'Entregas', icon: 'Package', color: 'text-violet-400', bg: 'bg-violet-500/10' },
     { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
   ];
 
@@ -47,7 +49,7 @@ export default function Employees() {
           ) : (
             <>
               {/* Navigation Cards */}
-              <div className={cn("grid gap-2", tabs.length <= 3 ? "grid-cols-3" : "grid-cols-4")}>
+              <div className={cn("grid gap-2", tabs.length <= 3 ? "grid-cols-3" : tabs.length <= 4 ? "grid-cols-4" : "grid-cols-5")}>
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
@@ -72,6 +74,7 @@ export default function Employees() {
                 {activeTab === 'time-tracking' && <TimeTracking />}
                 {activeTab === 'schedules' && (isAdmin ? <ScheduleManagement /> : <EmployeeScheduleRequest />)}
                 {activeTab === 'payslips' && !isAdmin && <MyPayslips />}
+                {activeTab === 'deliveries' && isAdmin && <MaterialDeliveries />}
                 {activeTab === 'warnings' && <EmployeeWarnings />}
               </div>
             </>
