@@ -946,7 +946,8 @@ export function ChecklistSettings({
                 </div>
                 <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
               </button>
-              <ListPicker
+               <ListPicker
+                 nested
                 open={freqPickerOpen}
                 onOpenChange={setFreqPickerOpen}
                 title="Frequência"
