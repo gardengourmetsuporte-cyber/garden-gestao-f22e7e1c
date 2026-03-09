@@ -271,6 +271,9 @@ export default function PDV() {
         itemCount={pos.cart.reduce((s, i) => s + i.quantity, 0)}
         savingSale={pos.savingSale}
         onFinalize={handleFinalize}
+        saleSource={pos.saleSource}
+        customerName={pos.customerName}
+        tableNumber={pos.tableNumber}
       />
 
       {/* Pending Orders Sheet */}
