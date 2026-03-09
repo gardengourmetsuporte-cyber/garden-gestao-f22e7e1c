@@ -249,18 +249,7 @@ export default function CardapioHub() {
     );
   }
 
-  // ==================== PEDIDOS VIEW ====================
-  if (isPedidos) {
-    return (
-      <AppLayout>
-        <div className="min-h-screen bg-background pb-24">
-          <div className="px-4 py-3 lg:px-6">
-            <UnifiedOrdersPanel unitId={activeUnit?.id} onRetryPDV={retryPDV} />
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
+  // Pedidos tab removed — orders are now managed via PDV, KDS, and Deliveries
 
   // ==================== CARDÁPIO VIEW (default) ====================
   return (
