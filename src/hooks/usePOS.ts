@@ -183,6 +183,9 @@ export function usePOS() {
     setTableNumber(null);
     setDiscount(0);
     setSaleNotes('');
+    setSaleSource('balcao');
+    setDeliveryPhone('');
+    setDeliveryAddress('');
   }, []);
 
   // Load order into cart
