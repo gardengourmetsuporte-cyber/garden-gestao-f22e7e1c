@@ -257,6 +257,16 @@ export function MenuCategoryTree({
                   const isSelected = selectedGroupId === grp.id;
                   const avail = grp.availability as any;
                   const isAvailable = grp.is_active !== false && (avail?.tablet || avail?.delivery);
+
+                  // Ficha mode: group-level CMV
+                  const grpStats = viewMode === 'ficha' && getProductsByGroup ? (() => {
+                    const prods = getProductsByGroup(grp.id);
+                    const wc = prods.filter(p => (p as any).cost_per_portion > 0);
+                    if (wc.length === 0) return null;
+                    const avgCMV = wc.reduce((s, p) => s + ((p as any).cost_per_portion / p.price) * 100, 0) / wc.length;
+                    return { avgCMV, linked: prods.filter(p => !!(p as any).recipe_id).length, total: prods.length };
+                  })() : null;
+
                   return (
                     <div key={grp.id}>
                       <div className="flex items-center gap-1">
@@ -274,29 +284,45 @@ export function MenuCategoryTree({
                             style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
                           />
                           <span className="flex-1 text-left truncate">{grp.name}</span>
-                          <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
-                              }}
-                              className={cn(
-                                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                                avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                          {viewMode === 'ficha' ? (
+                            <div className="flex items-center gap-1.5">
+                              {grpStats ? (
+                                <span className={cn(
+                                  "text-[10px] font-bold",
+                                  grpStats.avgCMV <= 30 ? 'text-success' : grpStats.avgCMV <= 40 ? 'text-warning' : 'text-destructive'
+                                )}>
+                                  CMV {grpStats.avgCMV.toFixed(0)}%
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground/50">Sem custo</span>
                               )}
-                            >Mesa</button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
-                              }}
-                              className={cn(
-                                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                                avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
-                              )}
-                            >Delivery</button>
-                            <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
-                          </div>
+                              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
+                                }}
+                                className={cn(
+                                  "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                                  avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                                )}
+                              >Mesa</button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
+                                }}
+                                className={cn(
+                                  "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                                  avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                                )}
+                              >Delivery</button>
+                              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                            </div>
+                          )}
                         </button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
