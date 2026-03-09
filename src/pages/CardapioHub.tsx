@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const CardapioConfigHubLazy = lazy(() => import('@/components/cardapio/CardapioConfigHub').then(m => ({ default: m.CardapioConfigHub })));
+const CardapioOrdersViewLazy = lazy(() => import('@/components/cardapio/CardapioOrdersView').then(m => ({ default: m.CardapioOrdersView })));
 
 type CardapioTab = 'produtos' | 'opcionais';
 
