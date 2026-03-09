@@ -110,7 +110,7 @@ const SECTIONS: DocSection[] = [
           {[
             { name: 'Free', price: 'R$ 0', features: ['Dashboard', 'Agenda', 'Checklists (limitado)', 'Estoque básico', 'Ranking'] },
             { name: 'Pro', price: 'R$ 97/mês', highlight: true, features: ['Financeiro completo', 'Estoque inteligente', 'Gestão de equipe', 'Checklists ilimitados', 'Fichas técnicas', 'Gamificação e ranking', 'Fechamento de caixa', 'Finanças pessoais', 'Até 15 usuários'] },
-            { name: 'Business', price: 'R$ 197/mês', features: ['Tudo do Pro', 'IA Copiloto', 'WhatsApp Bot', 'Marketing', 'Pedidos online (tablet)', 'Cardápio digital', 'Usuários ilimitados', 'Suporte prioritário'] },
+            { name: 'Business', price: 'R$ 197/mês', features: ['Tudo do Pro', 'Copilot IA', 'WhatsApp IA', 'Marketing', 'Pedidos online (tablet)', 'Cardápio digital', 'Usuários ilimitados', 'Suporte prioritário'] },
           ].map(p => (
             <div key={p.name} className={`rounded-lg border p-4 ${p.highlight ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
               <p className="font-bold text-foreground">{p.name}</p>
