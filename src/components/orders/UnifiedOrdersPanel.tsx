@@ -57,17 +57,17 @@ const platformLabel: Record<string, string> = {
 // Status flow for tablet delivery orders
 const TABLET_STATUS_FLOW: Record<string, { next: string[]; labels: Record<string, { label: string; icon: string; variant: 'default' | 'destructive' | 'outline' }> }> = {
   pending: {
-    next: ['confirmed', 'cancelled'],
+    next: ['preparing', 'cancelled'],
     labels: {
-      confirmed: { label: 'Aceitar pedido', icon: 'check_circle', variant: 'default' },
-      cancelled: { label: 'Recusar', icon: 'cancel', variant: 'destructive' },
+      preparing: { label: 'Começar o preparo', icon: 'skillet', variant: 'default' },
+      cancelled: { label: 'Cancelar', icon: 'cancel', variant: 'destructive' },
     },
   },
   awaiting_confirmation: {
-    next: ['confirmed', 'cancelled'],
+    next: ['preparing', 'cancelled'],
     labels: {
-      confirmed: { label: 'Aceitar pedido', icon: 'check_circle', variant: 'default' },
-      cancelled: { label: 'Recusar', icon: 'cancel', variant: 'destructive' },
+      preparing: { label: 'Começar o preparo', icon: 'skillet', variant: 'default' },
+      cancelled: { label: 'Cancelar', icon: 'cancel', variant: 'destructive' },
     },
   },
   confirmed: {
@@ -84,9 +84,10 @@ const TABLET_STATUS_FLOW: Record<string, { next: string[]; labels: Record<string
     },
   },
   ready: {
-    next: ['dispatched'],
+    next: ['dispatched', 'delivered'],
     labels: {
-      dispatched: { label: 'Saiu para entrega', icon: 'local_shipping', variant: 'default' },
+      dispatched: { label: 'Saiu p/ entrega', icon: 'local_shipping', variant: 'default' },
+      delivered: { label: 'Entregue', icon: 'check_circle', variant: 'default' },
     },
   },
   dispatched: {
