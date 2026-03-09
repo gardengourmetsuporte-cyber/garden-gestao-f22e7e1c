@@ -137,7 +137,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
 
     setSending(true);
 
-    const requestTimeoutMs = 12000;
+    const requestTimeoutMs = 20000;
     const maxRetries = 3;
 
     // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open tablets)
@@ -248,6 +248,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
            return; // Success — exit
         } catch (err: any) {
           lastError = err;
+          console.error(`[TabletMenuCart] Attempt ${attempt + 1} failed:`, err?.message || err);
 
           const msg = String(err?.message || '');
           const isTimeout = msg.startsWith('timeout:');
@@ -263,7 +264,9 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         }
       }
 
-      toast.error('Conexão lenta. Tente novamente.');
+      const errorMsg = lastError?.message || 'Erro desconhecido';
+      const isTimeoutError = errorMsg.startsWith('timeout:') || errorMsg.toLowerCase().includes('abort');
+      toast.error(isTimeoutError ? 'Conexão lenta. Tente novamente.' : `Erro ao enviar pedido: ${errorMsg}`);
       console.error('[TabletMenuCart] Order send failed:', lastError);
     } finally {
       setSending(false);
