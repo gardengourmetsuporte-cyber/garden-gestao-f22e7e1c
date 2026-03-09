@@ -93,7 +93,7 @@ function PixKeyConfig() {
   );
 }
 
-export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
+export function CardapioSettings({ initialTab = null, embedded = false }: CardapioSettingsProps) {
   const { activeUnit } = useUnit();
   const tabletAdmin = useTabletAdmin();
   const { tables, pdvConfig, addTable, removeTable, savePDVConfig, retryPDV } = tabletAdmin;
