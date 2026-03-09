@@ -25,7 +25,19 @@ type KDSOrder = {
     id: string;
     quantity: number;
     notes: string | null;
-    tablet_products: { name: string; codigo_pdv: string | null } | null;
+    tablet_products: {
+      name: string;
+      codigo_pdv: string | null;
+      recipes?: {
+        recipe_ingredients?: {
+          quantity: number;
+          unit_type: string;
+          kds_station_id: string | null;
+          kds_stations: { name: string; color: string } | null;
+          inventory_items: { name: string } | null;
+        }[];
+      } | null;
+    } | null;
   }[];
 };
 
