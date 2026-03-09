@@ -198,34 +198,40 @@ export type Database = {
           colors: Json
           created_at: string
           id: string
+          instagram_url: string | null
           institutional_phrases: string[]
           tagline: string
           tone_of_voice: string
           typography: Json
           unit_id: string
           updated_at: string
+          website_url: string | null
         }
         Insert: {
           colors?: Json
           created_at?: string
           id?: string
+          instagram_url?: string | null
           institutional_phrases?: string[]
           tagline?: string
           tone_of_voice?: string
           typography?: Json
           unit_id: string
           updated_at?: string
+          website_url?: string | null
         }
         Update: {
           colors?: Json
           created_at?: string
           id?: string
+          instagram_url?: string | null
           institutional_phrases?: string[]
           tagline?: string
           tone_of_voice?: string
           typography?: Json
           unit_id?: string
           updated_at?: string
+          website_url?: string | null
         }
         Relationships: [
           {

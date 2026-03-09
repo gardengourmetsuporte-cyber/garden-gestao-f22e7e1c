@@ -67,7 +67,7 @@ const WhatsApp = lazy(() => lazyRetry(() => import("./pages/WhatsApp")));
 const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
 const Orders = lazy(() => lazyRetry(() => import("./pages/Orders")));
 const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
-const BrandCore = lazy(() => lazyRetry(() => import("./pages/BrandCore")));
+// BrandCore removed — consolidated into Marketing
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const Deliveries = lazy(() => lazyRetry(() => import("./pages/Deliveries")));
 const DeliveryHub = lazy(() => lazyRetry(() => import("./pages/DeliveryHub")));
@@ -259,7 +259,7 @@ function AuthenticatedRoutes() {
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
           <Route path="/cardapio" element={<ProtectedRoute><CardapioHub /></ProtectedRoute>} />
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
-          <Route path="/brand-core" element={<ProtectedRoute><BrandCore /></ProtectedRoute>} />
+          <Route path="/brand-core" element={<Navigate to="/marketing" replace />} />
           <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />

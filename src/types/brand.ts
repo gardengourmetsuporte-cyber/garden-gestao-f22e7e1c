@@ -14,6 +14,8 @@ export interface BrandIdentity {
   tone_of_voice: string;
   tagline: string;
   institutional_phrases: string[];
+  instagram_url: string;
+  website_url: string;
   created_at: string;
   updated_at: string;
 }
