@@ -231,24 +231,26 @@ export function MenuCategoryTree({
                   />
                 )}
               </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="p-3 rounded-lg hover:bg-secondary/60 mr-2 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
-                    <AppIcon name="MoreVertical" size={14} className="text-muted-foreground/50" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => openNewGroup(cat.id)}>
-                    <AppIcon name="Plus" size={14} className="mr-2" /> Novo Grupo
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => openEditCategory(cat)}>
-                    <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onDeleteCategory(cat.id)} className="text-destructive">
-                    <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {viewMode !== 'ficha' && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-3 rounded-lg hover:bg-secondary/60 mr-2 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
+                      <AppIcon name="MoreVertical" size={14} className="text-muted-foreground/50" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => openNewGroup(cat.id)}>
+                      <AppIcon name="Plus" size={14} className="mr-2" /> Novo Grupo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openEditCategory(cat)}>
+                      <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onDeleteCategory(cat.id)} className="text-destructive">
+                      <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
             {expanded && (
