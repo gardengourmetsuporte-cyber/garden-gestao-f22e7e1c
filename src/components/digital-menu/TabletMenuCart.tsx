@@ -310,7 +310,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center">
-                <AppIcon name="Coins" size={18} className="text-amber-500" />
+                <span className="text-lg">🪙</span>
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground">Pagar com Moedas</p>
