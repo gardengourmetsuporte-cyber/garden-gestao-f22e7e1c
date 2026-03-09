@@ -114,6 +114,11 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   } = useUnifiedOrders(unitId);
 
   const [selectedOrder, setSelectedOrder] = useState<TabletOrder | null>(null);
+  const [showCancelled, setShowCancelled] = useState(false);
+
+  // Filter out cancelled orders unless toggle is on
+  const filterOrders = (orders: TabletOrder[]) =>
+    showCancelled ? orders : orders.filter(o => o.status !== 'cancelled');
 
   const tabs: { id: UnifiedTab; label: string; icon: string; count: number; badge?: number }[] = [
     { id: 'balcao', label: 'Balcão', icon: 'Store', count: stats.balcao, badge: stats.balcaoPending },
