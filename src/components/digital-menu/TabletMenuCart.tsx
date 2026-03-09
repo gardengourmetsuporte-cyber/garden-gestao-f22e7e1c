@@ -100,6 +100,20 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
 
     setSending(true);
 
+    // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open tablets)
+    let shouldAutoConfirm = autoConfirm;
+    try {
+      const { data: unitRow } = await withTimeout(
+        supabase.from('units').select('store_info').eq('id', unitId).maybeSingle(),
+        requestTimeoutMs,
+        'get_store_info'
+      );
+      const live = (unitRow as any)?.store_info?.auto_confirm?.mesa;
+      if (typeof live === 'boolean') shouldAutoConfirm = live;
+    } catch {
+      // keep prop fallback
+    }
+
     const maxRetries = 3;
     const requestTimeoutMs = 12000;
     let lastError: any = null;

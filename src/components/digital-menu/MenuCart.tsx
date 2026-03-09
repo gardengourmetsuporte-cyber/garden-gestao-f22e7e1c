@@ -24,6 +24,7 @@ interface Props {
 export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
+  const [sentAutoConfirmed, setSentAutoConfirmed] = useState(false);
 
   // Delivery fields — pre-fill from logged-in user + saved customer data
   const [customerName, setCustomerName] = useState('');
