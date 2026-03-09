@@ -18,10 +18,11 @@ import { AppIcon } from '@/components/ui/app-icon';
      isSaving,
    } = useRecipeCostSettings();
  
-   const [monthlyProductsSold, setMonthlyProductsSold] = useState('1000');
-   const [taxPercentage, setTaxPercentage] = useState('0');
-   const [cardFeePercentage, setCardFeePercentage] = useState('0');
-   const [packagingCostPerUnit, setPackagingCostPerUnit] = useState('0');
+    const [monthlyProductsSold, setMonthlyProductsSold] = useState('1000');
+    const [monthlyRevenue, setMonthlyRevenue] = useState('50000');
+    const [taxPercentage, setTaxPercentage] = useState('0');
+    const [cardFeePercentage, setCardFeePercentage] = useState('0');
+    const [packagingCostPerUnit, setPackagingCostPerUnit] = useState('0');
    const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
  
    // Carregar valores quando settings mudar
