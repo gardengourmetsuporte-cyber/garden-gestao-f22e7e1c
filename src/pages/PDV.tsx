@@ -46,9 +46,12 @@ export default function PDV() {
   const handleLoadOrder = (order: PendingOrder) => {
     pos.loadOrderIntoCart(order);
     setActiveOrderId(order.id);
+    setOriginalCartSize(order.items.length);
     setCartExpanded(true);
     setOrdersOpen(false);
   };
+
+  const hasNewItems = activeOrderId ? pos.cart.length > originalCartSize : false;
 
 
   return (
