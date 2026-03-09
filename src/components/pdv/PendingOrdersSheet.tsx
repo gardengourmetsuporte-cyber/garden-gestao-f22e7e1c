@@ -79,7 +79,7 @@ function OrderDetailSheet({
   const cfg = SOURCE_CONFIG[sourceKey] || { icon: 'ShoppingBag', label: sourceKey };
   const isDelivery = sourceKey === 'delivery' || sourceKey === 'ifood' || sourceKey === 'whatsapp';
   const canDispatch = isDelivery && ['confirmed', 'preparing', 'ready', 'pending'].includes(order.status);
-  const orderNumber = order.id.slice(0, 4).toUpperCase();
+  const orderNumber = order.order_number ? `${order.order_number}` : order.id.slice(0, 4).toUpperCase();
   const timeAgo = formatDistanceToNow(new Date(order.created_at), { addSuffix: false, locale: ptBR });
   const formattedDate = format(new Date(order.created_at), "dd/MM, HH:mm");
 

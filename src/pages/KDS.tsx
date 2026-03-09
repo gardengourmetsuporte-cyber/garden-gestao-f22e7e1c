@@ -85,7 +85,7 @@ function OrderCard({
   const a = ACCENT_MAP[cfg.accent];
   const source = order.source || 'mesa';
   const items = order.tablet_order_items || [];
-  const shortId = order.id.slice(0, 4).toUpperCase();
+  const shortId = (order as any).order_number ? `${(order as any).order_number}` : order.id.slice(0, 4).toUpperCase();
 
   return (
     <div className={cn(
@@ -169,7 +169,7 @@ function OrderDetail({
   const a = ACCENT_MAP[cfg.accent];
   const source = order.source || 'mesa';
   const items = order.tablet_order_items || [];
-  const shortId = order.id.slice(0, 4).toUpperCase();
+  const shortId = (order as any).order_number ? `${(order as any).order_number}` : order.id.slice(0, 4).toUpperCase();
   const mins = Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60_000);
 
   return (
@@ -311,7 +311,7 @@ export default function KDS() {
       try {
         const query = supabase
           .from('tablet_orders')
-          .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
+          .select('id, unit_id, table_number, order_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
           .eq('unit_id', unitId)
           .in('status', ACTIVE_STATUSES)
           .order('created_at', { ascending: true })

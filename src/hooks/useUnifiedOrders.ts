@@ -10,6 +10,7 @@ export interface TabletOrder {
   id: string;
   unit_id: string;
   table_number: number;
+  order_number: number | null;
   status: string;
   total: number;
   error_message: string | null;

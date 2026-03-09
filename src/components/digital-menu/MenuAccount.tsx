@@ -480,7 +480,7 @@ function OrdersTab({ orders }: { orders: OrderRecord[] }) {
           <div key={order.id} className="rounded-2xl bg-card border border-border/30 p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-foreground">#{order.id.slice(0, 8)}</span>
+                <span className="text-xs font-mono font-bold text-foreground">#{(order as any).order_number || order.id.slice(0, 8)}</span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${s.color}`}>
                   {s.label}
                 </span>

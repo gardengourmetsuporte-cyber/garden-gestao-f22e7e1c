@@ -30,6 +30,7 @@ export interface PendingOrder {
   customer_phone: string | null;
   customer_address: string | null;
   table_number: number | null;
+  order_number: number | null;
   total: number;
   status: string;
   created_at: string;
@@ -87,7 +88,7 @@ export function usePOS() {
     // Tablet orders
     const { data: tabletData } = await supabase
       .from('tablet_orders')
-      .select('id, source, customer_name, customer_phone, customer_address, table_number, total, status, created_at, tablet_order_items(quantity, unit_price, tablet_products(name))')
+      .select('id, source, customer_name, customer_phone, customer_address, table_number, order_number, total, status, created_at, tablet_order_items(quantity, unit_price, tablet_products(name))')
       .eq('unit_id', activeUnitId)
       .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
       .order('created_at', { ascending: false });
@@ -110,6 +111,7 @@ export function usePOS() {
         customer_phone: o.customer_phone || null,
         customer_address: o.customer_address || null,
         table_number: o.table_number,
+        order_number: o.order_number ?? null,
         total: o.total,
         status: o.status,
         created_at: o.created_at,
@@ -129,6 +131,7 @@ export function usePOS() {
         customer_phone: o.customer_phone || null,
         customer_address: o.customer_address || null,
         table_number: null,
+        order_number: null,
         total: o.total,
         status: o.status,
         created_at: o.created_at,

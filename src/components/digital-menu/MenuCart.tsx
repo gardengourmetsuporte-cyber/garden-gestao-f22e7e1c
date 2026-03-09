@@ -212,7 +212,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
 
       toast.success('Pedido enviado com sucesso!');
       setSentAutoConfirmed(true);
-      setOrderSent((order as any).id.slice(0, 8));
+      setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
     } catch (err: any) {
       toast.error(err.message || 'Erro ao enviar pedido');
     } finally {

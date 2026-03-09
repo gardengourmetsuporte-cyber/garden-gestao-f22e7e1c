@@ -4934,6 +4934,7 @@ export type Database = {
           customer_phone: string | null
           error_message: string | null
           id: string
+          order_number: number | null
           pdv_response: Json | null
           retry_count: number | null
           source: string
@@ -4951,6 +4952,7 @@ export type Database = {
           customer_phone?: string | null
           error_message?: string | null
           id?: string
+          order_number?: number | null
           pdv_response?: Json | null
           retry_count?: number | null
           source?: string
@@ -4968,6 +4970,7 @@ export type Database = {
           customer_phone?: string | null
           error_message?: string | null
           id?: string
+          order_number?: number | null
           pdv_response?: Json | null
           retry_count?: number | null
           source?: string
