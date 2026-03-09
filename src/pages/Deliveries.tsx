@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -24,6 +24,8 @@ const FILTERS: { key: DeliveryStatus | 'all'; label: string; icon: string }[] = 
   { key: 'delivered', label: 'Entregues', icon: 'check_circle' },
 ];
 
+type ViewMode = 'bairros' | 'pedidos';
+
 export default function Deliveries() {
   const { activeUnit, activeUnitId } = useUnit();
   const {
@@ -37,24 +39,24 @@ export default function Deliveries() {
   const [editDelivery, setEditDelivery] = useState<Delivery | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [dispatchMode, setDispatchMode] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('bairros');
   const mapHandleRef = useRef<DeliveryMapHandle>(null);
+  const autoImportedRef = useRef<Set<string>>(new Set());
 
-  // Pending digital menu orders that need delivery
+  // Pending delivery orders — auto-import
   const { data: pendingMenuOrders = [] } = useQuery({
     queryKey: ['delivery-pending-orders', activeUnitId],
     queryFn: async () => {
       if (!activeUnitId) return [];
-      // Get tablet orders with delivery source that are confirmed but not yet in deliveries
       const { data: tabletOrders } = await supabase
         .from('tablet_orders')
-        .select('id, customer_name, total, status, source, created_at, table_number, tablet_order_items(id, quantity, notes, tablet_products(name))')
+        .select('id, customer_name, customer_address, customer_phone, total, status, source, created_at, table_number, tablet_order_items(id, quantity, notes, unit_price, tablet_products(name))')
         .eq('unit_id', activeUnitId)
         .eq('source', 'delivery')
         .in('status', ['confirmed', 'preparing'])
         .order('created_at', { ascending: false })
         .limit(50);
 
-      // Get delivery hub orders that are ready/dispatched
       const { data: hubOrders } = await supabase
         .from('delivery_hub_orders')
         .select('id, customer_name, customer_address, total, status, platform, platform_display_id, created_at, delivery_hub_order_items(id, name, quantity)')
@@ -68,6 +70,7 @@ export default function Deliveries() {
           type: 'menu' as const,
           id: o.id,
           customer_name: o.customer_name || `Mesa ${o.table_number}`,
+          customer_address: o.customer_address || '',
           total: o.total || 0,
           status: o.status,
           source: 'Cardápio Digital',
@@ -78,7 +81,7 @@ export default function Deliveries() {
           type: 'hub' as const,
           id: o.id,
           customer_name: o.customer_name || '—',
-          customer_address: o.customer_address,
+          customer_address: o.customer_address || '',
           total: o.total || 0,
           status: o.status,
           source: o.platform === 'ifood' ? 'iFood' : o.platform === 'rappi' ? 'Rappi' : o.platform,
@@ -91,6 +94,52 @@ export default function Deliveries() {
     enabled: !!activeUnitId,
     refetchInterval: 30000,
   });
+
+  // Auto-import delivery orders into deliveries table
+  useEffect(() => {
+    if (!pendingMenuOrders.length) return;
+
+    const toImport = pendingMenuOrders.filter(o => !autoImportedRef.current.has(o.id));
+    if (!toImport.length) return;
+
+    // Check which orders already have a delivery
+    const checkAndImport = async () => {
+      for (const order of toImport) {
+        autoImportedRef.current.add(order.id);
+        
+        // Check if delivery already exists for this order (by order_number)
+        const ordNum = order.type === 'hub' ? ((order as any).displayId || order.id.slice(0, 8)) : order.id.slice(0, 8);
+        const { data: existing } = await supabase
+          .from('deliveries')
+          .select('id')
+          .eq('unit_id', activeUnitId!)
+          .eq('order_number', ordNum)
+          .limit(1);
+
+        if (existing && existing.length > 0) continue;
+
+        try {
+          await createDelivery({
+            ocrResult: {
+              order_number: ordNum,
+              customer_name: order.customer_name,
+              full_address: order.customer_address || '',
+              neighborhood: '',
+              city: '',
+              reference: '',
+              items_summary: order.items,
+              total: order.total,
+            },
+            photoUrl: null,
+          });
+        } catch {
+          // Silently skip failed imports
+        }
+      }
+    };
+
+    checkAndImport();
+  }, [pendingMenuOrders, activeUnitId, createDelivery]);
 
   const handleCardClick = useCallback((deliveryId: string) => {
     if (dispatchMode) {
@@ -120,29 +169,7 @@ export default function Deliveries() {
   };
 
   const handleArchive = async (delivery: Delivery) => {
-    try {
-      await deleteDelivery(delivery.id);
-    } catch {}
-  };
-
-  const handleImportOrder = async (order: typeof pendingMenuOrders[0]) => {
-    try {
-      const address = order.type === 'hub' ? (order as any).customer_address || '' : '';
-      await createDelivery({
-        ocrResult: {
-          order_number: order.type === 'hub' ? ((order as any).displayId || order.id.slice(0, 8)) : order.id.slice(0, 8),
-          customer_name: order.customer_name,
-          full_address: address,
-          neighborhood: '',
-          city: '',
-          reference: '',
-          items_summary: order.items,
-          total: order.total,
-        },
-        photoUrl: null,
-      });
-      toast.success(`Pedido ${order.source} importado!`);
-    } catch {}
+    try { await deleteDelivery(delivery.id); } catch {}
   };
 
   useFabAction({ icon: 'add', label: 'Nova Entrega', onClick: () => setSheetOpen(true) }, []);
@@ -162,7 +189,7 @@ export default function Deliveries() {
       <div className="pb-28 lg:pb-12 px-4 pt-2 lg:px-8 lg:max-w-7xl lg:mx-auto space-y-4">
         <DesktopActionBar label="Nova Entrega" onClick={() => setSheetOpen(true)} />
 
-        {/* ── Stats + Filters as Cards ── */}
+        {/* Stats filters */}
         <div className="grid grid-cols-4 gap-2">
           {FILTERS.map(({ key, label, icon }) => {
             const active = statusFilter === key;
@@ -192,51 +219,29 @@ export default function Deliveries() {
           })}
         </div>
 
-        {/* Pending orders from digital menu / iFood */}
-        {pendingMenuOrders.length > 0 && (
-          <div className="rounded-2xl bg-primary/5 border border-primary/20 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center">
-                  <AppIcon name="ShoppingBag" size={16} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-foreground">Pedidos aguardando entrega</p>
-                  <p className="text-[10px] text-muted-foreground">{pendingMenuOrders.length} pedido(s) do cardápio digital e hubs</p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {pendingMenuOrders.map(order => (
-                <div key={order.id} className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-card/80 border border-border/20">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary">{order.source}</span>
-                      <span className="text-xs font-semibold text-foreground truncate">{order.customer_name}</span>
-                    </div>
-                    {order.items && (
-                      <p className="text-[10px] text-muted-foreground truncate mt-0.5">{order.items}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-bold text-primary tabular-nums">
-                      R$ {order.total.toFixed(2)}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-[10px] px-2 rounded-lg font-semibold"
-                      onClick={() => handleImportOrder(order)}
-                    >
-                      <AppIcon name="Plus" size={14} className="mr-1" />
-                      Importar
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* View mode toggle */}
+        <div className="flex items-center gap-1 bg-secondary/50 rounded-xl p-1">
+          <button
+            onClick={() => setViewMode('bairros')}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all',
+              viewMode === 'bairros' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+            )}
+          >
+            <AppIcon name="location_on" size={14} />
+            Bairros
+          </button>
+          <button
+            onClick={() => setViewMode('pedidos')}
+            className={cn(
+              'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all',
+              viewMode === 'pedidos' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+            )}
+          >
+            <AppIcon name="receipt_long" size={14} />
+            Pedidos
+          </button>
+        </div>
 
         {/* Dispatch mode bar */}
         {dispatchMode && (
@@ -244,19 +249,14 @@ export default function Deliveries() {
             <div className="flex items-center gap-2">
               <AppIcon name="Truck" size={18} className="text-primary" />
               <span className="text-xs font-bold text-foreground">
-                {selectedIds.size > 0 ? `${selectedIds.size} selecionada(s)` : 'Toque nas entregas para selecionar'}
+                {selectedIds.size > 0 ? `${selectedIds.size} selecionada(s)` : 'Toque para selecionar'}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Button size="sm" variant="ghost" className="h-8 text-xs rounded-lg" onClick={() => { setDispatchMode(false); setSelectedIds(new Set()); }}>
                 Cancelar
               </Button>
-              <Button
-                size="sm"
-                className="h-8 text-xs rounded-lg font-bold"
-                disabled={selectedIds.size === 0}
-                onClick={handleDispatchSelected}
-              >
+              <Button size="sm" className="h-8 text-xs rounded-lg font-bold" disabled={selectedIds.size === 0} onClick={handleDispatchSelected}>
                 <AppIcon name="Send" size={14} className="mr-1" />
                 Despachar
               </Button>
@@ -264,19 +264,14 @@ export default function Deliveries() {
           </div>
         )}
 
-        {/* Dispatch button when not in dispatch mode */}
         {!dispatchMode && stats.pending > 0 && (
-          <Button
-            variant="outline"
-            className="w-full h-10 rounded-xl text-xs font-semibold gap-2"
-            onClick={() => setDispatchMode(true)}
-          >
+          <Button variant="outline" className="w-full h-10 rounded-xl text-xs font-semibold gap-2" onClick={() => setDispatchMode(true)}>
             <AppIcon name="Truck" size={16} className="text-primary" />
             Selecionar para despachar ({stats.pending} pendente{stats.pending > 1 ? 's' : ''})
           </Button>
         )}
 
-        {/* ── Main Content ── */}
+        {/* Main content */}
         <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-5 gap-4">
           {/* Map */}
           <div className="lg:col-span-5 lg:sticky lg:top-4">
@@ -293,17 +288,17 @@ export default function Deliveries() {
 
           {/* List */}
           <div className="lg:col-span-7 space-y-2.5">
-            {groupedByNeighborhood.length === 0 ? (
+            {deliveries.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-dashed border-border/20 bg-card/20">
                 <div className="w-14 h-14 rounded-2xl bg-muted/15 flex items-center justify-center mb-3">
                   <AppIcon name="local_shipping" size={28} className="text-muted-foreground/30" />
                 </div>
                 <p className="text-sm font-semibold text-muted-foreground">Nenhuma entrega</p>
                 <p className="text-xs text-muted-foreground/50 mt-1 max-w-[200px]">
-                  Tire foto de um pedido para cadastrar
+                  Pedidos de delivery entram automaticamente
                 </p>
               </div>
-            ) : (
+            ) : viewMode === 'bairros' ? (
               groupedByNeighborhood.map((group) => (
                 <NeighborhoodGroup
                   key={group.neighborhood}
@@ -326,6 +321,29 @@ export default function Deliveries() {
                   }}
                 />
               ))
+            ) : (
+              <div className="space-y-2">
+                {deliveries.map(delivery => (
+                  <DeliveryCard
+                    key={delivery.id}
+                    delivery={delivery}
+                    selected={selectedIds.has(delivery.id)}
+                    onStatusChange={(id, status) => updateStatus({ id, status })}
+                    onCardClick={dispatchMode ? undefined : handleCardClick}
+                    onSetLocation={setLocationPickerDelivery}
+                    onEdit={setEditDelivery}
+                    onArchive={handleArchive}
+                    onSelect={dispatchMode ? (id) => {
+                      setSelectedIds(prev => {
+                        const next = new Set(prev);
+                        if (next.has(id)) next.delete(id);
+                        else next.add(id);
+                        return next;
+                      });
+                    } : undefined}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -402,6 +420,7 @@ function NeighborhoodGroup({
               key={delivery.id}
               delivery={delivery}
               selected={selectedIds.has(delivery.id)}
+              compact
               onStatusChange={onStatusChange}
               onCardClick={dispatchMode ? undefined : onCardClick}
               onSetLocation={onSetLocation}
