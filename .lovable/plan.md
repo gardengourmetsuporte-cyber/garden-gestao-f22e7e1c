@@ -1,45 +1,34 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Plan: Add Sale Source Selector (Balcão / Mesa / Delivery)
 
-### O que muda
+Currently the PDV hardcodes `source: 'balcao'` when finalizing a sale. The user wants to choose between **Balcão**, **Mesa** (with table number), and **Delivery** (with customer info) before completing the sale.
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
+### Changes
 
-### Conceito visual
+**1. `src/hooks/usePOS.ts`**
+- Add `saleSource` state (`'balcao' | 'mesa' | 'delivery'`) defaulting to `'balcao'`
+- Expose `saleSource` and `setSaleSource` in the return
+- In `finalizeSale`, use `saleSource` instead of hardcoded `'balcao'`/`'pedido'`
+- In `clearCart`, reset `saleSource` to `'balcao'`
+
+**2. `src/pages/PDV.tsx` — Cart summary bar**
+- Add a source selector row above the customer fields in the cart bar — 3 toggle chips: **Balcão**, **Mesa**, **Delivery**
+- When **Mesa** is selected, show a table number input
+- When **Delivery** is selected, show customer name + phone + address fields
+- When **Balcão** is selected, show just the existing name/CPF fields
+- Pass `saleSource` through to the payment flow
+
+**3. `src/components/pdv/PaymentSheet.tsx`**
+- Accept and display the sale source in the header summary (e.g., "Mesa 5" or "Delivery - João")
+- Show source badge near the total so the operator confirms where the sale is going
+
+### UI Design
+The source selector will be compact chip-style buttons (similar to category chips) placed right above the customer info row in the cart panel:
 
 ```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
+[ 🏪 Balcão ]  [ 🍽 Mesa __ ]  [ 🛵 Delivery ]
 ```
 
-### Implementação
-
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
-
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
-
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
-
-### Resultado
-
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+When Mesa is selected, an inline number input appears. When Delivery is selected, address/phone fields appear below.
 
