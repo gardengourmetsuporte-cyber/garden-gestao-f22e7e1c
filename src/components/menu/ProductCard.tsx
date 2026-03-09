@@ -223,19 +223,4 @@ function FichaTecnicaCard({
       )}
     </div>
   );
-          >
-            <AppIcon name="Link" size={14} />
-            Vincular Ficha
-          </button>
-        )}
-        <button
-          onClick={onEdit}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/60 text-muted-foreground text-xs font-semibold transition-colors hover:bg-secondary active:scale-[0.97]"
-        >
-          <AppIcon name="Pencil" size={14} />
-          Produto
-        </button>
-      </div>
-    </div>
-  );
 }
