@@ -48,6 +48,7 @@ export default function CardapioHub() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isProdutos = searchParams.get('tab') === 'produtos';
+  const isPedidosConfig = searchParams.get('tab') === 'pedidos';
   const isDashboard = !searchParams.get('tab') && !searchParams.get('section');
   const isConfigFromUrl = searchParams.get('section') === 'config';
 
