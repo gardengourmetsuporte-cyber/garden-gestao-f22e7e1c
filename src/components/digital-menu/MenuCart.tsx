@@ -113,8 +113,8 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
               <AppIcon name="Schedule" size={20} className="text-amber-500" />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-foreground">{sentAutoConfirmed ? 'Aguardando preparo' : 'Aguardando confirmação'}</p>
-              <p className="text-xs text-muted-foreground">{sentAutoConfirmed ? 'Seu pedido foi confirmado automaticamente' : 'O estabelecimento confirmará seu pedido em breve'}</p>
+              <p className="font-semibold text-foreground">Aguardando preparo</p>
+              <p className="text-xs text-muted-foreground">Seu pedido foi confirmado automaticamente</p>
             </div>
           </div>
         </div>

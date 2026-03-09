@@ -131,8 +131,7 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
       {/* Delivery Time Widget */}
       <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
 
-      {/* Auto-confirm Settings */}
-      <AutoConfirmWidget unitId={unitId} storeInfo={storeInfo} />
+      {/* Auto-confirm removed — all orders are auto-confirmed */}
 
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (

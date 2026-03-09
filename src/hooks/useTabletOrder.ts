@@ -127,7 +127,7 @@ export function useTabletOrder(unitId: string) {
       if (qrError) throw new Error(qrError.message);
 
       setCart([]);
-      setOrderStatus('awaiting_confirmation');
+      setOrderStatus('confirmed');
       return { orderId: (order as any).id, token };
     } catch (err: any) {
       console.error('Error creating order:', err);
