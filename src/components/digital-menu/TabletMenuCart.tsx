@@ -427,7 +427,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
         ) : payWithCoins ? (
-          <AppIcon name="Coins" size={20} className="mr-2" />
+          <span className="mr-2 text-lg">🪙</span>
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
