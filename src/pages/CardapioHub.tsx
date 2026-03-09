@@ -250,7 +250,19 @@ export default function CardapioHub() {
     );
   }
 
-  // Pedidos tab removed — orders are now managed via PDV, KDS, and Deliveries
+  // ==================== CONFIG HUB VIEW ====================
+  if (isPedidosConfig) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background pb-24">
+          <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-10 w-48 rounded-xl" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
+            <CardapioConfigHubLazy />
+          </Suspense>
+        </div>
+      </AppLayout>
+    );
+  }
+
 
   // ==================== CARDÁPIO VIEW (default) ====================
   return (
