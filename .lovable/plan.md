@@ -1,17 +1,17 @@
-## Plano: Central de Configurações do Cardápio ✅
+## Plano: Cashback 10% — 1 ponto a cada R$10 gastos ✅
 
 ### Implementado
 
-A aba "Pedidos" no bottom nav do Cardápio foi transformada em **Central de Configurações** com seções colapsáveis (Accordion):
+A regra de acúmulo de Garden Coins foi atualizada de **1:1** (R$1 = 1 moeda) para **1 ponto a cada R$10 gastos** (cashback de 10%).
 
-- **Solução Delivery**: Sobre, delivery & retirada, áreas e taxas, pagamento, horários
-- **Solução Tablet**: Integração PDV, mesas & QR codes, chave Pix
-- **QR Code Balcão**: Link externo (`/m/:unitId?source=qrcode`) para cliente escanear e pedir pelo celular
-- **Gamificação**: Roleta de prêmios e probabilidades
-- **Rodízio**: Preço fixo, regras e categorias
+- Pedido de R$100 → 10 pontos
+- Pedido de R$45 → 4 pontos  
+- Pedido de R$8 → 0 pontos (abaixo de R$10)
 
 ### Arquivos alterados
-- `src/components/layout/BottomTabBar.tsx` — Tab renomeado de "Pedidos" (ShoppingBag) para "Config" (Settings)
-- `src/components/cardapio/CardapioConfigHub.tsx` — **Novo** — Hub de configurações com Accordion
-- `src/pages/CardapioHub.tsx` — Renderiza CardapioConfigHub quando `?tab=pedidos`
-- `src/components/settings/CardapioSettings.tsx` — Prop `embedded` para uso inline sem hub/back button
+- Migration SQL: `auto_register_customer_on_order` e `auto_register_customer_on_order_insert` — `floor(NEW.total)` → `floor(NEW.total / 10)`
+
+### O que NÃO mudou
+- `coin_price` dos produtos (preço em pontos = preço em reais)
+- Checkout com moedas no cardápio digital
+- Pontos já acumulados (não retroativo)
