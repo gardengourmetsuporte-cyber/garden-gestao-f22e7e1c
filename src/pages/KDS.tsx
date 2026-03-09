@@ -298,17 +298,26 @@ export default function KDS() {
   const [selectedOrder, setSelectedOrder] = useState<KDSOrder | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
-  const { data: orders = [], isPending, isFetching } = useQuery({
+  const { data: orders = [], isPending, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
     queryFn: async () => {
       if (!unitId) return [];
-      const { data, error } = await supabase
-        .from('tablet_orders')
-        .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
-        .eq('unit_id', unitId)
-        .in('status', ACTIVE_STATUSES)
-        .order('created_at', { ascending: true })
-        .limit(50);
+
+      const withTimeout = <T,>(promise: Promise<T>, ms = 12000) =>
+        Promise.race<T>([
+          promise,
+          new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar pedidos do KDS')), ms)),
+        ]);
+
+      const { data, error } = await withTimeout(
+        supabase
+          .from('tablet_orders')
+          .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
+          .eq('unit_id', unitId)
+          .in('status', ACTIVE_STATUSES)
+          .order('created_at', { ascending: true })
+          .limit(50)
+      );
       if (error) throw error;
       return (data as unknown as KDSOrder[]) || [];
     },
