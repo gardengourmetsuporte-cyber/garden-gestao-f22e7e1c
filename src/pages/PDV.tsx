@@ -17,11 +17,7 @@ export default function PDV() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
-  const [payments, setPayments] = useState<PaymentLine[]>([]);
-  const [payMethod, setPayMethod] = useState('pix');
-  const [payAmount, setPayAmount] = useState('');
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
-  const [mainTab, setMainTab] = useState('catalogo');
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -33,46 +29,11 @@ export default function PDV() {
     return list;
   }, [pos.products, selectedCategory, search]);
 
-  const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
-  const remaining = Math.max(0, pos.total - paymentTotal);
-  const change = Math.max(0, paymentTotal - pos.total);
-
-  const addPayment = () => {
-    const amt = parseFloat(payAmount) || pos.total - paymentTotal;
-    if (amt <= 0) return;
-    setPayments(prev => [...prev, { method: payMethod, amount: amt, change_amount: 0 }]);
-    setPayAmount('');
-  };
-
-  const removePayment = (idx: number) => {
-    setPayments(prev => prev.filter((_, i) => i !== idx));
-  };
-
-  const handleFinalize = async () => {
-    // If user didn't add payments, assume the remaining amount on the selected method.
-    let effectivePayments = payments;
-    let effectivePaymentTotal = paymentTotal;
-
-    if (effectivePaymentTotal < pos.total) {
-      const autoAmount = pos.total - effectivePaymentTotal;
-      if (autoAmount <= 0) return;
-      effectivePayments = [...effectivePayments, { method: payMethod, amount: autoAmount, change_amount: 0 }];
-      effectivePaymentTotal += autoAmount;
-      // Keep UI in sync (useful if finalize fails and the sheet stays open)
-      setPayments(effectivePayments);
-    }
-
-    // Adjust last payment for change
-    const effectiveChange = Math.max(0, effectivePaymentTotal - pos.total);
-    const adjusted = [...effectivePayments];
-    if (effectiveChange > 0 && adjusted.length > 0) {
-      adjusted[adjusted.length - 1] = { ...adjusted[adjusted.length - 1], change_amount: effectiveChange };
-    }
-
-    const saleId = await pos.finalizeSale(adjusted, activeOrderId || undefined);
+  const handleFinalize = async (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => {
+    if (options.notes) pos.setSaleNotes(options.notes);
+    const saleId = await pos.finalizeSale(payments, activeOrderId || undefined);
     if (saleId) {
       setPaymentOpen(false);
-      setPayments([]);
       setActiveOrderId(null);
     }
   };
@@ -81,7 +42,6 @@ export default function PDV() {
     pos.loadOrderIntoCart(order);
     setActiveOrderId(order.id);
     setOrdersOpen(false);
-    setMainTab('catalogo');
   };
 
   const statusLabel: Record<string, string> = {
