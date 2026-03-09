@@ -32,6 +32,7 @@ interface ItemFormSheetProps {
     purchase_to_stock_factor: number | null;
   }) => void;
   onDelete?: (id: string) => void;
+  onCreateSupplier?: (name: string) => Promise<{ id: string } | null>;
   isAdmin?: boolean;
 }
 
