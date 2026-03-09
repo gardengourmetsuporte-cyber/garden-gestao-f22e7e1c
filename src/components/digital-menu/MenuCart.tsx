@@ -112,12 +112,16 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
           <div className="flex items-center gap-3 text-sm">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/12 flex items-center justify-center shrink-0">
-              <AppIcon name="Schedule" size={20} className="text-amber-500" />
+            <div className={`w-10 h-10 rounded-xl ${isQrCode ? 'bg-primary/12' : 'bg-amber-500/12'} flex items-center justify-center shrink-0`}>
+              <AppIcon name={isQrCode ? 'HourglassEmpty' : 'Schedule'} size={20} className={isQrCode ? 'text-primary' : 'text-amber-500'} />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-foreground">Aguardando preparo</p>
-              <p className="text-xs text-muted-foreground">Seu pedido foi confirmado automaticamente</p>
+              <p className="font-semibold text-foreground">
+                {isQrCode ? 'Aguardando aprovação' : 'Aguardando preparo'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isQrCode ? 'Seu pedido será confirmado pelo restaurante' : 'Seu pedido foi confirmado automaticamente'}
+              </p>
             </div>
           </div>
         </div>
