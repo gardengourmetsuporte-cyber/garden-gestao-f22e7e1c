@@ -276,24 +276,76 @@ export default function PDV() {
                 {/* Items */}
                 <div className="max-h-28 overflow-y-auto space-y-1">
                   {pos.cart.map(item => (
-                    <div key={item.id} className="flex items-center gap-2">
-                      <div className="flex items-center gap-0.5 shrink-0">
+                    <div key={item.id} className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <button
+                            onClick={() => item.quantity <= 1 ? pos.removeFromCart(item.id) : pos.updateCartItem(item.id, { quantity: item.quantity - 1 })}
+                            className="w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center active:scale-95"
+                          >
+                            <AppIcon name={item.quantity <= 1 ? 'Trash2' : 'Minus'} size={12} className={item.quantity <= 1 ? 'text-destructive' : 'text-muted-foreground'} />
+                          </button>
+                          <span className="w-6 text-center font-bold text-xs text-foreground">{item.quantity}</span>
+                          <button
+                            onClick={() => pos.updateCartItem(item.id, { quantity: item.quantity + 1 })}
+                            className="w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center active:scale-95"
+                          >
+                            <AppIcon name="Plus" size={12} className="text-muted-foreground" />
+                          </button>
+                        </div>
                         <button
-                          onClick={() => item.quantity <= 1 ? pos.removeFromCart(item.id) : pos.updateCartItem(item.id, { quantity: item.quantity - 1 })}
-                          className="w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center active:scale-95"
+                          className="flex-1 truncate text-xs text-foreground text-left"
+                          onClick={() => {
+                            setEditingItemId(item.id);
+                            setEditingNotes(item.notes || '');
+                          }}
                         >
-                          <AppIcon name={item.quantity <= 1 ? 'Trash2' : 'Minus'} size={12} className={item.quantity <= 1 ? 'text-destructive' : 'text-muted-foreground'} />
+                          {item.product.name}
                         </button>
-                        <span className="w-6 text-center font-bold text-xs text-foreground">{item.quantity}</span>
-                        <button
-                          onClick={() => pos.updateCartItem(item.id, { quantity: item.quantity + 1 })}
-                          className="w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center active:scale-95"
-                        >
-                          <AppIcon name="Plus" size={12} className="text-muted-foreground" />
-                        </button>
+                        <span className="text-xs font-semibold text-foreground shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
                       </div>
-                      <span className="flex-1 truncate text-xs text-foreground">{item.product.name}</span>
-                      <span className="text-xs font-semibold text-foreground shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
+                      {/* Notes display */}
+                      {item.notes && (
+                        <button
+                          onClick={() => { setEditingItemId(item.id); setEditingNotes(item.notes); }}
+                          className="ml-[72px] text-[10px] text-muted-foreground italic truncate block text-left"
+                        >
+                          📝 {item.notes}
+                        </button>
+                      )}
+                      {/* Inline notes editor */}
+                      {editingItemId === item.id && (
+                        <div className="ml-[72px] flex gap-1 items-center mt-0.5">
+                          <Input
+                            autoFocus
+                            placeholder="Ex: sem cebola, bem passado..."
+                            value={editingNotes}
+                            onChange={e => setEditingNotes(e.target.value)}
+                            className="h-7 text-[11px] flex-1"
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') {
+                                pos.updateCartItem(item.id, { notes: editingNotes.trim() });
+                                setEditingItemId(null);
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              pos.updateCartItem(item.id, { notes: editingNotes.trim() });
+                              setEditingItemId(null);
+                            }}
+                            className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center shrink-0"
+                          >
+                            <AppIcon name="Check" size={12} className="text-primary" />
+                          </button>
+                          <button
+                            onClick={() => setEditingItemId(null)}
+                            className="w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center shrink-0"
+                          >
+                            <AppIcon name="X" size={12} className="text-muted-foreground" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
