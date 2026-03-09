@@ -739,7 +739,6 @@ function LevelsTab() {
             <SheetTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label>Nome</Label>
               <Input value={formName} onChange={e => setFormName(e.target.value)} placeholder="Ex: Líder" />
