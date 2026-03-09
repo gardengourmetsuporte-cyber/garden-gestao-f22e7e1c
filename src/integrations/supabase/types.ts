@@ -3774,34 +3774,44 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          item_id: string | null
           notes: string | null
           produced_by: string
           quantity: number
-          recipe_id: string
+          recipe_id: string | null
           status: string | null
           unit_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
+          item_id?: string | null
           notes?: string | null
           produced_by: string
           quantity: number
-          recipe_id: string
+          recipe_id?: string | null
           status?: string | null
           unit_id: string
         }
         Update: {
           created_at?: string | null
           id?: string
+          item_id?: string | null
           notes?: string | null
           produced_by?: string
           quantity?: number
-          recipe_id?: string
+          recipe_id?: string | null
           status?: string | null
           unit_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "production_orders_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "production_orders_recipe_id_fkey"
             columns: ["recipe_id"]
