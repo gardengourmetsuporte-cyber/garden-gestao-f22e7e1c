@@ -175,7 +175,8 @@ export function RecipeSheet({
     [costPerPortion, priceForFixedCost, settings]
   );
 
-  const variableCost = costPerPortion + operationalCosts.packagingCost;
+  const packagingCost = packagingTemplateId ? getTemplateCost(packagingTemplateId) : operationalCosts.packagingCost;
+  const variableCost = costPerPortion + packagingCost;
   const salesCost = operationalCosts.taxAmount + operationalCosts.cardFeeAmount;
   const fixedCost = operationalCosts.fixedCostPerProduct;
   const totalCostPerPortion = variableCost + salesCost + fixedCost;
