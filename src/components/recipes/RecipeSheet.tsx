@@ -32,6 +32,7 @@ interface LocalIngredient {
   quantity: number;
   unit_type: RecipeUnitType;
   total_cost: number;
+  kds_station_id?: string | null;
 }
 
 interface InventoryItem {
