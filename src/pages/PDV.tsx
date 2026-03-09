@@ -224,53 +224,13 @@ export default function PDV() {
       />
 
       {/* Pending Orders Sheet */}
-      <Sheet open={ordersOpen} onOpenChange={setOrdersOpen}>
-        <SheetContent side="bottom" className="max-h-[90vh] rounded-t-2xl flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Pedidos Pendentes ({pos.pendingOrders.length})</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto space-y-2 mt-4 pb-4">
-            {pos.loadingOrders ? (
-              <p className="text-center text-muted-foreground text-sm py-8">Carregando...</p>
-            ) : pos.pendingOrders.length === 0 ? (
-              <p className="text-center text-muted-foreground text-sm py-8">Nenhum pedido pendente</p>
-            ) : (
-              pos.pendingOrders.map(order => (
-                <button
-                  key={order.id}
-                  onClick={() => handleLoadOrder(order)}
-                  className="w-full bg-card border border-border/50 rounded-xl p-3 text-left hover:border-primary/30 transition-all"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <AppIcon name={sourceIcon[order.source] || 'ShoppingBag'} size={14} className="text-muted-foreground" />
-                      <span className="text-xs font-medium">
-                        {order.source === 'mesa' && order.table_number ? `Mesa ${order.table_number}` : order.source}
-                      </span>
-                      {order.customer_name && <span className="text-xs text-muted-foreground">• {order.customer_name}</span>}
-                    </div>
-                    <Badge variant="secondary" className="text-[10px]">
-                      {statusLabel[order.status] || order.status}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-muted-foreground">{format(new Date(order.created_at), 'HH:mm')}</span>
-                    <span className="text-sm font-bold text-primary">{formatCurrency(order.total)}</span>
-                  </div>
-                  {order.items.length > 0 && (
-                    <div className="mt-1.5 text-[10px] text-muted-foreground space-y-0.5">
-                      {order.items.slice(0, 3).map((item, i) => (
-                        <p key={i}>{item.quantity}x {item.name}</p>
-                      ))}
-                      {order.items.length > 3 && <p>+{order.items.length - 3} itens</p>}
-                    </div>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+      <PendingOrdersSheet
+        open={ordersOpen}
+        onOpenChange={setOrdersOpen}
+        orders={pos.pendingOrders}
+        loading={pos.loadingOrders}
+        onLoadOrder={handleLoadOrder}
+      />
 
       {/* Sales History Sheet */}
       <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />
