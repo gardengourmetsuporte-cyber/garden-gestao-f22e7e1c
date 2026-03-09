@@ -164,17 +164,35 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
         ))}
       </div>
 
+      {/* Cancelled toggle */}
+      {activeTab !== 'ifood' && (
+        <div className="flex items-center justify-end">
+          <button
+            onClick={() => setShowCancelled(prev => !prev)}
+            className={cn(
+              "text-xs px-3 py-1.5 rounded-full font-semibold transition-colors",
+              showCancelled
+                ? "bg-destructive/15 text-destructive"
+                : "bg-secondary text-muted-foreground"
+            )}
+          >
+            <AppIcon name="Ban" size={12} className="mr-1 inline" />
+            {showCancelled ? 'Ocultando cancelados' : 'Ver cancelados'}
+          </button>
+        </div>
+      )}
+
       {/* Content */}
       {activeTab === 'balcao' && (
-        <TabletOrderList orders={balcaoOrders} emptyIcon="Store" emptyTitle="Nenhum pedido no balcão" emptySubtitle="Pedidos para retirada aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={filterOrders(balcaoOrders)} emptyIcon="Store" emptyTitle="Nenhum pedido no balcão" emptySubtitle="Pedidos para retirada aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'comandas' && (
-        <TabletOrderList orders={comandas} emptyIcon="QrCode" emptyTitle="Nenhuma comanda" emptySubtitle="Pedidos feitos nas mesas aparecerão aqui" onRetryPDV={onRetryPDV} showTable onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={filterOrders(comandas)} emptyIcon="QrCode" emptyTitle="Nenhuma comanda" emptySubtitle="Pedidos feitos nas mesas aparecerão aqui" onRetryPDV={onRetryPDV} showTable onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'delivery' && (
-        <TabletOrderList orders={deliveryOrders} emptyIcon="Truck" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={filterOrders(deliveryOrders)} emptyIcon="Truck" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'ifood' && (
