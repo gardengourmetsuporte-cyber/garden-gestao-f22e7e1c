@@ -127,33 +127,7 @@ export default function CardapioHub() {
   const selectedGroup = groups.find(g => g.id === selectedGroupId) || null;
   const groupProducts = selectedGroupId ? getProductsByGroup(selectedGroupId) : [];
 
-  // Contextual FAB action based on current sub-view
-  const fabAction = useMemo(() => {
-    if (isDashboard || isConfigFromUrl) {
-      return null;
-    }
-    if (cardapioTab === 'opcionais') {
-      return { icon: 'Plus', label: 'Novo Opcional', onClick: () => {
-        setEditingOG({
-          title: '', min_selections: 0, max_selections: 1,
-          allow_repeat: false, is_active: true,
-          availability: { tablet: true, delivery: true }, options: [],
-        });
-        setOgSheetOpen(true);
-      }};
-    }
-    // Toggle between menu and ficha tecnica
-    if (cardapioTab === 'produtos') {
-      return {
-        icon: viewMode === 'menu' ? 'RecipeBook' : 'Eye',
-        label: viewMode === 'menu' ? 'Ficha Técnica' : 'Ver Cardápio',
-        onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu'),
-      };
-    }
-    return null;
-  }, [isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
-
-  useFabAction(fabAction, [fabAction]);
+  // No longer using FAB — actions are inline buttons now
 
   // Order stats
   const todayStats = useMemo(() => {
