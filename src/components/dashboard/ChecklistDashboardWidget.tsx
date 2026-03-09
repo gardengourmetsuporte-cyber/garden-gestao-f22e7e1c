@@ -11,8 +11,7 @@ import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
 
 type ChecklistType = 'abertura' | 'fechamento';
 
-/** Animated arc progress */
-function ArcProgress({ percent, size = 56, stroke = 3.5, isComplete }: {
+function RingProgress({ percent, size = 44, stroke = 3, isComplete }: {
   percent: number; size?: number; stroke?: number; isComplete: boolean;
 }) {
   const r = (size - stroke) / 2;
@@ -23,41 +22,20 @@ function ArcProgress({ percent, size = 56, stroke = 3.5, isComplete }: {
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size/2} cy={size/2} r={r} fill="none"
-          stroke="hsl(var(--muted) / 0.25)" strokeWidth={stroke} />
+          stroke="hsl(var(--muted) / 0.2)" strokeWidth={stroke} />
         <circle cx={size/2} cy={size/2} r={r} fill="none"
-          stroke={isComplete ? 'hsl(var(--success))' : 'url(#arcGrad)'}
+          stroke={isComplete ? 'hsl(var(--success))' : 'hsl(var(--primary))'}
           strokeWidth={stroke} strokeLinecap="round"
           strokeDasharray={c} strokeDashoffset={off}
-          className="transition-all duration-1000 ease-out" />
-        <defs>
-          <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--neon-cyan))" />
-          </linearGradient>
-        </defs>
+          className="transition-all duration-700 ease-out" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         {isComplete ? (
-          <AppIcon name="check" size={24} fill={1} className="text-success animate-scale-in" />
+          <AppIcon name="check" size={18} fill={1} className="text-success" />
         ) : (
-          <span className="text-sm font-black text-foreground tabular-nums">{percent}%</span>
+          <span className="text-[11px] font-bold text-foreground tabular-nums">{percent}%</span>
         )}
       </div>
-    </div>
-  );
-}
-
-/** Mini inline bar */
-function MiniBar({ percent, isComplete }: { percent: number; isComplete: boolean }) {
-  return (
-    <div className="h-1 rounded-full bg-muted/20 overflow-hidden">
-      <div
-        className={cn(
-          "h-full rounded-full transition-all duration-700 ease-out",
-          isComplete ? "bg-success" : "bg-gradient-to-r from-primary to-[hsl(var(--neon-cyan))]"
-        )}
-        style={{ width: `${Math.max(percent, 2)}%` }}
-      />
     </div>
   );
 }
@@ -161,58 +139,29 @@ export function ChecklistDashboardWidget() {
   return (
     <button
       onClick={() => navigate('/checklists')}
-      className={cn(
-        "w-full text-left rounded-2xl overflow-hidden transition-all duration-300",
-        "relative group"
-      )}
-      style={{
-        background: 'linear-gradient(145deg, hsl(var(--card) / 0.95), hsl(var(--card) / 0.7))',
-        border: allDone
-          ? '1px solid hsl(var(--success) / 0.3)'
-          : '1px solid hsl(var(--border) / 0.15)',
-        boxShadow: allDone
-          ? '0 0 30px hsl(var(--success) / 0.08)'
-          : '0 4px 24px hsl(var(--background) / 0.3)',
-      }}
+      className="w-full text-left card-unified p-4 group transition-all duration-300 hover:shadow-card-hover"
     >
-      {/* Subtle glow overlay */}
-      <div
-        className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{
-          background: allDone
-            ? 'radial-gradient(ellipse at 30% 20%, hsl(var(--success) / 0.08), transparent 60%)'
-            : 'radial-gradient(ellipse at 30% 20%, hsl(var(--primary) / 0.06), transparent 60%)',
-        }}
-      />
-
-      <div className="relative p-4 space-y-4">
-        {/* Header row */}
-        <div className="flex items-center gap-3.5">
-          <ArcProgress percent={totalPercent} isComplete={allDone} />
-          <div className="flex-1 min-w-0">
-            <p className={cn(
-              "text-[15px] font-bold tracking-tight",
+      <div className="space-y-3">
+        {/* Header: compact single line */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AppIcon name="checklist" size={16} className="text-primary" />
+            <span className="text-xs font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
+              Checklists
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className={cn(
+              "text-xs font-bold tabular-nums",
               allDone ? "text-success" : "text-foreground"
             )}>
-              {allDone ? 'Tudo concluído! 🎉' : (
-                <>
-                  <span className="tabular-nums">{totalCompleted}</span>
-                  <span className="text-muted-foreground font-medium"> de </span>
-                  <span className="tabular-nums">{totalItems}</span>
-                  <span className="text-muted-foreground font-medium"> tarefas</span>
-                </>
-              )}
-            </p>
-            <p className="text-[11px] text-muted-foreground/70 mt-0.5">
-              {allDone ? 'Excelente trabalho hoje' : 'Progresso de hoje'}
-            </p>
-          </div>
-          <div className="w-7 h-7 rounded-lg bg-muted/20 flex items-center justify-center group-hover:bg-muted/40 transition-colors">
-            <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/60" />
+              {totalPercent}%
+            </span>
+            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
           </div>
         </div>
 
-        {/* Shift cards */}
+        {/* Shift cards — clean minimal */}
         <div className="grid grid-cols-2 gap-2">
           {cards.map((card) => {
             const isActive = card.type === activeType;
@@ -223,73 +172,60 @@ export function ChecklistDashboardWidget() {
             return (
               <div
                 key={card.type}
-                className="relative rounded-xl p-3 transition-all duration-300"
-                style={{
-                  background: isComplete
-                    ? 'linear-gradient(135deg, hsl(var(--success) / 0.08), hsl(var(--success) / 0.03))'
+                className={cn(
+                  "relative rounded-xl p-3 transition-all duration-300",
+                  isComplete
+                    ? "bg-success/[0.06] border border-success/10"
                     : isActive
-                    ? 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--primary) / 0.02))'
-                    : 'hsl(var(--muted) / 0.08)',
-                  border: isComplete
-                    ? '1px solid hsl(var(--success) / 0.15)'
-                    : isActive
-                    ? '1px solid hsl(var(--primary) / 0.12)'
-                    : '1px solid hsl(var(--border) / 0.08)',
-                }}
+                    ? "bg-primary/[0.06] border border-primary/10"
+                    : "bg-muted/[0.06] border border-border/10"
+                )}
               >
-                {/* Active dot */}
+                {/* Active pulse dot */}
                 {isActive && !isComplete && (
-                  <div className="absolute top-2 right-2">
+                  <div className="absolute top-2.5 right-2.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <div className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-primary animate-ping opacity-40" />
+                    <div className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-primary animate-ping opacity-30" />
                   </div>
                 )}
 
-                {/* Icon + Label */}
-                <div className="flex items-center gap-2 mb-2.5">
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center",
-                    isComplete
-                      ? "bg-success/15"
-                      : isActive
-                      ? "bg-primary/10"
-                      : "bg-muted/15"
-                  )}>
-                    <AppIcon
-                      name={isComplete ? 'check_circle' : card.icon}
-                      size={18}
-                      fill={isComplete ? 1 : 0}
-                      className={cn(
-                        isComplete ? "text-success" : isActive ? "text-primary" : "text-muted-foreground/60"
-                      )}
-                    />
+                {/* Ring + Label row */}
+                <div className="flex items-center gap-2.5">
+                  <RingProgress
+                    percent={card.progress.percent}
+                    isComplete={isComplete}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={cn(
+                      "text-[13px] font-semibold leading-tight",
+                      isComplete ? "text-success" : "text-foreground"
+                    )}>
+                      {card.label}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-0.5 tabular-nums">
+                      {card.progress.completed}/{card.progress.total} itens
+                    </p>
                   </div>
-                  <span className={cn(
-                    "text-[13px] font-semibold",
-                    isComplete ? "text-success" : "text-foreground"
-                  )}>
-                    {card.label}
-                  </span>
                 </div>
 
-                {/* Bar */}
-                <MiniBar percent={card.progress.percent} isComplete={isComplete} />
-
-                {/* Stats row */}
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-[11px] tabular-nums font-semibold text-muted-foreground">
-                    {card.progress.completed}/{card.progress.total}
-                  </span>
+                {/* Status line */}
+                <div className="mt-2 pt-2 border-t border-border/5">
                   {isComplete ? (
-                    <span className="text-[10px] font-bold text-success">Concluído</span>
+                    <span className="text-[10px] font-semibold text-success flex items-center gap-1">
+                      <AppIcon name="check_circle" size={12} fill={1} />
+                      Concluído
+                    </span>
                   ) : deadlineInfo && !deadlineInfo.passed ? (
-                    <span className="text-[10px] font-medium text-muted-foreground/60 tabular-nums">
+                    <span className="text-[10px] text-muted-foreground/50 tabular-nums">
                       {countdowns[card.type] || deadlineInfo.label}
                     </span>
                   ) : deadlineInfo?.passed ? (
-                    <span className="text-[10px] font-bold text-destructive">Encerrado</span>
+                    <span className="text-[10px] font-semibold text-destructive flex items-center gap-1">
+                      <AppIcon name="error" size={12} fill={1} />
+                      Encerrado
+                    </span>
                   ) : pending > 0 ? (
-                    <span className="text-[10px] font-medium text-muted-foreground/60">
+                    <span className="text-[10px] text-muted-foreground/50">
                       {pending} restante{pending > 1 ? 's' : ''}
                     </span>
                   ) : null}
