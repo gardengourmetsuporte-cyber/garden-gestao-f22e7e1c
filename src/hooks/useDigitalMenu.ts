@@ -22,6 +22,7 @@ export interface DMProduct {
   id: string;
   name: string;
   price: number;
+  coin_price: number | null;
   image_url: string | null;
   description: string | null;
   group_id: string | null;
