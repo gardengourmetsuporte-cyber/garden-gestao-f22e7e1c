@@ -64,12 +64,16 @@ function OrderDetailSheet({
   onLoadOrder,
   onDispatch,
   dispatching,
+  onUpdateStatus,
+  updatingStatus,
 }: {
   order: (PendingOrder & { sequentialNumber: number }) | null;
   onClose: () => void;
   onLoadOrder: (order: PendingOrder) => void;
   onDispatch: (order: PendingOrder) => void;
   dispatching: string | null;
+  onUpdateStatus: (order: PendingOrder, status: string) => void;
+  updatingStatus: string | null;
 }) {
   const [showItems, setShowItems] = useState(false);
 
@@ -262,6 +266,34 @@ function OrderDetailSheet({
               Cobrar
             </Button>
           </div>
+
+          {/* Contextual status buttons */}
+          {order.status === 'preparing' && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full h-11 rounded-xl text-sm border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              onClick={() => onUpdateStatus(order, 'ready')}
+              disabled={updatingStatus === order.id}
+            >
+              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'CheckCircle'} size={16} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
+              Marcar como Pronto
+            </Button>
+          )}
+
+          {order.status === 'ready' && !isDelivery && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full h-11 rounded-xl text-sm border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              onClick={() => onUpdateStatus(order, 'delivered')}
+              disabled={updatingStatus === order.id}
+            >
+              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'PackageCheck'} size={16} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
+              Entregue
+            </Button>
+          )}
+
           {canDispatch && (
             <Button
               size="sm"
@@ -272,6 +304,19 @@ function OrderDetailSheet({
             >
               <AppIcon name={dispatching === order.id ? 'Loader2' : 'Bike'} size={16} className={cn("mr-1.5", dispatching === order.id && "animate-spin")} />
               Despachar
+            </Button>
+          )}
+
+          {!['delivered', 'dispatched', 'cancelled'].includes(order.status) && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="w-full h-9 rounded-xl text-xs text-destructive hover:bg-destructive/10"
+              onClick={() => onUpdateStatus(order, 'cancelled')}
+              disabled={updatingStatus === order.id}
+            >
+              <AppIcon name="X" size={14} className="mr-1" />
+              Cancelar pedido
             </Button>
           )}
         </div>
@@ -285,6 +330,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<(PendingOrder & { sequentialNumber: number }) | null>(null);
   const [dispatching, setDispatching] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
 
@@ -339,6 +385,28 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
       toast.error('Erro ao despachar: ' + (err.message || 'erro'));
     } finally {
       setDispatching(null);
+    }
+  };
+
+  const handleUpdateStatus = async (order: PendingOrder, newStatus: string) => {
+    setUpdatingStatus(order.id);
+    try {
+      const { error } = await supabase
+        .from('tablet_orders')
+        .update({ status: newStatus })
+        .eq('id', order.id);
+      if (error) throw error;
+      const labels: Record<string, string> = {
+        ready: 'Pedido marcado como pronto!',
+        delivered: 'Pedido entregue!',
+        cancelled: 'Pedido cancelado.',
+      };
+      toast.success(labels[newStatus] || 'Status atualizado!');
+      setSelectedOrder(null);
+    } catch (err: any) {
+      toast.error('Erro ao atualizar: ' + (err.message || 'erro'));
+    } finally {
+      setUpdatingStatus(null);
     }
   };
 
@@ -452,6 +520,8 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
         onLoadOrder={onLoadOrder}
         onDispatch={handleDispatch}
         dispatching={dispatching}
+        onUpdateStatus={handleUpdateStatus}
+        updatingStatus={updatingStatus}
       />
     </>
   );

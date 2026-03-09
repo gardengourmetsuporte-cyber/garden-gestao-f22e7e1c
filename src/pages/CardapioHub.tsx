@@ -19,7 +19,7 @@ import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
 import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
-import { UnifiedOrdersPanel } from '@/components/orders/UnifiedOrdersPanel';
+// UnifiedOrdersPanel removed — orders managed via PDV/KDS/Deliveries
 import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 
 // Recipe integration
@@ -45,7 +45,6 @@ export default function CardapioHub() {
   const { activeUnit } = useUnit();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isPedidos = searchParams.get('tab') === 'pedidos';
   const isProdutos = searchParams.get('tab') === 'produtos';
   const isDashboard = !searchParams.get('tab') && !searchParams.get('section');
   const isConfigFromUrl = searchParams.get('section') === 'config';
@@ -141,7 +140,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isPedidos || isDashboard || isConfigFromUrl || cardapioTab === 'config') {
+    if (isDashboard || isConfigFromUrl || cardapioTab === 'config') {
       return null;
     }
     if (cardapioTab === 'opcionais') {
@@ -163,7 +162,7 @@ export default function CardapioHub() {
       };
     }
     return null;
-  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
+  }, [isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
 
   useFabAction(fabAction, [fabAction]);
 
@@ -249,18 +248,7 @@ export default function CardapioHub() {
     );
   }
 
-  // ==================== PEDIDOS VIEW ====================
-  if (isPedidos) {
-    return (
-      <AppLayout>
-        <div className="min-h-screen bg-background pb-24">
-          <div className="px-4 py-3 lg:px-6">
-            <UnifiedOrdersPanel unitId={activeUnit?.id} onRetryPDV={retryPDV} />
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
+  // Pedidos tab removed — orders are now managed via PDV, KDS, and Deliveries
 
   // ==================== CARDÁPIO VIEW (default) ====================
   return (
