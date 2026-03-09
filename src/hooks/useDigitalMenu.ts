@@ -79,6 +79,7 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
   const [optionGroups, setOptionGroups] = useState<DMOptionGroup[]>([]);
   const [productOptionLinks, setProductOptionLinks] = useState<{ product_id: string; option_group_id: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasVisibleProducts, setHasVisibleProducts] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const fetchAll = useCallback(async () => {
@@ -157,6 +158,10 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
 
       setOptionGroups(ogs);
       setProductOptionLinks((linkData as any[]) || []);
+      
+      // Check if we have visible products
+      const hasProducts = filteredProducts.length > 0;
+      setHasVisibleProducts(hasProducts);
     } catch (err) {
       console.error('[useDigitalMenu] Error fetching:', err);
     } finally {
@@ -207,7 +212,7 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
-    unit, categories, groups, products, loading,
+    unit, categories, groups, products, loading, hasVisibleProducts,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   };

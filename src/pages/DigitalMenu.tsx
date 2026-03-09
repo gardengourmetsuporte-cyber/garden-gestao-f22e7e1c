@@ -29,7 +29,7 @@ export default function DigitalMenu() {
   const initialTab = (searchParams.get('tab') as MenuTab) || 'home';
 
   const {
-    unit, categories, groups, products, loading,
+    unit, categories, groups, products, loading, hasVisibleProducts,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId);
@@ -246,6 +246,32 @@ export default function DigitalMenu() {
             <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
             <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
             <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não há produtos visíveis, mostrar tela de cardápio indisponível
+  if (!hasVisibleProducts) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5 px-8">
+        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3">
+          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+        </div>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <AppIcon name="UtensilsCrossed" size={44} className="text-muted-foreground/30" />
+          <div>
+            <p className="text-lg font-bold text-foreground">Cardápio temporariamente indisponível</p>
+            <p className="text-sm text-muted-foreground mt-1">Nosso cardápio está sendo atualizado. Volte em breve!</p>
+          </div>
+          <div className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
+            {unit?.store_info?.opening_hours && (
+              <p>🕒 Horários: {unit.store_info.opening_hours.map((h: any) => `${h.open} - ${h.close}`).join(', ')}</p>
+            )}
+            {unit?.store_info?.address && (
+              <p>📍 {unit.store_info.address}</p>
+            )}
           </div>
         </div>
       </div>
