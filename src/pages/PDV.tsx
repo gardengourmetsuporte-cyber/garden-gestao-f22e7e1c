@@ -11,6 +11,7 @@ import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
+import { Drawer } from 'vaul';
 
 export default function PDV() {
   const pos = usePOS();
@@ -129,143 +130,126 @@ export default function PDV() {
           )}
         </div>
 
-        {/* Cart summary bar */}
-        {pos.cart.length > 0 && (
-          <div className="border-t border-border bg-card px-4 py-3 space-y-2">
-            {/* Cart items */}
-            <div className="max-h-32 overflow-y-auto space-y-1.5">
-              {pos.cart.map(item => (
-                <div key={item.id} className="flex items-center gap-2 text-sm">
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => item.quantity <= 1 ? pos.removeFromCart(item.id) : pos.updateCartItem(item.id, { quantity: item.quantity - 1 })}
-                      className="w-6 h-6 rounded-lg bg-secondary flex items-center justify-center"
-                    >
-                      <AppIcon name={item.quantity <= 1 ? 'Trash2' : 'Minus'} size={12} className={item.quantity <= 1 ? 'text-destructive' : ''} />
-                    </button>
-                    <span className="w-5 text-center font-bold text-xs">{item.quantity}</span>
-                    <button
-                      onClick={() => pos.updateCartItem(item.id, { quantity: item.quantity + 1 })}
-                      className="w-6 h-6 rounded-lg bg-secondary flex items-center justify-center"
-                    >
-                      <AppIcon name="Plus" size={12} />
-                    </button>
+        {/* Cart Drawer - swipe down to minimize */}
+        <Drawer.Root
+          open={pos.cart.length > 0}
+          onClose={() => {/* keep cart, just minimize */}}
+          modal={false}
+          dismissible
+          shouldScaleBackground={false}
+        >
+          <Drawer.Portal>
+            <Drawer.Content
+              className="fixed bottom-0 left-0 right-0 z-40 outline-none"
+              style={{ maxHeight: '70dvh' }}
+            >
+              <div className="bg-card border-t border-border rounded-t-2xl shadow-lg">
+                {/* Drag handle */}
+                <div className="flex justify-center pt-2 pb-1">
+                  <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+                </div>
+
+                <div className="px-4 pb-3 space-y-2 max-h-[60dvh] overflow-y-auto">
+                  {/* Cart items */}
+                  <div className="max-h-32 overflow-y-auto space-y-1.5">
+                    {pos.cart.map(item => (
+                      <div key={item.id} className="flex items-center gap-2 text-sm">
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => item.quantity <= 1 ? pos.removeFromCart(item.id) : pos.updateCartItem(item.id, { quantity: item.quantity - 1 })}
+                            className="w-6 h-6 rounded-lg bg-secondary flex items-center justify-center"
+                          >
+                            <AppIcon name={item.quantity <= 1 ? 'Trash2' : 'Minus'} size={12} className={item.quantity <= 1 ? 'text-destructive' : ''} />
+                          </button>
+                          <span className="w-5 text-center font-bold text-xs">{item.quantity}</span>
+                          <button
+                            onClick={() => pos.updateCartItem(item.id, { quantity: item.quantity + 1 })}
+                            className="w-6 h-6 rounded-lg bg-secondary flex items-center justify-center"
+                          >
+                            <AppIcon name="Plus" size={12} />
+                          </button>
+                        </div>
+                        <span className="flex-1 truncate text-xs">{item.product.name}</span>
+                        <span className="text-xs font-medium shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
+                      </div>
+                    ))}
                   </div>
-                  <span className="flex-1 truncate text-xs">{item.product.name}</span>
-                  <span className="text-xs font-medium shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
-                </div>
-              ))}
-            </div>
 
-            {/* Source selector */}
-            <div className="flex gap-1.5">
-              {([
-                { key: 'balcao', label: 'Balcão', icon: 'Store' },
-                { key: 'mesa', label: 'Mesa', icon: 'UtensilsCrossed' },
-                { key: 'delivery', label: 'Delivery', icon: 'Bike' },
-              ] as const).map(s => (
-                <button
-                  key={s.key}
-                  onClick={() => pos.setSaleSource(s.key)}
-                  className={cn(
-                    'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                    pos.saleSource === s.key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-muted-foreground'
+                  {/* Source selector */}
+                  <div className="flex gap-1.5">
+                    {([
+                      { key: 'balcao', label: 'Balcão', icon: 'Store' },
+                      { key: 'mesa', label: 'Mesa', icon: 'UtensilsCrossed' },
+                      { key: 'delivery', label: 'Delivery', icon: 'Bike' },
+                    ] as const).map(s => (
+                      <button
+                        key={s.key}
+                        onClick={() => pos.setSaleSource(s.key)}
+                        className={cn(
+                          'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                          pos.saleSource === s.key
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-muted-foreground'
+                        )}
+                      >
+                        <AppIcon name={s.icon} size={12} />
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Conditional fields */}
+                  {pos.saleSource === 'balcao' && (
+                    <div className="flex gap-2">
+                      <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1" />
+                      <Input placeholder="CPF" value={pos.customerDocument} onChange={e => pos.setCustomerDocument(e.target.value)} className="h-8 text-xs w-32" />
+                    </div>
                   )}
-                >
-                  <AppIcon name={s.icon} size={12} />
-                  {s.label}
-                </button>
-              ))}
-            </div>
+                  {pos.saleSource === 'mesa' && (
+                    <div className="flex gap-2">
+                      <Input type="number" placeholder="Nº da mesa" value={pos.tableNumber ?? ''} onChange={e => pos.setTableNumber(e.target.value ? Number(e.target.value) : null)} className="h-8 text-xs w-24" inputMode="numeric" />
+                      <Input placeholder="Nome do cliente (opcional)" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1" />
+                    </div>
+                  )}
+                  {pos.saleSource === 'delivery' && (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1" />
+                        <Input placeholder="Telefone" value={pos.deliveryPhone} onChange={e => pos.setDeliveryPhone(e.target.value)} className="h-8 text-xs w-32" />
+                      </div>
+                      <Input placeholder="Endereço de entrega" value={pos.deliveryAddress} onChange={e => pos.setDeliveryAddress(e.target.value)} className="h-8 text-xs" />
+                    </div>
+                  )}
 
-            {/* Conditional fields based on source */}
-            {pos.saleSource === 'balcao' && (
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Nome do cliente"
-                  value={pos.customerName}
-                  onChange={e => pos.setCustomerName(e.target.value)}
-                  className="h-8 text-xs flex-1"
-                />
-                <Input
-                  placeholder="CPF"
-                  value={pos.customerDocument}
-                  onChange={e => pos.setCustomerDocument(e.target.value)}
-                  className="h-8 text-xs w-32"
-                />
-              </div>
-            )}
-            {pos.saleSource === 'mesa' && (
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="Nº da mesa"
-                  value={pos.tableNumber ?? ''}
-                  onChange={e => pos.setTableNumber(e.target.value ? Number(e.target.value) : null)}
-                  className="h-8 text-xs w-24"
-                  inputMode="numeric"
-                />
-                <Input
-                  placeholder="Nome do cliente (opcional)"
-                  value={pos.customerName}
-                  onChange={e => pos.setCustomerName(e.target.value)}
-                  className="h-8 text-xs flex-1"
-                />
-              </div>
-            )}
-            {pos.saleSource === 'delivery' && (
-              <div className="space-y-1.5">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Nome do cliente"
-                    value={pos.customerName}
-                    onChange={e => pos.setCustomerName(e.target.value)}
-                    className="h-8 text-xs flex-1"
-                  />
-                  <Input
-                    placeholder="Telefone"
-                    value={pos.deliveryPhone}
-                    onChange={e => pos.setDeliveryPhone(e.target.value)}
-                    className="h-8 text-xs w-32"
-                  />
+                  {/* Totals and actions */}
+                  <div className="flex items-center justify-between pt-1">
+                    <div>
+                      <p className="text-xs text-muted-foreground">{pos.cart.reduce((s, i) => s + i.quantity, 0)} itens</p>
+                      <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={pos.clearCart} className="text-muted-foreground">
+                        <AppIcon name="X" size={14} className="mr-1" />
+                        Cancelar
+                      </Button>
+                      {pos.saleSource === 'balcao' ? (
+                        <Button size="sm" onClick={() => setPaymentOpen(true)}>
+                          <AppIcon name="Banknote" size={14} className="mr-1" />
+                          Cobrar
+                        </Button>
+                      ) : (
+                        <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
+                          <AppIcon name="Send" size={14} className="mr-1" />
+                          Enviar Pedido
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <Input
-                  placeholder="Endereço de entrega"
-                  value={pos.deliveryAddress}
-                  onChange={e => pos.setDeliveryAddress(e.target.value)}
-                  className="h-8 text-xs"
-                />
               </div>
-            )}
-
-            {/* Totals and actions */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">{pos.cart.reduce((s, i) => s + i.quantity, 0)} itens</p>
-                <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={pos.clearCart} className="text-muted-foreground">
-                  <AppIcon name="X" size={14} className="mr-1" />
-                  Cancelar
-                </Button>
-                {pos.saleSource === 'balcao' ? (
-                  <Button size="sm" onClick={() => setPaymentOpen(true)}>
-                    <AppIcon name="Banknote" size={14} className="mr-1" />
-                    Cobrar
-                  </Button>
-                ) : (
-                  <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
-                    <AppIcon name="Send" size={14} className="mr-1" />
-                    Enviar Pedido
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+            </Drawer.Content>
+          </Drawer.Portal>
+        </Drawer.Root>
       </div>
 
       {/* Payment Sheet */}
