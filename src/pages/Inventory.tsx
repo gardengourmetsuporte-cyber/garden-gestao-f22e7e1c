@@ -156,7 +156,10 @@ export default function InventoryPage() {
   };
 
   const handleMovement = async (itemId: string, type: 'entrada' | 'saida', quantity: number, notes?: string) => {
-    try { await registerMovement(itemId, type, quantity, notes); } catch { toast.error('Erro ao registrar movimentação'); }
+    try {
+      await registerMovement(itemId, type, quantity, notes);
+      setTimeout(() => scrollToItem(itemId), 400);
+    } catch { toast.error('Erro ao registrar movimentação'); }
   };
 
   if (isLoading) {
