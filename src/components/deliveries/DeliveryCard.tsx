@@ -107,6 +107,11 @@ export function DeliveryCard({ delivery, selected, onStatusChange, onCardClick, 
         </span>
 
         <div className="flex items-center gap-1">
+          {/* Edit button */}
+          <Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-lg" onClick={(e) => { e.stopPropagation(); onEdit?.(delivery); }}>
+            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+          </Button>
+
           {mapsUrl && (
             <Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-lg" asChild>
               <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Abrir rota" onClick={(e) => e.stopPropagation()}>
@@ -134,6 +139,18 @@ export function DeliveryCard({ delivery, selected, onStatusChange, onCardClick, 
               onClick={(e) => { e.stopPropagation(); onStatusChange(delivery.id, 'delivered'); }}
             >
               <CheckCircle2 className="w-3.5 h-3.5" /> Entregue
+            </Button>
+          )}
+
+          {/* Archive delivered */}
+          {delivery.status === 'delivered' && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-[11px] px-2 gap-1 rounded-lg font-medium text-muted-foreground"
+              onClick={(e) => { e.stopPropagation(); onArchive?.(delivery); }}
+            >
+              <Archive className="w-3.5 h-3.5" /> Encerrar
             </Button>
           )}
         </div>
