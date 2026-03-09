@@ -32,6 +32,7 @@ interface ItemFormSheetProps {
     purchase_to_stock_factor: number | null;
   }) => void;
   onDelete?: (id: string) => void;
+  onCreateSupplier?: (name: string) => Promise<{ id: string } | null>;
   isAdmin?: boolean;
 }
 
@@ -43,6 +44,7 @@ export function ItemFormSheetNew({
   onOpenChange, 
   onSave, 
   onDelete,
+  onCreateSupplier,
   isAdmin 
 }: ItemFormSheetProps) {
   const [name, setName] = useState('');
@@ -495,6 +497,12 @@ export function ItemFormSheetNew({
         onSelect={(id) => setSupplierId(id || '')}
         allowNone
         noneLabel="Sem fornecedor"
+        onCreateNew={onCreateSupplier ? async (name) => {
+          const result = await onCreateSupplier(name);
+          return result?.id || null;
+        } : undefined}
+        createLabel="Criar fornecedor"
+        createPlaceholder="Nome do fornecedor"
       />
     </Sheet>
   );

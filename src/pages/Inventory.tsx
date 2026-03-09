@@ -40,7 +40,7 @@ export default function InventoryPage() {
   } = useInventoryDB();
 
   const { categories } = useCategories();
-  const { suppliers } = useSuppliers();
+  const { suppliers, addSupplier } = useSuppliers();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('items');
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -361,6 +361,10 @@ export default function InventoryPage() {
           suppliers={suppliers}
           onSave={handleSaveItem}
           onDelete={editingItem ? () => handleDeleteItem(editingItem.id) : undefined}
+          onCreateSupplier={async (name) => {
+            const result = await addSupplier({ name });
+            return result ? { id: result.id } : null;
+          }}
           isAdmin={isAdmin}
         />
 
