@@ -12,7 +12,7 @@ import { useDeliveryZones } from '@/hooks/useDeliveryZones';
 import { formatCurrency } from '@/lib/format';
 import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
-import { AutoConfirmWidget } from './AutoConfirmWidget';
+
 
 interface Props {
   onNavigate: (tab: string) => void;
@@ -131,8 +131,7 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
       {/* Delivery Time Widget */}
       <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
 
-      {/* Auto-confirm Settings */}
-      <AutoConfirmWidget unitId={unitId} storeInfo={storeInfo} />
+      {/* Auto-confirm removed — all orders are auto-confirmed */}
 
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (

@@ -113,8 +113,8 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
               <AppIcon name="Schedule" size={20} className="text-amber-500" />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-foreground">{sentAutoConfirmed ? 'Aguardando preparo' : 'Aguardando confirmação'}</p>
-              <p className="text-xs text-muted-foreground">{sentAutoConfirmed ? 'Seu pedido foi confirmado automaticamente' : 'O estabelecimento confirmará seu pedido em breve'}</p>
+              <p className="font-semibold text-foreground">Aguardando preparo</p>
+              <p className="text-xs text-muted-foreground">Seu pedido foi confirmado automaticamente</p>
             </div>
           </div>
         </div>
@@ -149,27 +149,13 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
 
     setSending(true);
 
-    // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open menus)
-    let shouldAutoConfirm = autoConfirm;
-    try {
-      const { data: unitRow } = await supabase
-        .from('units')
-        .select('store_info')
-        .eq('id', unitId)
-        .maybeSingle();
-      const live = (unitRow as any)?.store_info?.auto_confirm?.delivery;
-      if (typeof live === 'boolean') shouldAutoConfirm = live;
-    } catch {
-      // keep prop fallback
-    }
-
     try {
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
         .insert({
         unit_id: unitId,
         table_number: 0,
-        status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
+        status: 'confirmed',
         total: grandTotal,
         source: 'delivery',
         customer_name: customerName.trim(),
@@ -192,22 +178,21 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      if (shouldAutoConfirm) {
-        try {
-          await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              },
-              body: JSON.stringify({ order_id: (order as any).id }),
-            }
-          );
-        } catch (e) {
-          console.warn('[MenuCart] send-to-pdv failed:', e);
-        }
+      // Auto send to PDV
+      try {
+        await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ order_id: (order as any).id }),
+          }
+        );
+      } catch (e) {
+        console.warn('[MenuCart] send-to-pdv failed:', e);
       }
 
       // Save address to customer record (fire-and-forget, don't block order)
@@ -226,7 +211,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       }
 
       toast.success('Pedido enviado com sucesso!');
-      setSentAutoConfirmed(shouldAutoConfirm);
+      setSentAutoConfirmed(true);
       setOrderSent((order as any).id.slice(0, 8));
     } catch (err: any) {
       toast.error(err.message || 'Erro ao enviar pedido');
