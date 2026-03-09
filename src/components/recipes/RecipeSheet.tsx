@@ -126,6 +126,7 @@ export function RecipeSheet({
       setYieldUnit(recipe.yield_unit);
       setNotes(recipe.preparation_notes || '');
       setMinReadyStock(String(recipe.min_ready_stock ?? 0));
+      setPackagingTemplateId((recipe as any).packaging_template_id || '');
       setIngredients(
         (recipe.ingredients || []).map((ing) => ({
           id: ing.id,
