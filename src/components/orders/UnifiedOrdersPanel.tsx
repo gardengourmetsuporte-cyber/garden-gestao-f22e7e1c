@@ -96,7 +96,7 @@ interface Props {
 export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   const {
     activeTab, setActiveTab,
-    comandas, deliveryOrders, hubOrders,
+    balcaoOrders, comandas, deliveryOrders, hubOrders,
     hubUpdateStatus, hubGetNextStatuses,
     isLoading, stats,
   } = useUnifiedOrders(unitId);
