@@ -127,7 +127,8 @@ export default function CardapioHub() {
   const selectedGroup = groups.find(g => g.id === selectedGroupId) || null;
   const groupProducts = selectedGroupId ? getProductsByGroup(selectedGroupId) : [];
 
-  // No longer using FAB — actions are inline buttons now
+  // FAB actions — contextual per tab
+  const { useFabActions } = require('@/contexts/FabActionContext');
 
   // Order stats
   const todayStats = useMemo(() => {
