@@ -4,17 +4,18 @@
  import { useUnit } from '@/contexts/UnitContext';
  import { toast } from 'sonner';
  
- export interface RecipeCostSettings {
-   id: string;
-   user_id: string;
-   monthly_products_sold: number;
-   tax_percentage: number;
-   card_fee_percentage: number;
-   packaging_cost_per_unit: number;
-   fixed_cost_category_ids: string[];
-   created_at: string;
-   updated_at: string;
- }
+export interface RecipeCostSettings {
+    id: string;
+    user_id: string;
+    monthly_products_sold: number;
+    monthly_revenue: number;
+    tax_percentage: number;
+    card_fee_percentage: number;
+    packaging_cost_per_unit: number;
+    fixed_cost_category_ids: string[];
+    created_at: string;
+    updated_at: string;
+  }
  
  export interface OperationalCosts {
    fixedCostPerProduct: number;
