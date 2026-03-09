@@ -29,7 +29,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Em Desenvolvimento',
+    key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Gestão',
   },
   {
     key: 'finance', label: 'Financeiro', icon: 'DollarSign', route: '/finance', routes: ['/finance'], group: 'Gestão',
@@ -127,7 +127,7 @@ export const ALL_MODULES: ModuleDef[] = [
     key: 'personal-finance', label: 'Finanças Pessoais', icon: 'Wallet', route: '/personal-finance', routes: ['/personal-finance'], group: 'Gestão',
   },
   {
-    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Em Desenvolvimento',
+    key: 'marketing', label: 'Marketing', icon: 'Megaphone', route: '/marketing', routes: ['/marketing', '/brand-core'], group: 'Gestão',
     children: [
       { key: 'marketing.calendar', label: 'Calendário de posts', icon: 'Calendar' },
       { key: 'marketing.create', label: 'Criar/editar posts', icon: 'PenSquare' },
@@ -136,7 +136,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'menu-admin', label: 'Cardápio Digital', icon: 'UtensilsCrossed', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Em Desenvolvimento',
+    key: 'menu-admin', label: 'Cardápio Digital', icon: 'UtensilsCrossed', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Operação',
     children: [
       { key: 'menu-admin.view', label: 'Ver cardápio', icon: 'Eye' },
       { key: 'menu-admin.products', label: 'Gerenciar produtos', icon: 'PenSquare' },
@@ -150,7 +150,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Em Desenvolvimento',
+    key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Operação',
     children: [
       { key: 'whatsapp.conversations', label: 'Conversas', icon: 'MessageCircle' },
       { key: 'whatsapp.settings', label: 'Configurações bot', icon: 'Settings' },
