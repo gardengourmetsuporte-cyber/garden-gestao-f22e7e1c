@@ -249,12 +249,13 @@ export default function OrdersPage() {
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           {/* Navigation Cards 2x2 */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
             {([
               { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
               { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, color: 'text-blue-400', bg: 'bg-blue-500/10' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, color: 'text-amber-400', bg: 'bg-amber-500/10' },
               { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+              { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: suppliers.length || undefined, color: 'text-primary', bg: 'bg-primary/10' },
             ]).map((tab) => (
               <button
                 key={tab.key}
