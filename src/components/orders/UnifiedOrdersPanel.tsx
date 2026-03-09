@@ -306,6 +306,9 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
   onStatusUpdated: (order: TabletOrder) => void;
 }) {
   const [updating, setUpdating] = useState(false);
+  const [showPinDialog, setShowPinDialog] = useState(false);
+  const [pendingCancelOrderId, setPendingCancelOrderId] = useState<string | null>(null);
+  const { validatePinWithPermission } = usePOS();
 
   if (!order) return null;
 
