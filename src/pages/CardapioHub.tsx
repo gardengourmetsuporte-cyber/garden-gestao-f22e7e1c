@@ -33,7 +33,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const CardapioConfigHubLazy = lazy(() => import('@/components/cardapio/CardapioConfigHub').then(m => ({ default: m.CardapioConfigHub })));
 
