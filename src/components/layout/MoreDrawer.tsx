@@ -323,6 +323,22 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
               );
             })}
 
+            {/* Cardápio Config shortcut when inside cardápio route */}
+            {location.pathname.startsWith('/cardapio') && (
+              <div className="space-y-1.5 px-4">
+                <button
+                  onClick={() => { navigate('/cardapio?section=config'); onOpenChange(false); }}
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl card-surface hover:bg-card/90 active:scale-[0.98] transition-all"
+                >
+                  <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                    <AppIcon name="Settings" size={18} className="text-primary" />
+                  </div>
+                  <span className="text-sm font-medium text-foreground">Configurações do Cardápio</span>
+                  <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />
+                </button>
+              </div>
+            )}
+
             {/* Settings + Logout */}
             <div className="space-y-1.5 mt-2 px-4 pb-4">
               <button
