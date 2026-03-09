@@ -326,42 +326,52 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
 
   return (
     <Sheet open={!!order} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <SheetContent side="bottom" className="max-h-[85dvh] rounded-t-3xl overflow-auto">
-        <div className="space-y-4 pb-10">
-          {/* Header */}
-          <SheetHeader>
-            <SheetTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl font-black">#{orderNumber}</span>
-                <Badge className={cn("text-xs font-bold", statusColor[order.status])}>
-                  {statusLabel[order.status] || order.status}
-                </Badge>
-              </div>
-              <span className="text-xs text-muted-foreground font-normal">
-                Recebido há {timeAgo}
-              </span>
-            </SheetTitle>
-          </SheetHeader>
+      <SheetContent side="bottom" className="h-[90dvh] rounded-t-3xl flex flex-col p-0">
+        {/* ── Drag handle ── */}
+        <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3 mb-1 shrink-0" />
+
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border/30 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl font-black tracking-tight">#{orderNumber}</span>
+            <Badge className={cn("text-xs font-bold px-2.5 py-1", statusColor[order.status])}>
+              {statusLabel[order.status] || order.status}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-muted-foreground">há {timeAgo}</span>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-xl bg-secondary/60 flex items-center justify-center hover:bg-secondary transition-colors"
+            >
+              <AppIcon name="X" size={15} className="text-muted-foreground" />
+            </button>
+          </div>
+        </div>
+
+        {/* ── Scrollable body ── */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
 
           {/* Customer card */}
           <div className="rounded-2xl border border-border/30 bg-secondary/20 p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <AppIcon name="person" size={18} className="text-primary" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <AppIcon name="person" size={20} className="text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">{order.customer_name || 'Cliente'}</p>
-                  {isDelivery && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
-                      Entrega
+                  <p className="text-base font-bold text-foreground leading-tight">{order.customer_name || 'Cliente'}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {isDelivery ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold">Entrega</span>
+                    ) : order.table_number > 0 ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">Mesa {order.table_number}</span>
+                    ) : null}
+                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <AppIcon name="schedule" size={11} />
+                      {formattedDate}
                     </span>
-                  )}
-                  {!isDelivery && order.table_number > 0 && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">
-                      Mesa {order.table_number}
-                    </span>
-                  )}
+                  </div>
                 </div>
               </div>
               {whatsappLink && (
@@ -369,19 +379,12 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
                   href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-500 text-xs font-bold hover:bg-emerald-500/20 transition-colors"
+                  className="flex flex-col items-center gap-0.5 p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
                 >
-                  <AppIcon name="MessageCircle" size={14} />
-                  {order.customer_phone}
+                  <AppIcon name="MessageCircle" size={18} />
+                  <span className="text-[9px] font-bold">WhatsApp</span>
                 </a>
               )}
-            </div>
-
-            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
-              <span className="flex items-center gap-1.5">
-                <AppIcon name="schedule" size={14} />
-                {formattedDate}
-              </span>
             </div>
 
             {/* Address with Google Maps */}
@@ -389,7 +392,7 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
               <div className="rounded-xl bg-background/60 p-3 space-y-1.5">
                 <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <AppIcon name="location_on" size={14} className="text-primary" />
-                  Endereço:
+                  Endereço
                 </p>
                 <p className="text-sm text-muted-foreground pl-5">{order.customer_address}</p>
                 {googleMapsLink && (
@@ -407,46 +410,51 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
             )}
           </div>
 
-          {/* Items table */}
+          {/* Items */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2.5">
               <h4 className="text-sm font-bold text-foreground">Itens do pedido</h4>
-              <span className="text-[10px] text-muted-foreground">{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
+              <span className="text-[10px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">
+                {items.length} {items.length === 1 ? 'item' : 'itens'}
+              </span>
             </div>
             {items.length === 0 ? (
               <p className="text-sm text-muted-foreground bg-secondary/30 rounded-xl p-4 text-center">Sem itens registrados</p>
             ) : (
               <div className="rounded-2xl border border-border/20 overflow-hidden">
                 {/* Table header */}
-                <div className="grid grid-cols-[40px_1fr_60px_80px] gap-1 px-3 py-2 bg-secondary/40 text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                <div className="grid grid-cols-[36px_1fr_52px_76px] gap-1 px-3.5 py-2.5 bg-secondary/40 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
                   <span>Qtd</span>
-                  <span>Itens</span>
+                  <span>Item</span>
                   <span className="text-right">Cód.</span>
-                  <span className="text-right">Preços</span>
+                  <span className="text-right">Preço</span>
                 </div>
                 {items.map((item: any, i: number) => {
                   const itemPrice = item.unit_price || item.total_price || 0;
                   const totalItemPrice = itemPrice * (item.quantity || 1);
                   return (
                     <div key={item.id || i} className="border-t border-border/10">
-                      <div className="grid grid-cols-[40px_1fr_60px_80px] gap-1 px-3 py-2.5 items-start">
-                        <span className="text-sm font-bold text-foreground">{item.quantity || 1}</span>
+                      <div className="grid grid-cols-[36px_1fr_52px_76px] gap-1 px-3.5 py-3 items-start">
+                        <span className="text-sm font-black text-foreground">{item.quantity || 1}</span>
                         <div>
-                          <p className="text-sm font-bold text-foreground">{item.tablet_products?.name || item.name || '?'}</p>
+                          <p className="text-sm font-semibold text-foreground">{item.tablet_products?.name || item.name || '?'}</p>
                           {item.notes && (
-                            <p className="text-[11px] text-muted-foreground mt-0.5">{item.notes}</p>
+                            <p className="text-[11px] text-warning/80 mt-0.5 flex items-center gap-1">
+                              <AppIcon name="StickyNote" size={10} />
+                              {item.notes}
+                            </p>
                           )}
                           {item.selected_options && Array.isArray(item.selected_options) && item.selected_options.length > 0 && (
                             <div className="mt-0.5 space-y-0.5">
                               {item.selected_options.map((opt: any, j: number) => (
                                 <p key={j} className="text-[11px] text-muted-foreground">
-                                  {opt.quantity > 1 ? `${opt.quantity} ` : ''}{opt.name}
+                                  {opt.quantity > 1 ? `${opt.quantity}× ` : '+ '}{opt.name}
                                 </p>
                               ))}
                             </div>
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground text-right tabular-nums">
+                        <span className="text-xs text-muted-foreground text-right tabular-nums font-mono">
                           {item.tablet_products?.codigo_pdv || '—'}
                         </span>
                         <span className="text-sm font-bold text-foreground text-right tabular-nums">
@@ -463,84 +471,76 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
           {/* Totals */}
           <div className="rounded-2xl bg-secondary/20 border border-border/20 p-4 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal:</span>
+              <span className="text-muted-foreground">Subtotal</span>
               <span className="font-semibold tabular-nums">{formatPrice(itemsSubtotal > 0 ? itemsSubtotal : order.total)}</span>
             </div>
             {deliveryFee > 0 && isDelivery && (
               <div className="flex justify-between text-sm">
-                <span className="text-primary font-medium">Taxa de entrega:</span>
+                <span className="text-primary font-medium">Taxa de entrega</span>
                 <span className="text-primary font-semibold tabular-nums">+{formatPrice(deliveryFee)}</span>
               </div>
             )}
-            <div className="flex justify-between text-lg font-black pt-2 border-t border-border/20">
-              <span>Total:</span>
+            <div className="flex justify-between text-xl font-black pt-2.5 border-t border-border/20">
+              <span>Total</span>
               <span className="text-primary tabular-nums">{formatPrice(order.total)}</span>
             </div>
           </div>
 
-          {/* Notes */}
+          {/* Error message */}
           {order.error_message && order.status !== 'cancelled' && (
             <div className="rounded-2xl bg-destructive/5 border border-destructive/20 p-4">
               <p className="text-xs font-bold text-destructive mb-1 flex items-center gap-1.5">
-                <AppIcon name="warning" size={14} /> Erro
+                <AppIcon name="warning" size={14} /> Erro no envio
               </p>
               <p className="text-sm text-destructive/80">{order.error_message}</p>
             </div>
           )}
 
-          {/* Action buttons */}
-          <div className="space-y-2 pt-1">
-            {nextStatuses.length > 0 && (
-              <div className="flex gap-2">
-                {nextStatuses.map(ns => {
-                  const config = flow?.labels[ns];
-                  if (!config) return null;
-                  const isCancel = ns === 'cancelled';
-                  return (
-                    <Button
-                      key={ns}
-                      variant={config.variant}
-                      className={cn(
-                        "flex-1 h-12 rounded-xl font-bold text-sm",
-                        !isCancel && "shadow-lg shadow-primary/20"
-                      )}
-                      onClick={() => handleUpdateStatus(ns)}
-                      disabled={updating}
-                    >
-                      {updating ? (
-                        <AppIcon name="Loader2" size={18} className="animate-spin mr-1.5" />
-                      ) : (
-                        <AppIcon name={config.icon} size={18} className="mr-1.5" />
-                      )}
-                      {config.label}
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 h-10 rounded-xl text-xs"
-                onClick={handlePrint}
-              >
-                <AppIcon name="print" size={16} className="mr-1.5" />
-                Imprimir
+          {/* Secondary actions */}
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 h-10 rounded-xl text-xs" onClick={handlePrint}>
+              <AppIcon name="print" size={15} className="mr-1.5" />
+              Imprimir
+            </Button>
+            {order.status === 'error' && (
+              <Button variant="outline" className="flex-1 h-10 rounded-xl text-xs" onClick={onClose}>
+                <AppIcon name="RefreshCw" size={15} className="mr-1.5" />
+                Reenviar
               </Button>
-              {order.status === 'error' && onClose && (
-                <Button
-                  variant="outline"
-                  className="flex-1 h-10 rounded-xl text-xs"
-                  onClick={onClose}
-                >
-                  <AppIcon name="RefreshCw" size={16} className="mr-1.5" />
-                  Reenviar
-                </Button>
-              )}
-            </div>
+            )}
           </div>
         </div>
+
+        {/* ── Fixed footer with action buttons ── */}
+        {nextStatuses.length > 0 && (
+          <div className="shrink-0 border-t border-border/20 bg-background/80 backdrop-blur-sm px-5 py-4 flex gap-3">
+            {nextStatuses.map(ns => {
+              const config = flow?.labels[ns];
+              if (!config) return null;
+              const isCancel = ns === 'cancelled';
+              return (
+                <Button
+                  key={ns}
+                  variant={config.variant}
+                  className={cn(
+                    "flex-1 h-14 rounded-2xl font-bold text-sm",
+                    !isCancel && "shadow-lg shadow-primary/20",
+                    isCancel && "flex-[0.5]"
+                  )}
+                  onClick={() => handleUpdateStatus(ns)}
+                  disabled={updating}
+                >
+                  {updating ? (
+                    <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
+                  ) : (
+                    <AppIcon name={config.icon} size={20} className="mr-2" />
+                  )}
+                  {config.label}
+                </Button>
+              );
+            })}
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );
