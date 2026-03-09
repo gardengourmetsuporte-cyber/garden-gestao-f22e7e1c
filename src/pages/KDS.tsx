@@ -318,13 +318,15 @@ export default function KDS() {
             .in('status', ACTIVE_STATUSES)
             .order('created_at', { ascending: true })
             .limit(50)
+            .then(r => r)
         );
-        console.log('[KDS] Query result:', { data: res.data?.length, error: res.error });
-        if (res.error) {
-          console.error('[KDS] Supabase error:', res.error);
-          throw res.error;
+        const { data, error } = res as { data: any; error: any };
+        console.log('[KDS] Query result:', { count: data?.length, error });
+        if (error) {
+          console.error('[KDS] Supabase error:', error);
+          throw error;
         }
-        return (res.data as unknown as KDSOrder[]) || [];
+        return (data as unknown as KDSOrder[]) || [];
       } catch (err: any) {
         console.error('[KDS] Fetch error:', err?.name, err?.message, err);
         const msg = String(err?.message || '');
