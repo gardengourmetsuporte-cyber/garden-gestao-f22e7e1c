@@ -149,9 +149,15 @@ export function ItemFormSheetNew({
 
   const isValid = name.trim();
 
+  const handleInputFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 350);
+  }, []);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-safe-bottom h-[85dvh] overflow-y-auto scroll-smooth">
+      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-safe-bottom h-[85dvh] overflow-y-auto scroll-smooth overscroll-contain">
         <SheetHeader className="pb-4">
           <SheetTitle className="text-xl">
             {item ? 'Editar Item' : 'Novo Item'}
