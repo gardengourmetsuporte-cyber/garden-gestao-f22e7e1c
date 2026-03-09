@@ -177,90 +177,50 @@ function FichaTecnicaCard({
       ? 'bg-warning/15 text-warning'
       : 'bg-destructive/15 text-destructive';
 
+  const cmv = price > 0 && cost > 0 ? (cost / price) * 100 : 0;
+
   return (
-    <div className="card-interactive p-3 space-y-2.5">
-      {/* Row 1: Name + margin badge */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
-            {!product.is_active && (
-              <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-destructive/10 text-destructive shrink-0">Inativo</span>
-            )}
-          </div>
-          {product.codigo_pdv && (
-            <span className="text-[10px] text-muted-foreground">PDV: {product.codigo_pdv}</span>
-          )}
-        </div>
-        {hasRecipe && cost > 0 ? (
-          <span className={cn("text-xs px-2.5 py-1 rounded-full font-bold shrink-0", marginBg)}>
-            {margin.toFixed(0)}% margem
-          </span>
-        ) : (
-          <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-muted text-muted-foreground shrink-0">
-            Sem ficha
-          </span>
+    <div
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors active:scale-[0.98] cursor-pointer"
+      onClick={() => onEditRecipe?.(product)}
+    >
+      {/* Name */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
+        {product.codigo_pdv && (
+          <span className="text-[9px] text-muted-foreground">PDV: {product.codigo_pdv}</span>
         )}
       </div>
 
-      {/* Row 2: Price breakdown */}
+      {/* Stats */}
       {hasRecipe && cost > 0 ? (
-        <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
-            <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Custo</p>
-            <p className="text-sm font-bold text-destructive mt-0.5">{formatPrice(cost)}</p>
-          </div>
-          <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
-            <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Venda</p>
-            <p className="text-sm font-bold text-foreground mt-0.5">{formatPrice(price)}</p>
-          </div>
-          <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
-            <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Lucro</p>
-            <p className={cn("text-sm font-bold mt-0.5", profit >= 0 ? 'text-success' : 'text-destructive')}>
-              {formatPrice(profit)}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="text-right">
+            <p className="text-[9px] text-muted-foreground uppercase">CMV</p>
+            <p className={cn("text-xs font-bold", cmv <= 30 ? 'text-success' : cmv <= 40 ? 'text-warning' : 'text-destructive')}>
+              {cmv.toFixed(0)}%
             </p>
           </div>
-        </div>
-      ) : hasRecipe ? (
-        <div className="rounded-xl bg-warning/10 border border-warning/20 p-2.5 flex items-center gap-2">
-          <AppIcon name="AlertTriangle" size={14} className="text-warning shrink-0" />
-          <p className="text-[11px] text-warning">Ficha vinculada mas sem custo calculado. Atualize os custos.</p>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 px-1">
-          <div className="flex-1">
-            <p className="text-[11px] text-muted-foreground">Preço de venda: <span className="font-bold text-foreground">{formatPrice(price)}</span></p>
+          <div className="text-right">
+            <p className="text-[9px] text-muted-foreground uppercase">Margem</p>
+            <p className={cn("text-xs font-bold", marginColor)}>{margin.toFixed(0)}%</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] text-muted-foreground uppercase">Lucro</p>
+            <p className={cn("text-xs font-bold", profit >= 0 ? 'text-success' : 'text-destructive')}>{formatPrice(profit)}</p>
           </div>
         </div>
+      ) : (
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] text-muted-foreground">{formatPrice(price)}</span>
+          <span className={cn(
+            "text-[9px] px-2 py-0.5 rounded-full font-semibold",
+            hasRecipe ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
+          )}>
+            {hasRecipe ? 'Sem custo' : 'Sem ficha'}
+          </span>
+        </div>
       )}
-
-      {/* Row 3: Actions */}
-      <div className="flex items-center gap-2 pt-0.5">
-        {hasRecipe ? (
-          <button
-            onClick={() => onEditRecipe?.(product)}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-primary/10 text-primary text-xs font-semibold transition-colors hover:bg-primary/20 active:scale-[0.97]"
-          >
-            <AppIcon name="FileEdit" size={14} />
-            Editar Ficha
-          </button>
-        ) : (
-          <button
-            onClick={() => onEditRecipe?.(product)}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-primary/10 text-primary text-xs font-semibold transition-colors hover:bg-primary/20 active:scale-[0.97]"
-          >
-            <AppIcon name="Link" size={14} />
-            Vincular Ficha
-          </button>
-        )}
-        <button
-          onClick={onEdit}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-secondary/60 text-muted-foreground text-xs font-semibold transition-colors hover:bg-secondary active:scale-[0.97]"
-        >
-          <AppIcon name="Pencil" size={14} />
-          Produto
-        </button>
-      </div>
     </div>
   );
 }

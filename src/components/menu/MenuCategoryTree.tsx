@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
-import type { MenuCategory, MenuGroup } from '@/hooks/useMenuAdmin';
+import type { MenuCategory, MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 
 const MENU_ICONS = [
   'restaurant', 'lunch_dining', 'local_pizza', 'ramen_dining', 'bakery_dining',
@@ -73,12 +73,15 @@ interface Props {
   onDeleteGroup: (id: string) => void;
   getProductCount: (groupId: string) => number;
   renderGroupContent?: (groupId: string) => React.ReactNode;
+  viewMode?: 'menu' | 'ficha';
+  getProductsByGroup?: (groupId: string) => MenuProduct[];
 }
 
 export function MenuCategoryTree({
   categories, groups, selectedGroupId,
   onSelectGroup, onSaveCategory, onDeleteCategory,
   onSaveGroup, onDeleteGroup, getProductCount, renderGroupContent,
+  viewMode = 'menu', getProductsByGroup,
 }: Props) {
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
   const [catDialog, setCatDialog] = useState(false);
@@ -158,6 +161,27 @@ export function MenuCategoryTree({
         const catGroups = groups.filter(g => g.category_id === cat.id);
         const totalProducts = catGroups.reduce((sum, g) => sum + getProductCount(g.id), 0);
 
+        // Ficha mode: compute category-level stats
+        const catStats = viewMode === 'ficha' && getProductsByGroup ? (() => {
+          const allProds = catGroups.flatMap(g => getProductsByGroup(g.id));
+          const withCost = allProds.filter(p => (p as any).cost_per_portion > 0);
+          if (withCost.length === 0) return null;
+          const avgCMV = withCost.reduce((s, p) => {
+            const cost = (p as any).cost_per_portion || 0;
+            return s + (p.price > 0 ? (cost / p.price) * 100 : 0);
+          }, 0) / withCost.length;
+          const avgMargin = withCost.reduce((s, p) => {
+            const cost = (p as any).cost_per_portion || 0;
+            return s + (cost > 0 ? ((p.price - cost) / cost) * 100 : 0);
+          }, 0) / withCost.length;
+          const linked = allProds.filter(p => !!(p as any).recipe_id).length;
+          return { avgCMV, avgMargin, linked, total: allProds.length, withCost: withCost.length };
+        })() : null;
+
+        const catMarginColor = catStats
+          ? catStats.avgMargin >= 200 ? 'text-success' : catStats.avgMargin >= 100 ? 'text-warning' : 'text-destructive'
+          : '';
+
         return (
           <div key={cat.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
             {/* Vertical accent bar */}
@@ -180,18 +204,30 @@ export function MenuCategoryTree({
                 </div>
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-semibold text-foreground truncate">{cat.name}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {catGroups.length} grupo{catGroups.length !== 1 ? 's' : ''} · {totalProducts} produto{totalProducts !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <AppIcon
-                  name="ChevronDown"
-                  size={16}
-                  className={cn(
-                    "text-muted-foreground/50 transition-transform duration-200",
-                    !expanded && "-rotate-90"
+                  {viewMode === 'ficha' && catStats ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      {catStats.linked}/{catStats.total} com ficha · CMV {catStats.avgCMV.toFixed(0)}%
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      {catGroups.length} grupo{catGroups.length !== 1 ? 's' : ''} · {totalProducts} produto{totalProducts !== 1 ? 's' : ''}
+                    </p>
                   )}
-                />
+                </div>
+                {viewMode === 'ficha' && catStats ? (
+                  <span className={cn("text-sm font-bold shrink-0", catMarginColor)}>
+                    {catStats.avgMargin.toFixed(0)}%
+                  </span>
+                ) : (
+                  <AppIcon
+                    name="ChevronDown"
+                    size={16}
+                    className={cn(
+                      "text-muted-foreground/50 transition-transform duration-200",
+                      !expanded && "-rotate-90"
+                    )}
+                  />
+                )}
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -221,6 +257,16 @@ export function MenuCategoryTree({
                   const isSelected = selectedGroupId === grp.id;
                   const avail = grp.availability as any;
                   const isAvailable = grp.is_active !== false && (avail?.tablet || avail?.delivery);
+
+                  // Ficha mode: group-level CMV
+                  const grpStats = viewMode === 'ficha' && getProductsByGroup ? (() => {
+                    const prods = getProductsByGroup(grp.id);
+                    const wc = prods.filter(p => (p as any).cost_per_portion > 0);
+                    if (wc.length === 0) return null;
+                    const avgCMV = wc.reduce((s, p) => s + ((p as any).cost_per_portion / p.price) * 100, 0) / wc.length;
+                    return { avgCMV, linked: prods.filter(p => !!(p as any).recipe_id).length, total: prods.length };
+                  })() : null;
+
                   return (
                     <div key={grp.id}>
                       <div className="flex items-center gap-1">
@@ -238,29 +284,45 @@ export function MenuCategoryTree({
                             style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
                           />
                           <span className="flex-1 text-left truncate">{grp.name}</span>
-                          <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
-                              }}
-                              className={cn(
-                                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                                avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                          {viewMode === 'ficha' ? (
+                            <div className="flex items-center gap-1.5">
+                              {grpStats ? (
+                                <span className={cn(
+                                  "text-[10px] font-bold",
+                                  grpStats.avgCMV <= 30 ? 'text-success' : grpStats.avgCMV <= 40 ? 'text-warning' : 'text-destructive'
+                                )}>
+                                  CMV {grpStats.avgCMV.toFixed(0)}%
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground/50">Sem custo</span>
                               )}
-                            >Mesa</button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
-                              }}
-                              className={cn(
-                                "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                                avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
-                              )}
-                            >Delivery</button>
-                            <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
-                          </div>
+                              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
+                                }}
+                                className={cn(
+                                  "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                                  avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                                )}
+                              >Mesa</button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
+                                }}
+                                className={cn(
+                                  "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
+                                  avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+                                )}
+                              >Delivery</button>
+                              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                            </div>
+                          )}
                         </button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

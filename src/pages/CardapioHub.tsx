@@ -312,6 +312,8 @@ export default function CardapioHub() {
                 />
               )}
               <MenuCategoryTree
+                viewMode={viewMode}
+                getProductsByGroup={getProductsByGroup}
                 categories={categories}
                 groups={groups}
                 selectedGroupId={selectedGroupId}
