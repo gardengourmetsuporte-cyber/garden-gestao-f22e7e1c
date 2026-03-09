@@ -133,7 +133,7 @@ export default function PDV() {
                   )}
                   <span className="text-xs font-medium text-foreground line-clamp-2 leading-tight">{product.name}</span>
                   {product.codigo_pdv && <span className="text-[10px] text-muted-foreground">#{product.codigo_pdv}</span>}
-                  <span className="text-xs font-bold text-primary">{formatPrice(product.price)}</span>
+                  <span className="text-xs font-bold text-primary">{formatCurrency(product.price)}</span>
                 </button>
               ))}
             </div>
