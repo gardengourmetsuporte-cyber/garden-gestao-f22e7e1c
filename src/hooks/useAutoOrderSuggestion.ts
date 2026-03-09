@@ -13,6 +13,10 @@ export interface AutoOrderItem {
   avgDailyConsumption: number;
   suggestedQuantity: number;
   daysUntilEmpty: number | null;
+  purchaseUnitLabel: string | null;
+  purchaseToStockFactor: number | null;
+  suggestedPurchaseQty: number | null;
+  stockUnitLabel: string | null;
 }
 
 export interface AutoOrderSuggestion {
