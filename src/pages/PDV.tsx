@@ -6,17 +6,22 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
+import { useCashRegister } from '@/hooks/useCashRegister';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
+import { CashRegisterOpenDialog } from '@/components/pdv/CashRegisterOpenDialog';
+import { CashRegisterCloseSheet } from '@/components/pdv/CashRegisterCloseSheet';
 import { PinDialog } from '@/components/checklists/PinDialog';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 
 export default function PDV() {
   const pos = usePOS();
+  const cashRegister = useCashRegister();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
@@ -26,6 +31,8 @@ export default function PDV() {
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [originalCartSize, setOriginalCartSize] = useState(0);
   const [cancelPinOpen, setCancelPinOpen] = useState(false);
+  const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
+  const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -84,6 +91,48 @@ export default function PDV() {
 
   const hasNewItems = activeOrderId ? pos.cart.length > originalCartSize : false;
 
+  // Cash register is loading
+  if (cashRegister.loading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+          <AppIcon name="Loader2" size={24} className="animate-spin text-muted-foreground" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Cash register is NOT open — show blocker screen
+  if (!cashRegister.isOpen) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] px-6 text-center pb-[calc(72px+env(safe-area-inset-bottom,0px))] lg:pb-0">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+            <AppIcon name="Lock" size={28} className="text-primary" />
+          </div>
+          <h2 className="text-lg font-bold text-foreground mb-1">Caixa Fechado</h2>
+          <p className="text-sm text-muted-foreground mb-6 max-w-xs">
+            Para registrar vendas, abra o caixa informando o valor inicial em dinheiro.
+          </p>
+          <Button onClick={() => setOpenRegisterDialog(true)} size="lg" className="h-12 px-8">
+            <AppIcon name="Unlock" size={18} className="mr-2" />
+            Abrir Caixa
+          </Button>
+
+          <CashRegisterOpenDialog
+            open={openRegisterDialog}
+            onOpenChange={setOpenRegisterDialog}
+            saving={cashRegister.saving}
+            onOpen={async (value) => {
+              const success = await cashRegister.openRegister(value);
+              if (success) setOpenRegisterDialog(false);
+              return success;
+            }}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -110,7 +159,33 @@ export default function PDV() {
               </span>
             )}
           </Button>
+          {/* Close register button */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10"
+            onClick={() => setCloseRegisterSheet(true)}
+          >
+            <AppIcon name="Lock" size={18} />
+          </Button>
         </div>
+
+        {/* Cash register status bar */}
+        {cashRegister.currentRegister && (
+          <div className="px-4 pb-2">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg px-3 py-1.5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs text-muted-foreground">
+                  Caixa aberto às {format(new Date(cashRegister.currentRegister.opened_at), "HH:mm", { locale: ptBR })}
+                </span>
+              </div>
+              <span className="text-xs font-medium text-primary">
+                Troco: {formatCurrency(cashRegister.currentRegister.initial_cash)}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Category chips */}
         <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto scrollbar-hide">
@@ -361,6 +436,18 @@ export default function PDV() {
         subtitle="Digite o PIN de um admin autorizado"
         onSubmit={handleCancelPinSubmit}
       />
+
+      {/* Cash Register Close Sheet */}
+      {cashRegister.currentRegister && (
+        <CashRegisterCloseSheet
+          open={closeRegisterSheet}
+          onOpenChange={setCloseRegisterSheet}
+          register={cashRegister.currentRegister}
+          saving={cashRegister.saving}
+          onClose={cashRegister.closeRegister}
+          fetchSummary={cashRegister.fetchSalesSummary}
+        />
+      )}
     </AppLayout>
   );
 }
