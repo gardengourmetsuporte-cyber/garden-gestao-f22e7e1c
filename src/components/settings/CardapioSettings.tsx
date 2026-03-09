@@ -34,10 +34,8 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab | null>(initialTab);
   const [newTableNum, setNewTableNum] = useState('');
 
-  // Use published URL for QR/link sharing when running in preview/sandbox
-  const basePublicUrl = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app')
-    ? 'https://garden-gestao.lovable.app'
-    : window.location.origin;
+  // Use the current origin so the generated links always point to the currently deployed environment
+  const basePublicUrl = window.location.origin;
 
   // PDV form
   const [hubUrl, setHubUrl] = useState('');
