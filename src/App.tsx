@@ -266,6 +266,11 @@ function AuthenticatedRoutes() {
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
           <Route path="/brand-core" element={<Navigate to="/marketing" replace />} />
           <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
+          <Route path="/whatsapp/chats" element={<ProtectedRoute><WhatsAppChats /></ProtectedRoute>} />
+          <Route path="/whatsapp/orders" element={<ProtectedRoute><WhatsAppOrdersPage /></ProtectedRoute>} />
+          <Route path="/whatsapp/knowledge" element={<ProtectedRoute><WhatsAppKnowledgePage /></ProtectedRoute>} />
+          <Route path="/whatsapp/logs" element={<ProtectedRoute><WhatsAppLogsPage /></ProtectedRoute>} />
+          <Route path="/whatsapp/settings" element={<ProtectedRoute><WhatsAppSettingsPage /></ProtectedRoute>} />
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
           <Route path="/delivery-hub" element={<ProtectedRoute><DeliveryHub /></ProtectedRoute>} />

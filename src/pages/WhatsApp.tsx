@@ -20,7 +20,7 @@ export default function WhatsAppHub() {
   const activeChannel = channels.find(c => c.is_active);
   const isConnected = !!activeChannel;
   const activeConvs = conversations.filter(c => c.status !== 'closed').length;
-  const pendingOrders = orders.filter(o => o.status === 'draft' || o.status === 'pending').length;
+  const pendingOrders = orders.filter(o => !['confirmed', 'cancelled'].includes(o.status)).length;
 
   const counters: Record<string, number> = {
     chats: activeConvs,
