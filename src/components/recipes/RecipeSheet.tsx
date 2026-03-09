@@ -275,6 +275,7 @@ export function RecipeSheet({
         total_cost: ing.total_cost,
         source_type: ing.source_type,
         source_recipe_id: ing.source_recipe_id,
+        kds_station_id: ing.kds_station_id || null,
       })),
     };
 
