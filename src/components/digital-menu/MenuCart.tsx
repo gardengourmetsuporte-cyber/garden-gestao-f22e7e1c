@@ -149,27 +149,13 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
 
     setSending(true);
 
-    // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open menus)
-    let shouldAutoConfirm = autoConfirm;
-    try {
-      const { data: unitRow } = await supabase
-        .from('units')
-        .select('store_info')
-        .eq('id', unitId)
-        .maybeSingle();
-      const live = (unitRow as any)?.store_info?.auto_confirm?.delivery;
-      if (typeof live === 'boolean') shouldAutoConfirm = live;
-    } catch {
-      // keep prop fallback
-    }
-
     try {
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
         .insert({
         unit_id: unitId,
         table_number: 0,
-        status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
+        status: 'confirmed',
         total: grandTotal,
         source: 'delivery',
         customer_name: customerName.trim(),
