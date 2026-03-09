@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useScrollToTopOnChange } from '@/components/ScrollToTop';
-import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
+import { useScrollToTopOnChange } from '@/components/ScrollToTop';
 import { useMarketing } from '@/hooks/useMarketing';
+import { MarketingDailyFeed } from '@/components/marketing/MarketingDailyFeed';
 import { MarketingCalendarGrid } from '@/components/marketing/MarketingCalendarGrid';
-import { MarketingSmartSuggestions } from '@/components/marketing/MarketingSmartSuggestions';
-import { MarketingFeed } from '@/components/marketing/MarketingFeed';
-import { MarketingIdeasAI } from '@/components/marketing/MarketingIdeasAI';
+import { MarketingBrandTab } from '@/components/marketing/MarketingBrandTab';
 import { PostSheet } from '@/components/marketing/PostSheet';
 import { PublishActions } from '@/components/marketing/PublishActions';
 import { UpgradeWall } from '@/components/paywall/UpgradeWall';
@@ -20,14 +17,12 @@ import type { MarketingPost } from '@/types/marketing';
 
 export default function Marketing() {
   const { hasPlan } = useAuth();
-  const navigate = useNavigate();
   const { posts, isLoading, createPost, updatePost, deletePost, markPublished, uploadMedia } = useMarketing();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<MarketingPost | null>(null);
   const [publishPost, setPublishPost] = useState<MarketingPost | null>(null);
-  const [activeTab, setActiveTab] = useState('calendar');
+  const [activeTab, setActiveTab] = useState('today');
   useScrollToTopOnChange(activeTab);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [prefillDate, setPrefillDate] = useState<Date | null>(null);
   const [prefillTitle, setPrefillTitle] = useState('');
 
@@ -57,13 +52,6 @@ export default function Marketing() {
     setSheetOpen(true);
   };
 
-  const handleSuggestionClick = (title: string, date: Date) => {
-    setEditingPost(null);
-    setPrefillDate(date);
-    setPrefillTitle(title);
-    setSheetOpen(true);
-  };
-
   const handleSave = (data: Partial<MarketingPost>) => {
     if (data.id) {
       updatePost.mutate({ id: data.id, ...data });
@@ -81,50 +69,35 @@ export default function Marketing() {
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           <DesktopActionBar label="Novo Post" onClick={() => { setEditingPost(null); setPrefillDate(null); setPrefillTitle(''); setSheetOpen(true); }} />
-          <div className="flex items-center justify-between mb-1">
-            <AnimatedTabs
-              tabs={[
-                { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
-                { key: 'feed', label: 'Feed', icon: <AppIcon name="LayoutList" size={16} /> },
-                { key: 'ideas', label: 'Ideias IA', icon: <AppIcon name="Sparkles" size={16} /> },
-              ]}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
-            <button onClick={() => navigate('/brand-core')} className="shrink-0 ml-2 flex items-center gap-1 text-xs text-primary hover:underline">
-              <AppIcon name="Palette" size={14} /> Brand Core
-            </button>
-          </div>
+
+          <AnimatedTabs
+            tabs={[
+              { key: 'today', label: 'Hoje', icon: <AppIcon name="Sparkles" size={16} /> },
+              { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
+              { key: 'brand', label: 'Marca', icon: <AppIcon name="Palette" size={16} /> },
+            ]}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
 
           <div className="animate-fade-in" key={activeTab}>
-            {activeTab === 'calendar' && (
-              <div className="space-y-4">
-                <MarketingSmartSuggestions
-                  onSuggestionClick={handleSuggestionClick}
-                />
-                <MarketingCalendarGrid
-                  posts={posts}
-                  onEdit={handleEdit}
-                  onDelete={id => deletePost.mutate(id)}
-                  onPublish={p => setPublishPost(p)}
-                  onNewPost={handleNewPost}
-                />
-              </div>
+            {activeTab === 'today' && (
+              <MarketingDailyFeed onSchedule={handleAISchedule} />
             )}
-            {activeTab === 'feed' && (
-              <MarketingFeed
+            {activeTab === 'calendar' && (
+              <MarketingCalendarGrid
                 posts={posts}
                 onEdit={handleEdit}
                 onDelete={id => deletePost.mutate(id)}
                 onPublish={p => setPublishPost(p)}
+                onNewPost={handleNewPost}
               />
             )}
-            {activeTab === 'ideas' && (
-              <MarketingIdeasAI onSchedule={handleAISchedule} />
+            {activeTab === 'brand' && (
+              <MarketingBrandTab />
             )}
           </div>
         </div>
-
       </div>
 
       <PostSheet
