@@ -1481,6 +1481,53 @@ export type Database = {
           },
         ]
       }
+      delivery_ocr_operations: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          image_data: string | null
+          image_type: string | null
+          result: Json | null
+          status: string
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          image_data?: string | null
+          image_type?: string | null
+          result?: Json | null
+          status?: string
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          image_data?: string | null
+          image_type?: string | null
+          result?: Json | null
+          status?: string
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_ocr_operations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_zones: {
         Row: {
           created_at: string
