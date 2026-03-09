@@ -1,45 +1,45 @@
 
 
-## Plano: Cancelamento de Pedido com PIN Admin no PDV
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Problema
-O botão "Cancelar" no PDV apenas limpa o carrinho. O usuário quer que ele **cancele o pedido de verdade** (no banco), exigindo autenticação por PIN de admin. Também precisa de uma forma de configurar quem tem permissão de cancelamento no PDV, vinculado aos níveis de acesso.
+### O que muda
 
-### Mudanças
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-#### 1. Adicionar sub-módulo de permissão no PDV (`src/lib/modules.ts`)
-- Adicionar children ao módulo `menu-admin` (ou criar módulo PDV separado):
-  - `menu-admin.pdv-cancel` — "Cancelar pedidos no PDV"
-- Isso permite que nos Níveis de Acesso o admin configure quem pode cancelar
+### Conceito visual
 
-#### 2. Lógica de cancelamento no hook (`src/hooks/usePOS.ts`)
-- Criar função `cancelOrder(orderId: string)` que:
-  - Atualiza `tablet_orders.status = 'cancelled'` para o pedido
-  - Se já havia uma `pos_sales` vinculada, marca `pos_sales.status = 'cancelled'` e `cancelled_at = now()`
-  - Limpa o carrinho após cancelamento
-  - Exibe toast de confirmação
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-#### 3. Validação de PIN admin no PDV (`src/pages/PDV.tsx`)
-- Ao clicar em "Cancelar":
-  - Se **não tem pedido ativo** (`activeOrderId` é null): apenas limpa o carrinho (comportamento atual, sem PIN)
-  - Se **tem pedido ativo**: abre o `PinDialog` existente
-  - Valida o PIN contra a tabela `employees` (mesma lógica do `validatePin` dos checklists)
-  - Após validação, verifica se o funcionário do PIN tem permissão `menu-admin.pdv-cancel` no seu nível de acesso
-  - Se autorizado, executa o cancelamento
+### Implementação
 
-#### 4. Verificação de permissão
-- Buscar o `access_level_id` do usuário que digitou o PIN via `user_units`
-- Buscar o `modules` (JSONB) do `access_levels` correspondente
-- Checar se contém `menu-admin.pdv-cancel`
-- Se não tiver permissão, mostrar erro "Sem permissão para cancelar"
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
 
-#### 5. UI do botão Cancelar (`src/pages/PDV.tsx`)
-- Quando `activeOrderId` existe: botão vermelho "Cancelar Pedido" com ícone de X
-- Quando não tem pedido ativo: manter comportamento de limpar carrinho (sem PIN)
-- Adicionar estado para controlar abertura do PinDialog de cancelamento
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
 
-#### Arquivos afetados
-- `src/lib/modules.ts` — novo sub-módulo de permissão
-- `src/hooks/usePOS.ts` — função `cancelOrder`
-- `src/pages/PDV.tsx` — PinDialog + lógica de cancelamento com verificação de permissão
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+
+### Resultado
+
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 

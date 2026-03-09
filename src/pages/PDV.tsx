@@ -9,8 +9,10 @@ import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingO
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
+import { PinDialog } from '@/components/checklists/PinDialog';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 
 export default function PDV() {
@@ -23,6 +25,7 @@ export default function PDV() {
   const [cartExpanded, setCartExpanded] = useState(true);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [originalCartSize, setOriginalCartSize] = useState(0);
+  const [cancelPinOpen, setCancelPinOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -49,6 +52,34 @@ export default function PDV() {
     setOriginalCartSize(order.items.length);
     setCartExpanded(true);
     setOrdersOpen(false);
+  };
+
+  const handleCancelClick = () => {
+    if (!activeOrderId) {
+      pos.clearCart();
+      return;
+    }
+    setCancelPinOpen(true);
+  };
+
+  const handleCancelPinSubmit = async (pin: string): Promise<boolean> => {
+    if (!activeOrderId) return false;
+    const { authorized, userName } = await pos.validatePinWithPermission(pin, 'menu-admin.pdv-cancel');
+    if (!authorized) {
+      if (!userName) {
+        toast.error('PIN inválido');
+      } else {
+        toast.error(`${userName} não tem permissão para cancelar pedidos`);
+      }
+      return false;
+    }
+    const success = await pos.cancelOrder(activeOrderId);
+    if (success) {
+      setActiveOrderId(null);
+      setOriginalCartSize(0);
+      setCancelPinOpen(false);
+    }
+    return success;
   };
 
   const hasNewItems = activeOrderId ? pos.cart.length > originalCartSize : false;
@@ -139,7 +170,6 @@ export default function PDV() {
         {/* Cart panel */}
         {pos.cart.length > 0 && (
           <div className="border-t border-border bg-card">
-            {/* Collapsed mini bar — tap to expand */}
             {!cartExpanded ? (
               <button
                 onClick={() => setCartExpanded(true)}
@@ -160,7 +190,6 @@ export default function PDV() {
               </button>
             ) : (
               <div className="px-4 py-3 space-y-2">
-                {/* Collapse handle */}
                 <button
                   onClick={() => setCartExpanded(false)}
                   className="w-full flex justify-center py-0.5 -mt-1 mb-1"
@@ -246,10 +275,17 @@ export default function PDV() {
                     <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={pos.clearCart} className="text-muted-foreground">
-                      <AppIcon name="X" size={14} className="mr-1" />
-                      Cancelar
-                    </Button>
+                    {activeOrderId ? (
+                      <Button variant="ghost" size="sm" onClick={handleCancelClick} className="text-destructive hover:text-destructive">
+                        <AppIcon name="Ban" size={14} className="mr-1" />
+                        Cancelar Pedido
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" size="sm" onClick={() => pos.clearCart()} className="text-muted-foreground">
+                        <AppIcon name="X" size={14} className="mr-1" />
+                        Limpar
+                      </Button>
+                    )}
                     {pos.saleSource === 'balcao' ? (
                       <>
                         <Button variant="outline" size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
@@ -314,6 +350,15 @@ export default function PDV() {
 
       {/* Sales History Sheet */}
       <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />
+
+      {/* Cancel PIN Dialog */}
+      <PinDialog
+        open={cancelPinOpen}
+        onOpenChange={setCancelPinOpen}
+        title="Cancelar pedido"
+        subtitle="Digite o PIN de um admin autorizado"
+        onSubmit={handleCancelPinSubmit}
+      />
     </AppLayout>
   );
 }
