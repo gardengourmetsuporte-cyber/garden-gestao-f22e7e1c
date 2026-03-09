@@ -29,7 +29,7 @@ export default function DigitalMenu() {
   const initialTab = (searchParams.get('tab') as MenuTab) || 'home';
 
   const {
-    unit, categories, groups, products, loading,
+    unit, categories, groups, products, loading, hasVisibleProducts,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId);
