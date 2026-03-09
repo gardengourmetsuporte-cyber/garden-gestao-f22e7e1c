@@ -246,6 +246,18 @@ function DeliveryTimeWidget({ unitId, onNavigate }: { unitId?: string; onNavigat
     );
   }
 
+  const handleZoneAdjust = async (zoneId: string, delta: number) => {
+    const zone = activeZones.find(z => z.id === zoneId);
+    if (!zone || (zone.delivery_time_minutes + delta < 5)) return;
+    const { error } = await supabase
+      .from('delivery_zones')
+      .update({ delivery_time_minutes: zone.delivery_time_minutes + delta, updated_at: new Date().toISOString() })
+      .eq('id', zoneId);
+    if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['delivery-zones'] });
+    }
+  };
+
   return (
     <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
       <div className="flex items-center justify-between">
@@ -281,26 +293,32 @@ function DeliveryTimeWidget({ unitId, onNavigate }: { unitId?: string; onNavigat
         </div>
       </div>
 
-      {/* Zone time summary */}
-      <div className="grid grid-cols-2 gap-1.5">
-        {activeZones.slice(0, 4).map(zone => (
-          <div key={zone.id} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-secondary/50">
-            <span className="text-[10px] text-muted-foreground truncate">
-              Até {zone.max_distance_km} km
+      {/* All zones with individual controls */}
+      <div className="space-y-1.5">
+        {activeZones.map(zone => (
+          <div key={zone.id} className="flex items-center justify-between px-2.5 py-2 rounded-lg bg-secondary/50">
+            <span className="text-[10px] text-muted-foreground truncate flex-1">
+              {zone.name || `Até ${zone.max_distance_km} km`}
             </span>
-            <span className="text-[10px] font-bold text-foreground ml-1">{zone.delivery_time_minutes} min</span>
+            <div className="flex items-center gap-1 ml-2">
+              <button
+                onClick={() => handleZoneAdjust(zone.id, -5)}
+                disabled={zone.delivery_time_minutes <= 5}
+                className="w-6 h-6 rounded-md bg-secondary hover:bg-secondary/80 flex items-center justify-center disabled:opacity-30 transition-colors"
+              >
+                <AppIcon name="Minus" size={10} />
+              </button>
+              <span className="text-[11px] font-bold text-foreground w-12 text-center">{zone.delivery_time_minutes} min</span>
+              <button
+                onClick={() => handleZoneAdjust(zone.id, 5)}
+                className="w-6 h-6 rounded-md bg-secondary hover:bg-secondary/80 flex items-center justify-center transition-colors"
+              >
+                <AppIcon name="Plus" size={10} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
-
-      {activeZones.length > 4 && (
-        <button
-          onClick={() => onNavigate('configuracoes')}
-          className="text-[10px] text-primary font-medium w-full text-center"
-        >
-          +{activeZones.length - 4} zonas • Ver todas
-        </button>
-      )}
     </div>
   );
 }
