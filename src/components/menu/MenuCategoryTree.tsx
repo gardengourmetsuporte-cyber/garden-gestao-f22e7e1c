@@ -328,21 +328,23 @@ export function MenuCategoryTree({
                             </div>
                           )}
                         </button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="p-2.5 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
-                              <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openEditGroup(grp)}>
-                              <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
-                              <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {viewMode !== 'ficha' && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="p-2.5 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
+                                <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => openEditGroup(grp)}>
+                                <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
+                                <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </div>
                       {isSelected && renderGroupContent && (
                         <div className="mt-2 mb-1">
