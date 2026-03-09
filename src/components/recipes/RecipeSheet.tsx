@@ -15,6 +15,7 @@ import { IngredientRow } from './IngredientRow';
 import { IngredientPicker } from './IngredientPicker';
 import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type Recipe, type RecipeCategory, type RecipeUnitType, type IngredientSourceType } from '@/types/recipe';
 import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
+import { usePackagingTemplates } from '@/hooks/usePackagingTemplates';
 import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -94,9 +95,11 @@ export function RecipeSheet({
   const [marginPercent, setMarginPercent] = useState(50);
   const [sellingPrice, setSellingPrice] = useState('');
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
+  const [packagingTemplateId, setPackagingTemplateId] = useState<string>('');
 
   const { activeUnit } = useUnit();
-  const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+   const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+   const { templates: packagingTemplates, getTemplateCost } = usePackagingTemplates();
 
   // Load KDS stations
   const { data: kdsStations = [] } = useQuery({
@@ -123,6 +126,7 @@ export function RecipeSheet({
       setYieldUnit(recipe.yield_unit);
       setNotes(recipe.preparation_notes || '');
       setMinReadyStock(String(recipe.min_ready_stock ?? 0));
+      setPackagingTemplateId((recipe as any).packaging_template_id || '');
       setIngredients(
         (recipe.ingredients || []).map((ing) => ({
           id: ing.id,
@@ -148,6 +152,7 @@ export function RecipeSheet({
       setYieldUnit('unidade');
       setNotes('');
       setMinReadyStock('0');
+      setPackagingTemplateId('');
       setIngredients([]);
     }
   }, [recipe, open]);
@@ -170,7 +175,8 @@ export function RecipeSheet({
     [costPerPortion, priceForFixedCost, settings]
   );
 
-  const variableCost = costPerPortion + operationalCosts.packagingCost;
+  const packagingCost = packagingTemplateId ? getTemplateCost(packagingTemplateId) : operationalCosts.packagingCost;
+  const variableCost = costPerPortion + packagingCost;
   const salesCost = operationalCosts.taxAmount + operationalCosts.cardFeeAmount;
   const fixedCost = operationalCosts.fixedCostPerProduct;
   const totalCostPerPortion = variableCost + salesCost + fixedCost;
@@ -285,6 +291,7 @@ export function RecipeSheet({
       yield_quantity: parseFloat(yieldQuantity) || 1,
       yield_unit: yieldUnit,
       min_ready_stock: parseInt(minReadyStock) || 0,
+      packaging_template_id: packagingTemplateId || null,
       preparation_notes: notes.trim() || null,
       ingredients: ingredients.map((ing) => ({
         ...(ing.id && { id: ing.id }),
@@ -481,12 +488,28 @@ export function RecipeSheet({
                     <span className="text-muted-foreground">Ingredientes ({ingredients.length})</span>
                     <span className="font-medium">{formatCurrency(costPerPortion)}</span>
                   </div>
-                  {operationalCosts.packagingCost > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Embalagem</span>
-                      <span className="font-medium">{formatCurrency(operationalCosts.packagingCost)}</span>
+                  {/* Packaging template selector */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Embalagem</span>
+                      <span className="font-medium text-sm">{formatCurrency(packagingCost)}</span>
                     </div>
-                  )}
+                    <Select value={packagingTemplateId || 'none'} onValueChange={(v) => setPackagingTemplateId(v === 'none' ? '' : v)}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Selecionar embalagem..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">
+                          {operationalCosts.packagingCost > 0 ? `Padrão (${formatCurrency(operationalCosts.packagingCost)})` : 'Sem embalagem'}
+                        </SelectItem>
+                        {packagingTemplates.map((tpl) => (
+                          <SelectItem key={tpl.id} value={tpl.id}>
+                            {tpl.name} ({formatCurrency(tpl.total_cost)})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="flex justify-between text-sm font-semibold pt-1 border-t">
                     <span>Subtotal</span>
                     <span className="text-primary">{formatCurrency(variableCost)}</span>
