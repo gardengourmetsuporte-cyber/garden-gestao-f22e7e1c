@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
 import { useCashRegister } from '@/hooks/useCashRegister';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
+import { DeliveryPaymentSheet } from '@/components/pdv/DeliveryPaymentSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
 import { CashRegisterOpenDialog } from '@/components/pdv/CashRegisterOpenDialog';
