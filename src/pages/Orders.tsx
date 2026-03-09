@@ -264,7 +264,7 @@ export default function OrdersPage() {
                 onClick={() => setOrderTab(tab.key as any)}
                 className={cn(
                   "relative flex flex-col items-center justify-center gap-2 rounded-2xl border transition-all duration-200 active:scale-[0.97]",
-                  large ? "p-5 h-full" : "p-4",
+                  large ? "p-5 min-h-0" : "p-4",
                   orderTab === tab.key
                     ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
                     : "bg-card border-border hover:border-primary/20"
@@ -287,13 +287,16 @@ export default function OrdersPage() {
             );
 
             return (
-              <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
-                {/* Fornecedores — spans left column, 2 rows tall on mobile */}
-                <div className="row-span-2 lg:col-span-1 lg:row-span-2">
+              <div className="space-y-2">
+                {/* Top row: Fornecedores + Sugestões side by side */}
+                <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
                   {renderCard(supplierTab, true)}
+                  {renderCard(smallTabs[0], true)}
                 </div>
-                {/* 2x2 smaller cards beside it */}
-                {smallTabs.map(tab => renderCard(tab))}
+                {/* Bottom row: Lista, Cotações, Histórico */}
+                <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
+                  {smallTabs.slice(1).map(tab => renderCard(tab))}
+                </div>
               </div>
             );
           })()}
