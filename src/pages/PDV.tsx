@@ -188,7 +188,7 @@ export default function PDV() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">{pos.cart.reduce((s, i) => s + i.quantity, 0)} itens</p>
-                <p className="text-lg font-bold text-foreground">{formatPrice(pos.total)}</p>
+                <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={pos.clearCart}>
