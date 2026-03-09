@@ -278,12 +278,15 @@ import { PackagingTemplatesSettings } from './PackagingTemplatesSettings';
            </CardContent>
          </Card>
  
-         {/* Botão Salvar */}
-         <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
-           <AppIcon name="Save" className="h-4 w-4 mr-2" />
-           {isSaving ? 'Salvando...' : 'Salvar Configurações'}
-         </Button>
-       </div>
-     </TooltipProvider>
+          {/* Templates de Embalagem */}
+          <PackagingTemplatesSettings />
+
+          {/* Botão Salvar */}
+          <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
+            <AppIcon name="Save" className="h-4 w-4 mr-2" />
+            {isSaving ? 'Salvando...' : 'Salvar Configurações'}
+          </Button>
+        </div>
+      </TooltipProvider>
    );
  }
