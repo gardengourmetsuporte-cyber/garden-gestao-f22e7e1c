@@ -140,21 +140,28 @@ export default function CardapioHub() {
     };
   }, [orders]);
 
-  const statusColor: Record<string, string> = {
-    draft: 'bg-secondary text-muted-foreground',
-    awaiting_confirmation: 'bg-warning/15 text-warning',
-    confirmed: 'bg-primary/15 text-primary',
-    sent_to_pdv: 'bg-success/15 text-success',
-    error: 'bg-destructive/15 text-destructive',
+  const statusConfig: Record<string, { label: string; color: string; icon: string; dotColor: string }> = {
+    draft: { label: 'Rascunho', color: 'bg-secondary text-muted-foreground', icon: 'FileEdit', dotColor: 'bg-muted-foreground' },
+    awaiting_confirmation: { label: 'Aguardando', color: 'bg-warning/15 text-warning', icon: 'Clock', dotColor: 'bg-warning' },
+    pending: { label: 'Pendente', color: 'bg-warning/15 text-warning', icon: 'Clock', dotColor: 'bg-warning' },
+    confirmed: { label: 'Confirmado', color: 'bg-primary/15 text-primary', icon: 'CheckCircle', dotColor: 'bg-primary' },
+    preparing: { label: 'Preparando', color: 'bg-orange-500/15 text-orange-400', icon: 'ChefHat', dotColor: 'bg-orange-400' },
+    ready: { label: 'Pronto', color: 'bg-success/15 text-success', icon: 'PackageCheck', dotColor: 'bg-success' },
+    dispatched: { label: 'Despachado', color: 'bg-blue-500/15 text-blue-400', icon: 'Truck', dotColor: 'bg-blue-400' },
+    delivered: { label: 'Entregue', color: 'bg-success/15 text-success', icon: 'CircleCheckBig', dotColor: 'bg-success' },
+    sent_to_pdv: { label: 'Enviado PDV', color: 'bg-success/15 text-success', icon: 'CheckCircle', dotColor: 'bg-success' },
+    cancelled: { label: 'Cancelado', color: 'bg-destructive/15 text-destructive', icon: 'XCircle', dotColor: 'bg-destructive' },
+    error: { label: 'Erro', color: 'bg-destructive/15 text-destructive', icon: 'AlertTriangle', dotColor: 'bg-destructive' },
   };
-  const statusLabel: Record<string, string> = {
-    draft: 'Rascunho',
-    awaiting_confirmation: 'Aguardando',
-    confirmed: 'Confirmado',
-    sent_to_pdv: 'Enviado PDV',
-    error: 'Erro',
-  };
+  const getStatus = (s: string) => statusConfig[s] || { label: s, color: 'bg-secondary text-muted-foreground', icon: 'HelpCircle', dotColor: 'bg-muted-foreground' };
   const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const getSourceLabel = (order: any) => {
+    if (order.source === 'delivery') return 'Delivery';
+    if (order.source === 'balcao') return 'Balcão';
+    if (order.table_number > 0) return `Mesa ${order.table_number}`;
+    if (order.customer_name) return order.customer_name;
+    return `Mesa ${order.table_number}`;
+  };
 
   // Product sheet handlers
   const openNewProduct = () => {
