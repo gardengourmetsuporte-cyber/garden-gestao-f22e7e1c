@@ -261,7 +261,7 @@ export default function OrdersPage() {
             const renderCard = (tab: { key: string; label: string; icon: string; badge: number | undefined; color: string; bg: string }, large = false) => (
               <button
                 key={tab.key}
-                onClick={() => setOrderTab(tab.key)}
+                onClick={() => setOrderTab(tab.key as any)}
                 className={cn(
                   "relative flex flex-col items-center justify-center gap-2 rounded-2xl border transition-all duration-200 active:scale-[0.97]",
                   large ? "p-5" : "p-4",
