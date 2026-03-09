@@ -1,6 +1,11 @@
 import gardenLogo from "@/assets/logo.png";
 
-export function PageLoader() {
+interface PageLoaderProps {
+  logoUrl?: string | null;
+}
+
+export function PageLoader({ logoUrl }: PageLoaderProps = {}) {
+  const logo = logoUrl || gardenLogo;
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative bg-background">
       {/* Super subtle center glow */}
@@ -18,7 +23,7 @@ export function PageLoader() {
           <img
             alt="Garden Gestão"
             className="w-full h-full object-cover animate-pulse"
-            src={gardenLogo}
+            src={logo}
             style={{ animationDuration: '2s' }}
             fetchPriority="high"
             decoding="async"

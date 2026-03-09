@@ -5,6 +5,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getUnitTheme, applyUnitTheme } from '@/lib/unitThemes';
 import { toast } from 'sonner';
 
+export interface UnitStoreInfo {
+  logo_url?: string;
+  banner_url?: string;
+  opening_hours?: { open: string; close: string }[];
+  address?: string;
+  cuisine_type?: string;
+  city?: string;
+  pix_key?: string;
+  pix_key_type?: string;
+  signup_bonus_points?: number;
+  auto_confirm?: { delivery?: boolean };
+  [key: string]: any;
+}
+
 export interface Unit {
   id: string;
   name: string;
@@ -13,6 +27,7 @@ export interface Unit {
   created_by: string;
   created_at: string;
   updated_at: string;
+  store_info?: UnitStoreInfo | null;
 }
 
 interface UnitContextType {

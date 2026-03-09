@@ -31,7 +31,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
-  const { isTransitioning } = useUnit();
+  const { isTransitioning, activeUnit } = useUnit();
+  const customLogo = activeUnit?.store_info?.logo_url;
   const isMobile = useIsMobile();
   const isDashboard = location.pathname === '/';
   const moduleTitle = useMemo(() => getRouteTitle(location.pathname), [location.pathname]);
@@ -62,7 +63,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   if (isSigningOut) {
     return (
       <div className="animate-fade-in">
-        <PageLoader />
+        <PageLoader logoUrl={customLogo} />
       </div>
     );
   }
@@ -99,7 +100,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
                       !isScrolled ? "w-6 h-6" : "w-8 h-8"
                     )}>
-                      <img alt="Garden Gestão" className="w-full h-full object-contain" src={gardenLogo} fetchPriority="high" decoding="async" />
+                      <img alt="Garden Gestão" className="w-full h-full object-contain" src={customLogo || gardenLogo} fetchPriority="high" decoding="async" />
                     </div>
                     <span
                       className={cn(

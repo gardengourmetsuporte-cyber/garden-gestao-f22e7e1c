@@ -82,7 +82,7 @@ export function AppSidebar() {
             onClick={() => navigate('/')}
             className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
           >
-            <img alt="Garden" className="w-6 h-6 object-contain" src={gardenLogo} loading="lazy" decoding="async" />
+            <img alt="Garden" className="w-6 h-6 object-contain" src={activeUnit?.store_info?.logo_url || gardenLogo} loading="lazy" decoding="async" />
           </button>
           {!collapsed && (
             <div className="flex-1 min-w-0 animate-fade-in">
