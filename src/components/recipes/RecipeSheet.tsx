@@ -15,6 +15,7 @@ import { IngredientRow } from './IngredientRow';
 import { IngredientPicker } from './IngredientPicker';
 import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type Recipe, type RecipeCategory, type RecipeUnitType, type IngredientSourceType } from '@/types/recipe';
 import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
+import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
