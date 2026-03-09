@@ -154,7 +154,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'whatsapp', label: 'WhatsApp', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Operação',
+    key: 'whatsapp', label: 'WhatsApp IA', icon: 'MessageSquare', route: '/whatsapp', routes: ['/whatsapp'], group: 'Operação',
     children: [
       { key: 'whatsapp.conversations', label: 'Conversas', icon: 'MessageCircle' },
       { key: 'whatsapp.settings', label: 'Configurações bot', icon: 'Settings' },
