@@ -332,6 +332,32 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
             Conversão: {ingredient.quantity} {UNIT_OPTIONS.find(u => u.value === ingredient.unit_type)?.label} → {displayUnit} (automática)
           </p>
         )}
+
+        {/* KDS Station selector */}
+        {kdsStations.length > 0 && (
+          <div className="space-y-1">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Pista KDS</Label>
+            <Select
+              value={ingredient.kds_station_id || 'none'}
+              onValueChange={(v) => onChange({ kds_station_id: v === 'none' ? null : v })}
+            >
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="Nenhuma pista" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma pista</SelectItem>
+                {kdsStations.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    <span className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                      {s.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Global Price Warning Dialog */}
