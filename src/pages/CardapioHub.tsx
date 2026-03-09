@@ -1,4 +1,5 @@
-import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
+import { useState, useMemo, useRef, useCallback, lazy, Suspense, useEffect } from 'react';
+import { useFabActions } from '@/contexts/FabActionContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
@@ -127,8 +128,6 @@ export default function CardapioHub() {
   const selectedGroup = groups.find(g => g.id === selectedGroupId) || null;
   const groupProducts = selectedGroupId ? getProductsByGroup(selectedGroupId) : [];
 
-  // No longer using FAB — actions are inline buttons now
-
   // Order stats
   const todayStats = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -180,7 +179,17 @@ export default function CardapioHub() {
   const openEditOG = (og: MenuOptionGroup) => { setEditingOG(og); setOgSheetOpen(true); };
   const openLinkProducts = (og: MenuOptionGroup) => { setLinkingOG(og); setLinkDialogOpen(true); };
 
-  // ==================== DASHBOARD VIEW ====================
+  // FAB actions — contextual per active tab
+  useFabActions(
+    isProdutos && cardapioTab === 'produtos'
+      ? [{ icon: viewMode === 'menu' ? 'RecipeBook' : 'Eye', label: viewMode === 'menu' ? 'Ficha Técnica' : 'Cardápio', onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu') }]
+      : isProdutos && cardapioTab === 'opcionais'
+        ? [{ icon: 'Plus', label: 'Novo Opcional', onClick: openNewOG }]
+        : [],
+    [isProdutos, cardapioTab, viewMode]
+  );
+
+
   if (isDashboard) {
     const handleDashboardNavigate = (tab: string) => {
       if (tab === 'pedidos') {
