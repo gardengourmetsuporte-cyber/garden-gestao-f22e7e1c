@@ -361,6 +361,10 @@ export default function InventoryPage() {
           suppliers={suppliers}
           onSave={handleSaveItem}
           onDelete={editingItem ? () => handleDeleteItem(editingItem.id) : undefined}
+          onCreateSupplier={async (name) => {
+            const result = await addSupplier({ name });
+            return result ? { id: result.id } : null;
+          }}
           isAdmin={isAdmin}
         />
 
