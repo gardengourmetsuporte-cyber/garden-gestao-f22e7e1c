@@ -833,7 +833,6 @@ function LevelsTab() {
               })}
             </div>
           </div>
-          </div>
           <div className="shrink-0 border-t border-border/30 px-5 py-3 flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setIsCreating(false)}>Cancelar</Button>
             <Button onClick={handleSave}>{editingLevel ? 'Salvar' : 'Criar'}</Button>
