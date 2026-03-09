@@ -28,6 +28,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   // ── Início ──
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'principal', groupLabel: 'Início' },
+  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início', badge: 'Beta' },
 
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
@@ -50,7 +51,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   // ── Gestão ──
   { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
-  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
+  
 ];
 
 /**
