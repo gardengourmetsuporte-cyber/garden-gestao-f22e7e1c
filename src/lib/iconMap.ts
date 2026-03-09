@@ -368,4 +368,12 @@ export const ICON_MAP: Record<string, string> = {
   Database: 'database',
   HardDrive: 'hard_drive',
   Delete: 'backspace',
+
+  // Compliance / Safety
+  FireExtinguisher: 'fire_extinguisher',
+  KeyRound: 'key',
+  ShieldAlert: 'gpp_maybe',
+  Recycle: 'recycling',
+  Bug: 'pest_control',
+  Wind: 'air',
 };
