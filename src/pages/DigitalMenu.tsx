@@ -454,6 +454,7 @@ export default function DigitalMenu() {
             unitId={unitId}
             autoConfirm={(unit?.store_info as any)?.auto_confirm?.delivery ?? false}
             customerUser={customerUser}
+            source={searchParams.get('source') || undefined}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}

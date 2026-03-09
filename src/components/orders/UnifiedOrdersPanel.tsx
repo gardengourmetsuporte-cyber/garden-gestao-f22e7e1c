@@ -407,6 +407,8 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {isDelivery ? (
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold">Entrega</span>
+                    ) : order.source === 'qrcode' ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 font-semibold">QR Code · Mesa {order.table_number}</span>
                     ) : order.table_number > 0 ? (
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">Mesa {order.table_number}</span>
                     ) : null}
