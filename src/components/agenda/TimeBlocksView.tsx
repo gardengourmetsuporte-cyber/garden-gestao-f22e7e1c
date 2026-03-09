@@ -73,7 +73,6 @@ function PickerTaskList({ availableTasks, pickerHour, allocateTask }: {
   sortedTasks.forEach(task => {
     const key = task.due_date || '__no_date__';
     if (!grouped.has(key)) grouped.set(key, []);
-    grouped.get(key)!.tasks = grouped.get(key)!;
     grouped.get(key)!.push(task);
   });
 
