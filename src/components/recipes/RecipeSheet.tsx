@@ -85,6 +85,7 @@ export function RecipeSheet({
   const [yieldUnit, setYieldUnit] = useState('unidade');
   const [notes, setNotes] = useState('');
   const [ingredients, setIngredients] = useState<LocalIngredient[]>([]);
+  const [minReadyStock, setMinReadyStock] = useState('0');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [marginPercent, setMarginPercent] = useState(50);
   const [sellingPrice, setSellingPrice] = useState('');
