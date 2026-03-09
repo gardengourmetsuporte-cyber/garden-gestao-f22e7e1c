@@ -25,6 +25,69 @@ interface CardapioSettingsProps {
   initialTab?: SettingsTab | null;
 }
 
+function PixKeyConfig() {
+  const { activeUnit, updateStoreInfo } = useUnit();
+  const storeInfo = (activeUnit as any)?.store_info as Record<string, any> | null;
+  const [pixKey, setPixKey] = useState(storeInfo?.pix_key || '');
+  const [pixKeyType, setPixKeyType] = useState(storeInfo?.pix_key_type || 'aleatoria');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateStoreInfo({ pix_key: pixKey, pix_key_type: pixKeyType });
+      toast.success('Chave Pix salva!');
+    } catch {
+      toast.error('Erro ao salvar chave Pix');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const PIX_TYPES = [
+    { value: 'cpf', label: 'CPF' },
+    { value: 'cnpj', label: 'CNPJ' },
+    { value: 'email', label: 'E-mail' },
+    { value: 'telefone', label: 'Telefone' },
+    { value: 'aleatoria', label: 'Chave aleatória' },
+  ];
+
+  return (
+    <div className="card-base p-4 space-y-3">
+      <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+        <AppIcon name="QrCode" size={16} className="text-primary" /> Chave Pix (Fechamento de Conta)
+      </h3>
+      <p className="text-[11px] text-muted-foreground">Clientes poderão pagar via QR Code Pix direto no tablet.</p>
+      <div>
+        <Label className="text-xs">Tipo de chave</Label>
+        <div className="flex flex-wrap gap-1.5 mt-1">
+          {PIX_TYPES.map(t => (
+            <button
+              key={t.value}
+              onClick={() => setPixKeyType(t.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                pixKeyType === t.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Label className="text-xs">Chave Pix</Label>
+        <Input placeholder="Sua chave Pix..." value={pixKey} onChange={e => setPixKey(e.target.value)} />
+      </div>
+      <Button onClick={handleSave} disabled={!pixKey || saving} className="w-full" size="sm">
+        {saving ? <AppIcon name="Loader2" size={14} className="animate-spin mr-1" /> : <AppIcon name="Save" size={14} className="mr-1" />}
+        Salvar Chave Pix
+      </Button>
+    </div>
+  );
+}
+
 export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
   const { activeUnit } = useUnit();
   const tabletAdmin = useTabletAdmin();
