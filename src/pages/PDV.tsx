@@ -248,8 +248,8 @@ export default function PDV() {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={pos.clearCart}>
-                  <AppIcon name="Trash2" size={14} className="mr-1" />
-                  Limpar
+                  <AppIcon name="RotateCcw" size={14} className="mr-1" />
+                  Novo Pedido
                 </Button>
                 {pos.saleSource === 'balcao' ? (
                   <Button size="sm" onClick={() => setPaymentOpen(true)}>
