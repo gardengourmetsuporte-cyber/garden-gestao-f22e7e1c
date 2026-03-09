@@ -55,6 +55,11 @@ export function ItemFormSheetNew({
   const [recipeUnitType, setRecipeUnitType] = useState<string>('');
   const [recipeUnitPrice, setRecipeUnitPrice] = useState('');
   const [showRecipeSection, setShowRecipeSection] = useState(false);
+  const [stockUnitLabel, setStockUnitLabel] = useState('');
+  const [stockToRecipeFactor, setStockToRecipeFactor] = useState('');
+  const [purchaseUnitLabel, setPurchaseUnitLabel] = useState('');
+  const [purchaseToStockFactor, setPurchaseToStockFactor] = useState('');
+  const [showPurchaseSection, setShowPurchaseSection] = useState(false);
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [supplierPickerOpen, setSupplierPickerOpen] = useState(false);
 
